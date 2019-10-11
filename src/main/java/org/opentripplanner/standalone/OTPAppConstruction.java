@@ -101,7 +101,7 @@ public class OTPAppConstruction {
      * registered.
      * <p/>
      * TODO OTP2 - move into OTPServer and/or GraphService itself, eliminate FileFactory and put
-     * TODO OTP2 - basePath in GraphService
+     *           - basePath in GraphService
      */
     GraphService graphService () {
         if(graphService == null) {

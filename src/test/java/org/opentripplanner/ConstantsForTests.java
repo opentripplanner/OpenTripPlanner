@@ -8,7 +8,6 @@ import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.config.OTPConfiguration;
@@ -92,8 +91,6 @@ public class ConstantsForTests {
                     .build();
             PatternHopFactory factory = new PatternHopFactory(portlandContext);
             factory.run(portlandGraph);
-            TransferGraphLinker linker = new TransferGraphLinker(portlandGraph);
-            linker.run();
             // TODO: eliminate GTFSContext
             // this is now making a duplicate calendarservicedata but it's oh so practical
             portlandGraph.putService(

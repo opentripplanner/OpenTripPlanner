@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
 import org.rutebanken.netex.model.LocationStructure;
@@ -91,11 +92,15 @@ public class StopMapperTest {
         quaysById.add(quay3);
 
         StopMapper stopMapper = new StopMapper(quaysById);
-        Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaces);
+        Collection<Stop> stops = new ArrayList<>();
+        Collection<Station> stations = new ArrayList<>();
 
-        assertEquals(4, stops.size());
+        stopMapper.mapParentAndChildStops(stopPlaces, stops, stations);
 
-        Stop parentStop = stops.stream().filter(s -> s.getId().getId().equals("NSR:StopPlace:1")).findFirst().get();
+        assertEquals(3, stops.size());
+        assertEquals(1, stations.size());
+
+        Station parentStop = stations.stream().filter(s -> s.getId().getId().equals("NSR:StopPlace:1")).findFirst().get();
         Stop childStop1 = stops.stream().filter(s -> s.getId().getId().equals("NSR:Quay:1")).findFirst().get();
         Stop childStop2 = stops.stream().filter(s -> s.getId().getId().equals("NSR:Quay:2")).findFirst().get();
         Stop childStop3 = stops.stream().filter(s -> s.getId().getId().equals("NSR:Quay:3")).findFirst().get();
@@ -107,9 +112,7 @@ public class StopMapperTest {
 
         assertEquals(59.909911, childStop1.getLat(), 0.0001);
         assertEquals(10.753008, childStop1.getLon(), 0.0001);
-        assertEquals("A", childStop1.getPlatformCode());
-
-        assertEquals(900, parentStop.getVehicleType());
+        assertEquals("A", childStop1.getCode());
     }
 
     private StopPlace createStopPlace(

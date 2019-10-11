@@ -19,8 +19,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.util.I18NString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -199,7 +199,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
                 else
                     edgeTree.insert(env, e);
             }
-            if (v instanceof TransitStop) {
+            if (v instanceof TransitStopVertex) {
                 Envelope env = new Envelope(v.getCoordinate());
                 transitStopTree.insert(env, v);
             }
@@ -212,13 +212,13 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
      * Get all transit stops within a given distance of a coordinate
      */
     @Override
-    public List<TransitStop> getNearbyTransitStops(Coordinate coordinate, double radius) {
+    public List<TransitStopVertex> getNearbyTransitStops(Coordinate coordinate, double radius) {
         Envelope env = new Envelope(coordinate);
         env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(radius, coordinate.y),
                 SphericalDistanceLibrary.metersToDegrees(radius));
-        List<TransitStop> nearby = getTransitStopForEnvelope(env);
-        List<TransitStop> results = new ArrayList<TransitStop>();
-        for (TransitStop v : nearby) {
+        List<TransitStopVertex> nearby = getTransitStopForEnvelope(env);
+        List<TransitStopVertex> results = new ArrayList<TransitStopVertex>();
+        for (TransitStopVertex v : nearby) {
             if (SphericalDistanceLibrary.distance(v.getCoordinate(), coordinate) <= radius) {
                 results.add(v);
             }
@@ -255,14 +255,14 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     @SuppressWarnings("unchecked")
     @Override
-    public List<TransitStop> getTransitStopForEnvelope(Envelope envelope) {
-        List<TransitStop> transitStops = transitStopTree.query(envelope);
-        for (Iterator<TransitStop> its = transitStops.iterator(); its.hasNext();) {
-            TransitStop ts = its.next();
+    public List<TransitStopVertex> getTransitStopForEnvelope(Envelope envelope) {
+        List<TransitStopVertex> stopVertices = transitStopTree.query(envelope);
+        for (Iterator<TransitStopVertex> its = stopVertices.iterator(); its.hasNext();) {
+            TransitStopVertex ts = its.next();
             if (!envelope.intersects(new Coordinate(ts.getLon(), ts.getLat())))
                 its.remove();
         }
-        return transitStops;
+        return stopVertices;
     }
 
     /**

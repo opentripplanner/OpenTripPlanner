@@ -43,9 +43,11 @@ public interface OtpTransitService {
 
     List<ShapePoint> getShapePointsForShapeId(FeedScopedId shapeId);
 
+    Station getStationForId(FeedScopedId id);
+
     Stop getStopForId(FeedScopedId id);
 
-    List<Stop> getStopsForStation(Stop station);
+    Collection<Station> getAllStations();
 
     Collection<Stop> getAllStops();
 

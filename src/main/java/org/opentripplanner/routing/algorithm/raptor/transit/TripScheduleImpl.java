@@ -62,7 +62,7 @@ public class TripScheduleImpl implements TripSchedule {
     /**
      * For tests.
      * TODO OTP2 - Create some kind of factory together with the tests that construct valid
-     * TODO OTP2 - objects for testing.
+     *           - objects for testing.
      */
     public TripScheduleImpl() {
         originalTripTimes = null;

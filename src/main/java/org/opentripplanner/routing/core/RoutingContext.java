@@ -22,8 +22,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -330,8 +330,8 @@ public class RoutingContext implements Cloneable {
 
     // this could be handled by method overloading on Vertex
     public boolean isWheelchairAccessible(Vertex v) {
-        if (v instanceof TransitStop) {
-            TransitStop ts = (TransitStop) v;
+        if (v instanceof TransitStopVertex) {
+            TransitStopVertex ts = (TransitStopVertex) v;
             return ts.hasWheelchairEntrance();
         } else if (v instanceof StreetLocation) {
             StreetLocation sl = (StreetLocation) v;

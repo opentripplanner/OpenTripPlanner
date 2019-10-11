@@ -11,6 +11,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import org.opentripplanner.model.FeedScopedId;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 
 @XmlRootElement(name = "Stop")
@@ -25,14 +26,23 @@ public class StopType {
         this.stopLon = stop.getLon();
         this.stopCode = stop.getCode();
         this.stopName = stop.getName();
-        this.stopDesc = stop.getDesc();
-        this.zoneId = stop.getZoneId();
+        this.stopDesc = stop.getDescription();
+        this.zoneId = stop.getZone();
         this.stopUrl = stop.getUrl();
-        this.locationType = stop.getLocationType();
-        this.parentStation = stop.getParentStation();
-        // this.stopTimezone = stop.getTimezone();s
-        this.wheelchairBoarding = stop.getWheelchairBoarding();
-        this.direction = stop.getDirection();
+        this.locationType = 0;
+        this.parentStation = stop.getParentStation().getId().getId();
+        this.wheelchairBoarding = stop.getWheelchairBoarding().gtfsCode;
+    }
+
+    public StopType(Station station) {
+        this.id = station.getId();
+        this.stopLat = station.getLat();
+        this.stopLon = station.getLon();
+        this.stopCode = station.getCode();
+        this.stopName = station.getName();
+        this.stopDesc = station.getDescription();
+        this.stopUrl = station.getUrl();
+        this.locationType = 1;
     }
 
     public StopType(Stop stop, Boolean extended) {
@@ -42,13 +52,12 @@ public class StopType {
         this.stopCode = stop.getCode();
         this.stopName = stop.getName();
         if (extended != null && extended.equals(true)) {
-            this.stopDesc = stop.getDesc();
-            this.zoneId = stop.getZoneId();
+            this.stopDesc = stop.getDescription();
+            this.zoneId = stop.getZone();
             this.stopUrl = stop.getUrl();
-            this.locationType = stop.getLocationType();
-            this.parentStation = stop.getParentStation();
-            // this.stopTimezone = stop.getTimezone();
-            this.wheelchairBoarding = stop.getWheelchairBoarding();
+            this.locationType = 0;
+            this.parentStation = stop.getParentStation().getId().getId();
+            this.wheelchairBoarding = stop.getWheelchairBoarding().gtfsCode;
         }
     }
 
