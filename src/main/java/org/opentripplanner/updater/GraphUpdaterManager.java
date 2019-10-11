@@ -9,7 +9,13 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.*;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.ThreadFactory;
+import java.util.concurrent.TimeUnit;
 
 /**
  * This class is attached to the graph:
@@ -210,5 +216,9 @@ public class GraphUpdaterManager {
     public GraphUpdater getUpdater (int id) {
         if (id >= updaterList.size()) return null;
         return updaterList.get(id);
+    }
+
+    public List<GraphUpdater> getUpdaterList() {
+        return updaterList;
     }
 }

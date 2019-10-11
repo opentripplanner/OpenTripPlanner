@@ -2,6 +2,7 @@ package org.opentripplanner.routing.services;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.Collection;
 import java.util.Set;
@@ -22,6 +23,8 @@ public interface AlertPatchService {
     Collection<AlertPatch> getStopAndRoutePatches(FeedScopedId stop, FeedScopedId route);
 
     Collection<AlertPatch> getStopAndTripPatches(FeedScopedId stop, FeedScopedId trip);
+
+    Collection<AlertPatch> getTripPatternPatches(TripPattern tripPattern);
 
     void apply(AlertPatch alertPatch);
 

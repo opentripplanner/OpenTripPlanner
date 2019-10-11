@@ -1,23 +1,22 @@
 package org.opentripplanner.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.model.EncodedPolylineBean;
+
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
 import java.util.TimeZone;
-
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.util.model.EncodedPolylineBean;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
  /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -228,6 +227,10 @@ public class Leg {
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
+    @XmlElement
+    @JsonSerialize
+    public List<AlertPatch> alertPatches = new ArrayList<>();
+
     @XmlAttribute
     @JsonSerialize
     public String routeShortName;
@@ -290,4 +293,10 @@ public class Leg {
         endTime = calendar;
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
-}
+
+     public void addAlertPatch(AlertPatch alertPatch) {
+        if (!alertPatches.contains(alertPatch)) {
+            alertPatches.add(alertPatch);
+        }
+     }
+ }

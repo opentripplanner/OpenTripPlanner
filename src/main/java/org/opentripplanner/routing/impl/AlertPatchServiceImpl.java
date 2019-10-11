@@ -3,11 +3,16 @@ package org.opentripplanner.routing.impl;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class AlertPatchServiceImpl implements AlertPatchService {
@@ -21,6 +26,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     private Map<StopAndRouteOrTripKey, Set<AlertPatch>> patchesByStopAndTrip = new ConcurrentHashMap<>();
     private Map<FeedScopedId, Set<AlertPatch>> patchesByTrip = new ConcurrentHashMap<>();
     private Map<String, Set<AlertPatch>> patchesByAgency = new ConcurrentHashMap<>();
+    private Map<String, Set<AlertPatch>> patchesByTripPattern = new ConcurrentHashMap<>();
 
     public AlertPatchServiceImpl(Graph graph) {
         this.graph = graph;
@@ -108,6 +114,15 @@ public class AlertPatchServiceImpl implements AlertPatchService {
         StopAndRouteOrTripKey key = new StopAndRouteOrTripKey(stop, trip);
         if (patchesByStopAndTrip.containsKey(key)) {
             result.addAll(patchesByStopAndTrip.get(key));
+        }
+        return result;
+    }
+
+    @Override
+    public Collection<AlertPatch> getTripPatternPatches(TripPattern pattern) {
+        Set<AlertPatch> result = new HashSet<>();
+        if (patchesByTripPattern.containsKey(pattern.getFeedId())) {
+            result.addAll(patchesByTripPattern.get(pattern.getFeedId()));
         }
         return result;
     }

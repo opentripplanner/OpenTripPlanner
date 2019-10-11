@@ -14,6 +14,7 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -27,6 +28,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -36,6 +38,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -55,6 +59,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -85,6 +90,9 @@ public class GraphIndex {
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
     private final Map<FeedScopedId,Integer> serviceCodes;
+
+    private AlertPatchService alertPatchService;
+
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -429,5 +437,79 @@ public class GraphIndex {
         // Delegate to graph
         Collection<Notice> res = graph.getNoticesByElement().get(entity);
         return res == null ? Collections.emptyList() : res;
+    }
+
+    private AlertPatchService getSiriAlertPatchService() {
+        if (graph.updaterManager == null) {
+            return new AlertPatchServiceImpl(graph);
+        }
+        if (alertPatchService == null) {
+            Optional<AlertPatchService> patchServiceOptional = graph.updaterManager.getUpdaterList().stream()
+                    .filter(SiriSXUpdater.class::isInstance)
+                    .map(SiriSXUpdater.class::cast)
+                    .map(SiriSXUpdater::getAlertPatchService).findFirst();
+
+            if (patchServiceOptional.isPresent()) {
+                alertPatchService = patchServiceOptional.get();
+            } else {
+                alertPatchService = new AlertPatchServiceImpl(graph);
+            }
+        }
+        return alertPatchService;
+    }
+
+    public Collection<AlertPatch> getAlerts() {
+        return getSiriAlertPatchService().getAllAlertPatches();
+    }
+
+    public Collection<AlertPatch> getAlertsForRoute(Route route) {
+        return getSiriAlertPatchService().getRoutePatches(route.getId());
+    }
+
+    public Collection<AlertPatch> getAlertsForRouteId(FeedScopedId routeId) {
+        return getSiriAlertPatchService().getRoutePatches(routeId);
+    }
+
+    public Collection<AlertPatch> getAlertsForTrip(Trip trip) {
+        return getSiriAlertPatchService().getTripPatches(trip.getId());
+    }
+
+    public Collection<AlertPatch> getAlertsForTripId(FeedScopedId tripId) {
+        return getSiriAlertPatchService().getTripPatches(tripId);
+    }
+
+    public Collection<AlertPatch> getAlertsForPattern(TripPattern pattern) {
+        return getSiriAlertPatchService().getTripPatternPatches(pattern);
+    }
+
+    public Collection<AlertPatch> getAlertsForAgency(Agency agency) {
+        return getSiriAlertPatchService().getAgencyPatches(agency.getId());
+    }
+
+    public AlertPatch getAlertForId(String id) {
+        return getSiriAlertPatchService().getPatchById(id);
+    }
+
+    public Collection<AlertPatch> getAlertsForStop(Stop stop) {
+        return getSiriAlertPatchService().getStopPatches(stop.getId());
+    }
+
+    public Collection<AlertPatch> getAlertsForStopId(FeedScopedId stopId) {
+        return getSiriAlertPatchService().getStopPatches(stopId);
+    }
+
+    public Collection<AlertPatch> getAlertsForStopAndRoute(Stop stop, Route route) {
+        return getSiriAlertPatchService().getStopAndRoutePatches(stop.getId(), route.getId());
+    }
+
+    public Collection<AlertPatch> getAlertsForStopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
+        return getSiriAlertPatchService().getStopAndRoutePatches(stopId, routeId);
+    }
+
+    public Collection<AlertPatch> getAlertsForStopAndTrip(Stop stop, Trip trip) {
+        return getSiriAlertPatchService().getStopAndTripPatches(stop.getId(), trip.getId());
+    }
+    public Collection<AlertPatch> getAlertsForStopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
+        return getSiriAlertPatchService().getStopAndTripPatches(stopId, tripId);
     }
 }
