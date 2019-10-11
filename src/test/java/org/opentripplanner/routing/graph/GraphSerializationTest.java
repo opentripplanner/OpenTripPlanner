@@ -84,6 +84,7 @@ public class GraphSerializationTest {
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
+        objectDiffer.printSummary();
         assertFalse(objectDiffer.hasDifferences());
     }
 
@@ -103,11 +104,6 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     private void testRoundTrip (Graph originalGraph) throws Exception {
-        // Remove the transit stations, which have no edges and won't survive serialization.
-        // These are buffered into a list to prevent concurrent modification (removal while iterating).
-        List<Vertex> transitVertices = originalGraph.getVertices().stream()
-                .filter(v -> v instanceof TransitStopVertex).collect(Collectors.toList());
-        transitVertices.forEach(originalGraph::remove);
         originalGraph.index(new DefaultStreetVertexIndexFactory());
         // The cached timezone in the graph is transient and lazy-initialized.
         // Previous tests may have caused a timezone to be cached.
@@ -135,6 +131,7 @@ public class GraphSerializationTest {
         // are deduplicated.
         objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
         objectDiffer.compareTwoObjects(g1, g2);
+        objectDiffer.printSummary();
         // Print differences before assertion so we can see what went wrong.
         assertFalse(objectDiffer.hasDifferences());
     }
