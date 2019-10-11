@@ -407,11 +407,11 @@ The complete list of modes are:
 
 - `CAR_RENT`: Taking a rented, shared-mobility car for part or the entirety of the route.
 
-    _Prerequisite:_ Vehicle positions need to be added to OTP  as dynamic data feeds.
+    _Prerequisite:_ Vehicle positions need to be added to OTP as dynamic data feeds.
 
     For dynamic car positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
 
-- `CAR_HAIL`: Hailing a car from a transportation network company such as Lyft or Uber and then riding in the vehicle for part or the entirety of the route. OTP will still use the underlying graph to calculate driving directions, so results will be different travel time estiamtes quoted from the TNC providers. If service is not available at a particular pickup location, this can cause a TNC availability error which can result in an itinerary not being able to be calculated.
+- `CAR_HAIL`: Hailing a car from a transportation network company such as Lyft or Uber and then riding in the vehicle for part or the entirety of the route. OTP will still use its underlying graph to calculate driving directions, so car leg results will likely contain different travel time estimates than those quoted from the TNC providers. If service is not available at a particular pickup location, this can cause a TNC availability error which can result in an itinerary not being able to be calculated.
 
     _Prerequisite:_ API keys for the respective TNC providers must be added in `router-config.json`.
 
@@ -713,6 +713,77 @@ sourceType: "gbfs"
 url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
+
+#### TNC Configuration
+
+It is possible to add either Uber or Lyft as a TNC updater. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
+
+For each TNC updater, you have to manually determine what the ride type ids are for wheelchair-accessible services in the area that OTP will be planning trips in.
+
+##### Uber
+
+- Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "transportation-network-company-updater",
+    "sourceType": "uber",
+    "serverToken": "YOUR-SECRET-TOKEN",
+    "wheelChairAccessibleRideType": "REGION-SPECIFIC-ID"
+}
+```
+
+##### Lyft
+
+- Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "transportation-network-company-updater",
+    "sourceType": "lyft",
+    "clientId": "YOUR-CLIENT-ID-IF-LYFT-ISNT-BEING-ALL-WALLED-GARDEN-WITH-YOU",
+    "clientSecret": "YOUR-CLIENT-SECRET-IF-LYFT-ISNT-BEING-ALL-WALLED-GARDEN-WITH-YOU"
+}
+```
+
+#### Car Rental Configuration
+
+Currently, it is possible to add an updater for either car2go or the now defunct ReachNow. Both of these updaters read in data from a url or file about the vehicle positions and the areas where the cars are allowed to be dropped off inside of. The data format of the vehicle positions slightly differs between the each updater, but they're both a list of JSON objects. The regions data must be valid GeoJSON of Polygons or MultiPolygons in either a Feature or a Feature collection.
+
+Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "car-rental-updater",
+    "sourceType": "car2go",
+    "frequencySec": 60,
+    "vehiclesUrl": "http://example.com/vehicles.json",
+    "regionsUrl": "http://example.com/regions.json"
+}
+```
+
+Use the same format above, but chagne the sourceType to `reachnow` and update the urls to setup for use with ReachNow.
+
+#### Micromobility Rental Configuration
+
+Adding networks of micromobility vehicles is very similar to adding in bikeshare, but the underlying code that determines how it is possible to pickup and dropoff vehicles and the speed at which they travel is different. Also, it is possible to add in data about where the vehicles can be dropped off at.
+
+The `network` field is used both internally and externally to identify the extent and use of this particular vehicle rental system. It's required for systems with more than 1 vehicle rental operator.
+
+The `url` field must point to the root `gbfs.json` endpoint.
+
+Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "vehicle-rental-updater",
+    "frequencySec": 60,
+    "network": "RENTAL-SYSTEM-NAME",
+    "sourceType": "gbfs",
+    "url": "https://example.com/gbfs.json",
+    "regionsUrl": "file:/home/workspace/boundary.json"
+}
+```
 
 # Configure using command-line arguments
 
