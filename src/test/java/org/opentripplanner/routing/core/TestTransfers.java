@@ -95,7 +95,7 @@ class Context {
 
         when(timetableSnapshotSource.getTimetableSnapshot()).thenReturn(snapshot);
 
-        graph.setupTimetableSnapshotProvider(g -> timetableSnapshotSource);
+        graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
     }
 
     /**

@@ -72,7 +72,7 @@ public abstract class GtfsTest extends TestCase {
         graph.index(new DefaultStreetVertexIndexFactory());
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
-        graph.setupTimetableSnapshotProvider(g -> timetableSnapshotSource);
+        graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
         alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
         alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
         alertsUpdateHandler.setFeedId(feedId.getId());

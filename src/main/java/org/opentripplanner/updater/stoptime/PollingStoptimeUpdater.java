@@ -109,7 +109,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
-        TimetableSnapshotSource snapshotSource = graph.setupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+        TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
 
         // Set properties of realtime data snapshot source
         if (logFrequency != null) {

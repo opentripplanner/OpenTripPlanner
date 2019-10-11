@@ -5,7 +5,6 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,15 +70,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
         feedId = config.path("feedId").asText("");
         String sourceType = config.path("sourceType").asText();
 
-        updateSource = new SiriETHttpTripUpdateSource();
-
-        // Configure update source
-        if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config);
-        } else {
-            throw new IllegalArgumentException(
-                    "Unknown update streamer source type: " + sourceType);
-        }
+        SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource();
+        // Configure update source before we asign it to the member field witch is not
+        // configurable.
+        source.configure(graph, config);
+        updateSource = source;
 
         int logFrequency = config.path("logFrequency").asInt(-1);
         if (logFrequency >= 0) {
@@ -132,7 +127,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (updates != null && updates.getServiceDelivery().getEstimatedTimetableDeliveries() != null) {
             // Handle trip updates via graph writer runnable
             EstimatedTimetableGraphWriterRunnable runnable =
-                    new EstimatedTimetableGraphWriterRunnable(fullDataset, feedId, updates.getServiceDelivery().getEstimatedTimetableDeliveries());
+                    new EstimatedTimetableGraphWriterRunnable(
+                            fullDataset,
+                            feedId,
+                            updates.getServiceDelivery().getEstimatedTimetableDeliveries()
+                    );
             if (!isReady()) {
                 LOG.info("Execute blocking tripupdates");
                 updaterManager.executeBlocking(runnable);

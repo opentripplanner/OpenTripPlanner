@@ -112,7 +112,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
             @Override
             public void run(Graph graph) {
                 // Only create a realtime data snapshot source if none exists already
-                SiriTimetableSnapshotSource snapshotSource = graph.setupTimetableSnapshotProvider(
+                SiriTimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(
                         SiriTimetableSnapshotSource::new
                 );
 

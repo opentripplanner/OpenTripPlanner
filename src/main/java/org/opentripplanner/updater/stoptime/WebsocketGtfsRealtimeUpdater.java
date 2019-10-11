@@ -80,7 +80,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Only create a realtime data snapshot source if none exists already
-        graph.setupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+        graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
     }
 
     @Override

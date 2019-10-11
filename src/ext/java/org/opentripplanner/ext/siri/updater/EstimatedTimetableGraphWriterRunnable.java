@@ -21,7 +21,6 @@ public class EstimatedTimetableGraphWriterRunnable implements GraphWriterRunnabl
 
     private final String feedId;
 
-    private SiriTimetableSnapshotSource snapshotSource;
 
     /**
      * The list with updates to apply to the graph
@@ -29,7 +28,11 @@ public class EstimatedTimetableGraphWriterRunnable implements GraphWriterRunnabl
     private final List<EstimatedTimetableDeliveryStructure> updates;
 
 
-    public EstimatedTimetableGraphWriterRunnable(final boolean fullDataset, final String feedId, final List<EstimatedTimetableDeliveryStructure> updates) {
+    EstimatedTimetableGraphWriterRunnable(
+            final boolean fullDataset,
+            final String feedId,
+            final List<EstimatedTimetableDeliveryStructure> updates
+    ) {
         // Preconditions
         Preconditions.checkNotNull(updates);
 
@@ -41,10 +44,11 @@ public class EstimatedTimetableGraphWriterRunnable implements GraphWriterRunnabl
 
     @Override
     public void run(Graph graph) {
-        // Apply updates to graph using realtime snapshot source
-        if (snapshotSource == null) {
-            snapshotSource = new SiriTimetableSnapshotSource(graph);
-        }
+        SiriTimetableSnapshotSource snapshotSource;
+        // TODO OTP2 - This is not thread safe, we should inject the snapshotSource on this class,
+        //           - it will work because the snapshotSource is created already.
+        snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+
         if (snapshotSource != null) {
             snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, updates);
         } else {

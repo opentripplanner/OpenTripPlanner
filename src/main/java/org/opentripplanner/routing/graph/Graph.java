@@ -134,7 +134,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
-    private transient TimetableSnapshotProvider timetableSnapshotSource = null;
+    private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -265,18 +265,27 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     public TimetableSnapshot getTimetableSnapshot() {
-        return timetableSnapshotSource == null ? null : timetableSnapshotSource.getTimetableSnapshot();
+        return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();
     }
 
+    /**
+     * TODO OTP2 - This should be replaced by proper dependency injection
+     */
     @SuppressWarnings("unchecked")
-    public <T extends TimetableSnapshotProvider> T setupTimetableSnapshotProvider(Function<Graph, T> creator) {
-        if(timetableSnapshotSource == null) {
-            timetableSnapshotSource = creator.apply(this);
+    public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(Function<Graph, T> creator) {
+        if (timetableSnapshotProvider == null) {
+            timetableSnapshotProvider = creator.apply(this);
         }
-        // TODO OTP2 - We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one
-        //           - for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters
-        //           - try setup both.
-        return (T) timetableSnapshotSource;
+        try {
+            return (T) timetableSnapshotProvider;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(
+                    "We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one " +
+                    "for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters " +
+                    "try setup both.",
+                    e
+            );
+        }
     }
 
     /**
