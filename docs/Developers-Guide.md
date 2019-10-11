@@ -89,7 +89,7 @@ documentation while you're working on writing it.
 
 In short:
 
-```shell script
+```shell
 $ pip install mkdocs
 $ mkdocs serve
 ```
@@ -101,7 +101,7 @@ Every API resource file will have documentation automatically generated using
 file and will automatically generate html pages of documentation. To view these files locally, run the following
 script:
 
-```shell script
+```shell
 $ mvn -DskipTests site
 ```
 
