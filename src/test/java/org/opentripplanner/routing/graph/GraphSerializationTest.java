@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import ch.qos.logback.classic.Logger;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
@@ -11,17 +10,13 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.util.BitSet;
-import java.util.List;
-import java.util.Locale;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.JarFile;
-import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertFalse;
 
@@ -101,7 +96,6 @@ public class GraphSerializationTest {
         assertFalse(objectDiffer.hasDifferences());
     }
 
-
     /**
      * Compare two separate essentially empty graphs.
      */
@@ -111,7 +105,6 @@ public class GraphSerializationTest {
         Graph graph2 = new Graph();
         assertNoDifferences(graph1, graph2);
     }
-
 
     /**
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
