@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.graph;
 
+import ch.qos.logback.classic.Logger;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
@@ -17,6 +18,7 @@ import java.lang.ref.SoftReference;
 import java.lang.reflect.Method;
 import java.util.BitSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.jar.JarFile;
 import java.util.stream.Collectors;
@@ -83,8 +85,15 @@ public class GraphSerializationTest {
         objectDiffer.ignoreFields("incoming", "outgoing");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
-        // Method instances usually are part of a proxy which are totally un-reflectable in Java 11
-        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class, Method.class, JarFile.class, SoftReference.class);
+        // Method instances usually are part of a proxy which are totally un-reflectable in Java 11.
+        objectDiffer.ignoreClasses(
+                ThreadPoolExecutor.class,
+                WeakValueHashMap.class,
+                Method.class,
+                JarFile.class,
+                SoftReference.class,
+                Class.class
+        );
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
@@ -133,7 +142,16 @@ public class GraphSerializationTest {
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
         // are deduplicated.
-        objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
+        objectDiffer.ignoreClasses(
+                HashGridSpatialIndex.class,
+                ThreadPoolExecutor.class,
+                Deduplicator.class,
+                WeakValueHashMap.class,
+                Method.class,
+                JarFile.class,
+                SoftReference.class,
+                Class.class
+        );
         objectDiffer.compareTwoObjects(g1, g2);
         objectDiffer.printSummary();
         // Print differences before assertion so we can see what went wrong.
