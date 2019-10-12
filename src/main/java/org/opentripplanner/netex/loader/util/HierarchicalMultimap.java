@@ -8,8 +8,14 @@ import java.util.Map;
 import java.util.Set;
 
 /**
+ * <p>
  * A concrete multimap implementation of {@link AbstractHierarchicalMap}.
- *
+ * </p>
+ * <p>
+ * Note that the collection retuned by the {@link ReadOnlyHierarchicalMap#lookup(Object)} is
+ * not <em>ReadOnly</em>, but should be treated as such. It is just to painful to achieve this with the
+ * current verion of the Java Collection API - without any side-effects.
+ *</p>
  * @param <K> the key type
  * @param <V> the base value type
  */
@@ -38,17 +44,17 @@ public class HierarchicalMultimap<K,V> extends AbstractHierarchicalMap<K, Collec
         }
     }
 
-    public Set<K> localKeys() {
+    Collection<K> localKeys() {
         return map.keySet();
     }
 
     @Override
-    protected Collection<V> localGet(K key) {
+    Collection<V> localGet(K key) {
         return map.get(key);
     }
 
     @Override
-    protected boolean localContainsKey(K key) {
+    boolean localContainsKey(K key) {
         return map.containsKey(key);
     }
 }

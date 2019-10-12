@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
@@ -10,6 +11,9 @@ import org.rutebanken.netex.model.Journey_VersionStructure;
 import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
+import org.rutebanken.netex.model.TimetabledPassingTime;
+import org.rutebanken.netex.model.TimetabledPassingTime_VersionedChildStructure;
+import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +29,10 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     private final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs = new HashSet<>();
 
     private final Multimap<String, ServiceJourney> serviceJourneyByPatternId = ArrayListMultimap.create();
+    private final Multimap<String, TimetabledPassingTime> passingTimeByStopPointId = ArrayListMultimap.create();
+
+    private final NoticeParser noticeParser = new NoticeParser();
+
 
     TimeTableFrameParser(ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById) {
         this.journeyPatternById = journeyPatternById;
@@ -33,6 +41,9 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     @Override
     void parse(Timetable_VersionFrameStructure frame) {
         parseJourneys(frame.getVehicleJourneys());
+
+        noticeParser.parseNotices(frame.getNotices());
+        noticeParser.parseNoticeAssignments(frame.getNoticeAssignments());
 
         warnOnMissingMapping(LOG, frame.getNetworkView());
         warnOnMissingMapping(LOG, frame.getLineView());
@@ -71,6 +82,9 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     void setResultOnIndex(NetexImportDataIndex netexIndex) {
         netexIndex.dayTypeRefs.addAll(dayTypeRefs);
         netexIndex.serviceJourneyByPatternId.addAll(serviceJourneyByPatternId);
+        netexIndex.passingTimeByStopPointId.addAll(passingTimeByStopPointId);
+
+        noticeParser.setResultOnIndex(netexIndex);
     }
 
     private void parseJourneys(JourneysInFrame_RelStructure element) {
@@ -90,17 +104,25 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
 
         String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
 
-        // TODO OTP2 - This check belongs to the mapping or as a separate validation
-        // TODO OTP2 - step. The problem is that we do not want to relay on the
-        // TODO OTP2 - the order in witch elements are loaded.
         JourneyPattern journeyPattern = journeyPatternById.lookup(journeyPatternId);
 
         if (journeyPattern != null) {
-            if (journeyPattern.getPointsInSequence().
-                    getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
-                    .size() == sj.getPassingTimes().getTimetabledPassingTime().size()) {
+            int nStopPointsInJourneyPattern = journeyPattern
+                    .getPointsInSequence()
+                    .getPointInJourneyPatternOrStopPointInJourneyPatternOrTimingPointInJourneyPattern()
+                    .size();
+            int nTimetablePassingTimes = sj.getPassingTimes().getTimetabledPassingTime().size();
 
+            // TODO OTP2 - This check belongs to the mapping or as a separate validation
+            //           - step. The problem is that we do not want to relay on the
+            //           - the order in witch elements are parsed/loaded; hence `journeyPattern`
+            //           - is know at this point.
+            if (nStopPointsInJourneyPattern == nTimetablePassingTimes) {
                 serviceJourneyByPatternId.put(journeyPatternId, sj);
+
+                for (TimetabledPassingTime it : sj.getPassingTimes().getTimetabledPassingTime()) {
+                    passingTimeByStopPointId.put(it.getPointInJourneyPatternRef().getValue().getRef(), it);
+                }
             } else {
                 LOG.warn(
                         "Mismatch between ServiceJourney and JourneyPattern. " +

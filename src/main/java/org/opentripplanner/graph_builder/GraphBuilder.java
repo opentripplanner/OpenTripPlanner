@@ -210,7 +210,14 @@ public class GraphBuilder implements Runnable {
             List<GtfsBundle> gtfsBundles = Lists.newArrayList();
             for (File gtfsFile : gtfsFiles) {
                 GtfsBundle gtfsBundle = new GtfsBundle(gtfsFile);
+
+                // TODO OTP2 - In OTP2 we have deleted the transfer edges from the street graph.
+                //           - The new transfer generation do not take this config param into
+                //           - account any more. This needs some investigation and probably
+                //           - a fix, but we are unsure if this is used any more. The Pathways.txt
+                //           - and osm import replaces this functionality.
                 gtfsBundle.setTransfersTxtDefinesStationPaths(builderParams.useTransfersTxt);
+
                 if (builderParams.parentStopLinking) {
                     gtfsBundle.linkStopsToParentStations = true;
                 }

@@ -44,6 +44,8 @@ public class AlertPatch implements Serializable {
 
     private String agency;
 
+    private FeedScopedId operatorId;
+
     private FeedScopedId route;
 
     private FeedScopedId trip;
@@ -136,7 +138,7 @@ public class AlertPatch implements Serializable {
             }
         } else if (stop != null) {
             throw new UnsupportedOperationException(
-                    "Cannot add alert to TransitStop - "
+                    "Cannot add alert to StopVertex - "
                     + "PreBoard and PreAlight edges no longer exist."
             );
         }
@@ -188,7 +190,7 @@ public class AlertPatch implements Serializable {
             }
         } else if (stop != null) {
             throw new UnsupportedOperationException(
-                    "Cannot remove alert from TransitStop - "
+                    "Cannot remove alert from StopVertex - "
                     + "PreBoard and PreAlight edges no longer exist."
             );
         }
@@ -214,6 +216,11 @@ public class AlertPatch implements Serializable {
     }
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
+    public FeedScopedId getOperatorId() {
+        return operatorId;
+    }
+
+    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getRoute() {
         return route;
     }
@@ -230,6 +237,10 @@ public class AlertPatch implements Serializable {
 
     public void setAgencyId(String agency) {
         this.agency = agency;
+    }
+
+    public void setOperatorId(FeedScopedId operatorId) {
+        this.operatorId = operatorId;
     }
 
     public void setRoute(FeedScopedId route) {

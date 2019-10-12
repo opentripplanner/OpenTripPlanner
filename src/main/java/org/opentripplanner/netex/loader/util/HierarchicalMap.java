@@ -49,18 +49,17 @@ public class HierarchicalMap<K,V> extends AbstractHierarchicalMap<K, V> {
      * @return a collection of all values hold in the local map, all values added to one of the
      * parents are excluded from the collection.
      */
-    public Collection<V> localValues() {
+    Collection<V> localValues() {
         return map.values();
     }
 
     @Override
-    protected V localGet(K key) {
+    V localGet(K key) {
         return map.get(key);
     }
 
     @Override
-    protected boolean localContainsKey(K key) {
+    boolean localContainsKey(K key) {
         return map.containsKey(key);
     }
-
 }

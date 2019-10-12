@@ -30,7 +30,7 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.HttpToGraphQLMapper;
@@ -188,7 +188,7 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList(); 
            Coordinate coord = new Coordinate(lon, lat);
-           for (TransitStop stopVertex : streetIndex.getNearbyTransitStops(
+           for (TransitStopVertex stopVertex : streetIndex.getNearbyTransitStops(
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
@@ -206,7 +206,7 @@ public class IndexAPI {
            }
            List<StopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
-           for (TransitStop stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
+           for (TransitStopVertex stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
                stops.add(new StopShort(stopVertex.getStop()));
            }
            return Response.status(Status.OK).entity(stops).build();           
@@ -287,7 +287,7 @@ public class IndexAPI {
         
         if (stop != null) {
             // get the transfers for the stop
-            TransitStop v = index.stopVertexForStop.get(stop);
+            TransitStopVertex v = index.stopVertexForStop.get(stop);
             Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
                 @Override
                 public boolean apply(Edge edge) {
@@ -462,7 +462,8 @@ public class IndexAPI {
         Trip trip = index.tripForId.get(tripId);
         if (trip != null) {
             TripPattern tripPattern = index.patternForTrip.get(trip);
-            return getGeometryForPattern(tripPattern.code);
+            // TODO OTP2 - Refactor to use the pattern ID
+            return getGeometryForPattern(tripPattern.getCode());
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
@@ -589,7 +590,7 @@ public class IndexAPI {
         
         /** Make a transfer from a simpletransfer edge from the graph. */
         public Transfer(SimpleTransfer e) {
-            toStopId = GtfsLibrary.convertIdToString(((TransitStop) e.getToVertex()).getStopId());
+            toStopId = GtfsLibrary.convertIdToString(((TransitStopVertex) e.getToVertex()).getStop().getId());
             distance = e.getDistance();
         }
     }

@@ -3,20 +3,38 @@ package org.opentripplanner.api.resource;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.model.*;
+import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.RelativeDirection;
+import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.core.*;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.ServiceDay;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
+import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
+import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -25,12 +43,22 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.*;
+import org.opentripplanner.routing.vertextype.BikeParkVertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.ExitVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -173,7 +201,7 @@ public abstract class GraphPathToTripPlanConverter {
         itinerary.walkDistance = lastState.getWalkDistance();
 
         itinerary.transfers = lastState.getNumBoardings();
-        if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
+        if (itinerary.transfers > 0) {
             itinerary.transfers--;
         }
 
@@ -596,10 +624,10 @@ public abstract class GraphPathToTripPlanConverter {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
-        Stop firstStop = firstVertex instanceof TransitVertex ?
-                ((TransitVertex) firstVertex).getStop(): null;
-        Stop lastStop = lastVertex instanceof TransitVertex ?
-                ((TransitVertex) lastVertex).getStop(): null;
+        Stop firstStop = firstVertex instanceof TransitStopVertex ?
+                ((TransitStopVertex) firstVertex).getStop(): null;
+        Stop lastStop = lastVertex instanceof TransitStopVertex ?
+                ((TransitStopVertex) lastVertex).getStop(): null;
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
@@ -616,9 +644,9 @@ public abstract class GraphPathToTripPlanConverter {
             for (int i = 1; i < edges.length; i++) {
                 Vertex vertex = states[i].getVertex();
 
-                if (!(vertex instanceof TransitVertex)) continue;
+                if (!(vertex instanceof TransitStopVertex)) continue;
 
-                currentStop = ((TransitVertex) vertex).getStop();
+                currentStop = ((TransitStopVertex) vertex).getStop();
                 if (currentStop == firstStop) continue;
 
                 if (currentStop == previousStop) {                  // Avoid duplication of stops
@@ -658,14 +686,11 @@ public abstract class GraphPathToTripPlanConverter {
         Place place = new Place(vertex.getX(), vertex.getY(), name,
                 makeCalendar(state), makeCalendar(state));
 
-        if (endOfLeg) edge = state.getBackEdge();
-
-        if (vertex instanceof TransitVertex && edge instanceof OnboardEdge) {
+        if (vertex instanceof TransitStopVertex) {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
-            place.platformCode = stop.getPlatformCode();
-            place.zoneId = stop.getZoneId();
-            place.stopIndex = ((OnboardEdge) edge).getStopIndex();
+            place.platformCode = stop.getCode();
+            place.zoneId = stop.getZone();
             if (endOfLeg) place.stopIndex++;
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);

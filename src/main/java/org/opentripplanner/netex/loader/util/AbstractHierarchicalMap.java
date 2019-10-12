@@ -38,10 +38,10 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
     }
 
     /** Get value from 'local' map, parent is not queried. */
-    protected abstract V localGet(K key);
+    abstract V localGet(K key);
 
     /** Check if key exist in 'local' map, parent is not queried. */
-    protected abstract boolean localContainsKey(K key);
+    abstract boolean localContainsKey(K key);
 
 
     /* private methods */

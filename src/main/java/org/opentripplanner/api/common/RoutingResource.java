@@ -153,7 +153,33 @@ public abstract class RoutingResource {
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
-    /** The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc. */
+    /**
+     * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
+     * <p>The possible values of the comma-separated list are:</p>
+     *
+     * <ul>
+     *  <li>WALK</li>
+     *  <li>TRANSIT</li>
+     *  <li>BICYCLE</li>
+     *  <li>BICYCLE_RENT</li>
+     *  <li>BICYCLE_PARK</li>
+     *  <li>CAR</li>
+     *  <li>CAR_PARK</li>
+     *  <li>TRAM</li>
+     *  <li>SUBWAY</li>
+     *  <li>RAIL</li>
+     *  <li>BUS</li>
+     *  <li>CABLE_CAR</li>
+     *  <li>FERRY</li>
+     *  <li>GONDOLA</li>
+     *  <li>FUNICULAR</li>
+     *  <li>AIRPLANE</li>
+     * </ul>
+     *
+     * <p>
+     *   For a more complete discussion of this parameter see <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
+     * </p>
+     */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
@@ -249,7 +275,9 @@ public abstract class RoutingResource {
      * street network. Also, it is still possible to travel through the stop. Just
      * boarding and alighting is prohibited.
      * The format is agencyId_stopId, so: TriMet_2107
+     * @deprecated This no longer works in OTP2, see issue #2843.
      */
+    @Deprecated
     @QueryParam("bannedStops")
     protected String bannedStops;
     
@@ -259,7 +287,9 @@ public abstract class RoutingResource {
      * For example, this parameter can be used when a train station is destroyed, such
      * that no trains can drive through the station anymore.
      * The format is agencyId_stopId, so: TriMet_2107
+     * @deprecated This no longer works in OTP2, see issue #2843.
      */
+    @Deprecated
     @QueryParam("bannedStopsHard")
     protected String bannedStopsHard;
     
@@ -524,12 +554,6 @@ public abstract class RoutingResource {
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
-        if (bannedStops != null)
-            request.setBannedStops(bannedStops);
-
-        if (bannedStopsHard != null)
-            request.setBannedStopsHard(bannedStopsHard);
-        
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) request.transferPenalty = transferPenalty;

@@ -4,7 +4,7 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.List;
 
@@ -15,7 +15,7 @@ public class UnconnectedStop extends AbstractStopTester {
      * @return true if the stop is not connected to any street
      */
     @Override
-    public boolean fulfillDemands(TransitStop ts, Graph graph) {
+    public boolean fulfillDemands(TransitStopVertex ts, Graph graph) {
         List<Edge> outgoingStreets = ts.getOutgoingStreetEdges();
         boolean hasStreetLink = false;
         for(Edge e:ts.getIncoming()){

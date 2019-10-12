@@ -6,6 +6,7 @@
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
 - NeTEx import support (#2769).
+- Added NeTEx notices (#2824)
 
 ## Ported over from the 1.x
 - Make OTP run on Java 11 (#2812)
@@ -30,6 +31,7 @@
 - Add "Accept" headers to GTFS-RT HTTP requests (#2796)
 - Fixes surefire test failure during build (#2816)
 - Cannot transfer between stops at exactly the same location (#2371)
+- Improve documentation for `mode` routing parameter (#2809)
 
 ## 1.3 (2018-08-03)
 

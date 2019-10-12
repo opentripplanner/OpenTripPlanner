@@ -7,7 +7,9 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-/** Responsible for mapping GTFS StopTime into the OTP model. */
+/**
+ * Responsible for mapping GTFS StopTime into the OTP Transit model.
+ */
 class StopTimeMapper {
     private final StopMapper stopMapper;
 
@@ -53,5 +55,4 @@ class StopTimeMapper {
 
         return lhs;
     }
-
 }

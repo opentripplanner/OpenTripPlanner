@@ -4,7 +4,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
-import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -341,10 +340,6 @@ public class State implements Cloneable {
         if (dw < 0) {
             throw new NegativeWeightException(String.valueOf(dw) + " on edge " + backEdge);
         }
-    }
-
-    public boolean isOnboard() {
-        return this.backEdge instanceof OnboardEdge;
     }
 
     public State getBackState() {

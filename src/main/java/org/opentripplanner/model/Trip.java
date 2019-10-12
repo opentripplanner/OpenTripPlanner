@@ -1,13 +1,15 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Trip extends IdentityBean<FeedScopedId> {
+public final class Trip extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
     private FeedScopedId id;
 
     private Route route;
+
+    private Operator operator;
 
     private FeedScopedId serviceId;
 
@@ -41,6 +43,7 @@ public final class Trip extends IdentityBean<FeedScopedId> {
     public Trip(Trip obj) {
         this.id = obj.id;
         this.route = obj.route;
+        this.operator = obj.operator;
         this.serviceId = obj.serviceId;
         this.tripShortName = obj.tripShortName;
         this.tripHeadsign = obj.tripHeadsign;
@@ -60,6 +63,27 @@ public final class Trip extends IdentityBean<FeedScopedId> {
 
     public void setId(FeedScopedId id) {
         this.id = id;
+    }
+
+
+    /**
+     * Operator running the trip. Returns operator of this trip, if it exist, or else the route operator.
+     */
+    public Operator getOperator() {
+        return operator != null ? operator : route.getOperator();
+    }
+
+    /**
+     * This method return the operator associated with the trip. If the Trip have no Operator set {@code null} is
+     * returned. Note! this method do not consider the {@link Route} that the trip is part of.
+     * @see #getOperator()
+     */
+    public Operator getTripOperator() {
+        return operator;
+    }
+
+    public void setTripOperator(Operator operator) {
+        this.operator = operator;
     }
 
     public Route getRoute() {

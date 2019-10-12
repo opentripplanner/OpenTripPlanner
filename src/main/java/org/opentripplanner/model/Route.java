@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Route extends IdentityBean<FeedScopedId> {
+public final class Route extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
@@ -10,6 +10,8 @@ public final class Route extends IdentityBean<FeedScopedId> {
     private FeedScopedId id;
 
     private Agency agency;
+
+    private Operator operator;
 
     private String shortName;
 
@@ -44,12 +46,27 @@ public final class Route extends IdentityBean<FeedScopedId> {
         this.id = id;
     }
 
+    /**
+     * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does NOT map
+     * 1-1 to Authority, it is rather a mix between Authority and Operator.
+     */
     public Agency getAgency() {
         return agency;
     }
 
     public void setAgency(Agency agency) {
         this.agency = agency;
+    }
+
+    /**
+     * NeTEx Operator, not in use when importing GTFS files.
+     */
+    public Operator getOperator() {
+        return operator;
+    }
+
+    public void setOperator(Operator operator) {
+        this.operator = operator;
     }
 
     public String getShortName() {

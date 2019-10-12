@@ -1,6 +1,6 @@
 package org.opentripplanner.model.impl;
 
-import com.google.common.collect.HashMultimap;
+import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
@@ -8,15 +8,19 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
@@ -50,11 +54,17 @@ public class OtpTransitServiceBuilder {
 
     private final List<Frequency> frequencies = new ArrayList<>();
 
+    private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
+
+    private final EntityById<FeedScopedId, Operator> operatorsById = new EntityById<>();
+
     private final List<Pathway> pathways = new ArrayList<>();
 
     private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
 
     private final List<ShapePoint> shapePoints = new ArrayList<>();
+
+    private final EntityById<FeedScopedId, Station> stationsById = new EntityById<>();
 
     private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
 
@@ -64,16 +74,14 @@ public class OtpTransitServiceBuilder {
 
     private final EntityById<FeedScopedId, Trip> tripsById = new EntityById<>();
 
-    private final Multimap<StopPattern, TripPattern> tripPatterns = HashMultimap.create();
+    private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
 
     public OtpTransitServiceBuilder() {
     }
 
 
-
     /* Accessors */
-
 
     public EntityById<String, Agency> getAgenciesById() {
         return agenciesById;
@@ -103,6 +111,18 @@ public class OtpTransitServiceBuilder {
         return frequencies;
     }
 
+    /**
+     * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable). Entities
+     * that might have Notices are Routes, Trips, Stops and StopTimes.
+     */
+    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
+        return noticeAssignments;
+    }
+
+    public EntityById<FeedScopedId, Operator> getOperatorsById() {
+        return operatorsById;
+    }
+
     public List<Pathway> getPathways() {
         return pathways;
     }
@@ -113,6 +133,10 @@ public class OtpTransitServiceBuilder {
 
     public List<ShapePoint> getShapePoints() {
         return shapePoints;
+    }
+
+    public EntityById<FeedScopedId, Station> getStations() {
+        return stationsById;
     }
 
     public EntityById<FeedScopedId, Stop> getStops() {
