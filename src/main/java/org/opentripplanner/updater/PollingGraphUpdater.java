@@ -37,7 +37,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** The type name in the preferences JSON. FIXME String type codes seem like a red flag, should probably be removed. */
     private String type;
 
-
     protected boolean blockReadinessUntilInitialized;
 
     protected boolean isInitialized;

@@ -7,10 +7,16 @@ package org.opentripplanner.routing.alertpatch;
  * Values are defined in the SIRI SituationExchange-xsd
  */
 public enum StopCondition {
-    START_POINT, // at departure or when passengers expect to board
-    DESTINATION, // for passengers expecting to disembark, or at the last stop
-    NOT_STOPPING, // when passing a stop
-    EXCEPTIONAL_STOP, // for passengers expecting an interchange
-    REQUEST_STOP, // when a passenger must request the serving of a stop
-    STOP // affects all interactions with the stop (boarding, alighting, arrival, departure, interchanges
+    /**  at departure or when passengers expect to board */
+    START_POINT,
+    /**  for passengers expecting to disembark, or at the last stop */
+    DESTINATION,
+    /**  when passing a stop */
+    NOT_STOPPING,
+    /**  for passengers expecting an interchange */
+    EXCEPTIONAL_STOP,
+    /**  when a passenger must request the serving of a stop */
+    REQUEST_STOP,
+    /**  affects all interactions with the stop (boarding, alighting, arrival, departure, interchanges */
+    STOP
 }

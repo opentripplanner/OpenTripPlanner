@@ -88,6 +88,8 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     int[] departureTimes;
 
     /**
+     * TODO OTP2 - This needs redesign and a bit more analyzes
+     *
      * Flag to indicate that the stop has been passed without removing arrival/departure-times - i.e. "estimates" are
      * actual times, no longer estimates.
      *
@@ -96,21 +98,29 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     boolean[] isRecordedStop;
 
     /**
+     * TODO OTP2 - This needs redesign and a bit more analyzes
+     *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
     boolean[] isCancelledStop;
 
     /**
+     * TODO OTP2 - This needs redesign and a bit more analyzes
+     *
      * Flag tho indicate inaccurate predictions on each stop. Non-final to allow updates, transient for backwards graph-compatibility.
      */
-    transient boolean[] isPredictionInaccurate;
+    boolean[] isPredictionInaccurate;
 
     /**
+     * TODO OTP2 - This needs redesign and a bit more analyzes
+     *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
     int[] pickups;
 
     /**
+     * TODO OTP2 - This needs redesign and a bit more analyzes
+     *
      * Flag tho indicate cancellations on each stop. Non-final to allow updates.
      */
     int[] dropoffs;
@@ -290,6 +300,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         isRecordedStop[stop] = recorded;
     }
 
+    // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isRecordedStop(int stop) {
         if (isRecordedStop == null) {
             return false;
@@ -303,6 +314,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         isCancelledStop[stop] = isCancelled;
     }
 
+    // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isCancelledStop(int stop) {
         if (isCancelledStop == null) {
             return false;
@@ -316,6 +328,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         isPredictionInaccurate[stop] = predictionInaccurate;
     }
 
+    // TODO OTP2 - Unused, but will be used by Transmodel API
     public boolean isPredictionInaccurate(int stop) {
         if (isPredictionInaccurate == null) {
             return false;
@@ -328,6 +341,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         pickups[stop] = pickupType;
     }
 
+    // TODO OTP2 - Unused, but will be used by Transmodel API
     public int getPickupType(int stop) {
         if (pickups == null) {
             return -999;
@@ -340,6 +354,7 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         dropoffs[stop] = dropoffType;
     }
 
+    // TODO OTP2 - Unused, but will be used by Transmodel API
     public int getDropoffType(int stop) {
         if (dropoffs == null) {
             return -999;
@@ -454,7 +469,6 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         isCancelledStop = new boolean[getNumStops()];
         Arrays.fill(isCancelledStop, true);
     }
-
 
     public void updateDepartureTime(final int stop, final int time) {
         checkCreateTimesArrays();
