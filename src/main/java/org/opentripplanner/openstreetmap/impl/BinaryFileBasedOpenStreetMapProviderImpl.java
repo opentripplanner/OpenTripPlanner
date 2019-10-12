@@ -12,8 +12,8 @@ import crosby.binary.file.BlockInputStream;
  * Parser for the OpenStreetMap PBF format. Parses files in three passes:
  * First the relations, then the ways, then the nodes are also loaded.
  *
- * @see http://wiki.openstreetmap.org/wiki/PBF_Format
- * @see org.opentripplanner.openstreetmap.services.graph_builder.services.osm.OpenStreetMapContentHandler#biPhase
+ * See http://wiki.openstreetmap.org/wiki/PBF_Format
+ * @see OpenStreetMapContentHandler
  * @since 0.4
  */
 public class BinaryFileBasedOpenStreetMapProviderImpl implements OpenStreetMapProvider {

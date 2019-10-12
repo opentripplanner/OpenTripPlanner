@@ -25,7 +25,7 @@ import static org.opentripplanner.netex.loader.util.SetSupport.sort;
  * </pre>
  * We add <em>president</em> <b>Regan</b> to <b>country</b>, a <em>governor</em>
  * <b>Schwarzenegger</b> to <b>state</b> and <em>mayor</em> <b>Eastwood</b> to <b>City</b>.
- * <p/>
+ * <p>
  * We also add an <em>actor</em> for each level, but this time <b>Eastwood</b> is added to the
  * <b>country</b> level (clearly the best actor ;-). <b>Schwarzenegger</b> is
  * added to the <b>state</b> level, and <b>Reagan</b> to <b>City</b>.

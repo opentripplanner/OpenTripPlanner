@@ -6,7 +6,7 @@ import org.rutebanken.netex.model.EntityStructure;
 /**
  * Create some entities. The classes under test is generic classes so we
  * have used american acters with a political career as sample data - just for the fun of it.
- * <p/>
+ * <p>
  * This class extends {@link EntityInVersionStructure} because some of the classes under
  * test only accepts this tye or the parent class {@link EntityStructure}.
  */

@@ -290,7 +290,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
     public int transferSlack = 0;
 
-    /** Invariant: boardSlack + alightSlack <= transferSlack. */
+    /** Invariant: boardSlack + alightSlack ≤ transferSlack. */
     public int boardSlack = 0;
 
     public int alightSlack = 0;
@@ -433,7 +433,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Option to disable the default filtering of GTFS-RT alerts by time. */
     public boolean disableAlertFiltering = false;
 
-    /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
+    /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
     /** Which path comparator to use */

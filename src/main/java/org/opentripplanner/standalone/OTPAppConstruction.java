@@ -16,10 +16,10 @@ import java.io.File;
  * application, creating the necessary Services and modules and putting them together.
  * It is NOT responsible for starting or running the application. The hole idea of this
  * class is to separate application construction from running it.
- * <p/>
+ * <p>
  * The top level construction class(this class) may delegate to other construction classes to
  * inject configuration and services into sub-modules.
- * <p/>
+ * <p>
  * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging.
  * Loading transit or map data should NOT happen during this phase.
@@ -75,7 +75,7 @@ public class OTPAppConstruction {
 
     /**
      * Return OTP application file configuration.
-     * <p/>
+     * <p>
      * The method is {@code public} to allow test access.
      */
     public OTPConfiguration configuration() {
@@ -85,7 +85,7 @@ public class OTPAppConstruction {
     /**
      * Create the top-level objects that represent the OTP server. There is one server and it
      * is created lazy at the first invocation of this method.
-     * <p/>
+     * <p>
      * The method is {@code public} to allow test access.
      */
     public OTPServer server() {
@@ -99,7 +99,7 @@ public class OTPAppConstruction {
      * Create a cached GraphService that will be used by all OTP components to resolve router IDs
      * to Graphs. If a graph is supplied (graph parameter is not null) then that graph is also
      * registered.
-     * <p/>
+     * <p>
      * TODO OTP2 - move into OTPServer and/or GraphService itself, eliminate FileFactory and put
      *           - basePath in GraphService
      */

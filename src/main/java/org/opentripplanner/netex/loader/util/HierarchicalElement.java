@@ -5,7 +5,7 @@ package org.opentripplanner.netex.loader.util;
  * ability to create <em>parent</em> and <em>child</em> relationship with
  * fallback from the child value to the parent value [if the child does not
  * have a value].
- * <p/>
+ * <p>
  * There is no reference from the parent to the child, enabling garbage
  * collection of children, when not referenced by the outer context any more.
  *

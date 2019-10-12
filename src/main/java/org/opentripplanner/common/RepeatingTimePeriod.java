@@ -5,7 +5,7 @@ import java.util.Calendar;
 import java.util.TimeZone;
 
 /**
- * Represents a repeating time period, used for opening hours &c.
+ * Represents a repeating time period, used for opening hours etc.
  * For instance: Monday - Friday 8AM to 8PM, Satuday 10AM to 5PM, Sunday closed.
  * For now it is week-based so doesn't handle every possible case, but since it is encapsulated 
  * that could conceivably be changed.

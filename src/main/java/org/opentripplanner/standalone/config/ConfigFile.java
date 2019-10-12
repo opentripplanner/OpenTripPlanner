@@ -14,7 +14,7 @@ import java.io.IOException;
 /**
  * Generic config file representation. This is used to load, not only the graph
  * configuration files, but also the otp application config file.
- * <p/>
+ * <p>
  * Load and cache a configuration file as a JsonNode. This class is also provide
  * logging when a config file is loaded.
  */
@@ -43,7 +43,7 @@ class ConfigFile {
     /**
      * Return the loaded configuration. The configuration is loaded the first time this
      * method is called.
-     * <p/>
+     * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      */
     JsonNode load(ObjectMapper configParser) {
@@ -53,7 +53,7 @@ class ConfigFile {
     /**
      * Return the loaded configuration. The configuration is loaded the first time this
      * method is called.
-     * <p/>
+     * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      *
      * @param configParser   The parser to use.
@@ -87,7 +87,7 @@ class ConfigFile {
 
     /**
      * Open and parse the JSON file at the given path into a Jackson JSON tree.
-     * <p/>
+     * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      * The program(OTP) exit, if the file contains syntax errors or cannot be parsed for some
      * other reason.

@@ -8,7 +8,7 @@ import java.util.HashSet;
 import java.util.List;
 
 /**
- * Class which creates "Travel by" options list from supported transit modes and which extra modes are supported (bike sharing, bike & ride, park & ride)
+ * Class which creates "Travel by" options list from supported transit modes and which extra modes are supported (bike sharing, bike &amp; ride, park &amp; ride)
  *
  * This list is then returned to the client which shows it in UI.
  * Created by mabu on 28.7.2015.

@@ -51,7 +51,7 @@ abstract class NetexParser<T> {
      * elements). The element should be relevant to OTP. OTP do not support Netex 100%, but
      * elements in Nordic profile, see https://enturas.atlassian.net/wiki/spaces/PUBLIC/overview
      * should be supported.
-     * <p/>
+     * <p>
      * If you get this warning and think the element should be mapped, please feel free to report
      * an issue on GitHub.
      */

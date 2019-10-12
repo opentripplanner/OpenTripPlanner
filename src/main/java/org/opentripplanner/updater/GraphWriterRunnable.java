@@ -11,7 +11,7 @@ import org.opentripplanner.routing.graph.Graph;
  *   request-threads might be reading the graph.
  * - Be sure that the request-threads always see a consistent view of the graph while planning.
  * 
- * @see GraphUpdaterManager.execute
+ * @see GraphUpdaterManager
  */
 public interface GraphWriterRunnable {
 

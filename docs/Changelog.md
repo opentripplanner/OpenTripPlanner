@@ -9,6 +9,11 @@
 - Added NeTEx notices (#2824)
 
 ## Ported over from the 1.x
+- Make OTP run on Java 11 (#2812)
+- Fixes surefire test failure during build (#2816)
+
+## 1.4 (2019-07-30)
+
 - Remove Open Traffic prototype code (#2698)
 - Docs: improve configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
