@@ -18,12 +18,12 @@ import static java.util.Collections.singletonList;
 
 /**
  * Loads/reads a NeTEx bundle of files(a zip file) and maps it into the OTP internal transit model.
- * <p/>
+ * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
  * keeping an index of entities to enable linking. The convention is documented here
  *{@link org.opentripplanner.standalone.NetexParameters#sharedFilePattern} and here
  * {@link NetexZipFileHierarchy}.
- * <p/>
+ * <p>
  * This class is also responsible for logging progress and exception handling.
  */
 public class NetexBundle {

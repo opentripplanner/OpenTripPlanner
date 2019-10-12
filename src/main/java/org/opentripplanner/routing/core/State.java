@@ -4,7 +4,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
-import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
@@ -343,10 +342,6 @@ public class State implements Cloneable {
         }
     }
 
-    public boolean isOnboard() {
-        return this.backEdge instanceof OnboardEdge;
-    }
-
     public State getBackState() {
         return this.backState;
     }
@@ -619,7 +614,7 @@ public class State implements Cloneable {
      * 
      * @param optimize Should this path be optimized or just reversed?
      * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
-     * @returns a state at the other end (or this end, in the case of a forward search) 
+     * @return a state at the other end (or this end, in the case of a forward search)
      * of a reversed, optimized path
      */
     public State optimizeOrReverse (boolean optimize, boolean forward) {

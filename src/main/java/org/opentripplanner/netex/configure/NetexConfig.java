@@ -15,11 +15,11 @@ import java.util.List;
  * objects. This decouple the main classes in the netex module, and serve
  * as a single entry-point to create a {@link NetexModule} witch simplify
  * the code({@link org.opentripplanner.graph_builder.GraphBuilder}) using it.
- * <p/>
+ * <p>
  * This class inject the build configuration. This way none of the other
  * classes in the `org.opentripplanner.netex` have dependencies to the
  * {@link GraphBuilderParameters}.
- * <p/>
+ * <p>
  * The naming convention used is close to the defacto standard used by Spring.
  */
 public class NetexConfig {

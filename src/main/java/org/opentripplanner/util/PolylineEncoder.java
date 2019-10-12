@@ -45,7 +45,7 @@ public class PolylineEncoder {
     }
 
     /**
-     * If level < 0, then {@link EncodedPolylineBean#getLevels()} will be null.
+     * If level less than 0, then {@link EncodedPolylineBean#getLevels()} will be null.
      * 
      * @param points
      * @param level

@@ -48,14 +48,16 @@ public class GtfsFeedId {
 
         /**
          * Extracts a feed_id from the passed source for a GTFS feed.
-         * <p/>
+         * <p>
          * This will try to fetch the experimental feed_id field from the feed_info.txt file.
-         * <p/>
+         * </p>
+         * <p>
          * If the feed does not contain a feed_info.txt or a feed_id field a default GtfsFeedId will be created.
+         * </p>
          *
          * @param source the input source
          * @return A GtfsFeedId
-         * @throws IOException
+         * @throws RuntimeException
          * @see <a href="http://developer.trimet.org/gtfs_ext.shtml">http://developer.trimet.org/gtfs_ext.shtml</a>
          */
         public Builder fromGtfsFeed(CsvInputSource source) {

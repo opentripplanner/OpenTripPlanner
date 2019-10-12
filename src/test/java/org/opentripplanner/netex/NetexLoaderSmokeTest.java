@@ -8,6 +8,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.TransitEntity;
@@ -61,6 +62,7 @@ public class NetexLoaderSmokeTest {
         assertAgencies(otpModel.getAllAgencies());
         assertOperators(otpModel.getAllOperators());
         assertStops(otpModel.getAllStops());
+        assertStations(otpModel.getAllStations());
         assertTripPatterns(otpModel.getTripPatterns());
         assertTrips(otpModel.getAllTrips());
         assertServiceIds(otpModel.getAllServiceIds());
@@ -102,18 +104,18 @@ public class NetexLoaderSmokeTest {
         assertEquals("N/A", quay.getName());
         assertEquals(59.909803, quay.getLat(), 0.000001);
         assertEquals(10.748062, quay.getLon(), 0.000001);
-        assertEquals("NSR:StopPlace:3995", quay.getParentStation());
-        assertEquals(0, quay.getLocationType());
-        assertEquals("L", quay.getPlatformCode());
+        assertEquals("RB_NSR:StopPlace:3995", quay.getParentStation().getId().toString());
+        assertEquals("L", quay.getCode());
+        assertEquals(16, stops.size());
+    }
 
-        Stop station = map.get(fId("NSR:StopPlace:58243"));
+    private void assertStations(Collection<Station> stations) {
+        Map<FeedScopedId, Station> map = stations.stream().collect(Collectors.toMap(Station::getId, s -> s));
+        Station station = map.get(fId("NSR:StopPlace:58243"));
         assertEquals("Bergkrystallen", station.getName());
         assertEquals(59.866603, station.getLat(), 0.000001);
         assertEquals(10.821614, station.getLon(), 0.000001);
-        assertNull(station.getParentStation());
-        assertEquals(1, station.getLocationType());
-
-        assertEquals(24, stops.size());
+        assertEquals(8, stations.size());
     }
 
     private void assertTripPatterns(Collection<TripPattern> patterns) {

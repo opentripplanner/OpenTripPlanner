@@ -9,7 +9,7 @@ import static java.util.Comparator.comparingInt;
 
 /**
  * Utility class to help working with versioned NeTEx element.
- * <p/>
+ * <p>
  * This class implements <em>Norwegian profile</em> specific rules.
  */
 public class NetexVersionHelper {

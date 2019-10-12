@@ -14,7 +14,7 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 
@@ -64,7 +64,7 @@ public class LinkStopToPlatformTest {
         stop.setLon(10.22213);
         stop.setLat(59.13545);
 
-        TransitStop transitStop = new TransitStop(graph, stop);
+        TransitStopVertex stopVertex = new TransitStopVertex(graph, stop);
     }
 
     /**

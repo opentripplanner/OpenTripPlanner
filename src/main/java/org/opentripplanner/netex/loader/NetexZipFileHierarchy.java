@@ -27,7 +27,7 @@ import java.util.zip.ZipFile;
  *
  * The files is loaded in the hierarchical order. First the <em>Shared files</em>,
  * then for each group: shared group files are loaded before individual group files.
- * <p/>
+ * <p>
  * All NeTEx entities are cached in an index made available for reference linking. To save
  * memory shared group files entities are discarded after the group is loaded (and linking is
  * complete). Entities in individual group files are discarded after the file entry is loaded.

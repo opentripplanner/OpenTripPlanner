@@ -79,7 +79,7 @@
 
     <properties>
         <!-- Lib versions - keep list sorted on property name -->
-        <geotools.version>20.1</geotools.version>
+        <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
         <jackson.version>2.9.7</jackson.version>
         <jersey.version>2.18</jersey.version>
@@ -184,7 +184,21 @@
                 <version>3.8.1</version>
                 <configuration>
                     <!-- Target Java versions -->
-                    <release>8</release>
+                    <release>11</release>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-jar-plugin</artifactId>
+                <version>3.1.2</version>
+                <configuration>
+                    <archive>
+                        <manifestEntries>
+                            <!-- For Java 11 Modules, specify a module name. Do not create module-info.java until all
+                                 our dependencies specify a module name. -->
+                            <Automatic-Module-Name>org.opentripplanner.otp</Automatic-Module-Name>
+                        </manifestEntries>
+                    </archive>
                 </configuration>
             </plugin>
             <plugin>
@@ -221,13 +235,16 @@
                 and in "reports" (for site generation), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.1.1</version>
                 <configuration>
-                    <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <!-- Turn off strict Javadoc checking -->
+                    <doclint>none</doclint>
+                    <!-- Sidestep strange error "class file for javax.media.jai.PropertySourceImpl not found" -->
+                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
                 </configuration>
                 <executions>
-                    <!-- Compress Javadoc into JAR and include that JAR when deploying. -->
+                    <!-- Compress Javadoc into JAR and include that JAR when deploying.
+                         Required for deployments to Maven Central. -->
                     <execution>
                         <id>attach-javadocs</id>
                         <goals>
@@ -239,7 +256,7 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-source-plugin</artifactId>
-                <version>3.0.1</version>
+                <version>3.1.0</version>
                 <executions>
                     <execution>
                         <id>attach-sources</id>
@@ -252,6 +269,7 @@
             <plugin>
                 <groupId>org.codehaus.mojo</groupId>
                 <artifactId>build-helper-maven-plugin</artifactId>
+                <version>3.0.0</version>
                 <executions>
                     <execution>
                         <id>build-helper-generate-sources</id>
@@ -299,10 +317,25 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
-                <version>2.21.0</version>
+                <version>2.19.1</version>
                 <configuration>
-                    <argLine>-Xmx3G</argLine>
-					<argLine>-Dfile.encoding=UTF-8</argLine>
+                    <!-- we have to fork the JVM during tests so that the argLine is passed along -->
+                    <forkCount>3</forkCount>
+                    <!-- enable the restricted reflection under Java 11 so that the ObjectDiffer works -->
+                    <argLine>
+                        -Xmx2G
+                        -Dfile.encoding=UTF-8
+                        --illegal-access=permit
+                        --add-opens java.base/java.lang.module=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.reflect=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.misc=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.loader=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.ref=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.util=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.util.jar=ALL-UNNAMED
+                        --add-opens java.base/jdk.internal.module=ALL-UNNAMED
+                        --add-opens java.base/java.lang=ALL-UNNAMED
+                    </argLine>
                     <!-- Jenkins needs XML test reports to determine whether the build is stable. -->
                     <disableXmlReport>false</disableXmlReport>
                 </configuration>
@@ -333,7 +366,6 @@
             <!-- There used to be a dependency-plugin:copy-dependencies plugin entry
               here, but the shade-plugin will explode the dependencies even if they aren't
               manually copied in. -->
-
             <plugin>
                 <!-- We want to create a standalone jar that can be run on the command
                   line. Java does not really allow this - you cannot place jars inside of jars.
@@ -350,7 +382,7 @@
                   properly if some input files are missing a terminating newline) -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
-                <version>2.2</version>
+                <version>3.2.1</version>
                 <executions>
                     <execution>
                         <phase>package</phase>
@@ -430,10 +462,12 @@
                 (for attach-javadoc during release), preferably with identical version numbers. -->
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.3</version>
+                <version>3.1.1</version>
                 <configuration>
-                    <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <!-- Turn off strict Javadoc checking -->
+                    <doclint>none</doclint>
+                    <!-- Sidestep strange error "class file for javax.media.jai.PropertySourceImpl not found" -->
+                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -461,6 +495,11 @@
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
             <url>https://download.osgeo.org/webdav/geotools/</url>
+        </repository>
+        <repository>
+            <id>geosolutions</id>
+            <name>GeoSolutions Repository</name>
+            <url>http://maven.geo-solutions.it</url>
         </repository>
         <repository>
             <id>axis</id>
@@ -501,17 +540,17 @@
         <!-- GEOTOOLS includes JTS as a transitive dependency. -->
         <dependency>
             <groupId>org.geotools</groupId>
+            <artifactId>gt-main</artifactId>
+            <version>${geotools.version}</version>
+        </dependency>
+        <dependency>
+            <groupId>org.geotools</groupId>
             <artifactId>gt-geojson</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <dependency>
             <groupId>org.geotools</groupId>
             <artifactId>gt-referencing</artifactId>
-            <version>${geotools.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>org.geotools</groupId>
-            <artifactId>gt-referencing3D</artifactId>
             <version>${geotools.version}</version>
         </dependency>
         <dependency>

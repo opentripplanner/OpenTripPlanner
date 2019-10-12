@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.junit.Test;
 import org.onebusaway.gtfs.model.AgencyAndId;
 import org.onebusaway.gtfs.model.Stop;
+import org.opentripplanner.model.WheelChairBoarding;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -42,6 +43,8 @@ public class StopMapperTest {
 
     private static final int WHEELCHAIR_BOARDING = 1;
 
+    private static final WheelChairBoarding WHEELCHAIR_BOARDING_ENUM = WheelChairBoarding.POSSIBLE;
+
     private static final String ZONE_ID = "Zone Id";
 
     private static final Stop STOP = new Stop();
@@ -79,19 +82,13 @@ public class StopMapperTest {
 
         assertEquals("A_1", result.getId().toString());
         assertEquals(CODE, result.getCode());
-        assertEquals(DESC, result.getDesc());
-        assertEquals(DIRECTION, result.getDirection());
+        assertEquals(DESC, result.getDescription());
         assertEquals(LAT, result.getLat(), 0.0001d);
         assertEquals(LON, result.getLon(), 0.0001d);
-        assertEquals(LOCATION_TYPE, result.getLocationType());
         assertEquals(NAME, result.getName());
-        assertEquals(PARENT, result.getParentStation());
-        assertEquals(PLATFORM_CODE, result.getPlatformCode());
-        assertEquals(TIMEZONE, result.getTimezone());
         assertEquals(URL, result.getUrl());
-        assertEquals(VEHICLE_TYPE, result.getVehicleType());
-        assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
-        assertEquals(ZONE_ID, result.getZoneId());
+        assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
+        assertEquals(ZONE_ID, result.getZone());
     }
 
     @Test
@@ -103,19 +100,15 @@ public class StopMapperTest {
 
         assertNotNull(result.getId());
         assertNull(result.getCode());
-        assertNull(result.getDesc());
-        assertNull(result.getDirection());
+        assertNull(result.getDescription());
         assertEquals(0d, result.getLat(), 0.0001);
         assertEquals(0d, result.getLon(), 0.0001);
-        assertEquals(0, result.getLocationType());
         assertNull(result.getName());
         assertNull(result.getParentStation());
-        assertNull(result.getPlatformCode());
-        assertNull(result.getTimezone());
+        assertNull(result.getCode());
         assertNull(result.getUrl());
-        assertFalse(result.isVehicleTypeSet());
-        assertEquals(0, result.getWheelchairBoarding());
-        assertNull(result.getZoneId());
+        assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+        assertNull(result.getZone());
     }
 
     /** Mapping the same object twice, should return the the same instance. */

@@ -25,7 +25,7 @@ public class NetexObjectDecorator {
      * </pre>
      * to:
      * <pre>
-     * withOptional(entity.getProperty(), x -> {
+     * withOptional(entity.getProperty(), x -&gt; {
      *     [do something with x]
      * });
      * </pre>
@@ -43,7 +43,7 @@ public class NetexObjectDecorator {
     /**
      * Use this method to log unmapped entities. The entity mys be part of the supported profile,
      * or not supported at all.
-     * <p/>
+     * <p>
      * Consider implementing the mapper.
      *
      * @param log the logger to use, passing the logger in as an argument make sure the log event

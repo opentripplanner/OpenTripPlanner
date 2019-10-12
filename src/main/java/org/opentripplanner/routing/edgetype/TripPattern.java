@@ -19,13 +19,14 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,7 +44,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
  * sequence of stops. For each stop, there is a list of departure times, running times, arrival
@@ -55,7 +55,7 @@ import java.util.Set;
  * thus TripPattern.
  *
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
+ *            - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
 
@@ -110,9 +110,9 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      * Note: these are not unique to this pattern, and could be shared in the stop.
      * FIXME they appear to be all null. are they even used?
      * TODO OTP2 - This is not used and can be removed. It is initialized in the
-     * TODO OTP2 - PatternHopFactory, but never accessed after that.
+     *           - PatternHopFactory, but never accessed after that.
      */
-    public final TransitStop[] stopVertices;
+    public final TransitStopVertex[] stopVertices;
 
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
@@ -148,8 +148,8 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     public LineString getHopGeometry(int stopIndex) {
-        TransitStop transitStopStart = stopVertices[stopIndex];
-        TransitStop transitStopEnd = stopVertices[stopIndex + 1];
+        TransitStopVertex stopVertexStart = stopVertices[stopIndex];
+        TransitStopVertex stopVertexEnd = stopVertices[stopIndex + 1];
 
         if (hopGeometries != null) {
             return CompactLineString.uncompactLineString(
@@ -160,8 +160,8 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             return GeometryUtils.getGeometryFactory()
                     .createLineString(
                             new Coordinate[] {
-                                    transitStopStart.getCoordinate(),
-                                    transitStopEnd.getCoordinate() });
+                                    stopVertexStart.getCoordinate(),
+                                    stopVertexEnd.getCoordinate() });
         }
     }
 
@@ -204,7 +204,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         this.route = route;
         this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
-        this.stopVertices = new TransitStop[stopPattern.size];
+        this.stopVertices = new TransitStopVertex[stopPattern.size];
         setStopsFromStopPattern(stopPattern);
     }
 
@@ -223,7 +223,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         int i = 0;
         for (Stop stop : stopPattern.stops) {
             // Assume that stops can be boarded with wheelchairs by default (defer to per-trip data)
-            if (stop.getWheelchairBoarding() != 2) {
+            if (stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE) {
                 perStopFlags[i] |= FLAG_WHEELCHAIR_ACCESSIBLE;
             }
             perStopFlags[i] |= stopPattern.pickups[i] << SHIFT_PICKUP;
@@ -270,7 +270,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
-        return getStop(stopIndex).getZoneId();
+        return getStop(stopIndex).getZone();
     }
 
     public int getAlightType(int stopIndex) {

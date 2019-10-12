@@ -23,7 +23,7 @@ import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOV
 import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 // TODO OTP2 - Add Unit tests
-// TODO OTP2 - JavaDoc needed
+//           - JavaDoc needed
 class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 

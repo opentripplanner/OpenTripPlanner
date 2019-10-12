@@ -11,7 +11,7 @@ import java.io.Serializable;
  * it is not kept as part of the Graph.
  * <p/>
  * TODO OTP2 - Refactor the mapping so it do not create these objecs, but map directly into the target
- * TODO OTP2 - object structure.
+ *           - object structure.
  */
 public final class StopTime implements Comparable<StopTime> {
 

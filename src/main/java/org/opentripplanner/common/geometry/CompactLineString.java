@@ -152,6 +152,8 @@ public final class CompactLineString {
     /**
      * Wrapper for the above method in the case where there are no start/end coordinates provided.
      * 0-coordinates are added and then removed in order for the delta encoding to work correctly.
+     * Same as the other version, but in a var-len int packed form (Dlugosz coding).
+     * @return
      */
     public static LineString uncompactLineString(byte[] packedCoords, boolean reverse) {
         LineString lineString = uncompactLineString(0.0, 0.0, 0.0, 0.0, packedCoords, reverse);

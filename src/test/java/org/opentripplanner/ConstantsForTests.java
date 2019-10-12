@@ -2,7 +2,6 @@ package org.opentripplanner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
-import org.geotools.graph.build.GraphBuilder;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -14,17 +13,14 @@ import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
-import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 

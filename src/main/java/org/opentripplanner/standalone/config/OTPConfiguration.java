@@ -10,20 +10,20 @@ import java.io.File;
  * This class is responsible for loading OTP configuration. At the top level this is the
  * 'otp-config.json', and at the graph level it is the 'build-config.json' and the
  * 'router-config.json' files.
- * <p/>
+ * <p>
  * Configuration is loaded lazy at startup form different configuration JSON files. Comments
  * and unquoted keys are allowed in the these configuration files. The configuration is cashed,
  * and not reloaded even if it is changed on the filesystem. This is a OTP design goal, the
  * priority is to make OTP restart fast, rather than supporting configuration reloading.
- * <p/>
+ * <p>
  * We do not require any JSON config files to be present because that would get in the way
  * of the simplest rapid deployment workflow. Therefore we return an empty JSON node when
  * the file is missing, causing us to fall back on all the default values as if there was a
  * JSON file present with no fields defined.
- * <p/>
+ * <p>
  * This class is responsible for logging when a configuration file is loaded, and if the
  * loading fails. It delegates most of this responsibility to the {@link ConfigFile}.
- * <p/>
+ * <p>
  * It support multiple graph configurations to be loaded from respective directories; Hence
  * support for multiple Routers.
  *

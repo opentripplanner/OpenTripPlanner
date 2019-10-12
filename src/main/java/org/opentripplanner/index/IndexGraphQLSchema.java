@@ -35,7 +35,7 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
-import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
 import java.text.ParseException;
@@ -230,7 +230,7 @@ public class IndexGraphQLSchema {
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
                     ((Stop) environment.getSource()).getId().getAgencyId(),
-                    ((Stop) environment.getSource()).getParentStation())))
+                    ((Stop) environment.getSource()).getParentStation().getId().getId())))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("wheelchairBoarding")
@@ -277,7 +277,7 @@ public class IndexGraphQLSchema {
                     .stream()
                     .filter(edge -> edge instanceof SimpleTransfer)
                     .map(edge -> new ImmutableMap.Builder<String, Object>()
-                        .put("stop", ((TransitVertex) edge.getToVertex()).getStop())
+                        .put("stop", ((TransitStopVertex) edge.getToVertex()).getStop())
                         .put("distance", edge.getDistance())
                         .build())
                     .collect(Collectors.toList()))
@@ -999,7 +999,7 @@ public class IndexGraphQLSchema {
                         new Coordinate(environment.getArgument("minLon"), environment.getArgument("minLat")),
                         new Coordinate(environment.getArgument("maxLon"), environment.getArgument("maxLat"))))
                     .stream()
-                    .map(TransitVertex::getStop)
+                    .map(TransitStopVertex::getStop)
                     .filter(stop -> environment.getArgument("agency") == null || stop.getId()
                         .getAgencyId().equalsIgnoreCase(environment.getArgument("agency")))
                     .collect(Collectors.toList()))

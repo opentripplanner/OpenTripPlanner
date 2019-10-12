@@ -20,13 +20,13 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.logUnmapped
 
 /**
  * Map {@link DayTypeAssignment}s to set of {@link LocalDateTime}.
- * <p/>
+ * <p>
  * The mapper is stateful and uses a 2 step approtch:
- * <p/>
+ * <p>
  * - Create a new mapper
  * - Add each dayTypeId and list of assignments (multiple calls)
  * - Merge dates. Take the list of all available days and remove all none available dates.
- * <p/>
+ * <p>
  * THIS CLASS IS NOT THREAD-SAFE, USE SEPARATE INSTANCES FOR EACH THREAD.
  */
 class DayTypeAssignmentMapper {
@@ -54,7 +54,7 @@ class DayTypeAssignmentMapper {
     /**
      * Map all given {@code dayTypeAssignments} for {@code dayTypeId}. The result is kept
      * internally in the mapper until all mapping are performed.
-     * <p/>
+     * <p>
      * Retrieve the results using {@link #mergeDates()}.
      */
     void mapAll(String dayTypeId, Collection<DayTypeAssignment> dayTypeAssignments) {
@@ -68,10 +68,10 @@ class DayTypeAssignmentMapper {
     /**
      * When mapping two lists of dates are created internally in this mapping class, these are
      * merged as a final step in the mapping process.
-     * <p/>
+     * <p>
      * Do not call this method before you want to retrieve the result. Calling this method more
      * than once, may have unexpected effects.
-     * <p/>
+     * <p>
      * @return the list of service dates for all dayTypes mapped.
      */
     Set<LocalDateTime> mergeDates() {

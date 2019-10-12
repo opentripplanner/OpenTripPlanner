@@ -16,6 +16,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
@@ -62,6 +63,8 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
 
     private final List<ShapePoint> shapePoints = new ArrayList<>();
+
+    private final EntityById<FeedScopedId, Station> stationsById = new EntityById<>();
 
     private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
 
@@ -130,6 +133,10 @@ public class OtpTransitServiceBuilder {
 
     public List<ShapePoint> getShapePoints() {
         return shapePoints;
+    }
+
+    public EntityById<FeedScopedId, Station> getStations() {
+        return stationsById;
     }
 
     public EntityById<FeedScopedId, Stop> getStops() {
