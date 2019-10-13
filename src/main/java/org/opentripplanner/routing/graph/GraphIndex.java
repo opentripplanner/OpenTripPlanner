@@ -14,7 +14,6 @@ import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -38,8 +37,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -59,7 +56,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -89,9 +85,6 @@ public class GraphIndex {
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
     private final Map<FeedScopedId,Integer> serviceCodes;
-
-    private AlertPatchService alertPatchService;
-
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
@@ -445,22 +438,5 @@ public class GraphIndex {
      */
     public Collection<Operator> getAllOperators() {
         return operatorForId.values();
-    }
-
-    public AlertPatchService getSiriAlertPatchService() {
-        if (alertPatchService == null) {
-            if (graph.updaterManager == null) {
-                alertPatchService = new AlertPatchServiceImpl(graph);
-            }
-            else {
-                Optional<AlertPatchService> patchServiceOptional = graph.updaterManager.getUpdaterList().stream()
-                        .filter(SiriSXUpdater.class::isInstance)
-                        .map(SiriSXUpdater.class::cast)
-                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
-
-                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(graph));
-            }
-        }
-        return alertPatchService;
     }
 }

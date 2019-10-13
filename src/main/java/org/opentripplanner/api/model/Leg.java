@@ -209,9 +209,7 @@ public class Leg {
      * For non-transit legs, null.
      * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
      */
-    @XmlElementWrapper(name = "intermediateStops")
-    @JsonProperty(value="intermediateStops")
-    public List<Place> stop;
+    public List<Place> intermediateStops;
 
     /**
      * The leg's geometry.

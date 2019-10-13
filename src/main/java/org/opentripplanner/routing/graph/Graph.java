@@ -24,6 +24,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -32,10 +33,10 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -49,7 +50,9 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -248,6 +251,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer realtimeTransitLayer;
+
+    private transient AlertPatchService alertPatchService;
+
 
     /**
      * Hack. I've tried three different ways of generating unique labels.
@@ -975,4 +981,22 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
+
+    public AlertPatchService getSiriAlertPatchService() {
+        if (alertPatchService == null) {
+            if (updaterManager == null) {
+                alertPatchService = new AlertPatchServiceImpl(this);
+            }
+            else {
+                Optional<AlertPatchService> patchServiceOptional = updaterManager.getUpdaterList().stream()
+                        .filter(SiriSXUpdater.class::isInstance)
+                        .map(SiriSXUpdater.class::cast)
+                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
+
+                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(this));
+            }
+        }
+        return alertPatchService;
+    }
+
 }

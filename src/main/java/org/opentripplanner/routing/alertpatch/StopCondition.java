@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.alertpatch;
 
 
+import java.util.Set;
+
 /**
  * Represents conditions for when an AlertPatch is applicable
  *
@@ -18,5 +20,10 @@ public enum StopCondition {
     /**  when a passenger must request the serving of a stop */
     REQUEST_STOP,
     /**  affects all interactions with the stop (boarding, alighting, arrival, departure, interchanges */
-    STOP
+    STOP;
+
+    public static final Set<StopCondition> FIRST_DEPARTURE = Set.of(STOP, START_POINT);
+    public static final Set<StopCondition> DEPARTURE = Set.of(STOP, START_POINT, EXCEPTIONAL_STOP);
+    public static final Set<StopCondition> PASSING = Set.of(STOP, NOT_STOPPING);
+    public static final Set<StopCondition> ARRIVING = Set.of(STOP, DESTINATION);
 }

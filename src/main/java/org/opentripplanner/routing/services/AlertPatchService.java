@@ -17,18 +17,15 @@ public interface AlertPatchService {
 
     Collection<AlertPatch> getRoutePatches(FeedScopedId route);
 
-    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
     Collection<AlertPatch> getTripPatches(FeedScopedId trip);
 
-    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
     Collection<AlertPatch> getAgencyPatches(String agency);
 
-    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
     Collection<AlertPatch> getStopAndRoutePatches(FeedScopedId stop, FeedScopedId route);
 
-    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
     Collection<AlertPatch> getStopAndTripPatches(FeedScopedId stop, FeedScopedId trip);
 
+    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
     Collection<AlertPatch> getTripPatternPatches(TripPattern tripPattern);
 
     void apply(AlertPatch alertPatch);
