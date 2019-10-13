@@ -3,6 +3,7 @@ package org.opentripplanner.ext.siri;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -18,7 +19,13 @@ import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
@@ -52,17 +59,6 @@ public class SiriFuzzyTripMatcher {
         initCache(this.index);
     }
 
-    //For testing only
-    protected SiriFuzzyTripMatcher(GraphIndex index, boolean forceCacheRebuild) {
-        LOG.error("For testing only");
-        this.index = index;
-
-        if (forceCacheRebuild) {
-            mappedTripsCache.clear();
-        }
-        initCache(this.index);
-    }
-
     /**
      * Matches VehicleActivity to a set of possible Trips based on tripId
      */
@@ -92,7 +88,7 @@ public class SiriFuzzyTripMatcher {
         return trips;
     }
 
-    public Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
+    Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
         String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
         if (serviceJourneyId != null) {
             for (String feedId : index.agenciesForFeedId.keySet()) {
@@ -162,7 +158,7 @@ public class SiriFuzzyTripMatcher {
             Stop stop = index.stopForId.get(new FeedScopedId(agencyId, lastStopPoint));
             if (stop != null && stop.getParentStation() != null) {
                 // TODO OTP2 resolve stop-station split
-                Collection<Stop> allQuays = index.stopsForParentStation.get(stop.getParentStation());
+                Collection<Stop> allQuays = stop.getParentStation().getChildStops();
                 for (Stop quay : allQuays) {
                     Set<Trip> tripSet = start_stop_tripCache.get(createStartStopKey(quay.getId().getId(), arrivalTime.toLocalTime().toSecondOfDay()));
                     if (tripSet != null) {
@@ -284,16 +280,18 @@ public class SiriFuzzyTripMatcher {
             return null;
         }
 
+        // TODO OTP2 #2838 - Guessing on the feedId is not a deterministic way to find a stop.
+
         //First, assume same agency
+
         Stop firstStop = index.stopForId.values().stream().findFirst().get();
         FeedScopedId id = new FeedScopedId(firstStop.getId().getAgencyId(), siriStopId);
         if (index.stopForId.containsKey(id)) {
             return id;
-        } /*
-        TODO: Find StopPlace when Quay is provided
-        else if (index.stationForId.containsKey(id)) {
+        }
+        else if (index.graph.stationById.containsKey(id)) {
             return id;
-        }*/
+        }
 
         //Not same agency - loop through all stops/Stations
         Collection<Stop> stops = index.stopForId.values();
@@ -303,10 +301,9 @@ public class SiriFuzzyTripMatcher {
             }
         }
         //No match found in quays - check parent-stops (stopplace)
-        for (Stop stop : stops) {
-            if (siriStopId.equals(stop.getParentStation())) {
-                // TODO OTP2 reflect stop-station split
-                return new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
+        for (Station station : index.graph.stationById.values()) {
+            if (station.getId().getId().equals(siriStopId)) {
+                return station.getId();
             }
         }
 
@@ -334,7 +331,7 @@ public class SiriFuzzyTripMatcher {
         return null;
     }
 
-    public List<FeedScopedId> getTripIdForTripShortNameServiceDateAndMode(String tripShortName, ServiceDate serviceDate, TraverseMode traverseMode/*, TransmodelTransportSubmode transportSubmode*/) {
+    List<FeedScopedId> getTripIdForTripShortNameServiceDateAndMode(String tripShortName, ServiceDate serviceDate, TraverseMode traverseMode/*, TransmodelTransportSubmode transportSubmode*/) {
 
         Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(tripShortName);
 

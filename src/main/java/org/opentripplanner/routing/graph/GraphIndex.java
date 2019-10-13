@@ -119,8 +119,6 @@ public class GraphIndex {
             this.operatorForId.put(operator.getId(), operator);
         }
 
-        Collection<Edge> edges = graph.getEdges();
-
         /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         for (Vertex vertex : graph.getVertices()) {
