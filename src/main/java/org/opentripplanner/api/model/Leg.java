@@ -1,5 +1,6 @@
 package org.opentripplanner.api.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
@@ -12,6 +13,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
+import javax.xml.bind.annotation.XmlTransient;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -227,8 +229,8 @@ public class Leg {
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
-    @XmlElement
-    @JsonSerialize
+    @XmlTransient
+    @JsonIgnore
     public List<AlertPatch> alertPatches = new ArrayList<>();
 
     @XmlAttribute

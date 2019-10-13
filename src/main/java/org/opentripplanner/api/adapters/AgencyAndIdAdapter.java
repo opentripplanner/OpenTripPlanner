@@ -1,13 +1,13 @@
 package org.opentripplanner.api.adapters;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.opentripplanner.model.FeedScopedId;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedScopedId> {
 
     @Override
-    public FeedScopedId unmarshal(AgencyAndIdType arg) throws Exception {
+    public FeedScopedId unmarshal(AgencyAndIdType arg) {
         if (arg == null) {
             return null;
         }
@@ -15,7 +15,7 @@ public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedScopedId
     }
 
     @Override
-    public AgencyAndIdType marshal(FeedScopedId arg) throws Exception {
+    public AgencyAndIdType marshal(FeedScopedId arg) {
         if (arg == null) {
             return null;
         }

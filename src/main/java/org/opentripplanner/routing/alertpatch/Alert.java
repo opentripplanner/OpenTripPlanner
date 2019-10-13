@@ -3,49 +3,33 @@ package org.opentripplanner.routing.alertpatch;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlType;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 
-@XmlType
 public class Alert implements Serializable {
     private static final long serialVersionUID = 8305126586053909836L;
 
-    @XmlElement
     public I18NString alertHeaderText;
-
-    @XmlElement
     public I18NString alertDescriptionText;
-
-    @XmlElement
     public I18NString alertDetailText;
-
-    @XmlElement
     public I18NString alertAdviceText;
-
-    @XmlElement
     public I18NString alertUrl;
 
     private List<AlertUrl> alertUrlList = new ArrayList<>();
 
     //null means unknown
-    @XmlElement
     public Date effectiveStartDate;
 
     //null means unknown
-    @XmlElement
     public Date effectiveEndDate;
 
     //null means unknown
-    @XmlElement
     public String alertType;
 
     //null means unknown
-    @XmlElement
     public String severity;
 
     public List<AlertUrl> getAlertUrlList() {
@@ -56,73 +40,30 @@ public class Alert implements Serializable {
         this.alertUrlList = alertUrlList;
     }
 
-    public static HashSet<Alert> newSimpleAlertSet(String text) {
-        Alert note = createSimpleAlerts(text);
-        HashSet<Alert> notes = new HashSet<Alert>(1);
-        notes.add(note);
-        return notes;
-    }
-
     public static Alert createSimpleAlerts(String text) {
         Alert note = new Alert();
         note.alertHeaderText = new NonLocalizedString(text);
         return note;
     }
 
+    // TODO - Alerts should not be added to the internal model if they are the same; This check should be done
+    //      - when importing the Alerts into the system. Then the Alert can use the System identity for
+    //      - hachCode and equals.
+    @Override
     public boolean equals(Object o) {
-        if (!(o instanceof Alert)) {
-            return false;
-        }
-        Alert ao = (Alert) o;
-        if (alertDescriptionText == null) {
-            if (ao.alertDescriptionText != null) {
-                return false;
-            }
-        } else {
-            if (!alertDescriptionText.equals(ao.alertDescriptionText)) {
-                return false;
-            }
-        }
-        if (alertDetailText == null) {
-            if (ao.alertDetailText != null) {
-                return false;
-            }
-        } else {
-            if (!alertDetailText.equals(ao.alertDetailText)) {
-                return false;
-            }
-        }
-        if (alertAdviceText == null) {
-            if (ao.alertAdviceText != null) {
-                return false;
-            }
-        } else {
-            if (!alertAdviceText.equals(ao.alertAdviceText)) {
-                return false;
-            }
-        }
-        if (alertHeaderText == null) {
-            if (ao.alertHeaderText != null) {
-                return false;
-            }
-        } else {
-            if (!alertHeaderText.equals(ao.alertHeaderText)) {
-                return false;
-            }
-        }
-        if (alertUrl == null) {
-            return ao.alertUrl == null;
-        } else {
-            return alertUrl.equals(ao.alertUrl);
-        }
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Alert alert = (Alert) o;
+        return Objects.equals(alertHeaderText, alert.alertHeaderText) &&
+                Objects.equals(alertDescriptionText, alert.alertDescriptionText) &&
+                Objects.equals(alertDetailText, alert.alertDetailText) &&
+                Objects.equals(alertAdviceText, alert.alertAdviceText) &&
+                Objects.equals(alertUrl, alert.alertUrl);
     }
 
+    @Override
     public int hashCode() {
-        return (alertDescriptionText == null ? 0 : alertDescriptionText.hashCode())
-                + (alertDetailText == null ? 0 : alertDetailText.hashCode())
-                + (alertAdviceText == null ? 0 : alertAdviceText.hashCode())
-                + (alertHeaderText == null ? 0 : alertHeaderText.hashCode())
-                + (alertUrl == null ? 0 : alertUrl.hashCode());
+        return Objects.hash(alertHeaderText, alertDescriptionText, alertDetailText, alertAdviceText, alertUrl);
     }
 
     @Override
