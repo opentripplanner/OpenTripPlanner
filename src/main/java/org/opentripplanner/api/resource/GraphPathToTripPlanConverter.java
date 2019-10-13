@@ -42,6 +42,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -652,22 +653,26 @@ public abstract class GraphPathToTripPlanConverter {
             }
 
             if (leg.tripId != null) {
-                addAlertPatchesToLeg(leg, graph.index.getAlertsForTripId(leg.tripId),
+                addAlertPatchesToLeg(leg, alertPatchService(graph).getTripPatches(leg.tripId),
                         requestedLocale, leg.startTime.getTime(), leg.endTime.getTime());
             }
             if (leg.routeId != null) {
-                addAlertPatchesToLeg(leg, graph.index.getAlertsForRouteId(leg.routeId),
+                addAlertPatchesToLeg(leg, alertPatchService(graph).getRoutePatches(leg.routeId),
                         requestedLocale, leg.startTime.getTime(), leg.endTime.getTime());
             }
 
             if (leg.agencyId != null) {
-                addAlertPatchesToLeg(leg, graph.index.getAlertsForAgency(graph.index.getAgencyWithoutFeedId(leg.agencyId)),
+                addAlertPatchesToLeg(leg, alertPatchService(graph).getAgencyPatches(graph.index.getAgencyWithoutFeedId(leg.agencyId).getId()),
                         requestedLocale, leg.startTime.getTime(), leg.endTime.getTime());
             }
 
             // Filter alerts when there are multiple timePeriods for each alert
             leg.alertPatches.removeIf(alertPatch ->  !alertPatch.displayDuring(leg.startTime.getTimeInMillis()/1000, leg.endTime.getTimeInMillis()/1000));
         }
+    }
+
+    private static AlertPatchService alertPatchService(Graph g) {
+        return g.index.getSiriAlertPatchService();
     }
 
     private static Collection<AlertPatch> getAlertsForStopAndRoute(Graph graph, FeedScopedId stopId, FeedScopedId routeId) {
@@ -680,7 +685,7 @@ public abstract class GraphPathToTripPlanConverter {
         if (stop == null) {
             return new ArrayList<>();
         }
-        Collection<AlertPatch> alertsForStopAndRoute = graph.index.getAlertsForStopAndRoute(stopId,routeId);
+        Collection<AlertPatch> alertsForStopAndRoute = graph.index.getSiriAlertPatchService().getStopAndRoutePatches(stopId, routeId);
         if (checkParentStop) {
             if (alertsForStopAndRoute == null) {
                 alertsForStopAndRoute = new HashSet<>();
@@ -719,7 +724,7 @@ public abstract class GraphPathToTripPlanConverter {
             return new ArrayList<>();
         }
 
-        Collection<AlertPatch> alertsForStopAndTrip = graph.index.getAlertsForStopAndTrip(stopId, tripId);
+        Collection<AlertPatch> alertsForStopAndTrip = graph.index.getSiriAlertPatchService().getStopAndTripPatches(stopId, tripId);
         if (checkParentStop) {
             if (alertsForStopAndTrip == null) {
                 alertsForStopAndTrip = new HashSet<>();
@@ -755,7 +760,7 @@ public abstract class GraphPathToTripPlanConverter {
             return new ArrayList<>();
         }
 
-        Collection<AlertPatch> alertsForStop  = graph.index.getAlertsForStopId(stopId);
+        Collection<AlertPatch> alertsForStop  = graph.index.getSiriAlertPatchService().getStopPatches(stopId);
         if (checkParentStop) {
             if (alertsForStop == null) {
                 alertsForStop = new HashSet<>();

@@ -29,7 +29,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -442,24 +441,6 @@ public class GraphIndex {
         return res == null ? Collections.emptyList() : res;
     }
 
-    private AlertPatchService getSiriAlertPatchService() {
-        if (graph.updaterManager == null) {
-            return new AlertPatchServiceImpl(graph);
-        }
-        if (alertPatchService == null) {
-            Optional<AlertPatchService> patchServiceOptional = graph.updaterManager.getUpdaterList().stream()
-                    .filter(SiriSXUpdater.class::isInstance)
-                    .map(SiriSXUpdater.class::cast)
-                    .map(SiriSXUpdater::getAlertPatchService).findFirst();
-
-            if (patchServiceOptional.isPresent()) {
-                alertPatchService = patchServiceOptional.get();
-            } else {
-                alertPatchService = new AlertPatchServiceImpl(graph);
-            }
-        }
-        return alertPatchService;
-    }
 
     /**
      * Get a list of all operators spanning across all feeds.
@@ -468,62 +449,20 @@ public class GraphIndex {
         return operatorForId.values();
     }
 
-    // All of the below methods are added just to fetch SIRI SX notices on different transit model entities.
-    // TODO OTP2 We should try storing all these alerts in a single map with complex keys
+    public AlertPatchService getSiriAlertPatchService() {
+        if (alertPatchService == null) {
+            if (graph.updaterManager == null) {
+                alertPatchService = new AlertPatchServiceImpl(graph);
+            }
+            else {
+                Optional<AlertPatchService> patchServiceOptional = graph.updaterManager.getUpdaterList().stream()
+                        .filter(SiriSXUpdater.class::isInstance)
+                        .map(SiriSXUpdater.class::cast)
+                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
 
-    public Collection<AlertPatch> getAlerts() {
-        return getSiriAlertPatchService().getAllAlertPatches();
+                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(graph));
+            }
+        }
+        return alertPatchService;
     }
-
-    public Collection<AlertPatch> getAlertsForRoute(Route route) {
-        return getSiriAlertPatchService().getRoutePatches(route.getId());
-    }
-
-    public Collection<AlertPatch> getAlertsForRouteId(FeedScopedId routeId) {
-        return getSiriAlertPatchService().getRoutePatches(routeId);
-    }
-
-    public Collection<AlertPatch> getAlertsForTrip(Trip trip) {
-        return getSiriAlertPatchService().getTripPatches(trip.getId());
-    }
-
-    public Collection<AlertPatch> getAlertsForTripId(FeedScopedId tripId) {
-        return getSiriAlertPatchService().getTripPatches(tripId);
-    }
-
-    public Collection<AlertPatch> getAlertsForPattern(TripPattern pattern) {
-        return getSiriAlertPatchService().getTripPatternPatches(pattern);
-    }
-
-    public Collection<AlertPatch> getAlertsForAgency(Agency agency) {
-        return getSiriAlertPatchService().getAgencyPatches(agency.getId());
-    }
-
-    public AlertPatch getAlertForId(String id) {
-        return getSiriAlertPatchService().getPatchById(id);
-    }
-
-    public Collection<AlertPatch> getAlertsForStop(Stop stop) {
-        return getSiriAlertPatchService().getStopPatches(stop.getId());
-    }
-
-    public Collection<AlertPatch> getAlertsForStopId(FeedScopedId stopId) {
-        return getSiriAlertPatchService().getStopPatches(stopId);
-    }
-
-    public Collection<AlertPatch> getAlertsForStopAndRoute(Stop stop, Route route) {
-        return getSiriAlertPatchService().getStopAndRoutePatches(stop.getId(), route.getId());
-    }
-
-    public Collection<AlertPatch> getAlertsForStopAndRoute(FeedScopedId stopId, FeedScopedId routeId) {
-        return getSiriAlertPatchService().getStopAndRoutePatches(stopId, routeId);
-    }
-
-    public Collection<AlertPatch> getAlertsForStopAndTrip(Stop stop, Trip trip) {
-        return getSiriAlertPatchService().getStopAndTripPatches(stop.getId(), trip.getId());
-    }
-    public Collection<AlertPatch> getAlertsForStopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
-        return getSiriAlertPatchService().getStopAndTripPatches(stopId, tripId);
-    }
-
 }
