@@ -216,7 +216,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
-                <version>2.4.0</version>
+                <version>2.12.0</version>
                 <executions>
                     <execution>
                         <!-- override default binding to process-sources phase (enunciate generates web services). -->
@@ -464,8 +464,10 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.1.1</version>
                 <configuration>
-                    <!-- Turn off Java 8 strict Javadoc checking -->
-                    <additionalparam>-Xdoclint:none</additionalparam>
+                    <!-- Turn off strict Javadoc checking -->
+                    <doclint>none</doclint>
+                    <!-- Sidestep strange error "class file for javax.media.jai.PropertySourceImpl not found" -->
+                    <excludePackageNames>org.opentripplanner.graph_builder.module.ned:*</excludePackageNames>
                 </configuration>
                 <reportSets>
                     <reportSet>
@@ -626,7 +628,12 @@
             <version>0.12</version>
         </dependency>
 
-        <!-- Necessary for JAXB -->
+        <!--
+            The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
+            The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and
+            runtime dependencies anyway here at the top level to prevent transitive dependencies from pulling in
+            mismatched versions. This is overriding an older version of jaxb-api pulled in by the netex-java-model.
+        -->
         <dependency>
             <groupId>javax.xml.bind</groupId>
             <artifactId>jaxb-api</artifactId>
@@ -636,9 +643,7 @@
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
             <version>2.3.1</version>
-            <scope>runtime</scope>
         </dependency>
-
 
         <!-- TESTING -->
         <dependency>
@@ -853,12 +858,6 @@
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
             <version>2.2.0</version>
-        </dependency>
-        <!-- Provides annotations like XmlElement indicating how classes should be serialized  -->
-        <dependency>
-            <groupId>javax.xml.bind</groupId>
-            <artifactId>jaxb-api</artifactId>
-            <version>2.3.1</version>
         </dependency>
         <!-- Support for OTP scripting -->
         <dependency>

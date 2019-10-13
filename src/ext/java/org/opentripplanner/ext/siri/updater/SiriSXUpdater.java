@@ -54,7 +54,6 @@ public class SiriSXUpdater extends PollingGraphUpdater {
             updateHandler = new SiriAlertsUpdateHandler();
         }
         updateHandler.setEarlyStart(earlyStart);
-        updateHandler.setFeedId(feedId);
         updateHandler.setAlertPatchService(alertPatchService);
         updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
 

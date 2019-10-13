@@ -3,9 +3,8 @@ package org.opentripplanner.util;
 import java.util.Locale;
 
 /**
- *
  * This interface is used when providing translations on server side.
- *
+ * Sources: OSM tags with multiple languages (like street names), or TranslatedString fields in GTFS-RT Alert messages.
  * @author mabu
  */
 public interface I18NString {

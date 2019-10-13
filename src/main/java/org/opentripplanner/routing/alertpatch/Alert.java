@@ -16,6 +16,9 @@ public class Alert implements Serializable {
     public I18NString alertDescriptionText;
     public I18NString alertDetailText;
     public I18NString alertAdviceText;
+
+    // TODO OTP2 we wanted to merge the GTFS single alertUrl and the SIRI multiple URLs.
+    //      However, GTFS URLs are one-per-language in a single object, and SIRI URLs are N objects with no translation.
     public I18NString alertUrl;
 
     private List<AlertUrl> alertUrlList = new ArrayList<>();

@@ -21,14 +21,13 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 /**
- * This updater only includes GTFS-Realtime Service Alert feeds.
- * @author novalis
- *
+ * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
+ * NOTE this cannot handle situations where there are multiple feeds with different IDs (for now it may only work in
+ * single-feed regions).
  */
 public class SiriAlertsUpdateHandler {
-    private static final Logger log = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
 
-    private String feedId;
+    private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
 
     private AlertPatchService alertPatchService;
 
@@ -56,7 +55,7 @@ public class SiriAlertsUpdateHandler {
                 alertPatchService.expire(idsToExpire);
                 alertPatchService.applyAll(alertPatches);
 
-                log.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms", alertPatches.size(), idsToExpire.size(), situations.getPtSituationElements().size(), alertPatchService.getAllAlertPatches().size(), (System.currentTimeMillis()-t1));
+                LOG.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms", alertPatches.size(), idsToExpire.size(), situations.getPtSituationElements().size(), alertPatchService.getAllAlertPatches().size(), (System.currentTimeMillis()-t1));
             }
         }
     }
@@ -74,7 +73,7 @@ public class SiriAlertsUpdateHandler {
                 ((alert.alertHeaderText == null || alert.alertHeaderText.toString().isEmpty()) &&
                 (alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()) &&
                 (alert.alertDetailText == null || alert.alertDetailText.toString().isEmpty()))) {
-            log.debug("Empty Alert - ignoring situationNumber: {}", situation.getSituationNumber() != null ? situation.getSituationNumber().getValue():null);
+            LOG.debug("Empty Alert - ignoring situationNumber: {}", situation.getSituationNumber() != null ? situation.getSituationNumber().getValue():null);
             return null;
         }
 
@@ -560,9 +559,9 @@ public class SiriAlertsUpdateHandler {
                 patch.setSituationNumber(situationNumber);
             }
         } else if (expireSituation) {
-            log.debug("Expired non-existing alert - ignoring situation with situationNumber {}", situationNumber);
+            LOG.debug("Expired non-existing alert - ignoring situation with situationNumber {}", situationNumber);
         } else {
-            log.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
+            LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
         }
 
         return Pair.of(idsToExpire, patches);
@@ -703,11 +702,6 @@ public class SiriAlertsUpdateHandler {
         }
 
         return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
-    }
-
-    public void setFeedId(String feedId) {
-        if(feedId != null)
-            this.feedId = feedId.intern();
     }
 
     public void setAlertPatchService(AlertPatchService alertPatchService) {

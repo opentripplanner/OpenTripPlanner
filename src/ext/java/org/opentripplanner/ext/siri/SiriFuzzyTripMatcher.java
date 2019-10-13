@@ -24,6 +24,14 @@ import java.util.*;
  * This class is used for matching TripDescriptors without trip_ids to scheduled GTFS data and to
  * feed back that information into a new TripDescriptor with proper trip_id.
  *
+ * It is mainly written for Entur (Norway) data, which doesn't yet have complete ID-based matching of SIRI messages
+ * to transit model objects. But it may be easily adaptable to other locations, as it's mainly looking at the last stop
+ * and arrival times of the scheduled trip. The matching process will always be applied even in places where you have
+ * good quality IDs in SIRI data and don't need it - we'd have to add a way to disable it.
+ *
+ * Several instances of this SiriFuzzyTripMatcher may appear in different SIRI updaters, but they all share a common
+ * set of static Map fields. We generally don't advocate using static fields in this way, but as part of a sandbox
+ * contribution we are maintaining this implementation.
  */
 public class SiriFuzzyTripMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
@@ -153,6 +161,7 @@ public class SiriFuzzyTripMatcher {
             String agencyId = index.agenciesForFeedId.keySet().iterator().next();
             Stop stop = index.stopForId.get(new FeedScopedId(agencyId, lastStopPoint));
             if (stop != null && stop.getParentStation() != null) {
+                // TODO OTP2 resolve stop-station split
                 Collection<Stop> allQuays = index.stopsForParentStation.get(stop.getParentStation());
                 for (Stop quay : allQuays) {
                     Set<Trip> tripSet = start_stop_tripCache.get(createStartStopKey(quay.getId().getId(), arrivalTime.toLocalTime().toSecondOfDay()));
@@ -296,6 +305,7 @@ public class SiriFuzzyTripMatcher {
         //No match found in quays - check parent-stops (stopplace)
         for (Stop stop : stops) {
             if (siriStopId.equals(stop.getParentStation())) {
+                // TODO OTP2 reflect stop-station split
                 return new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation());
             }
         }
