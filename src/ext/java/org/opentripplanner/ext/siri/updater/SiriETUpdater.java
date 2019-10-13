@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -8,8 +9,11 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
+import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -93,25 +97,19 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
-        // Create a realtime data snapshot source and wait for runnable to be executed
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                // Only create a realtime data snapshot source if none exists already
-                SiriTimetableSnapshotSource snapshotSource = new SiriTimetableSnapshotSource(graph);
+        // Only create a realtime data snapshot source if none exists already
+        SiriTimetableSnapshotSource snapshotSource = new SiriTimetableSnapshotSource(graph);
 
-                // Set properties of realtime data snapshot source
-                if (logFrequency != null) {
-                    snapshotSource.logFrequency = (logFrequency);
-                }
-                if (maxSnapshotFrequency != null) {
-                    snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
-                }
-                if (purgeExpiredData != null) {
-                    snapshotSource.purgeExpiredData = (purgeExpiredData);
-                }
-            }
-        });
+        // Set properties of realtime data snapshot source
+        if (logFrequency != null) {
+            snapshotSource.logFrequency = (logFrequency);
+        }
+        if (maxSnapshotFrequency != null) {
+            snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+        }
+        if (purgeExpiredData != null) {
+            snapshotSource.purgeExpiredData = (purgeExpiredData);
+        }
     }
 
     /**
@@ -120,32 +118,24 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     @Override
     public void runPolling() throws Exception {
-        // Get update lists from update source
-        Siri updates = updateSource.getUpdates();
-        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
-
-        if (updates != null && updates.getServiceDelivery().getEstimatedTimetableDeliveries() != null) {
-            // Handle trip updates via graph writer runnable
-            EstimatedTimetableGraphWriterRunnable runnable =
-                    new EstimatedTimetableGraphWriterRunnable(
-                            fullDataset,
-                            feedId,
-                            updates.getServiceDelivery().getEstimatedTimetableDeliveries()
-                    );
-            if (!isReady()) {
-                LOG.info("Execute blocking tripupdates");
-                updaterManager.executeBlocking(runnable);
-            } else {
-                updaterManager.execute(runnable);
+        boolean moreData = false;
+        do {
+            Siri updates = updateSource.getUpdates();
+            if (updates != null) {
+                boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+                ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+                // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
+                moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+                final boolean markPrimed = !moreData;
+                List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
+                if (etds != null) {
+                    // TODO OTP2 this could be a lambda or static method on this class
+                    updaterManager.execute(new EstimatedTimetableGraphWriterRunnable(fullDataset, feedId, etds));
+                }
             }
-        }
-        if (updates != null &&
-                updates.getServiceDelivery() != null &&
-                updates.getServiceDelivery().isMoreData() != null &&
-                updates.getServiceDelivery().isMoreData()) {
-            LOG.info("More data is available - fetching immediately");
-            runPolling();
-        }
+        } while (moreData);
+        // TODO OTP2 markPrimed inside GraphWriterRunnable
+        primed = true;
     }
 
     @Override

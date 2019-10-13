@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
@@ -10,8 +11,11 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
+import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 /**
@@ -108,29 +112,23 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Create a realtime data snapshot source and wait for runnable to be executed
-        updaterManager.executeBlocking(new GraphWriterRunnable() {
-            @Override
-            public void run(Graph graph) {
-                // Only create a realtime data snapshot source if none exists already
-                SiriTimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(
-                        SiriTimetableSnapshotSource::new
-                );
-
-                // Set properties of realtime data snapshot source
-                if (logFrequency != null) {
-                    snapshotSource.logFrequency = logFrequency;
-                }
-                if (maxSnapshotFrequency != null) {
-                    snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
-                }
-                if (purgeExpiredData != null) {
-                    snapshotSource.purgeExpiredData = purgeExpiredData;
-                }
-                if (siriFuzzyTripMatcher != null) {
-                    siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
-                }
-            }
-        });
+        // Only create a realtime data snapshot source if none exists already
+        SiriTimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(
+                SiriTimetableSnapshotSource::new
+        );
+        // Set properties of realtime data snapshot source
+        if (logFrequency != null) {
+            snapshotSource.logFrequency = logFrequency;
+        }
+        if (maxSnapshotFrequency != null) {
+            snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
+        }
+        if (purgeExpiredData != null) {
+            snapshotSource.purgeExpiredData = purgeExpiredData;
+        }
+        if (siriFuzzyTripMatcher != null) {
+            siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+        }
     }
 
     /**
@@ -138,29 +136,28 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      * applies those updates to the graph.
      */
     @Override
-    public void runPolling() throws Exception{
-        // Get update lists from update source
-        Siri updates = updateSource.getUpdates();
-        boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
-
-        if (updates != null && updates.getServiceDelivery().getVehicleMonitoringDeliveries() != null) {
-            // Handle trip updates via graph writer runnable
-            VehicleMonitoringGraphWriterRunnable runnable =
-                    new VehicleMonitoringGraphWriterRunnable(fullDataset,feedId, updates.getServiceDelivery().getVehicleMonitoringDeliveries());
-            if (!isReady()) {
-                LOG.info("Execute blocking tripupdates");
-                updaterManager.executeBlocking(runnable);
-            } else {
-                updaterManager.execute(runnable);
+    public void runPolling() throws Exception {
+        boolean moreData = false;
+        do {
+            // Get update lists from update source
+            Siri updates = updateSource.getUpdates();
+            if (updates != null) {
+                boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
+                ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+                // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
+                moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+                final boolean markPrimed = !moreData;
+                List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
+                if (vmds != null) {
+                    // Handle trip updates via graph writer runnable. TODO this could be a static method or lambda
+                    updaterManager.execute(new VehicleMonitoringGraphWriterRunnable(fullDataset, feedId, vmds));
+                }
+                // Use isTrue just in case isMoreData returns null
+                moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
             }
-        }
-        if (updates != null &&
-                updates.getServiceDelivery() != null &&
-                updates.getServiceDelivery().isMoreData() != null &&
-                updates.getServiceDelivery().isMoreData()) {
-            LOG.info("More data is available - fetching immediately");
-            runPolling();
-        }
+        } while (moreData);
+        // TODO OTP2 markPrimed inside GraphWriterRunnable, not here
+        primed = true;
     }
 
     @Override
@@ -171,4 +168,5 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         String s = (updateSource == null) ? "NONE" : updateSource.toString();
         return "Polling SIRI VM updater with update source = " + s;
     }
+
 }

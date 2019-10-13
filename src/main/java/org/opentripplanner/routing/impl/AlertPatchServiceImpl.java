@@ -15,6 +15,15 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * When an alert is added with more than one transit entity, e.g. a Stop and a Trip, both conditions must be met for
+ * the alert to be displayed. This is the case in both the Norwegian interpretation of SIRI, and the GTFS-RT alerts
+ * specification.
+ *
+ * TODO OTP2 - Simplify this large set of Map fields down into one Map with wrapper objects in the keys or values
+ *           - that do more complex matching and filtering. We could store alerts keyed on the single more specific
+ *           - entity (e.g. trip rather than stop or route) and then include the full filter logic in AlertPatch.
+ */
 public class AlertPatchServiceImpl implements AlertPatchService {
 
     private Graph graph;

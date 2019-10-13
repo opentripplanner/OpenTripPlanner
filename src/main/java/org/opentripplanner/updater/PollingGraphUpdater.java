@@ -34,19 +34,22 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** How long to wait after polling to poll again. */
     protected Integer pollingPeriodSeconds;
 
-    /** The type name in the preferences JSON. FIXME String type codes seem like a red flag, should probably be removed. */
-    private String type;
-
+    // TODO OTP2 eliminate this field for reasons in "primed" javadoc; also "initialized" is not a clear term.
     protected boolean blockReadinessUntilInitialized;
 
-    protected boolean isInitialized;
+    /**
+     * True when a full batch of realtime data has been fetched and applied to the graph.
+     * There was previously a second boolean field that controlled whether this affected "readiness". If we are waiting
+     * for any realtime data to be applied, we should wait for all of it to be applied, so I removed that.
+     */
+    protected boolean primed;
 
-    protected boolean isReady() {
-        if (blockReadinessUntilInitialized) {
-            return isInitialized;
-        }
-        return true;
-    }
+    /**
+     * The type name in the preferences JSON.
+     * FIXME: String type codes seem like a red flag. Though they are needed in JSON to decide which Java type to
+     *        deserialize into, they should probably not survive into those Java objects themselves.
+     */
+    private String type;
 
     @Override
     final public void run() {
@@ -68,7 +71,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                     LOG.error("Error while running polling updater of type {}", type, e);
                     // TODO Should we cancel the task? Or after n consecutive failures? cancel();
                 } finally {
-                    isInitialized = true;
+                    primed = true;
                 }
                 Thread.sleep(pollingPeriodSeconds * 1000);
             }
@@ -86,4 +89,15 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         // Additional configuration for the concrete subclass
         configurePolling(graph, config);
     }
+
+    /**
+     * Allow clients to wait for all realtime data to be loaded before submitting any travel plan requests.
+     * This does not block use of the OTP server. The client must voluntarily hit an endpoint and wait for readiness.
+     * TODO OTP2 This is really a bit backward. We should just run() the updaters once before scheduling them to poll,
+     *           and not bring the router online until they have finished.
+     */
+    public boolean isPrimed () {
+        return primed;
+    }
+
 }

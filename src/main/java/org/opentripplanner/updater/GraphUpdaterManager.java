@@ -48,16 +48,18 @@ public class GraphUpdaterManager {
      * but never simultaneous writes. We ensure this policy is respected by having a single writer
      * thread, which sequentially executes all graph updater tasks. Each task is a runnable that is
      * scheduled with the ExecutorService to run at regular intervals.
-     * FIXME in reality we're not using scheduleAtFixedInterval. We're scheduling for immediate execution from separate threads that sleep in a loop.
+     * FIXME: In reality we're not using scheduleAtFixedInterval.
+     *        We're scheduling for immediate execution from separate threads that sleep in a loop.
+     *        We should perhaps switch to having polling GraphUpdaters call scheduleAtFixedInterval.
      */
-    private ScheduledExecutorService scheduler = Executors.newSingleThreadScheduledExecutor();
+    private ScheduledExecutorService scheduler;
 
     /**
      * A pool of threads on which the updaters will run.
      * This creates a pool that will auto-scale up to any size (maximum pool size is MAX_INT).
      * FIXME The polling updaters occupy an entire thread, sleeping in between polling operations.
      */
-    private ExecutorService updaterPool = Executors.newCachedThreadPool();
+    private ExecutorService updaterPool;
 
     /**
      * Keep track of all updaters so we can cleanly free resources associated with them at shutdown.
@@ -131,7 +133,8 @@ public class GraphUpdaterManager {
     /**
      * This is the method to use to modify the graph from the updaters. The runnables will be
      * scheduled after each other, guaranteeing that only one of these runnables will be active at
-     * any time.
+     * any time. If a particular GraphUpdater calls this method on more than one GraphWriterRunnable, they should be
+     * executed in the same order that GraphUpdater made the calls.
      * 
      * @param runnable is a graph writer runnable
      */
@@ -143,36 +146,6 @@ public class GraphUpdaterManager {
                 LOG.error("Error while running graph writer {}:", runnable.getClass().getName(), e);
             }
         });
-    }
-
-    /**
-     * This is another method to use to modify the graph from the updaters. It behaves like execute,
-     * but blocks until the runnable has been executed. This might be particularly useful in the
-     * setup method of an updater.
-     *
-     * @param runnable is a graph writer runnable
-     * @throws ExecutionException
-     * @throws InterruptedException
-     * @see GraphUpdaterManager.execute
-     */
-    public void executeBlocking(GraphWriterRunnable runnable) throws InterruptedException,
-            ExecutionException {
-        Future<?> future = executeReturningFuture(runnable);
-        // Ask for result of future. Will block and return null when runnable is successfully
-        // finished, throws otherwise
-        future.get();
-    }
-
-    private Future<?> executeReturningFuture(final GraphWriterRunnable runnable) {
-        Future<?> future = scheduler.submit(() -> {
-            try {
-                runnable.run(graph);
-            } catch (Exception e) {
-                LOG.error("Error while running graph writer {}:", runnable.getClass().getName(),
-                        e);
-            }
-        });
-        return future;
     }
 
     public int size() {

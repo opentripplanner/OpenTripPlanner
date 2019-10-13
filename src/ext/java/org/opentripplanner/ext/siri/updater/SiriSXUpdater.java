@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
@@ -93,26 +94,22 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() throws Exception {
-        Siri updates = getUpdates();
-
-        if (updates != null && updates.getServiceDelivery().getSituationExchangeDeliveries() != null) {
-            // Handle trip updates via graph writer runnable
-            // Handle update in graph writer runnable
-            if (!isReady()) {
-                LOG.info("Execute blocking tripupdates");
-                updaterManager.executeBlocking(graph -> updateHandler.update(updates.getServiceDelivery()));
-            } else {
-                updaterManager.execute(graph -> updateHandler.update(updates.getServiceDelivery()));
+        boolean moreData = false;
+        do {
+            Siri updates = getUpdates();
+            if (updates != null) {
+                ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+                // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
+                moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+                final boolean markPrimed = !moreData;
+                if (serviceDelivery.getSituationExchangeDeliveries() != null) {
+                    updaterManager.execute(graph -> {
+                        updateHandler.update(serviceDelivery);
+                        if (markPrimed) primed = true;
+                    });
+                }
             }
-        }
-        if (updates != null &&
-                updates.getServiceDelivery() != null &&
-                updates.getServiceDelivery().isMoreData() != null &&
-                updates.getServiceDelivery().isMoreData()) {
-            LOG.info("More data is available - fetching immediately");
-            runPolling();
-        }
-        isInitialized = true;
+        } while (moreData);
     }
 
     private Siri getUpdates() {
