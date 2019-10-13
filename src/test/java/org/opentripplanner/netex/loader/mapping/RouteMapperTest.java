@@ -3,9 +3,17 @@ package org.opentripplanner.netex.loader.mapping;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
-import org.rutebanken.netex.model.*;
+import org.rutebanken.netex.model.AllVehicleModesOfTransportEnumeration;
+import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.GroupOfLinesRefStructure;
+import org.rutebanken.netex.model.Line;
+import org.rutebanken.netex.model.MultilingualString;
+import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.OrganisationRefStructure;
+import org.rutebanken.netex.model.PresentationStructure;
 
 import java.util.TimeZone;
 
@@ -18,17 +26,16 @@ public class RouteMapperTest {
     private static final String AUTHORITY_ID = "RUT:Authority:1";
     private static final String RUT_LINE_ID = "RUT:Line:1";
 
-    public static final String TIME_ZONE = "GMT";
+    private static final String TIME_ZONE = "GMT";
 
     @Test
     public void mapRouteWithDefaultAgency() {
         NetexImportDataIndex netexImportDataIndex = new NetexImportDataIndex();
-        Network network = new Network();
         Line line = createExampleLine();
-        network.setId(NETWORK_ID);
 
         RouteMapper routeMapper = new RouteMapper(
-                new OtpTransitServiceBuilder().getAgenciesById(),
+                new EntityById<>(),
+                new EntityById<>(),
                 netexImportDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );
@@ -45,17 +52,22 @@ public class RouteMapperTest {
         NetexImportDataIndex netexIndex = new NetexImportDataIndex();
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
 
-        Network network = new Network().withId(NETWORK_ID).withTransportOrganisationRef(
-                createJaxbElement(new OrganisationRefStructure().withRef(AUTHORITY_ID))
-        );
+        Network network = new Network()
+                .withId(NETWORK_ID)
+                .withTransportOrganisationRef(
+                    createJaxbElement(new OrganisationRefStructure().withRef(AUTHORITY_ID))
+                );
 
         netexIndex.networkById.add(network);
+        netexIndex.authoritiesById.add(new Authority().withId(AUTHORITY_ID));
+
         transitBuilder.getAgenciesById().add(createAgency());
 
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
                 transitBuilder.getAgenciesById(),
+                transitBuilder.getOperatorsById(),
                 netexIndex.readOnlyView(),
                 TIME_ZONE
         );
@@ -77,7 +89,8 @@ public class RouteMapperTest {
                         .withTextColour(textColor));
 
         RouteMapper routeMapper = new RouteMapper(
-                new OtpTransitServiceBuilder().getAgenciesById(),
+                new EntityById<>(),
+                new EntityById<>(),
                 netexImportDataIndex.readOnlyView(),
                 TimeZone.getDefault().toString()
         );

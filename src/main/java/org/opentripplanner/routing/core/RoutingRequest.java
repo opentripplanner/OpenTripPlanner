@@ -259,12 +259,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Do not use certain trips */
     public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
-    /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
-    
-    /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
-    public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher();
-    
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
     
@@ -296,7 +290,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
     public int transferSlack = 0;
 
-    /** Invariant: boardSlack + alightSlack <= transferSlack. */
+    /** Invariant: boardSlack + alightSlack ≤ transferSlack. */
     public int boardSlack = 0;
 
     public int alightSlack = 0;
@@ -439,7 +433,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Option to disable the default filtering of GTFS-RT alerts by time. */
     public boolean disableAlertFiltering = false;
 
-    /** Whether to apply the ellipsoid->geoid offset to all elevations in the response */
+    /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
     /** Which path comparator to use */
@@ -675,24 +669,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setBannedStops(String s) {
-        if (!s.isEmpty()) {
-            bannedStops = StopMatcher.parse(s);
-        }
-        else {
-            bannedStops = StopMatcher.emptyMatcher();
-        }
-    }
-
-    public void setBannedStopsHard(String s) {
-        if (!s.isEmpty()) {
-            bannedStopsHard = StopMatcher.parse(s);
-        }
-        else {
-            bannedStopsHard = StopMatcher.emptyMatcher();
-        }
-    }
-
     public void setBannedAgencies(String s) {
         if (!s.isEmpty()) {
             bannedAgencies = new HashSet<>();
@@ -847,8 +823,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.modes = modes.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
-            clone.bannedStops = bannedStops.clone();
-            clone.bannedStopsHard = bannedStopsHard.clone();
             clone.whiteListedAgencies = (HashSet<String>) whiteListedAgencies.clone();
             clone.whiteListedRoutes = whiteListedRoutes.clone();
             clone.preferredAgencies = (HashSet<String>) preferredAgencies.clone();

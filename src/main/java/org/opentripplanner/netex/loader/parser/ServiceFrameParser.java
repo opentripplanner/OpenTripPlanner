@@ -126,8 +126,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                 String quayRef = assignment.getQuayRef().getRef();
 
                 // TODO OTP2 - This check belongs to the mapping or as a separate validation
-                // TODO OTP2 - step. The problem is that we do not want to relay on the
-                // TODO OTP2 - the order in witch elements are loaded.
+                //           - step. The problem is that we do not want to relay on the
+                //           - the order in witch elements are loaded.
                 Quay quay = quayById.lookupLastVersionById(quayRef);
                 if (quay != null) {
                     String stopPointRef = assignment.getScheduledStopPointRef().getValue().getRef();

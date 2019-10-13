@@ -36,7 +36,7 @@ public class GraphConfig {
 
     /**
      * Get the builder config, load from {@link #BUILDER_CONFIG_FILENAME} config file, if not loaded.
-     * <p/>
+     * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      * The program(OTP) exit, if the file contains syntax errors or cannot be parsed.
      */
@@ -46,7 +46,7 @@ public class GraphConfig {
 
     /**
      * Get the router config, load from {@link #ROUTER_CONFIG_FILENAME} config file, if not loaded.
-     * <p/>
+     * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      * The program(OTP) will exit, if the file contains syntax errors or cannot be parsed.
      */

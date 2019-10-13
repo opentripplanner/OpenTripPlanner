@@ -20,6 +20,7 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -38,7 +39,7 @@ import java.util.Set;
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
  * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
  * in memory and to be able to override values in a more specific(lower) level.
- * <p/>
+ * <p>
  * There is one instance of this class for <em>shard data</em> - the ROOT.
  * For each <em>group of shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a
  * parent. When such <em>group of shared data</em> is not needed any more it is discard and become
@@ -46,10 +47,10 @@ import java.util.Set;
  * For each <em>single files</em> a new {@code NetexImportDataIndex} is created with the corresponding
  * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
  * the file is loaded.
- * <p/>
+ * <p>
  * This hierarchy make it possible to override values in child instances of the {@code NetexImportDataIndex}
  * and save memory during the load operation, because data not needed any more can be thrown away.
- * <p/>
+ * <p>
  * The hierarchy implementation is delegated to the
  * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
@@ -76,6 +77,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<Notice> noticeById;
     public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    public final HierarchicalMapById<Operator> operatorsById;
     public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
@@ -112,6 +114,7 @@ public class NetexImportDataIndex {
         this.noticeById = new HierarchicalMapById<>();
         this.noticeAssignmentById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
+        this.operatorsById = new HierarchicalMapById<>();
         this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
@@ -139,6 +142,7 @@ public class NetexImportDataIndex {
         this.noticeById = new HierarchicalMapById<>(parent.noticeById);
         this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
+        this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
         this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
@@ -207,6 +211,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
                 return operatingPeriodById;
+            }
+
+            public ReadOnlyHierarchicalMapById<Operator> getOperatorsById() {
+                return operatorsById;
             }
 
             public ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId() {

@@ -125,7 +125,7 @@ public abstract class GtfsTest extends TestCase {
             routingRequest.setBannedRoutes(feedId.getId() + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
-            routingRequest.setBannedStopsHard(feedId.getId() + ":" + excludedStop);
+            throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
         }
         routingRequest.setOtherThanPreferredRoutesPenalty(0);
         // The walk board cost is set low because it interferes with test 2c1.

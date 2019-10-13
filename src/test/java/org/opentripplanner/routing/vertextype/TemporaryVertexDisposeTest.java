@@ -94,7 +94,7 @@ public class TemporaryVertexDisposeTest {
     /**
      * Verify a complex temporary path is disposed. The temporary graph is connected to the
      * main graph in both directions (in/out) from many places (temp. vertexes).
-     * <p/>
+     * <p>
      * The temporary part of the graph do NOT contain any loops.
      */
     @Test public void disposeTemporaryVertexesWithComplexPaths() {
@@ -140,9 +140,9 @@ public class TemporaryVertexDisposeTest {
 
     /**
      * We should be able to delete an alternative path/loop created in the graph like:
-     * <p/>
+     * <p>
      * A -> x -> y -> B
-     * <p/>
+     * <p>
      * Where 'x' and 'y' are temporary vertexes
      */
     @Test public void disposeTemporaryAlternativePath() {

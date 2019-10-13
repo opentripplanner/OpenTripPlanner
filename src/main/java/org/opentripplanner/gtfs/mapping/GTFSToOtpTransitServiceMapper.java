@@ -1,9 +1,8 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-
-
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -12,6 +11,8 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
  */
 public class GTFSToOtpTransitServiceMapper {
     private final AgencyMapper agencyMapper = new AgencyMapper();
+
+    private final StationMapper stationMapper = new StationMapper();
 
     private final StopMapper stopMapper = new StopMapper();
 
@@ -36,7 +37,7 @@ public class GTFSToOtpTransitServiceMapper {
     private final FrequencyMapper frequencyMapper = new FrequencyMapper(tripMapper);
 
     private final TransferMapper transferMapper = new TransferMapper(
-            routeMapper, stopMapper, tripMapper
+            routeMapper, stationMapper, stopMapper, tripMapper
     );
 
     private final FareRuleMapper fareRuleMapper = new FareRuleMapper(
@@ -66,11 +67,25 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
-        builder.getStops().addAll(stopMapper.map(data.getAllStops()));
+
+        mapGtfsStopsToOtpStopsAndStations(data, builder);
+
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
 
         return builder;
+    }
+
+    private void mapGtfsStopsToOtpStopsAndStations(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
+        for (Stop it : data.getAllStops()) {
+            if(it.getLocationType() == 0) {
+                builder.getStops().add(stopMapper.map(it));
+            }
+            else if(it.getLocationType() == 1) {
+                builder.getStations().add(stationMapper.map(it));
+            }
+        }
+        new LinkStopsAndParentStationsTogether(builder.getStations(), builder.getStops()).link(data.getAllStops());
     }
 }

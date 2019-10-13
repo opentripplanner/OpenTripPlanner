@@ -20,7 +20,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.annotation.NonStationParentStation;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -29,20 +28,16 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.core.StopTransfer;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.StationStopEdge;
 import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TransferEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -50,9 +45,7 @@ import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStation;
-import org.opentripplanner.routing.vertextype.TransitStationStop;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,7 +66,7 @@ import java.util.Map;
  * Generates a set of edges from GTFS.
  *
  * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
- * TODO OTP2 - after ass Entur NeTEx PRs are merged.
+ *           - after ass Entur NeTEx PRs are merged.
  */
 public class PatternHopFactory {
 
@@ -93,9 +86,8 @@ public class PatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    // "stationStopNodes" means nodes that are either a station or a stop TODO clarify this name
-    // This is the OTP Graph Vertex representing each Stop from the input GTFS.
-    private Map<Stop, TransitStationStop> stationStopNodes = new HashMap<>();
+    // Map of stops and their vertices in the graph
+    private Map<Stop, TransitStopVertex> stopNodes = new HashMap<>();
 
     private int subwayAccessTime = 0;
 
@@ -128,13 +120,16 @@ public class PatternHopFactory {
         }
         fareServiceFactory.processGtfs(transitService);
 
-        // TODO: Why are we loading stops? The Javadoc above says this method assumes stops are aleady loaded.
+        // TODO OTP2 - Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
+        //           - It should not be the PHFs responsibility to insert anything into the graph, it should build
+        //           - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
         loadStops(graph);
-        loadPathways(graph);
+        //loadPathways(graph);
         loadFeedInfo(graph);
         loadAgencies(graph);
+
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
-        // Perhaps it is to allow name collisions with previously loaded feeds.
+        //       Perhaps it is to allow name collisions with previously loaded feeds?
         clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
@@ -182,7 +177,7 @@ public class PatternHopFactory {
              // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
             for (int s = 0; s < tripPattern.stopVertices.length; s++) {
                 Stop stop = tripPattern.stopPattern.stops[s];
-                tripPattern.stopVertices[s] = ((TransitStop) stationStopNodes.get(stop));
+                tripPattern.stopVertices[s] = ((TransitStopVertex) stopNodes.get(stop));
             }
             LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
             if (hopGeometries != null) {
@@ -193,7 +188,7 @@ public class PatternHopFactory {
 
             /* Iterate over all stops in this pattern recording mode information. */
             TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
-            for (TransitStop tstop : tripPattern.stopVertices) {
+            for (TransitStopVertex tstop : tripPattern.stopVertices) {
                 tstop.addMode(mode);
                 if (mode == TraverseMode.SUBWAY) {
                     tstop.setStreetToStopTime(subwayAccessTime);
@@ -212,11 +207,8 @@ public class PatternHopFactory {
         loadTransfers(graph);
 
         /* Store parent stops in graph, even if not linked. These are needed for clustering*/
-        for (TransitStationStop stop : stationStopNodes.values()) {
-            if (stop instanceof TransitStation) {
-                TransitStation parentStopVertex = (TransitStation) stop;
-                graph.parentStopById.put(parentStopVertex.getStopId(), parentStopVertex.getStop());
-            }
+        for (Station station : transitService.getAllStations()) {
+                graph.stationById.put(station.getId(), station);
         }
 
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
@@ -519,8 +511,8 @@ public class PatternHopFactory {
 
     private void loadPathways(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
-            Vertex fromVertex = stationStopNodes.get(pathway.getFromStop());
-            Vertex toVertex = stationStopNodes.get(pathway.getToStop());
+            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
+            Vertex toVertex = stopNodes.get(pathway.getToStop());
             if (pathway.isWheelchairTraversalTimeSet()) {
                 new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
             } else {
@@ -531,15 +523,16 @@ public class PatternHopFactory {
 
     private void loadStops(Graph graph) {
         for (Stop stop : transitService.getAllStops()) {
-            int locationType = stop.getLocationType();
             // Add a vertex representing the stop.
             // FIXME it is now possible for these vertices to not be connected to any edges.
-            if (locationType == 1) {
-                stationStopNodes.put(stop, new TransitStation(graph, stop));
-            } else {
-                TransitStop stopVertex = new TransitStop(graph, stop);
-                stationStopNodes.put(stop, stopVertex);
-            }
+            TransitStopVertex stopVertex = new TransitStopVertex(graph, stop);
+            stopNodes.put(stop, stopVertex);
+        }
+        for (Station station : transitService.getAllStations()) {
+            // TODO: What to do about linking transit vertices directly to stations
+            /*
+            stopNodes.put(station, new TransitStation(graph, station));
+             */
         }
     }
 
@@ -555,39 +548,7 @@ public class PatternHopFactory {
         Collection<Transfer> transfers = transitService.getAllTransfers();
         TransferTable transferTable = graph.getTransferTable();
         for (Transfer sourceTransfer : transfers) {
-            // Transfers may be specified using parent stations (https://developers.google.com/transit/gtfs/reference/transfers-file)
-            // "If the stop ID refers to a station that contains multiple stops, this transfer rule applies to all stops in that station."
-            // we thus expand transfers that use parent stations to all the member stops.
-            for (Transfer t : expandTransfer(sourceTransfer)) {
-                Stop fromStop = t.getFromStop();
-                Stop toStop = t.getToStop();
-                Route fromRoute = t.getFromRoute();
-                Route toRoute = t.getToRoute();
-                Trip fromTrip = t.getFromTrip();
-                Trip toTrip = t.getToTrip();
-                switch (t.getTransferType()) {
-                    case 1:
-                        // timed (synchronized) transfer
-                        // Handle with edges that bypass the street network.
-                        // from and to vertex here are stop_arrive and stop_depart vertices
-                        // add to transfer table to handle specificity
-                        transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, StopTransfer.TIMED_TRANSFER);
-                        break;
-                    case 2:
-                        // min transfer time
-                        transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, t.getMinTransferTime());
-                        break;
-                    case 3:
-                        // forbidden transfer
-                        transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, StopTransfer.FORBIDDEN_TRANSFER);
-                        break;
-                    case 0:
-                    default:
-                        // preferred transfer
-                        transferTable.addTransferTime(fromStop, toStop, fromRoute, toRoute, fromTrip, toTrip, StopTransfer.PREFERRED_TRANSFER);
-                        break;
-                }
-            }
+            transferTable.addTransfer(sourceTransfer);
         }
     }
 
@@ -793,149 +754,5 @@ public class PatternHopFactory {
 
     public void setFareServiceFactory(FareServiceFactory fareServiceFactory) {
         this.fareServiceFactory = fareServiceFactory;
-    }
-
-    /** 
-     * Create bidirectional, "free" edges (zero-time, low-cost edges) between stops and their 
-     * parent stations. This is used to produce implicit transfers between all stops that are
-     * part of the same parent station. It was introduced as a workaround to allow in-station 
-     * transfers for underground/grade-separated transportation systems like the NYC subway (where
-     * it's important to provide in-station transfers for fare computation).
-     * 
-     * This step used to be automatically applied whenever transfers.txt was used to create 
-     * transfers (rather than or in addition to transfers through the street netowrk),
-     * but has been separated out since it is really a separate process.
-     */
-    public void createParentStationTransfers() {
-        for (Stop stop : transitService.getAllStops()) {
-            String parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                Vertex stopVertex = stationStopNodes.get(stop);
-
-                String agencyId = stop.getId().getAgencyId();
-                FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
-
-                Stop parentStop = transitService.getStopForId(parentStationId);
-                Vertex parentStopVertex = stationStopNodes.get(parentStop);
-
-                new FreeEdge(parentStopVertex, stopVertex);
-                new FreeEdge(stopVertex, parentStopVertex);
-
-                // TODO: provide a cost for these edges when stations and
-                // stops have different locations
-            }
-        }
-    }
-    
-    /**
-     * Links the vertices representing parent stops to their child stops bidirectionally. This is
-     * not intended to provide implicit transfers (i.e. child stop to parent station to another
-     * child stop) but instead to allow beginning or ending a path (itinerary) at a parent station.
-     * 
-     * Currently this linking is only intended for use in the long distance path service. The
-     * pathparsers should ensure that it is effectively ignored in other path services, and even in
-     * the long distance path service anywhere but the beginning or end of a path.
-     */
-    public void linkStopsToParentStations(Graph graph) {
-        for (Stop stop : transitService.getAllStops()) {
-            String parentStation = stop.getParentStation();
-            if (parentStation != null) {
-                TransitStop stopVertex = (TransitStop) stationStopNodes.get(stop);
-                String agencyId = stop.getId().getAgencyId();
-                FeedScopedId parentStationId = new FeedScopedId(agencyId, parentStation);
-                Stop parentStop = transitService.getStopForId(parentStationId);
-                if (stationStopNodes.get(parentStop) instanceof TransitStation) {
-                    TransitStation parentStopVertex = (TransitStation) stationStopNodes.get(parentStop);
-                    new StationStopEdge(parentStopVertex, stopVertex);
-                    new StationStopEdge(stopVertex, parentStopVertex);
-                } else {
-                    LOG.warn(graph.addBuilderAnnotation(new NonStationParentStation(stopVertex)));
-                }
-            }
-        }
-    }
-
-    /**
-     * Create transfer edges between stops which are listed in transfers.txt.
-     * 
-     * NOTE: this method is only called when transfersTxtDefinesStationPaths is set to
-     * True for a given GFTS feed. 
-     */
-    public void createTransfersTxtTransfers() {
-
-        /* Create transfer edges based on transfers.txt. */
-        for (Transfer transfer : transitService.getAllTransfers()) {
-
-            int type = transfer.getTransferType();
-            if (type == 3) // type 3 = transfer not possible
-                continue;
-            if (transfer.getFromStop().equals(transfer.getToStop())) {
-                continue;
-            }
-            TransitStationStop fromv = stationStopNodes.get(transfer.getFromStop());
-            TransitStationStop tov = stationStopNodes.get(transfer.getToStop());
-
-            double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
-            int time;
-            if (transfer.getTransferType() == 2) {
-                time = transfer.getMinTransferTime();
-            } else {
-                time = (int) distance; // fixme: handle timed transfers
-            }
-
-            TransferEdge transferEdge = new TransferEdge(fromv, tov, distance, time);
-            CoordinateSequence sequence = new PackedCoordinateSequence.Double(new Coordinate[] {
-                    fromv.getCoordinate(), tov.getCoordinate() }, 2);
-            LineString geometry = geometryFactory.createLineString(sequence);
-            transferEdge.setGeometry(geometry);
-        }
-    }
-
-    private Collection<Transfer> expandTransfer (Transfer source) {
-        Stop fromStop = source.getFromStop();
-        Stop toStop = source.getToStop();
-
-        if (fromStop.isPlatform() && toStop.isPlatform()) {
-            // simple, no need to copy anything
-            return Collections.singletonList(source);
-        } else {
-            // at least one of the stops is a parent station
-            // all the stops this transfer originates with
-            List<Stop> fromStops = listPlatformsForStop(fromStop);
-
-            // all the stops this transfer terminates with
-            List<Stop> toStops = listPlatformsForStop(toStop);
-
-            List<Transfer> expandedTransfers = new ArrayList<>(fromStops.size() * toStops.size());
-
-            for (Stop expandedFromStop : fromStops) {
-                for (Stop expandedToStop : toStops) {
-                    Transfer expanded = new Transfer(source);
-                    expanded.setFromStop(expandedFromStop);
-                    expanded.setToStop(expandedToStop);
-                    expandedTransfers.add(expanded);
-                }
-            }
-
-            LOG.info(
-                    "Expanded transfer between stations \"{} ({})\" and \"{} ({})\" to {} transfers between {} and {} stops",
-                    fromStop.getName(), fromStop.getId(), toStop.getName(), toStop.getId(),
-                    expandedTransfers.size(), fromStops.size(), toStops.size());
-
-            return expandedTransfers;
-        }
-    }
-
-    /**
-     * Return a list of stops for the given stop:
-     * <ul>
-     *     <li>if platform - return a list with just one stop - the given stop input.</li>
-     *     <li>if station - return all platforms for the given station.</li>
-     * </ul>
-     */
-    private List<Stop> listPlatformsForStop(Stop stop) {
-        return stop.isStation()
-                ? transitService.getStopsForStation(stop)
-                : Collections.singletonList(stop);
     }
 }

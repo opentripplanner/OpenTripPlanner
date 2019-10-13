@@ -114,9 +114,9 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
             int nTimetablePassingTimes = sj.getPassingTimes().getTimetabledPassingTime().size();
 
             // TODO OTP2 - This check belongs to the mapping or as a separate validation
-            // TODO OTP2 - step. The problem is that we do not want to relay on the
-            // TODO OTP2 - the order in witch elements are parsed/loaded; hence `journeyPattern`
-            // TODO OTP2 - is know at this point.
+            //           - step. The problem is that we do not want to relay on the
+            //           - the order in witch elements are parsed/loaded; hence `journeyPattern`
+            //           - is know at this point.
             if (nStopPointsInJourneyPattern == nTimetablePassingTimes) {
                 serviceJourneyByPatternId.put(journeyPatternId, sj);
 

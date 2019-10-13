@@ -9,12 +9,14 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
@@ -54,11 +56,15 @@ public class OtpTransitServiceBuilder {
 
     private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
 
+    private final EntityById<FeedScopedId, Operator> operatorsById = new EntityById<>();
+
     private final List<Pathway> pathways = new ArrayList<>();
 
     private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
 
     private final List<ShapePoint> shapePoints = new ArrayList<>();
+
+    private final EntityById<FeedScopedId, Station> stationsById = new EntityById<>();
 
     private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
 
@@ -113,6 +119,10 @@ public class OtpTransitServiceBuilder {
         return noticeAssignments;
     }
 
+    public EntityById<FeedScopedId, Operator> getOperatorsById() {
+        return operatorsById;
+    }
+
     public List<Pathway> getPathways() {
         return pathways;
     }
@@ -123,6 +133,10 @@ public class OtpTransitServiceBuilder {
 
     public List<ShapePoint> getShapePoints() {
         return shapePoints;
+    }
+
+    public EntityById<FeedScopedId, Station> getStations() {
+        return stationsById;
     }
 
     public EntityById<FeedScopedId, Stop> getStops() {

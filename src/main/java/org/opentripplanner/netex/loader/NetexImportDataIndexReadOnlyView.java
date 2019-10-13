@@ -15,6 +15,7 @@ import org.rutebanken.netex.model.Network;
 import org.rutebanken.netex.model.Notice;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
@@ -35,6 +36,7 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<Notice> getNoticeById();
     ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById();
     ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById();
+    ReadOnlyHierarchicalMapById<Operator> getOperatorsById();
     ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId();
     ReadOnlyHierarchicalVersionMapById<Quay> getQuayById();
     ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef();

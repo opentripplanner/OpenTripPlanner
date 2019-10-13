@@ -5,6 +5,7 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;
@@ -21,7 +22,7 @@ import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.StopPlace;
 
-import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -79,7 +80,8 @@ public class NetexMapper {
         FeedScopedIdFactory.setFeedId(agencyId);
         // Be careful, the order matter. For example a Route has a reference to Agency; Hence Agency must be mapped
         // before Route - if both entities are defined in the same file.
-        mapAgency(netexIndex);
+        mapAuthorities(netexIndex);
+        mapOperators(netexIndex);
         mapStopPlaceAndQuays(netexIndex);
         mapRoute(netexIndex);
         mapTripPatterns(netexIndex);
@@ -87,11 +89,16 @@ public class NetexMapper {
         mapNoticeAssignments(netexIndex);
     }
 
-    private void mapAgency(NetexImportDataIndexReadOnlyView netexIndex) {
-        AgencyMapper agencyMapper = new AgencyMapper(netexIndex.getTimeZone());
+    private void mapOperators(NetexImportDataIndexReadOnlyView netexIndex) {
+        for (org.rutebanken.netex.model.Operator operator : netexIndex.getOperatorsById().localValues()) {
+            transitBuilder.getOperatorsById().add(OperatorToAgencyMapper.mapOperator(operator));
+        }
+    }
 
+    private void mapAuthorities(NetexImportDataIndexReadOnlyView netexIndex) {
+        AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(netexIndex.getTimeZone());
         for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
-            Agency agency = agencyMapper.mapAgency(authority);
+            Agency agency = agencyMapper.mapAuthorityToAgency(authority);
             transitBuilder.getAgenciesById().add(agency);
         }
     }
@@ -100,14 +107,18 @@ public class NetexMapper {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
             StopMapper stopMapper = new StopMapper(netexIndex.getQuayById());
-            Collection<Stop> stops = stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
+            Collection<Stop> stops = new ArrayList<>();
+            Collection<Station> stations = new ArrayList<>();
+            stopMapper.mapParentAndChildStops(stopPlaceAllVersions, stops, stations);
             transitBuilder.getStops().addAll(stops);
+            transitBuilder.getStations().addAll(stations);
         }
     }
 
     private void mapRoute(NetexImportDataIndexReadOnlyView netexIndex) {
         RouteMapper routeMapper = new RouteMapper(
                 transitBuilder.getAgenciesById(),
+                transitBuilder.getOperatorsById(),
                 netexIndex,
                 netexIndex.getTimeZone()
         );

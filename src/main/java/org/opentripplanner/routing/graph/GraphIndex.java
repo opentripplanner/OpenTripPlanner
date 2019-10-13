@@ -23,6 +23,7 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitEntity;
@@ -43,7 +44,7 @@ import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -74,18 +75,17 @@ public class GraphIndex {
 
     // TODO: consistently key on model object or id string
     public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
+    public final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
     public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
     public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
-    public final Map<FeedScopedId, String> serviceForId = Maps.newHashMap();
-    public final Map<Stop, TransitStop> stopVertexForStop = Maps.newHashMap();
+    public final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
     public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Multimap<String, Stop> stopsForParentStation = ArrayListMultimap.create();
-    final HashGridSpatialIndex<TransitStop> stopSpatialIndex = new HashGridSpatialIndex<>();
+    final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -116,20 +116,23 @@ public class GraphIndex {
             this.feedInfoForId.put(feedId, graph.getFeedInfo(feedId));
         }
 
+        for (Operator operator : graph.getOperators()) {
+            this.operatorForId.put(operator.getId(), operator);
+        }
+
         Collection<Edge> edges = graph.getEdges();
 
         /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         for (Vertex vertex : graph.getVertices()) {
-            if (vertex instanceof TransitStop) {
-                TransitStop transitStop = (TransitStop) vertex;
-                Stop stop = transitStop.getStop();
+            if (vertex instanceof TransitStopVertex) {
+                TransitStopVertex stopVertex = (TransitStopVertex) vertex;
+                Stop stop = stopVertex.getStop();
                 stopForId.put(stop.getId(), stop);
-                stopVertexForStop.put(stop, transitStop);
-                stopsForParentStation.put(stop.getParentStation(), stop);
+                stopVertexForStop.put(stop, stopVertex);
             }
         }
-        for (TransitStop stopVertex : stopVertexForStop.values()) {
+        for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
             Envelope envelope = new Envelope(stopVertex.getCoordinate());
             stopSpatialIndex.insert(envelope, stopVertex);
         }
@@ -203,8 +206,8 @@ public class GraphIndex {
         // Accumulate stops into ret as the search runs.
         @Override public void visitVertex(State state) {
             Vertex vertex = state.getVertex();
-            if (vertex instanceof TransitStop) {
-                stopsFound.add(new StopAndDistance(((TransitStop) vertex).getStop(),
+            if (vertex instanceof TransitStopVertex) {
+                stopsFound.add(new StopAndDistance(((TransitStopVertex) vertex).getStop(),
                     (int) state.getElapsedTimeSeconds()));
             }
         }
@@ -458,6 +461,16 @@ public class GraphIndex {
         return alertPatchService;
     }
 
+    /**
+     * Get a list of all operators spanning across all feeds.
+     */
+    public Collection<Operator> getAllOperators() {
+        return operatorForId.values();
+    }
+
+    // All of the below methods are added just to fetch SIRI SX notices on different transit model entities.
+    // TODO OTP2 We should try storing all these alerts in a single map with complex keys
+
     public Collection<AlertPatch> getAlerts() {
         return getSiriAlertPatchService().getAllAlertPatches();
     }
@@ -512,4 +525,5 @@ public class GraphIndex {
     public Collection<AlertPatch> getAlertsForStopAndTrip(FeedScopedId stopId, FeedScopedId tripId) {
         return getSiriAlertPatchService().getStopAndTripPatches(stopId, tripId);
     }
+
 }

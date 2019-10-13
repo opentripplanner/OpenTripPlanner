@@ -9,8 +9,7 @@ import org.rutebanken.netex.model.MultilingualString;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class AgencyMapperTest {
-
+public class AuthorityToAgencyMapperTest {
     private static final String ID = "ID";
     private static final String NAME = "Olsen";
     private static final String URL = "http://olsen.no/help";
@@ -18,14 +17,14 @@ public class AgencyMapperTest {
     private static final String TIME_ZONE = "CEST";
     private static final String N_A = "N/A";
 
-    AgencyMapper agencyMapper = new AgencyMapper(TIME_ZONE);
+    private AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(TIME_ZONE);
 
     @Test public void mapAgency() {
         // Given
         Authority authority = authority(ID, NAME, URL, PHONE);
 
         // When mapped
-        Agency a = agencyMapper.mapAgency(authority);
+        Agency a = mapper.mapAuthorityToAgency(authority);
 
         // Then expect
         assertEquals(ID, a.getId());
@@ -40,7 +39,7 @@ public class AgencyMapperTest {
         Authority authority = authority(ID, NAME, null, null);
 
         // When mapped
-        Agency a = agencyMapper.mapAgency(authority);
+        Agency a = mapper.mapAuthorityToAgency(authority);
 
         // Then expect
         assertNull(a.getUrl());
@@ -49,10 +48,10 @@ public class AgencyMapperTest {
 
     @Test public void getDefaultAgency() {
         // When mapped
-        Agency a = agencyMapper.createDefaultAgency();
+        Agency a = mapper.createDummyAgency();
 
         // Then expect
-        assertEquals(N_A, a.getId());
+        assertEquals("Dummy-" + a.getTimezone(), a.getId());
         assertEquals(N_A, a.getName());
         assertEquals(TIME_ZONE, a.getTimezone());
         assertEquals(N_A, a.getUrl());

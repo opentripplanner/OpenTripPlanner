@@ -31,7 +31,7 @@ import java.util.TreeSet;
  * At this point, only one writing thread at a time is supported.
  *
  *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *  TODO OTP2 - after ass Entur NeTEx PRs are merged.
+ *            - after ass Entur NeTEx PRs are merged.
  */
 public class TimetableSnapshot {
 

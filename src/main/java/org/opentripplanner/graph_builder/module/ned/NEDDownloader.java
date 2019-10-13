@@ -545,7 +545,7 @@ class EDCNamespaceContext implements NamespaceContext {
         }
     }
 
-    public Iterator<?> getPrefixes(String namespace) {
+    public Iterator<String> getPrefixes(String namespace) {
         return null;
     }
 }

@@ -32,9 +32,10 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -53,7 +54,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.WorldEnvelope;
@@ -66,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -129,7 +131,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
-     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
+     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
@@ -139,6 +141,8 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
+
+    private Collection<Operator> operators = new ArrayList<>();
 
     private Collection<String> feedIds = new HashSet<>();
 
@@ -225,7 +229,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Station> stationById = new HashMap<>();
 
     /**
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
@@ -293,10 +297,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      * when they are constructed or deserialized.
      *
      * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
-     * TODO OTP2 - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
-     * TODO OTP2 - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
-     * TODO OTP2 - a VertexCollection class, let the graph hold an instance of this collection,
-     * TODO OTP2 - and create factory methods for each type of Vertex in the VertexCollection.
+     *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
+     *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
+     *           - a VertexCollection class, let the graph hold an instance of this collection,
+     *           - and create factory methods for each type of Vertex in the VertexCollection.
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
@@ -834,7 +838,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         return timeZone;
     }
-    
+
+    public Collection<Operator> getOperators() {
+        return operators;
+    }
+
     /**
      * The timezone is cached by the graph. If you've done something to the graph that has the
      * potential to change the time zone, you should call this to ensure it is reset. 
@@ -923,7 +931,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
             Median median = new Median();
 
             getVertices().stream()
-                .filter(v -> v instanceof TransitStop)
+                .filter(v -> v instanceof TransitStopVertex)
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());
