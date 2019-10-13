@@ -50,7 +50,6 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) throws Exception {
-
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler();
         }

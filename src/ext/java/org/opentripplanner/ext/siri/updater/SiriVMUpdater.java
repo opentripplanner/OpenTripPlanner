@@ -149,15 +149,24 @@ public class SiriVMUpdater extends PollingGraphUpdater {
                 final boolean markPrimed = !moreData;
                 List<VehicleMonitoringDeliveryStructure> vmds = serviceDelivery.getVehicleMonitoringDeliveries();
                 if (vmds != null) {
-                    // Handle trip updates via graph writer runnable. TODO this could be a static method or lambda
-                    updaterManager.execute(new VehicleMonitoringGraphWriterRunnable(fullDataset, feedId, vmds));
+                    updaterManager.execute(graph -> {
+                        SiriTimetableSnapshotSource snapshotSource;
+                        // TODO OTP2 - This is not thread safe, we should inject the snapshotSource on this class,
+                        //           - it will work because the snapshotSource is created already.
+                        snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+                        if (snapshotSource != null) {
+                            snapshotSource.applyVehicleMonitoring(graph, feedId, fullDataset, vmds);
+                        } else {
+                            LOG.error("Could not find realtime data snapshot source in graph."
+                                    + " The following updates are not applied: {}", updates);
+                        }
+                        if (markPrimed) primed = true;
+                    });
                 }
                 // Use isTrue just in case isMoreData returns null
                 moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
             }
         } while (moreData);
-        // TODO OTP2 markPrimed inside GraphWriterRunnable, not here
-        primed = true;
     }
 
     @Override

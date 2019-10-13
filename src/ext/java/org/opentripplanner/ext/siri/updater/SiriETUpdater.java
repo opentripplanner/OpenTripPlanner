@@ -129,13 +129,23 @@ public class SiriETUpdater extends PollingGraphUpdater {
                 final boolean markPrimed = !moreData;
                 List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
                 if (etds != null) {
-                    // TODO OTP2 this could be a lambda or static method on this class
-                    updaterManager.execute(new EstimatedTimetableGraphWriterRunnable(fullDataset, feedId, etds));
+                    updaterManager.execute(graph -> {
+                        SiriTimetableSnapshotSource snapshotSource;
+                        // TODO OTP2 - This is not thread safe, we should inject the snapshotSource on this class,
+                        //           - it will work because the snapshotSource is created already.
+                        snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
+
+                        if (snapshotSource != null) {
+                            snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, etds);
+                        } else {
+                            LOG.error("Could not find realtime data snapshot source in graph."
+                                    + " The following updates are not applied: {}", updates);
+                        }
+                        if (markPrimed) primed = true;
+                    });
                 }
             }
         } while (moreData);
-        // TODO OTP2 markPrimed inside GraphWriterRunnable
-        primed = true;
     }
 
     @Override
