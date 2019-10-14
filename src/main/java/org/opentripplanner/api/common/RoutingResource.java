@@ -275,7 +275,9 @@ public abstract class RoutingResource {
      * street network. Also, it is still possible to travel through the stop. Just
      * boarding and alighting is prohibited.
      * The format is agencyId_stopId, so: TriMet_2107
+     * @deprecated This no longer works in OTP2, see issue #2843.
      */
+    @Deprecated
     @QueryParam("bannedStops")
     protected String bannedStops;
     
@@ -285,7 +287,9 @@ public abstract class RoutingResource {
      * For example, this parameter can be used when a train station is destroyed, such
      * that no trains can drive through the station anymore.
      * The format is agencyId_stopId, so: TriMet_2107
+     * @deprecated This no longer works in OTP2, see issue #2843.
      */
+    @Deprecated
     @QueryParam("bannedStopsHard")
     protected String bannedStopsHard;
     
@@ -550,12 +554,6 @@ public abstract class RoutingResource {
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
-        if (bannedStops != null)
-            request.setBannedStops(bannedStops);
-
-        if (bannedStopsHard != null)
-            request.setBannedStopsHard(bannedStopsHard);
-        
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) request.transferPenalty = transferPenalty;
@@ -600,7 +598,7 @@ public abstract class RoutingResource {
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
         boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
-        request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
+        request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
             request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);

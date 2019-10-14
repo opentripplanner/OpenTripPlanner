@@ -42,7 +42,7 @@ import org.opentripplanner.standalone.Router;
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
  * 
- * @see TileRendererManager
+ * @see org.opentripplanner.inspector.TileRendererManager
  * @see TileRenderer
  * 
  * @author laurent

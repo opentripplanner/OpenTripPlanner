@@ -27,7 +27,7 @@ public class ShapefileStreetSchema {
     /**
      * Sets the converter which gets IDs from features.
      * 
-     * @{see setIdAttribute}
+     * @see ShapefileStreetSchema#setIdAttribute
      */
     public void setIdConverter(SimpleFeatureConverter<String> idConverter) {
         this.idConverter = idConverter;
@@ -78,7 +78,6 @@ public class ShapefileStreetSchema {
      * street to have the same odds of dying as if you biked one mile on this street. For example,
      * if bike lanes reduce risk by a factor of 3, the safety factor would be 0.33...
      * 
-     * @return
      */
     public void setBicycleSafetyConverter(SimpleFeatureConverter<P2<Double>> safetyConverter) {
         this.bicycleSafetyConverter = safetyConverter;

@@ -4,6 +4,9 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorTransitLayerGraphUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -94,6 +97,15 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("raptor-transit-layer")) {
                     updater = new RaptorTransitLayerGraphUpdater();
+                }
+                else if (type.equals("siri-et-updater")) {
+                    updater = new SiriETUpdater();
+                }
+                else if (type.equals("siri-vm-updater")) {
+                    updater = new SiriVMUpdater();
+                }
+                else if (type.equals("siri-sx-updater")) {
+                    updater = new SiriSXUpdater();
                 }
             }
 

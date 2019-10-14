@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to be able to turn features on and off.
- * <p/>
+ * <p>
  * This configuration is optional an found under "feature" in the top
  * level 'otp-config.json' file.
  */

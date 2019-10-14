@@ -1,18 +1,6 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.concurrent.ExecutionException;
 import com.fasterxml.jackson.databind.JsonNode;
-
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.GraphUpdater;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -23,6 +11,15 @@ import com.ning.http.client.websocket.DefaultWebSocketListener;
 import com.ning.http.client.websocket.WebSocket;
 import com.ning.http.client.websocket.WebSocketListener;
 import com.ning.http.client.websocket.WebSocketUpgradeHandler;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.List;
+import java.util.concurrent.ExecutionException;
 
 /**
  * This class starts an HTTP client which opens a websocket connection to a GTFS-RT data source. A
@@ -83,11 +80,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Only create a realtime data snapshot source if none exists already
-        if (graph.timetableSnapshotSource == null) {
-            TimetableSnapshotSource snapshotSource = new TimetableSnapshotSource(graph);
-            // Add snapshot source to graph
-            graph.timetableSnapshotSource = (snapshotSource);
-        }
+        graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
     }
 
     @Override
@@ -182,7 +175,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             if (updates != null) {
                 // Handle trip updates via graph writer runnable
                 TripUpdateGraphWriterRunnable runnable = new TripUpdateGraphWriterRunnable(
-                        fullDataset, updates, feedId);
+                        fullDataset, updates, feedId
+                );
                 updaterManager.execute(runnable);
             }
         }

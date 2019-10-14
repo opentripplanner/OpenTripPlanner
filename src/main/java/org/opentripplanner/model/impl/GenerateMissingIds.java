@@ -1,6 +1,6 @@
 package org.opentripplanner.model.impl;
 
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 
 import java.util.List;
 
@@ -17,7 +17,7 @@ class GenerateMissingIds {
      * Iterate over the entities; First to find the larged numerical id, then
      * set all ids that is {@code 0} or {@code null} to a uniq nuberical id.
      */
-    static <T extends IdentityBean<String>> void generateNoneExistentIds(List<T> entities) {
+    static <T extends TransitEntity<String>> void generateNoneExistentIds(List<T> entities) {
         int maxId = 0;
 
         for (T it : entities) {
@@ -32,7 +32,7 @@ class GenerateMissingIds {
     }
 
     /** pares entity id as int, if not int -1 is resturned, if 0 or null zero is returned. */
-    private static int parseId(IdentityBean<String> entity) {
+    private static int parseId(TransitEntity<String> entity) {
         try {
             String id = entity.getId();
             return id == null ? 0 : Integer.parseInt(id);

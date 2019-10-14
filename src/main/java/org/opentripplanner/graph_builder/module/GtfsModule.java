@@ -116,16 +116,6 @@ public class GtfsModule implements GraphBuilderModule {
 
                 PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());
                 hf.run(graph);
-
-                if (gtfsBundle.doesTransfersTxtDefineStationPaths()) {
-                    hf.createTransfersTxtTransfers();
-                }
-                if (gtfsBundle.linkStopsToParentStations) {
-                    hf.linkStopsToParentStations(graph);
-                }
-                if (gtfsBundle.parentStationTransfers) {
-                    hf.createParentStationTransfers();
-                }
             }
         } catch (IOException e) {
             throw new RuntimeException(e);

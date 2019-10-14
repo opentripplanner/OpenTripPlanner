@@ -1,6 +1,6 @@
 package org.opentripplanner.model.impl;
 
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -16,7 +16,7 @@ import java.util.Map;
  * @param <I> the entity id type
  * @param <E> the entity type
  */
-public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
+public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
 
     private final Map<I, E> map = new HashMap<>();
 
@@ -45,7 +45,7 @@ public class EntityById<I extends Serializable, E extends IdentityBean<I>> {
     /**
      * Return a copy of the internal map. Changes in the source are not reflected
      * in the destination (returned Map), and visa versa.
-     * <p/>
+     * <p>
      * The returned map is immutable.
      */
     Map<I, E> asImmutableMap() {

@@ -42,7 +42,7 @@ public final class CompactElevationProfile implements Serializable {
      * at regular intervals according to the distanceBetweenSamplesM field. The last x-value is given
      * by the length of the geometry.
      * 
-     * @param profile The elevation profile to compact
+     * @param elevation The elevation profile to compact
      * @return The compacted format
      */
     public static byte[] compactElevationProfileWithRegularSamples(CoordinateSequence elevation) {

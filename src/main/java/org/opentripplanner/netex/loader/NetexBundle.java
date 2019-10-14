@@ -3,7 +3,8 @@ package org.opentripplanner.netex.loader;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
-import org.opentripplanner.netex.mapping.NetexMapper;
+import org.opentripplanner.netex.loader.mapping.NetexMapper;
+import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,12 +18,12 @@ import static java.util.Collections.singletonList;
 
 /**
  * Loads/reads a NeTEx bundle of files(a zip file) and maps it into the OTP internal transit model.
- * <p/>
+ * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
  * keeping an index of entities to enable linking. The convention is documented here
  *{@link org.opentripplanner.standalone.NetexParameters#sharedFilePattern} and here
  * {@link NetexZipFileHierarchy}.
- * <p/>
+ * <p>
  * This class is also responsible for logging progress and exception handling.
  */
 public class NetexBundle {
@@ -36,7 +37,6 @@ public class NetexBundle {
     /** maps the NeTEx XML document to OTP transit model. */
     private NetexMapper otpMapper;
 
-
     private NetexXmlParser xmlParser;
 
     private final String netexFeedId;
@@ -48,7 +48,7 @@ public class NetexBundle {
     }
 
     /** load the bundle, map it to the OTP transit model and return */
-    public OtpTransitServiceBuilder loadBundle() {
+    public OtpTransitServiceBuilder loadBundle(Deduplicator deduplicator) {
         LOG.info("reading {}", fileHierarchy.filename());
 
         // Store result in a mutable OTP Transit Model
@@ -56,7 +56,7 @@ public class NetexBundle {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        otpMapper = new NetexMapper(transitBuilder, netexFeedId);
+        otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator);
 
         // Load data
         fileHierarchy.load(this::loadZipFileEntries);
@@ -122,7 +122,7 @@ public class NetexBundle {
             loadSingeFileEntry(fileDescription, entry);
         }
         // map current NeTEx objects into the OTP Transit Model
-        otpMapper.mapNetexToOtp(index());
+        otpMapper.mapNetexToOtp(index().readOnlyView());
     }
 
     private NetexImportDataIndex index() {

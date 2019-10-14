@@ -3,7 +3,6 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
-import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
@@ -11,13 +10,13 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStation;
 
 import java.io.File;
+import java.lang.ref.SoftReference;
+import java.lang.reflect.Method;
 import java.util.BitSet;
-import java.util.List;
 import java.util.concurrent.ThreadPoolExecutor;
-import java.util.stream.Collectors;
+import java.util.jar.JarFile;
 
 import static org.junit.Assert.assertFalse;
 
@@ -34,30 +33,21 @@ import static org.junit.Assert.assertFalse;
 public class GraphSerializationTest {
 
     /**
-     * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
+     * Tests GTFS based graph serialization to file.
      */
     @Test
-    @Ignore // TODO OTP2 Why is this test ignored - needs to be investigated.
-    public void testRoundTrip () throws Exception {
+    public void testRoundTripSerializationForGTFSGraph() throws Exception {
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data
-        Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
-        // Remove the transit stations, which have no edges and won't survive serialization.
-        // These are buffered into a list to prevent concurrent modification (removal while iterating).
-        List<Vertex> transitVertices = originalGraph.getVertices().stream()
-                .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
-        transitVertices.forEach(originalGraph::remove);
-        originalGraph.index(new DefaultStreetVertexIndexFactory());
-        // The cached timezone in the graph is transient and lazy-initialized.
-        // Previous tests may have caused a timezone to be cached.
-        originalGraph.clearTimeZone();
-        // Now round-trip the graph through serialization.
-        File tempFile = TempFile.createTempFile("graph", "pdx");
-        originalGraph.save(tempFile);
-        Graph copiedGraph1 = Graph.load(tempFile);
-        assertNoDifferences(originalGraph, copiedGraph1);
-        Graph copiedGraph2 = Graph.load(tempFile);
-        assertNoDifferences(copiedGraph1, copiedGraph2);
+        testRoundTrip(ConstantsForTests.getInstance().getPortlandGraph());
+    }
+
+    /**
+     * Tests Netex based graph serialization to file.
+     */
+    @Test
+    public void testRoundTripSerializationForNetexGraph() throws Exception {
+        testRoundTrip(ConstantsForTests.getInstance().getMinimalNetexGraph());
     }
 
     // Ideally we'd also test comparing two separate but identical complex graphs, built separately from the same inputs.
@@ -90,13 +80,21 @@ public class GraphSerializationTest {
         objectDiffer.ignoreFields("incoming", "outgoing");
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // ThreadPoolExecutor contains a weak reference to a very deep chain of Finalizer instances.
-        objectDiffer.ignoreClasses(WeakValueHashMap.class, ThreadPoolExecutor.class);
+        // Method instances usually are part of a proxy which are totally un-reflectable in Java 11.
+        objectDiffer.ignoreClasses(
+                ThreadPoolExecutor.class,
+                WeakValueHashMap.class,
+                Method.class,
+                JarFile.class,
+                SoftReference.class,
+                Class.class
+        );
         // This setting is critical to perform a deep test of an object against itself.
         objectDiffer.enableComparingIdenticalObjects();
         objectDiffer.compareTwoObjects(originalGraph, originalGraph);
+        objectDiffer.printSummary();
         assertFalse(objectDiffer.hasDifferences());
     }
-
 
     /**
      * Compare two separate essentially empty graphs.
@@ -108,19 +106,58 @@ public class GraphSerializationTest {
         assertNoDifferences(graph1, graph2);
     }
 
+    /**
+     * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
+     */
+    private void testRoundTrip (Graph originalGraph) throws Exception {
+        originalGraph.index(new DefaultStreetVertexIndexFactory());
+        // The cached timezone in the graph is transient and lazy-initialized.
+        // Previous tests may have caused a timezone to be cached.
+        originalGraph.clearTimeZone();
+        // Now round-trip the graph through serialization.
+        File tempFile = TempFile.createTempFile("graph", "pdx");
+        originalGraph.save(tempFile);
+        Graph copiedGraph1 = Graph.load(tempFile);
+        assertNoDifferences(originalGraph, copiedGraph1);
+        Graph copiedGraph2 = Graph.load(tempFile);
+        assertNoDifferences(copiedGraph1, copiedGraph2);
+    }
+
     private static void assertNoDifferences (Graph g1, Graph g2) {
         // Make some exclusions because some classes are inherently transient or contain unordered lists we can't yet compare.
         ObjectDiffer objectDiffer = new ObjectDiffer();
         // Skip incoming and outgoing edge lists. These are unordered lists which will not compare properly.
         // The edges themselves will be compared via another field, and the edge lists are reconstructed after deserialization.
         // Some tests re-build the graph which will result in build times different by as little as a few milliseconds.
-        objectDiffer.ignoreFields("incoming", "outgoing", "buildTime", "transitLayer");
+        // Some transient fields are not relevant to routing, so are not restored after reloading the graph.
+        // Other structures contain Maps with keys that have identity equality - these also cannot be compared yet.
+        // We would need to apply a key extractor function to such maps, copying them into new maps.
+        objectDiffer.ignoreFields(
+                "incoming",
+                "outgoing",
+                "buildTime",
+                "transitLayer",
+                "realtimeTransitLayer",
+                "graphBuilderAnnotations"
+        );
+        // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
+        objectDiffer.setKeyExtractor("turnRestrictions", edge -> edge.toString());
         objectDiffer.useEquals(BitSet.class, LineString.class, Polygon.class);
         // HashGridSpatialIndex contains unordered lists in its bins. This is rebuilt after deserialization anyway.
         // The deduplicator in the loaded graph will be empty, because it is transient and only fills up when items
         // are deduplicated.
-        objectDiffer.ignoreClasses(HashGridSpatialIndex.class, ThreadPoolExecutor.class, Deduplicator.class);
+        objectDiffer.ignoreClasses(
+                HashGridSpatialIndex.class,
+                ThreadPoolExecutor.class,
+                Deduplicator.class,
+                WeakValueHashMap.class,
+                Method.class,
+                JarFile.class,
+                SoftReference.class,
+                Class.class
+        );
         objectDiffer.compareTwoObjects(g1, g2);
+        objectDiffer.printSummary();
         // Print differences before assertion so we can see what went wrong.
         assertFalse(objectDiffer.hasDifferences());
     }

@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.alertpatch;
 
-import org.opentripplanner.api.adapters.AgencyAndIdAdapter;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
@@ -12,26 +11,23 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
+import java.util.Set;
 
 /**
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)
- *
- * @author novalis
- *
  */
-@XmlRootElement(name = "AlertPatch")
 public class AlertPatch implements Serializable {
+
     private static final Logger LOG = LoggerFactory.getLogger(AlertPatch.class);
 
     private static final long serialVersionUID = 20140319L;
@@ -40,9 +36,11 @@ public class AlertPatch implements Serializable {
 
     private Alert alert;
 
-    private List<TimePeriod> timePeriods = new ArrayList<TimePeriod>();
+    private List<TimePeriod> timePeriods = new ArrayList<>();
 
     private String agency;
+
+    private FeedScopedId operatorId;
 
     private FeedScopedId route;
 
@@ -65,15 +63,28 @@ public class AlertPatch implements Serializable {
      */
     private int directionId = -1;
 
-    @XmlElement
+    /**
+     * Used to limit when Alert is applicable
+     */
+    private Set<StopCondition> stopConditions = new HashSet<>();
+
+    /**
+     * The provider's internal ID for this alert
+     */
+    private String situationNumber;
+
     public Alert getAlert() {
         return alert;
     }
 
     public boolean displayDuring(State state) {
+        return displayDuring(state.getStartTimeSeconds(), state.getTimeSeconds());
+    }
+
+    public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
         for (TimePeriod timePeriod : timePeriods) {
-            if (state.getTimeSeconds() >= timePeriod.startTime) {
-                if (state.getStartTimeSeconds() < timePeriod.endTime) {
+            if (endTimeSeconds >= timePeriod.startTime) {
+                if (startTimeSeconds < timePeriod.endTime) {
                     return true;
                 }
             }
@@ -81,7 +92,6 @@ public class AlertPatch implements Serializable {
         return false;
     }
 
-    @XmlElement
     public String getId() {
         return id;
     }
@@ -132,7 +142,7 @@ public class AlertPatch implements Serializable {
                 }
             }
         } else if (stop != null) {
-            LOG.warn("Cannot add alert to TransitStop - PreBoard and PreAlight edges no longer exist.");
+            LOG.warn("Cannot add alert to Stop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 
@@ -178,7 +188,7 @@ public class AlertPatch implements Serializable {
                 }
             }
         } else if (stop != null) {
-            LOG.warn("Cannot remove alert from TransitStop - PreBoard and PreAlight edges no longer exist.");
+            LOG.warn("Cannot remove alert from Stop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 
@@ -201,23 +211,24 @@ public class AlertPatch implements Serializable {
         return agency;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getRoute() {
         return route;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getTrip() {
         return trip;
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     public FeedScopedId getStop() {
         return stop;
     }
 
     public void setAgencyId(String agency) {
         this.agency = agency;
+    }
+
+    public void setOperatorId(FeedScopedId operatorId) {
+        this.operatorId = operatorId;
     }
 
     public void setRoute(FeedScopedId route) {
@@ -239,12 +250,10 @@ public class AlertPatch implements Serializable {
         this.directionId = direction;
     }
 
-    @XmlElement
     public String getDirection() {
         return direction;
     }
 
-    @XmlElement
     public int getDirectionId() {
         return directionId;
     }
@@ -265,106 +274,40 @@ public class AlertPatch implements Serializable {
         return trip != null;
     }
 
-    public boolean equals(Object o) {
-        if (!(o instanceof AlertPatch)) {
-            return false;
-        }
-        AlertPatch other = (AlertPatch) o;
-        if (direction == null) {
-            if (other.direction != null) {
-                return false;
-            }
-        } else {
-            if (!direction.equals(other.direction)) {
-                return false;
-            }
-        }
-        if (directionId != other.directionId) {
-            return false;
-        }
-        if (agency == null) {
-            if (other.agency != null) {
-                return false;
-            }
-        } else {
-            if (!agency.equals(other.agency)) {
-                return false;
-            }
-        }
-        if (trip == null) {
-            if (other.trip != null) {
-                return false;
-            }
-        } else {
-            if (!trip.equals(other.trip)) {
-                return false;
-            }
-        }
-        if (stop == null) {
-            if (other.stop != null) {
-                return false;
-            }
-        } else {
-            if (!stop.equals(other.stop)) {
-                return false;
-            }
-        }
-        if (route == null) {
-            if (other.route != null) {
-                return false;
-            }
-        } else {
-            if (!route.equals(other.route)) {
-                return false;
-            }
-        }
-        if (alert == null) {
-            if (other.alert != null) {
-                return false;
-            }
-        } else {
-            if (!alert.equals(other.alert)) {
-                return false;
-            }
-        }
-        if (id == null) {
-            if (other.id != null) {
-                return false;
-            }
-        } else {
-            if (!id.equals(other.id)) {
-                return false;
-            }
-        }
-        if (timePeriods == null) {
-            if (other.timePeriods != null) {
-                return false;
-            }
-        } else {
-            if (!timePeriods.equals(other.timePeriods)) {
-                return false;
-            }
-        }
-        if (feedId == null) {
-            if (other.feedId != null) {
-                return false;
-            }
-        } else {
-            if (!feedId.equals(other.feedId)) {
-                return false;
-            }
-        }
-        return true;
+    public Set<StopCondition> getStopConditions() {
+        return stopConditions;
     }
 
+    public void setSituationNumber(String situationNumber) {
+        this.situationNumber = situationNumber;
+    }
+
+    public String getSituationNumber() {
+        return situationNumber;
+    }
+
+    // TODO - Alerts should not be added to the internal model if they are the same; This check should be done
+    //      - when importing the Alerts into the system. Then the Alert can use the System identity for
+    //      - hachCode and equals.
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        AlertPatch that = (AlertPatch) o;
+        return Objects.equals(feedId, that.feedId) &&
+                Objects.equals(agency, that.agency) &&
+                Objects.equals(id, that.id) &&
+                Objects.equals(route, that.route) &&
+                Objects.equals(trip, that.trip) &&
+                Objects.equals(stop, that.stop) &&
+                directionId == that.directionId &&
+                Objects.equals(direction, that.direction) &&
+                Objects.equals(timePeriods, that.timePeriods) &&
+                Objects.equals(alert, that.alert);
+    }
+
+    @Override
     public int hashCode() {
-        return ((direction == null ? 0 : direction.hashCode()) +
-                directionId +
-                (agency == null ? 0 : agency.hashCode()) +
-                (trip == null ? 0 : trip.hashCode()) +
-                (stop == null ? 0 : stop.hashCode()) +
-                (route == null ? 0 : route.hashCode()) +
-                (alert == null ? 0 : alert.hashCode()) +
-                (feedId == null ? 0 : feedId.hashCode()));
+        return Objects.hash(directionId, feedId, agency, id, route, trip, stop, direction, timePeriods, alert);
     }
 }

@@ -8,7 +8,7 @@ import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * NextBike bike rental data source.
- * url: https://nextbike.net/maps/nextbike-live.xml?city=<city uid>
+ * url: {@code https://nextbike.net/maps/nextbike-live.xml?city=<city uid>}
  * Check https://nextbike.net/maps/nextbike-live.xml full feed to find the city uid
  * to use for your data location.
  */

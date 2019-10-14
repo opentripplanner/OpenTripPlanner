@@ -42,7 +42,7 @@ public class TripPatternCache {
             tripPattern = new TripPattern(route, stopPattern);
             
             // Generate unique code for trip pattern
-            tripPattern.code = generateUniqueTripPatternCode(tripPattern);
+            tripPattern.setId(new FeedScopedId(tripPattern.getFeedId(), generateUniqueTripPatternCode(tripPattern)));
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
             tripPattern.setServiceCodes(graph.serviceCodes);

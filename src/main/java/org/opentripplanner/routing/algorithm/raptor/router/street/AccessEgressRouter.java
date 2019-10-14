@@ -34,8 +34,10 @@ public class AccessEgressRouter {
         Vertex vertex = fromTarget ? rr.rctx.toVertex : rr.rctx.fromVertex;
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
+        // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
+        // target vertex will be cleaned up at the end of the super-request, and we don't want that to happen twice.
         List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
-                nearbyStopFinder.findNearbyStopsViaStreets(vertex, fromTarget);
+                nearbyStopFinder.findNearbyStopsViaStreets(vertex, fromTarget, false);
 
         Map<Stop, Transfer> result = new HashMap<>();
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {

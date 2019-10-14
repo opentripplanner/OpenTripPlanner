@@ -9,19 +9,19 @@ import javax.xml.bind.JAXBElement;
 import java.util.HashSet;
 import java.util.Set;
 
-import static org.opentripplanner.netex.mapping.DayTypeRefToServiceIdMapper.generateServiceId;
+import static org.opentripplanner.netex.support.DayTypeRefToServiceIdMapper.generateServiceId;
 
 /**
  * NeTEx do not have the GTFS concept of a ServiceId. In NeTEx a ServiceJourney is connected to a
  * ServiceCalendar using a set of {@link org.rutebanken.netex.model.DayTypeRefs_RelStructure}.
- * <p/>
+ * <p>
  * To create ServiceIds and avoid duplication we store all DayTypeRefs in a set using this class,
  * not the original. The reason is that the original DayTypeRefs do not implement hashCode()
  * and equals(), so we can not store it in a set.
- * <p/>
+ * <p>
  * This class is responsible for generating ServiceIds, any set of DayTypeRefs with identical refs
  * (order my differ) should result in the same unique ServiceId.
- * <p/>
+ * <p>
  * NeTEx implementation note: The DayTypeRefStructure version info is ignored.
  */
 public final class DayTypeRefsToServiceIdAdapter {

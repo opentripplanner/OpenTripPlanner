@@ -1,13 +1,13 @@
 package org.opentripplanner.api.adapters;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
 import org.opentripplanner.model.Agency;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class AgencyAdapter extends XmlAdapter<AgencyType, Agency> {
 
     @Override
-    public Agency unmarshal(AgencyType arg) throws Exception {
+    public Agency unmarshal(AgencyType arg) {
         if (arg == null) {
             return null;
         }
@@ -19,11 +19,11 @@ public class AgencyAdapter extends XmlAdapter<AgencyType, Agency> {
         a.setLang(arg.lang);
         a.setPhone(arg.phone);
         a.setFareUrl(arg.fareUrl);
-        return new Agency(a);
+        return a;
     }
 
     @Override
-    public AgencyType marshal(Agency arg) throws Exception {
+    public AgencyType marshal(Agency arg) {
         if (arg == null) {
             return null;
         }

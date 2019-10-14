@@ -31,7 +31,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -181,7 +181,7 @@ public class ItineraryMapper {
         }
 
         leg.serviceDate = new ServiceDate(request.getDateTime()).getAsString(); // TODO: This has to be changed for multi-day searches
-        leg.stop = new ArrayList<>();
+        leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.mode = tripPattern.mode.toString();
@@ -193,7 +193,7 @@ public class ItineraryMapper {
         leg.distance = getDistanceFromCoordinates(transitLegCoordinates);
 
         if (request.showIntermediateStops) {
-            leg.stop = extractIntermediateStops(pathLeg);
+            leg.intermediateStops = extractIntermediateStops(pathLeg);
         }
 
         leg.route = route.getLongName();
@@ -206,6 +206,20 @@ public class ItineraryMapper {
         leg.routeLongName = route.getLongName();
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
+
+        // TODO OTP2 - alightRule and boardRule needs mapping
+        //    Under Raptor, for transit trips, ItineraryMapper converts Path<TripSchedule> directly to Itinerary
+        //    (the old API response element, within TripPlan). Non-transit trips still use GraphPathToTripPlanConverter
+        //    to turn A* results (sequences of States and Edges called GraphPaths) into TripPlans which also contain
+        //    Itineraries.
+        //    So transit results do not go through GraphPathToTripPlanConverter. It contains logic to find board/alight
+        //    rules from StopPatterns within TripPatterns, and attach them as machine-readable codes on Legs, but only
+        //    where you are really boarding or alighting (considering interlining / in-seat transfers).
+        //    That needs to be re-implemented for the Raptor transit case.
+        //    - See e2118e0a -> GraphPathToTripPlanConverter#fixupLegs(List<Leg>, State[][]))
+        // leg.alightRule = <Assign here>;
+        // leg.boardRule =  <Assign here>;
+
         return leg;
     }
 
@@ -282,8 +296,8 @@ public class ItineraryMapper {
     }
 
     private Place mapOriginTargetToPlace(Vertex vertex, GenericLocation location) {
-        return vertex instanceof TransitVertex ?
-                mapTransitVertexToPlace((TransitVertex) vertex) :
+        return vertex instanceof TransitStopVertex ?
+                mapTransitVertexToPlace((TransitStopVertex) vertex) :
                 mapLocationToPlace(location);
     }
 
@@ -295,7 +309,7 @@ public class ItineraryMapper {
         }
     }
 
-    private Place mapTransitVertexToPlace(TransitVertex vertex) {
+    private Place mapTransitVertexToPlace(TransitStopVertex vertex) {
         return mapStopToPlace(vertex.getStop());
     }
 
@@ -303,8 +317,8 @@ public class ItineraryMapper {
         Place place = new Place(stop.getLon(), stop.getLat(), stop.getName());
         place.stopId = stop.getId();
         place.stopCode = stop.getCode();
-        place.platformCode = stop.getPlatformCode();
-        place.zoneId = stop.getZoneId();
+        place.platformCode = stop.getCode();
+        place.zoneId = stop.getZone();
         place.vertexType = VertexType.TRANSIT;
         return place;
     }

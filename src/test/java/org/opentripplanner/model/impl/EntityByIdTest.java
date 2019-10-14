@@ -1,7 +1,7 @@
 package org.opentripplanner.model.impl;
 
 import org.junit.Test;
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 
 import java.util.Collections;
 
@@ -77,7 +77,7 @@ public class EntityByIdTest {
     }
 
 
-    static class E extends IdentityBean<String> {
+    static class E extends TransitEntity<String> {
         private String id;
 
         E(String id) {

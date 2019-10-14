@@ -1,15 +1,16 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.util.List;
-import java.util.concurrent.ExecutionException;
-
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.updater.*;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.util.List;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -108,21 +109,17 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
-        TimetableSnapshotSource snapshotSource = graph.timetableSnapshotSource;
-        if (snapshotSource == null) {
-            snapshotSource = new TimetableSnapshotSource(graph);
-            // Add snapshot source to graph
-            graph.timetableSnapshotSource = (snapshotSource);
-        }
+        TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+
         // Set properties of realtime data snapshot source
         if (logFrequency != null) {
-            snapshotSource.logFrequency = (logFrequency);
+            snapshotSource.logFrequency = logFrequency;
         }
         if (maxSnapshotFrequency != null) {
-            snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+            snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
         }
         if (purgeExpiredData != null) {
-            snapshotSource.purgeExpiredData = (purgeExpiredData);
+            snapshotSource.purgeExpiredData = purgeExpiredData;
         }
         if (fuzzyTripMatcher != null) {
             snapshotSource.fuzzyTripMatcher = fuzzyTripMatcher;

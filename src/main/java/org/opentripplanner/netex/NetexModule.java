@@ -2,6 +2,7 @@ package org.opentripplanner.netex;
 
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
@@ -59,21 +60,28 @@ public class NetexModule implements GraphBuilderModule {
         CalendarServiceData calendarServiceData = new CalendarServiceData();
 
         // TODO OTP2 - Stops set inside the hf.run. The next line appered after merging
-        // TODO OTP2 - dev-2.x and netex_inport, It does not compile due to the deletion of the
-        // TODO OTP2 - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
-        // TODO OTP2 -  this and the "//hf.setStopContext(stopContext);" below (line 67).
+        //           - dev-2.x and netex_inport, It does not compile due to the deletion of the
+        //           - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
+        //           - this and the "//hf.setStopContext(stopContext);" below (line 67).
         //GtfsStopContext stopContext = new GtfsStopContext();
 
         try {
             for (NetexBundle netexBundle : netexBundles) {
-                OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle();
+                netexBundle.checkInputs();
+
+                OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(graph.deduplicator);
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
+
+                OtpTransitService otpService = transitBuilder.build();
+
+                graph.getOperators().addAll(otpService.getAllOperators());
+                graph.addNoticeAssignments(otpService.getNoticeAssignments());
 
                 PatternHopFactory hf = new PatternHopFactory(
                         new GtfsFeedId.Builder()
                                 .id(netexFeedId)
                                 .build(),
-                        transitBuilder.build(),
+                        otpService,
                         fareServiceFactory,
                         MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
                         subwayAccessTime,
@@ -81,13 +89,6 @@ public class NetexModule implements GraphBuilderModule {
                 );
                 //hf.setStopContext(stopContext);
                 hf.run(graph);
-
-                if (linkStopsToParentStations) {
-                    hf.linkStopsToParentStations(graph);
-                }
-                if (parentStationTransfers) {
-                    hf.createParentStationTransfers();
-                }
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

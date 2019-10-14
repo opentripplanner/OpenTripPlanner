@@ -50,11 +50,7 @@ public class TransitLayerMapper {
 
     private TransitLayerMapper(Graph graph) {
         this.graph = graph;
-        if (this.graph.timetableSnapshotSource != null) {
-            this.timetableSnapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
-        } else {
-            this.timetableSnapshot = null;
-        }
+        this.timetableSnapshot = graph.getTimetableSnapshot();
     }
 
     public static TransitLayer map(Graph graph) {

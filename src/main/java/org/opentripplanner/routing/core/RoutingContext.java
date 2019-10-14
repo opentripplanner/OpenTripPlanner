@@ -22,9 +22,8 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,12 +197,7 @@ public class RoutingContext implements Cloneable {
             if (routingRequest.ignoreRealtimeUpdates) {
                 timetableSnapshot = null;
             } else {
-                TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
-                if (timetableSnapshotSource == null) {
-                    timetableSnapshot = null;
-                } else {
-                    timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
-                }
+                timetableSnapshot = graph.getTimetableSnapshot();
             }
             calendarService = graph.getCalendarService();
             setServiceDays();
@@ -307,11 +301,9 @@ public class RoutingContext implements Cloneable {
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
-                        calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(), calendarService, agency.getId()));
                 addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
-                        calendarService, agency.getId()));
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(), calendarService, agency.getId()));
             }
         }
     }
@@ -332,8 +324,8 @@ public class RoutingContext implements Cloneable {
 
     // this could be handled by method overloading on Vertex
     public boolean isWheelchairAccessible(Vertex v) {
-        if (v instanceof TransitStop) {
-            TransitStop ts = (TransitStop) v;
+        if (v instanceof TransitStopVertex) {
+            TransitStopVertex ts = (TransitStopVertex) v;
             return ts.hasWheelchairEntrance();
         } else if (v instanceof StreetLocation) {
             StreetLocation sl = (StreetLocation) v;

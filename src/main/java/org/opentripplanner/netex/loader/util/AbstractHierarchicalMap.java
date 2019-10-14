@@ -6,7 +6,7 @@ package org.opentripplanner.netex.loader.util;
  * when retrieving values({@link #lookup(Object)}) the lookup call check the current instance, then
  * ask the parent. This continue until the root of the hierarchy is reached. If a {@code key}
  * exist in more than two places in the hierarchy, the first value found wins.
- * <p/>
+ * <p>
  * There is no reference from the parent to the child, enableing garbage collection of children,
  * when not referenced by the outer context any more.
  *
@@ -38,10 +38,10 @@ public abstract class AbstractHierarchicalMap<K,V> implements ReadOnlyHierarchic
     }
 
     /** Get value from 'local' map, parent is not queried. */
-    protected abstract V localGet(K key);
+    abstract V localGet(K key);
 
     /** Check if key exist in 'local' map, parent is not queried. */
-    protected abstract boolean localContainsKey(K key);
+    abstract boolean localContainsKey(K key);
 
 
     /* private methods */

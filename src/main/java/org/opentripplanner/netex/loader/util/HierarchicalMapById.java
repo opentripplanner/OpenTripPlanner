@@ -11,7 +11,9 @@ import java.util.Map;
  *
  * @param <V> the value type
  */
-public class HierarchicalMapById<V extends EntityStructure> extends HierarchicalMap<String, V> {
+public class HierarchicalMapById<V extends EntityStructure>
+        extends HierarchicalMap<String, V>
+        implements ReadOnlyHierarchicalMapById<V> {
 
     /** Create a root for the hierarchy */
     public HierarchicalMapById() {
@@ -36,6 +38,11 @@ public class HierarchicalMapById<V extends EntityStructure> extends Hierarchical
         for (V e : other) {
             add(e);
         }
+    }
+
+    @Override
+    public Collection<V> localValues() {
+        return super.localValues();
     }
 
     /**

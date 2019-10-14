@@ -5,6 +5,9 @@ import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
@@ -14,22 +17,29 @@ import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.Notice;
+import org.rutebanken.netex.model.NoticeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
+import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TimetabledPassingTime;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
 /**
- * This class holds indexes of Netex objects for lookup during the NeTEx import.
+ * This class holds indexes of Netex objects for lookup during the NeTEx import using the
+ * {@link NetexImportDataIndexReadOnlyView}.
  * <p>
  * A NeTEx import is grouped into several levels: <em>shard data</em>, <em>group of shared data</em>,
  * and <em>single files</em>. We create a hierarchy of {@code NetexImportDataIndex} to avoid keeping everything
  * in memory and to be able to override values in a more specific(lower) level.
- * <p/>
+ * <p>
  * There is one instance of this class for <em>shard data</em> - the ROOT.
  * For each <em>group of shared data</em> a new {@code NetexImportDataIndex} is created with the ROOT as a
  * parent. When such <em>group of shared data</em> is not needed any more it is discard and become
@@ -37,17 +47,17 @@ import java.util.Set;
  * For each <em>single files</em> a new {@code NetexImportDataIndex} is created with the corresponding
  * <em>group of shared data</em> as parent. The <em>single files</em> object is thrown away when
  * the file is loaded.
- * <p/>
+ * <p>
  * This hierarchy make it possible to override values in child instances of the {@code NetexImportDataIndex}
  * and save memory during the load operation, because data not needed any more can be thrown away.
- * <p/>
+ * <p>
  * The hierarchy implementation is delegated to the
  * {@link org.opentripplanner.netex.loader.util.AbstractHierarchicalMap} and the
  * {@link HierarchicalElement} classes.
- *
- *
- * TODO OTP2 - move this to package: org.opentripplanner.netex.index and move all the
- * TODO OTP2 - util classes to: org.opentripplanner.netex.index.collections
+ * <p/>
+ * The mapping code should not insert entities, so an instance of this class implements the
+ * {@link NetexImportDataIndexReadOnlyView} witch is passed to the mapping code for translation into
+ * OTP domain model objects.
  */
 public class NetexImportDataIndex {
 
@@ -56,7 +66,6 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<DayType> dayTypeById;
     public final HierarchicalMultimap<String, DayTypeAssignment> dayTypeAssignmentByDayTypeId;
     /**
-     * TODO OTP2 - Verify this
      * DayTypeRefs is only needed in the local scope, no need to lookup values in the parent.
      * */
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
@@ -65,7 +74,11 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
     public final HierarchicalMapById<Line> lineById;
     public final HierarchicalMapById<Network> networkById;
+    public final HierarchicalMapById<Notice> noticeById;
+    public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
     public final HierarchicalMapById<OperatingPeriod> operatingPeriodById;
+    public final HierarchicalMapById<Operator> operatorsById;
+    public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
@@ -79,8 +92,10 @@ public class NetexImportDataIndex {
 
     public final HierarchicalMap<String, String> networkIdByGroupOfLineId;
 
+
     // Shared data
     public final HierarchicalElement<String> timeZone;
+
 
     /**
      * Create a root node.
@@ -96,7 +111,11 @@ public class NetexImportDataIndex {
         this.lineById = new HierarchicalMapById<>();
         this.networkById = new HierarchicalMapById<>();
         this.networkIdByGroupOfLineId = new HierarchicalMap<>();
+        this.noticeById = new HierarchicalMapById<>();
+        this.noticeAssignmentById = new HierarchicalMapById<>();
         this.operatingPeriodById = new HierarchicalMapById<>();
+        this.operatorsById = new HierarchicalMapById<>();
+        this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
@@ -120,7 +139,11 @@ public class NetexImportDataIndex {
         this.lineById = new HierarchicalMapById<>(parent.lineById);
         this.networkById = new HierarchicalMapById<>(parent.networkById);
         this.networkIdByGroupOfLineId = new HierarchicalMap<>(parent.networkIdByGroupOfLineId);
+        this.noticeById = new HierarchicalMapById<>(parent.noticeById);
+        this.noticeAssignmentById = new HierarchicalMapById<>(parent.noticeAssignmentById);
         this.operatingPeriodById = new HierarchicalMapById<>(parent.operatingPeriodById);
+        this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
+        this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);
@@ -129,21 +152,98 @@ public class NetexImportDataIndex {
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
-    /**
-     * Lookup a Network given a GroupOfLine id or an Network id. If the given
-     * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
-     * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
-     * can lookup the Network directly.
-     * <p/>
-     * If no Network is found {@code null} is returned.
-     */
-    public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
-        GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
+    public NetexImportDataIndexReadOnlyView readOnlyView() {
+        return new NetexImportDataIndexReadOnlyView() {
 
-        String networkId = groupOfLines == null
-                ? groupOfLineOrNetworkId
-                : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
+            /**
+             * Lookup a Network given a GroupOfLine id or an Network id. If the given
+             * {@code groupOfLineOrNetworkId} is a GroupOfLine ID, we lookup the GroupOfLine, and then
+             * lookup its Network. If the given {@code groupOfLineOrNetworkId} is a Network ID then we
+             * can lookup the Network directly.
+             * <p/>
+             * If no Network is found {@code null} is returned.
+             */
+            public Network lookupNetworkForLine(String groupOfLineOrNetworkId) {
+                GroupOfLines groupOfLines = groupOfLinesById.lookup(groupOfLineOrNetworkId);
 
-        return networkById.lookup(networkId);
+                String networkId = groupOfLines == null
+                        ? groupOfLineOrNetworkId
+                        : networkIdByGroupOfLineId.lookup(groupOfLines.getId());
+
+                return networkById.lookup(networkId);
+            }
+
+            public ReadOnlyHierarchicalMapById<Authority> getAuthoritiesById() {
+                return authoritiesById;
+            }
+
+            public ReadOnlyHierarchicalMapById<DayType> getDayTypeById() {
+                return dayTypeById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> getDayTypeAssignmentByDayTypeId() {
+                return dayTypeAssignmentByDayTypeId;
+            }
+
+            public Iterable<DayTypeRefsToServiceIdAdapter> getDayTypeRefs() {
+                return Collections.unmodifiableSet(dayTypeRefs);
+            }
+
+            public ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
+                return destinationDisplayById;
+            }
+
+            public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
+                return journeyPatternsById;
+            }
+
+            public ReadOnlyHierarchicalMapById<Line> getLineById() {
+                return lineById;
+            }
+
+            public ReadOnlyHierarchicalMapById<Notice> getNoticeById() {
+                return noticeById;
+            }
+
+            public ReadOnlyHierarchicalMapById<NoticeAssignment> getNoticeAssignmentById() {
+                return noticeAssignmentById;
+            }
+
+            public ReadOnlyHierarchicalMapById<OperatingPeriod> getOperatingPeriodById() {
+                return operatingPeriodById;
+            }
+
+            public ReadOnlyHierarchicalMapById<Operator> getOperatorsById() {
+                return operatorsById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId() {
+                return passingTimeByStopPointId;
+            }
+
+            public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
+                return quayById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {
+                return quayIdByStopPointRef;
+            }
+
+            public ReadOnlyHierarchicalMapById<Route> getRouteById() {
+                return routeById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId() {
+                return serviceJourneyByPatternId;
+            }
+
+            public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
+                return stopPlaceById;
+            }
+
+            public String getTimeZone() {
+                return timeZone.get();
+            }
+        };
     }
 }

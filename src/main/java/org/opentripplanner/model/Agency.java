@@ -1,7 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Agency extends IdentityBean<String> {
+
+/**
+ * This class is tha same as a GTFS Agency and Netex Authority.
+ */
+public final class Agency extends TransitEntity<String> {
 
     private static final long serialVersionUID = 1L;
 
@@ -34,6 +38,7 @@ public final class Agency extends IdentityBean<String> {
         this.brandingUrl = a.brandingUrl;
     }
 
+    @Override
     public String getId() {
         return id;
     }

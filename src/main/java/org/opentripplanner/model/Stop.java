@@ -1,82 +1,57 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Stop extends IdentityBean<FeedScopedId> {
+/**
+ * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or
+ * a platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
+ */
+public final class Stop extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private static final int MISSING_VALUE = -999;
-
-    // the location types for transfers.txt
-    static final int PLATFORM_LOCATION_TYPE = 0;
-    static final int PARENT_STATION_LOCATION_TYPE = 1;
-
     private FeedScopedId id;
 
+    /**
+     * Name of the stop if provided. Usually only code is used.
+     */
     private String name;
 
     private double lat;
 
     private double lon;
 
+    /**
+     * Public facing stop code (short text or number).
+     */
     private String code;
 
-    private String desc;
+    /**
+     * Additional information about the stop (if needed).
+     */
+    private String description;
 
-    private String zoneId;
+    /**
+     * Used for GTFS fare information.
+     */
+    private String zone;
 
+    /**
+     * URL to a web page containing information about this particular stop.
+     */
     private String url;
 
-    private int locationType = 0;
+    private Station parentStation;
 
-    private String parentStation;
+    private WheelChairBoarding wheelchairBoarding;
 
-    private int wheelchairBoarding = 0;
+    public Stop() {}
 
-    private String direction;
-
-    private String timezone;
-
-    private int vehicleType = MISSING_VALUE;
-
-    private String platformCode;
-
-    public Stop() {
-
-    }
-
-    public Stop(Stop obj) {
-        this.id = obj.id;
-        this.code = obj.code;
-        this.name = obj.name;
-        this.desc = obj.desc;
-        this.lat = obj.lat;
-        this.lon = obj.lon;
-        this.zoneId = obj.zoneId;
-        this.url = obj.url;
-        this.locationType = obj.locationType;
-        this.parentStation = obj.parentStation;
-        this.wheelchairBoarding = obj.wheelchairBoarding;
-        this.direction = obj.direction;
-        this.timezone = obj.timezone;
-        this.vehicleType = obj.vehicleType;
-        this.platformCode = obj.platformCode;
-    }
-
-    public FeedScopedId getId() {
+    @Override public FeedScopedId getId() {
         return id;
     }
 
-    public void setId(FeedScopedId id) {
+    @Override public void setId(FeedScopedId id) {
         this.id = id;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
     }
 
     public String getName() {
@@ -85,14 +60,6 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getDesc() {
-        return desc;
-    }
-
-    public void setDesc(String desc) {
-        this.desc = desc;
     }
 
     public double getLat() {
@@ -111,12 +78,28 @@ public final class Stop extends IdentityBean<FeedScopedId> {
         this.lon = lon;
     }
 
-    public String getZoneId() {
-        return zoneId;
+    public String getCode() {
+        return code;
     }
 
-    public void setZoneId(String zoneId) {
-        this.zoneId = zoneId;
+    public void setCode(String code) {
+        this.code = code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public String getZone() {
+        return zone;
+    }
+
+    public void setZone(String zone) {
+        this.zone = zone;
     }
 
     public String getUrl() {
@@ -127,108 +110,24 @@ public final class Stop extends IdentityBean<FeedScopedId> {
         this.url = url;
     }
 
-    /**
-     * Consider using the {@link #isPlatform()} and {@link #isStation()} instead.
-     */
-    public int getLocationType() {
-        return locationType;
-    }
-
-    /**
-     * Stop (or "Platform"). A location where passengers board or disembark
-     * from a transit vehicle. Stops are called a "platform" when they're
-     * defined within a parent_station.
-     * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
-     * <p/>
-     * <code>locationType=0</code>
-     */
-    public boolean isPlatform() {
-        return locationType == PLATFORM_LOCATION_TYPE;
-    }
-
-    /**
-     * Station. A physical structure or area that contains one or more platforms.
-     * (https://developers.google.com/transit/gtfs/reference/#stopstxt)
-     * <p/>
-     * <code>locationType=1</code>
-     */
-    public boolean isStation() {
-        return locationType == PARENT_STATION_LOCATION_TYPE;
-    }
-
-    public void setLocationType(int locationType) {
-        this.locationType = locationType;
-    }
-
-    public String getParentStation() {
+    public Station getParentStation() {
         return parentStation;
     }
 
-    public void setParentStation(String parentStation) {
+    public void setParentStation(Station parentStation) {
         this.parentStation = parentStation;
+    }
+
+    public WheelChairBoarding getWheelchairBoarding() {
+        return wheelchairBoarding;
+    }
+
+    public void setWheelchairBoarding(WheelChairBoarding wheelchairBoarding) {
+        this.wheelchairBoarding = wheelchairBoarding;
     }
 
     @Override
     public String toString() {
         return "<Stop " + this.id + ">";
-    }
-
-    public void setWheelchairBoarding(int wheelchairBoarding) {
-        this.wheelchairBoarding = wheelchairBoarding;
-    }
-
-    public int getWheelchairBoarding() {
-        return wheelchairBoarding;
-    }
-
-    public String getDirection() {
-        return direction;
-    }
-
-    public void setDirection(String direction) {
-        this.direction = direction;
-    }
-
-    public String getTimezone() {
-        return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
-    }
-
-    public boolean isVehicleTypeSet() {
-        return vehicleType != MISSING_VALUE;
-    }
-
-    public int getVehicleType() {
-        return vehicleType;
-    }
-
-    public void setVehicleType(int vehicleType) {
-        this.vehicleType = vehicleType;
-    }
-
-    public void clearVehicleType() {
-        vehicleType = MISSING_VALUE;
-    }
-
-    public String getPlatformCode() {
-        return platformCode;
-    }
-
-    public void setPlatformCode(String platformCode) {
-        this.platformCode = platformCode;
-    }
-
-    /**
-     * This method convert a station to a stop(default location type in GTFS).
-     * This can be done to account for missing platforms in the input data.
-     */
-    public void convertStationToStop() {
-        if(!isStation()) {
-            throw new IllegalStateException("This method is only defined for Stations");
-        }
-        locationType = PLATFORM_LOCATION_TYPE;
     }
 }

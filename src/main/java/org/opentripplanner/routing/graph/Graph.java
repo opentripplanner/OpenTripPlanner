@@ -5,11 +5,13 @@ import com.esotericsoftware.kryo.io.Input;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+import com.google.common.collect.Multimap;
 import com.google.common.collect.Multiset;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
@@ -22,6 +24,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -29,7 +32,11 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -41,16 +48,18 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +70,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -73,6 +83,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -93,6 +104,12 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
+
+    /**
+     * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
+     * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
+     */
+    private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
 
     // transit feed validity information in seconds since epoch
     private long transitServiceStarts = Long.MAX_VALUE;
@@ -117,16 +134,18 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public final transient Deduplicator deduplicator = new Deduplicator();
 
     /**
-     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of Set<Object>.
+     * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
-    public transient TimetableSnapshotSource timetableSnapshotSource = null;
+    private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
+
+    private Collection<Operator> operators = new ArrayList<>();
 
     private Collection<String> feedIds = new HashSet<>();
 
@@ -213,7 +232,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public Double ellipsoidToGeoidDifference = 0.0;
 
     /** Parent stops **/
-    public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
+    public Map<FeedScopedId, Station> stationById = new HashMap<>();
 
     /**
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
@@ -232,6 +251,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer realtimeTransitLayer;
+
+    private transient AlertPatchService alertPatchService;
+
 
     /**
      * Hack. I've tried three different ways of generating unique labels.
@@ -252,15 +274,39 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     }
 
+    public TimetableSnapshot getTimetableSnapshot() {
+        return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();
+    }
+
+    /**
+     * TODO OTP2 - This should be replaced by proper dependency injection
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(Function<Graph, T> creator) {
+        if (timetableSnapshotProvider == null) {
+            timetableSnapshotProvider = creator.apply(this);
+        }
+        try {
+            return (T) timetableSnapshotProvider;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(
+                    "We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one " +
+                    "for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters " +
+                    "try setup both.",
+                    e
+            );
+        }
+    }
+
     /**
      * Add the given vertex to the graph. Ideally, only vertices should add themselves to the graph,
      * when they are constructed or deserialized.
      *
      * TODO OTP2 - This strategy is error prune, problematic when testing and causes a cyclic
-     * TODO OTP2 - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
-     * TODO OTP2 - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
-     * TODO OTP2 - a VertexCollection class, let the graph hold an instance of this collection,
-     * TODO OTP2 - and create factory methods for each type of Vertex in the VertexCollection.
+     *           - dependency Graph -> Vertex -> Graph. A better approach is to lett the bigger
+     *           - whole (Graph) create and attach its smaller parts (Vertex). A way is to create
+     *           - a VertexCollection class, let the graph hold an instance of this collection,
+     *           - and create factory methods for each type of Vertex in the VertexCollection.
      */
     public void addVertex(Vertex v) {
         Vertex old = vertices.put(v.getLabel(), v);
@@ -775,7 +821,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         return timeZone;
     }
-    
+
+    public Collection<Operator> getOperators() {
+        return operators;
+    }
+
     /**
      * The timezone is cached by the graph. If you've done something to the graph that has the
      * potential to change the time zone, you should call this to ensure it is reset. 
@@ -864,7 +914,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
             Median median = new Median();
 
             getVertices().stream()
-                .filter(v -> v instanceof TransitStop)
+                .filter(v -> v instanceof TransitStopVertex)
                 .forEach(v -> {
                     latitudes.add(v.getLat());
                     longitudes.add(v.getLon());
@@ -892,6 +942,14 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         return transitServiceEnds;
     }
 
+    public Multimap<TransitEntity<?>, Notice> getNoticesByElement() {
+        return noticesByElement;
+    }
+
+    public void addNoticeAssignments(Multimap<TransitEntity<?>, Notice> noticesByElement) {
+        this.noticesByElement.putAll(noticesByElement);
+    }
+
     public double getDistanceBetweenElevationSamples() {
         return distanceBetweenElevationSamples;
     }
@@ -900,4 +958,22 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
+
+    public AlertPatchService getSiriAlertPatchService() {
+        if (alertPatchService == null) {
+            if (updaterManager == null) {
+                alertPatchService = new AlertPatchServiceImpl(this);
+            }
+            else {
+                Optional<AlertPatchService> patchServiceOptional = updaterManager.getUpdaterList().stream()
+                        .filter(SiriSXUpdater.class::isInstance)
+                        .map(SiriSXUpdater.class::cast)
+                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
+
+                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(this));
+            }
+        }
+        return alertPatchService;
+    }
+
 }

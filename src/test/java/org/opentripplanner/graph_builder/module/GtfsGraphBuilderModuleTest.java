@@ -10,7 +10,7 @@ import java.util.List;
 import com.beust.jcommander.internal.Lists;
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -103,8 +103,7 @@ public class GtfsGraphBuilderModuleTest {
         return list;
     }
 
-    private static <S extends Serializable, T extends IdentityBean<S>> T withId(Iterable<T> beans,
-            S id) {
+    private static <S extends Serializable, T extends TransitEntity<S>> T withId(Iterable<T> beans, S id) {
         for (T bean : beans) {
             if (bean.getId().equals(id)) {
                 return bean;

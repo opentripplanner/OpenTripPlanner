@@ -1,20 +1,16 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
-import java.util.concurrent.locks.ReentrantLock;
-
+import com.google.common.base.Preconditions;
+import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.Timetable;
@@ -28,17 +24,21 @@ import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.base.Preconditions;
-import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
+import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.BitSet;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Set;
+import java.util.TimeZone;
+import java.util.concurrent.locks.ReentrantLock;
 
 /**
  * This class should be used to create snapshots of lookup tables of realtime data. This is
  * necessary to provide planning threads a consistent constant view of a graph with realtime data at
  * a specific point in time.
  */
-public class TimetableSnapshotSource {
+public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshotSource.class);
 
     /**
@@ -58,7 +58,7 @@ public class TimetableSnapshotSource {
     /**
      * If a timetable snapshot is requested less than this number of milliseconds after the previous
      * snapshot, just return the same one. Throttles the potentially resource-consuming task of
-     * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
+     * duplicating a TripPattern → Timetable map and indexing the new Timetables.
      */
     public int maxSnapshotFrequency = 1000; // msec
 
@@ -156,14 +156,10 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
      * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-<<<<<<< HEAD
-     * 
-=======
      *
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      *
->>>>>>> 7296be8ffd532a13afb0bec263a9f436ab787022
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
@@ -978,5 +974,4 @@ public class TimetableSnapshotSource {
         Stop stop = graphIndex.stopForId.get(new FeedScopedId(feedId, stopId));
         return stop;
     }
-
 }

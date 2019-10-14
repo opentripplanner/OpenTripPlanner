@@ -9,7 +9,7 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.IdentityBean;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.ServiceCalendar;
 import org.opentripplanner.model.ServiceCalendarDate;
@@ -101,7 +101,7 @@ public class OtpTransitServiceBuilderTest {
 
     /* private methods */
 
-    private <I extends Serializable, E extends IdentityBean<I>>
+    private <I extends Serializable, E extends TransitEntity<I>>
     void testRegenerateIndexForMap(EntityById<I, E> map, I fakeId) {
         E e = first(map.values());
         I originalId = e.getId();

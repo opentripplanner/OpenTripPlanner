@@ -1,17 +1,23 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.impl;
 
+import com.google.common.collect.ImmutableListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Notice;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.slf4j.Logger;
@@ -20,7 +26,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -36,8 +41,6 @@ import static java.util.stream.Collectors.groupingBy;
  * If you need to modify a {@link OtpTransitService}, you can create a new
  * {@link OtpTransitServiceBuilder} based on your old data, do your modification and
  * create a new unmodifiable instance.
- *
- * @author bdferris
  */
 class OtpTransitServiceImpl implements OtpTransitService {
 
@@ -45,17 +48,23 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<Agency> agencies;
 
+    private final Collection<Operator> operators;
+
     private final Collection<FareAttribute> fareAttributes;
 
     private final Collection<FareRule> fareRules;
 
     private final Collection<FeedInfo> feedInfos;
 
+    private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
+
     private final Collection<Pathway> pathways;
 
     private final Collection<FeedScopedId> serviceIds;
 
     private final Map<FeedScopedId, List<ShapePoint>> shapePointsByShapeId;
+
+    private final Map<FeedScopedId, Station> stationsById;
 
     private final Map<FeedScopedId, Stop> stopsById;
 
@@ -67,14 +76,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<Trip> trips;
 
-
-    /**
-     * Note! This field is lazy initialized - this relay on this field NOT
-     * being used BEFORE all data is loaded.
-     */
-    private Map<Stop, List<Stop>> stopsByStation = null;
-
-
     /**
      * Create a read only version of the {@link OtpTransitService}.
      */
@@ -83,9 +84,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
+        this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
+        this.operators = immutableList(builder.getOperatorsById().values());
         this.pathways = immutableList(builder.getPathways());
         this.serviceIds = immutableList(builder.findAllServiceIds());
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
+        this.stationsById = builder.getStations().asImmutableMap();
         this.stopsById = builder.getStops().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
@@ -113,9 +117,23 @@ class OtpTransitServiceImpl implements OtpTransitService {
         return feedInfos;
     }
 
+    /**
+     * Map from Transit Entity(id) to Notices. We need to use Serializable as a common type
+     * for ids, since some entities have String, while other have FeedScopeId ids.
+     */
+    @Override
+    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
+        return noticeAssignments;
+    }
+
     @Override
     public Collection<Pathway> getAllPathways() {
         return pathways;
+    }
+
+    @Override
+    public Collection<Operator> getAllOperators() {
+        return operators;
     }
 
     @Override
@@ -129,14 +147,18 @@ class OtpTransitServiceImpl implements OtpTransitService {
     }
 
     @Override
+    public Station getStationForId(FeedScopedId id) {
+        return stationsById.get(id);
+    }
+
+    @Override
     public Stop getStopForId(FeedScopedId id) {
         return stopsById.get(id);
     }
 
     @Override
-    public List<Stop> getStopsForStation(Stop station) {
-        ensureStopByStationsIsInitialized();
-        return stopsByStation.get(station);
+    public Collection<Station> getAllStations() {
+        return immutableList(stationsById.values());
     }
 
     @Override
@@ -167,39 +189,6 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /*  Private Methods */
 
-    private void ensureStopByStationsIsInitialized() {
-        if(stopsByStation != null) {
-            return;
-        }
-
-        stopsByStation = new HashMap<>();
-        for (Stop stop : getAllStops()) {
-            if (stop.isPlatform() && stop.getParentStation() != null) {
-                Stop parentStation = getStopForId(
-                        new FeedScopedId(stop.getId().getAgencyId(), stop.getParentStation()));
-                Collection<Stop> subStops = stopsByStation
-                        .computeIfAbsent(parentStation, k -> new ArrayList<>(2));
-                subStops.add(stop);
-            }
-        }
-
-        for (Map.Entry<Stop, List<Stop>> entry : stopsByStation.entrySet()) {
-            entry.setValue(Collections.unmodifiableList(entry.getValue()));
-        }
-
-        // Log warnings for Stations without Platforms - this is not allowed according to the
-        // GTFS specification. OTP will treat these Stations as a Platform - but there might be
-        // hick-ups.
-        // See: locationType = 1,t https://developers.google.com/transit/gtfs/reference/#stopstxt
-        getAllStops().stream()
-                .filter(this::isStationWithoutPlatforms)
-                .forEach(it -> {
-                    LOG.warn("The Station is missing Platforms: {}", it);
-                    it.convertStationToStop();
-
-                });
-    }
-
     private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(Collection<ShapePoint> shapePoints) {
         Map<FeedScopedId, List<ShapePoint>> map = shapePoints.stream()
                 .collect(groupingBy(ShapePoint::getShapeId));
@@ -222,7 +211,4 @@ class OtpTransitServiceImpl implements OtpTransitService {
         return Collections.unmodifiableList(list);
     }
 
-    private boolean isStationWithoutPlatforms(Stop it) {
-        return it.isStation() & stopsByStation.get(it) == null;
-    }
 }
