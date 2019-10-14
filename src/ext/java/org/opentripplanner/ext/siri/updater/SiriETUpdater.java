@@ -62,6 +62,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private String feedId;
 
+    /**
+     * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
+     * safe way.
+     */
+    private SiriTimetableSnapshotSource snapshotSource;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -97,9 +103,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Only create a realtime data snapshot source if none exists already
-        SiriTimetableSnapshotSource snapshotSource = new SiriTimetableSnapshotSource(graph);
+        // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
+        //           - Ideally we should inject the snapshotSource on this class.
+        snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
 
-        // Set properties of realtime data snapshot source
+        // Set properties of realtime data snapshot source.
+        // TODO OTP2 - this is overwriting these properties if they were specified by other updaters.
+        //           - These should not be specified at a per-updater level, but at a per-router level.
         if (logFrequency != null) {
             snapshotSource.logFrequency = logFrequency;
         }
@@ -109,6 +119,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         if (purgeExpiredData != null) {
             snapshotSource.purgeExpiredData = purgeExpiredData;
         }
+
     }
 
     /**
@@ -123,23 +134,14 @@ public class SiriETUpdater extends PollingGraphUpdater {
             if (updates != null) {
                 boolean fullDataset = updateSource.getFullDatasetValueOfLastUpdates();
                 ServiceDelivery serviceDelivery = updates.getServiceDelivery();
-                // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
+                // Use isTrue in case isMoreData returns null. Mark this updater as primed after last page of updates.
+                // Copy moreData into a final primitive, because the object moreData persists across iterations.
                 moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
                 final boolean markPrimed = !moreData;
                 List<EstimatedTimetableDeliveryStructure> etds = serviceDelivery.getEstimatedTimetableDeliveries();
                 if (etds != null) {
                     updaterManager.execute(graph -> {
-                        SiriTimetableSnapshotSource snapshotSource;
-                        // TODO OTP2 - This is not thread safe, we should inject the snapshotSource on this class,
-                        //           - it will work because the snapshotSource is created already.
-                        snapshotSource = graph.getOrSetupTimetableSnapshotProvider(SiriTimetableSnapshotSource::new);
-
-                        if (snapshotSource != null) {
-                            snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, etds);
-                        } else {
-                            LOG.error("Could not find realtime data snapshot source in graph."
-                                    + " The following updates are not applied: {}", updates);
-                        }
+                        snapshotSource.applyEstimatedTimetable(graph, feedId, fullDataset, etds);
                         if (markPrimed) primed = true;
                     });
                 }
