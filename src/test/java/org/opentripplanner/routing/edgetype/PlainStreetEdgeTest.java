@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -14,8 +14,10 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
 
 public class PlainStreetEdgeTest {
 
@@ -130,7 +132,7 @@ public class PlainStreetEdgeTest {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
 
-        v1.trafficLight = (true);
+        v1.trafficLight = true;
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
@@ -167,7 +169,7 @@ public class PlainStreetEdgeTest {
         StreetEdge e0 = edge(v0, v1, 50.0, StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE);
         StreetEdge e1 = edge(v1, v2, 18.4, StreetTraversalPermission.PEDESTRIAN);
 
-        v1.trafficLight = (true);
+        v1.trafficLight = true;
 
         RoutingRequest forward = proto.clone();
         forward.setMode(TraverseMode.BICYCLE);
@@ -209,8 +211,8 @@ public class PlainStreetEdgeTest {
         State s3 = e2.traverse(s2);
 
         RoutingRequest withPenalty = proto.clone();
-        withPenalty.bikeSwitchTime = (42);
-        withPenalty.bikeSwitchCost = (23);
+        withPenalty.bikeSwitchTime = 42;
+        withPenalty.bikeSwitchCost = 23;
         withPenalty.setMode(TraverseMode.BICYCLE);
         withPenalty.setRoutingContext(graph, v0, v0);
 

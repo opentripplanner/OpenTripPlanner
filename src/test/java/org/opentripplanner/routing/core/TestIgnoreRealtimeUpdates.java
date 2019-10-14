@@ -50,7 +50,7 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         assertNotNull(rctx.timetableSnapshot);
         
         // Now set routing request to ignore realtime updates
-        options.ignoreRealtimeUpdates = (true);
+        options.ignoreRealtimeUpdates = true;
         
         // Check that realtime updates are ignored
         assertTrue(options.ignoreRealtimeUpdates);

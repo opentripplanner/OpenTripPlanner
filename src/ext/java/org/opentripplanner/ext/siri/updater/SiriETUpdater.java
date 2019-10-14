@@ -5,7 +5,6 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,13 +101,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
 
         // Set properties of realtime data snapshot source
         if (logFrequency != null) {
-            snapshotSource.logFrequency = (logFrequency);
+            snapshotSource.logFrequency = logFrequency;
         }
         if (maxSnapshotFrequency != null) {
-            snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+            snapshotSource.maxSnapshotFrequency = maxSnapshotFrequency;
         }
         if (purgeExpiredData != null) {
-            snapshotSource.purgeExpiredData = (purgeExpiredData);
+            snapshotSource.purgeExpiredData = purgeExpiredData;
         }
     }
 

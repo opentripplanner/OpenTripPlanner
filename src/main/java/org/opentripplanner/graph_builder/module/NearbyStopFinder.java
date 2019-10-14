@@ -133,7 +133,7 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean reverseDirection) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.clampInitialWait = (0L);
+        routingRequest.clampInitialWait = 0L;
         routingRequest.setRoutingContext(graph, originVertex, null);
         routingRequest.arriveBy = reverseDirection;
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
