@@ -716,7 +716,7 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 
 #### TNC Configuration
 
-It is possible to add either Uber or Lyft as a TNC updater. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
+It is possible to add either Uber or Lyft as a TNC updater, assuming that either of those companies allow you to access their APIs. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
 
 For each TNC updater, you have to manually determine what the ride type ids are for wheelchair-accessible services in the area that OTP will be planning trips in.
 
@@ -741,14 +741,14 @@ For each TNC updater, you have to manually determine what the ride type ids are 
 {
     "type": "transportation-network-company-updater",
     "sourceType": "lyft",
-    "clientId": "YOUR-CLIENT-ID-IF-LYFT-ISNT-BEING-ALL-WALLED-GARDEN-WITH-YOU",
-    "clientSecret": "YOUR-CLIENT-SECRET-IF-LYFT-ISNT-BEING-ALL-WALLED-GARDEN-WITH-YOU"
+    "clientId": "YOUR-CLIENT-ID",
+    "clientSecret": "YOUR-CLIENT-SECRET"
 }
 ```
 
 #### Car Rental Configuration
 
-Currently, it is possible to add an updater for either car2go or the now defunct ReachNow. Both of these updaters read in data from a url or file about the vehicle positions and the areas where the cars are allowed to be dropped off inside of. The data format of the vehicle positions slightly differs between the each updater, but they're both a list of JSON objects. The regions data must be valid GeoJSON of Polygons or MultiPolygons in either a Feature or a Feature collection.
+Currently, it is possible to add an updater for car2go if they provide you with data for where their cars are. This updater reads in data from a url or file about the vehicle positions and the areas where the cars are allowed to be dropped off inside of. The data format is a list of JSON objects. The regions data must be valid GeoJSON of Polygons or MultiPolygons in either a Feature or a Feature collection.
 
 Add one entry in the `updater` field of `router-config.json` in the format:
 
@@ -761,8 +761,6 @@ Add one entry in the `updater` field of `router-config.json` in the format:
     "regionsUrl": "http://example.com/regions.json"
 }
 ```
-
-Use the same format above, but chagne the sourceType to `reachnow` and update the urls to setup for use with ReachNow.
 
 #### Micromobility Rental Configuration
 
@@ -778,7 +776,7 @@ Add one entry in the `updater` field of `router-config.json` in the format:
 {
     "type": "vehicle-rental-updater",
     "frequencySec": 60,
-    "network": "RENTAL-SYSTEM-NAME",
+    "network": "LIME",
     "sourceType": "gbfs",
     "url": "https://example.com/gbfs.json",
     "regionsUrl": "file:/home/workspace/boundary.json"

@@ -105,7 +105,7 @@ script:
 $ mvn -DskipTests site
 ```
 
-Then, browse to the folder `site/enunciate/apidocs/` and load the index.html file.
+Then, browse to the folder `target/site/enunciate/apidocs/` and load the index.html file.
 
 ### Debug layers
 
