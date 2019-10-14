@@ -34,6 +34,8 @@ import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
+ * TODO OTP2 These are not library functions, this is instantiated as an object. Define lifecycle of the object (reuse?).
+ *           Because AStar instances should only be used once, NearbyStopFinder should only be used once.
  * Ideally they could also be used in long distance mode and profile routing for the street segments.
  * For each stop, it finds the closest stops on all other patterns. This reduces the number of transfer edges
  * significantly compared to simple radius-constrained all-to-all stop linkage.

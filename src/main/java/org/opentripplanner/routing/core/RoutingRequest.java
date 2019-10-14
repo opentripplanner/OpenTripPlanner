@@ -863,7 +863,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
+    /**
+     * For use in tests. Force RoutingContext to specific vertices rather than making temp edges.
+     * TODO rename - this is not a "setter", it creates a new routingContext, which has side effects on Graph
+     *               (Constructors with side effects on their parameters are a bad design).
+     */
     public void setRoutingContext(Graph graph, Edge fromBackEdge, Vertex from, Vertex to) {
         // normally you would want to tear down the routing context...
         // but this method is mostly used in tests, and teardown interferes with testHalfEdges
