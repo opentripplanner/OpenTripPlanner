@@ -63,6 +63,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
         int nTransfersTotal = 0;
         int nLinkableStops = 0;
 
+        // This could be multi-threaded, in which case we'd need to be careful about the lifecycle of NearbyStopFinder instances.
         for (TransitStopVertex ts0 : Iterables.filter(graph.getVertices(), TransitStopVertex.class)) {
 
             /* Skip stops that are entrances to stations or whose entrances are coded separately */

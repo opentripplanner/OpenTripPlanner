@@ -34,6 +34,8 @@ import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
+ * TODO OTP2 These are not library functions, this is instantiated as an object. Define lifecycle of the object (reuse?).
+ *           Because AStar instances should only be used once, NearbyStopFinder should only be used once.
  * Ideally they could also be used in long distance mode and profile routing for the street segments.
  * For each stop, it finds the closest stops on all other patterns. This reduces the number of transfer edges
  * significantly compared to simple radius-constrained all-to-all stop linkage.
@@ -129,8 +131,17 @@ public class NearbyStopFinder {
      * @param originVertex the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
+     * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
+     *                        edges that are part of that context. NOTE: this will remove _all_ temporary edges
+     *                        coming out of the origin and destination vertices, including those in any other
+     *                        RoutingContext referencing them, making routing from/to them totally impossible.
+     *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
      */
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex, boolean reverseDirection) {
+    public List<StopAtDistance> findNearbyStopsViaStreets (
+            Vertex originVertex,
+            boolean reverseDirection,
+            boolean removeTempEdges
+    ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = 0L;
@@ -157,13 +168,15 @@ public class NearbyStopFinder {
         if (originVertex instanceof TransitStopVertex) {
             stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
         }
-        routingRequest.cleanup();
+        if (removeTempEdges) {
+            routingRequest.cleanup();
+        }
         return stopsFound;
 
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
-        return findNearbyStopsViaStreets(originVertex, false);
+        return findNearbyStopsViaStreets(originVertex, false, true);
     }
 
     /**

@@ -11,7 +11,14 @@ import java.util.List;
 public class Transfer {
     private int toStop;
 
-    private final int distanceMeters; // TODO Add units in the name of the field
+    // TODO OTP2: we only have a distance field here but in other cases have more detail.
+    // Inside Raptor we need distance to apply walking speed on the fly to precomputed transfers;
+    // Outside raptor (in access and egress searches) we can actually have true travel times, because we compute
+    // throw-away request-scoped transfers that are specific to a single set of routing parameters.
+    // Keeping the transfers simplified to only distances which are scaled at search time makes it impossible to
+    // include slowdown due to slope, for example. We could store an "effective distance" which bakes the non-linear
+    // slope (and other) components into the distance, and then the linear speed scaling can be applied fast in routing.
+    private final int distanceMeters;
 
     private final List<Edge> edges;
 
