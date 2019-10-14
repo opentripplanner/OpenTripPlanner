@@ -120,10 +120,7 @@ public class GraphBuilder implements Runnable {
     /**
      * Factory method to create and configure a GraphBuilder with all the appropriate modules
      * to build a graph from the files in the given configuration.
-     *
-     * TODO #2760 - Remove comment when we remove support for multiple routers
-     * TODO parameterize with the router ID and call repeatedly to make multiple builders
-     * note of all command line options this is only using  params.inMemory params.preFlight
+     * Note of all command line options this is only using  params.inMemory params.preFlight
      * and params.build directory
      */
     public static GraphBuilder create(CommandLineParameters params, GraphConfig config) {

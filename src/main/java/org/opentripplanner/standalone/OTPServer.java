@@ -1,8 +1,8 @@
 package org.opentripplanner.standalone;
 
+import org.geotools.referencing.factory.DeferredAuthorityFactory;
+import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.services.GraphService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -12,6 +12,7 @@ import java.util.Collection;
  * This replaces a Spring application context, which OTP originally used.
  * It contains a field referencing each top-level component of an OTP server. This means that supplying a single
  * instance of this object allows accessing any of the other OTP components.
+ * TODO OTP2 refactor: rename to OTPContext or OTPComponents and use to draft injection approach
  */
 public class OTPServer {
 
@@ -19,35 +20,27 @@ public class OTPServer {
 
     public final CommandLineParameters params;
 
-    // Core OTP modules
-    private final GraphService graphService;
+    private final Router router;
 
-    public OTPServer (CommandLineParameters params, GraphService gs) {
+    public OTPServer (CommandLineParameters params, Router router) {
         LOG.info("Wiring up and configuring server.");
-
         this.params = params;
-
-        // Core OTP modules
-        this.graphService = gs;
+        this.router = router;
     }
 
     /**
-     * @return The GraphService. Please use it only when the GraphService itself is necessary. To
-     *         get Graph instances, use getRouter().
+     * Hook to cleanup various stuff of some used libraries (org.geotools), which depend on the
+     * external client to call them for cleaning-up.
      */
-    public GraphService getGraphService() {
-        return graphService;
+    private static void cleanupWebapp() {
+        LOG.info("Web application shutdown: cleaning various stuff");
+        WeakCollectionCleaner.DEFAULT.exit();
+        DeferredAuthorityFactory.exit();
     }
 
-    /**
-     * @return A list of all router IDs currently available.
-     */
-    public Collection<String> getRouterIds() {
-        return graphService.getRouterIds();
-    }
-
-    public Router getRouter(String routerId) throws GraphNotFoundException {
-        return graphService.getRouter(routerId);
+    public Router getRouter(String routerId) {
+        // TODO OTP2 eventually remove the routerId entirely. For now we just always return the same router.
+        return router;
     }
 
     /**

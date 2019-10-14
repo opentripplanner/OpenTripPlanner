@@ -6,8 +6,8 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
-import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.MemoryGraphSource;
+import org.opentripplanner.routing.impl.GraphLoader;
+import org.opentripplanner.standalone.config.GraphConfig;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,8 +59,7 @@ public class OTPMain {
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
-
-        if (params.build == null && !params.visualize && !params.server && params.scriptFile == null) {
+        if (params.build == null && !params.visualize && !params.serve && params.scriptFile == null) {
             LOG.info("Nothing to do. Use --help to see available tasks.");
             System.exit(-1);
         }
@@ -72,14 +71,15 @@ public class OTPMain {
      * main method makes it possible to build graphs from web services or scripts, not just from the command line.
      *
      * @return
-     *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method will return when the web server shuts down;
+     *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method
+     *                will return when the web server shuts down;
      *         false - if an error occurs while loading the graph;
      */
     private static boolean startOTPServer(CommandLineParameters params) {
         OTPAppConstruction appConstruction = new OTPAppConstruction(params);
-        // TODO do params.infer() here to ensure coherency?
+        Router router = null;
 
-        /* Start graph builder if requested */
+        /* Start graph builder if requested. */
         if (params.build != null) {
             GraphBuilder graphBuilder = appConstruction.createDefaultGraphBuilder();
             if (graphBuilder != null) {
@@ -88,8 +88,9 @@ public class OTPMain {
                 if (params.inMemory || params.preFlight) {
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
-                    // FIXME set true router IDs
-                    appConstruction.graphService().registerGraph("", new MemoryGraphSource("", graph));
+                    // In-memory graph handoff. FIXME: This router config retrieval is too complex.
+                    router = new Router(graph);
+                    router.startup(appConstruction.configuration().getGraphConfig(params.build).routerConfig());
                 }
             } else {
                 LOG.error("An error occurred while building the graph.");
@@ -97,31 +98,34 @@ public class OTPMain {
             }
         }
 
-        /* Scan for graphs to load from disk if requested */
-        // FIXME eventually router IDs will be present even when just building a graph.
-        if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
-            /* Auto-register pre-existing graph on disk, with optional auto-scan. */
-            GraphScanner graphScanner = appConstruction.createDefaultGraphScanner();
-
-            if (params.routerIds != null && params.routerIds.size() > 0) {
-                graphScanner.defaultRouterId = params.routerIds.get(0);
-            }
-            graphScanner.autoRegister = params.routerIds;
-            graphScanner.startup();
+        /* Load graph from disk if one is not present from build. */
+        if (params.load != null) {
+            GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.load);
+            router = GraphLoader.loadGraph(graphConfig);
         }
 
-        /* Start visualizer if requested */
+        /* Bail out if we have no graph (router) to work with. */
+        if (router == null) {
+            LOG.error("Did not build or load a graph. Exiting.");
+            return false;
+        }
+
+        /* Start visualizer if requested. */
         if (params.visualize) {
-            Router defaultRouter = appConstruction.graphService().getRouter();
-            defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
-            defaultRouter.graphVisualizer.run();
-            defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
+            router.graphVisualizer = new GraphVisualizer(router);
+            router.graphVisualizer.run();
+            router.timeouts = new double[] {60}; // avoid timeouts due to search animation
         }
 
-        /* Start web server if requested */
-        if (params.server) {
+        /* Start web server if requested. */
+        // We could start the server first so it can report build/load progress to a load balancer.
+        // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
+        // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
+        if (params.serve) {
+            appConstruction.setRouter(router);
             GrizzlyServer grizzlyServer = appConstruction.createGrizzlyServer();
-            while (true) { // Loop to restart server on uncaught fatal exceptions.
+            // Loop to restart server on uncaught fatal exceptions.
+            while (true) {
                 try {
                     grizzlyServer.run();
                     return true;
@@ -131,7 +135,6 @@ public class OTPMain {
                 }
             }
         }
-
         return true;
     }
 }

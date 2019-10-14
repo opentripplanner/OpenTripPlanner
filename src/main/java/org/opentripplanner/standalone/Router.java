@@ -13,6 +13,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayer
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;
@@ -28,8 +29,6 @@ import java.util.EnumMap;
 public class Router {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
-
-    public String id;
     public Graph graph;
     public double[] timeouts = {5, 4, 2};
 
@@ -51,8 +50,7 @@ public class Router {
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
-    public Router(String id, Graph graph) {
-        this.id = id;
+    public Router(Graph graph) {
         this.graph = graph;
     }
 
@@ -64,7 +62,7 @@ public class Router {
 
     /**
      * Start up a new router once it has been created.
-     * @param config The configuration (loaded from Graph.properties for example).
+     * @param config The configuration (loaded from router-config.json).
      */
     public void startup(JsonNode config) {
 
@@ -104,7 +102,7 @@ public class Router {
                 LOG.error("The 'timeouts' configuration option should be an array of values in seconds.");
             }
         }
-        LOG.info("Timeouts for router '{}': {}", this.id, this.timeouts);
+        LOG.info("Timeouts: {}", this.timeouts);
 
         JsonNode requestLogFile = config.get("requestLogFile");
         if (requestLogFile != null) {
@@ -185,4 +183,18 @@ public class Router {
         logger.setAdditive(false);
         return logger;
     }
+
+    /**
+     * Convenience method for tests: make a router from a graph using embedded config.
+     */
+    public static Router forTestGraph(Graph graph) {
+        Router router = new Router(graph);
+        // GraphConfig contains all the methods for parsing config files, including embedded ones. But it seems to
+        // only be designed for the case where you're loading from a directory, not for in-memory testing graphs.
+        router.startup(
+            new OTPConfiguration(null).getGraphConfig(null).routerConfig(graph.routerConfig)
+        );
+        return router;
+    }
+
 }
