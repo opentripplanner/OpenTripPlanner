@@ -87,8 +87,6 @@ public class CarRentalUpdater extends PollingGraphUpdater {
         if (network != null) {
             if (network.equals("car2go")) {
                 source = new Car2GoCarRentalDataSource();
-            } else if (network.equals("reachnow")) {
-                source = new ReachNowCarRentalDataSource();
             }
         }
 

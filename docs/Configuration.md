@@ -66,6 +66,44 @@ are found in `router-config.json`.
 
 # Graph build configuration
 
+This table lists the possible settings that can be defined in a `build-config.json` file. Sections follow that describe particular settings in more depth.
+
+config key | description | value type | value default | notes
+---------- | ----------- | ---------- | ------------- | -----
+`htmlAnnotations` |  Generate nice HTML report of Graph errors/warnings (annotations) | boolean | false |
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
+`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
+`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
+`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
+`stopClusterMode` | Stop clusters can be built in one of two ways, either by geographical proximity and name, or according to a parent/child station topology, if it exists | enum | `proximity` | options: `proximity`, `parentStation`
+`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`streets` | Include street input files (OSM/PBF) | boolean | true | 
+`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
+`areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
+`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
+`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
+`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
+`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
+`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
+`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
+`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
+`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
+`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
+`maxHtmlAnnotationsPerFile` | If number of annotations is larger then specified number annotations will be split in multiple files | int | 1,000 | 
+`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
+`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
+`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
+`banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
+`banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
+`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`micromobilityTravelRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to traverse a StreetEdge with the `MICROMOBILITY` mode. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)
+`micromobilityDropoffRestrictionsUrlOrFile` | Loads in a GeoJSON file that represents areas where it is forbidden to dropoff a rented micromobility vehicle. | string | null | see [Micromobility Restrictions](#micromobility-restrictions)  
+
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
+
 ## Reaching a subway platform
 
 The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
@@ -278,10 +316,11 @@ There is currently only one custom naming module called `portland` (which has no
 
 ### Micromobility Restrictions
 
-It is possible to load in restricted micromobility travel and rental parking areas that will be applied throughout the graph.
-There are two separate keys that can be added to describe either areas where travel is forbidden or where parking floating 
-rental vehicles is forbidden. Each file must contain GeoJson with a Feature or FeatureCollection that contains only Polygons 
-or MultiPolygons. The values of these keys can be either a url or a file path. For example: 
+By default, OTP allows the traversal of any StreetEdge by a micromobility vehicle where a bicycle is also allowed to traverse the StreetEdge. Also by default, OTP allows rented micromobility vehicles to be dropped off on any StreetEdge in the graph.
+
+It is possible to load in restricted micromobility travel and rental parking areas that will be applied throughout the graph. There are two separate keys that can be added to describe either areas where travel is forbidden or where parking floating
+rental vehicles is forbidden. Each file must contain GeoJson with a Feature or FeatureCollection that contains only Polygons
+or MultiPolygons. If any part of the geometry of a StreetEdge intersects any part of the given GeoJSON, then the entire StreetEdge will be marked as either not allowing traversal or not allowing the dropoff of a rented micromobility vehicle depending on the restriction being analyzed. The values of these keys can be either a url or a file path. For example:
 
 ```JSON
 // build-config.json
@@ -305,7 +344,9 @@ internally that are not exposed via the API. You may want to change the default 
 i.e. the value which will be applied unless it is overridden in a web API request.
 
 A full list of them can be found in the RoutingRequest class
-[in the Javadoc](http://dev.opentripplanner.org/javadoc/master/org/opentripplanner/routing/core/RoutingRequest.html).
+
+[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/routing/core/RoutingRequest.html).
+
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
@@ -318,6 +359,95 @@ Any public field or setter method in this class can be given a default value usi
     }
 }
 ```
+
+## Routing modes
+
+The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
+of routes.
+
+Some modes (mostly bicycle and car) also have optional qualifiers `RENT`, `HAIL` or `PARK` to specify if vehicles are to be parked at a station or rented. In theory
+this can also apply to other modes but makes sense only in select cases which are listed below.
+
+Whether a transport mode is available highly depends on the input feeds (GTFS, OSM, bike sharing feeds) and the graph building options supplied to OTP.
+
+The complete list of modes are:
+
+- `WALK`: Walking some or all of the route.
+
+- `TRANSIT`: General catch-all for all public transport modes.
+
+- `BICYCLE`: Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+
+- `BICYCLE_RENT`: Taking a rented, shared-mobility bike for part or the entirety of the route.  
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP either as static stations or dynamic data feeds. 
+
+    For dynamic bike positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
+
+    For static stations check the graph building documentation for the property `staticBikeRental`.
+
+- `BICYCLE_PARK`: Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+
+    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary bicycle journey.
+
+    _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
+
+- `CAR`: Driving your own car the entirety of the route. 
+
+    If this is combined with `TRANSIT` it will return routes with a 
+    [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component. This means that the car is not parked in a permanent
+    parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off
+    location.
+
+- `CAR_PARK`: Driving a car to the park-and-ride facilities near a station and taking public transport.
+
+    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary car journey.
+
+    _Prerequisite:_ Park-and-ride areas near the station need to be present in the OSM input file.
+
+- `CAR_RENT`: Taking a rented, shared-mobility car for part or the entirety of the route.
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP as dynamic data feeds.
+
+    For dynamic car positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
+
+- `CAR_HAIL`: Hailing a car from a transportation network company such as Lyft or Uber and then riding in the vehicle for part or the entirety of the route. OTP will still use its underlying graph to calculate driving directions, so car leg results will likely contain different travel time estimates than those quoted from the TNC providers. If service is not available at a particular pickup location, this can cause a TNC availability error which can result in an itinerary not being able to be calculated.
+
+    _Prerequisite:_ API keys for the respective TNC providers must be added in `router-config.json`.
+
+- `MICROMOBILITY`: Riding on a lightweight motorized vehicle for the entirety of the route or taking said vehicle onto public transport and riding again from the arrival station to the destination. This mode could theoretically also be used to model human power while pedaling a bicycle.
+
+- `MICROMOBILITY_RENT`: Taking a rented, shared-mobility motorized vehicle for part or the entirety of the route.  
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP  as dynamic data feeds.
+
+    For dynamic vehicle positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
+
+The following modes are 1-to-1 mappings from the [GTFS `route_type`](https://developers.google.com/transit/gtfs/reference/#routestxt):
+
+- `TRAM`: Tram, streetcar, or light rail. Used for any light rail or street-level system within a metropolitan area.
+
+- `SUBWAY`: Subway or metro. Used for any underground rail system within a metropolitan area.
+
+- `RAIL`: Used for intercity or long-distance travel.
+
+- `BUS`: Used for short- and long-distance bus routes.
+
+- `FERRY`: Ferry. Used for short- and long-distance boat service.
+
+- `CABLE_CAR`: Cable car. Used for street-level cable cars where the cable runs beneath the car.
+
+- `GONDOLA`: Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
+
+- `FUNICULAR`: Funicular. Used for any rail system that moves on steep inclines with a cable traction system.
+
+Lastly, this mode is part of the [Extended GTFS route types](https://developers.google.com/transit/gtfs/reference/extended-route-types):
+
+- `AIRPLANE`: Taking an airplane.
+
+Note that there are conceptual overlaps between `TRAM`, `SUBWAY` and `RAIL` and some transport providers categorize their routes differently to others.
+In other words, what is considered a `SUBWAY` in one city might be of type `RAIL` in another. Study your input GTFS feed carefully to 
+find out the appropriate mapping in your region.
 
 ### Drive-to-transit routing defaults
 
@@ -584,3 +714,75 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
+#### TNC Configuration
+
+It is possible to add either Uber or Lyft as a TNC updater, assuming that either of those companies allow you to access their APIs. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
+
+For each TNC updater, you have to manually determine what the ride type ids are for wheelchair-accessible services in the area that OTP will be planning trips in.
+
+##### Uber
+
+- Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "transportation-network-company-updater",
+    "sourceType": "uber",
+    "serverToken": "YOUR-SECRET-TOKEN",
+    "wheelChairAccessibleRideType": "REGION-SPECIFIC-ID"
+}
+```
+
+##### Lyft
+
+- Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "transportation-network-company-updater",
+    "sourceType": "lyft",
+    "clientId": "YOUR-CLIENT-ID",
+    "clientSecret": "YOUR-CLIENT-SECRET"
+}
+```
+
+#### Car Rental Configuration
+
+Currently, it is possible to add an updater for car2go if they provide you with data for where their cars are. This updater reads in data from a url or file about the vehicle positions and the areas where the cars are allowed to be dropped off inside of. The data format is a list of JSON objects. The regions data must be valid GeoJSON of Polygons or MultiPolygons in either a Feature or a Feature collection.
+
+Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "car-rental-updater",
+    "sourceType": "car2go",
+    "frequencySec": 60,
+    "vehiclesUrl": "http://example.com/vehicles.json",
+    "regionsUrl": "http://example.com/regions.json"
+}
+```
+
+#### Micromobility Rental Configuration
+
+Adding networks of micromobility vehicles is very similar to adding in bikeshare, but the underlying code that determines how it is possible to pickup and dropoff vehicles and the speed at which they travel is different. Also, it is possible to add in data about where the vehicles can be dropped off at.
+
+The `network` field is used both internally and externally to identify the extent and use of this particular vehicle rental system. It's required for systems with more than 1 vehicle rental operator.
+
+The `url` field must point to the root `gbfs.json` endpoint.
+
+Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "vehicle-rental-updater",
+    "frequencySec": 60,
+    "network": "LIME",
+    "sourceType": "gbfs",
+    "url": "https://example.com/gbfs.json",
+    "regionsUrl": "file:/home/workspace/boundary.json"
+}
+```
+
+# Configure using command-line arguments
+
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/standalone/CommandLineParameters.html).

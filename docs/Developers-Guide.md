@@ -79,6 +79,8 @@ modifications. Pages that help organize development teams or serve as scratchpad
 [on the wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki), but all documentation that would be of interest
 to people configuring or using OTP belong [in the repo](https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
 
+#### Markdown docs
+
 The documentation files are in Markdown format and are in the `/docs` directory under the root of the project. On every
 push to the master branch the documentation will be rebuilt and deployed as static pages to our subdomain of
 [ReadTheDocs](http://opentripplanner.readthedocs.org/). MkDocs is a Python program and should run on any major platform.
@@ -87,10 +89,23 @@ documentation while you're working on writing it.
 
 In short:
 
-```
+```shell
 $ pip install mkdocs
 $ mkdocs serve
 ```
+
+#### API Docs
+
+Every API resource file will have documentation automatically generated using 
+[enunciate](https://github.com/stoicflame/enunciate). Enunciate will read the JavaDoc associated with each webservice 
+file and will automatically generate html pages of documentation. To view these files locally, run the following
+script:
+
+```shell
+$ mvn -DskipTests site
+```
+
+Then, browse to the folder `target/site/enunciate/apidocs/` and load the index.html file.
 
 ### Debug layers
 
