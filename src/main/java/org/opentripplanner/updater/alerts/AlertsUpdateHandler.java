@@ -160,9 +160,9 @@ public class AlertsUpdateHandler {
     }
 
     /**
-     * convert a protobuf TranslatedString to a OTP TranslatedString
+     * Convert a GTFS-RT Protobuf TranslatedString to a OTP TranslatedString or NonLocalizedString.
      *
-     * @return A TranslatedString containing the same information as the input
+     * @return An OTP TranslatedString containing the same information as the input GTFS-RT Protobuf TranslatedString.
      */
     private I18NString deBuffer(GtfsRealtime.TranslatedString input) {
         Map<String, String> translations = new HashMap<>();

@@ -1,16 +1,17 @@
 package org.opentripplanner.routing.vertextype;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class IntersectionVertexTest {
 
@@ -65,7 +66,7 @@ public class IntersectionVertexTest {
         IntersectionVertex iv = new IntersectionVertex(graph, "vertex", 1.0, 2.0);
         assertFalse(iv.freeFlowing);
         
-        iv.freeFlowing = (true);
+        iv.freeFlowing = true;
         assertTrue(iv.freeFlowing);
     }
     
@@ -77,7 +78,7 @@ public class IntersectionVertexTest {
         assertEquals(0, iv.getDegreeIn());
         assertEquals(0, iv.getDegreeOut());
         
-        iv.trafficLight = (true);  
+        iv.trafficLight = true;
         assertTrue(iv.trafficLight);
         assertFalse(iv.inferredFreeFlowing());
         
@@ -91,12 +92,12 @@ public class IntersectionVertexTest {
         assertEquals(1, iv.getDegreeOut());
         assertFalse(iv.inferredFreeFlowing());
         
-        iv.trafficLight = (false);  
+        iv.trafficLight = false;
         assertFalse(iv.trafficLight);
         assertTrue(iv.inferredFreeFlowing());
         
         // Set the freeFlowing bit to false.
-        iv.freeFlowing = (false);
+        iv.freeFlowing = false;
         assertFalse(iv.freeFlowing);       
     }
 

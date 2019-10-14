@@ -32,6 +32,7 @@ import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -579,11 +580,14 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> {
                     try {
                         Trip trip = (Trip) environment.getSource();
-                        return TripTimeShort.fromTripTimes(
-                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
-                                .resolve(index.patternForTrip.get(trip),
-                                    ServiceDate.parseString(environment.getArgument("serviceDay")))
-                                , trip);
+                        TimetableSnapshot tts = index.graph.getTimetableSnapshot();
+                        if (tts == null) {
+                            return null;
+                        } else {
+                            ServiceDate serviceDay = ServiceDate.parseString(environment.getArgument("serviceDay"));
+                            TripPattern pattern = index.patternForTrip.get(trip);
+                            return TripTimeShort.fromTripTimes(tts.resolve(pattern, serviceDay), trip);
+                        }
                     } catch (ParseException e) {
                          return null; // Invalid date format
                     }
