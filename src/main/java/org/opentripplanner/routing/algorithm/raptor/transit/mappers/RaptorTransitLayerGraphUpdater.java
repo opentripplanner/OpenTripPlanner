@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -70,11 +70,10 @@ public class RaptorTransitLayerGraphUpdater implements GraphUpdater {
     }
 
     @Override
-    public void teardown () {
-    }
+    public void teardown () { }
 
     @Override
-    public void configure (Graph graph, JsonNode jsonNode) throws Exception {
+    public void configure (Graph graph, JsonNode jsonNode) {
         updateIntervalSeconds = jsonNode.get("updateIntervalSeconds").asInt(DEFAULT_INTERVAL_SECONDS);
     }
 

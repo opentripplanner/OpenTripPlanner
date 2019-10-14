@@ -96,10 +96,6 @@ public class PatternHopFactory {
     public void run(Graph graph) {
         fareServiceFactory.processGtfs(transitService);
 
-        // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
-        //       Perhaps it is to allow name collisions with previously loaded feeds?
-        clearCachedData();
-
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
@@ -161,9 +157,6 @@ public class PatternHopFactory {
         for (TripPattern tableTripPattern : tripPatterns) {
             tableTripPattern.scheduledTimetable.finish();
         }
-
-        // FIXME again, what is the goal here? Why is there cached "data", and why are we clearing it?
-        clearCachedData();
 
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
     }
@@ -440,14 +433,6 @@ public class PatternHopFactory {
         }
 
         return null;
-    }
-
-    private void clearCachedData() {
-        LOG.debug("shapes=" + geometriesByShapeId.size());
-        LOG.debug("segments=" + geometriesByShapeSegmentKey.size());
-        geometriesByShapeId.clear();
-        distancesByShapeId.clear();
-        geometriesByShapeSegmentKey.clear();
     }
 
     private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
