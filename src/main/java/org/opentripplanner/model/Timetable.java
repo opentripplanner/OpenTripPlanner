@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.model;
 
 import com.beust.jcommander.internal.Lists;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
@@ -6,13 +6,8 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;

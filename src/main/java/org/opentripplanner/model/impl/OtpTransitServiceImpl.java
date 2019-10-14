@@ -19,7 +19,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

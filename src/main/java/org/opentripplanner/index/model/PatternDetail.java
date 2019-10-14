@@ -3,7 +3,7 @@ package org.opentripplanner.index.model;
 import java.util.Collection;
 
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 
 import com.beust.jcommander.internal.Lists;
 

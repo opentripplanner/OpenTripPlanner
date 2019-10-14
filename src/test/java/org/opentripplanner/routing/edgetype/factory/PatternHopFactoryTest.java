@@ -8,8 +8,6 @@ import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 import static junit.framework.TestCase.assertTrue;

@@ -6,7 +6,7 @@ import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**

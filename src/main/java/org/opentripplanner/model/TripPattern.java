@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.model;
 
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
@@ -13,13 +13,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;

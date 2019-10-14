@@ -11,7 +11,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleImpl;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

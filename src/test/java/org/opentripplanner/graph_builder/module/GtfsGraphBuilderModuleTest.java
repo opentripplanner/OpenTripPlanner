@@ -15,7 +15,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 

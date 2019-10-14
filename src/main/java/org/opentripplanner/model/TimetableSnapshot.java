@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.calendar.ServiceDate;

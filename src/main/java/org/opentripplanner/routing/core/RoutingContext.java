@@ -12,7 +12,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemaining
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;

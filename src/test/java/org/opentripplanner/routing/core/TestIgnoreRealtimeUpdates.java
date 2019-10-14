@@ -3,7 +3,7 @@ package org.opentripplanner.routing.core;
 import junit.framework.TestCase;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;

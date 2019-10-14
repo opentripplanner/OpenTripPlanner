@@ -25,7 +25,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 
 import java.util.ArrayList;
 import java.util.HashSet;

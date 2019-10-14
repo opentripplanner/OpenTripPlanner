@@ -13,8 +13,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperImpl;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -108,7 +108,7 @@ public class TransitLayerMapper {
         // If we are using realtime updates, we want to include both the TripPatterns in the scheduled (static) data
         // and any new patterns that were created by realtime data (added or rerouted trips).
         // So far, realtime messages cannot add new stops or service IDs, so we can use those straight from the Graph.
-        Collection<org.opentripplanner.routing.edgetype.TripPattern> allTripPatterns;
+        Collection<org.opentripplanner.model.TripPattern> allTripPatterns;
         allTripPatterns = graph.tripPatternForId.values();
         if (timetableSnapshot != null && !timetableSnapshot.getAllRealtimeTripPatterns().isEmpty()) {
             // Make a protective copy, also removing duplicates between the scheduled and updated patterns.
@@ -119,7 +119,7 @@ public class TransitLayerMapper {
             allTripPatterns.addAll(timetableSnapshot.getAllRealtimeTripPatterns());
         }
 
-        final Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> newTripPatternForOld;
+        final Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
         newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
         // Presumably even when applying realtime, many TripTimes will recur on future dates.
@@ -154,7 +154,7 @@ public class TransitLayerMapper {
 
             // This nested loop could be quite inefficient.
             // Maybe determine in advance which patterns are running on each service and day.
-            for (org.opentripplanner.routing.edgetype.TripPattern oldTripPattern : allTripPatterns) {
+            for (org.opentripplanner.model.TripPattern oldTripPattern : allTripPatterns) {
                 // Get an updated or scheduled timetable depending on the date. This might have the
                 // trips pre-filtered for the specified date, that needs to be investigated. But in
                 // any case we might end up with a scheduled timetable, which can include
@@ -209,15 +209,15 @@ public class TransitLayerMapper {
      * Do this conversion up front (rather than lazily on demand) to ensure pattern IDs match
      * the sequence of patterns in source data.
      */
-    private static Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> mapOldTripPatternToRaptorTripPattern(
+    private static Map<org.opentripplanner.model.TripPattern, TripPattern> mapOldTripPatternToRaptorTripPattern(
             StopIndexForRaptor stopIndex,
-            Collection<org.opentripplanner.routing.edgetype.TripPattern> oldTripPatterns
+            Collection<org.opentripplanner.model.TripPattern> oldTripPatterns
     ) {
-        Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> newTripPatternForOld;
+        Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
         newTripPatternForOld = new HashMap<>();
         int patternId = 0;
 
-        for (org.opentripplanner.routing.edgetype.TripPattern oldTripPattern : oldTripPatterns) {
+        for (org.opentripplanner.model.TripPattern oldTripPattern : oldTripPatterns) {
             TripPattern newTripPattern = new TripPattern(
                     patternId++,
                     // TripPatternForDate should never access the tripTimes inside the TripPattern,

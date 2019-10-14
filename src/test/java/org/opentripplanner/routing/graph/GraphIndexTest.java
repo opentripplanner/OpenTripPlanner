@@ -8,7 +8,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import org.locationtech.jts.geom.Coordinate;

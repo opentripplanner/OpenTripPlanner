@@ -2,7 +2,7 @@ package org.opentripplanner.routing.services;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 
 import java.util.Collection;
 
