@@ -91,6 +91,9 @@ public class OTPMain {
                     // In-memory graph handoff. FIXME: This router config retrieval is too complex.
                     router = new Router(graph);
                     router.startup(appConstruction.configuration().getGraphConfig(params.build).routerConfig());
+                } else {
+                    LOG.info("Done building graph. Exiting.");
+                    return true;
                 }
             } else {
                 LOG.error("An error occurred while building the graph.");
@@ -106,7 +109,7 @@ public class OTPMain {
 
         /* Bail out if we have no graph (router) to work with. */
         if (router == null) {
-            LOG.error("Did not build or load a graph. Exiting.");
+            LOG.error("No graph/router available for server. Exiting.");
             return false;
         }
 
