@@ -20,30 +20,20 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -72,8 +62,6 @@ public class PatternHopFactory {
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-    private final GtfsFeedId feedId;
-
     private OtpTransitService transitService;
 
     private Map<ShapeSegmentKey, LineString> geometriesByShapeSegmentKey = new HashMap<ShapeSegmentKey, LineString>();
@@ -84,48 +72,29 @@ public class PatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    // Map of stops and their vertices in the graph
-    private Map<Stop, TransitStopVertex> stopNodes = new HashMap<>();
-
-    private final int subwayAccessTime;
-
     private final double maxStopToShapeSnapDistance;
 
     private final int maxInterlineDistance;
 
     public PatternHopFactory(GtfsContext context) {
-        this(context.getFeedId(), context.getTransitService(), null, -1, -1, -1);
+        this(context.getTransitService(), null, -1, -1);
     }
 
     public PatternHopFactory(
-            GtfsFeedId feedId,
             OtpTransitService transitService,
             FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance,
-            int subwayAccessTime,
             int maxInterlineDistance
     ) {
-
-        this.feedId = feedId;
         this.transitService = transitService;
         this.fareServiceFactory = fareServiceFactory != null ? fareServiceFactory : new DefaultFareServiceFactory();
         this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
-        this.subwayAccessTime = Math.max(subwayAccessTime, 0);
         this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
         fareServiceFactory.processGtfs(transitService);
-
-        // TODO OTP2 - Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
-        //           - It should not be the PHFs responsibility to insert anything into the graph, it should build
-        //           - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
-        loadStops(graph);
-        loadStations(graph);
-        loadPathways(graph);
-        loadFeedInfo(graph);
-        loadAgencies(graph);
 
         // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
         //       Perhaps it is to allow name collisions with previously loaded feeds?
@@ -471,76 +440,6 @@ public class PatternHopFactory {
         }
 
         return null;
-    }
-
-    private void loadAgencies(Graph graph) {
-        for (Agency agency : transitService.getAllAgencies()) {
-            graph.addAgency(feedId.getId(), agency);
-        }
-    }
-
-    private void loadFeedInfo(Graph graph) {
-        for (FeedInfo info : transitService.getAllFeedInfos()) {
-            graph.addFeedInfo(info);
-        }
-    }
-
-    private void loadPathways(Graph graph) {
-        for (Pathway pathway : transitService.getAllPathways()) {
-            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
-            Vertex toVertex = stopNodes.get(pathway.getToStop());
-
-            if(fromVertex != null && toVertex != null) {
-                if (pathway.isWheelchairTraversalTimeSet()) {
-                    new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
-                } else {
-                    new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
-                }
-            }
-            else {
-                if(fromVertex == null) {
-                    LOG.warn("The 'fromVertex' is missing for pathway from stop: " + pathway.getFromStop().getId());
-                }
-                if(toVertex == null) {
-                    LOG.warn("The 'toVertex' is missing for pathway to stop: " + pathway.getToStop().getId());
-                }
-            }
-        }
-    }
-
-    private void loadStops(Graph graph) {
-        // Compute the set of modes for each stop based on all the TripPatterns it is part of
-        Map<Stop, TraverseModeSet> stopModeMap = new HashMap<>();
-
-        for (TripPattern pattern : transitService.getTripPatterns()) {
-            TraverseMode mode = pattern.mode;
-            graph.addTransitMode(mode);
-            for (Stop stop : pattern.getStops()) {
-                TraverseModeSet set = stopModeMap.computeIfAbsent(stop, s -> new TraverseModeSet());
-                set.setMode(mode, true);
-            }
-        }
-
-        // Add a vertex representing the stop.
-        // It is now possible for these vertices to not be connected to any edges.
-        for (Stop stop : transitService.getAllStops()) {
-            TraverseModeSet modes = stopModeMap.get(stop);
-            TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, modes);
-            if (modes != null && modes.contains(TraverseMode.SUBWAY)) {
-                stopVertex.setStreetToStopTime(subwayAccessTime);
-            }
-
-            // Add stops to internal index for Pathways to be created from this map
-            // TODO rename
-            stopNodes.put(stop, stopVertex);
-        }
-    }
-
-    private void loadStations(Graph graph) {
-        /* Store parent stops in graph, even if not linked*/
-        for (Station station : transitService.getAllStations()) {
-            graph.stationById.put(station.getId(), station);
-        }
     }
 
     private void clearCachedData() {

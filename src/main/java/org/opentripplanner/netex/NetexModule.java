@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.OtpTransitService;
@@ -59,12 +60,6 @@ public class NetexModule implements GraphBuilderModule {
         graph.clearTimeZone();
         CalendarServiceData calendarServiceData = new CalendarServiceData();
 
-        // TODO OTP2 - Stops set inside the hf.run. The next line appered after merging
-        //           - dev-2.x and netex_inport, It does not compile due to the deletion of the
-        //           - GtfsStopContext in dex-2.x - Verify that the code still is OK, and remove
-        //           - this and the "//hf.setStopContext(stopContext);" below (line 67).
-        //GtfsStopContext stopContext = new GtfsStopContext();
-
         try {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
@@ -77,14 +72,16 @@ public class NetexModule implements GraphBuilderModule {
                 graph.getOperators().addAll(otpService.getAllOperators());
                 graph.addNoticeAssignments(otpService.getNoticeAssignments());
 
+                GtfsFeedId feedId = new GtfsFeedId.Builder().id(netexFeedId).build();
+
+                AddTransitModelEntitiesToGraph.addToGraph(
+                        feedId, otpService, subwayAccessTime, graph
+                );
+
                 PatternHopFactory hf = new PatternHopFactory(
-                        new GtfsFeedId.Builder()
-                                .id(netexFeedId)
-                                .build(),
                         otpService,
                         fareServiceFactory,
                         MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
-                        subwayAccessTime,
                         maxInterlineDistance
                 );
                 //hf.setStopContext(stopContext);

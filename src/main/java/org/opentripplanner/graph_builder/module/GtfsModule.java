@@ -114,7 +114,11 @@ public class GtfsModule implements GraphBuilderModule {
                 // NB! The calls below have side effects - the builder state is updated!
                 createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
 
-                PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());
+                OtpTransitService transitModel = builder.build();
+
+                addTransitModelToGraph(graph, gtfsBundle, transitModel);
+
+                PatternHopFactory hf = createPatternHopFactory(gtfsBundle, transitModel);
                 hf.run(graph);
             }
         } catch (IOException e) {
@@ -155,13 +159,20 @@ public class GtfsModule implements GraphBuilderModule {
         graph.hasScheduledService = graph.hasScheduledService || buildTPOp.hasScheduledTrips();
     }
 
+    private void addTransitModelToGraph(Graph graph, GtfsBundle gtfsBundle, OtpTransitService transitModel) {
+        AddTransitModelEntitiesToGraph.addToGraph(
+                gtfsBundle.getFeedId(),
+                transitModel,
+                gtfsBundle.subwayAccessTime,
+                graph
+        );
+    }
+
     private PatternHopFactory createPatternHopFactory(GtfsBundle bundle, OtpTransitService transitService) {
         return new PatternHopFactory(
-                bundle.getFeedId(),
                 transitService,
                 fareServiceFactory,
                 bundle.getMaxStopToShapeSnapDistance(),
-                bundle.subwayAccessTime,
                 bundle.maxInterlineDistance
         );
     }

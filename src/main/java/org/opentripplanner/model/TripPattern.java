@@ -19,7 +19,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -98,15 +97,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public final Timetable scheduledTimetable = new Timetable(this);
 
-    /**
-     * The vertices in the Graph that correspond to each Stop in this pattern.
-     * Note: these are not unique to this pattern, and could be shared in the stop.
-     * FIXME they appear to be all null. are they even used?
-     * TODO OTP2 - This is not used and can be removed. It is initialized in the
-     *           - PatternHopFactory, but never accessed after that.
-     */
-    public final TransitStopVertex[] stopVertices;
-
     // redundant since tripTimes have a trip
     // however it's nice to have for order reference, since all timetables must have tripTimes
     // in this order, e.g. for interlining.
@@ -141,20 +131,18 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     public LineString getHopGeometry(int stopIndex) {
-        TransitStopVertex stopVertexStart = stopVertices[stopIndex];
-        TransitStopVertex stopVertexEnd = stopVertices[stopIndex + 1];
-
         if (hopGeometries != null) {
             return CompactLineString.uncompactLineString(
                     hopGeometries[stopIndex],
                     false
             );
         } else {
-            return GeometryUtils.getGeometryFactory()
-                    .createLineString(
-                            new Coordinate[] {
-                                    stopVertexStart.getCoordinate(),
-                                    stopVertexEnd.getCoordinate() });
+            return GeometryUtils.getGeometryFactory().createLineString(
+                    new Coordinate[]{
+                            coordinate(stopPattern.stops[stopIndex]),
+                            coordinate(stopPattern.stops[stopIndex + 1])
+                    }
+            );
         }
     }
 
@@ -197,7 +185,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         this.route = route;
         this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
-        this.stopVertices = new TransitStopVertex[stopPattern.size];
         setStopsFromStopPattern(stopPattern);
     }
 
@@ -297,6 +284,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         Timetable timetable = getUpdatedTimetable(options, serviceDay);
         return timetable.getTripTimes(tripIndex);
     }
+
 
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
 
@@ -521,14 +509,14 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         }
         scheduledTimetable.setServiceCodes (serviceCodes);
     }
-    
+
     /**
      * @return bitset of service codes
      */
     public BitSet getServices() {
         return services;
     }
-    
+
     /**
      * @param services bitset of service codes
      */
@@ -632,5 +620,9 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
         return route.getId().getAgencyId();
+    }
+
+    private static Coordinate coordinate(Stop s) {
+        return new Coordinate(s.getLon(), s.getLat());
     }
 }
