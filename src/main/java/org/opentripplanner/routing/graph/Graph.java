@@ -24,6 +24,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -33,8 +34,9 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -46,8 +48,11 @@ import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -55,7 +60,6 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,6 +83,7 @@ import java.util.Optional;
 import java.util.Set;
 import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.function.Function;
 import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
@@ -134,7 +139,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      */
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
-    public transient TimetableSnapshotSource timetableSnapshotSource = null;
+    private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
@@ -247,6 +252,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** Data model for Raptor routing, with realtime updates applied (if any). */
     public transient TransitLayer realtimeTransitLayer;
 
+    private transient AlertPatchService alertPatchService;
+
+
     /**
      * Hack. I've tried three different ways of generating unique labels.
      * Previously we were just tolerating edge label collisions.
@@ -264,6 +272,30 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     // Constructor for deserialization.
     public Graph() {
 
+    }
+
+    public TimetableSnapshot getTimetableSnapshot() {
+        return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();
+    }
+
+    /**
+     * TODO OTP2 - This should be replaced by proper dependency injection
+     */
+    @SuppressWarnings("unchecked")
+    public <T extends TimetableSnapshotProvider> T getOrSetupTimetableSnapshotProvider(Function<Graph, T> creator) {
+        if (timetableSnapshotProvider == null) {
+            timetableSnapshotProvider = creator.apply(this);
+        }
+        try {
+            return (T) timetableSnapshotProvider;
+        } catch (ClassCastException e) {
+            throw new IllegalArgumentException(
+                    "We support only one timetableSnapshotSource, there are two implementation; one for GTFS and one " +
+                    "for Netex/Siri. They need to be refactored to work together. This cast will fail if updaters " +
+                    "try setup both.",
+                    e
+            );
+        }
     }
 
     /**
@@ -670,7 +702,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
                 } catch (InterruptedException e) {
                     throw new RuntimeException(e);
                 }
-                if (this.timetableSnapshotSource != null) {
+                if (this.getTimetableSnapshot() != null) {
                     // TODO this is creating a new TransitLayer even if no changes have been made to the timetables.
                     // TODO this is not accounting for any new patterns created by realtime "add trip" messages.
                     this.realtimeTransitLayer = TransitLayerMapper.map(this);
@@ -949,4 +981,22 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         this.distanceBetweenElevationSamples = distanceBetweenElevationSamples;
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
+
+    public AlertPatchService getSiriAlertPatchService() {
+        if (alertPatchService == null) {
+            if (updaterManager == null) {
+                alertPatchService = new AlertPatchServiceImpl(this);
+            }
+            else {
+                Optional<AlertPatchService> patchServiceOptional = updaterManager.getUpdaterList().stream()
+                        .filter(SiriSXUpdater.class::isInstance)
+                        .map(SiriSXUpdater.class::cast)
+                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
+
+                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(this));
+            }
+        }
+        return alertPatchService;
+    }
+
 }

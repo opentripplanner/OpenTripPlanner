@@ -1,23 +1,39 @@
 package org.opentripplanner.routing.services;
 
-import java.util.Collection;
-import java.util.Set;
-
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.edgetype.TripPattern;
+
+import java.util.Collection;
 
 public interface AlertPatchService {
     Collection<AlertPatch> getAllAlertPatches();
+
+    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
+    AlertPatch getPatchById(String id);
 
     Collection<AlertPatch> getStopPatches(FeedScopedId stop);
 
     Collection<AlertPatch> getRoutePatches(FeedScopedId route);
 
+    Collection<AlertPatch> getTripPatches(FeedScopedId trip);
+
+    Collection<AlertPatch> getAgencyPatches(String agency);
+
+    Collection<AlertPatch> getStopAndRoutePatches(FeedScopedId stop, FeedScopedId route);
+
+    Collection<AlertPatch> getStopAndTripPatches(FeedScopedId stop, FeedScopedId trip);
+
+    // TODO OTP2 - Not used, will be used by the new Transit API(not included jet)
+    Collection<AlertPatch> getTripPatternPatches(TripPattern tripPattern);
+
     void apply(AlertPatch alertPatch);
 
-    void expire(Set<String> ids);
+    void expire(Collection<String> ids);
 
     void expireAll();
 
-    void expireAllExcept(Set<String> ids);
+    void expireAllExcept(Collection<String> ids);
+
+    void applyAll(Collection<AlertPatch> alertPatches);
 }

@@ -444,13 +444,13 @@ public class TimetableSnapshotSourceTest {
         final Trip trip = graph.index.tripForId.get(tripId);
         final TripPattern pattern = graph.index.patternForTrip.get(trip);
 
-        updater.maxSnapshotFrequency = (0);
-        updater.purgeExpiredData = (false);
+        updater.maxSnapshotFrequency = 0;
+        updater.purgeExpiredData = false;
 
         updater.applyTripUpdates(graph, fullDataset, Arrays.asList(TripUpdate.parseFrom(cancellation)), feedId);
         final TimetableSnapshot snapshotA = updater.getTimetableSnapshot();
 
-        updater.purgeExpiredData = (true);
+        updater.purgeExpiredData = true;
 
         final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.core;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -11,7 +11,9 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 /**
  * Tests for SimpleIntersectionTraversalCostModel.
@@ -105,7 +107,7 @@ public class SimpleTraversalCostModelTest {
         IntersectionVertex u = vertex("from_v", a, false);
         IntersectionVertex v = vertex("intersection", b, false);
         IntersectionVertex w = vertex("to_v", c, false);
-        v.freeFlowing = (true);
+        v.freeFlowing = true;
         
         // Two edges.
         StreetEdge fromEdge = edge(u, v, 1.0, false);
@@ -248,7 +250,7 @@ public class SimpleTraversalCostModelTest {
 
     private IntersectionVertex vertex(String label, Coordinate coord, boolean hasLight) {
         IntersectionVertex v = new IntersectionVertex(graph, label, coord.y, coord.x);
-        v.trafficLight = (hasLight);
+        v.trafficLight = hasLight;
         return v;
     }
 

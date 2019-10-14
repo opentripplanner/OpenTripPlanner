@@ -24,7 +24,6 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -198,12 +197,7 @@ public class RoutingContext implements Cloneable {
             if (routingRequest.ignoreRealtimeUpdates) {
                 timetableSnapshot = null;
             } else {
-                TimetableSnapshotSource timetableSnapshotSource = graph.timetableSnapshotSource;
-                if (timetableSnapshotSource == null) {
-                    timetableSnapshot = null;
-                } else {
-                    timetableSnapshot = timetableSnapshotSource.getTimetableSnapshot();
-                }
+                timetableSnapshot = graph.getTimetableSnapshot();
             }
             calendarService = graph.getCalendarService();
             setServiceDays();

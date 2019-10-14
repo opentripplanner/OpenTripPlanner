@@ -172,7 +172,7 @@ public class InputStreamGraphSource implements GraphSource {
                 return null;
             }
 
-            newGraph.routerId = (routerId);
+            newGraph.routerId = routerId;
         } catch (IOException e) {
             LOG.warn("Graph file not found or not openable for routerId '{}': {}", routerId, e);
             return null;

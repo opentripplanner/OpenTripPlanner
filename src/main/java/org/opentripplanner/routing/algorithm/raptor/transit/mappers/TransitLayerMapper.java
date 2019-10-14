@@ -120,11 +120,10 @@ public class TransitLayerMapper {
         // to convert it to a new Raptor TripPattern.
         // Get a frozen snapshot of timetable data so it isn't changed by incoming realtime data
         // while we're iterating.
-        TimetableSnapshot timetableSnapshot = null;
-        if (graph.timetableSnapshotSource == null) {
+        TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
+        if (timetableSnapshot == null) {
             LOG.info("There is no timetable snapshot source. This TransitLayer will reflect scheduled service.");
         } else {
-            timetableSnapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
             LOG.info("Got timetable snapshot. This TransitLayer will reflect realtime updates.");
         }
         Set<ServiceDate> allServiceDates = serviceIdsForServiceDate.keySet();

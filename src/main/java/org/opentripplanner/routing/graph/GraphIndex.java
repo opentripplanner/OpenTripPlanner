@@ -112,8 +112,6 @@ public class GraphIndex {
             this.operatorForId.put(operator.getId(), operator);
         }
 
-        Collection<Edge> edges = graph.getEdges();
-
         /* We will keep a separate set of all vertices in case some have the same label.
          * Maybe we should just guarantee unique labels. */
         for (Vertex vertex : graph.getVertices()) {
@@ -263,10 +261,7 @@ public class GraphIndex {
             startTime = System.currentTimeMillis() / 1000;
         }
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableSnapshot snapshot = null;
-        if (graph.timetableSnapshotSource != null) {
-            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
-        }
+        TimetableSnapshot snapshot = graph.getTimetableSnapshot();
         Date date = new Date(startTime * 1000);
         ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
@@ -347,10 +342,8 @@ public class GraphIndex {
      */
     public List<StopTimesInPattern> getStopTimesForStop(Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
         List<StopTimesInPattern> ret = new ArrayList<>();
-        TimetableSnapshot snapshot = null;
-        if (graph.timetableSnapshotSource != null) {
-            snapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
-        }
+        TimetableSnapshot snapshot = graph.getTimetableSnapshot();
+
         Collection<TripPattern> patterns = patternsForStop.get(stop);
         for (TripPattern pattern : patterns) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
@@ -438,6 +431,7 @@ public class GraphIndex {
         Collection<Notice> res = graph.getNoticesByElement().get(entity);
         return res == null ? Collections.emptyList() : res;
     }
+
 
     /**
      * Get a list of all operators spanning across all feeds.

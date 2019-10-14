@@ -18,25 +18,25 @@ public interface GraphUpdater extends JsonConfigurable {
      * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.
      * GraphUpdaterConfigurator should take care of calling this function.
      */
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager);
+    void setGraphUpdaterManager (GraphUpdaterManager updaterManager);
 
     /**
      * Here the updater can be initialized. If it throws, the updater won't be started (i.e. the run
      * method won't be called). All updaters' setup methods will be run sequentially in a single-threaded manner
      * before updates begin, in order to avoid concurrent reads/writes.
      */
-    public void setup(Graph graph) throws Exception;
+    void setup (Graph graph) throws Exception;
 
     /**
      * This method will run in its own thread. It pulls or receives updates and applies them to the graph.
      * It must perform any writes to the graph by passing GraphWriterRunnables to GraphUpdaterManager.execute().
      * This queues up the write operations, ensuring that only one updater performs writes at a time.
      */
-    public void run() throws Exception;
+    void run () throws Exception;
 
     /**
      * Here the updater can clean up after itself.
      */
-    public void teardown();
+    void teardown ();
 
 }
