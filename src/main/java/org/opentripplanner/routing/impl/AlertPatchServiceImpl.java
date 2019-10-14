@@ -137,7 +137,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public synchronized void applyAll(Set<AlertPatch> alertPatches) {
+    public synchronized void applyAll(Collection<AlertPatch> alertPatches) {
         for (AlertPatch alertPatch : alertPatches) {
             apply(alertPatch);
         }
@@ -195,7 +195,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public void expire(Set<String> purge) {
+    public void expire(Collection<String> purge) {
         for (String patchId : purge) {
             if (alertPatches.containsKey(patchId)) {
                 expire(alertPatches.get(patchId));
@@ -214,7 +214,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public void expireAllExcept(Set<String> retain) {
+    public void expireAllExcept(Collection<String> retain) {
         ArrayList<String> toRemove = new ArrayList<String>();
 
         for (Entry<String, AlertPatch> entry : alertPatches.entrySet()) {

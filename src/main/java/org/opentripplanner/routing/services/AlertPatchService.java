@@ -5,7 +5,6 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.Collection;
-import java.util.Set;
 
 public interface AlertPatchService {
     Collection<AlertPatch> getAllAlertPatches();
@@ -30,11 +29,11 @@ public interface AlertPatchService {
 
     void apply(AlertPatch alertPatch);
 
-    void expire(Set<String> ids);
+    void expire(Collection<String> ids);
 
     void expireAll();
 
-    void expireAllExcept(Set<String> ids);
+    void expireAllExcept(Collection<String> ids);
 
-    void applyAll(Set<AlertPatch> alertPatches);
+    void applyAll(Collection<AlertPatch> alertPatches);
 }
