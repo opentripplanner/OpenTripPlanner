@@ -131,11 +131,16 @@ public class NearbyStopFinder {
      * @param originVertex the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
+     * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
+     *                        edges that are part of that context. NOTE: this will remove _all_ temporary edges
+     *                        coming out of the origin and destination vertices, including those in any other
+     *                        RoutingContext referencing them, making routing from/to them totally impossible.
+     *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
      */
     public List<StopAtDistance> findNearbyStopsViaStreets (
             Vertex originVertex,
             boolean reverseDirection,
-            boolean retainEdges
+            boolean removeTempEdges
     ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
@@ -163,7 +168,7 @@ public class NearbyStopFinder {
         if (originVertex instanceof TransitStopVertex) {
             stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
         }
-        if (!retainEdges) {
+        if (removeTempEdges) {
             routingRequest.cleanup();
         }
         return stopsFound;
@@ -171,7 +176,7 @@ public class NearbyStopFinder {
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
-        return findNearbyStopsViaStreets(originVertex, false, false);
+        return findNearbyStopsViaStreets(originVertex, false, true);
     }
 
     /**
