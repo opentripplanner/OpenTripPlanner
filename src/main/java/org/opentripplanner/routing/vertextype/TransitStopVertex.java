@@ -19,7 +19,7 @@ public class TransitStopVertex extends Vertex {
 
     // Do we actually need a set of modes for each stop?
     // It's nice to have for the index web API but can be generated on demand.
-    private TraverseModeSet modes = new TraverseModeSet();
+    private final TraverseModeSet modes;
 
     private static final long serialVersionUID = 1L;
 
@@ -35,13 +35,19 @@ public class TransitStopVertex extends Vertex {
      */
     private int streetToStopTime = 0;
 
-    public TransitStopVertex (Graph graph, Stop stop) {
+    public TransitStopVertex (Graph graph, Stop stop, TraverseModeSet modes) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop.getLon(), stop.getLat());
         this.stop = stop;
+        this.modes = modes != null ? modes : new TraverseModeSet();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
         isEntrance = false; // Entrance not supported in current otp model
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices
         graph.expandToInclude(stop.getLon(), stop.getLat());
+    }
+
+    /** for tests only */
+    public TransitStopVertex (Graph graph, Stop stop) {
+        this(graph, stop, new TraverseModeSet());
     }
 
     public boolean hasWheelchairEntrance() {

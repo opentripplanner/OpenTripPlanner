@@ -2,9 +2,9 @@ package org.opentripplanner.index.model;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.model.Timetable;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 

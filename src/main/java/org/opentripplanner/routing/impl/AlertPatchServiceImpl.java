@@ -2,8 +2,8 @@ package org.opentripplanner.routing.impl;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
 

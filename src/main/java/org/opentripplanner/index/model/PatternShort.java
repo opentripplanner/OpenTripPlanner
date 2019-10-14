@@ -1,11 +1,10 @@
 package org.opentripplanner.index.model;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
 import org.opentripplanner.model.TripPattern;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.Collection;
+import java.util.List;
 
 public class PatternShort {
 

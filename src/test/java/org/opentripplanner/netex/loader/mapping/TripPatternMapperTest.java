@@ -3,8 +3,8 @@ package org.opentripplanner.netex.loader.mapping;
 import org.junit.Test;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
