@@ -20,7 +20,7 @@ import org.slf4j.LoggerFactory;
  */
 public class RaptorTransitLayerGraphUpdater implements GraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(RaptorTransitLayerGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RaptorTransitLayerGraphUpdater.class);
 
     private static final int DEFAULT_INTERVAL_SECONDS = 40;
 
@@ -38,12 +38,12 @@ public class RaptorTransitLayerGraphUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup (Graph graph) throws Exception {
+    public void setup (Graph graph) {
         this.graph = graph;
     }
 
     @Override
-    public void run () throws Exception {
+    public void run () {
         // TODO OTP2 - See discussion in PR #2794 (Graph.java@650)
         LOG.info("Periodically making an OTP2 Raptor TransitLayer from the TimetableSnapshot at intervals of {} seconds.",
                 updateIntervalSeconds);
@@ -56,8 +56,8 @@ public class RaptorTransitLayerGraphUpdater implements GraphUpdater {
                 Thread.currentThread().interrupt();
                 break;
             }
-            if (graph.timetableSnapshotSource != null) {
-                final TimetableSnapshot timetableSnapshot = graph.timetableSnapshotSource.getTimetableSnapshot();
+            final TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
+            if (timetableSnapshot != null) {
                 // Only build a new layer if we got a different snapshot than last time through the loop.
                 if (timetableSnapshot.hashCode() != lastSnapshotHashCode) {
                     lastSnapshotHashCode = timetableSnapshot.hashCode();

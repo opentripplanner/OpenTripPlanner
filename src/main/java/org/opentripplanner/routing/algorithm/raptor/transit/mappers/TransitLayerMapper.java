@@ -83,8 +83,7 @@ public class TransitLayerMapper {
      *
      * TODO OTP2 - This can be refactored and broken up into smaller. Se discussion in PR #2794
      */
-    private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (
-            StopIndexForRaptor stopIndex) {
+    private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (StopIndexForRaptor stopIndex) {
         // CalendarService has one main implementation (CalendarServiceImpl) which contains a
         // CalendarServiceData which can easily supply all of the dates. But it's impossible to
         // actually see those dates without modifying the interfaces and inheritance. So we have
