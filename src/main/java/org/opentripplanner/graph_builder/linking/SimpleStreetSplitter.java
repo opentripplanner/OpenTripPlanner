@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.linking;
 import com.google.common.collect.Iterables;
 import gnu.trove.map.TObjectDoubleMap;
 import gnu.trove.map.hash.TObjectDoubleHashMap;
+import jersey.repackaged.com.google.common.collect.Lists;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -10,7 +11,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
-import jersey.repackaged.com.google.common.collect.Lists;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -18,34 +18,34 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
 import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -140,9 +140,12 @@ public class SimpleStreetSplitter {
     }
 
     /** Link all relevant vertices to the street network */
-    public void link () {	
+    public void link () {
         for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex)
+            if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
+                boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
+                if (alreadyLinked) continue;
+
                 if (!link(v)) {
                     if (v instanceof TransitStopVertex)
                         LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStopVertex) v)));
@@ -151,6 +154,7 @@ public class SimpleStreetSplitter {
                     else if (v instanceof BikeParkVertex)
                         LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
                 };
+            }
         }
     }
 
