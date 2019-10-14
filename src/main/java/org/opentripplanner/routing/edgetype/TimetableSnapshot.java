@@ -6,6 +6,7 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Comparator;
 import java.util.ConcurrentModificationException;
 import java.util.HashMap;
@@ -44,6 +45,7 @@ public class TimetableSnapshot {
     
     /**
      * Class to use as key in HashMap containing feed id, trip id and service date
+     * TODO shouldn't this be a static class?
      */
     protected class TripIdAndServiceDate {
         private final String feedId;
@@ -93,10 +95,15 @@ public class TimetableSnapshot {
 
     private static final Logger LOG = LoggerFactory.getLogger(TimetableSnapshot.class);
     
-    // Use HashMap not Map so we can clone.
-    // if this turns out to be slow/spacious we can use an array with integer pattern indexes
-    // The SortedSet members are copy-on-write
-    // FIXME: this could be made into a flat hashtable with compound keys.
+    /**
+     * The timetables for different days, for each TripPattern (each sequence of stops on a particular Route) for which
+     * we have an updated Timetable. The keys include both TripPatterns from the scheduled GTFS, and TripPatterns added
+     * by realtime messages and tracked by the TripPatternCache. Note that the keys will not include all scheduled
+     * TripPatterns, only those for which we've got an update.
+     * We use a HashMap rather than a Map so we can clone it. If this turns out to be slow/spacious we can use an array
+     * with integer pattern indexes. The SortedSet members are copy-on-write.
+     * FIXME: this could be made into a flat hashtable with compound keys.
+     */
     private HashMap<TripPattern, SortedSet<Timetable>> timetables = new HashMap();
 
     /**
@@ -108,6 +115,7 @@ public class TimetableSnapshot {
      * <p>
      * This is a HashMap and not a Map so the clone function is available.
      * </p>
+     * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
     
@@ -151,6 +159,7 @@ public class TimetableSnapshot {
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
      * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of
      * a trip that didn't exist yet in the trip pattern.
+     * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      *
      * @param feedId feed id the trip id belongs to
      * @param tripId trip id (without agency)
@@ -349,4 +358,14 @@ public class TimetableSnapshot {
         String d = readOnly ? "committed" : String.format("%d dirty", dirtyTimetables.size());
         return String.format("Timetable snapshot: %d timetables (%s)", timetables.size(), d);
     }
+
+    /**
+     * @return all TripPatterns for which we have any updated timetables created by realtime messages, including both
+     *         patterns that were in the scheduled (static) transit data and those that were added to this snapshot by
+     *         rerouted or added trips.
+     */
+    public Collection<TripPattern> getAllRealtimeTripPatterns () {
+        return timetables.keySet();
+    }
+
 }

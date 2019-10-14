@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperI
 import org.opentripplanner.routing.edgetype.Timetable;
 import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,6 +26,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -44,9 +46,11 @@ public class TransitLayerMapper {
 
     private final Graph graph;
 
+    private final TimetableSnapshot timetableSnapshot;
 
     private TransitLayerMapper(Graph graph) {
         this.graph = graph;
+        this.timetableSnapshot = graph.getTimetableSnapshot();
     }
 
     public static TransitLayer map(Graph graph) {
@@ -79,8 +83,7 @@ public class TransitLayerMapper {
      *
      * TODO OTP2 - This can be refactored and broken up into smaller. Se discussion in PR #2794
      */
-    private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (
-            StopIndexForRaptor stopIndex) {
+    private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (StopIndexForRaptor stopIndex) {
         // CalendarService has one main implementation (CalendarServiceImpl) which contains a
         // CalendarServiceData which can easily supply all of the dates. But it's impossible to
         // actually see those dates without modifying the interfaces and inheritance. So we have
@@ -102,11 +105,22 @@ public class TransitLayerMapper {
             }
         }
 
-        Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> newTripPatternForOld;
-        newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(
-                stopIndex,
-                graph.tripPatternForId.values()
-        );
+        // If we are using realtime updates, we want to include both the TripPatterns in the scheduled (static) data
+        // and any new patterns that were created by realtime data (added or rerouted trips).
+        // So far, realtime messages cannot add new stops or service IDs, so we can use those straight from the Graph.
+        Collection<org.opentripplanner.routing.edgetype.TripPattern> allTripPatterns;
+        allTripPatterns = graph.tripPatternForId.values();
+        if (timetableSnapshot != null && !timetableSnapshot.getAllRealtimeTripPatterns().isEmpty()) {
+            // Make a protective copy, also removing duplicates between the scheduled and updated patterns.
+            // This may be somewhat inefficient since we copy all patterns into a Set even when none have been added.
+            // However references to the TripPatternCache are private, and none is held by the timetableSnapshot so
+            // this is simpler.
+            allTripPatterns = new HashSet(allTripPatterns);
+            allTripPatterns.addAll(timetableSnapshot.getAllRealtimeTripPatterns());
+        }
+
+        final Map<org.opentripplanner.routing.edgetype.TripPattern, TripPattern> newTripPatternForOld;
+        newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
         // Presumably even when applying realtime, many TripTimes will recur on future dates.
         // This Map is used to deduplicate the resulting TripSchedules.
@@ -115,16 +129,13 @@ public class TransitLayerMapper {
         // The return value of this entire process.
         HashMap<LocalDate, List<TripPatternForDate>> tripPatternsForDates = new HashMap<>();
 
-        // Loop over all dates for which any service is defined
-        // We need the original TripPattern to look it up in the timetable snapshot, but also need
-        // to convert it to a new Raptor TripPattern.
-        // Get a frozen snapshot of timetable data so it isn't changed by incoming realtime data
-        // while we're iterating.
-        TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
+        // Loop over all dates for which any service is defined. We need the original TripPattern to look it up in the
+        // timetable snapshot, but also need to convert it to a new Raptor TripPattern. Get a frozen snapshot of
+        // timetable data so it isn't changed by incoming realtime data while we're iterating.
         if (timetableSnapshot == null) {
-            LOG.info("There is no timetable snapshot source. This TransitLayer will reflect scheduled service.");
+            LOG.info("This TransitLayerMapper could not get a realtime timetable snapshot. The TransitLayer will reflect only scheduled service.");
         } else {
-            LOG.info("Got timetable snapshot. This TransitLayer will reflect realtime updates.");
+            LOG.info("This TransitLayerMapper got a realtime timetable snapshot. The TransitLayer will reflect realtime updates to scheduled service.");
         }
         Set<ServiceDate> allServiceDates = serviceIdsForServiceDate.keySet();
         Map<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new HashMap<>();
@@ -143,7 +154,7 @@ public class TransitLayerMapper {
 
             // This nested loop could be quite inefficient.
             // Maybe determine in advance which patterns are running on each service and day.
-            for (org.opentripplanner.routing.edgetype.TripPattern oldTripPattern : graph.tripPatternForId.values()) {
+            for (org.opentripplanner.routing.edgetype.TripPattern oldTripPattern : allTripPatterns) {
                 // Get an updated or scheduled timetable depending on the date. This might have the
                 // trips pre-filtered for the specified date, that needs to be investigated. But in
                 // any case we might end up with a scheduled timetable, which can include
@@ -169,11 +180,14 @@ public class TransitLayerMapper {
                     if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
                         continue;
                     }
+                    if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {
+                        continue;
+                    }
                     TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(
                         tripTimes,
-                        // Two different implementations of TripSchedule
+                        // The following are two alternative implementations of TripSchedule
                         tt -> new TripScheduleWrapperImpl(tt, oldTripPattern)
-                        // t -> t.toTripSchedulImpl(oldTripPattern)
+                        // tt -> tt.toTripSchedulImpl(oldTripPattern)
                     );
                     newTripSchedules.add(tripSchedule);
                 } 

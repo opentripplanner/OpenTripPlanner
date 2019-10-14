@@ -8,6 +8,8 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
 import java.io.ObjectOutputStream;
@@ -25,6 +27,9 @@ import java.util.Set;
  * This adds a note to all boardings of a given route or stop (optionally, in a given direction)
  */
 public class AlertPatch implements Serializable {
+
+    private static final Logger LOG = LoggerFactory.getLogger(AlertPatch.class);
+
     private static final long serialVersionUID = 20140319L;
 
     private String id;
@@ -131,19 +136,13 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            throw new UnsupportedOperationException(
-                                    "Cannot add Alert patch to Board/Alight edges - "
-                                    + "transit edges do not exist anymore under Raptor."
-                            );
+                            LOG.warn("Cannot add Alert patch to Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }
             }
         } else if (stop != null) {
-            throw new UnsupportedOperationException(
-                    "Cannot add alert to StopVertex - "
-                    + "PreBoard and PreAlight edges no longer exist."
-            );
+            LOG.warn("Cannot add alert to Stop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 
@@ -183,19 +182,13 @@ public class AlertPatch implements Serializable {
                     }
                     for (int i = 0; i < tripPattern.stopPattern.stops.length; i++) {
                         if (stop == null || stop.equals(tripPattern.stopPattern.stops[i])) {
-                            throw new UnsupportedOperationException(
-                                    "Cannot remove Alert patch from Board/Alight edges - "
-                                    + "transit edges do not exist anymore under Raptor."
-                            );
+                            LOG.warn("Cannot remove Alert patch from Board/Alight edges - transit edges do not exist anymore under Raptor.");
                         }
                     }
                 }
             }
         } else if (stop != null) {
-            throw new UnsupportedOperationException(
-                    "Cannot remove alert from StopVertex - "
-                    + "PreBoard and PreAlight edges no longer exist."
-            );
+            LOG.warn("Cannot remove alert from Stop - PreBoard and PreAlight edges no longer exist.");
         }
     }
 

@@ -90,6 +90,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     protected ServiceDate lastPurgeDate = null;
 
+    /** Epoch time in milliseconds at which the last snapshot was generated. */
     protected long lastSnapshotTime = -1;
 
     private final TimeZone timeZone;
@@ -319,6 +320,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             LOG.warn("TripUpdate contains no updates, skipping.");
             return false;
         }
+
+        // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
+        // changed, and is now changing back to the originally scheduled one) cancel that previously created trip.
+        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
         final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
@@ -743,7 +748,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     /**
      * Cancel previously added trip from buffer if there is a previously added trip with given trip
-     * id (without agency id) on service date
+     * id (without agency id) on service date. This does not remove the modified/added trip from the buffer, it just
+     * marks it as canceled. This also does not remove the corresponding vertices and edges from the Graph. Any
+     * TripPattern that was created for the added/modified trip continues to exist, and will be reused if a similar
+     * added/modified trip message is received with the same route and stop sequence.
      *
      * @param feedId feed id the trip id belongs to
      * @param tripId trip id without agency id
@@ -919,7 +927,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
     }
 
     /**
-     * Retrieve a trip pattern given a feed id and trid id.
+     * Retrieve a trip pattern given a feed id and trip id.
      *
      * @param feedId feed id for the trip id
      * @param tripId trip id without agency
