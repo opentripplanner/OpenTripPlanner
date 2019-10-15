@@ -10,7 +10,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -38,7 +38,7 @@ public class TimetableSnapshotTest {
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .build();
 
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
         graph.putService(CalendarServiceData.class,
                 context.getCalendarServiceData());

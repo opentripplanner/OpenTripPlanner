@@ -19,7 +19,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -61,7 +61,7 @@ public class TimetableSnapshotSourceTest {
 
         feedId = context.getFeedId().getId();
 
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
 

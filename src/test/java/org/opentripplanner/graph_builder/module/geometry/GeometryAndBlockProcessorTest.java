@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
 
 import org.junit.Test;
@@ -10,7 +10,7 @@ import org.opentripplanner.routing.graph.Graph;
 
 import java.io.IOException;
 
-public class PatternHopFactoryTest {
+public class GeometryAndBlockProcessorTest {
 
     @Test
     public void testBikesAllowed() throws IOException {
@@ -31,7 +31,7 @@ public class PatternHopFactoryTest {
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .build();
 
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
 
         factory.run(graph);
 

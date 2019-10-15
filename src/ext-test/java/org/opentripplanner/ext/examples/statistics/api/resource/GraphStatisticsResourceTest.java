@@ -6,7 +6,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
@@ -27,8 +27,7 @@ public class GraphStatisticsResourceTest {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
         Graph graph = new Graph();
         AddTransitModelEntitiesToGraph.addToGraph(context, graph);
-        PatternHopFactory hl = new PatternHopFactory(context);
-        hl.run(graph);
+        new GeometryAndBlockProcessor(context).run(graph);
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );

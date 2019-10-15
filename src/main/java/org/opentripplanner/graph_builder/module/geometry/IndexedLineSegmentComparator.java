@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
 import org.apache.commons.math3.util.FastMath;
 import org.locationtech.jts.geom.Coordinate;

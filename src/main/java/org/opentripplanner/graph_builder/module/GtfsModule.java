@@ -26,7 +26,7 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -118,8 +118,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 addTransitModelToGraph(graph, gtfsBundle, transitModel);
 
-                PatternHopFactory hf = createPatternHopFactory(gtfsBundle, transitModel);
-                hf.run(graph);
+                createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -168,12 +167,12 @@ public class GtfsModule implements GraphBuilderModule {
         );
     }
 
-    private PatternHopFactory createPatternHopFactory(GtfsBundle bundle, OtpTransitService transitService) {
-        return new PatternHopFactory(
+    private GeometryAndBlockProcessor createGeometryAndBlockProcessor (GtfsBundle gtfsBundle, OtpTransitService transitService) {
+        return new GeometryAndBlockProcessor(
                 transitService,
                 fareServiceFactory,
-                bundle.getMaxStopToShapeSnapDistance(),
-                bundle.maxInterlineDistance
+                gtfsBundle.getMaxStopToShapeSnapDistance(),
+                gtfsBundle.maxInterlineDistance
         );
     }
 

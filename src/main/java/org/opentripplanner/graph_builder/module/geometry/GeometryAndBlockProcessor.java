@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
@@ -47,18 +47,13 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-// Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
-// or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
-
 /**
- * Generates a set of edges from GTFS.
- *
- * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
- *           - after ass Entur NeTEx PRs are merged.
+ * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
+ * geometries. It also does some other postprocessing involving fares and interlined blocks.
  */
-public class PatternHopFactory {
+public class GeometryAndBlockProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PatternHopFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
@@ -76,11 +71,11 @@ public class PatternHopFactory {
 
     private final int maxInterlineDistance;
 
-    public PatternHopFactory(GtfsContext context) {
+    public GeometryAndBlockProcessor (GtfsContext context) {
         this(context.getTransitService(), null, -1, -1);
     }
 
-    public PatternHopFactory(
+    public GeometryAndBlockProcessor (
             OtpTransitService transitService,
             FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance,
@@ -102,15 +97,11 @@ public class PatternHopFactory {
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
 
-        LOG.debug("building hops from trips");
+        LOG.info("Processing geometries and blocks on graph...");
 
-        /* The hops don't actually exist when we build their geometries, but we have to build their geometries
-         * below, before we throw away the modified stopTimes, saving only the tripTimes (which don't have enough
-         * information to build a geometry). So we keep them here.
-         *
-         *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
-         *  FIXME _why_ doesn't it have a single geometry?
-         */
+        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving only the tripTimes
+        // (which don't have enough information to build a geometry). So we keep them here. In the current design, a
+        // trip pattern does not have a single geometry, but one per hop, so we store them in an array.
         Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();

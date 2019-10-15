@@ -7,7 +7,7 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -78,14 +78,12 @@ public class NetexModule implements GraphBuilderModule {
                         feedId, otpService, subwayAccessTime, graph
                 );
 
-                PatternHopFactory hf = new PatternHopFactory(
+                new GeometryAndBlockProcessor(
                         otpService,
                         fareServiceFactory,
                         MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
                         maxInterlineDistance
-                );
-                //hf.setStopContext(stopContext);
-                hf.run(graph);
+                ).run(graph);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);

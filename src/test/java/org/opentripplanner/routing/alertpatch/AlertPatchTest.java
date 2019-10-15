@@ -9,7 +9,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -45,7 +45,7 @@ public class AlertPatchTest extends TestCase {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .build();
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
 
         graph.putService(
