@@ -42,11 +42,10 @@ public class OTPMain {
     private static CommandLineParameters parseAndValidateCmdLine(String[] args) {
         CommandLineParameters params = new CommandLineParameters();
         try {
-            // TODO sub-command syntax:
-            // JCommander jc = JCommander.newBuilder()
-            // .addObject(params)
-            // .build();
-            JCommander jc = new JCommander(params, args);
+            // It is tempting to use JCommander's command syntax: http://jcommander.org/#_more_complex_syntaxes_commands
+            // But this seems to lead to confusing switch ordering and more difficult subsequent use of the
+            // parsed commands, since there will be three separate objects.
+            JCommander jc = JCommander.newBuilder().addObject(params).args(args).build();
             if (params.version) {
                 System.out.println(MavenVersion.VERSION.getLongVersionString());
                 System.exit(0);
@@ -57,7 +56,7 @@ public class OTPMain {
                 jc.usage();
                 System.exit(0);
             }
-            params.infer();
+            params.inferAndValidate();
         } catch (ParameterException pex) {
             System.out.println(MavenVersion.VERSION.getShortVersionString());
             LOG.error("Parameter error: {}", pex.getMessage());

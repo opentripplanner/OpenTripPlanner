@@ -38,10 +38,6 @@ public class CommandLineParameters implements Cloneable {
             description = "Print this help message and exit.")
     public boolean help;
 
-    @Parameter(names = {"--verbose"},
-            description = "Verbose output.")
-    public boolean verbose;
-
     @Parameter(names = {"--version"}, description = "Print the version, and then exit.")
     public boolean version = false;
 
@@ -81,15 +77,15 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--maxThreads"}, description = "The maximum number of HTTP handler threads.")
     public Integer maxThreads;
 
-    @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
+    @Parameter(names = {"--port"}, validateWith = PositiveInteger.class,
             description = "Server port for plain HTTP.")
     public Integer port = DEFAULT_PORT;
 
     @Parameter(names = {"--serve"},
-            description = "Run an OTP API server. Valid together with --build.")
+            description = "Run an OTP API server. Implied by --load, and optional with --build.")
     public boolean serve = false;
 
-    @Parameter(names = {"--securePort"}, validateWith = AvailablePort.class,
+    @Parameter(names = {"--securePort"}, validateWith = PositiveInteger.class,
             description = "Server port for HTTPS.")
     public Integer securePort = DEFAULT_SECURE_PORT;
 
@@ -102,19 +98,19 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
     public List<File> graphDirectory;
 
-    /** Set some convenience parameters based on other parameters' values. */
-    public void infer() {
+    /**
+     * Set some convenience parameters based on other parameters' values.
+     * Default values are validated even when no command line option is specified, and we will not bind ports unless
+     * a server is started. Therefore we only validate that port parameters are positive integers, and we check that
+     * ports are available only when a server will be started.
+     */
+    public void inferAndValidate () {
         if (inMemory) {
             serve = true;
         }
-        // Validate ports even if default is used.
-        // TODO: check whether this is necessary, are defaults already validated?
-        // Maybe we can just check that they're positive integers, and have a separate checkPortsAvailable method.
-        if (port == DEFAULT_PORT) {
-            new AvailablePort().validate(port);
-        }
-        if (securePort == DEFAULT_SECURE_PORT) {
-            new AvailablePort().validate(securePort);
+        if (serve) {
+            checkPortAvailable(port);
+            checkPortAvailable(securePort);
         }
     }
 
@@ -129,16 +125,6 @@ public class CommandLineParameters implements Cloneable {
         return graphDirectory.get(0);
     }
 
-    //    public CommandLineParameters clone() {
-//        CommandLineParameters ret;
-//        try {
-//            ret = (CommandLineParameters) super.clone();
-//        } catch (CloneNotSupportedException e) {
-//            return null;
-//        }
-//        return ret;
-//    }
-    
     public static class ReadableFile implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
@@ -192,39 +178,33 @@ public class CommandLineParameters implements Cloneable {
         }
     }
 
-    public static class AvailablePort implements IParameterValidator {
-
-        @Override
-        public void validate(String name, String value) throws ParameterException {
-            new PositiveInteger().validate(name, value);
-            int port = Integer.parseInt(value);
-            this.validate(port);
-        }
-        
-        public void validate(int port) throws ParameterException {
-            ServerSocket socket = null;
-            boolean portUnavailable = false;
-            String reason = null;
-            try {
-                socket = new ServerSocket(port);
-            } catch (IOException e) {
-                portUnavailable = true;
-                reason = e.getMessage();
-            } finally {
-                if (socket != null) {
-                    try {
-                        socket.close();
-                    } catch (IOException e) { 
-                        // will not be thrown
-                    }
+    /**
+     * @param port a port that we plan to bind to
+     * @throws ParameterException if that port is not available
+     */
+    public static void checkPortAvailable (int port) throws ParameterException {
+        ServerSocket socket = null;
+        boolean portUnavailable = false;
+        String reason = null;
+        try {
+            socket = new ServerSocket(port);
+        } catch (IOException e) {
+            portUnavailable = true;
+            reason = e.getMessage();
+        } finally {
+            if (socket != null) {
+                try {
+                    socket.close();
+                } catch (IOException e) {
+                    // will not be thrown
                 }
             }
-            if ( portUnavailable ) {
-                String msg = String.format(": port %d is not available. %s.", port, reason);
-                throw new ParameterException(msg);
-            }
+        }
+        if ( portUnavailable ) {
+            String msg = String.format(": port %d is not available. %s.", port, reason);
+            throw new ParameterException(msg);
         }
     }
-    
+
 }
 
