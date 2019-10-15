@@ -76,8 +76,7 @@ public class GraphBuilder implements Runnable {
         if (serializeGraph) {
         	
             if (graphFile.exists()) {
-                LOG.info("graph already exists => skipping graph build");
-                return;
+                LOG.info("Graph already exists and will be overwritten.");
             }
         	
             try {
