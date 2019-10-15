@@ -37,7 +37,7 @@ public class OTPAppConstruction {
      */
     public OTPAppConstruction(CommandLineParameters commandLineParameters) {
         this.commandLineParameters = commandLineParameters;
-        this.configuration = new OTPConfiguration(new File(commandLineParameters.basePath));
+        this.configuration = new OTPConfiguration(commandLineParameters.getGraphDirectory());
 
         // Initialize features from configuration file.
         OTPFeature.configure(configuration().otpConfig());
@@ -57,7 +57,7 @@ public class OTPAppConstruction {
     GraphBuilder createDefaultGraphBuilder() {
         return GraphBuilder.create(
                 commandLineParameters,
-                configuration().getGraphConfig(commandLineParameters.build)
+                configuration().getGraphConfig(commandLineParameters.getGraphDirectory())
         );
     }
 

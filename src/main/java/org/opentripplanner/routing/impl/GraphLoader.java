@@ -30,7 +30,7 @@ public class GraphLoader {
         File graphFile = new File(config.getPath(), GRAPH_FILENAME);
         LOG.info("Loading graph from file '{}'", graphFile.getPath());
         try (InputStream is = new FileInputStream(graphFile)) {
-            final Graph newGraph  = Graph.load(is);
+            Graph newGraph  = Graph.load(is);
             // Load configuration from disk or use the embedded configuration as fallback.
             JsonNode jsonConfig = config.routerConfig(newGraph.routerConfig);
             Router newRouter = new Router(newGraph);

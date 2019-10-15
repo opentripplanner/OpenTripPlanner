@@ -74,11 +74,9 @@ public class GraphBuilder implements Runnable {
         long startTime = System.currentTimeMillis();
 
         if (serializeGraph) {
-        	
             if (graphFile.exists()) {
                 LOG.info("Graph already exists and will be overwritten.");
             }
-        	
             try {
                 if (!graphFile.getParentFile().exists()) {
                     if (!graphFile.getParentFile().mkdirs()) {
@@ -128,7 +126,7 @@ public class GraphBuilder implements Runnable {
         List<File> netexFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File demFile = null;
-        File dir = params.build;
+        File dir = params.getGraphDirectory();
 
         LOG.info("Searching for graph builder input files in {}", dir);
 
@@ -294,9 +292,9 @@ public class GraphBuilder implements Runnable {
         }
         graphBuilder.addModule(new EmbedConfig(config.builderConfig(), config.routerConfig()));
         if (builderParams.htmlAnnotations) {
-            graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
+            graphBuilder.addModule(new AnnotationsToHTML(params.getGraphDirectory(), builderParams.maxHtmlAnnotationsPerFile));
         }
-        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
+        graphBuilder.serializeGraph = !params.inMemory;
         return graphBuilder;
     }
 

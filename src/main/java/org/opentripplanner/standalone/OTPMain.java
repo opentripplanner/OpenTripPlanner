@@ -8,6 +8,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.util.ThrowableUtils;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,6 @@ import org.slf4j.LoggerFactory;
 public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
-
 
     /**
      * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
@@ -42,6 +42,10 @@ public class OTPMain {
     private static CommandLineParameters parseAndValidateCmdLine(String[] args) {
         CommandLineParameters params = new CommandLineParameters();
         try {
+            // TODO sub-command syntax:
+            // JCommander jc = JCommander.newBuilder()
+            // .addObject(params)
+            // .build();
             JCommander jc = new JCommander(params, args);
             if (params.version) {
                 System.out.println(MavenVersion.VERSION.getLongVersionString());
@@ -49,7 +53,7 @@ public class OTPMain {
             }
             if (params.help) {
                 System.out.println(MavenVersion.VERSION.getShortVersionString());
-                jc.setProgramName("java -Xmx[several]G -jar otp.jar");
+                jc.setProgramName("java -Xmx4G -jar otp.jar");
                 jc.usage();
                 System.exit(0);
             }
@@ -59,38 +63,36 @@ public class OTPMain {
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
-        if (params.build == null && !params.visualize && !params.serve && params.scriptFile == null) {
-            LOG.info("Nothing to do. Use --help to see available tasks.");
+        if ( ! (params.build || params.load || params.serve)) {
+            LOG.info("Nothing to do. Use --help to see available options.");
             System.exit(-1);
         }
         return params;
     }
 
     /**
-     * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
-     * main method makes it possible to build graphs from web services or scripts, not just from the command line.
+     * All startup logic is in an instance method instead of the static main method so it is possible to build graphs
+     * from web services or scripts, not just from the command line. If options cause an OTP API server to start up,
+     * this method will return when the web server shuts down.
      *
-     * @return
-     *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method
-     *                will return when the web server shuts down;
-     *         false - if an error occurs while loading the graph;
+     * @return true if the OTPServer starts successfully; false if an error occurs while loading the graph.
      */
     private static boolean startOTPServer(CommandLineParameters params) {
         OTPAppConstruction appConstruction = new OTPAppConstruction(params);
         Router router = null;
 
         /* Start graph builder if requested. */
-        if (params.build != null) {
+        if (params.build) {
             GraphBuilder graphBuilder = appConstruction.createDefaultGraphBuilder();
             if (graphBuilder != null) {
                 graphBuilder.run();
                 /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
-                if (params.inMemory || params.preFlight) {
+                if (params.inMemory) {
                     Graph graph = graphBuilder.getGraph();
                     graph.index(new DefaultStreetVertexIndexFactory());
-                    // In-memory graph handoff. FIXME: This router config retrieval is too complex.
+                    // FIXME: This router config retrieval is too complex.
                     router = new Router(graph);
-                    router.startup(appConstruction.configuration().getGraphConfig(params.build).routerConfig());
+                    router.startup(appConstruction.configuration().getGraphConfig(params.getGraphDirectory()).routerConfig());
                 } else {
                     LOG.info("Done building graph. Exiting.");
                     return true;
@@ -102,14 +104,14 @@ public class OTPMain {
         }
 
         /* Load graph from disk if one is not present from build. */
-        if (params.load != null) {
-            GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.load);
+        if (params.load) {
+            GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.getGraphDirectory());
             router = GraphLoader.loadGraph(graphConfig);
         }
 
-        /* Bail out if we have no graph (router) to work with. */
+        /* Bail out if we have no router to work with. */
         if (router == null) {
-            LOG.error("No graph/router available for server. Exiting.");
+            LOG.error("No router available for server or visualizer. Exiting.");
             return false;
         }
 
@@ -133,11 +135,14 @@ public class OTPMain {
                     grizzlyServer.run();
                     return true;
                 } catch (Throwable throwable) {
-                    LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
-                            throwable.getClass().getSimpleName(), throwable);
+                    LOG.error(
+                        "An uncaught error occurred inside OTP. Restarting server. Error was: {}",
+                        ThrowableUtils.detailedString(throwable)
+                    );
                 }
             }
         }
         return true;
     }
+
 }

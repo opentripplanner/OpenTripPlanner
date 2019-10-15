@@ -27,9 +27,10 @@ import java.util.List;
  */
 public class CommandLineParameters implements Cloneable {
 
-    private static final int    DEFAULT_PORT        = 8080;
-    private static final int    DEFAULT_SECURE_PORT = 8081;
-    private static final String DEFAULT_BASE_PATH   = "/var/otp";
+    private static final int    DEFAULT_PORT         = 8080;
+    private static final int    DEFAULT_SECURE_PORT  = 8081;
+    private static final String DEFAULT_CACHE_PATH   = "/var/otp/cache";
+    private static final String DEFAULT_BIND_ADDRESS = "0.0.0.0";
 
     /* Options for the command itself, rather than build or server sub-tasks. */
 
@@ -41,116 +42,102 @@ public class CommandLineParameters implements Cloneable {
             description = "Verbose output.")
     public boolean verbose;
 
-    @Parameter(names = {"--basePath"}, validateWith = ReadWriteDirectory.class,
-            description = "Set the path under which graphs, caches, etc. are stored by default.")
-    public String basePath = DEFAULT_BASE_PATH;
+    @Parameter(names = {"--version"}, description = "Print the version, and then exit.")
+    public boolean version = false;
 
-    /* Options for the graph builder sub-task. */
+    /* Options for graph building and loading. */
 
-    @Parameter(names = {"--build"}, validateWith = ReadableDirectory.class,
-            description = "Build graphs at specified paths.")
-    public File build;
+    @Parameter(names = {"--build"}, description = "Build graphs from inputs in the specified directory.")
+    public boolean build;
 
     @Parameter(names = {"--cache"}, validateWith = ReadWriteDirectory.class,
             description = "The directory under which to cache OSM and NED tiles. Default is BASE_PATH/cache.")
-    public File cacheDirectory;
+    public File cacheDirectory = new File(DEFAULT_CACHE_PATH);
 
     @Parameter(names = {"--inMemory"},
-            description = "Pass the graph to the server in-memory after building it, without saving to disk.")
+            description = "Do not save the graph after building, just start the server.")
     public boolean inMemory;
 
-    @Parameter(names = {"--load"}, validateWith = ReadableDirectory.class,
-            description = "Load the Graph.obj in the specified directory.")
-    public File load;
-
-    @Parameter(names = {"--preFlight"},
-            description = "Pass the graph to the server in-memory after building it, and saving to disk.")
-    public boolean preFlight;
-
-    @Parameter(names = { "--version", },
-            description = "Print the version, and then exit.")
-    public boolean version = false;
+    @Parameter(names = {"--load"}, description = "Load the Graph.obj in the specified directory.")
+    public boolean load;
 
     /* Options for the server sub-task. */
 
     @Parameter(names = {"--bindAddress"},
             description = "Specify which network interface to bind to by address. 0.0.0.0 means all interfaces.")
-    public String bindAddress = "0.0.0.0";
-
-    @Parameter(names = {"--securePort"}, validateWith = AvailablePort.class,
-            description = "Server port for HTTPS.")
-    public Integer securePort;
-
-    @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
-            description = "Server port for plain HTTP.")
-    public Integer port;
-
-    @Parameter(names = {"--maxThreads"}, description = "The maximum number of HTTP handler threads in the pool.")
-    public Integer maxThreads;
-
-    @Parameter(names = {"--graph"}, validateWith = ReadableDirectory.class,
-            description = "Path to directory containing graphs. Defaults to BASE_PATH/graphs.")
-    public File graphDirectory;
-
-    // TODO OTP2 remove analysis functionality
-    @Parameter(names = {"--pointSets"}, validateWith = ReadableDirectory.class,
-            description = "Path to directory containing PointSets. Defaults to BASE_PATH/pointsets.")
-    public File pointSetDirectory;
+    public String bindAddress = DEFAULT_BIND_ADDRESS;
 
     @Parameter(names = {"--clientFiles"}, validateWith = ReadableDirectory.class,
             description = "Path to directory containing local client files to serve.")
     public File clientDirectory = null;
 
-    @Parameter(names = {"--disableFileCache"}, description = "Disable http server static file cache. Handy for development.")
+    @Parameter(names = {"--disableFileCache"}, description = "Disable HTTP server static file cache (for development).")
     public boolean disableFileCache = false;
-
-    @Parameter(names = {"--serve"},
-            description = "Run an OTP API server.")
-    public boolean serve = false;
-
-    @Parameter(names = {"--visualize"},
-            description = "Open a graph visualizer window for debugging.")
-    public boolean visualize;
-
-    // TODO should these replace the files auto-discovered in the router directory?
-    @Parameter(validateWith = ReadableFile.class, // the remaining parameters in one array
-            description = "Files for graph build.")
-    public List<File> files = new ArrayList<File>();
 
     @Parameter(names = {"--insecure"},
             description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
     public boolean insecure = false;
 
-    @Parameter(names = { "--script" }, description = "run the specified OTP script (groovy, python)")
-    public File scriptFile = null;
+    @Parameter(names = {"--maxThreads"}, description = "The maximum number of HTTP handler threads.")
+    public Integer maxThreads;
+
+    @Parameter(names = {"--port"}, validateWith = AvailablePort.class,
+            description = "Server port for plain HTTP.")
+    public Integer port = DEFAULT_PORT;
+
+    @Parameter(names = {"--serve"},
+            description = "Run an OTP API server. Valid together with --build.")
+    public boolean serve = false;
+
+    @Parameter(names = {"--securePort"}, validateWith = AvailablePort.class,
+            description = "Server port for HTTPS.")
+    public Integer securePort = DEFAULT_SECURE_PORT;
+
+    @Parameter(names = {"--visualize"},
+            description = "Open a graph visualizer window for debugging.")
+    public boolean visualize;
+
+    /* The remaining single parameter after the switches is the directory with graph files. */
+
+    @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
+    public List<File> graphDirectory;
 
     /** Set some convenience parameters based on other parameters' values. */
     public void infer() {
-        serve |= (inMemory || preFlight || port != null);
-        if (basePath == null) basePath = DEFAULT_BASE_PATH;
-        /* If user has not overridden these paths, use default locations under the base path. */
-        if (cacheDirectory == null) cacheDirectory = new File(basePath, "cache");
-        if (graphDirectory == null) graphDirectory = new File(basePath, "graph");
-        if (pointSetDirectory == null) pointSetDirectory = new File(basePath, "pointsets");
-        if (serve && port == null) {
-            port = DEFAULT_PORT;
+        if (inMemory) {
+            serve = true;
+        }
+        // Validate ports even if default is used.
+        // TODO: check whether this is necessary, are defaults already validated?
+        // Maybe we can just check that they're positive integers, and have a separate checkPortsAvailable method.
+        if (port == DEFAULT_PORT) {
             new AvailablePort().validate(port);
         }
-        if (serve && securePort == null) {
-            securePort = DEFAULT_SECURE_PORT;
+        if (securePort == DEFAULT_SECURE_PORT) {
             new AvailablePort().validate(securePort);
         }
     }
 
-    public CommandLineParameters clone() {
-        CommandLineParameters ret;
-        try {
-            ret = (CommandLineParameters) super.clone();
-        } catch (CloneNotSupportedException e) {
-            return null;
+    /**
+     * Workaround for bug https://github.com/cbeust/jcommander/pull/390
+     * The main non-switch parameter has to be a list. Return the first one.
+     */
+    public File getGraphDirectory () {
+        if (graphDirectory == null || graphDirectory.size() != 1) {
+            throw new ParameterException("You must supply a single directory name.");
         }
-        return ret;
+        return graphDirectory.get(0);
     }
+
+    //    public CommandLineParameters clone() {
+//        CommandLineParameters ret;
+//        try {
+//            ret = (CommandLineParameters) super.clone();
+//        } catch (CloneNotSupportedException e) {
+//            return null;
+//        }
+//        return ret;
+//    }
     
     public static class ReadableFile implements IParameterValidator {
         @Override

@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -168,7 +169,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(graph, extra);
         new StreetVertexIndexServiceImpl(graph);
 
-        Router router = Router.forTestGraph(graph);
+        Router router = ConstantsForTests.forTestGraph(graph);
 
         RoutingRequest request = new RoutingRequest("WALK");
 

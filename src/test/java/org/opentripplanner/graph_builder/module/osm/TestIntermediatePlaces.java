@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -49,7 +50,7 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index(new DefaultStreetVertexIndexFactory());
-            Router router = Router.forTestGraph(graph);
+            Router router = ConstantsForTests.forTestGraph(graph);
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();
         } catch (Exception e) {

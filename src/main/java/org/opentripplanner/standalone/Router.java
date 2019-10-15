@@ -184,17 +184,4 @@ public class Router {
         return logger;
     }
 
-    /**
-     * Convenience method for tests: make a router from a graph using embedded config.
-     */
-    public static Router forTestGraph(Graph graph) {
-        Router router = new Router(graph);
-        // GraphConfig contains all the methods for parsing config files, including embedded ones. But it seems to
-        // only be designed for the case where you're loading from a directory, not for in-memory testing graphs.
-        router.startup(
-            new OTPConfiguration(null).getGraphConfig(null).routerConfig(graph.routerConfig)
-        );
-        return router;
-    }
-
 }
