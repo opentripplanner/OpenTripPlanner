@@ -1,11 +1,11 @@
 package org.opentripplanner.graph_builder.module;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -71,7 +71,7 @@ public class FakeGraph {
                 stop.setCode(id);
                 stop.setId(aid);
 
-                new TransitStopVertex(g, stop);
+                new TransitStopVertex(g, stop, null);
                 count++;
             }
         }
@@ -91,7 +91,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new TransitStopVertex(g, stop);
+            new TransitStopVertex(g, stop, null);
             count++;
         }
 
@@ -108,7 +108,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new TransitStopVertex(g, stop);
+            new TransitStopVertex(g, stop, null);
             count++;
         }
 
@@ -125,7 +125,7 @@ public class FakeGraph {
             stop.setCode(id);
             stop.setId(aid);
 
-            new TransitStopVertex(g, stop);
+            new TransitStopVertex(g, stop, null);
             count++;
         }
     }

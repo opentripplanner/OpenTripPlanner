@@ -35,6 +35,12 @@ public class TransitStopVertex extends Vertex {
      */
     private int streetToStopTime = 0;
 
+    /**
+     * @param stop The transit model stop reference.
+     *             See {@link org.opentripplanner.routing.graph.GraphIndex#stopVertexForStop} for navigation
+     *             from a Stop to this class.
+     * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
+     */
     public TransitStopVertex (Graph graph, Stop stop, TraverseModeSet modes) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop.getLon(), stop.getLat());
         this.stop = stop;
@@ -43,11 +49,6 @@ public class TransitStopVertex extends Vertex {
         isEntrance = false; // Entrance not supported in current otp model
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices
         graph.expandToInclude(stop.getLon(), stop.getLat());
-    }
-
-    /** for tests only */
-    public TransitStopVertex (Graph graph, Stop stop) {
-        this(graph, stop, new TraverseModeSet());
     }
 
     public boolean hasWheelchairEntrance() {

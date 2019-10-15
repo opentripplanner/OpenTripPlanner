@@ -32,8 +32,8 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Stop stop2 = new Stop();
         stop2.setId(new FeedScopedId("agency", "stop2"));
         
-        Vertex from = new TransitStopVertex(graph, stop1);
-        Vertex to = new TransitStopVertex(graph, stop2);
+        Vertex from = new TransitStopVertex(graph, stop1, null);
+        Vertex to = new TransitStopVertex(graph, stop2, null);
         
         // Create dummy TimetableSnapshot
         TimetableSnapshot snapshot = new TimetableSnapshot();

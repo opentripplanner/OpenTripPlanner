@@ -116,8 +116,8 @@ public class TestHalfEdges {
         s2.setLat(40.0099999);
         s2.setId(new FeedScopedId("A", "morx station"));
 
-        station1 = new TransitStopVertex(graph, s1);
-        station2 = new TransitStopVertex(graph, s2);
+        station1 = new TransitStopVertex(graph, s1, null);
+        station2 = new TransitStopVertex(graph, s2, null);
         station1.addMode(TraverseMode.RAIL);
         station2.addMode(TraverseMode.RAIL);
         
