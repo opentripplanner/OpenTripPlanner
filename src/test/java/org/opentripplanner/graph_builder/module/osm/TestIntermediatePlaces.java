@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -14,12 +15,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.impl.MemoryGraphSource;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.util.Calendar;
 import java.util.List;
@@ -52,11 +50,7 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index(new DefaultStreetVertexIndexFactory());
-
-            OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
-            otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", graph));
-
-            Router router = otpServer.getGraphService().getRouter("A");
+            Router router = ConstantsForTests.forTestGraph(graph);
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();
         } catch (Exception e) {

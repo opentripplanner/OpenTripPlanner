@@ -18,7 +18,6 @@ public enum OTPFeature {
     APIExternalGeocoder(true),
     APIBikeRental(true),
     APIAlertPatcher(true),
-    APIRouters(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),

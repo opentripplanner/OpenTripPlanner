@@ -70,12 +70,12 @@ public class GrizzlyServer {
         
         LOG.info("Starting OTP Grizzly server on ports {} (HTTP) and {} (HTTPS) of interface {}",
             params.port, params.securePort, params.bindAddress);
-        LOG.info("OTP server base path is {}", params.basePath);
+        LOG.info("OTP server graph directory is: {}", params.graphDirectory);
         HttpServer httpServer = new HttpServer();
 
-        /* Configure SSL */
+        /* Configure SSL FIXME OTP2 where will we store they keyfile? */
         SSLContextConfigurator sslConfig = new SSLContextConfigurator();
-        sslConfig.setKeyStoreFile(new File(params.basePath, "keystore").getAbsolutePath());
+        sslConfig.setKeyStoreFile(new File(params.getGraphDirectory(), "keystore").getAbsolutePath());
         sslConfig.setKeyStorePass("opentrip");
 
         // Set up a pool of threads to handle incoming HTTP requests.

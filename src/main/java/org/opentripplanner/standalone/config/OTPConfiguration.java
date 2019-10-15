@@ -56,8 +56,7 @@ public class OTPConfiguration {
     }
 
     /**
-     * Retrieve config for a graph in the given directory. The configuration is
-     * NOT cashed by this class.
+     * Retrieve config for a graph in the given directory. The configuration is NOT cached by this class.
      */
     public GraphConfig getGraphConfig(File graphPath) {
         return new GraphConfig(graphPath, parser);
