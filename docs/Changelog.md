@@ -2,6 +2,7 @@
 
 ## 1.5.0 (in progress)
 
+- Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Add Way Property Set for the UK (#2818)
 - Fixes surefire test failure during build (#2816)
 - Improve documentation for `mode` routing parameter (#2809)
