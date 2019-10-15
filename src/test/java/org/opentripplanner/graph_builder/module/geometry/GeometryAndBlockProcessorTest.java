@@ -1,20 +1,16 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
-
-import java.io.IOException;
 
 import org.junit.Test;
-import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.gtfs.MockGtfs;
 import org.opentripplanner.routing.graph.Graph;
 
-import static junit.framework.TestCase.assertTrue;
+import java.io.IOException;
 
-public class PatternHopFactoryTest {
+public class GeometryAndBlockProcessorTest {
 
     @Test
     public void testBikesAllowed() throws IOException {
@@ -35,7 +31,7 @@ public class PatternHopFactoryTest {
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
                 .build();
 
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
 
         factory.run(graph);
 

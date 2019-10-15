@@ -19,7 +19,7 @@ public class TransitStopVertex extends Vertex {
 
     // Do we actually need a set of modes for each stop?
     // It's nice to have for the index web API but can be generated on demand.
-    private TraverseModeSet modes = new TraverseModeSet();
+    private final TraverseModeSet modes;
 
     private static final long serialVersionUID = 1L;
 
@@ -35,9 +35,16 @@ public class TransitStopVertex extends Vertex {
      */
     private int streetToStopTime = 0;
 
-    public TransitStopVertex (Graph graph, Stop stop) {
+    /**
+     * @param stop The transit model stop reference.
+     *             See {@link org.opentripplanner.routing.graph.GraphIndex#stopVertexForStop} for navigation
+     *             from a Stop to this class.
+     * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
+     */
+    public TransitStopVertex (Graph graph, Stop stop, TraverseModeSet modes) {
         super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop.getLon(), stop.getLat());
         this.stop = stop;
+        this.modes = modes != null ? modes : new TraverseModeSet();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
         isEntrance = false; // Entrance not supported in current otp model
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices

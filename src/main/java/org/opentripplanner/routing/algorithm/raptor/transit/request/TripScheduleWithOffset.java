@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**

@@ -3,9 +3,10 @@ package org.opentripplanner.ext.examples.statistics.api.resource;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
@@ -25,8 +26,8 @@ public class GraphStatisticsResourceTest {
     @Before public void setUp() throws Exception {
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS).build();
         Graph graph = new Graph();
-        PatternHopFactory hl = new PatternHopFactory(context);
-        hl.run(graph);
+        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+        new GeometryAndBlockProcessor(context).run(graph);
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );

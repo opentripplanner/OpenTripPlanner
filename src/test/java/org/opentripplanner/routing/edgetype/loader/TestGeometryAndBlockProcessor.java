@@ -19,7 +19,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -40,7 +40,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
  */
 @Ignore
-public class TestPatternHopFactory extends TestCase {
+public class TestGeometryAndBlockProcessor extends TestCase {
 
     private Graph graph;
     private AStar aStar = new AStar();
@@ -55,7 +55,7 @@ public class TestPatternHopFactory extends TestCase {
                 .build();
 
         feedId = context.getFeedId().getId();
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()

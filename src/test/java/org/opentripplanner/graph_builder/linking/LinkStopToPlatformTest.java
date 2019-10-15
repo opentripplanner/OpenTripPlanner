@@ -1,17 +1,19 @@
 package org.opentripplanner.graph_builder.linking;
 
 
+import org.junit.Before;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.junit.Before;
-import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.AreaEdge;
+import org.opentripplanner.routing.edgetype.AreaEdgeList;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -64,7 +66,7 @@ public class LinkStopToPlatformTest {
         stop.setLon(10.22213);
         stop.setLat(59.13545);
 
-        TransitStopVertex stopVertex = new TransitStopVertex(graph, stop);
+        TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
     }
 
     /**

@@ -22,10 +22,10 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
-import org.opentripplanner.routing.edgetype.TripPattern;
 
 import java.util.ArrayList;
 import java.util.HashSet;

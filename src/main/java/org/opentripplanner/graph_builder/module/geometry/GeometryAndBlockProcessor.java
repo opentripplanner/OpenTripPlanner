@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
 import com.beust.jcommander.internal.Maps;
 import com.google.common.base.Strings;
@@ -20,32 +20,20 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
-import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.gtfs.GtfsContext;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -59,22 +47,15 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Map;
 
-// Filtering out (removing) stoptimes from a trip forces us to either have two copies of that list,
-// or do all the steps within one loop over trips. It would be clearer if there were multiple loops over the trips.
-
 /**
- * Generates a set of edges from GTFS.
- *
- * TODO OTP2 - Move this to package: org.opentripplanner.gtfs
- *           - after ass Entur NeTEx PRs are merged.
+ * Once transit model entities have been loaded into the graph, this post-processes them to extract and prepare
+ * geometries. It also does some other postprocessing involving fares and interlined blocks.
  */
-public class PatternHopFactory {
+public class GeometryAndBlockProcessor {
 
-    private static final Logger LOG = LoggerFactory.getLogger(PatternHopFactory.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
-
-    private GtfsFeedId feedId;
 
     private OtpTransitService transitService;
 
@@ -86,51 +67,29 @@ public class PatternHopFactory {
 
     private FareServiceFactory fareServiceFactory;
 
-    // Map of stops and their vertices in the graph
-    private Map<Stop, TransitStopVertex> stopNodes = new HashMap<>();
+    private final double maxStopToShapeSnapDistance;
 
-    private int subwayAccessTime = 0;
+    private final int maxInterlineDistance;
 
-    private double maxStopToShapeSnapDistance = 150;
-
-    private int maxInterlineDistance = 200;
-
-    public PatternHopFactory(GtfsContext context) {
-        this.feedId = context.getFeedId();
-        this.transitService = context.getTransitService();
+    public GeometryAndBlockProcessor (GtfsContext context) {
+        this(context.getTransitService(), null, -1, -1);
     }
 
-    public PatternHopFactory(
-            GtfsFeedId feedId, OtpTransitService transitService, FareServiceFactory fareServiceFactory,
-            double maxStopToShapeSnapDistance, int subwayAccessTime, int maxInterlineDistance
+    public GeometryAndBlockProcessor (
+            OtpTransitService transitService,
+            FareServiceFactory fareServiceFactory,
+            double maxStopToShapeSnapDistance,
+            int maxInterlineDistance
     ) {
-
-        this.feedId = feedId;
         this.transitService = transitService;
-        this.fareServiceFactory = fareServiceFactory;
-        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance;
-        this.subwayAccessTime = subwayAccessTime;
-        this.maxInterlineDistance = maxInterlineDistance;
+        this.fareServiceFactory = fareServiceFactory != null ? fareServiceFactory : new DefaultFareServiceFactory();
+        this.maxStopToShapeSnapDistance = maxStopToShapeSnapDistance > 0 ? maxStopToShapeSnapDistance : 150;
+        this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
-        if (fareServiceFactory == null) {
-            fareServiceFactory = new DefaultFareServiceFactory();
-        }
         fareServiceFactory.processGtfs(transitService);
-
-        // TODO OTP2 - Why are we loading stops? The Javadoc above says this method assumes stops are already loaded.
-        //           - It should not be the PHFs responsibility to insert anything into the graph, it should build
-        //           - PatternHops and return them. The caller (Netex and GTFS Modules should update the graph)
-        loadStops(graph);
-        //loadPathways(graph);
-        loadFeedInfo(graph);
-        loadAgencies(graph);
-
-        // TODO: Why is there cached "data", and why are we clearing it? Due to a general lack of comments, I have no idea.
-        //       Perhaps it is to allow name collisions with previously loaded feeds?
-        clearCachedData(); 
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
@@ -138,15 +97,11 @@ public class PatternHopFactory {
             graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
         }
 
-        LOG.debug("building hops from trips");
+        LOG.info("Processing geometries and blocks on graph...");
 
-        /* The hops don't actually exist when we build their geometries, but we have to build their geometries
-         * below, before we throw away the modified stopTimes, saving only the tripTimes (which don't have enough
-         * information to build a geometry). So we keep them here.
-         *
-         *  A trip pattern actually does not have a single geometry, but one per hop, so we store an array.
-         *  FIXME _why_ doesn't it have a single geometry?
-         */
+        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving only the tripTimes
+        // (which don't have enough information to build a geometry). So we keep them here. In the current design, a
+        // trip pattern does not have a single geometry, but one per hop, so we store them in an array.
         Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
@@ -174,27 +129,12 @@ public class PatternHopFactory {
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
-             // Store the stop vertex corresponding to each GTFS stop entity in the pattern.
-            for (int s = 0; s < tripPattern.stopVertices.length; s++) {
-                Stop stop = tripPattern.stopPattern.stops[s];
-                tripPattern.stopVertices[s] = ((TransitStopVertex) stopNodes.get(stop));
-            }
             LineString[] hopGeometries = geometriesByTripPattern.get(tripPattern);
             if (hopGeometries != null) {
                 // Make a single unified geometry, and also store the per-hop split geometries.
                 tripPattern.setHopGeometries(hopGeometries);
             }
             tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
-
-            /* Iterate over all stops in this pattern recording mode information. */
-            TraverseMode mode = GtfsLibrary.getTraverseMode(tripPattern.route);
-            for (TransitStopVertex tstop : tripPattern.stopVertices) {
-                tstop.addMode(mode);
-                if (mode == TraverseMode.SUBWAY) {
-                    tstop.setStreetToStopTime(subwayAccessTime);
-                }
-                graph.addTransitMode(mode);
-            }
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
             graph.tripPatternForId.put(tripPattern.getCode(), tripPattern);
@@ -203,22 +143,11 @@ public class PatternHopFactory {
         /* Identify interlined trips and create the necessary edges. */
         interline(tripPatterns, graph);
 
-        /* Interpret the transfers explicitly defined in transfers.txt. */
-        loadTransfers(graph);
-
-        /* Store parent stops in graph, even if not linked. These are needed for clustering*/
-        for (Station station : transitService.getAllStations()) {
-                graph.stationById.put(station.getId(), station);
-        }
-
         /* Is this the wrong place to do this? It should be done on all feeds at once, or at deserialization. */
         // it is already done at deserialization, but standalone mode allows using graphs without serializing them.
         for (TripPattern tableTripPattern : tripPatterns) {
             tableTripPattern.scheduledTimetable.finish();
         }
-
-        // FIXME again, what is the goal here? Why is there cached "data", and why are we clearing it?
-        clearCachedData();
 
         graph.putService(FareService.class, fareServiceFactory.makeFareService());
     }
@@ -496,62 +425,6 @@ public class PatternHopFactory {
 
         return null;
     }
-
-    private void loadAgencies(Graph graph) {
-        for (Agency agency : transitService.getAllAgencies()) {
-            graph.addAgency(feedId.getId(), agency);
-        }
-    }
-
-    private void loadFeedInfo(Graph graph) {
-        for (FeedInfo info : transitService.getAllFeedInfos()) {
-            graph.addFeedInfo(info);
-        }
-    }
-
-    private void loadPathways(Graph graph) {
-        for (Pathway pathway : transitService.getAllPathways()) {
-            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
-            Vertex toVertex = stopNodes.get(pathway.getToStop());
-            if (pathway.isWheelchairTraversalTimeSet()) {
-                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
-            } else {
-                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
-            }
-        }
-    }
-
-    private void loadStops(Graph graph) {
-        for (Stop stop : transitService.getAllStops()) {
-            // Add a vertex representing the stop.
-            // FIXME it is now possible for these vertices to not be connected to any edges.
-            TransitStopVertex stopVertex = new TransitStopVertex(graph, stop);
-            stopNodes.put(stop, stopVertex);
-        }
-        for (Station station : transitService.getAllStations()) {
-            // TODO: What to do about linking transit vertices directly to stations
-            /*
-            stopNodes.put(station, new TransitStation(graph, station));
-             */
-        }
-    }
-
-    private void clearCachedData() {
-        LOG.debug("shapes=" + geometriesByShapeId.size());
-        LOG.debug("segments=" + geometriesByShapeSegmentKey.size());
-        geometriesByShapeId.clear();
-        distancesByShapeId.clear();
-        geometriesByShapeSegmentKey.clear();
-    }
-
-    private void loadTransfers(Graph graph) {
-        Collection<Transfer> transfers = transitService.getAllTransfers();
-        TransferTable transferTable = graph.getTransferTable();
-        for (Transfer sourceTransfer : transfers) {
-            transferTable.addTransfer(sourceTransfer);
-        }
-    }
-
 
     private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
 

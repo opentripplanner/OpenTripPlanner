@@ -1,9 +1,7 @@
 package org.opentripplanner.model;
 
 import com.google.common.collect.Multimap;
-import org.opentripplanner.routing.edgetype.TripPattern;
 
-import java.io.Serializable;
 import java.util.Collection;
 import java.util.List;
 

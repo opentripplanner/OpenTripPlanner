@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import com.conveyal.r5.otp2.api.transit.TripScheduleInfo;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**

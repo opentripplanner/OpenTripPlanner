@@ -2,6 +2,7 @@ package org.opentripplanner;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -12,7 +13,7 @@ import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.Router;
@@ -109,7 +110,8 @@ public class ConstantsForTests {
                 portlandContext = contextBuilder(ConstantsForTests.PORTLAND_GTFS)
                         .withGraphBuilderAnnotationsAndDeduplicator(portlandGraph)
                         .build();
-                PatternHopFactory factory = new PatternHopFactory(portlandContext);
+                AddTransitModelEntitiesToGraph.addToGraph(portlandContext, portlandGraph);
+                GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(portlandContext);
                 factory.run(portlandGraph);
             }
             // Link transit stops to streets
@@ -168,7 +170,9 @@ public class ConstantsForTests {
             e.printStackTrace();
             return null;
         }
-        PatternHopFactory factory = new PatternHopFactory(context);
+        AddTransitModelEntitiesToGraph.addToGraph(context, graph);
+
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()

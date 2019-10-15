@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.edgetype.factory;
+package org.opentripplanner.graph_builder.module.geometry;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
