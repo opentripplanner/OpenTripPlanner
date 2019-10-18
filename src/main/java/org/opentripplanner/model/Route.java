@@ -1,6 +1,9 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import lombok.Builder;
+
+@Builder
 public final class Route extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;

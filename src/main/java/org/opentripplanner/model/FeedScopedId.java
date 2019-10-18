@@ -1,8 +1,11 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import lombok.Builder;
+
 import java.io.Serializable;
 
+@Builder
 public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     private static final char ID_SEPARATOR = '_';

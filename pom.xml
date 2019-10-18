@@ -838,7 +838,13 @@
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
-
+        <!-- Lombok creates data model classes and builders with annotations instead of boilerplate -->
+        <dependency>
+            <groupId>org.projectlombok</groupId>
+            <artifactId>lombok</artifactId>
+            <version>1.18.10</version>
+            <scope>provided</scope>
+        </dependency>
         <!-- Lucene for sophisticated text search -->
         <dependency>
             <groupId>org.apache.lucene</groupId>
