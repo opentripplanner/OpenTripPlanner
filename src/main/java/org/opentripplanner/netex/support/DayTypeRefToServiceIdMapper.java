@@ -13,18 +13,17 @@ class DayTypeRefToServiceIdMapper {
     private static final char SEP = '+';
 
     /** private constructor to prevent instantiation of utility class */
-    private DayTypeRefToServiceIdMapper() {
-    }
+    private DayTypeRefToServiceIdMapper() { }
 
     /**
-     * Generate a new ServiceId based on the dayTypeRefs. This method should be deterministic,
-     * tha same id should be generated every time the same set if refs is passed inn and if
-     * two different set should always generate diffrent ServiceIds. The order of the elements
+     * Generate a new ServiceId based on the dayTypeRefs. This method is deterministic,
+     * the same id should be generated every time the same set if refs is passed inn and if
+     * two different set should always generate different ServiceIds. The order of the elements
      * in the input set should not matter and duplicate elements in the set ignored.
+     * <p>
+     * @return A new serviceId or {@code null} if the input is en empty collection.
      */
     static String generateServiceId(Collection<String> dayTypeRefs) {
-        return dayTypeRefs.stream().distinct().sorted().reduce((s,t) -> s + SEP + t).orElse(
-                null
-        );
+        return dayTypeRefs.stream().distinct().sorted().reduce((s,t) -> s + SEP + t).orElse(null);
     }
 }

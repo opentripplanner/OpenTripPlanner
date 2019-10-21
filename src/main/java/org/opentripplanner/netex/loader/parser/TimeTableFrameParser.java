@@ -1,7 +1,6 @@
 package org.opentripplanner.netex.loader.parser;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
@@ -12,8 +11,6 @@ import org.rutebanken.netex.model.JourneysInFrame_RelStructure;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.Timetable_VersionFrameStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
-import org.rutebanken.netex.model.TimetabledPassingTime_VersionedChildStructure;
-import org.rutebanken.netex.model.TimetabledPassingTimes_RelStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -100,7 +97,13 @@ class TimeTableFrameParser extends NetexParser<Timetable_VersionFrameStructure> 
     }
 
     private void parseServiceJourney(ServiceJourney sj) {
-        dayTypeRefs.add(new DayTypeRefsToServiceIdAdapter(sj.getDayTypes()));
+        DayTypeRefsToServiceIdAdapter serviceAdapter = DayTypeRefsToServiceIdAdapter.create(sj.getDayTypes());
+        if(serviceAdapter == null) {
+            LOG.warn("Skipping ServiceJourney with empty dayTypes. Service Journey id : {}", sj.getId());
+            return;
+        }
+
+        dayTypeRefs.add(serviceAdapter);
 
         String journeyPatternId = sj.getJourneyPatternRef().getValue().getRef();
 

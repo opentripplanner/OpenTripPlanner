@@ -20,8 +20,9 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
     @Override
     public void parse(Site_VersionFrameStructure frame) {
-        parseStopPlaces(frame.getStopPlaces().getStopPlace());
-
+        if(frame.getStopPlaces() != null) {
+            parseStopPlaces(frame.getStopPlaces().getStopPlace());
+        }
         // Keep list sorted alphabetically
         warnOnMissingMapping(LOG, frame.getAccesses());
         warnOnMissingMapping(LOG, frame.getAddresses());
