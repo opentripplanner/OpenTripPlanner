@@ -345,7 +345,7 @@ i.e. the value which will be applied unless it is overridden in a web API reques
 
 A full list of them can be found in the RoutingRequest class
 
-[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/routing/core/RoutingRequest.html).
+[in the Javadoc](http://otp-docs.ibi-transit.com/JavaDoc/org/opentripplanner/routing/core/RoutingRequest.html).
 
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
@@ -785,4 +785,4 @@ Add one entry in the `updater` field of `router-config.json` in the format:
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/standalone/CommandLineParameters.html).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://otp-docs.ibi-transit.com/JavaDoc/org/opentripplanner/standalone/CommandLineParameters.html).
