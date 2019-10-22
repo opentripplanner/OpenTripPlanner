@@ -12,6 +12,23 @@ install: true
 # Only run the test suite
 script:  mvn clean verify --settings maven-settings.xml -B -V -Dgpg.skip
 
+# if on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
+after_success:
+  - |
+    if [[ "$TRAVIS_BRANCH" = "ibi-dev" ]]; then
+      # create AWS deploy credentials
+      mkdir ~/.aws && printf '%s\n' '[default]' 'aws_access_key_id=${AWS_ACCESS_KEY_ID}' 'aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}' 'region=us-east-1' > ~/.aws/config;
+      # build markdown docs using mkdocs
+      mkdocs build
+      # copy enunciate API docs into mkdocs folder
+      cp -R target/site/enunciate/apidocs target/mkdocs/api
+      # copy JavaDoc into mkdocs folder
+      cp -R target/apidocs target/mkdocs/JavaDoc
+      # upload to S3
+      aws s3 cp --recursive --acl public-read "target/mkdocs" "s3://otp-docs.ibi-transit.com"
+    fi
+
+
 # Secure envs are OSSRH_JIRA_USERNAME, OSSRH_JIRA_PASSWORD, GPG_KEY_NAME, GPG_PASSPHRASE
 env:
   global:
@@ -23,7 +40,11 @@ sudo: false
 # Retain the local Maven repository to speed up builds.
 cache:
   directories:
-    - $HOME/.m2/repository
+    - $HOME/.m2
+    - $HOME/.cache/pip
+before_install:
+  # install mkdocs
+  - pip install --user mkdocs
 
 # Notify us of the build status on the Slack channel
 notifications:
