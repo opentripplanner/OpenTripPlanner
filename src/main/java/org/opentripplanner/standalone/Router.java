@@ -35,6 +35,7 @@ public class Router {
     public String id;
     public Graph graph;
     public double[] timeouts = {5, 4, 2};
+    public int mbtaShuttlePenalty = 300;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger rather than something
@@ -158,6 +159,15 @@ public class Router {
         JsonNode useFlexService = config.get("useFlexService");
         if (useFlexService != null) {
             graph.setUseFlexService(useFlexService.asBoolean(false));
+        }
+
+        JsonNode mbtaShuttlePenalty = config.get("mbtaShuttlePenalty");
+        if (mbtaShuttlePenalty != null) {
+            if (mbtaShuttlePenalty.isNumber()) {
+                this.mbtaShuttlePenalty = mbtaShuttlePenalty.intValue();
+            } else {
+                LOG.error("The 'mbtaShuttlePenalty' configuration option should be a number of seconds.");
+            }
         }
 
         /* Create Graph updater modules from JSON config. */

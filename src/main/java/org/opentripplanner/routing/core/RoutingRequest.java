@@ -314,7 +314,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int nonpreferredTransferPenalty = 180;
 
     /** Penalty for using MBTA shuttles **/
-    public int shuttlePenalty = 600;
+    public int mbtaShuttlePenalty;
 
     /**
      * For the bike triangle, how important time is. 

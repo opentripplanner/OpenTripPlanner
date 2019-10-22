@@ -331,7 +331,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                         options.nonpreferredTransferPenalty);
             }
 
-            int shuttlePenalty = getPattern().route.isShuttle() ? options.shuttlePenalty : 0;
+            int shuttlePenalty = getPattern().route.isShuttle() ? options.mbtaShuttlePenalty : 0;
 
             s1.incrementWeight(preferences_penalty + transferPenalty + shuttlePenalty);
 

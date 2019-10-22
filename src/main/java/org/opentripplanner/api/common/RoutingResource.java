@@ -487,6 +487,8 @@ public abstract class RoutingResource {
         if (bikeSwitchCost != null)
             request.bikeSwitchCost = bikeSwitchCost;
 
+        request.mbtaShuttlePenalty = router.mbtaShuttlePenalty;
+
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setOptimize(optimize);

@@ -1,6 +1,7 @@
 {
   "stopClusterMode": "parentStation",
   "useFlexService": "true",
+  "mbtaShuttlePenalty": 300,
   "updaters": [
     {
       "type": "real-time-alerts-enhanced",
