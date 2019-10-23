@@ -1,3 +1,5 @@
+# OTP2 Using European Data Standards
+
 ## Building with Netex Data
 
 One important new feature of OTP2 is the ability to load [Netex](https://en.wikipedia.org/wiki/NeTEx) data. Netex is a European [specification for transit data exchange](http://netex-cen.eu), comparable in purpose to GTFS but broader in scope. An EU directive aims to have all EU countries sharing Netex data by the end of 2019.
@@ -74,12 +76,16 @@ Another important feature in OTP2 is the ability to use [SIRI realtime data](htt
             "url": "https://api.entur.io/realtime/v1/services",
             "feedId": "siri-vm",
             "blockReadinessUntilInitialized": true
+        },
+        {
+            "type": "raptor-transit-layer",
+            "updateIntervalSeconds": 20
         }
     ]
 }
 ```
 
-These three different updaters fetch three kinds of SIRI data: 
+The first three updaters fetch three different kinds of SIRI data: 
 - Situation Exchange (SX, text notices analogous to GTFS-RT Alerts)
 - Estimated Timetable (ET, predicted arrival times analogous to GTFS-RT TripUpdates)
 - Vehicle Monitoring (VM, location and status of vehicles analogous to GTFS-RT VehiclePositions)
@@ -87,5 +93,7 @@ These three different updaters fetch three kinds of SIRI data:
 These updaters can handle differential updates, but they use a polling approach rather than the message-oriented streaming approach of the GTFS-RT Websocket updater. The server keeps track of clients, sending only the things that have changed since the last polling operation. 
 
 Note that between these SIRI updaters and the GTFS-RT Websocket updater, we now have both polling and streaming examples of GTFS-RT "incrementality" semantics, so should be able to finalize that part of the specification.
+
+The final updater regularly performs a copy of the realtime data into a format suitable for use by OTP2's new Raptor router. Without this updater the realtime data will be received and cataloged, but not visible to the router.
 
 TODO explain on `blockReadinessUntilInitialized` for load balancers.
