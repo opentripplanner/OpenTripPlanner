@@ -16,8 +16,8 @@ It is generated automatically by [Enunciate](http://enunciate.codehaus.org/) fro
 so may be incomplete or overly verbose in places.
 These documents are organized into folders for different release versions of OTP.
 
- * [OTP Javadoc](http://dev.opentripplanner.org/javadoc/)
- * [OTP web service API documentation](http://dev.opentripplanner.org/apidoc/)
+ * [OTP Javadoc](http://otp-docs.ibi-transit.com/JavaDoc/)
+ * [OTP web service API documentation](http://otp-docs.ibi-transit.com/api/)
 
 ## Contact Info
 

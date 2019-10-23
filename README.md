@@ -1,13 +1,17 @@
 ## Overview
 
-OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as a map-based Javascript client. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. For more information, see the project website: http://opentripplanner.org
+OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as a map-based Javascript client. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. 
+
+This is the IBI fork of OpenTripPlanner and as such has a few differences between the main repository of OpenTripPlanner. This fork allows planning with additional modes such as car rentals, E-scooters and TNCs.
 
 The main Java server code is in `src/main/`. OTP also includes a Javascript client based on the Leaflet mapping library in `src/client/`. The Maven build produces a JAR file at `target/otp-VERSION.jar` containing all necessary code and dependencies to run OpenTripPlanner.
 
-Additional information and instructions are available in the [main documentation](http://opentripplanner.readthedocs.org/en/latest/), including a 
-[quick introduction](http://opentripplanner.readthedocs.org/en/latest/Basic-Usage/).
+This fork is used primarily in conjunction with the [trimet-mod-otp](https://github.com/ibi-group/trimet-mod-otp) UI library.
 
-[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
+Additional information and instructions are available in the [main documentation](http://otp-docs.ibi-transit.com), including a 
+[quick introduction](http://otp-docs.ibi-transit.com/Basic-Tutorial/).
+
+[![Build Status](https://travis-ci.org/ibi-group/OpenTripPlanner.svg?branch=ibi-dev)](https://travis-ci.org/ibi-group/OpenTripPlanner)
 
 ## Development 
 
