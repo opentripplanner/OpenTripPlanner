@@ -84,11 +84,11 @@ public class NetexDocumentParser {
         // Declare some ugly types to prevent obstructing the reading later...
         Collection<JAXBElement<? extends Common_VersionFrameStructure>> frames;
 
-        // TODO #2781 - Frame defaults can be set on any frame according to the Norwegian
-        // TODO #2781 - profile. This only set it on the composite frame, and further
-        // TODO #2781 - overriding it at a sub-level will not be acknowledged, or even
-        // TODO #2781 - given any kind of warning. This should be fixed as part of Issue
-        // TODO #2781 - https://github.com/opentripplanner/OpenTripPlanner/issues/2781
+        // TODO OTP2 #2781 - Frame defaults can be set on any frame according to the Norwegian
+        //                 - profile. This only set it on the composite frame, and further
+        //                 - overriding it at a sub-level will not be acknowledged, or even
+        //                 - given any kind of warning. This should be fixed as part of Issue
+        //                 - https://github.com/opentripplanner/OpenTripPlanner/issues/2781
         parseFrameDefaultsLikeTimeZone(frame.getFrameDefaults());
 
         frames = frame.getFrames().getCommonFrame();

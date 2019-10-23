@@ -27,23 +27,42 @@ import static org.opentripplanner.netex.support.DayTypeRefToServiceIdMapper.gene
 public final class DayTypeRefsToServiceIdAdapter {
     private static final Logger LOG = LoggerFactory.getLogger(DayTypeRefsToServiceIdAdapter.class);
 
-
-    private final Set<String> dayTypeRefs = new HashSet<>();
-    private String serviceId = null;
+    private final Set<String> dayTypeRefs;
+    private final String serviceId;
 
     /**
      * Create an adapter base on the given {@code ref}.
+     *
+     * @return the new adapter or {@code null} if the input set is empty.
      */
-    public DayTypeRefsToServiceIdAdapter(DayTypeRefs_RelStructure refs) {
+    public static DayTypeRefsToServiceIdAdapter create(DayTypeRefs_RelStructure refs) {
+        Set<String> dayTypeRefs = collectDayTypeRefs(refs);
+        return dayTypeRefs.isEmpty() ?  null : new DayTypeRefsToServiceIdAdapter(dayTypeRefs);
+    }
+
+    /**
+     * Create a serviceId for the given dayTypes ids.
+     *
+     * @return the new ServiceId or {@code null} if the input set is empty.
+     */
+    public static String createServiceId(DayTypeRefs_RelStructure refs) {
+        Set<String> dayTypeRefs = collectDayTypeRefs(refs);
+        return dayTypeRefs.isEmpty() ? null : generateServiceId(dayTypeRefs);
+    }
+
+    private static Set<String> collectDayTypeRefs(DayTypeRefs_RelStructure refs) {
+        Set<String> dayTypeRefs = new HashSet<>();
         for (JAXBElement<? extends DayTypeRefStructure> e : refs.getDayTypeRef()) {
             // Keep the ref, ignore version info. Handling the version info is part of the
             // Norwegian NeTEx profile, so this should probably be fixed. On the other hand
             // there is not problems reported on this.
             dayTypeRefs.add(e.getValue().getRef());
         }
-        if(dayTypeRefs.isEmpty()) {
-            LOG.warn("DayTypeRefs is empty - not expected: " + refs);
-        }
+        return dayTypeRefs;
+    }
+
+    public DayTypeRefsToServiceIdAdapter(Set<String> dayTypeRefs) {
+        this.dayTypeRefs = dayTypeRefs;
         this.serviceId = generateServiceId(dayTypeRefs);
     }
 
@@ -55,11 +74,13 @@ public final class DayTypeRefsToServiceIdAdapter {
         return serviceId;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return dayTypeRefs.hashCode();
     }
 
-    @Override public boolean equals(Object obj) {
+    @Override
+    public boolean equals(Object obj) {
         if(!(obj instanceof DayTypeRefsToServiceIdAdapter)) return false;
         return dayTypeRefs.equals(((DayTypeRefsToServiceIdAdapter)obj).dayTypeRefs);
     }

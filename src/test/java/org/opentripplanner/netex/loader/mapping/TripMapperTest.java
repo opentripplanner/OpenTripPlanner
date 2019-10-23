@@ -5,7 +5,6 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
-import org.rutebanken.netex.model.DayTypeRefs_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.JourneyPatternRefStructure;
 import org.rutebanken.netex.model.LineRefStructure;
@@ -78,8 +77,7 @@ public class TripMapperTest {
                 journeyPatternById
         );
 
-        Trip trip = tripMapper.mapServiceJourney(
-                serviceJourney);
+        Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
         assertEquals(trip.getId(), createFeedScopedId("RUT:ServiceJourney:1"));
     }
@@ -87,8 +85,7 @@ public class TripMapperTest {
     private ServiceJourney createExampleServiceJourney() {
         ServiceJourney serviceJourney = new ServiceJourney();
         serviceJourney.setId("RUT:ServiceJourney:1");
-        DayTypeRefs_RelStructure dayTypeRefs_relStructure = new DayTypeRefs_RelStructure();
-        serviceJourney.setDayTypes(dayTypeRefs_relStructure);
+        serviceJourney.setDayTypes(NetexTestDataSample.createEveryDayRefs());
         return serviceJourney;
     }
 }

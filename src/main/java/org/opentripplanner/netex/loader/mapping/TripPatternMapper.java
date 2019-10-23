@@ -86,9 +86,10 @@ class TripPatternMapper {
         List<Trip> trips = new ArrayList<>();
 
         for (ServiceJourney serviceJourney : serviceJourneys) {
-            Trip trip = tripMapper.mapServiceJourney(
-                    serviceJourney
-            );
+            Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+
+            // Unable to map ServiceJourney, problem logged by the mapper above
+            if(trip == null) continue;
 
             StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
@@ -101,6 +102,9 @@ class TripPatternMapper {
             trip.setTripHeadsign(getHeadsign(stopTimes.stopTimes));
             trips.add(trip);
         }
+
+        // No trips successfully mapped
+        if(trips.isEmpty()) return result;
 
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
         StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));

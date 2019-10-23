@@ -179,7 +179,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
                 this.lines.add((Line) element.getValue());
             }
             else {
-                warnOnMissingMapping(LOG, lines.getLine_());
+                warnOnMissingMapping(LOG, element.getValue());
             }
         }
     }

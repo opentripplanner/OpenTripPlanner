@@ -16,6 +16,8 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 
+
+// TODO OTP2 - This needs to be fixed
 public class CalendarMapperTest {
     private DayTypeRefsToServiceIdAdapter dayTypeRefs;
     private FeedScopedId serviceId = new FeedScopedId("a1", "A+B");
@@ -29,7 +31,7 @@ public class CalendarMapperTest {
                 new HierarchicalMapById<>()
         );
 
-        dayTypeRefs = new DayTypeRefsToServiceIdAdapter(
+        dayTypeRefs = DayTypeRefsToServiceIdAdapter.create(
                 // TODO OTP2 add some data
                 new DayTypeRefs_RelStructure()
         );

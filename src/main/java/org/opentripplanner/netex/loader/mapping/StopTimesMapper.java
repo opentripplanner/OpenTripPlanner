@@ -9,13 +9,11 @@ import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
-import org.rutebanken.netex.model.ScheduledStopPointRefStructure;
 import org.rutebanken.netex.model.StopPointInJourneyPattern;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.JAXBElement;
 import java.math.BigInteger;
 import java.time.LocalTime;
 import java.util.ArrayList;
@@ -153,23 +151,21 @@ class StopTimesMapper {
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             EntityById<FeedScopedId, Stop> stopsById
     ) {
-        if (stopPointInJourneyPattern != null) {
-            JAXBElement<? extends ScheduledStopPointRefStructure> scheduledStopPointRef
-                    = stopPointInJourneyPattern.getScheduledStopPointRef();
-            String stopId = quayIdByStopPointRef.lookup(scheduledStopPointRef.getValue().getRef());
-            if (stopId == null) {
-                LOG.warn("No passengerStopAssignment found for " + scheduledStopPointRef
-                        .getValue().getRef());
-            } else {
-                Stop stop = stopsById.get(FeedScopedIdFactory.createFeedScopedId(stopId));
-                if (stop == null) {
-                    LOG.warn("Quay not found for " + scheduledStopPointRef.getValue()
-                            .getRef());
-                }
-                return stop;
-            }
+        if (stopPointInJourneyPattern == null) return null;
+
+        String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
+
+        String stopId = quayIdByStopPointRef.lookup(stopPointRef);
+        if (stopId == null) {
+            LOG.warn("No passengerStopAssignment found for " + stopPointRef);
+            return null;
         }
-        return null;
+
+        Stop stop = stopsById.get(FeedScopedIdFactory.createFeedScopedId(stopId));
+        if (stop == null) {
+            LOG.warn("Quay not found for " + stopPointRef);
+        }
+        return stop;
     }
 
     private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,

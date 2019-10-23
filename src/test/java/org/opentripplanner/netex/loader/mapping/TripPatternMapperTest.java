@@ -21,26 +21,26 @@ public class TripPatternMapperTest {
     @Test
     public void testMapTripPattern() {
 
-        TripPatternStructure tripPatternStructure = new TripPatternStructure();
+        NetexTestDataSample sample = new NetexTestDataSample();
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
-                tripPatternStructure.getStopsById(),
-                tripPatternStructure.getOtpRouteByid(),
-                tripPatternStructure.getRouteById(),
-                tripPatternStructure.getJourneyPatternById(),
-                tripPatternStructure.getQuayIdByStopPointRef(),
+                sample.getStopsById(),
+                sample.getOtpRouteByid(),
+                sample.getRouteById(),
+                sample.getJourneyPatternById(),
+                sample.getQuayIdByStopPointRef(),
                 new HierarchicalMapById<>(),
-                tripPatternStructure.getServiceJourneyByPatternId(),
+                sample.getServiceJourneyByPatternId(),
                 new Deduplicator()
         );
 
-        TripPatternMapper.Result r = tripPatternMapper.mapTripPattern(tripPatternStructure.getJourneyPattern());
+        TripPatternMapper.Result r = tripPatternMapper.mapTripPattern(sample.getJourneyPattern());
 
         assertEquals(1, r.tripPatterns.size());
 
         TripPattern tripPattern = r.tripPatterns.get(0);
 
-        assertEquals(5, tripPattern.getStops().size());
+        assertEquals(4, tripPattern.getStops().size());
         assertEquals(1, tripPattern.getTrips().size());
 
         List<Stop> stops = tripPattern.getStops();
@@ -51,18 +51,16 @@ public class TripPatternMapperTest {
         assertEquals("NSR:Quay:2", stops.get(1).getId().getId());
         assertEquals("NSR:Quay:3", stops.get(2).getId().getId());
         assertEquals("NSR:Quay:4", stops.get(3).getId().getId());
-        assertEquals("NSR:Quay:5", stops.get(4).getId().getId());
 
         assertEquals(1, tripPattern.scheduledTimetable.tripTimes.size());
 
         TripTimes tripTimes = tripPattern.scheduledTimetable.tripTimes.get(0);
 
-        assertEquals(5, tripTimes.getNumStops());
+        assertEquals(4, tripTimes.getNumStops());
 
         assertEquals(18000, tripTimes.getDepartureTime(0));
         assertEquals(18240, tripTimes.getDepartureTime(1));
         assertEquals(18600, tripTimes.getDepartureTime(2));
         assertEquals(18900, tripTimes.getDepartureTime(3));
-        assertEquals(19320, tripTimes.getDepartureTime(4));
     }
 }
