@@ -8,9 +8,7 @@ The Norwegian Netex data can be downloaded from the [Entur developer pages](http
 
 Full OSM data for Norway can be downloaded from the [Geofabrik Norway downloads page](http://download.geofabrik.de/europe/norway.html). Get the `norway-latest.osm.pbf` file, which can then be filtered to remove buildings and other unused data before loading into OTP using a command like the one below. This filtering step can be skipped if you don't have the necessary Osmium tools installed.
 
-```
-osmium tags-filter norway-latest.osm.pbf w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction -o norway-filtered.osm.pbf -f pbf,add_metadata=false,pbf_dense_nodes=true
-```
+`osmium tags-filter norway-latest.osm.pbf w/highway w/public_transport=platform w/railway=platform w/park_ride=yes r/type=restriction -o norway-filtered.osm.pbf -f pbf,add_metadata=false,pbf_dense_nodes=true`
 
 Be sure to move the original unfiltered file out of your graph inputs directory (or rename it with a suffix like `norway-latest.osm.pbf.ignore`) otherwise OTP2 will try to include both the filtered and unfiltered OSM data in your graph.
 
@@ -40,17 +38,17 @@ Once you have the graph inputs (the OSM PBF file, the Netex ZIP file, and the `b
 
 `java -Xmx10G otp2.jar --build /path/to/graph/inputs`
 
-This should produce a file `Graph.obj` in the same directory as your inputs. You can then start up an OTP server with a command like this:
+This should produce a file `Graph.obj` in the same directory as your inputs. Building this Norway graph takes approximately 16 minutes (without elevation data, as configured above), and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under light use.
+
+You can then start up an OTP server with a command like this:
 
 `java -Xmx6G otp2.jar --load /path/to/graph`
-
-Building this Norway graph takes approximately 16 minutes (without elevation data, as configured above), and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under light use.
  
  Once the server is started up, go to `http://localhost:8080` in a browser to try out your server using OTP's built in testing web client. Try some long trips like Oslo to Bergen and see if you can get long distance trains and flights as alternatives. You might need to increase the walking limit above its very low default value.
 
 ## Adding SIRI Realtime Data
 
-Another important feature in OTP2 is the ability to use [SIRI realtime data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information). Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply realtime updates on top of schedule data. Like GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in the `router-config.json` file.
+Another important feature in OTP2 is the ability to use [SIRI realtime data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information). Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply realtime updates on top of schedule data. While technically a distinct specification from Netex, both Netex and SIRI use the Transmodel vocabulary, allowing SIRI messages to reference entities in Netex schedule data. Like GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in the `router-config.json` file, which is placed in the same directory as the `Graph.obj` file and loaded at server startup.
 
 ```json
 {
