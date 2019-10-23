@@ -1,11 +1,23 @@
-# OpenTripPlanner Basic Tutorial
+# OpenTripPlanner 2 Basic Tutorial
 
-This page will get you up and running with your own OTP server. If all goes well it should only take a few minutes!
+This page should allow you to set up and test your own OTP2 server. If all goes well it should only take a few minutes!
+**Note that this covers OTP2 which is just beginning beta testing, not the existing OTP 1.x release versions.**
+
+## Get Java
+
+OTP2 has recently been updated to be compatible with Java 11 or later. We recommend running on Java 11, which is a long-term support release, though OTP might build and run on older JDKs and JREs. Java 11 has tighter security restrictions than previous versions, so when running OTP under Java 11 you will see warnings like this:
+```
+WARNING: An illegal reflective access operation has occurred
+WARNING: Please consider reporting this to the maintainers of com.esotericsoftware.kryo.util.UnsafeUtil
+```
+This warning will probably be around for a while. Migration to Java's new module system will take some time, as we need to wait for all libraries OTP2 uses to migrate before we can do so fully. 
 
 ## Get OTP
 
-OpenTripPlanner is written in Java and distributed as a single runnable JAR file. These JARs are deployed to the Maven Central repository. Go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `.shaded.jar`.
-You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP), especially if you plan to do some development yourself.
+OpenTripPlanner is written in Java and distributed as a single runnable JAR file. Once OTP2 is released, 
+it will be available from the Maven Central repository. You will be able to go to [the OTP directory at Maven Central](https://repo1.maven.org/maven2/org/opentripplanner/otp/), navigate to the directory for the highest version number, and download the file whose name ends with `.shaded.jar`.
+
+In the mean time, you will need to get your own copy of the OTP source code and [build a beta testing JAR from scratch](Getting-OTP), especially if you plan to do some development yourself.
 
 ## Get some data
 
@@ -34,7 +46,12 @@ I find [this tool](https://boundingbox.klokantech.com/) useful for determining t
 
 If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both the original file and the extract in a later step.
 
+
 ## Start up OTP
+
+`java -Xmx10G target/otp-2.0.0-SNAPSHOT.jar --build ~/path/to/graph/inputs`
+
+`./otp --build .`
 
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime
 (JRE) or Java development kit (JDK). Run `java -version` to check that you have version 1.8 or newer of the JVM installed.
