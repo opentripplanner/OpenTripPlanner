@@ -86,6 +86,7 @@ Another important feature in OTP2 is the ability to use [SIRI realtime data](htt
 ```
 
 The first three updaters fetch three different kinds of SIRI data: 
+
 - Situation Exchange (SX, text notices analogous to GTFS-RT Alerts)
 - Estimated Timetable (ET, predicted arrival times analogous to GTFS-RT TripUpdates)
 - Vehicle Monitoring (VM, location and status of vehicles analogous to GTFS-RT VehiclePositions)
