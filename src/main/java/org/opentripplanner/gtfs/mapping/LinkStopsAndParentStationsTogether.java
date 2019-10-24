@@ -4,6 +4,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -16,6 +18,8 @@ class LinkStopsAndParentStationsTogether {
     private final EntityById<FeedScopedId, Station> otpStations;
     private final EntityById<FeedScopedId, Stop> otpStops;
 
+    private static Logger LOG = LoggerFactory.getLogger(LinkStopsAndParentStationsTogether.class);
+
     LinkStopsAndParentStationsTogether(EntityById<FeedScopedId, Station> stations, EntityById<FeedScopedId, Stop> stops) {
         this.otpStations = stations;
         this.otpStops = stops;
@@ -27,6 +31,12 @@ class LinkStopsAndParentStationsTogether {
 
                 Stop otpStop = getOtpStop(gtfsStop);
                 Station otpStation = getOtpParentStation(gtfsStop);
+
+                if (otpStation == null) {
+                    LOG.warn("Parent station {} not found. Stop {} will not be linked to a parent"
+                            + " station.", gtfsStop.getParentStation(), gtfsStop.getId().getId());
+                    continue;
+                }
 
                 otpStop.setParentStation(otpStation);
                 otpStation.addChildStop(otpStop);
