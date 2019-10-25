@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import com.google.common.collect.Lists;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;

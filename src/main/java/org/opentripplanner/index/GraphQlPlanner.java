@@ -1,17 +1,8 @@
 package org.opentripplanner.index;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.List;
-import java.util.Map;
-import java.util.function.Consumer;
-import java.util.function.Function;
-import java.util.stream.Collectors;
-
 import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.Sets;
 import graphql.schema.DataFetchingEnvironment;
-import org.onebusaway.gtfs.model.AgencyAndId;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
@@ -23,23 +14,23 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.impl.ComparingGraphPathFinder;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.SentryUtilities;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
-import com.google.common.collect.Sets;
 
 public class GraphQlPlanner {
 
@@ -60,7 +51,7 @@ public class GraphQlPlanner {
 
         SentryUtilities.setupSentryBeforePlan(request);
 
-        GraphPathFinder gpFinder = new GraphPathFinder(router);
+        GraphPathFinder gpFinder = new ComparingGraphPathFinder(router);
 
         TripPlan plan = new TripPlan(
                 new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
