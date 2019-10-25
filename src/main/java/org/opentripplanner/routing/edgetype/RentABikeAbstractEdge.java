@@ -82,7 +82,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceMeters() {
         return 0;
     }
 

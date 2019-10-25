@@ -58,8 +58,8 @@ public class LinkingTest {
 
             // distances expressed internally in mm so this epsilon is plenty good enough to ensure that they
             // have the same values
-            assertEquals(sp0.first.getDistance(), sp1.second.getDistance(), 0.0000001);
-            assertEquals(sp0.second.getDistance(), sp1.first.getDistance(), 0.0000001);
+            assertEquals(sp0.first.getDistanceMeters(), sp1.second.getDistanceMeters(), 0.0000001);
+            assertEquals(sp0.second.getDistanceMeters(), sp1.first.getDistanceMeters(), 0.0000001);
             assertFalse(sp0.first.isBack());
             assertFalse(sp0.second.isBack());
             assertTrue(sp1.first.isBack());

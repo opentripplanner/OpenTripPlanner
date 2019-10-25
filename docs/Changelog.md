@@ -7,6 +7,7 @@
 - Remove redundant LineStrings in order to save memory (#2795)
 - NeTEx import support (#2769).
 - Added NeTEx notices (#2824)
+- Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
