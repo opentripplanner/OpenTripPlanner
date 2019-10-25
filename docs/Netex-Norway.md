@@ -58,7 +58,7 @@ Another important feature in OTP2 is the ability to use [SIRI realtime data](htt
         {
             "type": "siri-sx-updater",
             "frequencySec": 60,
-            "url": "https://api.entur.io/realtime/v1/services?maxSize=50",
+            "url": "https://api.example.com/siri",
             "feedId": "siri-sx",
             "blockReadinessUntilInitialized": true
         },
@@ -66,14 +66,14 @@ Another important feature in OTP2 is the ability to use [SIRI realtime data](htt
             "type": "siri-et-updater",
             "frequencySec": 20,
             "previewIntervalMinutes": 180,
-            "url": "https://api.entur.io/realtime/v1/services",
+            "url": "https://api.example.com/siri",
             "feedId": "siri-et",
             "blockReadinessUntilInitialized": true
         },
         {
             "type": "siri-vm-updater",
             "frequencySec": 60,
-            "url": "https://api.entur.io/realtime/v1/services",
+            "url": "https://api.example.com/siri",
             "feedId": "siri-vm",
             "blockReadinessUntilInitialized": true
         },
@@ -86,6 +86,7 @@ Another important feature in OTP2 is the ability to use [SIRI realtime data](htt
 ```
 
 The first three updaters fetch three different kinds of SIRI data: 
+
 - Situation Exchange (SX, text notices analogous to GTFS-RT Alerts)
 - Estimated Timetable (ET, predicted arrival times analogous to GTFS-RT TripUpdates)
 - Vehicle Monitoring (VM, location and status of vehicles analogous to GTFS-RT VehiclePositions)

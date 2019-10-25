@@ -20,6 +20,7 @@ it will be available from the Maven Central repository. You will be able to go t
 Leading up to the release, we will occasionally deploy some snapshot builds for use in beta testing. These will be in the 2.0 directory of [the snapshots repository](https://oss.sonatype.org/content/repositories/snapshots/org/opentripplanner/otp/2.0.0-SNAPSHOT/). The latest testing build should be the file with the latest timestamp ending in `.shaded.jar`.
 
 Here are direct links to recent builds:
+
  - [OTP2 Beta 1 JAR file (~90MB)](https://oss.sonatype.org/content/repositories/snapshots/org/opentripplanner/otp/2.0.0-SNAPSHOT/otp-2.0.0-20191023.121912-2-shaded.jar) built from [commit bf3d4e66357ff9e596c38a2074b02cba98e5fd38 on dev-2.x](https://github.com/opentripplanner/OpenTripPlanner/tree/66a5e6dd6c6312b52b9ccf641241b07647bfff60).
 
 You may also want to get your own copy of the OTP source code and [build a bleeding edge development JAR from scratch](Getting-OTP), especially if you plan to do some development yourself. If you're beta testing OTP2, be sure to check out the `dev-2.x`branch before running the build.
