@@ -37,3 +37,21 @@ update_js: $(LOCALE_FILES)
 init:
 	#$(PYBABEL) init --domain "$(LAN)" --locale "$(LAN)" --input-file $(TEMPLATE_FILE) --output-file $(LOCALE_FOLDER)/"$(LAN).po";
 	msginit -l "$(LAN)" -i $(TEMPLATE_FILE) -o "$(LOCALE_FOLDER)/$(LAN).po";
+
+graphs/default/vvs-with-shapes.gtfs.zip:
+	mkdir -p graphs/default
+	wget https://gtfs.mfdz.de/gtfs/VVS.with-shapes.gtfs.zip -O graphs/default/vvs-with-shapes.gtfs.zip
+
+graphs/default/stuttgart.pbf:
+	mkdir -p graphs/default
+	wget http://download.geofabrik.de/europe/germany/baden-wuerttemberg/stuttgart-regbez-latest.osm.pbf -O graphs/default/stuttgart.pbf
+
+build-herrenberg: graphs/default/vvs-with-shapes.gtfs.zip graphs/default/stuttgart.pbf
+	java -Xmx4G -jar otp.jar --build ./graphs/default
+
+run:
+	java -Xmx5G -server -jar otp.jar --server --basePath ./ --router default --insecure
+
+rebuild:
+	mvn package -DskipTests
+	cp target/otp-1.5.0-SNAPSHOT-shaded.jar ./otp.jar
