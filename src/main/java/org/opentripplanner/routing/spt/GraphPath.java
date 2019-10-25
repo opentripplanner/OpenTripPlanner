@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
@@ -12,6 +13,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -39,14 +41,30 @@ public class GraphPath {
     private RoutingContext rctx;
 
     /**
+     * This is only an approximation of meters driven. It can actually also include the walking edges.
+     *
+     * TODO: Need to find out how to actually figure out if it is walking, driving or cycling. Perhaps in conjunction
+     *       with the states variable?
+     */
+    public double streetMeters() {
+        return edges.stream()
+                .filter(e -> e.getClass() == StreetEdge.class)
+                .map(e -> (StreetEdge) e)
+                .map(StreetEdge::getDistance)
+                .mapToDouble(Double::doubleValue)
+                .sum();
+
+    }
+
+    /**
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
      * to the origin of the search. This constructs a proper Java list of states (allowing random
      * access etc.) from the predecessor information left in states by the search algorithm.
-     * 
+     *
      * Optionally re-traverses all edges backward in order to remove excess waiting time from the
      * final itinerary presented to the user. When planning with departure time, the edges will then
      * be re-traversed once more in order to move the waiting time forward in time, towards the end.
-     * 
+     *
      * @param s
      *            - the state for which a path is requested
      * @param optimize
@@ -90,7 +108,7 @@ public class GraphPath {
         this.edges = new LinkedList<Edge>();
         for (State cur = lastState; cur != null; cur = cur.getBackState()) {
             states.addFirst(cur);
-            
+
             // Record the edge if it exists and this is not the first state in the path.
             if (cur.getBackEdge() != null && cur.getBackState() != null) {
                 edges.addFirst(cur.getBackEdge());
@@ -195,7 +213,7 @@ public class GraphPath {
     public void dumpPathParser() {
         System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
         System.out.println(this.toString());
-        for (State s : states) 
+        for (State s : states)
             System.out.println(s.getPathParserStates() + s + " via " + s.getBackEdge());
         System.out.println(" --- END GRAPHPATH DUMP ---");
     }
@@ -203,7 +221,7 @@ public class GraphPath {
     public double getWalkDistance() {
         return walkDistance;
     }
-    
+
     public RoutingContext getRoutingContext() {
         return rctx;
     }

@@ -66,12 +66,17 @@ public class ComparingGraphPathFinder extends GraphPathFinder {
         return new GraphPathFinder(router).graphPathFinderEntryPoint(carOnlyOptions);
     }
 
+    /**
+     * We filter out unsuitable P+R routes.
+     *
+     * Right now "unsuitable" means that driving to the P+R is less more than 50% of the distance of
+     * driving all the way to the destination.
+     */
     private List<GraphPath> filterOut(List<GraphPath> parkAndRide, List<GraphPath> carOnly) {
         List<GraphPath> result = new ArrayList<>();
         if (!carOnly.isEmpty()) {
-            int twiceTheTimeOfDriving = carOnly.get(0).getDuration() * 2;
-            // if P+R is slower than half the time it takes to drive, filter them out and just display driving
-            List<GraphPath> onlyFastOnes = parkAndRide.stream().filter(graphPath -> graphPath.getDuration() < twiceTheTimeOfDriving).collect(Collectors.toList());
+            double halfDistanceOfCarOnly = carOnly.get(0).streetMeters() / 2;
+            List<GraphPath> onlyFastOnes = parkAndRide.stream().filter(graphPath -> graphPath.streetMeters() < halfDistanceOfCarOnly).collect(Collectors.toList());
             if (onlyFastOnes.toArray().length < parkAndRide.size()) {
                 result.addAll(onlyFastOnes);
                 result.addAll(carOnly);
