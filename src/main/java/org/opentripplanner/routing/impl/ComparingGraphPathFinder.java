@@ -69,7 +69,7 @@ public class ComparingGraphPathFinder extends GraphPathFinder {
     /**
      * We filter out unsuitable P+R routes.
      *
-     * Right now "unsuitable" means that driving to the P+R is less more than 50% of the distance of
+     * Right now "unsuitable" means that driving to the P+R is more than 50% of the distance of
      * driving all the way to the destination.
      */
     private List<GraphPath> filterOut(List<GraphPath> parkAndRide, List<GraphPath> carOnly) {
