@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import com.conveyal.r5.otp2.api.transit.IntIterator;
-import com.conveyal.r5.otp2.api.transit.TransferLeg;
-import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
-import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 import java.time.LocalDate;
 import java.time.ZonedDateTime;

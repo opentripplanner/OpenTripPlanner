@@ -1,12 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.router;
 
-import com.conveyal.r5.otp2.RangeRaptorService;
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.request.RangeRaptorProfile;
-import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
-import com.conveyal.r5.otp2.api.request.RequestBuilder;
-import com.conveyal.r5.otp2.api.request.TuningParameters;
-import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
@@ -19,6 +12,13 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.RangeRaptorService;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
