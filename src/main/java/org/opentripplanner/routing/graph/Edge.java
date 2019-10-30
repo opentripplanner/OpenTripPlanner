@@ -182,6 +182,10 @@ public abstract class Edge implements Serializable {
         return 0;
     }
 
+    /**
+     * This gets the effective length for walking, taking slopes into account. This can be divided
+     * by the speed on a flat surface to get the duration.
+     */
     public double getEffectiveWalkDistance() {
         return 0;
     }

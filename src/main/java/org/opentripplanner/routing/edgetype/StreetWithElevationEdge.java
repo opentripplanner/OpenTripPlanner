@@ -67,7 +67,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         effectiveWalkDistanceFactor = costs.effectiveWalkFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
-        bicycleSafetyFactor += costs.slopeSafetyCost / getEffectiveWalkDistance();
+        bicycleSafetyFactor += costs.slopeSafetyCost / getDistanceMeters();
         return costs.flattened;
     }
 
@@ -90,24 +90,24 @@ public class StreetWithElevationEdge extends StreetEdge {
     }
 
     @Override
-    public double getSlopeBikeSpeedEffectiveDistance() {
-        return effectiveBikeDistanceFactor * getEffectiveWalkDistance();
+    public double getEffectiveBikeDistance() {
+        return effectiveBikeDistanceFactor * getDistanceMeters();
     }
 
     @Override
-    public double getSlopeBikeWorkCostEffectiveDistance() {
-        return effectiveBikeWorkFactor * getEffectiveWalkDistance();
+    public double getEffectiveBikeWorkCost() {
+        return effectiveBikeWorkFactor * getDistanceMeters();
     }
 
     @Override
-    public double getSlopeWalkSpeedEffectiveDistance() {
-        return effectiveWalkDistanceFactor * getEffectiveWalkDistance();
+    public double getEffectiveWalkDistance() {
+        return effectiveWalkDistanceFactor * getDistanceMeters();
     }
 
     @Override
     public String toString() {
         return "StreetWithElevationEdge(" + getName() + ", " + fromv + " -> "
-                + tov + " length=" + this.getEffectiveWalkDistance() + " carSpeed=" + this.getCarSpeed()
+                + tov + " length=" + this.getDistanceMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 }

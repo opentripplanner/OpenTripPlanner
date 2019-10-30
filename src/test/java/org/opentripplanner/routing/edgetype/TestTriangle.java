@@ -45,8 +45,8 @@ public class TestTriangle extends TestCase {
 
         SlopeCosts costs = ElevationUtils.getSlopeCosts(elev, true);
         double trueLength = costs.lengthMultiplier * length;
-        double slopeWorkLength = testStreet.getSlopeBikeWorkCostEffectiveDistance();
-        double slopeSpeedLength = testStreet.getSlopeBikeSpeedEffectiveDistance();
+        double slopeWorkLength = testStreet.getEffectiveBikeWorkCost();
+        double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;

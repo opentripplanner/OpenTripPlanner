@@ -247,11 +247,6 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     @Override
-    public double getEffectiveWalkDistance() {
-        return getDistanceMeters();
-    }
-
-    @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
         final TraverseMode currMode = s0.getNonTransitMode();
@@ -326,15 +321,15 @@ public class StreetEdge extends Edge implements Cloneable {
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
-            weight = getSlopeBikeSpeedEffectiveDistance() / speed;
+            weight = getEffectiveBikeDistance() / speed;
         } else if (traverseMode.equals(TraverseMode.BICYCLE)) {
-            time = getSlopeBikeSpeedEffectiveDistance() / speed;
+            time = getEffectiveBikeDistance() / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = bicycleSafetyFactor * getEffectiveWalkDistance() / speed;
+                weight = bicycleSafetyFactor * getDistanceMeters() / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyFactor * getEffectiveWalkDistance() / speed;
+                weight = bicycleSafetyFactor * getDistanceMeters() / speed;
                 if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
@@ -342,34 +337,34 @@ public class StreetEdge extends Edge implements Cloneable {
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = getEffectiveWalkDistance() / speed + getSlopeBikeWorkCostEffectiveDistance();
+                weight = getDistanceMeters() / speed + getEffectiveBikeWorkCost();
                 break;
             case QUICK:
-                weight = getSlopeBikeSpeedEffectiveDistance() / speed;
+                weight = getEffectiveBikeDistance() / speed;
                 break;
             case TRIANGLE:
-                double quick = getSlopeBikeSpeedEffectiveDistance();
-                double safety = bicycleSafetyFactor * getEffectiveWalkDistance();
+                double quick = getEffectiveBikeDistance();
+                double safety = bicycleSafetyFactor * getDistanceMeters();
                 // TODO This computation is not coherent with the one for FLAT
-                double slope = getSlopeBikeWorkCostEffectiveDistance();
+                double slope = getEffectiveBikeWorkCost();
                 weight = quick * options.triangleTimeFactor + slope
                         * options.triangleSlopeFactor + safety
                         * options.triangleSafetyFactor;
                 weight /= speed;
                 break;
             default:
-                weight = getEffectiveWalkDistance() / speed;
+                weight = getDistanceMeters() / speed;
             }
         } else {
             if (walkingBike) {
                 // take slopes into account when walking bikes
-                time = getSlopeBikeSpeedEffectiveDistance() / speed;
+                time = getEffectiveBikeDistance() / speed;
             }
             weight = time;
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double distance = getSlopeWalkSpeedEffectiveDistance();
+                double distance = getEffectiveWalkDistance();
                 weight = distance / speed;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
@@ -478,7 +473,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         if (!traverseMode.isDriving()) {
-            s1.incrementWalkDistance(getEffectiveWalkDistance());
+            s1.incrementWalkDistance(getEffectiveBikeDistance());
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
@@ -552,31 +547,28 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return this.getEffectiveWalkDistance() / options.getStreetSpeedUpperBound();
+        return this.getDistanceMeters() / options.getStreetSpeedUpperBound();
     }
 
     /**
      * This gets the effective length for bikes and wheelchairs, taking slopes into account. This
      * can be divided by the speed on a flat surface to get the duration.
      */
-    public double getSlopeBikeSpeedEffectiveDistance() {
-        return getEffectiveWalkDistance();
+    public double getEffectiveBikeDistance() {
+        return getDistanceMeters();
     }
 
     /**
-     * This gets the effective length for bikes, taking the effort required to traverse the slopes
-     * into account.
+     * This gets the effective work amount for bikes, taking the effort required to traverse the
+     * slopes into account.
      */
-    public double getSlopeBikeWorkCostEffectiveDistance() {
-        return getEffectiveWalkDistance();
+    public double getEffectiveBikeWorkCost() {
+        return getDistanceMeters();
     }
 
-    /**
-     * This gets the effective length for walking, taking slopes into account. This
-     * can be divided by the speed on a flat surface to get the duration.
-     */
-    public double getSlopeWalkSpeedEffectiveDistance() {
-        return getEffectiveWalkDistance();
+    @Override
+    public double getEffectiveWalkDistance() {
+        return getDistanceMeters();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
@@ -593,7 +585,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public String toString() {
         return "StreetEdge(" + name + ", " + fromv + " -> " + tov
-                + " length=" + this.getEffectiveWalkDistance() + " carSpeed=" + this.getCarSpeed()
+                + " length=" + this.getDistanceMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 
