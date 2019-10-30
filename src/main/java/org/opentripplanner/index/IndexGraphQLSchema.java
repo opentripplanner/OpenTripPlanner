@@ -15,7 +15,6 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
-import graphql.schema.TypeResolver;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -116,31 +115,30 @@ public class IndexGraphQLSchema {
 
     private Relay relay = new Relay();
 
-    private GraphQLInterfaceType nodeInterface = relay.nodeInterface(new TypeResolver() {
-        @Override public GraphQLObjectType getType(Object o) {
-            if (o instanceof Stop){
-                return (GraphQLObjectType) stopType;
-            }
-            if (o instanceof Trip){
-                return (GraphQLObjectType) tripType;
-            }
-            if (o instanceof Route){
-                return (GraphQLObjectType) routeType;
-            }
-            if (o instanceof TripPattern){
-                return (GraphQLObjectType) patternType;
-            }
-            if (o instanceof Agency){
-                return (GraphQLObjectType) agencyType;
-            }
-            if (o instanceof Operator) {
-                return (GraphQLObjectType) operatorType;
-            }
-            if (o instanceof Notice) {
-                return (GraphQLObjectType) noticeType;
-            }
-            return null;
+    private GraphQLInterfaceType nodeInterface = relay.nodeInterface(e ->  {
+        Object o = e.getObject();
+        if (o instanceof Stop){
+            return (GraphQLObjectType) stopType;
         }
+        if (o instanceof Trip){
+            return (GraphQLObjectType) tripType;
+        }
+        if (o instanceof Route){
+            return (GraphQLObjectType) routeType;
+        }
+        if (o instanceof TripPattern){
+            return (GraphQLObjectType) patternType;
+        }
+        if (o instanceof Agency){
+            return (GraphQLObjectType) agencyType;
+        }
+        if (o instanceof Operator) {
+            return (GraphQLObjectType) operatorType;
+        }
+        if (o instanceof Notice) {
+            return (GraphQLObjectType) noticeType;
+        }
+        return null;
     });
 
     public IndexGraphQLSchema(GraphIndex index) {
@@ -896,23 +894,23 @@ public class IndexGraphQLSchema {
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
-                if (id.type.equals(stopType.getName())) {
-                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(stopType.getName())) {
+                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(tripType.getName())) {
-                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(tripType.getName())) {
+                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(routeType.getName())) {
-                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(routeType.getName())) {
+                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(patternType.getName())) {
-                    return index.graph.tripPatternForId.get(id.id);
+                if (id.getType().equals(patternType.getName())) {
+                    return index.graph.tripPatternForId.get(id.getId());
                 }
-                if (id.type.equals(agencyType.getName())) {
-                    return index.getAgencyWithoutFeedId(id.id);
+                if (id.getType().equals(agencyType.getName())) {
+                    return index.getAgencyWithoutFeedId(id.getId());
                 }
-                if (id.type.equals(operatorType.getName())) {
-                    return index.operatorForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(operatorType.getName())) {
+                    return index.operatorForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 return null;
             }))
