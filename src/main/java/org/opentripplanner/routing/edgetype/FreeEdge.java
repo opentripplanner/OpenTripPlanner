@@ -32,7 +32,7 @@ public class FreeEdge extends Edge {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceMeters() {
         return 0;
     }
 

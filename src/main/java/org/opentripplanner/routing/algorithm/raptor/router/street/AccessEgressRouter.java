@@ -44,7 +44,7 @@ public class AccessEgressRouter {
             result.put(
                     stopAtDistance.tstop.getStop(),
                     new Transfer(-1,
-                            (int)stopAtDistance.edges.stream().map(Edge::getDistance)
+                            (int)stopAtDistance.edges.stream().map(Edge::getEffectiveWalkDistance)
                                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum(),
                             stopAtDistance.edges));
         }

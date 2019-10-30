@@ -591,7 +591,7 @@ public class IndexAPI {
         /** Make a transfer from a simpletransfer edge from the graph. */
         public Transfer(SimpleTransfer e) {
             toStopId = GtfsLibrary.convertIdToString(((TransitStopVertex) e.getToVertex()).getStop().getId());
-            distance = e.getDistance();
+            distance = e.getDistanceMeters();
         }
     }
 }

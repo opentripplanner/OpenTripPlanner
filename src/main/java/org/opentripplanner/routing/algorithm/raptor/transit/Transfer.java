@@ -5,32 +5,18 @@ import org.opentripplanner.routing.graph.Edge;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.List;
 
 public class Transfer {
     private int toStop;
 
-    // TODO OTP2: we only have a distance field here but in other cases have more detail.
-    // Inside Raptor we need distance to apply walking speed on the fly to precomputed transfers;
-    // Outside raptor (in access and egress searches) we can actually have true travel times, because we compute
-    // throw-away request-scoped transfers that are specific to a single set of routing parameters.
-    // Keeping the transfers simplified to only distances which are scaled at search time makes it impossible to
-    // include slowdown due to slope, for example. We could store an "effective distance" which bakes the non-linear
-    // slope (and other) components into the distance, and then the linear speed scaling can be applied fast in routing.
-    private final int distanceMeters;
+    private final int effectiveWalkDistanceMeters;
 
     private final List<Edge> edges;
 
-    public Transfer(int toStop, int distanceMeters) {
+    public Transfer(int toStop, int effectiveWalkDistanceMeters, List<Edge> edges) {
         this.toStop = toStop;
-        this.distanceMeters = distanceMeters;
-        this.edges = Collections.emptyList();
-    }
-
-    public Transfer(int toStop, int distanceMeters, List<Edge> edges) {
-        this.toStop = toStop;
-        this.distanceMeters = distanceMeters;
+        this.effectiveWalkDistanceMeters = effectiveWalkDistanceMeters;
         this.edges = edges;
     }
 
@@ -46,8 +32,20 @@ public class Transfer {
 
     public int getToStop() { return toStop; }
 
+    /**
+     * The effective distance is defined as the value that divided by the speed will give the
+     * correct duration of the transfer. This takes into account slowdowns/speedups related to
+     * slopes. It can also account for other factors that affect the transfer duration, but all
+     * factors are required to be proportional to the speed. The reason we are doing this is so
+     * that we can calculate all transfer durations in a reasonable amount of time for each
+     * incoming request.
+     */
+    public int getEffectiveWalkDistanceMeters() {
+        return effectiveWalkDistanceMeters;
+    }
+
     public int getDistanceMeters() {
-        return distanceMeters;
+        return (int)edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
     }
 
     public List<Edge> getEdges() {

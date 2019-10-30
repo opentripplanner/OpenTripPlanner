@@ -279,7 +279,7 @@ public class IndexGraphQLSchema {
                     .filter(edge -> edge instanceof SimpleTransfer)
                     .map(edge -> new ImmutableMap.Builder<String, Object>()
                         .put("stop", ((TransitStopVertex) edge.getToVertex()).getStop())
-                        .put("distance", edge.getDistance())
+                        .put("distance", edge.getDistanceMeters())
                         .build())
                     .collect(Collectors.toList()))
                 .build())

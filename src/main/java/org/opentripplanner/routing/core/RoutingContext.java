@@ -163,7 +163,7 @@ public class RoutingContext implements Cloneable {
                     from.getCoordinate(), to.getCoordinate());
 
             double lengthRatio = partial.getLength() / parent.getLength();
-            double length = streetEdge.getDistance() * lengthRatio;
+            double length = streetEdge.getDistanceMeters() * lengthRatio;
 
             //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();
