@@ -150,8 +150,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double totalGeomLength = geometry.getLength();
         double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
 
-        double lengthIn = street.getDistance() * lengthRatioIn;
-        double lengthOut = street.getDistance() * (1 - lengthRatioIn);
+        double lengthIn = street.getDistanceMeters() * lengthRatioIn;
+        double lengthOut = street.getDistanceMeters() * (1 - lengthRatioIn);
 
         if (endVertex) {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(

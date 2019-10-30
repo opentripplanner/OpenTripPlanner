@@ -61,7 +61,7 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceMeters() {
         return 0;
     }
 

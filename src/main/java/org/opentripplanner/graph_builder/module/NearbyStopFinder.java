@@ -231,7 +231,7 @@ public class NearbyStopFinder {
      * TODO this should probably be merged with similar classes in Profile routing.
      */
     public static StopAtDistance stopAtDistanceForState (State state) {
-        double distance = 0.0;
+        double effectiveWalkDistance = 0.0;
         GraphPath graphPath = new GraphPath(state, false);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
         List<Edge> edges = new ArrayList<>();
@@ -245,7 +245,7 @@ public class NearbyStopFinder {
                         coordinates.extend(geometry.getCoordinates(), 1);
                     }
                 }
-                distance += edge.getDistance();
+                effectiveWalkDistance += edge.getEffectiveWalkDistance();
             }
             edges.add(edge);
         }
@@ -256,7 +256,7 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), distance);
+        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), effectiveWalkDistance);
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;

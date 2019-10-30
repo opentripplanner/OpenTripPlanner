@@ -78,7 +78,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getDistance() / options.walkSpeed;
+        double expectedWeight = e1.getDistanceMeters() / options.walkSpeed;
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
@@ -97,7 +97,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getDistance() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistanceMeters() / e1.getCarSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
