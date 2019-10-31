@@ -376,14 +376,12 @@ public class GraphIndex {
      * making a fake routing request.
      */
     public Timetable currentUpdatedTimetableForTripPattern (TripPattern tripPattern) {
-        RoutingRequest req = new RoutingRequest();
-        req.setRoutingContext(graph, (Vertex)null, (Vertex)null);
         // The timetableSnapshot will be null if there's no real-time data being applied.
-        if (req.rctx.timetableSnapshot == null) return tripPattern.scheduledTimetable;
+        if (graph.getTimetableSnapshot() == null) return tripPattern.scheduledTimetable;
         // Get the updated times for right now, which is the only reasonable default since no date is supplied.
         Calendar calendar = Calendar.getInstance();
         ServiceDate serviceDate = new ServiceDate(calendar.getTime());
-        return req.rctx.timetableSnapshot.resolve(tripPattern, serviceDate);
+        return graph.getTimetableSnapshot().resolve(tripPattern, serviceDate);
     }
 
     public Response getGraphQLResponse(String query, Map<String, Object> variables, String operationName) {
