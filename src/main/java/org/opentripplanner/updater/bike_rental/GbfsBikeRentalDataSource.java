@@ -74,7 +74,13 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         // See https://github.com/NABSA/gbfs/blob/master/gbfs.md#files
         InputStream rootData = fetchFromUrl(makeGbfsEndpointUrl("gbfs.json"));
 
-        // Check to see if data from the root url was able to be fetched. The GBFS.json file is not required.
+        // Check to see if data from the root url was able to be fetched. The gbfs.json file is not required.
+        if (rootData == null) {
+            // root data is null, however some feeds don't specifically have a gbfs.json endpoint and just use the root
+            // url itself. Therefore try again with the root url to see if that works.
+            rootData = fetchFromUrl(makeGbfsEndpointUrl(""));
+        }
+
         if (rootData == null) {
             // Root GBFS.json file not able to be fetched, set default endpoints.
             stationInformationSource.setUrl(makeGbfsEndpointUrl("station_information.json"));
