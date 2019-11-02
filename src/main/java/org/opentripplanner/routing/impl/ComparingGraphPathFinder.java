@@ -1,5 +1,8 @@
 package org.opentripplanner.routing.impl;
 
+import com.google.common.collect.Iterables;
+import com.google.common.collect.Lists;
+import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -8,7 +11,6 @@ import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.CompletableFuture;
 import java.util.stream.Collectors;
@@ -36,10 +38,12 @@ public class ComparingGraphPathFinder extends GraphPathFinder {
         if (options.parkAndRide) {
             LOG.debug("Detected a P&R routing request. Will execute two requests to also get car-only routes.");
 
+            // cloning needs to be happen beforehand to prevent a race condition
+            RoutingRequest clonedOptions = options.clone();
+            // car-only
+            CompletableFuture<List<GraphPath>> carOnlyF = CompletableFuture.supplyAsync(() -> runCarOnlyRequest(clonedOptions));
             // the normal P&R
             CompletableFuture<List<GraphPath>> parkAndRideF = CompletableFuture.supplyAsync(() -> new GraphPathFinder(router).graphPathFinderEntryPoint(options));
-            // car-only
-            CompletableFuture<List<GraphPath>> carOnlyF = CompletableFuture.supplyAsync(() -> runCarOnlyRequest(options));
             // the CompletableFutures are there to make sure that the computations run in parallel
             List<List<GraphPath>> allResults = Stream.of(parkAndRideF, carOnlyF)
                     .map(CompletableFuture::join)
@@ -58,12 +62,20 @@ public class ComparingGraphPathFinder extends GraphPathFinder {
     }
 
 
-    private List<GraphPath> runCarOnlyRequest(RoutingRequest originalOptions) {
-        RoutingRequest carOnlyOptions = originalOptions.clone();
-        carOnlyOptions.parkAndRide = false;
-        carOnlyOptions.setModes(new TraverseModeSet(TraverseMode.CAR));
+    private List<GraphPath> runCarOnlyRequest(RoutingRequest clonedOptions) {
+        clonedOptions.parkAndRide = false;
+        clonedOptions.setModes(new TraverseModeSet(TraverseMode.CAR));
+        List<GraphPath> results;
+        try {
+             results = new GraphPathFinder(router).graphPathFinderEntryPoint(clonedOptions);
+        } catch(Exception e)  {
+            throw e;
+        }
+        finally {
+            clonedOptions.cleanup();
+        }
 
-        return new GraphPathFinder(router).graphPathFinderEntryPoint(carOnlyOptions);
+        return results;
     }
 
     /**
@@ -73,16 +85,16 @@ public class ComparingGraphPathFinder extends GraphPathFinder {
      * driving all the way to the destination.
      */
     private List<GraphPath> filterOut(List<GraphPath> parkAndRide, List<GraphPath> carOnly) {
-        List<GraphPath> result = new ArrayList<>();
         if (!carOnly.isEmpty()) {
             double halfDistanceOfCarOnly = carOnly.get(0).streetMeters() / 2;
             List<GraphPath> onlyFastOnes = parkAndRide.stream().filter(graphPath -> graphPath.streetMeters() < halfDistanceOfCarOnly).collect(Collectors.toList());
-            if (onlyFastOnes.toArray().length < parkAndRide.size()) {
-                result.addAll(onlyFastOnes);
-                result.addAll(carOnly);
-            }
-        }
-        else result.addAll(parkAndRide);
-        return result;
+            if (haveGraphsBeenFilteredOut(parkAndRide, onlyFastOnes)) {
+                return Lists.newArrayList(Iterables.concat(onlyFastOnes, carOnly));
+            } else return parkAndRide;
+        } else return parkAndRide;
+    }
+
+    private boolean haveGraphsBeenFilteredOut(List<GraphPath> parkAndRide, List<GraphPath> onlyFastOnes) {
+        return onlyFastOnes.size() < parkAndRide.size();
     }
 }
