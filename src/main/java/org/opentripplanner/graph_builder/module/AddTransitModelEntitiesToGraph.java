@@ -107,21 +107,20 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addStationsToGraph(Graph graph) {
-        /* Store parent stops in graph, even if not linked*/
+        // TODO OTP2 MMSP - What does 'linked' means
+        // Store parent stops in graph, even if not linked.
         for (Station station : transitService.getAllStations()) {
             graph.stationById.put(station.getId(), station);
         }
     }
 
     private void addMultiModalStationsToGraph(Graph graph) {
-        /* Store parent stops in graph, even if not linked*/
         for (MultiModalStation multiModalStation : transitService.getAllMultiModalStations()) {
             graph.multiModalStationById.put(multiModalStation.getId(), multiModalStation);
         }
     }
 
     private void addGroupsOfStationsToGraph(Graph graph) {
-        /* Store parent stops in graph, even if not linked*/
         for (GroupOfStations groupOfStations : transitService.getAllGroupsOfStations()) {
             graph.groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
         }

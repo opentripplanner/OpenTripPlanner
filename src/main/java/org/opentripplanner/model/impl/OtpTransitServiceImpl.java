@@ -58,8 +58,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
+    // TODO OTP2 MMSP - Change to Collection
     private final Map<FeedScopedId, GroupOfStations> groupsOfStationsById;
 
+    // TODO OTP2 MMSP - Change to Collection
     private final Map<FeedScopedId, MultiModalStation> multiModalStationsById;
 
     private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
