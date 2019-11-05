@@ -3063,7 +3063,21 @@ public class IndexGraphQLSchema {
                         .name("trips")
                         .description("Get all trips")
                         .type(new GraphQLList(tripType))
-                        .dataFetcher(environment -> new ArrayList<>(index.tripForId.values()))
+                        .argument(GraphQLArgument.newArgument()
+                                .name("feeds")
+                                .description("Only return trips with these feedIds")
+                                .type(new GraphQLList(Scalars.GraphQLString))
+                                .build())
+                        .dataFetcher(environment -> {
+                                Stream<Trip> stream = index.tripForId.values().stream();
+                                if (environment.getArgument("feeds") instanceof List) {
+                                        stream = stream
+                                                .filter(trip -> ((List<String>) environment.getArgument("feeds")).contains(
+                                                        trip.getId().getAgencyId())
+                                        );
+                                }
+                                return stream.collect(Collectors.toList());
+                        })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("trip")
