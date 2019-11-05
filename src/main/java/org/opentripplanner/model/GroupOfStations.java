@@ -12,6 +12,7 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
 
         private String name;
 
+        // TODO Map from NeTEx
         private PurposeOfGrouping purposeOfGrouping;
 
         private double lat;

@@ -17,6 +17,7 @@ import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.NoticeAssignment;
@@ -82,7 +83,9 @@ public class NetexMapper {
         // before Route - if both entities are defined in the same file.
         mapAuthorities(netexIndex);
         mapOperators(netexIndex);
+        mapMultiModalStopPlaces(netexIndex);
         mapStopPlaceAndQuays(netexIndex);
+        mapGroupsOfStopPlaces(netexIndex);
         mapRoute(netexIndex);
         mapTripPatterns(netexIndex);
         mapCalendarDayTypes(netexIndex);
@@ -103,15 +106,34 @@ public class NetexMapper {
         }
     }
 
+    private void mapMultiModalStopPlaces(NetexImportDataIndexReadOnlyView netexIndex) {
+        for (StopPlace multiModalStopPlace : netexIndex.getMultiModalStopPlaceById().localValues()) {
+            transitBuilder.getMultiModalStationsById().add(MultiModalStationMapper.map(multiModalStopPlace));
+        }
+    }
+
     private void mapStopPlaceAndQuays(NetexImportDataIndexReadOnlyView netexIndex) {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopMapper stopMapper = new StopMapper(netexIndex.getQuayById());
+            StopMapper stopMapper = new StopMapper(
+                    netexIndex.getQuayById(),
+                    transitBuilder.getMultiModalStationsById()
+            );
             Collection<Stop> stops = new ArrayList<>();
             Collection<Station> stations = new ArrayList<>();
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions, stops, stations);
             transitBuilder.getStops().addAll(stops);
             transitBuilder.getStations().addAll(stations);
+        }
+    }
+
+    private void mapGroupsOfStopPlaces(NetexImportDataIndexReadOnlyView netexIndex) {
+        GroupOfStationsMapper groupOfStationsMapper = new GroupOfStationsMapper(
+                transitBuilder.getMultiModalStationsById(),
+                transitBuilder.getStations()
+        );
+        for (GroupOfStopPlaces groupOfStopPlaces : netexIndex.getGroupOfStopPlacesById().localValues()) {
+            transitBuilder.getGroupsOfStationsById().add(groupOfStationsMapper.map(groupOfStopPlaces));
         }
     }
 

@@ -91,7 +91,7 @@ public class StopMapperTest {
         quaysById.add(quay2);
         quaysById.add(quay3);
 
-        StopMapper stopMapper = new StopMapper(quaysById);
+        StopMapper stopMapper = new StopMapper(quaysById, null);
         Collection<Stop> stops = new ArrayList<>();
         Collection<Station> stations = new ArrayList<>();
 

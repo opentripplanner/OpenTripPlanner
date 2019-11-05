@@ -1,7 +1,12 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
@@ -49,9 +54,14 @@ class StopMapper {
 
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
 
+    private final StationMapper stationMapper;
 
-    StopMapper(ReadOnlyHierarchicalVersionMapById<Quay> quayIndex) {
+
+    StopMapper(
+            ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
+            EntityById<FeedScopedId, MultiModalStation> multiModalStations) {
         this.quayIndex = quayIndex;
+        this.stationMapper = new StationMapper(multiModalStations);
     }
 
     /**
@@ -68,7 +78,7 @@ class StopMapper {
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
         // Map the highest priority StopPlace version to station
-        Station station = StationMapper.mapToStation(first(stopPlaceAllVersions));
+        Station station = stationMapper.map(first(stopPlaceAllVersions));
 
         resultStations.add(station);
 
