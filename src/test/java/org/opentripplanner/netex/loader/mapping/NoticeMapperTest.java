@@ -12,11 +12,13 @@ public class NoticeMapperTest {
     private static final String NOTICE_TEXT = "Something is happening on this line";
     private static final String PUBLIC_CODE = "Public Code";
 
-    @Test public void mapNotice() {
+    @Test
+    public void mapNotice() {
         org.opentripplanner.model.Notice otpNotice;
 
         // Given
-        NoticeMapper mapper = new NoticeMapper();
+        NoticeMapper mapper = new NoticeMapper(MappingSupport.ID_FACTORY);
+
         // And
         Notice netexNotice = new Notice();
         netexNotice.setId(NOTICE_ID);

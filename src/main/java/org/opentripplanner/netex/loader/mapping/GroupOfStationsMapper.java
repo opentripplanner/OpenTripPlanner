@@ -19,14 +19,19 @@ class GroupOfStationsMapper {
 
         private static final Logger LOG = LoggerFactory.getLogger(GroupOfStationsMapper.class);
 
+        private final FeedScopedIdFactory idFactory;
+
         private final EntityById<FeedScopedId, MultiModalStation> multiModalStations;
 
         private final EntityById<FeedScopedId, Station> stations;
 
+
         GroupOfStationsMapper(
+                FeedScopedIdFactory idFactory,
                 EntityById<FeedScopedId, MultiModalStation> multiModalStations,
                 EntityById<FeedScopedId, Station> stations
         ) {
+                this.idFactory = idFactory;
                 this.multiModalStations = multiModalStations;
                 this.stations = stations;
         }
@@ -34,7 +39,7 @@ class GroupOfStationsMapper {
         GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
                 GroupOfStations groupOfStations = new GroupOfStations();
                 groupOfStations.setId(
-                        FeedScopedIdFactory.createFeedScopedId(groupOfStopPlaces.getId()));
+                        idFactory.createId(groupOfStopPlaces.getId()));
                 groupOfStations.setName(groupOfStopPlaces.getName().getValue());
                 boolean locationOk = verifyPointAndProcessCoordinate(
                         groupOfStopPlaces.getCentroid(),
@@ -67,8 +72,7 @@ class GroupOfStationsMapper {
                         List<StopPlaceRefStructure> memberList = members.getStopPlaceRef();
                         for (StopPlaceRefStructure stopPlaceRefStructure : memberList) {
                                 FeedScopedId stationId =
-                                        FeedScopedIdFactory
-                                                .createFeedScopedId(stopPlaceRefStructure.getRef());
+                                        idFactory.createId(stopPlaceRefStructure.getRef());
                                 if (stations.containsKey(stationId)) {
                                         groupOfStations.addChildStation(
                                                 stations.get(stationId)

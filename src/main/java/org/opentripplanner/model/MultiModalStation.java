@@ -1,14 +1,16 @@
 package org.opentripplanner.model;
 
+import java.util.ArrayList;
 import java.util.Collection;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.Collections;
 import java.util.stream.Collectors;
 
 public class MultiModalStation extends TransitEntity<FeedScopedId> implements StopCollection {
         private static final long serialVersionUID = 1L;
 
-        private FeedScopedId id;
+        private final FeedScopedId id;
+
+        private final Collection<Station> childStations;
 
         private String name;
 
@@ -31,16 +33,16 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
          */
         private String url;
 
-        private Set<Station> childStations = new HashSet<>();
-
-        public MultiModalStation() {}
+        /**
+         * Create a new multi modal station with the given list of child stations.
+         */
+        public MultiModalStation(FeedScopedId feedScopedId, Collection<Station> children) {
+                this.id = feedScopedId;
+                this.childStations = Collections.unmodifiableCollection(new ArrayList<>(children));
+        }
 
         @Override public FeedScopedId getId() {
                 return id;
-        }
-
-        @Override public void setId(FeedScopedId id) {
-                this.id = id;
         }
 
         public String getName() {
@@ -94,15 +96,11 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
         public Collection<Stop> getChildStops() {
                 return this.childStations.stream()
                         .flatMap(s -> s.getChildStops().stream())
-                        .collect(Collectors.toList());
+                        .collect(Collectors.toUnmodifiableList());
         }
 
         public Collection<Station> getChildStations() {
                 return this.childStations;
-        }
-
-        public void addChildStation(Station station) {
-                this.childStations.add(station);
         }
 
         @Override
