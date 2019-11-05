@@ -32,6 +32,8 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Station;
@@ -233,6 +235,10 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     /** Parent stops **/
     public Map<FeedScopedId, Station> stationById = new HashMap<>();
+
+    public Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
+
+    public Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
 
     /**
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
