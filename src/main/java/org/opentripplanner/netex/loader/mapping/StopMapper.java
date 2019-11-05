@@ -68,7 +68,7 @@ class StopMapper {
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
 
         // Map the highest priority StopPlace version to station
-        Station station = mapToStation(first(stopPlaceAllVersions));
+        Station station = StationMapper.mapToStation(first(stopPlaceAllVersions));
 
         resultStations.add(station);
 
@@ -93,32 +93,7 @@ class StopMapper {
                 .collect(toList());
     }
 
-    private Station mapToStation(StopPlace stop) {
-        Station station = new Station();
 
-        if (stop.getName() != null) {
-            station.setName(stop.getName().getValue());
-        } else {
-            station.setName("N/A");
-        }
-        boolean locationOk = verifyPointAndProcessCoordinate(
-                stop.getCentroid(),
-                // This kind of awkward callback can be avoided if we add a
-                // Coordinate type the the OTP model, and return that instead.
-                coordinate -> {
-                    station.setLon(coordinate.getLongitude().doubleValue());
-                    station.setLat(coordinate.getLatitude().doubleValue());
-                }
-        );
-
-        if (!locationOk) {
-            LOG.warn("Station {} does not contain any coordinates.", station.getId());
-        }
-
-        station.setId(FeedScopedIdFactory.createFeedScopedId(stop.getId()));
-
-        return station;
-    }
 
     private void addNewStopToParentIfNotPresent(Quay quay, Station station) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
