@@ -2982,6 +2982,11 @@ public class IndexGraphQLSchema {
                                 .type(new GraphQLList(Scalars.GraphQLString))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
+                                .name("feeds")
+                                .description("Only return routes with these feedIds")
+                                .type(new GraphQLList(Scalars.GraphQLString))
+                                .build())
+                        .argument(GraphQLArgument.newArgument()
                                 .name("name")
                                 .description("Query routes by this name")
                                 .type(Scalars.GraphQLString)
@@ -3011,6 +3016,12 @@ public class IndexGraphQLSchema {
                                         .collect(Collectors.toList());
                             }
                             Stream<Route> stream = index.routeForId.values().stream();
+                            if (environment.getArgument("feeds") instanceof List) {
+                                stream = stream
+                                        .filter(route -> ((List<String>) environment.getArgument("feeds")).contains(
+                                                route.getId().getAgencyId())
+                                        );
+                            }
                             if (environment.getArgument("name") != null) {
                                 stream = stream
                                         .filter(route -> route.getShortName() != null)
