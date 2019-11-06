@@ -107,8 +107,7 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addStationsToGraph(Graph graph) {
-        // TODO OTP2 MMSP - What does 'linked' means
-        // Store parent stops in graph, even if not linked.
+        // Store parent stops in graph, even if not connected to the road network
         for (Station station : transitService.getAllStations()) {
             graph.stationById.put(station.getId(), station);
         }

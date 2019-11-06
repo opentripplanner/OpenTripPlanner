@@ -6,7 +6,12 @@ import java.util.Collections;
 import java.util.stream.Collectors;
 
 
-// TODO OTP2 MMSP - JavaDoc
+/**
+ * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As
+ * a NeTEx StopPlace (Station) only supports a single transit mode, you are required to group
+ * several Stations together using a MultiModalStation in order to support several modes. This
+ * entity is not part of GTFS.
+ */
 public class MultiModalStation extends TransitEntity<FeedScopedId> implements StopCollection {
     private static final long serialVersionUID = 1L;
 
@@ -20,22 +25,10 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
 
     private double lon;
 
-    // TODO OTP2 MMSP - move doc to getter
-    /**
-     * Public facing station code (short text or number)
-     */
     private String code;
 
-    // TODO OTP2 MMSP - move doc to getter
-    /**
-     * Additional information about the station (if needed)
-     */
     private String description;
 
-    // TODO OTP2 MMSP - move doc to getter
-    /**
-     * URL to a web page containing information about this particular station
-     */
     private String url;
 
     /**
@@ -75,6 +68,9 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
         this.lon = lon;
     }
 
+    /**
+     * Public facing station code (short text or number)
+     */
     public String getCode() {
         return code;
     }
@@ -83,6 +79,9 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
         this.code = code;
     }
 
+    /**
+     * Additional information about the station (if needed)
+     */
     public String getDescription() {
         return description;
     }
@@ -91,6 +90,9 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
         this.description = description;
     }
 
+    /**
+     * URL to a web page containing information about this particular station
+     */
     public String getUrl() {
         return url;
     }

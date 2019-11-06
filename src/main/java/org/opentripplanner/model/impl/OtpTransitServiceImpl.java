@@ -58,11 +58,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
-    // TODO OTP2 MMSP - Change to Collection
-    private final Map<FeedScopedId, GroupOfStations> groupsOfStationsById;
+    private final Collection<GroupOfStations> groupsOfStations;
 
-    // TODO OTP2 MMSP - Change to Collection
-    private final Map<FeedScopedId, MultiModalStation> multiModalStationsById;
+    private final Collection<MultiModalStation> multiModalStations;
 
     private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
 
@@ -92,8 +90,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
-        this.groupsOfStationsById = builder.getGroupsOfStationsById().asImmutableMap();
-        this.multiModalStationsById = builder.getMultiModalStationsById().asImmutableMap();
+        this.groupsOfStations = builder.getGroupsOfStationsById().values();
+        this.multiModalStations = builder.getMultiModalStationsById().values();
         this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
         this.operators = immutableList(builder.getOperatorsById().values());
         this.pathways = immutableList(builder.getPathways());
@@ -129,12 +127,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     @Override
     public Collection<GroupOfStations> getAllGroupsOfStations() {
-        return immutableList(groupsOfStationsById.values());
+        return immutableList(groupsOfStations);
     }
 
     @Override
     public Collection<MultiModalStation> getAllMultiModalStations() {
-        return immutableList(multiModalStationsById.values());
+        return immutableList(multiModalStations);
     }
 
     /**

@@ -5,8 +5,11 @@ import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-
-// TODO OTP2 MMSP - JavaDoc
+/**
+ * A grouping that can contain a mix of Stations and MultiModalStations. It can be used to link
+ * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster
+ * of stops that naturally belong together.
+ */
 public class GroupOfStations extends TransitEntity<FeedScopedId> implements StopCollection {
     private static final long serialVersionUID = 1L;
 
@@ -90,7 +93,9 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
         return "<GroupOfStations " + this.id + ">";
     }
 
-    // TODO OTP2 MMSP - JavaDoc
+    /**
+     * Categorization for the grouping
+     */
     public enum PurposeOfGrouping {
         /**
          * Group of prominent stop places within a town or city(centre)

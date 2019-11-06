@@ -235,10 +235,15 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     /** Parent stops **/
     public Map<FeedScopedId, Station> stationById = new HashMap<>();
 
-    // TODO OTP2 MMSP - JavaDoc
+    /**
+     * Optional level above parent stops (only supported in NeTEx)
+     */
     public Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
 
-    // TODO OTP2 MMSP - JavaDoc
+    /**
+     * Optional grouping that can contain both stations and multimodal stations (only supported in
+     * NeTEx)
+     */
     public Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
 
     /**
