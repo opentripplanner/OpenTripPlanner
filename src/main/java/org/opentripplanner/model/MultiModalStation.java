@@ -8,7 +8,7 @@ import java.util.stream.Collectors;
 
 /**
  * The next level grouping of stops above Station. Equivalent to NeTEx multimodal StopPlace. As
- * a NeTEx StopPlace (Station) only supports a single transit mode, you are required to group
+ * a Station (NeTEx StopPlace) only supports a single transit mode, you are required to group
  * several Stations together using a MultiModalStation in order to support several modes. This
  * entity is not part of GTFS.
  */

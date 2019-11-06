@@ -107,7 +107,6 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addStationsToGraph(Graph graph) {
-        // Store parent stops in graph, even if not connected to the road network
         for (Station station : transitService.getAllStations()) {
             graph.stationById.put(station.getId(), station);
         }
