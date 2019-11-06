@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import com.conveyal.r5.kryo.KryoNetworkSerializer;
-import com.conveyal.r5.profile.ProfileRequest;
-import com.conveyal.r5.transit.TransportNetwork;
 import org.opentripplanner.transit.raptor.RangeRaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
@@ -67,7 +64,7 @@ public class SpeedTest {
 
     public static void main(String[] args) throws Exception {
         AvgTimer.NOOP = false;
-        new org.opentripplanner.transit.raptor.speed_test.SpeedTest(new SpeedTestCmdLineOpts(args)).runTest();
+        new SpeedTest(new SpeedTestCmdLineOpts(args)).runTest();
     }
 
     private void initTransportNetwork() throws Exception {
@@ -84,7 +81,7 @@ public class SpeedTest {
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
         nAdditionalTransfers = opts.numOfExtraTransfers();
-        service = new RangeRaptorService<>(org.opentripplanner.transit.raptor.speed_test.RequestSupport.TUNING_PARAMETERS);
+        service = new RangeRaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
         boolean skipFirstProfile;
 
         initProfileStatistics();
@@ -122,7 +119,7 @@ public class SpeedTest {
             // Warm up JIT compiler by running one of the longer searches
             runSingleTestCase(tripPlans, testCases.get(25), opts, true);
         }
-        org.opentripplanner.transit.raptor.speed_test.ResultPrinter.logSingleTestHeader(routeProfile);
+        ResultPrinter.logSingleTestHeader(routeProfile);
 
         AvgTimer.resetAll();
         for (TestCase testCase : testCasesToRun) {
@@ -133,7 +130,7 @@ public class SpeedTest {
         workerResults.get(routeProfile).add((int) TIMER_WORKER.avgTime());
         totalResults.get(routeProfile).add((int) TOT_TIMER.avgTime());
 
-        org.opentripplanner.transit.raptor.speed_test.ResultPrinter.logSingleTestResult(
+        ResultPrinter.logSingleTestResult(
                 routeProfile, numOfPathsFound, sample, nSamples, nSuccess, tcSize, TOT_TIMER.totalTimeInSeconds()
         );
 
@@ -141,8 +138,8 @@ public class SpeedTest {
     }
 
     private void printProfileStatistics() {
-        org.opentripplanner.transit.raptor.speed_test.ResultPrinter.printProfileResults("Worker: ", workerResults);
-        org.opentripplanner.transit.raptor.speed_test.ResultPrinter.printProfileResults("Total:  ", totalResults);
+        ResultPrinter.printProfileResults("Worker: ", workerResults);
+        ResultPrinter.printProfileResults("Total:  ", totalResults);
     }
 
     private void initProfileStatistics() {
@@ -155,12 +152,12 @@ public class SpeedTest {
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, SpeedTestCmdLineOpts opts, boolean ignoreResults) {
         try {
-            final SpeedTestProfileRequest request = org.opentripplanner.transit.raptor.speed_test.RequestSupport.buildProfileRequest(testCase, opts);
+            final SpeedTestRequest request = new SpeedTestRequest(testCase, opts);
 
             if (opts.compareHeuristics()) {
                 TOT_TIMER.start();
-                SpeedTestProfileRequest heurReq = org.opentripplanner.transit.raptor.speed_test.RequestSupport.buildProfileRequest(testCase, opts);
-                compareHeuristics(heurReq, request, testCase.arrivalTime);
+                SpeedTestRequest heurReq = new SpeedTestRequest(testCase, opts);
+                compareHeuristics(heurReq, request);
                 TOT_TIMER.stop();
             } else {
                 // Perform routing
@@ -171,21 +168,21 @@ public class SpeedTest {
                 if (!ignoreResults) {
                     tripPlans.add(route);
                     testCase.assertResult(route.getItineraries());
-                    org.opentripplanner.transit.raptor.speed_test.ResultPrinter.printResultOk(testCase, TOT_TIMER.lapTime(), opts.verbose());
+                    ResultPrinter.printResultOk(testCase, TOT_TIMER.lapTime(), opts.verbose());
                 }
             }
             return true;
         } catch (Exception e) {
             TOT_TIMER.failIfStarted();
             if (!ignoreResults) {
-                org.opentripplanner.transit.raptor.speed_test.ResultPrinter.printResultFailed(testCase, TOT_TIMER.lapTime(), e);
+                ResultPrinter.printResultFailed(testCase, TOT_TIMER.lapTime(), e);
             }
             return false;
         }
     }
 
 
-    public TripPlan route(ProfileRequest request, int latestArrivalTime) {
+    public TripPlan route(SpeedTestRequest request, int latestArrivalTime) {
         try {
             Collection<Path<TripScheduleAdapter>> paths;
             EgressAccessRouter streetRouter = new EgressAccessRouter(transportNetwork, request);
@@ -225,10 +222,12 @@ public class SpeedTest {
         }
     }
 
-    private void compareHeuristics(ProfileRequest heurReq, ProfileRequest routeReq, int latestArrivalTime) {
+    private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
         EgressAccessRouter streetRouter = new EgressAccessRouter(transportNetwork, heurReq);
         streetRouter.route();
         TransitDataProvider<TripScheduleAdapter> transitData = transitData(heurReq);
+        int latestArrivalTime = routeReq.getArrivalTime();
+
         RangeRaptorRequest<TripScheduleAdapter> req1 = heuristicRequest(
                 heuristicProfile, heurReq, latestArrivalTime, streetRouter
         );
@@ -258,28 +257,32 @@ public class SpeedTest {
 
     private RangeRaptorRequest<TripScheduleAdapter> heuristicRequest(
             SpeedTestProfile profile,
-            ProfileRequest request,
+            SpeedTestRequest request,
             int latestArrivalTime,
             EgressAccessRouter streetRouter
     ) {
-        return org.opentripplanner.transit.raptor.speed_test.RequestSupport.createRangeRaptorRequest(
-                opts, request, profile, latestArrivalTime, nAdditionalTransfers, true, streetRouter
+        return request.createRangeRaptorRequest(
+                profile,
+                latestArrivalTime,
+                nAdditionalTransfers,
+                true,
+                streetRouter
         );
     }
 
 
     private RangeRaptorRequest<TripScheduleAdapter> rangeRaptorRequest(
             SpeedTestProfile profile,
-            ProfileRequest request,
+            SpeedTestRequest request,
             int latestArrivalTime,
             EgressAccessRouter streetRouter
     ) {
-        return org.opentripplanner.transit.raptor.speed_test.RequestSupport.createRangeRaptorRequest(
-                opts, request, profile, latestArrivalTime, nAdditionalTransfers, false, streetRouter
+        return request.createRangeRaptorRequest(
+                profile, latestArrivalTime, nAdditionalTransfers, false, streetRouter
         );
     }
 
-    private static TripPlan mapToTripPlan(ProfileRequest request, Collection<Path<TripScheduleAdapter>> paths, EgressAccessRouter streetRouter) {
+    private static TripPlan mapToTripPlan(SpeedTestRequest request, Collection<Path<TripScheduleAdapter>> paths, EgressAccessRouter streetRouter) {
         ItinerarySet itineraries = ItineraryMapper2.mapItineraries(request, paths, streetRouter, transportNetwork);
 
         // Filter away similar itineraries for easier reading
@@ -288,7 +291,7 @@ public class SpeedTest {
         return TripPlanSupport.createTripPlanForRequest(request, itineraries);
     }
 
-    private TransitLayerRRDataProvider transitData(ProfileRequest request) {
+    private TransitLayerRRDataProvider transitData(SpeedTestRequest request) {
         return new TransitLayerRRDataProvider(
                 transportNetwork.transitLayer,
                 request.date,

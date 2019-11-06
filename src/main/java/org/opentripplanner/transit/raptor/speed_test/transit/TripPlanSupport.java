@@ -1,11 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
-import com.conveyal.r5.profile.ProfileRequest;
+import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
 import org.opentripplanner.transit.raptor.speed_test.api.model.Place;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
-
-import java.time.ZoneId;
-import java.util.Date;
 
 
 /**
@@ -16,17 +13,17 @@ public class TripPlanSupport {
     private TripPlanSupport() { }
 
 
-    public static TripPlan createTripPlanForRequest(ProfileRequest request, ItinerarySet itineraries) {
+    public static TripPlan createTripPlanForRequest(SpeedTestRequest request, ItinerarySet itineraries) {
         TripPlan tripPlan = createTripPlanForRequest(request);
         addItineraries(tripPlan, itineraries);
         return tripPlan;
     }
 
-    public static TripPlan createTripPlanForRequest(ProfileRequest request) {
+    public static TripPlan createTripPlanForRequest(SpeedTestRequest request) {
         TripPlan tripPlan = new TripPlan();
-        tripPlan.date = new Date(request.date.atStartOfDay(ZoneId.of("Europe/Oslo")).toInstant().toEpochMilli() + request.fromTime * 1000);
-        tripPlan.from = new Place(request.fromLon, request.fromLat, "Origin");
-        tripPlan.to = new Place(request.toLon, request.toLat, "Destination");
+        tripPlan.date = request.getStartTimeAsDate();
+        tripPlan.from = new Place(request.getFromLon(), request.getFromLat(), "Origin");
+        tripPlan.to = new Place(request.getToLon(), request.getToLat(), "Destination");
         return tripPlan;
     }
 
@@ -36,6 +33,4 @@ public class TripPlanSupport {
         }
         tripPlan.sort();
     }
-
-
 }
