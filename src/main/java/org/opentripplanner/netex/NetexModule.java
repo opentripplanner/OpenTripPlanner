@@ -64,7 +64,8 @@ public class NetexModule implements GraphBuilderModule {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
 
-                OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(graph.deduplicator);
+                OtpTransitServiceBuilder transitBuilder =
+                        netexBundle.loadBundle(graph.deduplicator, graph);
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 OtpTransitService otpService = transitBuilder.build();

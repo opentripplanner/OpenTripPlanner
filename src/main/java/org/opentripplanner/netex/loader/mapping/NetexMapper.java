@@ -15,6 +15,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
+import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -49,6 +50,8 @@ public class NetexMapper {
     private final String agencyId;
     private final Deduplicator deduplicator;
 
+    private final AddBuilderAnnotation addBuilderAnnotation;
+
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
      * so we need to temporally cash this here.
@@ -56,10 +59,16 @@ public class NetexMapper {
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
 
-    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId, Deduplicator deduplicator) {
+    public NetexMapper(
+            OtpTransitServiceBuilder transitBuilder,
+            String agencyId,
+            Deduplicator deduplicator,
+            AddBuilderAnnotation addBuilderAnnotation
+    ) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;
         this.deduplicator = deduplicator;
+        this.addBuilderAnnotation = addBuilderAnnotation;
     }
 
     /**
@@ -106,7 +115,7 @@ public class NetexMapper {
     private void mapStopPlaceAndQuays(NetexImportDataIndexReadOnlyView netexIndex) {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopMapper stopMapper = new StopMapper(netexIndex.getQuayById());
+            StopMapper stopMapper = new StopMapper(netexIndex.getQuayById(), addBuilderAnnotation);
             Collection<Stop> stops = new ArrayList<>();
             Collection<Station> stations = new ArrayList<>();
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions, stops, stations);
@@ -158,7 +167,8 @@ public class NetexMapper {
         CalendarMapper calMapper = new CalendarMapper(
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
                 netexIndex.getOperatingPeriodById(),
-                netexIndex.getDayTypeById()
+                netexIndex.getDayTypeById(),
+                addBuilderAnnotation
         );
 
         for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.getDayTypeRefs()) {

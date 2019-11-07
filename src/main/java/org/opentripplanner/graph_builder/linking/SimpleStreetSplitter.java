@@ -148,11 +148,11 @@ public class SimpleStreetSplitter {
 
                 if (!link(v)) {
                     if (v instanceof TransitStopVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStopVertex) v)));
+                        graph.addBuilderAnnotation(new StopUnlinked((TransitStopVertex) v));
                     else if (v instanceof BikeRentalStationVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v)));
+                        graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
                     else if (v instanceof BikeParkVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
+                        graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v));
                 };
             }
         }

@@ -11,6 +11,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
+import org.opentripplanner.graph_builder.annotation.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -257,7 +258,7 @@ public class ElevationModule implements GraphBuilderModule {
             //limit elevation propagation to at max 2km; this prevents an infinite loop
             //in the case of islands missing elevation (and some other cases)
             if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                log.warn("While propagating elevations, hit 2km distance limit at " + state.vertex);
+                graph.addBuilderAnnotation(new ElevationPropagationLimit(state.vertex));
                 bestDistance = state.distance;
                 bestElevation = state.initialElevation;
             }
@@ -313,7 +314,7 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if (edge.setElevationProfile(profile, true)) {
-                        log.trace(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
+                        graph.addBuilderAnnotation(new ElevationFlattened(edge));
                     }
                 }
             }
@@ -365,7 +366,7 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
+            graph.addBuilderAnnotation(new ElevationFlattened(ee));
         }
     }
 

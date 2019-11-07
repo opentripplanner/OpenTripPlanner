@@ -1,9 +1,13 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.QuayWithoutCoordinates;
+import org.opentripplanner.graph_builder.annotation.StopPlaceWithoutCoordinates;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
+import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -34,7 +38,7 @@ import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAn
  * of the StopPlace.
  */
 class StopMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
+    private final AddBuilderAnnotation addBuilderAnnotation;
 
     private final StopPlaceTypeMapper transportModeMapper = new StopPlaceTypeMapper();
 
@@ -50,8 +54,16 @@ class StopMapper {
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
 
 
-    StopMapper(ReadOnlyHierarchicalVersionMapById<Quay> quayIndex) {
+    StopMapper(
+            ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
+            AddBuilderAnnotation addBuilderAnnotation
+    ) {
         this.quayIndex = quayIndex;
+        this.addBuilderAnnotation = addBuilderAnnotation;
+    }
+
+    protected void addBuilderAnnotation(GraphBuilderAnnotation annotation) {
+        addBuilderAnnotation.addBuilderAnnotation(annotation);
     }
 
     /**
@@ -112,7 +124,7 @@ class StopMapper {
         );
 
         if (!locationOk) {
-            LOG.warn("Station {} does not contain any coordinates.", station.getId());
+            addBuilderAnnotation(new StopPlaceWithoutCoordinates(stop.getId()));
         }
 
         station.setId(FeedScopedIdFactory.createFeedScopedId(stop.getId()));
@@ -141,7 +153,7 @@ class StopMapper {
                 }
         );
         if (!locationOk) {
-            LOG.warn("Quay {} does not contain any coordinates. Quay is ignored.", quay.getId());
+            addBuilderAnnotation(new QuayWithoutCoordinates(quay.getId()));
             return;
         }
         stop.setName(station.getName());

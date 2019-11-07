@@ -110,7 +110,7 @@ public class GeometryAndBlockProcessor {
         TripPattern.generateUniqueIds(tripPatterns);
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
-        TripPattern.generateUniqueNames(tripPatterns);
+        TripPattern.generateUniqueNames(tripPatterns, graph);
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
@@ -340,7 +340,7 @@ public class GeometryAndBlockProcessor {
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
                 geoms[i] = geometry;
                 //this warning is not strictly correct, but will do
-                LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
+                graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1));
             }
             return geoms;
         }
@@ -439,7 +439,7 @@ public class GeometryAndBlockProcessor {
         double[] distances = getDistanceForShapeId(shapeId);
 
         if (distances == null) {
-            LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometry(shapeId)));
+            graph.addBuilderAnnotation(new BogusShapeGeometry(shapeId));
             return null;
         } else {
             LinearLocation startIndex = getSegmentFraction(distances, startDistance);
@@ -522,7 +522,7 @@ public class GeometryAndBlockProcessor {
             geometry = geometryFactory.createLineString(sequence);
 
             if (!isValid(geometry, st0.getStop(), st1.getStop())) {
-                LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
+                graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1));
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }

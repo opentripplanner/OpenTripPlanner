@@ -45,4 +45,7 @@
   <!-- Suppress an inconsequential IOException that is logged at debug level. -->
   <logger name="org.glassfish.grizzly" level="info" />
 
+  <!-- All graph builder annotations are logged at INFO level -->
+  <logger name="GRAPH_BUILDER_ANNOTATION_LOG" level="WARN" />
+
 </configuration>

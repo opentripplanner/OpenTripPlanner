@@ -92,6 +92,9 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
+    private static final Logger GRAPH_BUILDER_ANNOTATION_LOG =
+            LoggerFactory.getLogger("GRAPH_BUILDER_ANNOTATION_LOG");
+
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
     private final MavenVersion mavenVersion = MavenVersion.VERSION;
@@ -592,7 +595,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                LOG.warn(this.addBuilderAnnotation(new NoFutureDates(agency)));
+                this.addBuilderAnnotation(new NoFutureDates(agency));
             }
         }
     }
@@ -639,11 +642,11 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message is still returned. This
      * allows annotation registration to be turned off, saving memory and disk space when the user is not interested in annotations.
      */
-    public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
-        String ret = gba.getMessage();
-        if (this.graphBuilderAnnotations != null)
+    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
+        GRAPH_BUILDER_ANNOTATION_LOG.info(gba.getMessage());
+        if (this.graphBuilderAnnotations != null) {
             this.graphBuilderAnnotations.add(gba);
-        return ret;
+        }
     }
 
     public List<GraphBuilderAnnotation> getBuilderAnnotations() {

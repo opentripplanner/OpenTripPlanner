@@ -122,7 +122,7 @@ public class StreetUtils {
             }
         }
         if (graph.removeEdgelessVertices() > 0) {
-            LOG.warn("Removed edgeless vertices after pruning islands");
+            LOG.info("Removed edgeless vertices after pruning islands");
         }
     }
 
@@ -163,7 +163,7 @@ public class StreetUtils {
                 }
             }
         }
-        LOG.debug(graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize())));
+        graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize()));
     }
 
     private static Subgraph computeConnectedSubgraph(

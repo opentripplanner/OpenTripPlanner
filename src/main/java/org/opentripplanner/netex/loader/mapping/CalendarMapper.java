@@ -1,15 +1,16 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.ServiceCodeDoesNotContainServiceDates;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
+import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -25,7 +26,7 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
+    private final AddBuilderAnnotation addBuilderAnnotation;
 
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
     private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
@@ -35,11 +36,17 @@ class CalendarMapper {
     CalendarMapper(
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
-            ReadOnlyHierarchicalMapById<DayType> dayTypeById
+            ReadOnlyHierarchicalMapById<DayType> dayTypeById,
+            AddBuilderAnnotation addBuilderAnnotation
     ) {
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
         this.operatingPeriodById = operatingPeriodById;
         this.dayTypeById = dayTypeById;
+        this.addBuilderAnnotation = addBuilderAnnotation;
+    }
+
+    protected void addBuilderAnnotation(GraphBuilderAnnotation annotation) {
+        addBuilderAnnotation.addBuilderAnnotation(annotation);
     }
 
     Collection<ServiceCalendarDate> mapToCalendarDates(DayTypeRefsToServiceIdAdapter dayTypeRefs) {
@@ -55,7 +62,7 @@ class CalendarMapper {
         Set<LocalDateTime> dates = dayTypeAssignmentMapper.mergeDates();
 
         if (dates.isEmpty()) {
-            LOG.warn("ServiceCode " + serviceId + " does not contain any serviceDates");
+            addBuilderAnnotation(new ServiceCodeDoesNotContainServiceDates(serviceId));
             // Add one date exception when list is empty to ensure serviceId is not lost
             LocalDateTime today = LocalDate.now().atStartOfDay();
             return Collections.singleton(

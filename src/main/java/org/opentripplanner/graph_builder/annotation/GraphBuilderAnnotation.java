@@ -28,13 +28,8 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class GraphBuilderAnnotation implements Serializable {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphBuilderAnnotation.class);
-
     private static final long serialVersionUID = 20121004L;
 
-//    /** Generally, this should return the Vertex or Edge that is most relevant to this annotation. */
-//    public abstract Object getReferencedObject();
-    
     public String toString() {
         return "GraphBuilderAnnotation: " + this.getMessage();
     }

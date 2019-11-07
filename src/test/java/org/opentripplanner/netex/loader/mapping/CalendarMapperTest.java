@@ -28,7 +28,8 @@ public class CalendarMapperTest {
         subject = new CalendarMapper(
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
-                new HierarchicalMapById<>()
+                new HierarchicalMapById<>(),
+                aba -> {}
         );
 
         dayTypeRefs = DayTypeRefsToServiceIdAdapter.create(

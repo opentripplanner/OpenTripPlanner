@@ -54,7 +54,8 @@ public class NetexLoaderSmokeTest {
         netexBundle.checkInputs();
 
         // When
-        OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(new Deduplicator());
+        OtpTransitServiceBuilder transitBuilder =
+                netexBundle.loadBundle(new Deduplicator(), aba -> {});
 
         // Then - smoke test model
         OtpTransitService otpModel = transitBuilder.build();

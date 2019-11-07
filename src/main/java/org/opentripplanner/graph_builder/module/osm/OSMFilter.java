@@ -179,7 +179,7 @@ public class OSMFilter {
                 (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))) {
             permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
             if (forceBikes) {
-                LOG.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
+                graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId()));
             }
         }
 

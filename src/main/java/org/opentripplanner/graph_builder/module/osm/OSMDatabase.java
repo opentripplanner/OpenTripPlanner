@@ -17,15 +17,19 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class OSMDatabase implements OpenStreetMapContentHandler {
+public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnotation {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
+
+    private static final Logger GRAPH_BUILDER_ANNOTATION_LOG =
+            LoggerFactory.getLogger("GRAPH_BUILDER_ANNOTATION_LOG");
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
@@ -556,13 +560,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             OSMLevel level = OSMLevel.DEFAULT;
             if (way.hasTag("level")) { // TODO: floating-point levels &c.
                 levelName = way.getTag("level");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, this);
             } else if (way.hasTag("layer")) {
                 levelName = way.getTag("layer");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, this);
             }
             if (level == null || (!level.reliable)) {
-                LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId())));
+                addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId()));
                 level = OSMLevel.DEFAULT;
             }
             wayLevels.put(way, level);
@@ -739,8 +743,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relation.getId(),
-                "One of from|via|to edges are empty in relation")));
+            addBuilderAnnotation(new TurnRestrictionBad(relation.getId(),
+                "One of from|via|to edges are empty in relation"));
             return;
         }
 
@@ -752,7 +756,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
-                    LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));
+                    addBuilderAnnotation(new TurnRestrictionException(via, from));
                 }
             }
         }
@@ -783,7 +787,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U,
                 relation.getId());
         } else {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction"))));
+            addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
             return;
         }
         tag.modes = modes.clone();
@@ -812,7 +816,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void processLevelMap(OSMRelation relation) {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
-                Source.LEVEL_MAP, true);
+                Source.LEVEL_MAP, true, this);
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
                 OSMWay way = waysById.get(member.getRef());
@@ -889,13 +893,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 if (platformArea == null)
                     platformArea = areaWaysById.get(member.getRef());
                 else
-                    LOG.warn("Too many areas in relation " + relation.getId());
+                    addBuilderAnnotation(new TooManyAreasInRelation(relation.getId()));
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
                     && relationsById.containsKey(member.getRef())) {
                 if (platformArea == null)
                     platformArea = relationsById.get(member.getRef());
                 else
-                    LOG.warn("Too many areas in relation " + relation.getId());
+                    addBuilderAnnotation(new TooManyAreasInRelation(relation.getId()));
             } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
                 platformsNodes.add(nodesById.get(member.getRef()));
             }
@@ -903,7 +907,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         if (platformArea != null && !platformsNodes.isEmpty())
             stopsInAreas.put(platformArea, platformsNodes);
         else
-            LOG.warn("Unable to process public transportation relation " + relation.getId());
+            addBuilderAnnotation(new UnableToProcessPublicTransportationRelation(relation.getId()));
     }
 
     private String addUniqueName(String routes, String name) {
@@ -916,10 +920,14 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return routes + ", " + name;
     }
 
-    private String addBuilderAnnotation(GraphBuilderAnnotation annotation) {
-        annotations.add(annotation);
-        return annotation.getMessage();
+    @Override
+    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
+        GRAPH_BUILDER_ANNOTATION_LOG.info(gba.getMessage());
+        if (this.annotations != null) {
+            this.annotations.add(gba);
+        }
     }
+
     
     /**
      * Check if a point is within an epsilon of a node.

@@ -528,7 +528,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                LOG.warn(graph.addBuilderAnnotation(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId)));
+                graph.addBuilderAnnotation(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
@@ -976,8 +976,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param graph
          */
         private void applyBikeSafetyFactor(Graph graph) {
-            LOG.info(graph.addBuilderAnnotation(new Graphwide(
-                    "Multiplying all bike safety values by " + (1 / bestBikeSafety))));
+            graph.addBuilderAnnotation(new Graphwide(
+                    "Multiplying all bike safety values by " + (1 / bestBikeSafety)));
             HashSet<Edge> seenEdges = new HashSet<Edge>();
             HashSet<AreaEdgeList> seenAreas = new HashSet<AreaEdgeList>();
             for (Vertex vertex : graph.getVertices()) {
@@ -1144,7 +1144,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             // < 0.04: account for
             if (carSpeed < 0.04) {
-                LOG.warn(graph.addBuilderAnnotation(new StreetCarSpeedZero(way.getId())));
+                graph.addBuilderAnnotation(new StreetCarSpeedZero(way.getId()));
             }
 
             if (customNamer != null) {

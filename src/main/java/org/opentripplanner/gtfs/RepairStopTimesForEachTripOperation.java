@@ -56,8 +56,8 @@ public class RepairStopTimesForEachTripOperation {
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
             if (!removedStopSequences.isEmpty()) {
-                LOG.warn(builderAnnotation
-                        .addBuilderAnnotation(new RepeatedStops(trip, removedStopSequences)));
+                builderAnnotation
+                        .addBuilderAnnotation(new RepeatedStops(trip, removedStopSequences));
             }
             filterStopTimes(stopTimes);
             interpolateStopTimes(stopTimes);
@@ -169,7 +169,7 @@ public class RepairStopTimesForEachTripOperation {
             }
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
             if (dwellTime < 0) {
-                LOG.warn(builderAnnotation.addBuilderAnnotation(new NegativeDwellTime(st0)));
+                builderAnnotation.addBuilderAnnotation(new NegativeDwellTime(st0));
                 if (st0.getArrivalTime() > 23 * SECONDS_IN_HOUR
                         && st0.getDepartureTime() < 1 * SECONDS_IN_HOUR) {
                     midnightCrossed = true;
@@ -181,8 +181,8 @@ public class RepairStopTimesForEachTripOperation {
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {
-                LOG.warn(builderAnnotation.addBuilderAnnotation(
-                        new NegativeHopTime(new StopTime(st0), new StopTime(st1))));
+                builderAnnotation.addBuilderAnnotation(
+                        new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
                 // negative hops are usually caused by incorrect coding of midnight crossings
                 midnightCrossed = true;
                 if (st0.getDepartureTime() > 23 * SECONDS_IN_HOUR
@@ -210,9 +210,9 @@ public class RepairStopTimesForEachTripOperation {
                     .getDepartureTime()) {
                 LOG.trace("{} {}", st0, st1);
                 // series of identical stop times at different stops
-                LOG.trace(builderAnnotation.addBuilderAnnotation(
+                builderAnnotation.addBuilderAnnotation(
                         new HopZeroTime((float) hopDistance, st1.getTrip(),
-                                st1.getStopSequence())));
+                                st1.getStopSequence()));
                 // clear stoptimes that are obviously wrong, causing them to later be interpolated
 /* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
                 //                st1.clearArrivalTime();
@@ -221,14 +221,14 @@ public class RepairStopTimesForEachTripOperation {
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                LOG.trace(builderAnnotation.addBuilderAnnotation(
+                builderAnnotation.addBuilderAnnotation(
                         new HopSpeedFast((float) hopSpeed, (float) hopDistance, st0.getTrip(),
-                                st0.getStopSequence())));
+                                st0.getStopSequence()));
             } else if (hopSpeed < 0.1) {
                 // 0.1 m/sec ~= 0.2 miles/hr
-                LOG.trace(builderAnnotation.addBuilderAnnotation(
+                builderAnnotation.addBuilderAnnotation(
                         new HopSpeedSlow((float) hopSpeed, (float) hopDistance, st0.getTrip(),
-                                st0.getStopSequence())));
+                                st0.getStopSequence()));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect
             if (!st1bogus)

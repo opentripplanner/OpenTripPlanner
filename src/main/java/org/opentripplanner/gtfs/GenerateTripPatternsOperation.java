@@ -101,7 +101,7 @@ public class GenerateTripPatternsOperation {
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
         if (!calendarServiceIds.contains(trip.getServiceId())) {
-            LOG.warn(builderAnnotation.addBuilderAnnotation(new TripUndefinedService(trip)));
+            builderAnnotation.addBuilderAnnotation(new TripUndefinedService(trip));
             return; // Invalid trip, skip it, it will break later
         }
 
@@ -110,7 +110,7 @@ public class GenerateTripPatternsOperation {
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
         if (stopTimes.size() < 2) {
-            LOG.warn(builderAnnotation.addBuilderAnnotation(new TripDegenerate(trip)));
+            builderAnnotation.addBuilderAnnotation(new TripDegenerate(trip));
             return;
         }
 

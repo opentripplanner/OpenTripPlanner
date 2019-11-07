@@ -1,6 +1,5 @@
 package org.opentripplanner.graph_builder.annotation;
 
-
 import org.opentripplanner.model.StopTime;
 
 public class BogusShapeDistanceTraveled extends GraphBuilderAnnotation {
