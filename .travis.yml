@@ -1,5 +1,5 @@
 language: java
-# OpenTripPlanner requires Java 8
+# OpenTripPlanner requires Java 11
 jdk:
   - openjdk11
 

@@ -125,16 +125,6 @@ public class StateEditor {
         return child;
     }
 
-    public boolean weHaveWalkedTooFar(RoutingRequest options) {
-        // Only apply limit in transit-only case, unless this is a one-to-many request with hard
-        // walk limiting, in which case we want to cut off the search.
-        if (options.modes.isTransit()) {
-            return child.walkDistance >= options.maxWalkDistance;
-        } else {
-            return false;
-        }
-    }
-
     public boolean isMaxPreTransitTimeExceeded(RoutingRequest options) {
         return child.preTransitTime > options.maxPreTransitTime;
     }

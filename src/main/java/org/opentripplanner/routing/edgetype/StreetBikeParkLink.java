@@ -43,7 +43,7 @@ public class StreetBikeParkLink extends Edge {
         return null;
     }
 
-    public double getDistance() {
+    public double getDistanceMeters() {
         return 0;
     }
 
