@@ -98,17 +98,6 @@ public class GraphPathFinder {
         }
         options.rctx.remainingWeightHeuristic = heuristic;
 
-
-        /* In RoutingRequest, maxTransfers defaults to 2. But as discussed in #2522, you can't limit the number of
-         * transfers in our routing algorithm. This is a resource limiting problem, like imposing a walk limit or
-         * not optimizing on arrival time in a time-dependent network (both of which we have done / do but need
-         * to systematically eliminate).
-         */
-        options.maxTransfers = 4; // should probably be Integer.MAX_VALUE;
-
-        // OTP now always uses what used to be called longDistance mode. Non-longDistance mode is no longer supported.
-        options.longDistance = true;
-
         /* maxWalk has a different meaning than it used to. It's the radius around the origin or destination within
          * which you can walk on the streets. An unlimited value would cause the bidi heuristic to do unbounded street
          * searches and consider the whole graph walkable.
@@ -280,9 +269,6 @@ public class GraphPathFinder {
         State lastState = paths.get(0).states.getLast();
         GraphPath newPath = new GraphPath(lastState, false);
         Vertex lastVertex = lastState.getVertex();
-
-        //With more paths we should allow more transfers
-        lastState.getOptions().maxTransfers *= paths.size();
 
         for (GraphPath path : paths.subList(1, paths.size())) {
             lastState = newPath.states.getLast();
