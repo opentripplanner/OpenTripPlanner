@@ -404,6 +404,10 @@ public class GenericGbfsService implements VehicleRentalDataSource, JsonConfigur
             if (!bike.is_disabled && !bike.is_reserved) {
                 VehicleRentalStation floatingVehicle = new VehicleRentalStation();
                 floatingVehicle.id = bike.bike_id;
+                // some GBFS feeds have `null` as the value for bike_id. If that happens, just set the id to be a UUID.
+                if (floatingVehicle.id == null) {
+                    floatingVehicle.id = UUID.randomUUID().toString();
+                }
                 floatingVehicle.name = new NonLocalizedString(bike.bike_id);
                 floatingVehicle.x = bike.lon;
                 floatingVehicle.y = bike.lat;
