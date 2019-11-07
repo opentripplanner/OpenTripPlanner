@@ -21,18 +21,14 @@ import java.util.stream.Collectors;
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
 
-    private double distance;
+    private double effectiveWalkDistance;
     
     private List<Edge> edges;
 
-    public SimpleTransfer(TransitStopVertex from, TransitStopVertex to, double distance, LineString geometry, List<Edge> edges) {
+    public SimpleTransfer(TransitStopVertex from, TransitStopVertex to, double effectiveWalkDistance, List<Edge> edges) {
         super(from, to);
-        this.distance = distance;
+        this.effectiveWalkDistance = effectiveWalkDistance;
         this.edges = edges;
-    }
-
-    public SimpleTransfer(TransitStopVertex from, TransitStopVertex to, double distance, LineString geometry) {
-        this(from, to, distance, geometry, null);
     }
 
     @Override
@@ -44,7 +40,7 @@ public class SimpleTransfer extends Edge {
         if (s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
-        if(distance > s0.getOptions().maxTransferWalkDistance) {
+        if(effectiveWalkDistance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
         // Only transfer right after riding a vehicle.
@@ -52,10 +48,10 @@ public class SimpleTransfer extends Edge {
         double walkspeed = rr.walkSpeed;
         StateEditor se = s0.edit(this);
         se.setBackMode(TraverseMode.WALK);
-        int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
+        int time = (int) Math.ceil(effectiveWalkDistance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
         se.incrementTimeInSeconds(time);
         se.incrementWeight(time * rr.walkReluctance);
-        se.incrementWalkDistance(distance);
+        se.incrementWalkDistance(effectiveWalkDistance);
         return se.makeState();
     }
 
@@ -72,13 +68,13 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest rr) {
-        int time = (int) (distance / rr.walkSpeed); 
+        int time = (int) (effectiveWalkDistance / rr.walkSpeed);
         return (time * rr.walkReluctance);
     }
     
     @Override
-    public double getDistance(){
-    	return this.distance;
+    public double getEffectiveWalkDistance(){
+    	return this.effectiveWalkDistance;
     }
 
     @Override

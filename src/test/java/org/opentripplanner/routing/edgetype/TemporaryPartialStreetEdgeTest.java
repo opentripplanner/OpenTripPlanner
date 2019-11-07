@@ -50,7 +50,7 @@ public class TemporaryPartialStreetEdgeTest {
     @Test
     public void testConstruction() {
         TemporaryPartialStreetEdge pEdge = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getDistance());
+                "partial e1", e1.getDistanceMeters());
 
         assertTrue(pEdge.isEquivalentTo(e1));
         assertTrue(pEdge.isPartial());
@@ -69,9 +69,9 @@ public class TemporaryPartialStreetEdgeTest {
 
         // Partial edge with same endpoints as the parent.
         TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getDistance());
+                "partial e1", e1.getDistanceMeters());
         TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e2, v2, v3, e2.getGeometry(),
-                "partial e2", e2.getDistance());
+                "partial e2", e2.getDistanceMeters());
 
         // Traverse both the partial and parent edges.
         State s0 = new State(options);
@@ -173,9 +173,9 @@ public class TemporaryPartialStreetEdgeTest {
     @Test
     public void testReverseEdge() {
         TemporaryPartialStreetEdge pEdge1 = newTemporaryPartialStreetEdge(e1, v1, v2, e1.getGeometry(),
-                "partial e1", e1.getDistance());
+                "partial e1", e1.getDistanceMeters());
         TemporaryPartialStreetEdge pEdge2 = newTemporaryPartialStreetEdge(e1Reverse, v2, v1, e1Reverse.getGeometry(),
-                "partial e2", e1Reverse.getDistance());
+                "partial e2", e1Reverse.getDistanceMeters());
         
         assertFalse(e1.isReverseOf(pEdge1));
         assertFalse(pEdge1.isReverseOf(e1));

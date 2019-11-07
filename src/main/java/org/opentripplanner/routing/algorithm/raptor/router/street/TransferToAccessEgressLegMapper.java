@@ -24,7 +24,11 @@ public class TransferToAccessEgressLegMapper {
             Stop stop = entry.getKey();
             Transfer transfer = entry.getValue();
             int stopIndex = transitLayer.getIndexByStop(stop);
-            Transfer newTransfer = new Transfer(stopIndex, transfer.getDistanceMeters());
+            Transfer newTransfer = new Transfer(
+                    stopIndex,
+                    transfer.getEffectiveWalkDistanceMeters(),
+                    transfer.getEdges()
+            );
             result.add(new TransferWithDuration(newTransfer, walkSpeed));
         }
         return result;

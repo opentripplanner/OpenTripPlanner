@@ -7,12 +7,14 @@
 - Remove redundant LineStrings in order to save memory (#2795)
 - NeTEx import support (#2769).
 - Added NeTEx notices (#2824)
+- Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Make OTP run on Java 11 (#2812)
 - Fixes surefire test failure during build (#2816)
 - Disable linking from already linked stops (#2372)
+- Add Way Property Set for the UK (#2818)
 
 ## 1.4 (2019-07-30)
 

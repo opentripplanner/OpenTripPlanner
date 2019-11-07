@@ -29,10 +29,10 @@ class TransfersMapper {
 
             for (Edge edge : stopVertexForStop.get(stop).getOutgoing()) {
                 if (edge instanceof SimpleTransfer) {
-                    double distance = edge.getDistance();
+                    double effectiveDistance = edge.getEffectiveWalkDistance();
 
                     int toStopIndex = stopIndex.indexByStop.get(((TransitStopVertex) edge.getToVertex()).getStop());
-                    Transfer transfer = new Transfer(toStopIndex, (int) distance,
+                    Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
                             ((SimpleTransfer) edge).getEdges());
 
                     list.add(transfer);
