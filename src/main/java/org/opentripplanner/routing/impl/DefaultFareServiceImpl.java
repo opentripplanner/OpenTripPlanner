@@ -159,6 +159,8 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         fareRulesPerType.put(fareType, new ArrayList<>(fareRules));
     }
 
+    // TODO OTP2 Removing transit search from A* breaks this. I have commented out some code to
+    //      get it to compile.
     protected List<Ride> createRides(GraphPath path) {
         List<Ride> rides = new LinkedList<Ride>();
         Ride ride = null;
@@ -167,17 +169,17 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             if ( ! (edge instanceof HopEdge))
                 continue;
             HopEdge hEdge = (HopEdge) edge;
-            if (ride == null || ! state.getRoute().equals(ride.route)) {
-                ride = new Ride();
-                rides.add(ride);
-                ride.startZone = hEdge.getBeginStop().getZone();
-                ride.zones.add(ride.startZone);
-                ride.agency = state.getBackTrip().getRoute().getAgency().getId();
-                ride.route = state.getRoute();
-                ride.startTime = state.getBackState().getTimeSeconds();
-                ride.firstStop = hEdge.getBeginStop();
-                ride.trip = state.getTripId();
-            }
+            //if (ride == null || ! state.getRoute().equals(ride.route)) {
+            //    ride = new Ride();
+            //    rides.add(ride);
+            //    ride.startZone = hEdge.getBeginStop().getZone();
+            //    ride.zones.add(ride.startZone);
+            //    ride.agency = state.getBackTrip().getRoute().getAgency().getId();
+            //    ride.route = state.getRoute();
+            //    ride.startTime = state.getBackState().getTimeSeconds();
+            //    ride.firstStop = hEdge.getBeginStop();
+            //    ride.trip = state.getTripId();
+            //}
             ride.lastStop = hEdge.getEndStop();
             ride.endZone  = ride.lastStop.getZone();
             ride.zones.add(ride.endZone);

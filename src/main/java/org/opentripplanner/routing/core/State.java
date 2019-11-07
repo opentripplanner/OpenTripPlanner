@@ -1,15 +1,10 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.Date;
 import java.util.Set;
@@ -41,14 +36,6 @@ public class State implements Cloneable {
     // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
     // we should DEFINITELY rename this variable and the associated methods.
     public double walkDistance;
-
-    // The time traveled pre-transit, for park and ride or kiss and ride searches
-    int preTransitTime;
-
-    // track the states of all path parsers -- probably changes frequently
-    protected int[] pathParserStates;
-    
-    private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
     /* CONSTRUCTORS */
 
@@ -113,9 +100,7 @@ public class State implements Cloneable {
                     : TraverseMode.BICYCLE;
         }
         this.walkDistance = 0;
-        this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
-        stateData.routeSequence = new FeedScopedId[0];
     }
 
     /**
@@ -144,19 +129,6 @@ public class State implements Cloneable {
      * set methods are in StateEditor.
      */
 
-    /**
-     * Retrieve a State extension based on its key.
-     * 
-     * @param key - An Object that is a key in this State's extension map
-     * @return - The extension value for the given key, or null if not present
-     */
-    public Object getExtension(Object key) {
-        if (stateData.extensions == null) {
-            return null;
-        }
-        return stateData.extensions.get(key);
-    }
-
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
                 + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
@@ -168,8 +140,6 @@ public class State implements Cloneable {
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
                 " d=" + this.getWalkDistance() + 
-                " p=" + this.getPreTransitTime() +
-                " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() + ">";
     }
@@ -182,39 +152,6 @@ public class State implements Cloneable {
     /** returns the length of the trip in seconds up to this state */
     public long getElapsedTimeSeconds() {
         return Math.abs(getTimeSeconds() - stateData.startTime);
-    }
-
-    public TripTimes getTripTimes() {
-        return stateData.tripTimes;
-    }
-
-    public FeedScopedId getTripId() {
-        return stateData.tripId;
-    }
-
-    public Trip getPreviousTrip() {
-        return stateData.previousTrip;
-    }
-    
-    public String getZone() {
-        return stateData.zone;
-    }
-
-    public FeedScopedId getRoute() {
-        return stateData.route;
-    }
-
-    public int getNumBoardings() {
-        return stateData.numBoardings;
-    }
-
-
-    /**
-     * Whether this path has ever previously boarded (or alighted from, in a reverse search) a
-     * transit vehicle
-     */
-    public boolean isEverBoarded() {
-        return stateData.everBoarded;
     }
 
     public boolean isBikeRenting() {
@@ -251,16 +188,8 @@ public class State implements Cloneable {
         return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
     }
 
-    long getLastAlightedTimeSeconds() {
-        return stateData.lastAlightedTime;
-    }
-
     public double getWalkDistance() {
         return walkDistance;
-    }
-
-    public int getPreTransitTime() {
-        return preTransitTime;
     }
 
     public Vertex getVertex() {
@@ -286,13 +215,6 @@ public class State implements Cloneable {
             return 0.0;
     }
 
-    private int getPreTransitTimeDelta () {
-        if (backState != null)
-            return Math.abs(this.preTransitTime - backState.preTransitTime);
-        else
-            return 0;
-    }
-
     public double getWeightDelta() {
         return this.weight - backState.weight;
     }
@@ -314,14 +236,6 @@ public class State implements Cloneable {
     
     public boolean isBackWalkingBike () {
         return stateData.backWalkingBike;
-    }
-
-    /**
-     * Get the back trip of the given state. For time dependent transit, State will find the
-     * right thing to do.
-     */
-    public Trip getBackTrip () {
-        return backEdge.getTrip(); // This is probably wrong now, but we are no longer even using States to search on Transit.
     }
 
     public Edge getBackEdge() {
@@ -367,12 +281,6 @@ public class State implements Cloneable {
         return this;
     }
 
-    public State detachNextResult() {
-        State ret = this.next;
-        this.next = null;
-        return ret;
-    }
-
     public RoutingContext getContext() {
         return stateData.opt.rctx;
     }
@@ -398,8 +306,6 @@ public class State implements Cloneable {
         // We no longer compensate for schedule slack (minTransferTime) here.
         // It is distributed symmetrically over all preboard and prealight edges.
         State newState = new State(this.vertex, getTimeSeconds(), stateData.opt.reversedClone());
-        newState.stateData.tripTimes = stateData.tripTimes;
-        newState.stateData.initialWaitTime = stateData.initialWaitTime;
         // TODO Check if those two lines are needed:
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
@@ -419,26 +325,6 @@ public class State implements Cloneable {
 
     public long getTimeInMillis() {
         return time;
-    }
-
-    // subset check: is this a subset of that?
-    private boolean routeSequenceSubset (State that) {
-        FeedScopedId[] rs0 = this.stateData.routeSequence;
-        FeedScopedId[] rs1 = that.stateData.routeSequence;
-        if (rs0 == rs1) return true;
-        if (rs0.length > rs1.length) return false;
-        /* bad complexity, but these are tiny arrays */
-        for (FeedScopedId r0 : rs0) {
-            boolean match = false;
-            for (FeedScopedId r1 : rs1) {
-                if (r0 == r1) {
-                    match = true;
-                    break;
-                }
-            }
-            if (!match) return false;
-        }
-        return true;
     }
 
     public boolean multipleOptionsBefore() {
@@ -485,20 +371,6 @@ public class State implements Cloneable {
         }
         return foundAlternatePaths;
     }
-    
-    public String getPathParserStates() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("( ");
-        for (int i : pathParserStates) {
-            sb.append(String.format("%02d ", i));
-        }
-        sb.append(")");
-        return sb.toString();
-    }
-
-    public ServiceDay getServiceDay() {
-        return stateData.serviceDay;
-    }
 
     public Set<String> getBikeRentalNetworks() {
         return stateData.bikeRentalNetworks;
@@ -534,7 +406,6 @@ public class State implements Cloneable {
             editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
             editor.incrementWeight(orig.getWeightDelta());
             editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-            editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
 
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());
@@ -548,8 +419,6 @@ public class State implements Cloneable {
                 editor.setCarParked(!orig.isCarParked());
             if (orig.isBikeParked() != orig.getBackState().isBikeParked())
                 editor.setBikeParked(!orig.isBikeParked());
-
-            editor.setNumBoardings(getNumBoardings() - orig.getNumBoardings());
 
             ret = editor.makeState();
 

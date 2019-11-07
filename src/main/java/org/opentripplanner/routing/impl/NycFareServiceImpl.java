@@ -34,6 +34,7 @@ enum NycFareState {
 	BUS_PRE_TRANSFER, CANARSIE,
 }
 
+// TODO OTP2 Removing transit from A* breaks this. I have commented out code to get it to compile.
 /**
  * This handles the New York City MTA's baroque fare rules for subways and buses
  * with the following limitations:
@@ -110,41 +111,41 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				newRide = null;
 				continue;
 			}
-			FeedScopedId routeId = state.getRoute();
-			String agencyId = state.getBackTrip().getRoute().getAgency().getId();
-			if (!AGENCIES.contains(agencyId)) {
-				continue;
-			}
-			if (routeId == null) {
-				newRide = null;
-			} else {
-				if (newRide == null || !routeId.equals(newRide.route)) {
-					newRide = new Ride();
-					rides.add(newRide);
-
-					newRide.firstStop = ((HopEdge) backEdge).getBeginStop();
-
-					newRide.route = routeId;
-					Trip trip = state.getBackTrip();
-					Route route = trip.getRoute();
-					int type = route.getType();
-					newRide.classifier = type;
-					String shortName = route.getShortName();
-					if (shortName == null ) {
-						newRide.classifier = SUBWAY;
-					} else if (shortName.equals("BxM4C")) {
-						newRide.classifier = EXPENSIVE_EXPRESS_BUS;
-					} else if (shortName.startsWith("X")
-							|| shortName.startsWith("BxM")
-							|| shortName.startsWith("QM")
-							|| shortName.startsWith("BM")) {
-						newRide.classifier = EXPRESS_BUS; // Express bus
-					} 
-
-					newRide.startTime = state.getTimeSeconds();
-				}
-				newRide.lastStop = ((HopEdge) backEdge).getBeginStop();
-			}
+			//FeedScopedId routeId = state.getRoute();
+			//String agencyId = state.getBackTrip().getRoute().getAgency().getId();
+			//if (!AGENCIES.contains(agencyId)) {
+			//	continue;
+			//}
+			//if (routeId == null) {
+			//	newRide = null;
+			//} else {
+			//	if (newRide == null || !routeId.equals(newRide.route)) {
+			//		newRide = new Ride();
+			//		rides.add(newRide);
+			//
+			//		newRide.firstStop = ((HopEdge) backEdge).getBeginStop();
+			//
+			//		newRide.route = routeId;
+			//		Trip trip = state.getBackTrip();
+			//		Route route = trip.getRoute();
+			//		int type = route.getType();
+			//		newRide.classifier = type;
+			//		String shortName = route.getShortName();
+			//		if (shortName == null ) {
+			//			newRide.classifier = SUBWAY;
+			//		} else if (shortName.equals("BxM4C")) {
+			//			newRide.classifier = EXPENSIVE_EXPRESS_BUS;
+			//		} else if (shortName.startsWith("X")
+			//				|| shortName.startsWith("BxM")
+			//				|| shortName.startsWith("QM")
+			//				|| shortName.startsWith("BM")) {
+			//			newRide.classifier = EXPRESS_BUS; // Express bus
+			//		}
+			//
+			//		newRide.startTime = state.getTimeSeconds();
+			//	}
+			//	newRide.lastStop = ((HopEdge) backEdge).getBeginStop();
+			//}
 		}
 
 		// There are no rides, so there's no fare.
