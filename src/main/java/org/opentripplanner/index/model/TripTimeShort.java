@@ -9,6 +9,7 @@ import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.List;
 
 
@@ -70,5 +71,23 @@ public class TripTimeShort {
         }
         return out;
     }
-    
+
+    /**
+     * must pass in both table and trip, because tripTimes do not have stops.
+     * @param serviceDay service day to set, if null none is set
+     */
+    public static List<TripTimeShort> fromTripTimes(Timetable table, Trip trip,
+            ServiceDay serviceDay) {
+        TripTimes times = table.getTripTimes(table.getTripIndex(trip.getId()));
+        List<TripTimeShort> out = new ArrayList<>();
+        // one per stop, not one per hop, thus the <= operator
+        for (int i = 0; i < times.getNumStops(); ++i) {
+            out.add(new TripTimeShort(times, i, table.pattern.getStop(i), serviceDay));
+        }
+        return out;
+    }
+
+    public static Comparator<TripTimeShort> compareByDeparture() {
+        return Comparator.comparing(t -> t.serviceDay + t.realtimeDeparture);
+    }
 }
