@@ -863,7 +863,7 @@
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
-            <version>2.2.0</version>
+            <version>9.2</version>
         </dependency>
         <!-- Support for OTP scripting -->
         <dependency>
