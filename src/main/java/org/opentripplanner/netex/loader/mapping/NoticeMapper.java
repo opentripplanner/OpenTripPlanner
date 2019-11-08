@@ -4,8 +4,6 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.impl.EntityById;
 
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
-
 /**
  * Maps NeTEx notice to OTP notice.
  * <p/>
@@ -15,12 +13,16 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
  */
 class NoticeMapper {
 
+    private FeedScopedIdFactory idFactory;
+
     private EntityById<FeedScopedId, Notice> cache = new EntityById<>();
 
-    NoticeMapper() {}
+    NoticeMapper(FeedScopedIdFactory idFactory) {
+        this.idFactory = idFactory;
+    }
 
     Notice map(org.rutebanken.netex.model.Notice netexNotice) {
-            FeedScopedId id = createFeedScopedId(netexNotice.getId());
+            FeedScopedId id = idFactory.createId(netexNotice.getId());
             Notice otpNotice = cache.get(id);
 
             if(otpNotice == null) {
@@ -32,6 +34,5 @@ class NoticeMapper {
                 cache.add(otpNotice);
             }
             return otpNotice;
-
     }
 }

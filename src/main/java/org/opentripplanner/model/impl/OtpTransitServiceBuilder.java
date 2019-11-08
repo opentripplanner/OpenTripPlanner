@@ -8,6 +8,8 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
@@ -53,6 +55,10 @@ public class OtpTransitServiceBuilder {
     private final List<FeedInfo> feedInfos = new ArrayList<>();
 
     private final List<Frequency> frequencies = new ArrayList<>();
+
+    private final EntityById<FeedScopedId, GroupOfStations> groupsOfStationsById = new EntityById<>();
+
+    private final EntityById<FeedScopedId, MultiModalStation> multiModalStationsById = new EntityById<>();
 
     private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
 
@@ -109,6 +115,14 @@ public class OtpTransitServiceBuilder {
 
     public List<Frequency> getFrequencies() {
         return frequencies;
+    }
+
+    public EntityById<FeedScopedId, GroupOfStations> getGroupsOfStationsById() {
+        return groupsOfStationsById;
+    }
+
+    public EntityById<FeedScopedId, MultiModalStation> getMultiModalStationsById() {
+        return multiModalStationsById;
     }
 
     /**

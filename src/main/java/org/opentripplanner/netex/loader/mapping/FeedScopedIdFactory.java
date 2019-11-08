@@ -8,18 +8,17 @@ import org.opentripplanner.model.FeedScopedId;
  * <p>
  * This factory is used to set the feed id once and then apply it to elements as they are created.
  * <p>
- * This class should only be used by the Netex import/mapping process. It is NOT THREAD SAFE and each import
- * must be done in sequence for it to work properly.
+ * This class should only be used by the Netex import/mapping process.
  */
 class FeedScopedIdFactory {
-    private static String feedId = "NETEX_AGENCY_ID_NOT_SET";
 
-    public static void setFeedId(String feedId) {
-        FeedScopedIdFactory.feedId = feedId;
+    private final String feedId;
+
+    public FeedScopedIdFactory(String feedId) {
+        this.feedId = feedId;
     }
 
-
-    public static FeedScopedId createFeedScopedId(String netexId) {
+    public FeedScopedId createId(String netexId) {
         return new FeedScopedId(feedId, netexId);
     }
 }
