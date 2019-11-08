@@ -32,6 +32,7 @@ public class StopTimesMapperTest {
         NetexTestDataSample sample = new NetexTestDataSample();
 
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
+                MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 sample.getDestinationDisplayById(),
                 sample.getQuayIdByStopPointRef()

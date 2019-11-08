@@ -34,7 +34,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
+import static org.opentripplanner.netex.loader.mapping.MappingSupport.ID_FACTORY;
 import static org.opentripplanner.netex.loader.mapping.MappingSupport.createJaxbElement;
 import static org.opentripplanner.netex.loader.mapping.MappingSupport.createWrappedRef;
 
@@ -68,7 +68,7 @@ class NetexTestDataSample {
         // Add OTP Route (correspond to Netex Line)
         {
             org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
-            otpRoute.setId(createFeedScopedId(line.getId()));
+            otpRoute.setId(ID_FACTORY.createId(line.getId()));
             otpRouteByid.add(otpRoute);
         }
 
@@ -187,7 +187,7 @@ class NetexTestDataSample {
 
     private static Stop newStop(String s) {
         Stop stop1 = new Stop();
-        stop1.setId(createFeedScopedId(s));
+        stop1.setId(ID_FACTORY.createId(s));
         return stop1;
     }
 

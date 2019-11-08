@@ -24,6 +24,7 @@ public class TripPatternMapperTest {
         NetexTestDataSample sample = new NetexTestDataSample();
 
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
+                MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 sample.getOtpRouteByid(),
                 sample.getRouteById(),
