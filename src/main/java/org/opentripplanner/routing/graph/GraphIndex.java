@@ -24,6 +24,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
@@ -58,6 +59,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -436,5 +438,26 @@ public class GraphIndex {
      */
     public Collection<Operator> getAllOperators() {
         return operatorForId.values();
+    }
+
+    /**
+     *
+     * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+     * @return The associated TransitStopVertex or all underlying TransitStopVertices
+     */
+    public Set<TransitStopVertex> getStopVerticesById(FeedScopedId id) {
+        // Station
+        Station station = graph.stationById.get(id);
+        if (station != null) {
+            return station.getChildStops().stream()
+                    .map(s -> graph.index.stopVertexForStop.get(s))
+                    .collect(Collectors.toSet());
+        }
+        // Single stop
+        Stop stop = graph.index.stopForId.get(id);
+        if (stop != null) {
+            return Collections.singleton(this.stopVertexForStop.get(stop));
+        }
+        return null;
     }
 }
