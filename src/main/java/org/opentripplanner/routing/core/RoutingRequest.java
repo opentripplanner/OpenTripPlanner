@@ -81,6 +81,34 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double maxWalkDistance = Double.MAX_VALUE;
 
+
+    /**
+     *  new maxWalkdistance parameters for RAPTOR (OTP 2.0) algorithm
+     */
+
+    /**
+     * The absolute maximum that can be walked in access to public transport.
+     */
+    public int maxWalkDistanceAccess = 10 * 1000;
+
+    /**
+     * The desired maximum walk distance in access to public transport.
+     * When no stop can be found within this range, the range will be increased until the maxWalkDistanceAccess is
+     * reached.
+     */
+    public int desiredMaxWalkDistanceAccess = 2 * 1000;
+
+    /**
+     *
+     */
+    public int maxWalkDistanceEgress = 10 * 1000;
+
+    /**
+     *
+     */
+    public int desiredMaxWalkDistanceEgress = 2 * 1000;
+
+
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.
      * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.

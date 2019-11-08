@@ -27,6 +27,40 @@ public class AccessEgressRouter {
      * @param rr the current routing request
      * @param fromTarget whether to route from or towards the point provided in the routing request
      *                   (access or egress)
+     * @return Transfer objects by access/egress stop
+     */
+    public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget) {
+        int desiredDistance = fromTarget ? rr.desiredMaxWalkDistanceAccess : rr.desiredMaxWalkDistanceEgress;
+        int maxDistance = fromTarget ? rr.maxWalkDistanceAccess : rr.maxWalkDistanceEgress;
+
+
+        // Make sure that always one try is made.
+        if (desiredDistance > maxDistance) {
+            desiredDistance = maxDistance;
+        }
+
+        Map<Stop, Transfer> result = null;
+        while (desiredDistance < maxDistance) {
+            result = streetSearch(rr, fromTarget, desiredDistance);
+            if (result.size() > 0) {
+                return result;
+            }
+            desiredDistance += 1000;
+
+            if (desiredDistance >= maxDistance) {
+                result = streetSearch(rr, fromTarget, maxDistance);
+                return result;
+            }
+        }
+
+        return result;
+    }
+
+    /**
+     *
+     * @param rr the current routing request
+     * @param fromTarget whether to route from or towards the point provided in the routing request
+     *                   (access or egress)
      * @param distanceMeters the maximum street distance to search for access/egress stops
      * @return Transfer objects by access/egress stop
      */

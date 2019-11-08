@@ -66,9 +66,9 @@ public class RaptorRouter {
         double startTimeAccessEgress = System.currentTimeMillis();
 
         Map<Stop, Transfer> accessTransfers =
-            AccessEgressRouter.streetSearch(request, false, 2000);
+            AccessEgressRouter.streetSearch(request, false);
         Map<Stop, Transfer> egressTransfers =
-            AccessEgressRouter.streetSearch(request, true, 2000);
+            AccessEgressRouter.streetSearch(request, true);
 
         TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(transitLayer);
 
