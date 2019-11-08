@@ -19,8 +19,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.Map;
 
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
-
 /**
  * Maps NeTEx NoticeAssignment, which is the connection between a Notice and the object it refers
  * to. In the case of a notice referring to a StopPointInJourneyPattern, which has no OTP equivalent,
@@ -28,6 +26,8 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
  * same JourneyPattern.
  */
 class NoticeAssignmentMapper {
+
+    private final FeedScopedIdFactory idFactory;
 
     private final ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId;
 
@@ -40,17 +40,20 @@ class NoticeAssignmentMapper {
     private final Map<String, StopTime> stopTimesByNetexId;
 
     /** Note! The notce mapper cashes notices, making sure duplicates are not created. */
-    private final NoticeMapper noticeMapper = new NoticeMapper();
+    private final NoticeMapper noticeMapper;
 
     private static final Logger LOG = LoggerFactory.getLogger(NoticeAssignmentMapper.class);
 
     NoticeAssignmentMapper(
+            FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> passingTimeByStopPointId,
             ReadOnlyHierarchicalMap<String, org.rutebanken.netex.model.Notice> noticesById,
             EntityById<FeedScopedId, Route> routesById,
             EntityById<FeedScopedId, Trip> tripsById,
             Map<String, StopTime> stopTimesByNetexId
     ) {
+        this.idFactory = idFactory;
+        this.noticeMapper = new NoticeMapper(idFactory);
         this.passingTimeByStopPointId = passingTimeByStopPointId;
         this.noticesById = noticesById;
         this.routesById = routesById;
@@ -82,7 +85,7 @@ class NoticeAssignmentMapper {
         } else if (stopTimesByNetexId.containsKey(noticedObjectId)) {
             noticiesByEntity.put(lookupStopTimeKey(noticedObjectId), otpNotice);
         } else {
-            FeedScopedId otpId = createFeedScopedId(noticedObjectId);
+            FeedScopedId otpId = idFactory.createId(noticedObjectId);
 
             if(routesById.containsKey(otpId)) {
                 noticiesByEntity.put(routesById.get(otpId), otpNotice);

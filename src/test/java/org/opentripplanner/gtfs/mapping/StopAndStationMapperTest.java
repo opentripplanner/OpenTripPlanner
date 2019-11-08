@@ -9,12 +9,11 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-public class StopMapperTest {
+public class StopAndStationMapperTest {
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
     private static final String CODE = "Code";

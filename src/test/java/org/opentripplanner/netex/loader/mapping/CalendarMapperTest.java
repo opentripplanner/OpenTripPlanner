@@ -26,6 +26,7 @@ public class CalendarMapperTest {
     @Before
     public void setup() {
         subject = new CalendarMapper(
+                MappingSupport.ID_FACTORY,
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
                 new HierarchicalMapById<>()
