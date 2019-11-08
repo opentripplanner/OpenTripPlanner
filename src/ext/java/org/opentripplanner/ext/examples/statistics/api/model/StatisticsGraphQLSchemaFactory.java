@@ -20,8 +20,10 @@ public class StatisticsGraphQLSchemaFactory {
     private Relay relay = new Relay();
 
     private GraphQLInterfaceType nodeInterface = relay.nodeInterface(
-            o -> (o instanceof GraphStatistics) ? (GraphQLObjectType) graphStatisticsType : null);
-
+            e -> (e.getObject() instanceof GraphStatistics)
+                    ? (GraphQLObjectType) graphStatisticsType
+                    : null
+    );
 
     private StatisticsGraphQLSchemaFactory(final GraphStatistics index) {
         graphStatisticsType = createType(graphStatisticsType)

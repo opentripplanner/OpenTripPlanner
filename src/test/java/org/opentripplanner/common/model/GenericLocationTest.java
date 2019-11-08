@@ -146,7 +146,7 @@ public class GenericLocationTest {
         assertFalse(loc.hasHeading());
         
         assertFalse(loc.hasName());
-        assertFalse(loc.hasPlace());   
+        assertFalse(loc.hasPlace());
     }
     
     @Test
