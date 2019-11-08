@@ -1,9 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.graph_builder.annotation.ParentStationNotFoundAnnotation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.routing.graph.AddBuilderAnnotation;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 
@@ -16,9 +20,17 @@ class LinkStopsAndParentStationsTogether {
     private final EntityById<FeedScopedId, Station> otpStations;
     private final EntityById<FeedScopedId, Stop> otpStops;
 
-    LinkStopsAndParentStationsTogether(EntityById<FeedScopedId, Station> stations, EntityById<FeedScopedId, Stop> stops) {
+    private final AddBuilderAnnotation addBuilderAnnotation;
+
+    private static Logger LOG = LoggerFactory.getLogger(LinkStopsAndParentStationsTogether.class);
+
+    LinkStopsAndParentStationsTogether(
+            EntityById<FeedScopedId, Station> stations,
+            EntityById<FeedScopedId, Stop> stops,
+            AddBuilderAnnotation addBuilderAnnotation) {
         this.otpStations = stations;
         this.otpStops = stops;
+        this.addBuilderAnnotation = addBuilderAnnotation;
     }
 
     void link(Collection<org.onebusaway.gtfs.model.Stop> gtfsStops) {
@@ -27,6 +39,16 @@ class LinkStopsAndParentStationsTogether {
 
                 Stop otpStop = getOtpStop(gtfsStop);
                 Station otpStation = getOtpParentStation(gtfsStop);
+
+                if (otpStation == null) {
+                    addBuilderAnnotation.addBuilderAnnotation(
+                            new ParentStationNotFoundAnnotation(
+                                    otpStop,
+                                    gtfsStop.getParentStation()
+                            )
+                    );
+                    continue;
+                }
 
                 otpStop.setParentStation(otpStation);
                 otpStation.addChildStop(otpStop);

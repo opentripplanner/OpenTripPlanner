@@ -42,11 +42,17 @@ public class MockGtfs {
     }
 
     public OtpTransitServiceBuilder read() throws IOException {
-        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(gtfsDelegate.read());
+        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
+                gtfsDelegate.read(),
+                annotation -> null
+        );
     }
 
     public OtpTransitServiceBuilder read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
-        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(gtfsDelegate.read(reader));
+        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
+                gtfsDelegate.read(reader),
+                annotation -> null
+        );
     }
 
     public void putMinimal() {
