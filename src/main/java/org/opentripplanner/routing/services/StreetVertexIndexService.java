@@ -10,6 +10,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Set;
 
 public interface StreetVertexIndexService {
 
@@ -44,8 +45,18 @@ public interface StreetVertexIndexService {
     List<TransitStopVertex> getTransitStopForEnvelope(Envelope envelope);
 
     /**
-     * Finds the appropriate vertex for this location.
+     * Finds the appropriate vertices for this location.
      * 
+     * @param place
+     * @param options
+     * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
+     * @return
+     */
+    Set<Vertex> getVerticesForLocation(GenericLocation place, RoutingRequest options, boolean endVertex);
+
+    /**
+     * Finds the appropriate vertex for this location.
+     *
      * @param place
      * @param options
      * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)

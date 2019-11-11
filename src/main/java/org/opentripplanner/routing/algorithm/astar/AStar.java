@@ -125,9 +125,10 @@ public class AStar {
         runState.targetAcceptedStates = Lists.newArrayList();
         
         if (addToQueue) {
-            State initialState = new State(options);
-            runState.spt.add(initialState);
-            runState.pq.insert(initialState, 0);
+            for (State initialState : State.getStates(options)) {
+                runState.spt.add(initialState);
+                runState.pq.insert(initialState, 0);
+            }
         }
     }
 
@@ -231,7 +232,7 @@ public class AStar {
              * Terminate based on timeout?
              */
             if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+                LOG.warn("Search timeout. origin={} target={}", runState.rctx.fromVertices, runState.rctx.toVertices);
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
@@ -264,10 +265,10 @@ public class AStar {
             }
             if (runState.terminationStrategy != null) {
                 if (runState.terminationStrategy.shouldSearchTerminate (
-                    runState.rctx.origin, runState.rctx.target, runState.u, runState.spt, runState.options)) {
+                    runState.rctx.fromVertices, runState.rctx.toVertices, runState.u, runState.spt, runState.options)) {
                     break;
                 }
-            }  else if (runState.u_vertex == runState.rctx.target && runState.u.isFinal()) {
+            }  else if (runState.rctx.toVertices.contains(runState.u_vertex) && runState.u.isFinal()) {
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();

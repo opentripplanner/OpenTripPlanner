@@ -2,7 +2,11 @@ package org.opentripplanner.routing.core;
 
 import org.junit.Test;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+
+import java.util.Collections;
+import java.util.HashSet;
 
 import static org.junit.Assert.assertEquals;
 
@@ -28,6 +32,7 @@ public class StateEditorTest {
         request.setMode(TraverseMode.CAR);
         request.parkAndRide = true;
         Graph graph = new Graph();
+        graph.index = new GraphIndex(graph);
         graph.streetIndex = new StreetVertexIndexServiceImpl(graph);
         request.rctx = new RoutingContext(request, graph);
         State state = new State(request);

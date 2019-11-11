@@ -33,6 +33,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -882,6 +883,20 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
         setRoutingContext(graph, null, from, to);
+    }
+
+    public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
+        setRoutingContext(graph, null, from, to);
+    }
+
+    public void setRoutingContext(Graph graph, Edge fromBackEdge, Set<Vertex> from, Set<Vertex> to) {
+        // normally you would want to tear down the routing context...
+        // but this method is mostly used in tests, and teardown interferes with testHalfEdges
+        // FIXME here, or in test, and/or in other places like TSP that use this method
+        // if (rctx != null)
+        // this.rctx.destroy();
+        this.rctx = new RoutingContext(this, graph, from, to);
+        this.rctx.originBackEdge = fromBackEdge;
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */

@@ -2,6 +2,7 @@ package org.opentripplanner.common.model;
 
 import com.google.common.base.Joiner;
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.io.Serializable;
 import java.util.regex.Matcher;
@@ -28,6 +29,12 @@ public class GenericLocation implements Cloneable, Serializable {
      * The identifier of the place, if provided. May be a lat,lng string or a vertex ID.
      */
     public final String place;
+
+    /**
+     * This can be a Stop or StopCollection
+     */
+    // TODO Get this from the request
+    public final FeedScopedId stopCollectionId = new FeedScopedId("test", "test");
 
     /**
      * Coordinates of the place, if provided.

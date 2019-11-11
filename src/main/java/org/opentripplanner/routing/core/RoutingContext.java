@@ -14,13 +14,13 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -42,15 +42,9 @@ public class RoutingContext implements Cloneable {
 
     public final Graph graph;
 
-    public final Vertex fromVertex;
+    public final Set<Vertex> fromVertices;
 
-    public final Vertex toVertex;
-
-    // origin means "where the initial state will be located" not "the beginning of the trip from the user's perspective"
-    public final Vertex origin;
-
-    // target means "where this search will terminate" not "the end of the trip from the user's perspective"
-    public final Vertex target;
+    public final Set<Vertex> toVertices;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
@@ -74,13 +68,17 @@ public class RoutingContext implements Cloneable {
      * Constructor that automatically computes origin/target from RoutingRequest.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph) {
-        this(routingRequest, graph, null, null, true);
+        this(routingRequest, graph, (Vertex)null, null, true);
     }
 
     /**
      * Constructor that takes to/from vertices as input.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
+        this(routingRequest, graph, from, to, false);
+    }
+
+    public RoutingContext(RoutingRequest routingRequest, Graph graph, Set<Vertex> from, Set<Vertex> to) {
         this(routingRequest, graph, from, to, false);
     }
 
@@ -139,8 +137,13 @@ public class RoutingContext implements Cloneable {
      * 
      * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
      */
-    private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
-            boolean findPlaces) {
+    private RoutingContext(
+            RoutingRequest routingRequest,
+            Graph graph,
+            Set<Vertex> from,
+            Set<Vertex> to,
+            boolean findPlaces
+    ) {
         if (graph == null) {
             throw new GraphNotFoundException();
         }
@@ -148,53 +151,60 @@ public class RoutingContext implements Cloneable {
         this.graph = graph;
         this.debugOutput.startedCalculating();
 
-        Edge fromBackEdge = null;
-        Edge toBackEdge = null;
+        Set<Vertex> fromVertices;
+        Set<Vertex> toVertices;
+
         if (findPlaces) {
             // normal mode, search for vertices based RoutingRequest and split streets
-            toVertex = graph.streetIndex.getVertexForLocation(opt.to, opt, true);
-            if (opt.startingTransitTripId != null && !opt.arriveBy) {
-                // Depart on-board mode: set the from vertex to "on-board" state
-                OnBoardDepartService onBoardDepartService = graph.getService(OnBoardDepartService.class);
-                if (onBoardDepartService == null)
-                    throw new UnsupportedOperationException("Missing OnBoardDepartService");
-                fromVertex = onBoardDepartService.setupDepartOnBoard(this);
-            } else {
-                fromVertex = graph.streetIndex.getVertexForLocation(opt.from, opt, false);
-            }
+            fromVertices = graph.streetIndex.getVerticesForLocation(opt.from, opt, false);
+            toVertices = graph.streetIndex.getVerticesForLocation(opt.to, opt, true);
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching
-            fromVertex = from;
-            toVertex = to;
+            fromVertices = from;
+            toVertices = to;
         }
 
-        // If the from and to vertices are generated and lie on some of the same edges, we need to wire them
-        // up along those edges so that we don't get odd circuitous routes for really short trips.
-        // TODO(flamholz): seems like this might be the wrong place for this code? Can't find a better one.
-        //
-        if (fromVertex instanceof TemporaryStreetLocation && toVertex instanceof TemporaryStreetLocation) {
-            TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
-            TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
-            Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex, toStreetVertex);
-            for (StreetEdge pse : overlap) {
-                makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
-            }
-        }
+        this.fromVertices = routingRequest.arriveBy ? toVertices : fromVertices;
+        this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
 
-        origin = opt.arriveBy ? toVertex : fromVertex;
-        originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
-        target = opt.arriveBy ? fromVertex : toVertex;
+        adjustForSameFromToEdge();
+
         remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
+    }
 
-        if (this.origin != null) {
-            LOG.debug("Origin vertex inbound edges {}", this.origin.getIncoming());
-            LOG.debug("Origin vertex outbound edges {}", this.origin.getOutgoing());
-        }
-        // target is where search will terminate, can be origin or destination depending on arriveBy
-        LOG.debug("Target vertex {}", this.target);
-        if (this.target != null) {
-            LOG.debug("Destination vertex inbound edges {}", this.target.getIncoming());
-            LOG.debug("Destination vertex outbound edges {}", this.target.getOutgoing());
+    private RoutingContext(
+            RoutingRequest routingRequest,
+            Graph graph,
+            Vertex from,
+            Vertex to,
+            boolean findPlaces
+    ) {
+        this(
+                routingRequest,
+                graph,
+                Collections.singleton(from),
+                Collections.singleton(to),
+                findPlaces
+        );
+    }
+
+    /**
+     * If the from and to vertices are generated and lie on some of the same edges, we need to wire
+     * them up along those edges so that we don't get odd circuitous routes for really short trips.
+     */
+    private void adjustForSameFromToEdge() {
+        if (fromVertices != null && toVertices != null) {
+            Vertex fromVertex = fromVertices.iterator().next();
+            Vertex toVertex = toVertices.iterator().next();
+            if (fromVertex instanceof TemporaryStreetLocation && toVertex instanceof TemporaryStreetLocation) {
+                TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
+                TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
+                Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex,
+                        toStreetVertex);
+                for (StreetEdge pse : overlap) {
+                    makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+                }
+            }
         }
     }
 
@@ -204,12 +214,12 @@ public class RoutingContext implements Cloneable {
         ArrayList<String> notFound = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
-        if (fromVertex == null) {
+        if (fromVertices == null) {
             notFound.add("from");
         }
 
         // check destination present when not doing a depart-after batch search
-        if (toVertex == null) {
+        if (toVertices == null) {
             notFound.add("to");
         }
         if (notFound.size() > 0) {
@@ -223,7 +233,11 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        TemporaryVertex.dispose(fromVertex);
-        TemporaryVertex.dispose(toVertex);
+        for (Vertex fromVertex : fromVertices) {
+            TemporaryVertex.dispose(fromVertex);
+        }
+        for (Vertex toVertex : toVertices) {
+            TemporaryVertex.dispose(toVertex);
+        }
     }
 }

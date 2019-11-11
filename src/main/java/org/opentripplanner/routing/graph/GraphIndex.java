@@ -456,7 +456,7 @@ public class GraphIndex {
      * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
      * @return The associated TransitStopVertex or all underlying TransitStopVertices
      */
-    public Set<TransitStopVertex> getStopVerticesById(FeedScopedId id) {
+    public Set<Vertex> getStopVerticesById(FeedScopedId id) {
         // Station
         Station station = graph.stationById.get(id);
         if (station != null) {

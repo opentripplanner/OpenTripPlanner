@@ -92,12 +92,12 @@ public class RoutingContextDestroyTest {
 
     private void originAndDestinationInsertedCorrect() {
         // Then - the origin and destination is
-        assertEquals("Origin", subject.fromVertex.getName());
-        assertEquals("Destination", subject.toVertex.getName());
+        assertEquals("Origin", subject.fromVertices.iterator().next().getName());
+        assertEquals("Destination", subject.toVertices.iterator().next().getName());
 
         // And - from the origin
         Collection<String> vertexesReachableFromOrigin = findAllReachableVertexes(
-                subject.fromVertex, true, new ArrayList<>());
+                subject.fromVertices.iterator().next(), true, new ArrayList<>());
         String msg = "All reachable vertexes from origin: " + vertexesReachableFromOrigin;
 
         // it is possible to reach the A, B, C and the Destination Vertex
@@ -108,7 +108,7 @@ public class RoutingContextDestroyTest {
 
         // And - from the destination we can backtrack
         Collection<String> vertexesReachableFromDestination = findAllReachableVertexes(
-                subject.toVertex, false, new ArrayList<>());
+                subject.toVertices.iterator().next(), false, new ArrayList<>());
         msg = "All reachable vertexes back from destination: " + vertexesReachableFromDestination;
 
         // and reach the A, B and the Origin Vertex

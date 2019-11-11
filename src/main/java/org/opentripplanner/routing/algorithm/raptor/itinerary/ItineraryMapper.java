@@ -138,7 +138,8 @@ public class ItineraryMapper {
         Stop accessToStop = transitLayer.getStopByIndex(accessPathLeg.toStop());
         Transfer accessPath = accessPaths.get(accessToStop);
 
-        Place from = mapOriginTargetToPlace(request.rctx.fromVertex, request.from);
+        // TODO Need to account for multiple fromVertices
+        Place from = mapOriginTargetToPlace(request.rctx.fromVertices.iterator().next(), request.from);
         Place to = mapStopToPlace(accessToStop);
         mapNonTransitLeg(itinerary, accessPathLeg, accessPath, from, to, true);
     }
@@ -242,7 +243,8 @@ public class ItineraryMapper {
         Transfer egressPath = egressPaths.get(egressStop);
 
         Place from = mapStopToPlace(egressStop);
-        Place to = mapOriginTargetToPlace(request.rctx.toVertex, request.to);
+        // TODO Need to account for multiple toVertices
+        Place to = mapOriginTargetToPlace(request.rctx.toVertices.iterator().next(), request.to);
         mapNonTransitLeg(itinerary, egressPathLeg, egressPath, from, to, true);
     }
 

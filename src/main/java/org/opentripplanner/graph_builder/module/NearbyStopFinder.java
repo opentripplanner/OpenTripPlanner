@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -128,7 +129,7 @@ public class NearbyStopFinder {
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a StopVertex, the result will include it.
      *
-     * @param originVertex the origin point of the street search
+     * @param originVertices the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
      * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
@@ -138,14 +139,14 @@ public class NearbyStopFinder {
      *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
      */
     public List<StopAtDistance> findNearbyStopsViaStreets (
-            Vertex originVertex,
+            Set<Vertex> originVertices,
             boolean reverseDirection,
             boolean removeTempEdges
     ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.clampInitialWait = 0L;
-        routingRequest.setRoutingContext(graph, originVertex, null);
+        routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
@@ -158,15 +159,15 @@ public class NearbyStopFinder {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
-                if (targetVertex == originVertex) continue;
+                if (targetVertex == originVertices) continue;
                 if (targetVertex instanceof TransitStopVertex) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
         }
         /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        if (originVertex instanceof TransitStopVertex) {
-            stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
+        if (originVertices instanceof TransitStopVertex) {
+            stopsFound.add(new StopAtDistance((TransitStopVertex)originVertices, 0));
         }
         if (removeTempEdges) {
             routingRequest.cleanup();
@@ -176,7 +177,11 @@ public class NearbyStopFinder {
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
-        return findNearbyStopsViaStreets(originVertex, false, true);
+        return findNearbyStopsViaStreets(
+                Collections.singleton(originVertex),
+                false,
+                true
+        );
     }
 
     /**
