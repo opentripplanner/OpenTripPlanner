@@ -159,7 +159,7 @@ public class NearbyStopFinder {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
-                if (targetVertex == originVertices) continue;
+                if (originVertices.contains(targetVertex)) continue;
                 if (targetVertex instanceof TransitStopVertex) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }

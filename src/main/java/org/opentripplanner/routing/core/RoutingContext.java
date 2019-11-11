@@ -233,11 +233,15 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        for (Vertex fromVertex : fromVertices) {
-            TemporaryVertex.dispose(fromVertex);
+        if (fromVertices != null) {
+            for (Vertex fromVertex : fromVertices) {
+                TemporaryVertex.dispose(fromVertex);
+            }
         }
-        for (Vertex toVertex : toVertices) {
-            TemporaryVertex.dispose(toVertex);
+        if (toVertices != null) {
+            for (Vertex toVertex : toVertices) {
+                TemporaryVertex.dispose(toVertex);
+            }
         }
     }
 }
