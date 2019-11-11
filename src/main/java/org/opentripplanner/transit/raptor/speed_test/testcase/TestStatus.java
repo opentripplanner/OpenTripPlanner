@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 
 /**
@@ -16,7 +16,7 @@ enum TestStatus {
         this.label = label;
     }
 
-    private boolean is(org.opentripplanner.transit.raptor.speed_test.test.TestStatus value) {
+    private boolean is(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus value) {
         return this == value;
     }
 

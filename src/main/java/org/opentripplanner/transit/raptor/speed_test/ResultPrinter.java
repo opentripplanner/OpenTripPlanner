@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
-import org.opentripplanner.transit.raptor.speed_test.test.TestCase;
-import org.opentripplanner.transit.raptor.speed_test.test.TestCaseFailedException;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 import java.util.List;

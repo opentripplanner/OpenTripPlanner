@@ -1,64 +1,89 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
-import com.conveyal.r5.profile.StreetPath;
-import com.conveyal.r5.streets.StreetRouter;
-import com.conveyal.r5.transit.TransportNetwork;
 import gnu.trove.map.TIntIntMap;
+import gnu.trove.map.hash.TIntIntHashMap;
+import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.module.NearbyStopFinder;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
+import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
+import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
+import java.util.stream.Collectors;
 
 public class EgressAccessRouter {
+    private static final Logger LOG = LoggerFactory.getLogger(EgressAccessRouter.class);
 
-    private final static AvgTimer TIMER = AvgTimer.timerMilliSec("EgressAccessRouter:route");
-    private final TransportNetwork transportNetwork;
+    private static final AvgTimer TIMER = AvgTimer.timerMilliSec("EgressAccessRouter:route");
+    private final TransitLayer transitLayer;
+    private final Graph graph;
+    private final SimpleStreetSplitter splitter;
     private final SpeedTestRequest request;
 
-    StreetRouter egressRouter;
-    StreetRouter accessRouter;
+    public TIntIntMap egressTimesInSecondsByStopIndex;
+    public TIntIntMap accessTimesInSecondsByStopIndex;
 
-    public TIntIntMap egressTimesToStopsInSeconds;
-    public TIntIntMap accessTimesToStopsInSeconds;
-
-    public EgressAccessRouter(TransportNetwork transportNetwork, SpeedTestRequest request) {
-        this.transportNetwork = transportNetwork;
+    public EgressAccessRouter(Graph graph, TransitLayer transitLayer, SpeedTestRequest request) {
+        this.graph = graph;
+        this.transitLayer = transitLayer;
         this.request = request;
+        this.splitter = new SimpleStreetSplitter(graph, null, null, false);
     }
 
     public void route() {
         TIMER.time(() -> {
-            egressRouter = streetRoute(request, true);
-            accessRouter = streetRoute(request, false);
-
-            egressTimesToStopsInSeconds = egressRouter.getReachedStops();
-            accessTimesToStopsInSeconds = accessRouter.getReachedStops();
+            // Search for access to / egress from transit on streets.
+            NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
+                    graph, request.getAccessEgressMaxWalkDistanceMeters(), true
+            );
+            accessTimesInSecondsByStopIndex = streetRoute(nearbyStopFinder, request.tc().fromPlace, true);
+            egressTimesInSecondsByStopIndex = streetRoute(nearbyStopFinder, request.tc().toPlace, false);
         });
     }
 
-    public StreetPath accessPath(int boardStopIndex) {
-        StreetRouter.State accessState = accessRouter.getStateAtVertex(
-                transportNetwork.transitLayer.streetVertexForStop.get(boardStopIndex)
-        );
-        return new StreetPath(accessState, transportNetwork, false);
-    }
+    /** return access times (in seconds) by stop index */
+    private TIntIntMap streetRoute(NearbyStopFinder nearbyStopFinder, Place place, boolean fromOrigin) {
+        Vertex vertex = null;
 
-    public StreetPath egressPath(int alightStopIndex) {
-        StreetRouter.State egressState = egressRouter.getStateAtVertex(
-                transportNetwork.transitLayer.streetVertexForStop.get(alightStopIndex)
-        );
-        return new StreetPath(egressState, transportNetwork, false);
-    }
-
-    private StreetRouter streetRoute(SpeedTestRequest request, boolean fromDest) {
-        // Search for access to / egress from transit on streets.
-        StreetRouter sr = new StreetRouter(transportNetwork.streetLayer);
-        sr.profileRequest = request;
-        if (!fromDest ? !sr.setOrigin(request.fromLat, request.fromLon) : !sr.setOrigin(request.toLat, request.toLon)) {
-            throw new RuntimeException("Point not near a road.");
+        if(place.getStopId() != null) {
+            vertex = graph.getVertex(place.getStopId().getId());
         }
-        sr.timeLimitSeconds = request.maxWalkTime * 60;
-        sr.quantityToMinimize = StreetRouter.State.RoutingVariable.DURATION_SECONDS;
-        sr.route();
-        return sr;
-    }
+        if(vertex == null) {
+            vertex = new TemporaryStreetLocation(
+                    place.getDescription(),
+                    place.getCoordinate(),
+                    new NonLocalizedString(place.getDescription()),
+                    !fromOrigin
+            );
+            splitter.link(vertex);
+        }
 
+        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
+                nearbyStopFinder.findNearbyStopsViaStreets(vertex, !fromOrigin, false);
+
+        if(stopAtDistanceList.isEmpty()) {
+            throw new RuntimeException("Point not near a road: " + place);
+        }
+
+        TIntIntMap res = new TIntIntHashMap();
+
+        for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
+            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.tstop.getStop());
+            int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistance)
+                    .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
+            res.put(stopIndex, accessTimeSec);
+        }
+
+        LOG.info("Found {} {} stops", res.size(), fromOrigin ?  "access" : "egress");
+
+        return res;
+    }
 }

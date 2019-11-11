@@ -20,7 +20,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleE
 import java.util.Collection;
 
 /**
- * The seach context is used to hold search scoped instances and to pass these
+ * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
  *
  * @param <T> The TripSchedule type defined by the user of the range raptor API.

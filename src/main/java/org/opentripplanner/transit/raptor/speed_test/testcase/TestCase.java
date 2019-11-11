@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
 
@@ -12,19 +12,14 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrShort;
  * Hold all information about a test case and its results.
  */
 public class TestCase {
+    private static final String FEED_ID = "RB";
     public final String id;
     public final String description;
     public final int departureTime;
     public final int arrivalTime;
     public final int window;
-    public final String origin;
-    public final String fromPlace;
-    public final double fromLat;
-    public final double fromLon;
-    public final String toPlace;
-    public final double toLat;
-    public final double toLon;
-    public final String destination;
+    public final Place fromPlace;
+    public final Place toPlace;
     final TestCaseResults results;
 
     TestCase(
@@ -38,14 +33,8 @@ public class TestCase {
         this.arrivalTime = arrivalTime;
         this.window = window;
         this.description = description;
-        this.origin = origin;
-        this.fromPlace = fromPlace;
-        this.fromLat = fromLat;
-        this.fromLon = fromLon;
-        this.destination = destination;
-        this.toPlace = toPlace;
-        this.toLat = toLat;
-        this.toLon = toLon;
+        this.fromPlace = new Place(origin, FEED_ID, fromPlace, fromLat, fromLon);
+        this.toPlace = new Place(destination, FEED_ID, toPlace, toLat, toLon);
         this.results = testCaseResults == null ? new TestCaseResults(id) : testCaseResults;
     }
 
@@ -53,9 +42,9 @@ public class TestCase {
     public String toString() {
         return String.format(
                 "#%s %s - %s, (%.3f, %.3f) - (%.3f, %.3f), %s-%s(%s)",
-                id, origin, destination,
-                fromLat, fromLon,
-                toLat, toLon,
+                id, fromPlace.getDescription(), toPlace.getDescription(),
+                fromPlace.getLat(), fromPlace.getLon(),
+                toPlace.getLat(), toPlace.getLon(),
                 timeToStrShort(departureTime), timeToStrShort(arrivalTime), timeToStrShort(window)
         );
     }
@@ -94,7 +83,7 @@ public class TestCase {
     /**
      * List all results found for this testcase.
      */
-    List<org.opentripplanner.transit.raptor.speed_test.test.Result> actualResults() {
+    List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> actualResults() {
         return results.actualResults();
     }
 }

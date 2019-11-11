@@ -1,7 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
 import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
-import org.opentripplanner.transit.raptor.speed_test.api.model.Place;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 
 
@@ -21,9 +20,9 @@ public class TripPlanSupport {
 
     public static TripPlan createTripPlanForRequest(SpeedTestRequest request) {
         TripPlan tripPlan = new TripPlan();
-        tripPlan.date = request.getStartTimeAsDate();
-        tripPlan.from = new Place(request.getFromLon(), request.getFromLat(), "Origin");
-        tripPlan.to = new Place(request.getToLon(), request.getToLat(), "Destination");
+        tripPlan.date = request.getDepartureTimestamp();
+        tripPlan.from = request.tc().fromPlace;
+        tripPlan.to = request.tc().toPlace;
         return tripPlan;
     }
 

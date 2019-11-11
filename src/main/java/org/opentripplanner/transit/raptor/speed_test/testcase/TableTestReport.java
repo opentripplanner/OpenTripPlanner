@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
@@ -8,9 +8,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.transit.raptor.speed_test.test.OutputTable.Align.Center;
-import static org.opentripplanner.transit.raptor.speed_test.test.OutputTable.Align.Left;
-import static org.opentripplanner.transit.raptor.speed_test.test.OutputTable.Align.Right;
+import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Center;
+import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Left;
+import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Right;
 
 
 /**
@@ -19,15 +19,15 @@ import static org.opentripplanner.transit.raptor.speed_test.test.OutputTable.Ali
  */
 public class TableTestReport {
 
-    public static String report(List<org.opentripplanner.transit.raptor.speed_test.test.Result> results) {
+    public static String report(List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> results) {
         if (results.isEmpty()) {
             return "NO RESULTS FOUND FOR TEST CASE!";
         }
 
         Collections.sort(results);
 
-        org.opentripplanner.transit.raptor.speed_test.test.OutputTable table = newTable();
-        for (org.opentripplanner.transit.raptor.speed_test.test.Result it : results) {
+        org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable table = newTable();
+        for (org.opentripplanner.transit.raptor.speed_test.testcase.Result it : results) {
             addTo(table, it);
         }
         return table.toString();
@@ -36,14 +36,14 @@ public class TableTestReport {
 
     /* private methods */
 
-    private static org.opentripplanner.transit.raptor.speed_test.test.OutputTable newTable() {
-        return new org.opentripplanner.transit.raptor.speed_test.test.OutputTable(
+    private static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable newTable() {
+        return new org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable(
                         Arrays.asList(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
                         Arrays.asList("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
                 );
     }
 
-    private static void addTo(org.opentripplanner.transit.raptor.speed_test.test.OutputTable table, org.opentripplanner.transit.raptor.speed_test.test.Result result) {
+    private static void addTo(org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable table, org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
         boolean longFormat = true;
 
         table.addRow(

@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.google.common.base.Strings;
 

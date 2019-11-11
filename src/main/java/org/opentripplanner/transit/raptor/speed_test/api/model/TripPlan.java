@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;

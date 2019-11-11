@@ -1,5 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.transit.raptor.RangeRaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
@@ -7,19 +13,18 @@ import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.cli.CommandLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
-import org.opentripplanner.transit.raptor.speed_test.test.CsvFileIO;
-import org.opentripplanner.transit.raptor.speed_test.test.NoResultFound;
-import org.opentripplanner.transit.raptor.speed_test.test.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
+import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper2;
+import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.speed_test.transit.TripPlanSupport;
-import org.opentripplanner.transit.raptor.transitadapter.TransitLayerRRDataProvider;
-import org.opentripplanner.transit.raptor.transitadapter.TripScheduleAdapter;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -34,10 +39,11 @@ import java.util.stream.Collectors;
 public class SpeedTest {
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
-    private static final String NETWORK_DATA_FILE = "network.dat";
 
 
-    private static TransportNetwork transportNetwork;
+    private final Graph graph;
+    private final TransitLayer transitLayer;
+
 
     private final AvgTimer TOT_TIMER = AvgTimer.timerMilliSec("SpeedTest:route");
     private final AvgTimer TIMER_WORKER = AvgTimer.timerMilliSec("SpeedTest:route Worker");
@@ -54,26 +60,20 @@ public class SpeedTest {
     /**
      * Init profile used by the HttpServer
      */
-    private RangeRaptorService<TripScheduleAdapter> service;
+    private RangeRaptorService<TripSchedule> service;
 
 
-    private SpeedTest(CommandLineOpts opts) throws Exception {
+    public SpeedTest(Graph graph, CommandLineOpts opts) {
+        this.graph = graph;
         this.opts = opts;
-        initTransportNetwork();
+        this.transitLayer = TransitLayerMapper.map(graph);
     }
 
     public static void main(String[] args) throws Exception {
         AvgTimer.NOOP = false;
-        new SpeedTest(new SpeedTestCmdLineOpts(args)).runTest();
-    }
-
-    private void initTransportNetwork() throws Exception {
-        synchronized (NETWORK_DATA_FILE) {
-            if (transportNetwork == null) {
-                transportNetwork = KryoNetworkSerializer.read(new File(opts.rootDir(), NETWORK_DATA_FILE));
-                transportNetwork.rebuildTransientIndexes();
-            }
-        }
+        SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
+        Graph graph = GraphLoader.loadGraph(new File(opts.rootDir(), "Graph.obj"));
+        new SpeedTest(graph, opts).runTest();
     }
 
     private void runTest() throws Exception {
@@ -184,17 +184,17 @@ public class SpeedTest {
 
     public TripPlan route(SpeedTestRequest request, int latestArrivalTime) {
         try {
-            Collection<Path<TripScheduleAdapter>> paths;
-            EgressAccessRouter streetRouter = new EgressAccessRouter(transportNetwork, request);
+            Collection<Path<TripSchedule>> paths;
+            EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, request);
             streetRouter.route();
 
             // -------------------------------------------------------- [ WORKER ROUTE ]
 
-            TransitDataProvider<TripScheduleAdapter> transitData = transitData(request);
+            TransitDataProvider<TripSchedule> transitData = transitData(request);
 
             TIMER_WORKER.start();
 
-            RangeRaptorRequest<TripScheduleAdapter> req = rangeRaptorRequest(routeProfile, request, latestArrivalTime, streetRouter);
+            RangeRaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, latestArrivalTime, streetRouter);
 
             paths = service.route(req, transitData);
 
@@ -223,15 +223,15 @@ public class SpeedTest {
     }
 
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
-        EgressAccessRouter streetRouter = new EgressAccessRouter(transportNetwork, heurReq);
+        EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, heurReq);
         streetRouter.route();
-        TransitDataProvider<TripScheduleAdapter> transitData = transitData(heurReq);
+        TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
         int latestArrivalTime = routeReq.getArrivalTime();
 
-        RangeRaptorRequest<TripScheduleAdapter> req1 = heuristicRequest(
+        RangeRaptorRequest<TripSchedule> req1 = heuristicRequest(
                 heuristicProfile, heurReq, latestArrivalTime, streetRouter
         );
-        RangeRaptorRequest<TripScheduleAdapter> req2 = heuristicRequest(
+        RangeRaptorRequest<TripSchedule> req2 = heuristicRequest(
                 routeProfile, routeReq, latestArrivalTime, streetRouter
         );
 
@@ -255,7 +255,7 @@ public class SpeedTest {
         }
     }
 
-    private RangeRaptorRequest<TripScheduleAdapter> heuristicRequest(
+    private RangeRaptorRequest<TripSchedule> heuristicRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
             int latestArrivalTime,
@@ -271,7 +271,7 @@ public class SpeedTest {
     }
 
 
-    private RangeRaptorRequest<TripScheduleAdapter> rangeRaptorRequest(
+    private RangeRaptorRequest<TripSchedule> rangeRaptorRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
             int latestArrivalTime,
@@ -282,8 +282,8 @@ public class SpeedTest {
         );
     }
 
-    private static TripPlan mapToTripPlan(SpeedTestRequest request, Collection<Path<TripScheduleAdapter>> paths, EgressAccessRouter streetRouter) {
-        ItinerarySet itineraries = ItineraryMapper2.mapItineraries(request, paths, streetRouter, transportNetwork);
+    private TripPlan mapToTripPlan(SpeedTestRequest request, Collection<Path<TripSchedule>> paths, EgressAccessRouter streetRouter) {
+        ItinerarySet itineraries = ItineraryMapper.mapItineraries(request, paths, streetRouter, transitLayer);
 
         // Filter away similar itineraries for easier reading
         // itineraries.filter();
@@ -291,12 +291,14 @@ public class SpeedTest {
         return TripPlanSupport.createTripPlanForRequest(request, itineraries);
     }
 
-    private TransitLayerRRDataProvider transitData(SpeedTestRequest request) {
-        return new TransitLayerRRDataProvider(
-                transportNetwork.transitLayer,
-                request.date,
-                request.transitModes,
-                request.walkSpeed
+    private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
+        ZonedDateTime startOfTime = request.getDepartureDateWithZone();
+        return new RaptorRoutingRequestTransitData(
+                transitLayer,
+                startOfTime,
+                2,
+                request.getTransitModes(),
+                request.getWalkSpeedMeterPrSecond()
         );
     }
 
@@ -306,5 +308,4 @@ public class SpeedTest {
             System.gc();
         }
     }
-
 }

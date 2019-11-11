@@ -2,26 +2,31 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.speed_test.cli.CommandLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
-import org.opentripplanner.transit.raptor.speed_test.test.TestCase;
+import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
-import org.opentripplanner.transit.raptor.transitadapter.TripScheduleAdapter;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.Date;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
 
-/**
- * Help SpeedTast with mapping to new {@link RangeRaptorRequest}.
- */
-class RequestSupport {
-
+public class SpeedTestRequest {
     /**
      * This is used to expand the search window for all test cases to test the effect of long windows.
      * <p/>
@@ -29,13 +34,70 @@ class RequestSupport {
      */
     private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
 
-    /** Private to prevent it from instantiation. This is a utility class with ONLY static methods. */
-    private RequestSupport() { }
+    static final TuningParameters TUNING_PARAMETERS = new TuningParameters() {
+        @Override
+        public int maxNumberOfTransfers() {
+            return 12;
+        }
+
+        @Override
+        public int searchThreadPoolSize() {
+            return 0;
+        }
+    };
+
+    private final TestCase testCase;
+    private final SpeedTestCmdLineOpts opts;
+    private final LocalDate date = LocalDate.of(2019, 11, 11);
+    //public String description;
+    //public int numberOfItineraries;
+
+    SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts) {
+        this.testCase = testCase;
+        this.opts = opts;
+    }
+
+    // maxWalkTime = 20;
+    // maxTripDurationMinutes = 1200; // Not in use by the "new" RR or McRR
+    // description = testCase.origin + " -> " + testCase.destination;
+    // fromTime = testCase.departureTime;
+    // toTime = request.fromTime + testCase.window;
+    // date = LocalDate.of(2019, 1, 28);
+
+    // numberOfItineraries = opts.numOfItineraries();
+
+    public TestCase tc() { return testCase; }
+    public LocalDate getDepartureDate() {
+        return date;
+    }
+    public Date getDepartureTimestamp() {
+        return new Date(
+                date.atStartOfDay(ZoneId.of("Europe/Oslo")).toInstant().toEpochMilli()
+                        + testCase.departureTime * 1000
+        );
+    }
+    ZonedDateTime getDepartureDateWithZone() {
+        return ZonedDateTime.of(date, LocalTime.NOON, ZoneId.of("Europe/Oslo"));
+    }
+    public int getArrivalTime() {
+        return testCase.arrivalTime;
+    }
+    TraverseModeSet getTransitModes() {
+        return new TraverseModeSet(TraverseMode.BUS, TraverseMode.RAIL, TraverseMode.SUBWAY, TraverseMode.TRAM);
+    }
+    public EnumSet<TraverseMode> getAccessEgressModes() {
+        return EnumSet.of(TraverseMode.WALK);
+    }
+    double getWalkSpeedMeterPrSecond() {
+        // 1.4 m/s = ~ 5.0 km/t
+        return 1.4;
+    }
+    public double getAccessEgressMaxWalkDistanceMeters() {
+        return 300;
+    }
 
 
-    static RangeRaptorRequest<TripScheduleAdapter> xcreateRangeRaptorRequest(
-            TestCase testCase,
-            CommandLineOpts opts,
+    RangeRaptorRequest<TripSchedule> createRangeRaptorRequest(
             SpeedTestProfile profile,
             int latestArrivalTime,
             int numOfExtraTransfers,
@@ -46,10 +108,10 @@ class RequestSupport {
         int expandDeltaSeconds = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
 
 
-        RequestBuilder<TripScheduleAdapter> builder = new RequestBuilder<>();
+        RequestBuilder<TripSchedule> builder = new RequestBuilder<>();
         builder.searchParams()
                 .boardSlackInSeconds(120)
-                .timetableEnabled(false)
+                .timetableEnabled(true)
                 .earliestDepartureTime(testCase.departureTime - expandDeltaSeconds)
                 .latestArrivalTime(latestArrivalTime + expandDeltaSeconds)
                 .searchWindowInSeconds(testCase.window + 2 * expandDeltaSeconds)
@@ -71,12 +133,12 @@ class RequestSupport {
 
         builder.searchDirection(profile.forward);
 
-        addAccessEgressStopArrivals(streetRouter.accessTimesToStopsInSeconds, builder.searchParams()::addAccessStop);
-        addAccessEgressStopArrivals(streetRouter.egressTimesToStopsInSeconds, builder.searchParams()::addEgressStop);
+        addAccessEgressStopArrivals(streetRouter.accessTimesInSecondsByStopIndex, builder.searchParams()::addAccessStop);
+        addAccessEgressStopArrivals(streetRouter.egressTimesInSecondsByStopIndex, builder.searchParams()::addEgressStop);
 
         addDebugOptions(builder, opts);
 
-        RangeRaptorRequest<TripScheduleAdapter> req = builder.build();
+        RangeRaptorRequest<TripSchedule> req = builder.build();
 
         if (opts.debugRequest()) {
             System.err.println("-> Request: " + req);
@@ -93,7 +155,7 @@ class RequestSupport {
         }
     }
 
-    private static void addDebugOptions(RequestBuilder<TripScheduleAdapter> builder, CommandLineOpts opts) {
+    private static void addDebugOptions(RequestBuilder<TripSchedule> builder, CommandLineOpts opts) {
         List<Integer> stops = opts.debugStops();
         List<Integer> path = opts.debugPath();
 
@@ -107,7 +169,7 @@ class RequestSupport {
             return;
         }
 
-        DebugLogger<TripScheduleAdapter> logger = new DebugLogger<>(debugLoggerEnabled);
+        DebugLogger<TripSchedule> logger = new DebugLogger<>(debugLoggerEnabled);
 
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)

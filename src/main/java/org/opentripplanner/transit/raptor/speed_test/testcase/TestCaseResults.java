@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
 
@@ -18,16 +18,16 @@ import java.util.List;
  */
 class TestCaseResults {
     private String testCaseId;
-    private List<org.opentripplanner.transit.raptor.speed_test.test.Result> matchedResults = new ArrayList<>();
-    private List<org.opentripplanner.transit.raptor.speed_test.test.Result> expected = new ArrayList<>();
-    private List<org.opentripplanner.transit.raptor.speed_test.test.Result> actual = new ArrayList<>();
-    private org.opentripplanner.transit.raptor.speed_test.test.TestStatus status = org.opentripplanner.transit.raptor.speed_test.test.TestStatus.NA;
+    private List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> matchedResults = new ArrayList<>();
+    private List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> expected = new ArrayList<>();
+    private List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> actual = new ArrayList<>();
+    private org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus status = org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus.NA;
 
     TestCaseResults(String testCaseId) {
         this.testCaseId = testCaseId;
     }
 
-    void addExpectedResult(org.opentripplanner.transit.raptor.speed_test.test.Result expectedResult) {
+    void addExpectedResult(org.opentripplanner.transit.raptor.speed_test.testcase.Result expectedResult) {
         this.expected.add(expectedResult);
     }
 
@@ -35,7 +35,7 @@ class TestCaseResults {
         actual.addAll(ItineraryResultMapper.map(testCaseId, itineraries));
         boolean[] resultsOk = new boolean[actual.size()];
 
-        for (org.opentripplanner.transit.raptor.speed_test.test.Result exp : expected) {
+        for (org.opentripplanner.transit.raptor.speed_test.testcase.Result exp : expected) {
             int i = actual.indexOf(exp);
             if (i == -1) {
                 failed(exp);
@@ -52,7 +52,7 @@ class TestCaseResults {
         }
     }
 
-    List<org.opentripplanner.transit.raptor.speed_test.test.Result> actualResults() {
+    List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> actualResults() {
         return actual;
     }
 
@@ -86,25 +86,25 @@ class TestCaseResults {
 
     /* private methods */
 
-    private void failed(org.opentripplanner.transit.raptor.speed_test.test.Result result) {
-        addResult(org.opentripplanner.transit.raptor.speed_test.test.TestStatus.FAILED, result);
+    private void failed(org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
+        addResult(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus.FAILED, result);
     }
 
-    private void ok(org.opentripplanner.transit.raptor.speed_test.test.Result result) {
-        addResult(org.opentripplanner.transit.raptor.speed_test.test.TestStatus.OK, result);
+    private void ok(org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
+        addResult(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus.OK, result);
     }
 
-    private void notExpected(org.opentripplanner.transit.raptor.speed_test.test.Result result) {
-        addResult(org.opentripplanner.transit.raptor.speed_test.test.TestStatus.WARN, result);
+    private void notExpected(org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
+        addResult(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus.WARN, result);
     }
 
-    private void addResult(org.opentripplanner.transit.raptor.speed_test.test.TestStatus status, org.opentripplanner.transit.raptor.speed_test.test.Result result) {
+    private void addResult(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus status, org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
         updateStatus(status);
         result.setStatus(status);
         matchedResults.add(result);
     }
 
-    private void updateStatus(org.opentripplanner.transit.raptor.speed_test.test.TestStatus newStatus) {
+    private void updateStatus(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus newStatus) {
         if (status.ordinal() < newStatus.ordinal()) {
             status = newStatus;
         }

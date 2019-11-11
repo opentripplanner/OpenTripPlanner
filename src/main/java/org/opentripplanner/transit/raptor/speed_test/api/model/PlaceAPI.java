@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.api.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -9,7 +11,7 @@ import java.util.Calendar;
 /**
  * A Place is where a journey starts or ends, or a transit stop along the way.
  */
-public class Place {
+public class PlaceAPI {
 
     /**
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
@@ -19,7 +21,7 @@ public class Place {
     /**
      * The ID of the stop. This is often something that users don't care about.
      */
-    public AgencyAndId stopId = null;
+    public FeedScopedId stopId = null;
 
     /**
      * The "code" of the stop. Depending on the transit agency, this is often
@@ -94,6 +96,13 @@ public class Place {
 
     public String carParkId;
 
+    public PlaceAPI(Place place) {
+        this.name = place.getDescription();
+        this.stopId = place.getStopId();
+        this.lat = place.getLat();
+        this.lon = place.getLon();
+    }
+
     /**
      * Returns the geometry in GeoJSON format
      *
@@ -104,17 +113,17 @@ public class Place {
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 
-    public Place() {
+    public PlaceAPI() {
     }
 
-    public Place(Double lon, Double lat, String name) {
+    public PlaceAPI(Double lon, Double lat, String name) {
         this.lon = lon;
         this.lat = lat;
         this.name = name;
         this.vertexType = VertexType.NORMAL;
     }
 
-    public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
+    public PlaceAPI(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
         this(lon, lat, name);
         this.arrival = arrival;
         this.departure = departure;

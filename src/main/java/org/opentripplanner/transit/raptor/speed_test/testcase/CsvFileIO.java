@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
@@ -41,7 +41,7 @@ public class CsvFileIO {
      * </pre>
      */
     public List<TestCase> readTestCasesFromFile() throws IOException {
-        Map<String, org.opentripplanner.transit.raptor.speed_test.test.TestCaseResults> expectedResults = readExpectedResultsFromFile();
+        Map<String, org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseResults> expectedResults = readExpectedResultsFromFile();
         List<TestCase> testCases = new ArrayList<>();
         CsvReader csvReader = new CsvReader(testCasesFile.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
         csvReader.readHeaders(); // Skip header
@@ -85,7 +85,7 @@ public class CsvFileIO {
             out.println("tcId,transfers,duration,cost,walkDistance,startTime,endTime,details");
 
             for (TestCase tc : testCases) {
-                for (org.opentripplanner.transit.raptor.speed_test.test.Result result : tc.actualResults()) {
+                for (org.opentripplanner.transit.raptor.speed_test.testcase.Result result : tc.actualResults()) {
                     out.print(tc.id);
                     out.print(CSV_DELIMITER);
                     out.print(result.transfers);
@@ -114,26 +114,26 @@ public class CsvFileIO {
 
     /* private methods */
 
-    private Map<String, org.opentripplanner.transit.raptor.speed_test.test.TestCaseResults> readExpectedResultsFromFile() throws IOException {
+    private Map<String, org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseResults> readExpectedResultsFromFile() throws IOException {
         if (!expectedResultsFile.exists()) {
             return Collections.emptyMap();
         }
 
-        Map<String, org.opentripplanner.transit.raptor.speed_test.test.TestCaseResults> results = new HashMap<>();
+        Map<String, org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseResults> results = new HashMap<>();
         CsvReader csvReader = new CsvReader(expectedResultsFile.getAbsolutePath(), CSV_DELIMITER, CHARSET_UTF_8);
         csvReader.readHeaders();
 
         while (csvReader.readRecord()) {
             if (isCommentOrEmpty(csvReader.getRawRecord())) { continue; }
-            org.opentripplanner.transit.raptor.speed_test.test.Result expRes = readExpectedResult(csvReader);
-            results.computeIfAbsent(expRes.testCaseId, org.opentripplanner.transit.raptor.speed_test.test.TestCaseResults::new).addExpectedResult(expRes);
+            org.opentripplanner.transit.raptor.speed_test.testcase.Result expRes = readExpectedResult(csvReader);
+            results.computeIfAbsent(expRes.testCaseId, org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseResults::new).addExpectedResult(expRes);
         }
         return results;
     }
 
-    private org.opentripplanner.transit.raptor.speed_test.test.Result readExpectedResult(CsvReader csvReader) throws IOException {
+    private org.opentripplanner.transit.raptor.speed_test.testcase.Result readExpectedResult(CsvReader csvReader) throws IOException {
         try {
-            return new org.opentripplanner.transit.raptor.speed_test.test.Result(
+            return new org.opentripplanner.transit.raptor.speed_test.testcase.Result(
                     csvReader.get("tcId"),
                     Integer.parseInt(csvReader.get("transfers")),
                     Integer.parseInt(csvReader.get("duration")),

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.model.FeedScopedId;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
@@ -116,7 +117,7 @@ public class Leg {
     * For transit legs, the ID of the route.
     * For non-transit legs, null.
     */
-   public AgencyAndId routeId = null;
+   public FeedScopedId routeId = null;
 
    /**
     * For transit leg, the route's text color (if one exists). For non-transit legs, null.
@@ -166,7 +167,7 @@ public class Leg {
     * For transit legs, the ID of the trip.
     * For non-transit legs, null.
     */
-   public AgencyAndId tripId = null;
+   public FeedScopedId tripId = null;
 
    /**
     * For transit legs, the service date of the trip.
@@ -192,12 +193,12 @@ public class Leg {
     /**
     * The Place where the leg originates.
     */
-   public Place from = null;
+   public PlaceAPI from = null;
 
    /**
     * The Place where the leg begins.
     */
-   public Place to = null;
+   public PlaceAPI to = null;
 
    /**
     * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
@@ -206,7 +207,7 @@ public class Leg {
     */
    @XmlElementWrapper(name = "intermediateStops")
    @JsonProperty(value="intermediateStops")
-   public List<Place> stop;
+   public List<PlaceAPI> stop;
 
    /**
     * The leg's geometry.

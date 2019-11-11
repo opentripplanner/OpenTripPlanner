@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.test;
+package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.api.model.Leg;
@@ -39,12 +39,12 @@ class ItineraryResultMapper {
         AGENCY_NAMES_SHORT.put("Østfold fylkeskommune", "Øst");
     }
 
-    static Collection<org.opentripplanner.transit.raptor.speed_test.test.Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
+    static Collection<org.opentripplanner.transit.raptor.speed_test.testcase.Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
         return itineraries.stream().map(it -> map(testCaseId, it)).collect(Collectors.toList());
     }
 
-    private static org.opentripplanner.transit.raptor.speed_test.test.Result map(String testCaseId, Itinerary itinerary) {
-        org.opentripplanner.transit.raptor.speed_test.test.Result result = new org.opentripplanner.transit.raptor.speed_test.test.Result(
+    private static org.opentripplanner.transit.raptor.speed_test.testcase.Result map(String testCaseId, Itinerary itinerary) {
+        org.opentripplanner.transit.raptor.speed_test.testcase.Result result = new org.opentripplanner.transit.raptor.speed_test.testcase.Result(
                 testCaseId,
                 itinerary.transfers,
                 itinerary.duration.intValue(),
