@@ -18,6 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -69,6 +70,18 @@ public class RaptorRouter {
             AccessEgressRouter.streetSearch(request, false);
         Map<Stop, Transfer> egressTransfers =
             AccessEgressRouter.streetSearch(request, true);
+
+        if (accessTransfers.size() == 0 ) {
+            // TODO Would be nice a specification about why not path was found can be added.
+            // In this case base at the egress side no route can be found within the maxWalkDistanceAccess
+            throw new PathNotFoundException();
+        }
+        if (egressTransfers.size() == 0 ) {
+            // TODO Would be nice a specification about why not path was found can be added.
+            // In this case base at the egress side no route can be found within the maxWalkDistanceEgress
+            throw new PathNotFoundException();
+        }
+
 
         TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(transitLayer);
 
