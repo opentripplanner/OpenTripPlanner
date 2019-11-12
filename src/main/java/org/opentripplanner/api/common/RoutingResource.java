@@ -79,9 +79,29 @@ public abstract class RoutingResource {
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
 
-    /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
+    /**
+     * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
+     * In OTP 2.0 the behaviour of this parameter is modified, this parameter is used to
+     * set-up maxWalkDistanceAccess and maxWalkDistanceEgress when no parameter for this
+     * variables is specified.
+     *
+     * In case maxWalkDistanceAccess or maxWalkDistanceEgress is not used set the value is overriden
+     * based on this field.
+     * */
     @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
+
+    @QueryParam("maxWalkDistanceAccess")
+    protected Integer maxWalkDistanceAccess;
+
+    @QueryParam("desiredMaxWalkDistanceAccess")
+    protected Integer desiredMaxWalkDistanceAccess;
+
+    @QueryParam("maxWalkDistanceEgress")
+    protected Integer maxWalkDistanceEgress;
+
+    @QueryParam("desiredMaxWalkDistanceEgress")
+    protected Integer desiredMaxWalkDistanceEgress;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
@@ -458,9 +478,33 @@ public abstract class RoutingResource {
         if (numItineraries != null)
             request.setNumItineraries(numItineraries);
 
+        if (maxWalkDistanceAccess != null) {
+            request.maxWalkDistanceAccess = maxWalkDistanceAccess;
+        }
+
+        if (desiredMaxWalkDistanceAccess != null) {
+            request.desiredMaxWalkDistanceAccess = desiredMaxWalkDistanceAccess;
+        }
+
+        if (maxWalkDistanceEgress != null) {
+            request.maxWalkDistanceEgress = maxWalkDistanceEgress;
+        }
+
+        if (desiredMaxWalkDistanceEgress != null) {
+            request.desiredMaxWalkDistanceEgress = desiredMaxWalkDistanceEgress;
+        }
+
         if (maxWalkDistance != null) {
             request.setMaxWalkDistance(maxWalkDistance);
             request.maxTransferWalkDistance = maxWalkDistance;
+            // When maxWalkDistanceAccess or maxWalkDistanceEgress is not set, maxWalkDistance is used.
+            if (maxWalkDistanceAccess == null) {
+                request.maxWalkDistanceAccess = maxWalkDistance.intValue();
+            }
+            if (maxWalkDistanceEgress == null) {
+                request.maxWalkDistanceEgress = maxWalkDistance.intValue();
+            }
+
         }
 
         if (maxPreTransitTime != null)
