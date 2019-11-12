@@ -14,7 +14,7 @@ import org.rutebanken.netex.model.ServiceJourney;
 import javax.xml.bind.JAXBElement;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
+import static org.opentripplanner.netex.loader.mapping.MappingSupport.ID_FACTORY;
 
 public class TripMapperTest {
 
@@ -30,10 +30,10 @@ public class TripMapperTest {
     public void mapTrip() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
         Route route = new Route();
-        route.setId(createFeedScopedId(ROUTE_ID));
+        route.setId(ID_FACTORY.createId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
-        TripMapper tripMapper = new TripMapper(transitBuilder.getRoutes(),
+        TripMapper tripMapper = new TripMapper(ID_FACTORY, transitBuilder.getRoutes(),
                 new HierarchicalMapById<>(),
                 new HierarchicalMapById<>()
         );
@@ -44,14 +44,14 @@ public class TripMapperTest {
 
         Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
-        assertEquals(trip.getId(), createFeedScopedId(SERVICE_JOURNEY_ID));
+        assertEquals(trip.getId(), ID_FACTORY.createId(SERVICE_JOURNEY_ID));
     }
 
     @Test
     public void mapTripWithRouteRefViaJourneyPattern() {
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
         Route route = new Route();
-        route.setId(createFeedScopedId(ROUTE_ID));
+        route.setId(ID_FACTORY.createId(ROUTE_ID));
         transitBuilder.getRoutes().add(route);
 
         JourneyPattern journeyPattern = new JourneyPattern().withId(JOURNEY_PATTERN_ID);
@@ -72,6 +72,7 @@ public class TripMapperTest {
         journeyPatternById.add(journeyPattern);
 
         TripMapper tripMapper = new TripMapper(
+                ID_FACTORY,
                 transitBuilder.getRoutes(),
                 routeById,
                 journeyPatternById
@@ -79,7 +80,7 @@ public class TripMapperTest {
 
         Trip trip = tripMapper.mapServiceJourney(serviceJourney);
 
-        assertEquals(trip.getId(), createFeedScopedId("RUT:ServiceJourney:1"));
+        assertEquals(trip.getId(), ID_FACTORY.createId("RUT:ServiceJourney:1"));
     }
 
     private ServiceJourney createExampleServiceJourney() {

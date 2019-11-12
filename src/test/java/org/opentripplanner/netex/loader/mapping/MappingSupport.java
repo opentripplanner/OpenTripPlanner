@@ -10,6 +10,10 @@ import javax.xml.namespace.QName;
  * Test mapping support utility functions - shared between tests.
  */
 class MappingSupport {
+
+    static final FeedScopedIdFactory ID_FACTORY = new FeedScopedIdFactory("TEST");
+
+
     /** private constructor to prevent instansiation of utility class */
     private MappingSupport() {
     }

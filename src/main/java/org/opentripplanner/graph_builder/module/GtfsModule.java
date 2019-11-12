@@ -104,7 +104,10 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
                 }
 
-                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(loadBundle(gtfsBundle));
+                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(
+                        loadBundle(gtfsBundle),
+                        graph
+                );
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
 

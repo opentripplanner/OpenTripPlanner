@@ -26,7 +26,7 @@ public class OperatorToAgencyMapperTest {
 
         // When mapped
         org.opentripplanner.model.Operator o;
-        o = OperatorToAgencyMapper.mapOperator(operator);
+        o = new OperatorToAgencyMapper(MappingSupport.ID_FACTORY).mapOperator(operator);
 
         // Then expect
         assertEquals(ID, o.getId().getId());
@@ -41,7 +41,7 @@ public class OperatorToAgencyMapperTest {
 
         // When mapped
         org.opentripplanner.model.Operator o;
-        o = OperatorToAgencyMapper.mapOperator(operator);
+        o = new OperatorToAgencyMapper(MappingSupport.ID_FACTORY).mapOperator(operator);
 
         // Then expect
         assertEquals(ID, o.getId().getId());
