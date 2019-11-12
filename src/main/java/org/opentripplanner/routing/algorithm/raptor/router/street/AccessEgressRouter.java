@@ -40,7 +40,7 @@ public class AccessEgressRouter {
         }
 
         Map<Stop, Transfer> result = null;
-        while (desiredDistance < maxDistance) {
+        while (desiredDistance <= maxDistance) {
             result = streetSearch(rr, fromTarget, desiredDistance);
             if (result.size() > 0) {
                 return result;
