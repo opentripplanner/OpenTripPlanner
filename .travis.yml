@@ -47,6 +47,8 @@ cache:
 before_install:
   # install mkdocs
   - pip install --user mkdocs
+  # install awscli
+  - pip install --user awscli
 
 # Notify us of the build status on the Slack channel
 notifications:
