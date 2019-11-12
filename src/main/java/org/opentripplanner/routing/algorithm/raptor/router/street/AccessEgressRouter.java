@@ -30,8 +30,8 @@ public class AccessEgressRouter {
      * @return Transfer objects by access/egress stop
      */
     public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget) {
-        int desiredDistance = fromTarget ? rr.desiredMaxWalkDistanceAccess : rr.desiredMaxWalkDistanceEgress;
-        int maxDistance = fromTarget ? rr.maxWalkDistanceAccess : rr.maxWalkDistanceEgress;
+        int desiredDistance = fromTarget ? rr.desiredMaxWalkDistanceEgress : rr.desiredMaxWalkDistanceAccess;
+        int maxDistance = fromTarget ?  rr.maxWalkDistanceEgress : rr.maxWalkDistanceAccess ;
 
 
         // Make sure that always one try is made.
