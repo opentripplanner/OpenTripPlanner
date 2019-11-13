@@ -28,6 +28,10 @@ public class BuilderAnnotationStore {
                 }
         }
 
+        public List<GraphBuilderAnnotation> getAnnotations() {
+                return this.annotations;
+        }
+
         public void summarize() {
                 Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
                 GRAPH_BUILDER_ANNOTATION_LOG.info("Summary (number of each type of annotation):");

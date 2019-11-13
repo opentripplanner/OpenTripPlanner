@@ -59,7 +59,11 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
 
         if (outPath == null) {
             LOG.error("Saving folder is empty!");
@@ -89,7 +93,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
         //Groups annotations in multimap according to annotation class
-        for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
+        for (GraphBuilderAnnotation annotation : annotationStore.getAnnotations()) {
             //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
             // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
             addAnnotation(annotation);
