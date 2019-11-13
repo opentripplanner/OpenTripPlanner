@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import com.google.common.collect.Multimap;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
@@ -49,7 +50,7 @@ public class NetexMapper {
     private final String agencyId;
     private final Deduplicator deduplicator;
 
-    private final AddBuilderAnnotation addBuilderAnnotation;
+    private final BuilderAnnotationStore addBuilderAnnotation;
 
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
@@ -62,7 +63,7 @@ public class NetexMapper {
             OtpTransitServiceBuilder transitBuilder,
             String agencyId,
             Deduplicator deduplicator,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore addBuilderAnnotation
     ) {
         this.transitBuilder = transitBuilder;
         this.agencyId = agencyId;

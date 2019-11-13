@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
@@ -91,7 +92,7 @@ public class StopMapperTest {
         quaysById.add(quay2);
         quaysById.add(quay3);
 
-        StopMapper stopMapper = new StopMapper(quaysById, aba -> {});
+        StopMapper stopMapper = new StopMapper(quaysById, new BuilderAnnotationStore(false));
         Collection<Stop> stops = new ArrayList<>();
         Collection<Station> stations = new ArrayList<>();
 

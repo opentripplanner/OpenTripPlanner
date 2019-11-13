@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.QuayWithoutCoordinates;
 import org.opentripplanner.graph_builder.annotation.StopPlaceWithoutCoordinates;
@@ -35,7 +36,7 @@ import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAn
  * of the StopPlace.
  */
 class StopMapper {
-    private final AddBuilderAnnotation addBuilderAnnotation;
+    private final BuilderAnnotationStore addBuilderAnnotation;
 
     private final StopPlaceTypeMapper transportModeMapper = new StopPlaceTypeMapper();
 
@@ -53,14 +54,14 @@ class StopMapper {
 
     StopMapper(
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore addBuilderAnnotation
     ) {
         this.quayIndex = quayIndex;
         this.addBuilderAnnotation = addBuilderAnnotation;
     }
 
     protected void addBuilderAnnotation(GraphBuilderAnnotation annotation) {
-        addBuilderAnnotation.addBuilderAnnotation(annotation);
+        addBuilderAnnotation.add(annotation);
     }
 
     /**

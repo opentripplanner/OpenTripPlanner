@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
 import org.opentripplanner.model.FeedScopedId;
@@ -36,7 +37,7 @@ public class GenerateTripPatternsOperation {
     private static final int UNKNOWN_DIRECTION_ID = -1;
 
     private final OtpTransitServiceBuilder transitDaoBuilder;
-    private final AddBuilderAnnotation builderAnnotation;
+    private final BuilderAnnotationStore annotationStore;
     private final Deduplicator deduplicator;
     private final Set<FeedScopedId> calendarServiceIds;
 
@@ -49,10 +50,10 @@ public class GenerateTripPatternsOperation {
 
 
 
-    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, AddBuilderAnnotation builderAnnotation,
+    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, BuilderAnnotationStore annotationStore,
             Deduplicator deduplicator, Set<FeedScopedId> calendarServiceIds) {
         this.transitDaoBuilder = builder;
-        this.builderAnnotation = builderAnnotation;
+        this.annotationStore = annotationStore;
         this.deduplicator = deduplicator;
         this.calendarServiceIds = calendarServiceIds;
         this.tripPatterns = transitDaoBuilder.getTripPatterns();
@@ -100,7 +101,7 @@ public class GenerateTripPatternsOperation {
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
         if (!calendarServiceIds.contains(trip.getServiceId())) {
-            builderAnnotation.addBuilderAnnotation(new TripUndefinedService(trip));
+            annotationStore.add(new TripUndefinedService(trip));
             return; // Invalid trip, skip it, it will break later
         }
 
@@ -109,7 +110,7 @@ public class GenerateTripPatternsOperation {
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
         if (stopTimes.size() < 2) {
-            builderAnnotation.addBuilderAnnotation(new TripDegenerate(trip));
+            annotationStore.add(new TripDegenerate(trip));
             return;
         }
 

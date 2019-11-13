@@ -16,6 +16,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
 import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
@@ -77,6 +78,8 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
+    private BuilderAnnotationStore annotationStore;
+
     public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
     private Boolean addExtraEdgesToAreas = false;
@@ -109,7 +112,8 @@ public class SimpleStreetSplitter {
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
-        SpatialIndex transitStopIndex, boolean destructiveSplitting) {
+        SpatialIndex transitStopIndex, boolean destructiveSplitting, BuilderAnnotationStore annotationStore) {
+        this.annotationStore = annotationStore;
         this.graph = graph;
         this.transitStopIndex = transitStopIndex;
         this.destructiveSplitting = destructiveSplitting;
@@ -135,8 +139,12 @@ public class SimpleStreetSplitter {
      * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
      * @param graph
      */
+    public SimpleStreetSplitter(Graph graph, BuilderAnnotationStore annotationStore) {
+        this(graph, null, null, true, annotationStore);
+    }
+
     public SimpleStreetSplitter(Graph graph) {
-        this(graph, null, null, true);
+        this(graph, new BuilderAnnotationStore(false));
     }
 
     /** Link all relevant vertices to the street network */
@@ -148,11 +156,11 @@ public class SimpleStreetSplitter {
 
                 if (!link(v)) {
                     if (v instanceof TransitStopVertex)
-                        graph.addBuilderAnnotation(new StopUnlinked((TransitStopVertex) v));
+                        annotationStore.add(new StopUnlinked((TransitStopVertex) v));
                     else if (v instanceof BikeRentalStationVertex)
-                        graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
+                        annotationStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
                     else if (v instanceof BikeParkVertex)
-                        graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v));
+                        annotationStore.add(new BikeParkUnlinked((BikeParkVertex) v));
                 };
             }
         }
@@ -294,7 +302,7 @@ public class SimpleStreetSplitter {
                 int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
                 if (distanceMeters > WARNING_DISTANCE_METERS) {
                     // Registering an annotation but not logging because tests produce thousands of these warnings.
-                    graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
+                    annotationStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
                 }
             }
 

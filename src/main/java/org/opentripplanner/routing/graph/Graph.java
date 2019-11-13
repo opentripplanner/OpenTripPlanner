@@ -25,6 +25,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -570,7 +571,10 @@ public class Graph implements Serializable {
     }
 
     // Infer the time period covered by the transit feed
-    public void updateTransitFeedValidity(CalendarServiceData data) {
+    public void updateTransitFeedValidity(
+            CalendarServiceData data,
+            BuilderAnnotationStore annotationStore
+    ) {
         long now = new Date().getTime() / 1000;
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
@@ -593,7 +597,7 @@ public class Graph implements Serializable {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                this.addBuilderAnnotation(new NoFutureDates(agency));
+                annotationStore.add(new NoFutureDates(agency));
             }
         }
     }

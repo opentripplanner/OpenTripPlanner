@@ -9,6 +9,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.*;
@@ -23,12 +24,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnotation {
+public class OSMDatabase implements OpenStreetMapContentHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private static final Logger GRAPH_BUILDER_ANNOTATION_LOG =
-            LoggerFactory.getLogger("GRAPH_BUILDER_ANNOTATION_LOG");
+    private BuilderAnnotationStore annotationStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
@@ -90,9 +90,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
      */
     private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
 
-    /* List of graph annotations registered during building, to add to the graph. */
-    private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
-
     /*
      * ID of the next virtual node we create during building phase. Negative to prevent conflicts
      * with existing ones.
@@ -104,6 +101,10 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
      * in the United States. This does not affect floor names from level maps.
      */
     public boolean noZeroLevels = true;
+
+    public OSMDatabase(BuilderAnnotationStore annotationStore) {
+        this.annotationStore = annotationStore;
+    }
 
     public OSMNode getNode(Long nodeId) {
         return nodesById.get(nodeId);
@@ -164,10 +165,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
 
     public boolean isNodeBelongsToWay(Long nodeId) {
         return waysNodeIds.contains(nodeId);
-    }
-
-    public Collection<GraphBuilderAnnotation> getAnnotations() {
-        return Collections.unmodifiableList(annotations);
     }
 
     @Override
@@ -559,13 +556,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
             OSMLevel level = OSMLevel.DEFAULT;
             if (way.hasTag("level")) { // TODO: floating-point levels &c.
                 levelName = way.getTag("level");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, this);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, annotationStore);
             } else if (way.hasTag("layer")) {
                 levelName = way.getTag("layer");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, this);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, annotationStore);
             }
             if (level == null || (!level.reliable)) {
-                addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId()));
+                annotationStore.add(new LevelAmbiguous(levelName, way.getId()));
                 level = OSMLevel.DEFAULT;
             }
             wayLevels.put(way, level);
@@ -742,7 +739,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            addBuilderAnnotation(new TurnRestrictionBad(relation.getId(),
+            annotationStore.add(new TurnRestrictionBad(relation.getId(),
                 "One of from|via|to edges are empty in relation"));
             return;
         }
@@ -755,7 +752,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
-                    addBuilderAnnotation(new TurnRestrictionException(via, from));
+                    annotationStore.add(new TurnRestrictionException(via, from));
                 }
             }
         }
@@ -786,7 +783,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U,
                 relation.getId());
         } else {
-            addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
+            annotationStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
             return;
         }
         tag.modes = modes.clone();
@@ -815,7 +812,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
      */
     private void processLevelMap(OSMRelation relation) {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
-                Source.LEVEL_MAP, true, this);
+                Source.LEVEL_MAP, true, annotationStore);
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
                 OSMWay way = waysById.get(member.getRef());
@@ -892,13 +889,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
                 if (platformArea == null)
                     platformArea = areaWaysById.get(member.getRef());
                 else
-                    addBuilderAnnotation(new TooManyAreasInRelation(relation.getId()));
+                    annotationStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
                     && relationsById.containsKey(member.getRef())) {
                 if (platformArea == null)
                     platformArea = relationsById.get(member.getRef());
                 else
-                    addBuilderAnnotation(new TooManyAreasInRelation(relation.getId()));
+                    annotationStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
                 platformsNodes.add(nodesById.get(member.getRef()));
             }
@@ -906,7 +903,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
         if (platformArea != null && !platformsNodes.isEmpty())
             stopsInAreas.put(platformArea, platformsNodes);
         else
-            addBuilderAnnotation(new UnableToProcessPublicTransportationRelation(relation.getId()));
+            annotationStore.add(new UnableToProcessPublicTransportationRelation(relation.getId()));
     }
 
     private String addUniqueName(String routes, String name) {
@@ -918,15 +915,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler, AddBuilderAnnot
         }
         return routes + ", " + name;
     }
-
-    @Override
-    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
-        GRAPH_BUILDER_ANNOTATION_LOG.info(gba.getMessage());
-        if (this.annotations != null) {
-            this.annotations.add(gba);
-        }
-    }
-
     
     /**
      * Check if a point is within an epsilon of a node.

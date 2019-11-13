@@ -12,6 +12,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.AreaNotEpsilonValid;
 import org.opentripplanner.graph_builder.annotation.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
@@ -71,6 +72,8 @@ public class WalkableAreaBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
+    private BuilderAnnotationStore annotationStore;
+
     public static final int MAX_AREA_NODES = 500;
 
     public static final double VISIBILITY_EPSILON = 0.000000001;
@@ -89,12 +92,13 @@ public class WalkableAreaBuilder {
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
-            StreetEdgeFactory edgeFactory, Handler handler) {
+            StreetEdgeFactory edgeFactory, Handler handler, BuilderAnnotationStore annotationStore) {
         this.graph = graph;
         this.osmdb = osmdb;
         this.wayPropertySet = wayPropertySet;
         this.edgeFactory = edgeFactory;
         this.handler = handler;
+        this.annotationStore = annotationStore;
     }
 
     /**
@@ -223,14 +227,14 @@ public class WalkableAreaBuilder {
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
             if (visibilityPoints.size() > MAX_AREA_NODES) {
-                graph.addBuilderAnnotation(
+                annotationStore.add(
                         new AreaTooComplicated(
                                 group.getSomeOSMObject().getId(), visibilityPoints.size()));
                 continue;
             }
 
             if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                graph.addBuilderAnnotation(
+                annotationStore.add(
                         new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
                 continue;
             }

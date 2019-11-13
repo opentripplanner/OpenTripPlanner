@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.loader;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
@@ -54,7 +55,7 @@ public class NetexBundle {
     /** load the bundle, map it to the OTP transit model and return */
     public OtpTransitServiceBuilder loadBundle(
             Deduplicator deduplicator,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore addBuilderAnnotation
     ) {
         LOG.info("reading {}", fileHierarchy.filename());
 

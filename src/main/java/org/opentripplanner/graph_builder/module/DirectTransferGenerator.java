@@ -99,7 +99,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
             if (n == 0) {
-                graph.addBuilderAnnotation(new StopNotLinkedForTransfers(ts0));
+                annotationStore.add(new StopNotLinkedForTransfers(ts0));
             }
             nTransfersTotal += n;
         }

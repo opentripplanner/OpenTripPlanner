@@ -3,6 +3,7 @@ package org.opentripplanner.common;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -26,7 +27,7 @@ public class StreetUtils {
     private static int islandCounter = 0;
 
     public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
-            int islandWithStopMaxSize, String islandLogName) {
+            int islandWithStopMaxSize, String islandLogName, BuilderAnnotationStore annotationStore) {
         LOG.debug("pruning");
         PrintWriter islandLog = null;
         if (islandLogName != null && !islandLogName.isEmpty()) {
@@ -107,13 +108,13 @@ public class StreetUtils {
             if(island.stopSize() > 0){
             //for islands with stops
                 if (island.streetSize() < islandWithStopMaxSize) {
-                    depedestrianizeOrRemove(graph, island);
+                    depedestrianizeOrRemove(graph, island, annotationStore);
                     hadRemoved = true;
                 }
             }else{
             //for islands without stops
                 if (island.streetSize() < maxIslandSize) {
-                    depedestrianizeOrRemove(graph, island);
+                    depedestrianizeOrRemove(graph, island, annotationStore);
                     hadRemoved = true;
                 }
             }
@@ -126,7 +127,11 @@ public class StreetUtils {
         }
     }
 
-    private static void depedestrianizeOrRemove(Graph graph, Subgraph island) {
+    private static void depedestrianizeOrRemove(
+            Graph graph,
+            Subgraph island,
+            BuilderAnnotationStore annotationStore
+    ) {
         //iterate over the street vertex of the subgraph
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
             Vertex v = vIter.next();
@@ -163,7 +168,7 @@ public class StreetUtils {
                 }
             }
         }
-        graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize()));
+        annotationStore.add(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize()));
     }
 
     private static Subgraph computeConnectedSubgraph(

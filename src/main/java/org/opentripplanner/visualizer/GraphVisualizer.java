@@ -939,15 +939,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         });
         buttonPanel.add(traceButton);
 
-        // annotation search button
-        JButton annotationButton = new JButton("Find annotations");
-        annotationButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                findAnnotation();
-            }
-        });
-        buttonPanel.add(annotationButton);
-
         JButton findEdgeByIdButton = new JButton("Find edge ID");
         findEdgeByIdButton.addActionListener(e -> {
             throw new UnsupportedOperationException("Edges no longer have integer IDs.");
@@ -1443,40 +1434,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		}
 		pathsList.setModel(data);
 	}
-
-    protected void findAnnotation() {
-        Set<Class<? extends GraphBuilderAnnotation>> gbaClasses = Sets.newHashSet();
-        for (GraphBuilderAnnotation gba : graph.getBuilderAnnotations()) {
-            gbaClasses.add(gba.getClass());
-        }
-
-        @SuppressWarnings("unchecked")
-        Class<? extends GraphBuilderAnnotation> variety = (Class<? extends GraphBuilderAnnotation>) JOptionPane
-                .showInputDialog(null, // parentComponent; TODO: set correctly
-                        "Select the type of annotation to find", // question
-                        "Select annotation", // title
-                        JOptionPane.QUESTION_MESSAGE, // message type
-                        null, // no icon
-                        gbaClasses.toArray(), // options (built above)
-                        StopUnlinked.class // default value
-                );
-
-        // User clicked cancel
-        if (variety == null)
-            return;
-
-        // loop over the annotations and save the ones of the requested type
-        annotationMatchesModel.clear();
-        for (GraphBuilderAnnotation anno : graph.getBuilderAnnotations()) {
-            if (variety.isInstance(anno)) {
-                annotationMatchesModel.addElement(anno);
-            }
-        }
-
-        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type "
-                + variety);
-
-    }
 
     public void verticesSelected(final List<Vertex> selected) {
         // sort vertices by name

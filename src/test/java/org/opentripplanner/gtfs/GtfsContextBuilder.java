@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -37,7 +38,7 @@ public class GtfsContextBuilder {
 
     private CalendarService calendarService = null;
 
-    private AddBuilderAnnotation addBuilderAnnotation = null;
+    private BuilderAnnotationStore annotationStore = null;
 
     private Deduplicator deduplicator;
 
@@ -53,7 +54,10 @@ public class GtfsContextBuilder {
         GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
         GtfsFeedId feedId = gtfsImport.getFeedId();
         OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(gtfsImport.getDao());
-        return new GtfsContextBuilder(feedId, transitBuilder);
+        return new GtfsContextBuilder(
+                feedId,
+                transitBuilder).withAddBuilderAnnotation(new BuilderAnnotationStore(false)
+        );
     }
 
     public GtfsContextBuilder(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
@@ -69,13 +73,25 @@ public class GtfsContextBuilder {
         return transitBuilder;
     }
 
-    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(Graph graph) {
-        return withAddBuilderAnnotation(graph)
+    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(
+            Graph graph
+    ) {
+        return withGraphBuilderAnnotationsAndDeduplicator(
+                graph,
+                new BuilderAnnotationStore(false)
+        );
+    }
+
+    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(
+            Graph graph,
+            BuilderAnnotationStore annotationStore
+    ) {
+        return withAddBuilderAnnotation(annotationStore)
                 .withDeduplicator(graph.deduplicator);
     }
 
-    public GtfsContextBuilder withAddBuilderAnnotation(AddBuilderAnnotation addBuilderAnnotation) {
-        this.addBuilderAnnotation = addBuilderAnnotation;
+    public GtfsContextBuilder withAddBuilderAnnotation(BuilderAnnotationStore annotationStore) {
+        this.annotationStore = annotationStore;
         return this;
     }
 
@@ -185,14 +201,14 @@ public class GtfsContextBuilder {
     private void repairStopTimesForEachTrip() {
         new RepairStopTimesForEachTripOperation(
                 transitBuilder.getStopTimesSortedByTrip(),
-                addBuilderAnnotation()
+                annotationStore
         ).run();
     }
 
     private void generateTripPatterns() {
         new GenerateTripPatternsOperation(
                 transitBuilder,
-                addBuilderAnnotation(),
+                annotationStore,
                 deduplicator(),
                 calendarService().getServiceIds()
         ).run();
@@ -203,13 +219,6 @@ public class GtfsContextBuilder {
             calendarService = new CalendarServiceImpl(transitBuilder.buildCalendarServiceData());
         }
         return calendarService;
-    }
-
-    private AddBuilderAnnotation addBuilderAnnotation() {
-        if (addBuilderAnnotation == null) {
-            addBuilderAnnotation = GraphBuilderAnnotation::getMessage;
-        }
-        return addBuilderAnnotation;
     }
 
     private Deduplicator deduplicator() {

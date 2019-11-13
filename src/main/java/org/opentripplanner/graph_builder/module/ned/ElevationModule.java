@@ -46,6 +46,8 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
+    private BuilderAnnotationStore annotationStore;
+
     private ElevationGridCoverageFactory gridCoverageFactory;
 
     private Coverage coverage;
@@ -90,6 +92,8 @@ public class ElevationModule implements GraphBuilderModule {
             HashMap<Class<?>, Object> extra,
             BuilderAnnotationStore annotationStore
     ) {
+        this.annotationStore = annotationStore;
+
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
@@ -263,7 +267,7 @@ public class ElevationModule implements GraphBuilderModule {
             //limit elevation propagation to at max 2km; this prevents an infinite loop
             //in the case of islands missing elevation (and some other cases)
             if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                graph.addBuilderAnnotation(new ElevationPropagationLimit(state.vertex));
+                annotationStore.add(new ElevationPropagationLimit(state.vertex));
                 bestDistance = state.distance;
                 bestElevation = state.initialElevation;
             }
@@ -319,7 +323,7 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if (edge.setElevationProfile(profile, true)) {
-                        graph.addBuilderAnnotation(new ElevationFlattened(edge));
+                        annotationStore.add(new ElevationFlattened(edge));
                     }
                 }
             }
@@ -371,7 +375,7 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            graph.addBuilderAnnotation(new ElevationFlattened(ee));
+            annotationStore.add(new ElevationFlattened(ee));
         }
     }
 

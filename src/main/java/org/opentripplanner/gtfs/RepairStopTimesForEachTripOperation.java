@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
 import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
 import org.opentripplanner.graph_builder.annotation.HopZeroTime;
@@ -33,11 +34,11 @@ public class RepairStopTimesForEachTripOperation {
 
     private final TripStopTimes stopTimesByTrip;
 
-    private AddBuilderAnnotation builderAnnotation;
+    private BuilderAnnotationStore annotationStore;
 
-    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, AddBuilderAnnotation builderAnnotation) {
+    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, BuilderAnnotationStore annotationStore) {
         this.stopTimesByTrip = stopTimesByTrip;
-        this.builderAnnotation = builderAnnotation;
+        this.annotationStore = annotationStore;
     }
 
     public void run() {
@@ -55,8 +56,7 @@ public class RepairStopTimesForEachTripOperation {
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
             if (!removedStopSequences.isEmpty()) {
-                builderAnnotation
-                        .addBuilderAnnotation(new RepeatedStops(trip, removedStopSequences));
+                annotationStore.add(new RepeatedStops(trip, removedStopSequences));
             }
             filterStopTimes(stopTimes);
             interpolateStopTimes(stopTimes);
@@ -168,7 +168,7 @@ public class RepairStopTimesForEachTripOperation {
             }
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
             if (dwellTime < 0) {
-                builderAnnotation.addBuilderAnnotation(new NegativeDwellTime(st0));
+                annotationStore.add(new NegativeDwellTime(st0));
                 if (st0.getArrivalTime() > 23 * SECONDS_IN_HOUR
                         && st0.getDepartureTime() < 1 * SECONDS_IN_HOUR) {
                     midnightCrossed = true;
@@ -180,8 +180,7 @@ public class RepairStopTimesForEachTripOperation {
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {
-                builderAnnotation.addBuilderAnnotation(
-                        new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
+                annotationStore.add(new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
                 // negative hops are usually caused by incorrect coding of midnight crossings
                 midnightCrossed = true;
                 if (st0.getDepartureTime() > 23 * SECONDS_IN_HOUR
@@ -209,8 +208,7 @@ public class RepairStopTimesForEachTripOperation {
                     .getDepartureTime()) {
                 LOG.trace("{} {}", st0, st1);
                 // series of identical stop times at different stops
-                builderAnnotation.addBuilderAnnotation(
-                        new HopZeroTime((float) hopDistance, st1.getTrip(),
+                annotationStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(),
                                 st1.getStopSequence()));
                 // clear stoptimes that are obviously wrong, causing them to later be interpolated
 /* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
@@ -220,14 +218,12 @@ public class RepairStopTimesForEachTripOperation {
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                builderAnnotation.addBuilderAnnotation(
-                        new HopSpeedFast((float) hopSpeed, (float) hopDistance, st0.getTrip(),
-                                st0.getStopSequence()));
+                annotationStore.add(new HopSpeedFast((float) hopSpeed, (float) hopDistance,
+                        st0.getTrip(), st0.getStopSequence()));
             } else if (hopSpeed < 0.1) {
                 // 0.1 m/sec ~= 0.2 miles/hr
-                builderAnnotation.addBuilderAnnotation(
-                        new HopSpeedSlow((float) hopSpeed, (float) hopDistance, st0.getTrip(),
-                                st0.getStopSequence()));
+                annotationStore.add(new HopSpeedSlow((float) hopSpeed, (float) hopDistance,
+                        st0.getTrip(), st0.getStopSequence()));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect
             if (!st1bogus)

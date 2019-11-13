@@ -84,6 +84,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private static Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
+    private BuilderAnnotationStore annotationStore;
+
     // Private members that are only read or written internally.
 
     private Set<Object> _uniques = new HashSet<Object>();
@@ -193,16 +195,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             HashMap<Class<?>, Object> extra,
             BuilderAnnotationStore annotationStore
     ) {
-        OSMDatabase osmdb = new OSMDatabase();
+        this.annotationStore = annotationStore;
+        OSMDatabase osmdb = new OSMDatabase(annotationStore);
         Handler handler = new Handler(graph, osmdb);
         for (OpenStreetMapProvider provider : _providers) {
             LOG.info("Gathering OSM from provider: " + provider);
             provider.readOSM(osmdb);
         }
         osmdb.postLoad();
-        for (GraphBuilderAnnotation annotation : osmdb.getAnnotations()) {
-            graph.addBuilderAnnotation(annotation);
-        }
         LOG.info("Building street graph from OSM");
         handler.buildGraph(extra);
         graph.hasStreets = true;
@@ -434,7 +434,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             List<AreaGroup> areaGroups = groupAreas(osmdb.getWalkableAreas());
             WalkableAreaBuilder walkableAreaBuilder = new WalkableAreaBuilder(graph, osmdb,
-                    wayPropertySet, edgeFactory, this);
+                    wayPropertySet, edgeFactory, this, annotationStore);
             if (skipVisibility) {
                 for (AreaGroup group : areaGroups) {
                     walkableAreaBuilder.buildWithoutVisibility(group);
@@ -533,7 +533,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             }
             if (!walkAccessibleOut || !carAccessibleIn) {
                 // This will prevent the P+R to be useful.
-                graph.addBuilderAnnotation(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId));
+                annotationStore.add(new ParkAndRideUnlinked((creativeName != null ? creativeName.toString() : "null"), osmId));
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
@@ -580,7 +580,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 setWayName(way);
 
                 StreetTraversalPermission permissions = OSMFilter.getPermissionsForWay(way,
-                        wayData.getPermission(), graph, banDiscouragedWalking, banDiscouragedBiking);
+                        wayData.getPermission(), graph, banDiscouragedWalking, banDiscouragedBiking,
+                        annotationStore);
                 if (!OSMFilter.isWayRoutable(way) || permissions.allowsNothing())
                     continue;
 
@@ -843,26 +844,26 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (Long fromWay : osmdb.getTurnRestrictionWayIds()) {
                 for (TurnRestrictionTag restrictionTag : osmdb.getFromWayTurnRestrictions(fromWay)) {
                     if (restrictionTag.possibleFrom.isEmpty()) {
-                        graph.addBuilderAnnotation(new TurnRestrictionBad(restrictionTag.relationOSMID,
+                        annotationStore.add(new TurnRestrictionBad(restrictionTag.relationOSMID,
                             "No from edge found"));
                         continue;
                     }
                     if (restrictionTag.possibleTo.isEmpty()) {
-                        graph.addBuilderAnnotation(
+                        annotationStore.add(
                             new TurnRestrictionBad(restrictionTag.relationOSMID,
                                 "No to edge found"));
                         continue;
                     }
                     for (StreetEdge from : restrictionTag.possibleFrom) {
                         if (from == null) {
-                            graph.addBuilderAnnotation(
+                            annotationStore.add(
                                 new TurnRestrictionBad(restrictionTag.relationOSMID,
                                     "from-edge is null"));
                             continue;
                         }
                         for (StreetEdge to : restrictionTag.possibleTo) {
                             if (from == null || to == null) {
-                                graph.addBuilderAnnotation(
+                                annotationStore.add(
                                     new TurnRestrictionBad(restrictionTag.relationOSMID,
                                         "to-edge is null"));
                                 continue;
@@ -874,7 +875,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                             switch (restrictionTag.direction) {
                             case LEFT:
                                 if (angleDiff >= 160) {
-                                    graph.addBuilderAnnotation(
+                                    annotationStore.add(
                                         new TurnRestrictionBad(restrictionTag.relationOSMID,
                                             "Left turn restriction is not on edges which turn left"));
                                     continue; // not a left turn
@@ -882,7 +883,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 break;
                             case RIGHT:
                                 if (angleDiff <= 200) {
-                                    graph.addBuilderAnnotation(
+                                    annotationStore.add(
                                         new TurnRestrictionBad(restrictionTag.relationOSMID,
                                             "Right turn restriction is not on edges which turn right"));
                                     continue; // not a right turn
@@ -890,7 +891,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 break;
                             case U:
                                 if ((angleDiff <= 150 || angleDiff > 210)) {
-                                    graph.addBuilderAnnotation(
+                                    annotationStore.add(
                                         new TurnRestrictionBad(restrictionTag.relationOSMID,
                                             "U-turn restriction is not on U-turn"));
                                     continue; // not a U turn
@@ -898,7 +899,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                                 break;
                             case STRAIGHT:
                                 if (angleDiff >= 30 && angleDiff < 330) {
-                                    graph.addBuilderAnnotation(
+                                    annotationStore.add(
                                         new TurnRestrictionBad(restrictionTag.relationOSMID,
                                             "Straight turn restriction is not on edges which go straight"));
                                     continue; // not straight
@@ -981,7 +982,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * @param graph
          */
         private void applyBikeSafetyFactor(Graph graph) {
-            graph.addBuilderAnnotation(new Graphwide(
+            annotationStore.add(new Graphwide(
                     "Multiplying all bike safety values by " + (1 / bestBikeSafety)));
             HashSet<Edge> seenEdges = new HashSet<Edge>();
             HashSet<AreaEdgeList> seenAreas = new HashSet<AreaEdgeList>();
@@ -1149,7 +1150,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             // < 0.04: account for
             if (carSpeed < 0.04) {
-                graph.addBuilderAnnotation(new StreetCarSpeedZero(way.getId()));
+                annotationStore.add(new StreetCarSpeedZero(way.getId()));
             }
 
             if (customNamer != null) {

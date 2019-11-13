@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.ServiceCodeDoesNotContainServiceDates;
 import org.opentripplanner.model.ServiceCalendarDate;
@@ -25,7 +26,7 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
-    private final AddBuilderAnnotation addBuilderAnnotation;
+    private final BuilderAnnotationStore addBuilderAnnotation;
 
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
     private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
@@ -36,7 +37,7 @@ class CalendarMapper {
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore addBuilderAnnotation
     ) {
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
         this.operatingPeriodById = operatingPeriodById;
@@ -45,7 +46,7 @@ class CalendarMapper {
     }
 
     protected void addBuilderAnnotation(GraphBuilderAnnotation annotation) {
-        addBuilderAnnotation.addBuilderAnnotation(annotation);
+        addBuilderAnnotation.add(annotation);
     }
 
     Collection<ServiceCalendarDate> mapToCalendarDates(DayTypeRefsToServiceIdAdapter dayTypeRefs) {

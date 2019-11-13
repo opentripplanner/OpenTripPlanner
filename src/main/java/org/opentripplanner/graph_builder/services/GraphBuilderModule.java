@@ -15,6 +15,13 @@ public interface GraphBuilderModule {
             BuilderAnnotationStore annotationStore
     );
 
+    public default void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra
+    ) {
+        buildGraph(graph, extra, new BuilderAnnotationStore(false));
+    }
+
     /** Check that all inputs to the graphbuilder are valid; throw an exception if not. */
     public void checkInputs();
 

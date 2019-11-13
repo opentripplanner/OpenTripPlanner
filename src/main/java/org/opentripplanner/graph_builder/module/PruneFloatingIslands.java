@@ -64,12 +64,12 @@ public class PruneFloatingIslands implements GraphBuilderModule {
         LOG.info("Pruning isolated islands in street network");
         
         StreetUtils.pruneFloatingIslands(graph, pruningThresholdIslandWithoutStops, 
-        		pruningThresholdIslandWithStops, islandLogFile);
+        		pruningThresholdIslandWithStops, islandLogFile, annotationStore);
         if (transitToStreetNetwork == null) {
             LOG.debug("TransitToStreetNetworkGraphBuilder was not provided to PruneFloatingIslands. Not attempting to reconnect stops.");
         } else {
             //reconnect stops on small islands (that removed)
-            transitToStreetNetwork.buildGraph(graph,extra);
+            transitToStreetNetwork.buildGraph(graph,extra, annotationStore);
         }
         LOG.debug("Done pruning isolated islands");
     }

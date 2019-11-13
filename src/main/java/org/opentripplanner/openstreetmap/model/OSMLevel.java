@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownGuessedFromAltitude;
 import org.slf4j.Logger;
@@ -52,7 +53,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     public static OSMLevel fromString (
             String spec, Source source,
             boolean incrementNonNegative,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore annotationStore
     ) {
 
         /*  extract any altitude information after the @ character */
@@ -115,7 +116,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* fall back on altitude when necessary */
         if (floorNumber == null && altitude != null) {
             floorNumber = (int)(altitude / METERS_PER_FLOOR);
-            addBuilderAnnotation.addBuilderAnnotation(
+            annotationStore.add(
                     new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber));
             reliable = false;
         }
@@ -127,7 +128,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* signal failure to extract any useful level information */
         if (floorNumber == null) {
             floorNumber = 0;
-            addBuilderAnnotation.addBuilderAnnotation(
+            annotationStore.add(
                     new FloorNumberUnknownAssumedGroundLevel(spec, floorNumber));
             reliable = false;
         }
@@ -138,7 +139,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             String specList,
             Source source,
             boolean incrementNonNegative,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore annotationStore
     ) {
 
         List<String> levelSpecs = new ArrayList<String>();
@@ -160,7 +161,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* build an OSMLevel for each level spec in the list */
         List<OSMLevel> levels = new ArrayList<OSMLevel>();
         for (String spec : levelSpecs) {
-            levels.add(fromString(spec, source, incrementNonNegative, addBuilderAnnotation));
+            levels.add(fromString(spec, source, incrementNonNegative, annotationStore));
         }
         return levels;
     }
@@ -169,11 +170,11 @@ public class OSMLevel implements Comparable<OSMLevel> {
             String specList,
             Source source,
             boolean incrementNonNegative,
-            AddBuilderAnnotation addBuilderAnnotation
+            BuilderAnnotationStore annotationStore
     ) {
         Map<String, OSMLevel> map = new HashMap<String, OSMLevel>();
         for (OSMLevel level :
-                fromSpecList(specList, source, incrementNonNegative, addBuilderAnnotation)) {
+                fromSpecList(specList, source, incrementNonNegative, annotationStore)) {
             map.put(level.shortName, level);
         }
         return map;

@@ -119,7 +119,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         Collections.reverse(directTransfersTooLong);
 
         for (TransferInfo transferInfo : directTransfersTooLong) {
-            graph.addBuilderAnnotation(new TransferRoutingDistanceTooLong(
+            annotationStore.add(new TransferRoutingDistanceTooLong(
                     transferInfo.origin,
                     transferInfo.destination,
                     transferInfo.directDistance,
@@ -132,7 +132,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         directTransfersNotFound.sort(Comparator.comparingDouble(t -> t.directDistance));
 
         for (TransferInfo transferInfo : directTransfersNotFound) {
-            graph.addBuilderAnnotation(new TransferCouldNotBeRouted(
+            annotationStore.add(new TransferCouldNotBeRouted(
                     transferInfo.origin,
                     transferInfo.destination,
                     transferInfo.directDistance

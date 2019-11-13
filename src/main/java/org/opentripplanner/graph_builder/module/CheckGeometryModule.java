@@ -51,7 +51,7 @@ public class CheckGeometryModule implements GraphBuilderModule {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 LOG.warn("Vertex " + gv + " has NaN location; this will cause doom.");
-                graph.addBuilderAnnotation(new BogusVertexGeometry(gv));
+                annotationStore.add(new BogusVertexGeometry(gv));
             }
             
             // TODO: This was filtered to EdgeNarratives before EdgeNarrative removal
@@ -62,7 +62,7 @@ public class CheckGeometryModule implements GraphBuilderModule {
                 }
                 for (Coordinate c : g.getCoordinates()) {
                     if (Double.isNaN(c.x) || Double.isNaN(c.y)) {
-                        graph.addBuilderAnnotation(new BogusEdgeGeometry(e));
+                        annotationStore.add(new BogusEdgeGeometry(e));
                     }
                 }
                 if (e instanceof HopEdge) {
@@ -70,15 +70,15 @@ public class CheckGeometryModule implements GraphBuilderModule {
                     Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
                     Coordinate[] geometryCoordinates = g.getCoordinates();
                     if (geometryCoordinates.length < 2) {
-                        graph.addBuilderAnnotation(new BogusEdgeGeometry(e));
+                        annotationStore.add(new BogusEdgeGeometry(e));
                         continue;
                     }
                     Coordinate geometryStartCoord = geometryCoordinates[0];
                     Coordinate geometryEndCoord = geometryCoordinates[geometryCoordinates.length - 1];
                     if (SphericalDistanceLibrary.distance(edgeStartCoord, geometryStartCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        graph.addBuilderAnnotation(new VertexShapeError(e));
+                        annotationStore.add(new VertexShapeError(e));
                     } else if (SphericalDistanceLibrary.distance(edgeEndCoord, geometryEndCoord) > MAX_VERTEX_SHAPE_ERROR) {
-                        graph.addBuilderAnnotation(new VertexShapeError(e));
+                        annotationStore.add(new VertexShapeError(e));
                     }
                 }
             }

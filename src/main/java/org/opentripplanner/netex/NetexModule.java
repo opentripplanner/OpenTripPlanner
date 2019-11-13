@@ -70,7 +70,7 @@ public class NetexModule implements GraphBuilderModule {
                 netexBundle.checkInputs();
 
                 OtpTransitServiceBuilder transitBuilder =
-                        netexBundle.loadBundle(graph.deduplicator, graph);
+                        netexBundle.loadBundle(graph.deduplicator, annotationStore);
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 OtpTransitService otpService = transitBuilder.build();
@@ -89,14 +89,14 @@ public class NetexModule implements GraphBuilderModule {
                         fareServiceFactory,
                         MAX_STOP_TO_SHAPE_SNAP_DISTANCE,
                         maxInterlineDistance
-                ).run(graph);
+                ).run(graph, annotationStore);
             }
         } catch (Exception e) {
             throw new RuntimeException(e);
         }
 
         graph.putService(CalendarServiceData.class, calendarServiceData);
-        graph.updateTransitFeedValidity(calendarServiceData);
+        graph.updateTransitFeedValidity(calendarServiceData, annotationStore);
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
