@@ -80,7 +80,8 @@
     <properties>
         <geotools.version>20.1</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
-        <jackson.version>2.9.7</jackson.version>
+        <!-- Upgrading jackson version might break serialization of null values for GraphQL output fields. -->
+        <jackson.version>2.8.11</jackson.version>
         <jersey.version>2.18</jersey.version>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <aws.version>1.11.456</aws.version>
