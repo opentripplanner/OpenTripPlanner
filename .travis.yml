@@ -15,7 +15,7 @@ script:  mvn clean verify --settings maven-settings.xml -B -V -Dgpg.skip
 # if on ibi-dev branch, then upload docs to IBI s3 buckets & cloudfront
 after_success:
   - |
-    if [[ "$TRAVIS_BRANCH" = "ibi-dev" || "$TRAVIS_BRANCH" = "doc-publishing-fix" ]]; then
+    if [[ "$TRAVIS_BRANCH" = "ibi-dev" ]]; then
       # create AWS deploy credentials
       mkdir ~/.aws && printf '%s\n' '[default]' 'aws_access_key_id=${AWS_ACCESS_KEY_ID}' 'aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}' 'region=us-east-1' > ~/.aws/config;
       # build markdown docs using mkdocs
