@@ -16,7 +16,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 

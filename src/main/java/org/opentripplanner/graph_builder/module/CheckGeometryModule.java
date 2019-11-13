@@ -6,6 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.BogusEdgeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusVertexGeometry;
 import org.opentripplanner.graph_builder.annotation.VertexShapeError;
@@ -42,7 +43,11 @@ public class CheckGeometryModule implements GraphBuilderModule {
     private static final double MAX_VERTEX_SHAPE_ERROR = 150;
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {
                 LOG.warn("Vertex " + gv + " has NaN location; this will cause doom.");

@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.module.stopsAlerts.IStopTester;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -28,7 +29,11 @@ public class StopsAlerts implements GraphBuilderModule {
     String logFile = "";
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
             pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");

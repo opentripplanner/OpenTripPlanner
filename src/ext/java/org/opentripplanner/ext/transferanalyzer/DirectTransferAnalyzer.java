@@ -3,6 +3,7 @@ package org.opentripplanner.ext.transferanalyzer;
 import com.google.common.collect.Iterables;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,7 +39,11 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         /* Initialize graph index which is needed by the nearby stop finder. */
         graph.index = new GraphIndex(graph);
 

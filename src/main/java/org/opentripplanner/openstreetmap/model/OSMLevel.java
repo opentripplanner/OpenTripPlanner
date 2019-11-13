@@ -9,7 +9,6 @@ import java.util.regex.Pattern;
 
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownGuessedFromAltitude;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

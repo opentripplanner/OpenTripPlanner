@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module;
 import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
@@ -49,7 +50,11 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
         index = new StreetVertexIndexServiceImpl(graph);

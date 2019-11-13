@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,7 +33,11 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
     private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         boolean coherent = true;
         LOG.info("checking graph coherency...");
         for (Vertex v : graph.getVertices()) {

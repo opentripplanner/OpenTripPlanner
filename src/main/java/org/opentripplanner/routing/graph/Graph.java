@@ -88,7 +88,7 @@ import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
-public class Graph implements Serializable, AddBuilderAnnotation {
+public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
@@ -143,8 +143,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
-
-    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
@@ -635,25 +633,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     /**
-     * Add a graph builder annotation to this graph's list of graph builder annotations. The return value of this method is the annotation's message,
-     * which allows for a single-line idiom that creates, registers, and logs a new graph builder annotation:
-     * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
-     * 
-     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message is still returned. This
-     * allows annotation registration to be turned off, saving memory and disk space when the user is not interested in annotations.
-     */
-    public void addBuilderAnnotation(GraphBuilderAnnotation gba) {
-        GRAPH_BUILDER_ANNOTATION_LOG.info(gba.getMessage());
-        if (this.graphBuilderAnnotations != null) {
-            this.graphBuilderAnnotations.add(gba);
-        }
-    }
-
-    public List<GraphBuilderAnnotation> getBuilderAnnotations() {
-        return this.graphBuilderAnnotations;
-    }
-
-    /**
      * Adds mode of transport to transit modes in graph
      * @param mode
      */
@@ -835,19 +814,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      */
     public void clearTimeZone () {
         this.timeZone = null;
-    }
-
-    public void summarizeBuilderAnnotations() {
-        List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
-        Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
-        LOG.info("Summary (number of each type of annotation):");
-        for (GraphBuilderAnnotation gba : gbas)
-            classes.add(gba.getClass());
-        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
-            String name = e.getElement().getSimpleName();
-            int count = e.getCount();
-            LOG.info("    {} - {}", name, count);
-        }
     }
 
     /**

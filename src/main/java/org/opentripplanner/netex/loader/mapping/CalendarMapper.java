@@ -7,7 +7,6 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;

@@ -7,12 +7,9 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collection;

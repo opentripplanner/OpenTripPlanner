@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.annotation.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
@@ -84,7 +85,11 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            BuilderAnnotationStore annotationStore
+    ) {
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();

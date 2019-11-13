@@ -93,12 +93,14 @@ public class GraphBuilder implements Runnable {
         for (GraphBuilderModule builder : graphBuilderModules) {
             builder.checkInputs();
         }
+
+        BuilderAnnotationStore annotationStore = new BuilderAnnotationStore(true);
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilderModule load : graphBuilderModules)
-            load.buildGraph(graph, extra);
+            load.buildGraph(graph, extra, annotationStore);
 
-        graph.summarizeBuilderAnnotations();
+        annotationStore.summarize();
         if (serializeGraph) {
             try {
                 graph.save(graphFile);
