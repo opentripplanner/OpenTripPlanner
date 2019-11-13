@@ -89,7 +89,19 @@ def get_trip_plans(environment, from_place, to_place, trip_date, arrive_by):
         "arriveBy": "true" if arrive_by else "false",
     }
 
-    return requests.get(url, params).json()
+    response = None
+
+    try:
+        response = requests.get(url, params).text
+    except Exception as err:
+        print(f"Unable to get response from {url}:\nException: {err}")
+        exit(1)
+
+    try:
+        return json.loads(response)
+    except Exception as err:
+        print(f"Unable to parse JSON response:\n{response}\n\nException: {err}")
+        exit(1)
 
 
 def process_plan(plan):
@@ -163,7 +175,10 @@ def compare_plans(plan1, plan2, **kwargs):
             def save(plan, prefix):
                 filename = f"{dt}-{prefix}.json"
                 with open(filename, "w") as f:
-                    json.dump(plan, f, sort_keys=True, indent=2)
+                    try:
+                        json.dump(plan, f, sort_keys=True, indent=2)
+                    except TypeError:
+                        f.write(str(plan))
                     print(f"Plan saved to {filename}")
 
             save(plan1, "prod")
