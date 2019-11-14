@@ -6,13 +6,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -26,7 +24,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
@@ -93,9 +90,6 @@ import java.util.prefs.Preferences;
 public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
-
-    private static final Logger GRAPH_BUILDER_ANNOTATION_LOG =
-            LoggerFactory.getLogger("GRAPH_BUILDER_ANNOTATION_LOG");
 
     private static final long serialVersionUID = MavenVersion.VERSION.getUID();
 
