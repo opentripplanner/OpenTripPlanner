@@ -156,9 +156,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
 
-    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
+    /**
+     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
      *
-     * TODO: Needs to  be implemented
+     * @Deprecated - Discuss if this should be reimplemented
      * */
     @Deprecated
     public boolean arriveBy = false;
