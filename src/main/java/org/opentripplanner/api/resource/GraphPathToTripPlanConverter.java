@@ -66,10 +66,14 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+// TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
+//      to decide where real-time updates should be applied to the itinerary.
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
- * are also bundled together here.
+ * are also bundled together here. This only produces itineraries for non-transit searches, as well as
+ * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
+ * by {@link org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper}.
  */
 public abstract class GraphPathToTripPlanConverter {
 
