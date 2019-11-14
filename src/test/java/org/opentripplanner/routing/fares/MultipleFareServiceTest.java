@@ -3,8 +3,10 @@ package org.opentripplanner.routing.fares;
 import java.util.ArrayList;
 import java.util.Arrays;
 
+import com.conveyal.r5.otp2.api.path.Path;
 import junit.framework.TestCase;
 
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
@@ -26,7 +28,7 @@ public class MultipleFareServiceTest extends TestCase {
         }
 
         @Override
-        public Fare getCost(GraphPath path) {
+        public Fare getCost(Path<TripSchedule> path) {
             return fare;
         }
     }

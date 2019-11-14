@@ -1,23 +1,16 @@
 package org.opentripplanner.routing.spt;
 
 import java.util.LinkedList;
-import java.util.List;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * A shortest path on the graph.
  */
 public class GraphPath {
-    private static final Logger LOG = LoggerFactory.getLogger(GraphPath.class);
-
     public LinkedList<State> states;
 
     public LinkedList<Edge> edges;
@@ -45,39 +38,25 @@ public class GraphPath {
      *            - whether excess waiting time should be removed
      */
     public GraphPath(State s, boolean optimize) {
-        // Only optimize transit trips
-        optimize &= s.getOptions().modes.isTransit();
         this.rctx = s.getContext();
         this.back = s.getOptions().arriveBy;
-        // optimize = false; // DEBUG
-        if (s.getOptions().startingTransitTripId != null) {
-            LOG.debug("Disable reverse-optimize for on-board depart");
-            optimize = false;
-        }
 
-//        LOG.info("NORMAL");
-//        s.dumpPath();
-//        LOG.info("OPTIMIZED");
-//        s.optimize().dumpPath();
-
-        /* Put path in chronological order, and optimize as necessary */
+        /* Put path in chronological order */
         State lastState;
         walkDistance = s.getWalkDistance();
         if (back) {
-            lastState = optimize ? s.optimize() : s.reverse();
+            lastState = s.reverse();
         } else {
-            lastState = optimize ? s.optimize().optimize() : s;
+            lastState = s;
         }
-        // DEBUG
-        // lastState = s;
 
         /*
          * Starting from latest (time-wise) state, copy states to the head of a list in reverse
          * chronological order. List indices will thus increase forward in time, and backEdges will
          * be chronologically 'back' relative to their state.
          */
-        this.states = new LinkedList<State>();
-        this.edges = new LinkedList<Edge>();
+        this.states = new LinkedList<>();
+        this.edges = new LinkedList<>();
         for (State cur = lastState; cur != null; cur = cur.getBackState()) {
             states.addFirst(cur);
             
@@ -86,7 +65,6 @@ public class GraphPath {
                 edges.addFirst(cur.getBackEdge());
             }
         }
-        // dump();
     }
 
     /**
@@ -126,23 +104,6 @@ public class GraphPath {
         return states.getLast().getVertex();
     }
 
-    /** @return A list containing one trip_id for each vehicle boarded in this path,
-     * in the chronological order they are boarded. */
-    public List<FeedScopedId> getTrips() {
-        List<FeedScopedId> ret = new LinkedList<FeedScopedId>();
-        Trip lastTrip = null;
-        for (State s : states) {
-            if (s.getBackEdge() != null) {
-                Trip trip = s.getBackTrip();
-                if (trip != null && trip != lastTrip) {
-                    ret.add(trip.getId());
-                    lastTrip = trip;
-                }
-            }
-        }
-        return ret;
-    }
-
     public String toString() {
     	return "GraphPath(nStates=" + states.size() + ")";
     }
@@ -150,11 +111,8 @@ public class GraphPath {
     /**
      * Two paths are equal if they use the same ordered list of trips
      */
+    // TODO OTP2 How should this be implemented now that the GraphPath has no trips?
     public boolean equals(Object o) {
-        if (o instanceof GraphPath) {
-            GraphPath go = (GraphPath) o;
-            return go.getTrips().equals(getTrips());
-        }
         return false;
     }
 
@@ -166,29 +124,6 @@ public class GraphPath {
     /****
      * Private Methods
      ****/
-
-    public void dump() {
-        System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
-        System.out.println(this.toString());
-        for (State s : states) {
-            //System.out.println(s.getBackEdge() + " leads to " + s);
-            if (s.getBackEdge() != null) {
-                System.out.println(s.getBackEdge().getClass().getSimpleName() + " --> " + s.getVertex().getClass().getSimpleName());
-                System.out.println("  " + s.weight);
-            }
-        }
-        System.out.println(" --- END GRAPHPATH DUMP ---");
-        System.out.println("Total meters walked in the preceding graphpath: " +
-               states.getLast().getWalkDistance());
-    }
-
-    public void dumpPathParser() {
-        System.out.println(" --- BEGIN GRAPHPATH DUMP ---");
-        System.out.println(this.toString());
-        for (State s : states) 
-            System.out.println(s.getPathParserStates() + s + " via " + s.getBackEdge());
-        System.out.println(" --- END GRAPHPATH DUMP ---");
-    }
 
     public double getWalkDistance() {
         return walkDistance;

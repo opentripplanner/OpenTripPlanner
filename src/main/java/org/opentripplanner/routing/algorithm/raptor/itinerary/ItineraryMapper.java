@@ -29,6 +29,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -97,6 +98,11 @@ public class ItineraryMapper {
         // TODO: Add back this code when PathLeg interface contains object references
 
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
+
+        FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
+        if (fareService != null) {
+            itinerary.fare = fareService.getCost(path);
+        }
 
         while (!pathLeg.isEgressLeg()) {
             // Map transit leg

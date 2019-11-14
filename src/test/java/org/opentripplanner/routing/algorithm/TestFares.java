@@ -26,7 +26,7 @@ import java.util.List;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
- * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
+ * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented for Raptor.
  */
 @Ignore
 public class TestFares extends TestCase {
@@ -54,7 +54,7 @@ public class TestFares extends TestCase {
 
         FareService fareService = gg.getService(FareService.class);
         
-        Fare cost = fareService.getCost(path);
+        Fare cost = null; // was: fareService.getCost(path);
         assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
 
@@ -75,7 +75,7 @@ public class TestFares extends TestCase {
         assertNotNull(path);
 
         FareService fareService = gg.getService(FareService.class);
-        Fare cost = fareService.getCost(path);
+        Fare cost = null; // was: fareService.getCost(path);
         assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
 
         // long trip
@@ -87,7 +87,7 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex(feedId + ":1252"), true);
         assertNotNull(path);
-        cost = fareService.getCost(path);
+        cost = null; // was: fareService.getCost(path);
         
         //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
         
@@ -100,7 +100,7 @@ public class TestFares extends TestCase {
 
         path = spt.getPath(gg.getVertex(feedId + ":4231"), true);
         assertNotNull(path);
-        cost = fareService.getCost(path);
+        cost = null; // was: fareService.getCost(path);
         //
         // this is commented out because portland's fares are, I think, broken in the gtfs. see
         // thread on gtfs-changes.
@@ -135,7 +135,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(vertex1), true);
 
-        Fare costOffPeak = fareService.getCost(path);
+        Fare costOffPeak = null; // was: fareService.getCost(path);
         assertEquals(costOffPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 250));
         
         long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
@@ -144,7 +144,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(vertex1), true);
 
-        Fare costOnPeak = fareService.getCost(path);
+        Fare costOnPeak = null; // was: fareService.getCost(path);
         assertEquals(costOnPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 275));
         
     }
@@ -171,7 +171,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":A", feedId+":B");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":B"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -182,14 +182,14 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":D", feedId+":E");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":E"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         assertNull(fare);
 
         // A -> C, 2 components in a path
         options.setRoutingContext(gg, feedId+":A", feedId+":C");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":C"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was:  fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -203,7 +203,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":B", feedId+":D");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":D"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -215,7 +215,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":E", feedId+":G");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":G"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -227,7 +227,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":C", feedId+":E");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":E"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -238,7 +238,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":D", feedId+":G");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":G"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
@@ -250,7 +250,7 @@ public class TestFares extends TestCase {
         options.setRoutingContext(gg, feedId+":A", feedId+":D");
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":D"), true);
-        fare = fareService.getCost(path);
+        fare = null; // was: fareService.getCost(path);
         fareComponents = fare.getDetails(FareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
