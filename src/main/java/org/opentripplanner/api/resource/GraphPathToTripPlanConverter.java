@@ -183,13 +183,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         Graph graph = path.getRoutingContext().graph;
 
-        FareService fareService = graph.getService(FareService.class);
-
         State[][] legsStates = sliceStates(states);
-
-        if (fareService != null) {
-            itinerary.fare = fareService.getCost(path);
-        }
 
         for (State[] legStates : legsStates) {
             itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
