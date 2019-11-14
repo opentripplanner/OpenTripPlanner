@@ -19,7 +19,7 @@ import java.util.Collection;
 
 import static org.junit.Assert.assertEquals;
 
-public class StopMapperTest {
+public class StopAndStationMapperTest {
     @Test
     public void mapStopPlaceAndQuays() {
         Collection<StopPlace> stopPlaces = new ArrayList<>();
@@ -92,11 +92,16 @@ public class StopMapperTest {
         quaysById.add(quay2);
         quaysById.add(quay3);
 
-        StopMapper stopMapper = new StopMapper(quaysById, new BuilderAnnotationStore(false));
-        Collection<Stop> stops = new ArrayList<>();
-        Collection<Station> stations = new ArrayList<>();
+        StopAndStationMapper stopMapper = new StopAndStationMapper(
+                MappingSupport.ID_FACTORY,
+                quaysById,
+                new BuilderAnnotationStore(false)
+        );
 
-        stopMapper.mapParentAndChildStops(stopPlaces, stops, stations);
+        stopMapper.mapParentAndChildStops(stopPlaces);
+
+        Collection<Stop> stops = stopMapper.resultStops;
+        Collection<Station> stations = stopMapper.resultStations;
 
         assertEquals(3, stops.size());
         assertEquals(1, stations.size());
@@ -116,7 +121,7 @@ public class StopMapperTest {
         assertEquals("A", childStop1.getCode());
     }
 
-    private StopPlace createStopPlace(
+    private static StopPlace createStopPlace(
             String id,
             String name,
             String version,
@@ -124,20 +129,15 @@ public class StopMapperTest {
             Double lon,
             VehicleModeEnumeration transportMode)
     {
-        StopPlace stopPlace = new StopPlace();
-        stopPlace.setName(new MultilingualString().withValue(name));
-        stopPlace.setVersion(version);
-        stopPlace.setId(id);
-        LocationStructure locationStructure1 = new LocationStructure();
-        locationStructure1.setLatitude(new BigDecimal(lat));
-        locationStructure1.setLongitude(new BigDecimal(lon));
-        stopPlace.setCentroid(new SimplePoint_VersionStructure().withLocation(locationStructure1));
-        stopPlace.setTransportMode(transportMode);
-
-        return stopPlace;
+        return new StopPlace()
+            .withName(createMLString(name))
+            .withVersion(version)
+            .withId(id)
+            .withCentroid(createSimplePoint(lat, lon))
+            .withTransportMode(transportMode);
     }
 
-    private Quay createQuay(
+    private static Quay createQuay(
             String id,
             String name,
             String version,
@@ -145,16 +145,24 @@ public class StopMapperTest {
             Double lon,
             String platformCode
     ) {
-        Quay quay = new Quay();
-        quay.setName(new MultilingualString().withValue(name));
-        quay.setId(id);
-        quay.setVersion(version);
-        quay.setPublicCode(platformCode);
-        LocationStructure locationStructure = new LocationStructure();
-        locationStructure.setLatitude(new BigDecimal(lat));
-        locationStructure.setLongitude(new BigDecimal(lon));
-        quay.setCentroid(new SimplePoint_VersionStructure().withLocation(locationStructure));
+        return new Quay()
+                .withName(createMLString(name))
+                .withId(id)
+                .withVersion(version)
+                .withPublicCode(platformCode)
+                .withCentroid(createSimplePoint(lat, lon));
+    }
 
-        return quay;
+    private static MultilingualString createMLString(String name) {
+        return new MultilingualString().withValue(name);
+    }
+
+    private static SimplePoint_VersionStructure createSimplePoint(Double lat, Double lon) {
+        return new SimplePoint_VersionStructure()
+                .withLocation(
+                        new LocationStructure()
+                                .withLatitude(new BigDecimal(lat))
+                                .withLongitude(new BigDecimal(lon))
+                );
     }
 }

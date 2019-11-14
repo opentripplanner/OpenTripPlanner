@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs;
 
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.FeedScopedId;
@@ -42,11 +43,17 @@ public class MockGtfs {
     }
 
     public OtpTransitServiceBuilder read() throws IOException {
-        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(gtfsDelegate.read());
+        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
+                gtfsDelegate.read(),
+                new BuilderAnnotationStore(false)
+        );
     }
 
     public OtpTransitServiceBuilder read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
-        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(gtfsDelegate.read(reader));
+        return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
+                gtfsDelegate.read(reader),
+                new BuilderAnnotationStore(false)
+        );
     }
 
     public void putMinimal() {

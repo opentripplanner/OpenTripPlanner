@@ -3,6 +3,8 @@ package org.opentripplanner.graph_builder.module;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Station;
@@ -63,6 +65,8 @@ public class AddTransitModelEntitiesToGraph {
     private void applyToGraph(Graph graph) {
         addStopsToGraphAndGenerateStopVertexes(graph);
         addStationsToGraph(graph);
+        addMultiModalStationsToGraph(graph);
+        addGroupsOfStationsToGraph(graph);
 
         // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
         createPathwayEdgesAndAddThemToGraph(graph);
@@ -103,9 +107,20 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     private void addStationsToGraph(Graph graph) {
-        /* Store parent stops in graph, even if not linked*/
         for (Station station : transitService.getAllStations()) {
             graph.stationById.put(station.getId(), station);
+        }
+    }
+
+    private void addMultiModalStationsToGraph(Graph graph) {
+        for (MultiModalStation multiModalStation : transitService.getAllMultiModalStations()) {
+            graph.multiModalStationById.put(multiModalStation.getId(), multiModalStation);
+        }
+    }
+
+    private void addGroupsOfStationsToGraph(Graph graph) {
+        for (GroupOfStations groupOfStations : transitService.getAllGroupsOfStations()) {
+            graph.groupOfStationsById.put(groupOfStations.getId(), groupOfStations);
         }
     }
 

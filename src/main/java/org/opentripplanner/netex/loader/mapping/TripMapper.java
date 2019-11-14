@@ -14,8 +14,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBElement;
 
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
-
 /**
  * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP Route) in two ways.
  * Either directly from the ServiceJourney or through JourneyPattern → Route. The former has precedent over the latter.
@@ -23,15 +21,18 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
 class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
 
+    private final FeedScopedIdFactory idFactory;
     private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
     private ReadOnlyHierarchicalMap<String, Route> routeById;
     private ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
 
     TripMapper(
+            FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById
     ) {
+        this.idFactory = idFactory;
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;
         this.journeyPatternsById = journeyPatternsById;
@@ -52,9 +53,9 @@ class TripMapper {
         }
 
         Trip trip = new Trip();
-        trip.setId(createFeedScopedId(serviceJourney.getId()));
+        trip.setId(idFactory.createId(serviceJourney.getId()));
         trip.setRoute(route);
-        trip.setServiceId(createFeedScopedId(serviceId));
+        trip.setServiceId(idFactory.createId(serviceId));
 
         return trip;
     }
@@ -86,7 +87,7 @@ class TripMapper {
             String routeRef = journeyPattern.getRouteRef().getRef();
             lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
         }
-        org.opentripplanner.model.Route route = otpRouteById.get(createFeedScopedId(lineRef));
+        org.opentripplanner.model.Route route = otpRouteById.get(idFactory.createId(lineRef));
 
         if(route == null) {
             LOG.warn(

@@ -14,6 +14,7 @@ import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.GroupOfLines;
+import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.Network;
@@ -71,8 +72,10 @@ public class NetexImportDataIndex {
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
+    public final HierarchicalMapById<GroupOfStopPlaces> groupOfStopPlacesById;
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
     public final HierarchicalMapById<Line> lineById;
+    public final HierarchicalMapById<StopPlace> multiModalStopPlaceById;
     public final HierarchicalMapById<Network> networkById;
     public final HierarchicalMapById<Notice> noticeById;
     public final HierarchicalMapById<NoticeAssignment> noticeAssignmentById;
@@ -107,8 +110,10 @@ public class NetexImportDataIndex {
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
+        this.groupOfStopPlacesById = new HierarchicalMapById<>();
         this.journeyPatternsById = new HierarchicalMapById<>();
         this.lineById = new HierarchicalMapById<>();
+        this.multiModalStopPlaceById = new HierarchicalMapById<>();
         this.networkById = new HierarchicalMapById<>();
         this.networkIdByGroupOfLineId = new HierarchicalMap<>();
         this.noticeById = new HierarchicalMapById<>();
@@ -135,8 +140,10 @@ public class NetexImportDataIndex {
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
+        this.groupOfStopPlacesById = new HierarchicalMapById<>(parent.groupOfStopPlacesById);
         this.journeyPatternsById = new HierarchicalMapById<>(parent.journeyPatternsById);
         this.lineById = new HierarchicalMapById<>(parent.lineById);
+        this.multiModalStopPlaceById = new HierarchicalMapById<>(parent.multiModalStopPlaceById);
         this.networkById = new HierarchicalMapById<>(parent.networkById);
         this.networkIdByGroupOfLineId = new HierarchicalMap<>(parent.networkIdByGroupOfLineId);
         this.noticeById = new HierarchicalMapById<>(parent.noticeById);
@@ -193,12 +200,20 @@ public class NetexImportDataIndex {
                 return destinationDisplayById;
             }
 
+            public ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById() {
+                return groupOfStopPlacesById;
+            }
+
             public ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById() {
                 return journeyPatternsById;
             }
 
             public ReadOnlyHierarchicalMapById<Line> getLineById() {
                 return lineById;
+            }
+
+            public ReadOnlyHierarchicalMapById<StopPlace> getMultiModalStopPlaceById() {
+                return multiModalStopPlaceById;
             }
 
             public ReadOnlyHierarchicalMapById<Notice> getNoticeById() {

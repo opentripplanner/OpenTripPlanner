@@ -53,7 +53,10 @@ public class GtfsContextBuilder {
     public static GtfsContextBuilder contextBuilder(String defaultFeedId, String path) throws IOException {
         GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
         GtfsFeedId feedId = gtfsImport.getFeedId();
-        OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(gtfsImport.getDao());
+        OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(
+                gtfsImport.getDao(),
+                new BuilderAnnotationStore(false)
+        );
         return new GtfsContextBuilder(
                 feedId,
                 transitBuilder).withAddBuilderAnnotation(new BuilderAnnotationStore(false)

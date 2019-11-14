@@ -17,7 +17,6 @@ import org.rutebanken.netex.model.NoticeRefStructure;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 import org.rutebanken.netex.model.VersionOfObjectRefStructure;
 
-import java.io.Serializable;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -45,12 +44,13 @@ public class NoticeAssignmentMapperTest {
         noticeAssignment.setNotice(NOTICE);
 
         Route route = new Route();
-        route.setId(FeedScopedIdFactory.createFeedScopedId(ROUTE_ID));
+        route.setId(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
 
         EntityById<FeedScopedId, Route> routesById = new EntityById<>();
         routesById.add(route);
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                MappingSupport.ID_FACTORY,
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
                 routesById,
@@ -98,6 +98,7 @@ public class NoticeAssignmentMapperTest {
                 .withNoticeRef(new NoticeRefStructure().withRef(NOTICE_ID));
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
+                MappingSupport.ID_FACTORY,
                 passingTimeByStopPointId,
                 noticesById,
                 new EntityById<>(),

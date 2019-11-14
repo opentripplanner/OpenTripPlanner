@@ -34,6 +34,7 @@ public class RouteMapperTest {
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
+                MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
                 netexImportDataIndex.readOnlyView(),
@@ -42,7 +43,7 @@ public class RouteMapperTest {
 
         Route route = routeMapper.mapRoute(line);
 
-        assertEquals( FeedScopedIdFactory.createFeedScopedId("RUT:Line:1"), route.getId());
+        assertEquals( MappingSupport.ID_FACTORY.createId("RUT:Line:1"), route.getId());
         assertEquals("Line 1", route.getLongName());
         assertEquals("L1", route.getShortName());
     }
@@ -66,6 +67,7 @@ public class RouteMapperTest {
         Line line = createExampleLine();
 
         RouteMapper routeMapper = new RouteMapper(
+                MappingSupport.ID_FACTORY,
                 transitBuilder.getAgenciesById(),
                 transitBuilder.getOperatorsById(),
                 netexIndex.readOnlyView(),
@@ -89,6 +91,7 @@ public class RouteMapperTest {
                         .withTextColour(textColor));
 
         RouteMapper routeMapper = new RouteMapper(
+                MappingSupport.ID_FACTORY,
                 new EntityById<>(),
                 new EntityById<>(),
                 netexImportDataIndex.readOnlyView(),

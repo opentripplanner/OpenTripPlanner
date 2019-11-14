@@ -37,7 +37,7 @@ class StopTimesMapper {
 
     private static final int DAY_IN_SECONDS = 3600 * 24;
 
-    private String currentHeadSign;
+    private final FeedScopedIdFactory idFactory;
 
     private final ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById;
 
@@ -45,11 +45,16 @@ class StopTimesMapper {
 
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
 
+    private String currentHeadSign;
+
+
     StopTimesMapper(
+            FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, Stop> stopsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
     ) {
+        this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
@@ -146,7 +151,7 @@ class StopTimesMapper {
         return stopTime;
     }
 
-    private static Stop lookupStop(
+    private Stop lookupStop(
             StopPointInJourneyPattern stopPointInJourneyPattern,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
             EntityById<FeedScopedId, Stop> stopsById
@@ -161,7 +166,7 @@ class StopTimesMapper {
             return null;
         }
 
-        Stop stop = stopsById.get(FeedScopedIdFactory.createFeedScopedId(stopId));
+        Stop stop = stopsById.get(idFactory.createId(stopId));
         if (stop == null) {
             LOG.warn("Quay not found for " + stopPointRef);
         }

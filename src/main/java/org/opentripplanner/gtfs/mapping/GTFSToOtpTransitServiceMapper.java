@@ -2,6 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.graph_builder.BuilderAnnotationStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 /**
@@ -44,14 +45,20 @@ public class GTFSToOtpTransitServiceMapper {
             routeMapper, fareAttributeMapper
     );
 
+    private final BuilderAnnotationStore annotationStore;
+
+    GTFSToOtpTransitServiceMapper(BuilderAnnotationStore annotationStore) {
+        this.annotationStore = annotationStore;
+    }
 
     /**
      * Map from GTFS data to the internal OTP model
      */
     public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
-            GtfsRelationalDao data
+            GtfsRelationalDao data,
+            BuilderAnnotationStore annotationStore
     ) {
-        return new GTFSToOtpTransitServiceMapper().map(data);
+        return new GTFSToOtpTransitServiceMapper(annotationStore).map(data);
     }
 
     private OtpTransitServiceBuilder map(GtfsRelationalDao data) {
@@ -86,6 +93,10 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getStations().add(stationMapper.map(it));
             }
         }
-        new LinkStopsAndParentStationsTogether(builder.getStations(), builder.getStops()).link(data.getAllStops());
+        new LinkStopsAndParentStationsTogether(
+                builder.getStations(),
+                builder.getStops(),
+                annotationStore)
+            .link(data.getAllStops());
     }
 }
