@@ -1,23 +1,23 @@
 package org.opentripplanner.graph_builder.module;
 
-import static org.junit.Assert.assertEquals;
+import com.beust.jcommander.internal.Lists;
+import org.junit.Test;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.gtfs.MockGtfs;
+import org.opentripplanner.model.BikeAccess;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 import java.io.IOException;
 import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 
-import com.beust.jcommander.internal.Lists;
-import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TransitEntity;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.gtfs.MockGtfs;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.model.BikeAccess;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import static org.junit.Assert.assertEquals;
 
 public class GtfsGraphBuilderModuleTest {
 

@@ -24,17 +24,20 @@ class RouteMapper {
     private final HexBinaryAdapter hexBinaryAdapter = new HexBinaryAdapter();
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
+    private final FeedScopedIdFactory idFactory;
     private final EntityById<String, Agency> agenciesById;
     private final EntityById<FeedScopedId, Operator> operatorsById;
     private final NetexImportDataIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
 
     RouteMapper(
+            FeedScopedIdFactory idFactory,
             EntityById<String, Agency> agenciesById,
             EntityById<FeedScopedId, Operator> operatorsById,
             NetexImportDataIndexReadOnlyView netexIndex,
             String timeZone
     ) {
+        this.idFactory = idFactory;
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
         this.netexIndex = netexIndex;
@@ -44,7 +47,7 @@ class RouteMapper {
     org.opentripplanner.model.Route mapRoute(Line line){
         org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
 
-        otpRoute.setId(FeedScopedIdFactory.createFeedScopedId(line.getId()));
+        otpRoute.setId(idFactory.createId(line.getId()));
         otpRoute.setAgency(findOrCreateAuthority(line));
         otpRoute.setOperator(findOperator(line));
         otpRoute.setLongName(line.getName().getValue());
@@ -102,6 +105,6 @@ class RouteMapper {
         if(opeRef == null) {
             return null;
         }
-        return operatorsById.get(FeedScopedIdFactory.createFeedScopedId(opeRef.getRef()));
+        return operatorsById.get(idFactory.createId(opeRef.getRef()));
     }
 }

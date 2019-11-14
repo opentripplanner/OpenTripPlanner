@@ -15,7 +15,6 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
-import graphql.schema.TypeResolver;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -29,11 +28,11 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -116,31 +115,30 @@ public class IndexGraphQLSchema {
 
     private Relay relay = new Relay();
 
-    private GraphQLInterfaceType nodeInterface = relay.nodeInterface(new TypeResolver() {
-        @Override public GraphQLObjectType getType(Object o) {
-            if (o instanceof Stop){
-                return (GraphQLObjectType) stopType;
-            }
-            if (o instanceof Trip){
-                return (GraphQLObjectType) tripType;
-            }
-            if (o instanceof Route){
-                return (GraphQLObjectType) routeType;
-            }
-            if (o instanceof TripPattern){
-                return (GraphQLObjectType) patternType;
-            }
-            if (o instanceof Agency){
-                return (GraphQLObjectType) agencyType;
-            }
-            if (o instanceof Operator) {
-                return (GraphQLObjectType) operatorType;
-            }
-            if (o instanceof Notice) {
-                return (GraphQLObjectType) noticeType;
-            }
-            return null;
+    private GraphQLInterfaceType nodeInterface = relay.nodeInterface(e ->  {
+        Object o = e.getObject();
+        if (o instanceof Stop){
+            return (GraphQLObjectType) stopType;
         }
+        if (o instanceof Trip){
+            return (GraphQLObjectType) tripType;
+        }
+        if (o instanceof Route){
+            return (GraphQLObjectType) routeType;
+        }
+        if (o instanceof TripPattern){
+            return (GraphQLObjectType) patternType;
+        }
+        if (o instanceof Agency){
+            return (GraphQLObjectType) agencyType;
+        }
+        if (o instanceof Operator) {
+            return (GraphQLObjectType) operatorType;
+        }
+        if (o instanceof Notice) {
+            return (GraphQLObjectType) noticeType;
+        }
+        return null;
     });
 
     public IndexGraphQLSchema(GraphIndex index) {
@@ -279,7 +277,7 @@ public class IndexGraphQLSchema {
                     .filter(edge -> edge instanceof SimpleTransfer)
                     .map(edge -> new ImmutableMap.Builder<String, Object>()
                         .put("stop", ((TransitStopVertex) edge.getToVertex()).getStop())
-                        .put("distance", edge.getDistance())
+                        .put("distance", edge.getDistanceMeters())
                         .build())
                     .collect(Collectors.toList()))
                 .build())
@@ -896,23 +894,23 @@ public class IndexGraphQLSchema {
             .name("QueryType")
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
-                if (id.type.equals(stopType.getName())) {
-                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(stopType.getName())) {
+                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(tripType.getName())) {
-                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(tripType.getName())) {
+                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(routeType.getName())) {
-                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(routeType.getName())) {
+                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
-                if (id.type.equals(patternType.getName())) {
-                    return index.graph.tripPatternForId.get(id.id);
+                if (id.getType().equals(patternType.getName())) {
+                    return index.graph.tripPatternForId.get(id.getId());
                 }
-                if (id.type.equals(agencyType.getName())) {
-                    return index.getAgencyWithoutFeedId(id.id);
+                if (id.getType().equals(agencyType.getName())) {
+                    return index.getAgencyWithoutFeedId(id.getId());
                 }
-                if (id.type.equals(operatorType.getName())) {
-                    return index.operatorForId.get(GtfsLibrary.convertIdFromString(id.id));
+                if (id.getType().equals(operatorType.getName())) {
+                    return index.operatorForId.get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 return null;
             }))

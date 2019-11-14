@@ -62,7 +62,7 @@ public abstract class GtfsTest extends TestCase {
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
-        router = new Router("TEST", graph);
+        router = new Router(graph);
 
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);

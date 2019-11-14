@@ -8,6 +8,8 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
@@ -19,7 +21,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -56,6 +58,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<FeedInfo> feedInfos;
 
+    private final Collection<GroupOfStations> groupsOfStations;
+
+    private final Collection<MultiModalStation> multiModalStations;
+
     private final ImmutableListMultimap<TransitEntity<?>, Notice> noticeAssignments;
 
     private final Collection<Pathway> pathways;
@@ -84,6 +90,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.fareAttributes = immutableList(builder.getFareAttributes());
         this.fareRules = immutableList(builder.getFareRules());
         this.feedInfos = immutableList(builder.getFeedInfos());
+        this.groupsOfStations = builder.getGroupsOfStationsById().values();
+        this.multiModalStations = builder.getMultiModalStationsById().values();
         this.noticeAssignments = ImmutableListMultimap.copyOf(builder.getNoticeAssignments());
         this.operators = immutableList(builder.getOperatorsById().values());
         this.pathways = immutableList(builder.getPathways());
@@ -115,6 +123,16 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<FeedInfo> getAllFeedInfos() {
         return feedInfos;
+    }
+
+    @Override
+    public Collection<GroupOfStations> getAllGroupsOfStations() {
+        return immutableList(groupsOfStations);
+    }
+
+    @Override
+    public Collection<MultiModalStation> getAllMultiModalStations() {
+        return immutableList(multiModalStations);
     }
 
     /**

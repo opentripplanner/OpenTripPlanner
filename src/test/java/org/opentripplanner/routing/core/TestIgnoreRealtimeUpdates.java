@@ -3,7 +3,7 @@ package org.opentripplanner.routing.core;
 import junit.framework.TestCase;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -32,8 +32,8 @@ public class TestIgnoreRealtimeUpdates extends TestCase {
         Stop stop2 = new Stop();
         stop2.setId(new FeedScopedId("agency", "stop2"));
         
-        Vertex from = new TransitStopVertex(graph, stop1);
-        Vertex to = new TransitStopVertex(graph, stop2);
+        Vertex from = new TransitStopVertex(graph, stop1, null);
+        Vertex to = new TransitStopVertex(graph, stop2, null);
         
         // Create dummy TimetableSnapshot
         TimetableSnapshot snapshot = new TimetableSnapshot();

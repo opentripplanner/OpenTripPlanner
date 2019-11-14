@@ -10,13 +10,13 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -231,7 +231,7 @@ public class NearbyStopFinder {
      * TODO this should probably be merged with similar classes in Profile routing.
      */
     public static StopAtDistance stopAtDistanceForState (State state) {
-        double distance = 0.0;
+        double effectiveWalkDistance = 0.0;
         GraphPath graphPath = new GraphPath(state, false);
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
         List<Edge> edges = new ArrayList<>();
@@ -245,7 +245,7 @@ public class NearbyStopFinder {
                         coordinates.extend(geometry.getCoordinates(), 1);
                     }
                 }
-                distance += edge.getDistance();
+                effectiveWalkDistance += edge.getEffectiveWalkDistance();
             }
             edges.add(edge);
         }
@@ -256,7 +256,7 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), distance);
+        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), effectiveWalkDistance);
         sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
         sd.edges = edges;
         return sd;

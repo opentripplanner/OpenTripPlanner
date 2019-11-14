@@ -25,8 +25,11 @@ import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
@@ -34,9 +37,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -368,6 +368,17 @@ public class GraphIndex {
             ret.add(stopTimes);
         }
         return ret;
+    }
+
+    // TODO OTP2 - Add support for includeRealtimeUpdates
+    public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
+        List<TripPattern> tripPatterns = new ArrayList<>(patternsForStop.get(stop));
+        /*
+        if (includeRealtimeUpdates && graph.timetableSnapshotSource != null) {
+            tripPatterns.addAll(graph.timetableSnapshotSource.getAddedTripPatternsForStop(stop));
+        }
+         */
+        return tripPatterns;
     }
 
     /**

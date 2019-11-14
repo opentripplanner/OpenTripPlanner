@@ -1,7 +1,7 @@
 package org.opentripplanner.index.model;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 
 import java.util.List;
 

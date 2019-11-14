@@ -29,29 +29,29 @@ public class StopTimesMapperTest {
 
     @Test
     public void testMapStopTimes() {
-        TripPatternStructure tripPatternStructure = new TripPatternStructure();
+        NetexTestDataSample sample = new NetexTestDataSample();
 
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
-                tripPatternStructure.getStopsById(),
-                tripPatternStructure.getDestinationDisplayById(),
-                tripPatternStructure.getQuayIdByStopPointRef()
+                MappingSupport.ID_FACTORY,
+                sample.getStopsById(),
+                sample.getDestinationDisplayById(),
+                sample.getQuayIdByStopPointRef()
         );
 
         StopTimesMapper.MappedStopTimes result = stopTimesMapper.mapToStopTimes(
-                tripPatternStructure.getJourneyPattern(),
+                sample.getJourneyPattern(),
                 new Trip(),
-                tripPatternStructure.getTimetabledPassingTimes()
+                sample.getTimetabledPassingTimes()
         );
 
         List<StopTime> stopTimes = result.stopTimes;
 
-        assertEquals(5, stopTimes.size());
+        assertEquals(4, stopTimes.size());
 
         assertStop(stopTimes.get(0),"NSR:Quay:1", 18000, "Bergen");
         assertStop(stopTimes.get(1),"NSR:Quay:2", 18240, "Bergen");
-        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Bergen");
+        assertStop(stopTimes.get(2),"NSR:Quay:3", 18600, "Stavanger");
         assertStop(stopTimes.get(3),"NSR:Quay:4", 18900, "Stavanger");
-        assertStop(stopTimes.get(4),"NSR:Quay:5", 19320, "Stavanger");
 
         Map<String, StopTime> map = result.stopTimeByNetexId;
 
@@ -59,7 +59,6 @@ public class StopTimesMapperTest {
         assertEquals(stopTimes.get(1), map.get("TTPT-2"));
         assertEquals(stopTimes.get(2), map.get("TTPT-3"));
         assertEquals(stopTimes.get(3), map.get("TTPT-4"));
-        assertEquals(stopTimes.get(4), map.get("TTPT-5"));
     }
 
     private void assertStop(StopTime stopTime, String stopId, long departureTime, String headsign) {

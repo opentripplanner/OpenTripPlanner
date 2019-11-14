@@ -74,12 +74,9 @@ public class GraphBuilder implements Runnable {
         long startTime = System.currentTimeMillis();
 
         if (serializeGraph) {
-        	
             if (graphFile.exists()) {
-                LOG.info("graph already exists => skipping graph build");
-                return;
+                LOG.info("Graph already exists and will be overwritten at the end of the build process.");
             }
-        	
             try {
                 if (!graphFile.getParentFile().exists()) {
                     if (!graphFile.getParentFile().mkdirs()) {
@@ -120,10 +117,7 @@ public class GraphBuilder implements Runnable {
     /**
      * Factory method to create and configure a GraphBuilder with all the appropriate modules
      * to build a graph from the files in the given configuration.
-     *
-     * TODO #2760 - Remove comment when we remove support for multiple routers
-     * TODO parameterize with the router ID and call repeatedly to make multiple builders
-     * note of all command line options this is only using  params.inMemory params.preFlight
+     * Note of all command line options this is only using  params.inMemory params.preFlight
      * and params.build directory
      */
     public static GraphBuilder create(CommandLineParameters params, GraphConfig config) {
@@ -132,7 +126,7 @@ public class GraphBuilder implements Runnable {
         List<File> netexFiles = Lists.newArrayList();
         List<File> osmFiles =  Lists.newArrayList();
         File demFile = null;
-        File dir = params.build;
+        File dir = params.getGraphDirectory();
 
         LOG.info("Searching for graph builder input files in {}", dir);
 
@@ -298,9 +292,9 @@ public class GraphBuilder implements Runnable {
         }
         graphBuilder.addModule(new EmbedConfig(config.builderConfig(), config.routerConfig()));
         if (builderParams.htmlAnnotations) {
-            graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
+            graphBuilder.addModule(new AnnotationsToHTML(params.getGraphDirectory(), builderParams.maxHtmlAnnotationsPerFile));
         }
-        graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
+        graphBuilder.serializeGraph = !params.inMemory;
         return graphBuilder;
     }
 

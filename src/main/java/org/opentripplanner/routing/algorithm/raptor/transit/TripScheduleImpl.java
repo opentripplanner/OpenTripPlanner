@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 import static org.opentripplanner.util.DateUtils.secToHHMM;

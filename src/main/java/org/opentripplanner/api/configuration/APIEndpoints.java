@@ -5,11 +5,11 @@ import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.api.resource.PlannerResource;
-import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.index.IndexAPI;
+import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
 import org.opentripplanner.util.OTPFeature;
 
 import java.util.ArrayList;
@@ -21,9 +21,9 @@ import static org.opentripplanner.util.OTPFeature.APIAlertPatcher;
 import static org.opentripplanner.util.OTPFeature.APIBikeRental;
 import static org.opentripplanner.util.OTPFeature.APIExternalGeocoder;
 import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
-import static org.opentripplanner.util.OTPFeature.APIRouters;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
+import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
 
 /**
@@ -43,13 +43,13 @@ public class APIEndpoints {
         addIfEnabled(APIExternalGeocoder, ExternalGeocoderResource.class);
         addIfEnabled(APIBikeRental, BikeRental.class);
         addIfEnabled(APIAlertPatcher, AlertPatcher.class);
-        addIfEnabled(APIRouters, Routers.class);
         addIfEnabled(APIServerInfo, ServerInfo.class);
         addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
         addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
 
         // Sandbox extension APIs
         addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
+        addIfEnabled(SandboxAPITransmodelApi, TransmodelIndexAPI.class);
     }
 
     /**

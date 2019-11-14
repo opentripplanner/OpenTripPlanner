@@ -3,12 +3,12 @@ package org.opentripplanner.updater;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.util.TimeToStringConverter;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.util.TimeToStringConverter;
 
 import java.text.ParseException;
 import java.util.BitSet;

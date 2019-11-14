@@ -26,7 +26,7 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -104,7 +104,10 @@ public class GtfsModule implements GraphBuilderModule {
                     gtfsBundle.useCached = useCached;
                 }
 
-                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(loadBundle(gtfsBundle));
+                OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(
+                        loadBundle(gtfsBundle),
+                        graph
+                );
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
@@ -114,8 +117,11 @@ public class GtfsModule implements GraphBuilderModule {
                 // NB! The calls below have side effects - the builder state is updated!
                 createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
 
-                PatternHopFactory hf = createPatternHopFactory(gtfsBundle, builder.build());
-                hf.run(graph);
+                OtpTransitService transitModel = builder.build();
+
+                addTransitModelToGraph(graph, gtfsBundle, transitModel);
+
+                createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -155,14 +161,21 @@ public class GtfsModule implements GraphBuilderModule {
         graph.hasScheduledService = graph.hasScheduledService || buildTPOp.hasScheduledTrips();
     }
 
-    private PatternHopFactory createPatternHopFactory(GtfsBundle bundle, OtpTransitService transitService) {
-        return new PatternHopFactory(
-                bundle.getFeedId(),
+    private void addTransitModelToGraph(Graph graph, GtfsBundle gtfsBundle, OtpTransitService transitModel) {
+        AddTransitModelEntitiesToGraph.addToGraph(
+                gtfsBundle.getFeedId(),
+                transitModel,
+                gtfsBundle.subwayAccessTime,
+                graph
+        );
+    }
+
+    private GeometryAndBlockProcessor createGeometryAndBlockProcessor (GtfsBundle gtfsBundle, OtpTransitService transitService) {
+        return new GeometryAndBlockProcessor(
                 transitService,
                 fareServiceFactory,
-                bundle.getMaxStopToShapeSnapDistance(),
-                bundle.subwayAccessTime,
-                bundle.maxInterlineDistance
+                gtfsBundle.getMaxStopToShapeSnapDistance(),
+                gtfsBundle.maxInterlineDistance
         );
     }
 

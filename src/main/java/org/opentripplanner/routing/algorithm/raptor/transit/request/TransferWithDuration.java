@@ -11,7 +11,7 @@ public class TransferWithDuration implements TransferLeg {
 
     public TransferWithDuration(Transfer transfer, double walkSpeed) {
         this.transfer = transfer;
-        this.durationSeconds = (int) Math.round(transfer.getDistanceMeters() / walkSpeed);
+        this.durationSeconds = (int) Math.round(transfer.getEffectiveWalkDistanceMeters() / walkSpeed);
     }
 
     @Override

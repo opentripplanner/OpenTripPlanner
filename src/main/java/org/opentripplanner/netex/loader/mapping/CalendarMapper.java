@@ -20,23 +20,25 @@ import java.util.stream.Collectors;
 
 import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_ADD;
 import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
 
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
     private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
 
+    private final FeedScopedIdFactory idFactory;
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
     private final ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById;
     private final ReadOnlyHierarchicalMapById<DayType> dayTypeById;
 
 
     CalendarMapper(
+            FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById
     ) {
+        this.idFactory = idFactory;
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
         this.operatingPeriodById = operatingPeriodById;
         this.dayTypeById = dayTypeById;
@@ -71,11 +73,11 @@ class CalendarMapper {
         return dayTypeAssignmentByDayTypeId.lookup(dayTypeId);
     }
 
-    private static ServiceCalendarDate newServiceCalendarDate(
+    private ServiceCalendarDate newServiceCalendarDate(
             LocalDateTime date, String serviceId, Integer exceptionType
     ) {
         ServiceCalendarDate serviceCalendarDate = new ServiceCalendarDate();
-        serviceCalendarDate.setServiceId(createFeedScopedId(serviceId));
+        serviceCalendarDate.setServiceId(idFactory.createId(serviceId));
         serviceCalendarDate.setDate(
                 new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
         serviceCalendarDate.setExceptionType(exceptionType);

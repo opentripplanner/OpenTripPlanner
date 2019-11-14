@@ -22,11 +22,11 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
@@ -591,7 +591,7 @@ public class IndexAPI {
         /** Make a transfer from a simpletransfer edge from the graph. */
         public Transfer(SimpleTransfer e) {
             toStopId = GtfsLibrary.convertIdToString(((TransitStopVertex) e.getToVertex()).getStop().getId());
-            distance = e.getDistance();
+            distance = e.getDistanceMeters();
         }
     }
 }

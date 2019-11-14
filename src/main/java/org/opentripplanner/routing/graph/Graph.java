@@ -32,24 +32,25 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -233,6 +234,17 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     /** Parent stops **/
     public Map<FeedScopedId, Station> stationById = new HashMap<>();
+
+    /**
+     * Optional level above parent stops (only supported in NeTEx)
+     */
+    public Map<FeedScopedId, MultiModalStation> multiModalStationById = new HashMap<>();
+
+    /**
+     * Optional grouping that can contain both stations and multimodal stations (only supported in
+     * NeTEx)
+     */
+    public Map<FeedScopedId, GroupOfStations> groupOfStationsById = new HashMap<>();
 
     /**
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit

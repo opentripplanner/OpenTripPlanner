@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -14,13 +15,9 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.impl.MemoryGraphSource;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.LocalizedString;
 
@@ -157,7 +154,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
      * @throws UnsupportedEncodingException
      */
     private void testBuildingAreas(boolean skipVisibility) throws UnsupportedEncodingException {
-        Graph gg = new Graph();
+        Graph graph = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.skipVisibility = skipVisibility;
@@ -169,23 +166,21 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, extra);
-        new StreetVertexIndexServiceImpl(gg);
+        loader.buildGraph(graph, extra);
+        new StreetVertexIndexServiceImpl(graph);
 
-        OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
-        otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", gg));
+        Router router = ConstantsForTests.forTestGraph(graph);
 
-        Router a = otpServer.getGraphService().getRouter("A");
         RoutingRequest request = new RoutingRequest("WALK");
 
         //This are vertices that can be connected only over edges on area (with correct permissions)
         //It tests if it is possible to route over area without visibility calculations
-        Vertex bottomV = gg.getVertex("osm:node:580290955");
-        Vertex topV = gg.getVertex("osm:node:559271124");
+        Vertex bottomV = graph.getVertex("osm:node:580290955");
+        Vertex topV = graph.getVertex("osm:node:559271124");
 
-        request.setRoutingContext(a.graph, bottomV, topV);
+        request.setRoutingContext(router.graph, bottomV, topV);
 
-        GraphPathFinder graphPathFinder = new GraphPathFinder(a);
+        GraphPathFinder graphPathFinder = new GraphPathFinder(router);
         List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
 
         assertNotNull(pathList);

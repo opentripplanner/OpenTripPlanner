@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -1220,6 +1222,25 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.triangleSafetyFactor = safe;
         this.triangleSlopeFactor = slope;
         this.triangleTimeFactor = time;
+    }
+
+    public static void assertTriangleParameters(
+            Double triangleSafetyFactor,
+            Double triangleTimeFactor,
+            Double triangleSlopeFactor
+    )
+            throws ParameterException
+    {
+        if (triangleSafetyFactor == null && triangleSlopeFactor == null && triangleTimeFactor == null) {
+            throw new ParameterException(Message.TRIANGLE_VALUES_NOT_SET);
+        }
+        if (triangleSafetyFactor == null || triangleSlopeFactor == null || triangleTimeFactor == null) {
+            throw new ParameterException(Message.UNDERSPECIFIED_TRIANGLE);
+        }
+        // FIXME couldn't this be simplified by only specifying TWO of the values?
+        if (Math.abs(triangleSafetyFactor + triangleSlopeFactor + triangleTimeFactor - 1) > Math.ulp(1) * 3) {
+            throw new ParameterException(Message.TRIANGLE_NOT_AFFINE);
+        }
     }
 
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */

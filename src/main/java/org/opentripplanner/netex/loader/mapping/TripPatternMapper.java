@@ -5,9 +5,9 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.rutebanken.netex.model.DestinationDisplay;
@@ -23,8 +23,6 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.createFeedScopedId;
-
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
  * sequence of stops. This means that they can all use the same StopPattern. Each ServiceJourney contains
@@ -38,6 +36,8 @@ import static org.opentripplanner.netex.loader.mapping.FeedScopedIdFactory.creat
 class TripPatternMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPatternMapper.class);
+
+    private final FeedScopedIdFactory idFactory;
 
     private final EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
 
@@ -54,6 +54,7 @@ class TripPatternMapper {
     private Result result;
 
     TripPatternMapper(
+            FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, Stop> stopsById,
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
@@ -63,11 +64,12 @@ class TripPatternMapper {
             ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> serviceJourneyByPatternId,
             Deduplicator deduplicator
     ) {
+        this.idFactory = idFactory;
         this.routeById = routeById;
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
-        this.tripMapper = new TripMapper(otpRouteById, routeById, journeyPatternById);
-        this.stopTimesMapper = new StopTimesMapper(stopsById, destinationDisplayById, quayIdByStopPointRef);
+        this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById);
+        this.stopTimesMapper = new StopTimesMapper(idFactory, stopsById, destinationDisplayById, quayIdByStopPointRef);
         this.deduplicator = deduplicator;
     }
 
@@ -86,9 +88,10 @@ class TripPatternMapper {
         List<Trip> trips = new ArrayList<>();
 
         for (ServiceJourney serviceJourney : serviceJourneys) {
-            Trip trip = tripMapper.mapServiceJourney(
-                    serviceJourney
-            );
+            Trip trip = tripMapper.mapServiceJourney(serviceJourney);
+
+            // Unable to map ServiceJourney, problem logged by the mapper above
+            if(trip == null) continue;
 
             StopTimesMapper.MappedStopTimes stopTimes = stopTimesMapper.mapToStopTimes(
                     journeyPattern,
@@ -102,11 +105,14 @@ class TripPatternMapper {
             trips.add(trip);
         }
 
+        // No trips successfully mapped
+        if(trips.isEmpty()) return result;
+
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
         StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
 
         TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
-        tripPattern.setId(createFeedScopedId(journeyPattern.getId()));
+        tripPattern.setId(idFactory.createId(journeyPattern.getId()));
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
 
         createTripTimes(trips, tripPattern);
@@ -120,7 +126,7 @@ class TripPatternMapper {
             JourneyPattern journeyPattern
     ) {
         Route route = routeById.lookup(journeyPattern.getRouteRef().getRef());
-        return otpRouteById.get(createFeedScopedId(route.getLineRef().getValue().getRef()));
+        return otpRouteById.get(idFactory.createId(route.getLineRef().getValue().getRef()));
     }
 
     private void createTripTimes(

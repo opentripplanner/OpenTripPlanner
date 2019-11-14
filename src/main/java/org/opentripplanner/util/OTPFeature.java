@@ -18,12 +18,12 @@ public enum OTPFeature {
     APIExternalGeocoder(true),
     APIBikeRental(true),
     APIAlertPatcher(true),
-    APIRouters(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),
 
     // Sandbox extension features - Must be turned OFF by default
+    SandboxAPITransmodelApi(false),
     SandboxExampleAPIGraphStatistics(false),
     TransferAnalyzer(false);
 

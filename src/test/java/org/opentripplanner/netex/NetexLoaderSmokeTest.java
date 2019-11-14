@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
@@ -13,11 +14,11 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 import java.io.Serializable;
@@ -60,6 +61,7 @@ public class NetexLoaderSmokeTest {
         OtpTransitService otpModel = transitBuilder.build();
 
         assertAgencies(otpModel.getAllAgencies());
+        assertMultiModalStations(otpModel.getAllMultiModalStations());
         assertOperators(otpModel.getAllOperators());
         assertStops(otpModel.getAllStops());
         assertStations(otpModel.getAllStations());
@@ -88,6 +90,16 @@ public class NetexLoaderSmokeTest {
         assertNull( a.getBrandingUrl());
     }
 
+    private void assertMultiModalStations(Collection<MultiModalStation> multiModalStations) {
+        Map<FeedScopedId, MultiModalStation> map = multiModalStations.stream()
+                        .collect(Collectors.toMap(MultiModalStation::getId, s -> s));
+        MultiModalStation multiModalStation = map.get(fId("NSR:StopPlace:58243"));
+        assertEquals("Bergkrystallen", multiModalStation.getName());
+        assertEquals(59.866603, multiModalStation.getLat(), 0.000001);
+        assertEquals(10.821614, multiModalStation.getLon(), 0.000001);
+        assertEquals(3, multiModalStations.size());
+    }
+
     private void assertOperators(Collection<Operator> operators) {
         assertEquals(1, operators.size());
         Operator o = list(operators).get(0);
@@ -111,11 +123,11 @@ public class NetexLoaderSmokeTest {
 
     private void assertStations(Collection<Station> stations) {
         Map<FeedScopedId, Station> map = stations.stream().collect(Collectors.toMap(Station::getId, s -> s));
-        Station station = map.get(fId("NSR:StopPlace:58243"));
-        assertEquals("Bergkrystallen", station.getName());
-        assertEquals(59.866603, station.getLat(), 0.000001);
-        assertEquals(10.821614, station.getLon(), 0.000001);
-        assertEquals(8, stations.size());
+        Station station = map.get(fId("NSR:StopPlace:5825"));
+        assertEquals("Bergkrystallen T", station.getName());
+        assertEquals(59.866297, station.getLat(), 0.000001);
+        assertEquals(10.821484, station.getLon(), 0.000001);
+        assertEquals(5, stations.size());
     }
 
     private void assertTripPatterns(Collection<TripPattern> patterns) {

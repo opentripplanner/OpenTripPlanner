@@ -13,13 +13,13 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.Timetable;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.edgetype.Timetable;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TripPattern;
-import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -61,7 +61,7 @@ public class TimetableSnapshotSourceTest {
 
         feedId = context.getFeedId().getId();
 
-        PatternHopFactory factory = new PatternHopFactory(context);
+        GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
         graph.index(new DefaultStreetVertexIndexFactory());
 

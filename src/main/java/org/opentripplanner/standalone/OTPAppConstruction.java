@@ -1,26 +1,26 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.impl.GraphScanner;
-import org.opentripplanner.routing.impl.InputStreamGraphSource;
-import org.opentripplanner.routing.services.GraphService;
+import org.opentripplanner.routing.impl.GraphLoader;
+import org.opentripplanner.standalone.config.GraphConfig;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.visualizer.GraphVisualizer;
 
 import javax.ws.rs.core.Application;
 import java.io.File;
 
 /**
- * This class is responsible for creating the top level services like {@link OTPConfiguration},
- * {@link OTPServer} and {@link GraphService}. The purpose of this class is to wire the
+ * This class is responsible for creating the top level services like {@link OTPConfiguration}
+ * and {@link OTPServer}. The purpose of this class is to wire the
  * application, creating the necessary Services and modules and putting them together.
- * It is NOT responsible for starting or running the application. The hole idea of this
+ * It is NOT responsible for starting or running the application. The whole idea of this
  * class is to separate application construction from running it.
- * <p>
- * The top level construction class(this class) may delegate to other construction classes to
- * inject configuration and services into sub-modules.
- * <p>
- * THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
+ *
+ * <p> The top level construction class(this class) may delegate to other construction classes
+ * to inject configuration and services into sub-modules.
+ *
+ * <p> THIS CLASS IS NOT THREAD SAFE - THE APPLICATION SHOULD BE CREATED IN ONE THREAD. This
  * should be really fast, since the only IO operations are reading config files and logging.
  * Loading transit or map data should NOT happen during this phase.
  */
@@ -29,15 +29,15 @@ public class OTPAppConstruction {
     private final OTPConfiguration configuration;
     private final CommandLineParameters commandLineParameters;
 
+    private Router router = null;
     private OTPServer server = null;
-    private GraphService graphService = null;
 
     /**
      * Create a new OTP configuration instance for a given directory.
      */
     public OTPAppConstruction(CommandLineParameters commandLineParameters) {
         this.commandLineParameters = commandLineParameters;
-        this.configuration = new OTPConfiguration(new File(commandLineParameters.basePath));
+        this.configuration = new OTPConfiguration(commandLineParameters.getGraphDirectory());
 
         // Initialize features from configuration file.
         OTPFeature.configure(configuration().otpConfig());
@@ -57,19 +57,7 @@ public class OTPAppConstruction {
     GraphBuilder createDefaultGraphBuilder() {
         return GraphBuilder.create(
                 commandLineParameters,
-                configuration().getGraphConfig(commandLineParameters.build)
-        );
-    }
-
-    /**
-     * Create the default graph scanner.
-     */
-    GraphScanner createDefaultGraphScanner() {
-        return new GraphScanner(
-                graphService(),
-                configuration(),
-                commandLineParameters.graphDirectory,
-                commandLineParameters.autoScan
+                configuration().getGraphConfig(commandLineParameters.getGraphDirectory())
         );
     }
 
@@ -89,32 +77,18 @@ public class OTPAppConstruction {
      * The method is {@code public} to allow test access.
      */
     public OTPServer server() {
-        if(server == null) {
-            server = new OTPServer(commandLineParameters, graphService());
+        if (server == null) {
+            server = new OTPServer(commandLineParameters, router);
         }
         return server;
-    }
-
-    /**
-     * Create a cached GraphService that will be used by all OTP components to resolve router IDs
-     * to Graphs. If a graph is supplied (graph parameter is not null) then that graph is also
-     * registered.
-     * <p>
-     * TODO OTP2 - move into OTPServer and/or GraphService itself, eliminate FileFactory and put
-     *           - basePath in GraphService
-     */
-    GraphService graphService () {
-        if(graphService == null) {
-            graphService = new GraphService(
-                    commandLineParameters.autoReload,
-                    new InputStreamGraphSource.FileFactory(configuration(), commandLineParameters.graphDirectory
-                    )
-            );
-        }
-        return graphService;
     }
 
     private Application createApplication() {
         return new OTPApplication(server(), !commandLineParameters.insecure);
     }
+
+    public void setRouter (Router router) {
+        this.router = router;
+    }
+
 }
