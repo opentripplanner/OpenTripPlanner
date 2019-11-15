@@ -4,16 +4,17 @@ import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
 import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
 import org.opentripplanner.graph_builder.annotation.HopZeroTime;
 import org.opentripplanner.graph_builder.annotation.NegativeDwellTime;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
 import org.opentripplanner.graph_builder.annotation.RepeatedStops;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -34,11 +35,11 @@ public class RepairStopTimesForEachTripOperation {
 
     private final TripStopTimes stopTimesByTrip;
 
-    private DataImportIssueStore annotationStore;
+    private DataImportIssueStore issueStore;
 
-    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, DataImportIssueStore annotationStore) {
+    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, DataImportIssueStore issueStore) {
         this.stopTimesByTrip = stopTimesByTrip;
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
     }
 
     public void run() {
@@ -56,7 +57,7 @@ public class RepairStopTimesForEachTripOperation {
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
             if (!removedStopSequences.isEmpty()) {
-                annotationStore.add(new RepeatedStops(trip, removedStopSequences));
+                issueStore.add(new RepeatedStops(trip, removedStopSequences));
             }
             filterStopTimes(stopTimes);
             interpolateStopTimes(stopTimes);
@@ -110,7 +111,7 @@ public class RepairStopTimesForEachTripOperation {
      * Scan through the given list, looking for clearly incorrect series of stoptimes and unsetting
      * them. This includes duplicate times (0-time hops), as well as negative, fast or slow hops.
      * Unsetting the arrival/departure time of clearly incorrect stoptimes will cause them to be
-     * interpolated in the next step. Annotations are also added to the graph to reveal the problems
+     * interpolated in the next step. {@link DataImportIssue}s are reported to reveal the problems
      * to the user.
      *
      * @param stopTimes the stoptimes to be filtered (from a single trip)
@@ -168,7 +169,7 @@ public class RepairStopTimesForEachTripOperation {
             }
             int dwellTime = st0.getDepartureTime() - st0.getArrivalTime();
             if (dwellTime < 0) {
-                annotationStore.add(new NegativeDwellTime(st0));
+                issueStore.add(new NegativeDwellTime(st0));
                 if (st0.getArrivalTime() > 23 * SECONDS_IN_HOUR
                         && st0.getDepartureTime() < 1 * SECONDS_IN_HOUR) {
                     midnightCrossed = true;
@@ -180,7 +181,7 @@ public class RepairStopTimesForEachTripOperation {
             int runningTime = st1.getArrivalTime() - st0.getDepartureTime();
 
             if (runningTime < 0) {
-                annotationStore.add(new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
+                issueStore.add(new NegativeHopTime(new StopTime(st0), new StopTime(st1)));
                 // negative hops are usually caused by incorrect coding of midnight crossings
                 midnightCrossed = true;
                 if (st0.getDepartureTime() > 23 * SECONDS_IN_HOUR
@@ -208,7 +209,7 @@ public class RepairStopTimesForEachTripOperation {
                     .getDepartureTime()) {
                 LOG.trace("{} {}", st0, st1);
                 // series of identical stop times at different stops
-                annotationStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(),
+                issueStore.add(new HopZeroTime((float) hopDistance, st1.getTrip(),
                                 st1.getStopSequence()));
                 // clear stoptimes that are obviously wrong, causing them to later be interpolated
 /* FIXME (lines commented out because they break routability in multi-feed NYC for some reason -AMB) */
@@ -218,11 +219,11 @@ public class RepairStopTimesForEachTripOperation {
             } else if (hopSpeed > 45) {
                 // 45 m/sec ~= 100 miles/hr
                 // elapsed time of 0 will give speed of +inf
-                annotationStore.add(new HopSpeedFast((float) hopSpeed, (float) hopDistance,
+                issueStore.add(new HopSpeedFast((float) hopSpeed, (float) hopDistance,
                         st0.getTrip(), st0.getStopSequence()));
             } else if (hopSpeed < 0.1) {
                 // 0.1 m/sec ~= 0.2 miles/hr
-                annotationStore.add(new HopSpeedSlow((float) hopSpeed, (float) hopDistance,
+                issueStore.add(new HopSpeedSlow((float) hopSpeed, (float) hopDistance,
                         st0.getTrip(), st0.getStopSequence()));
             }
             // st0 should reflect the last stoptime that was not clearly incorrect

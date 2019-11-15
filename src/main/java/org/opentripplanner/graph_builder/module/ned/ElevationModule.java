@@ -46,7 +46,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
-    private DataImportIssueStore annotationStore;
+    private DataImportIssueStore issueStore;
 
     private ElevationGridCoverageFactory gridCoverageFactory;
 
@@ -90,9 +90,9 @@ public class ElevationModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
 
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
         gridCoverageFactory.setGraph(graph);
@@ -267,7 +267,7 @@ public class ElevationModule implements GraphBuilderModule {
             //limit elevation propagation to at max 2km; this prevents an infinite loop
             //in the case of islands missing elevation (and some other cases)
             if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                annotationStore.add(new ElevationPropagationLimit(state.vertex));
+                issueStore.add(new ElevationPropagationLimit(state.vertex));
                 bestDistance = state.distance;
                 bestElevation = state.initialElevation;
             }
@@ -323,7 +323,7 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if (edge.setElevationProfile(profile, true)) {
-                        annotationStore.add(new ElevationFlattened(edge));
+                        issueStore.add(new ElevationFlattened(edge));
                     }
                 }
             }
@@ -375,7 +375,7 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            annotationStore.add(new ElevationFlattened(ee));
+            issueStore.add(new ElevationFlattened(ee));
         }
     }
 

@@ -1,10 +1,6 @@
 package org.opentripplanner.graph_builder.module;
 
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -18,7 +14,10 @@ import org.opentripplanner.util.stats.DiscreteDistribution.NumberQuantifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.LineString;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * Print statistics on geometry and edge/vertices data for a graph (number of geometry, average
@@ -46,7 +45,7 @@ public class GraphStatisticsModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
 
         DiscreteDistribution<ConstantQuantifiable<String>> edgeTypeDistribution = new DiscreteDistribution<ConstantQuantifiable<String>>();

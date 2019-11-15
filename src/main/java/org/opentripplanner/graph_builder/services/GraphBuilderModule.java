@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.services;
 
-import java.util.HashMap;
-
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.routing.graph.Graph;
+
+import java.util.HashMap;
 
 /** Modules that add elements to a graph. These are plugins to the GraphBuilder. */
 public interface GraphBuilderModule {
@@ -12,7 +12,7 @@ public interface GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     );
 
     public default void buildGraph(

@@ -10,37 +10,37 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class DataImportIssueStore {
-        private static final Logger GRAPH_BUILDER_ANNOTATION_LOG =
-                LoggerFactory.getLogger("GRAPH_BUILDER_ANNOTATION_LOG");
+        private static final Logger DATA_IMPORT_ISSUES_LOG =
+            LoggerFactory.getLogger("DATA_IMPORT_ISSUES");
 
-        private final List<DataImportIssue> annotations = new ArrayList<>();
+        private final List<DataImportIssue> issues = new ArrayList<>();
 
-        private final boolean storeAnnotations;
+        private final boolean storeIssues;
 
-        public DataImportIssueStore(boolean storeAnnotations) {
-                this.storeAnnotations = storeAnnotations;
+        public DataImportIssueStore(boolean storeIssues) {
+                this.storeIssues = storeIssues;
         }
 
-        public void add(DataImportIssue annotation) {
-                GRAPH_BUILDER_ANNOTATION_LOG.info(annotation.getMessage());
-                if (storeAnnotations) {
-                        this.annotations.add(annotation);
+        public void add(DataImportIssue issue) {
+                DATA_IMPORT_ISSUES_LOG.info(issue.getMessage());
+                if (storeIssues) {
+                        this.issues.add(issue);
                 }
         }
 
-        public List<DataImportIssue> getAnnotations() {
-                return this.annotations;
+        public List<DataImportIssue> getIssues() {
+                return this.issues;
         }
 
         public void summarize() {
                 Multiset<Class<? extends DataImportIssue>> classes = HashMultiset.create();
-                GRAPH_BUILDER_ANNOTATION_LOG.info("Summary (number of each type of annotation):");
-                for (DataImportIssue gba : annotations)
+                DATA_IMPORT_ISSUES_LOG.info("Summary (number of each type of issue):");
+                for (DataImportIssue gba : issues)
                         classes.add(gba.getClass());
                 for (Multiset.Entry<Class<? extends DataImportIssue>> e : classes.entrySet()) {
                         String name = e.getElement().getSimpleName();
                         int count = e.getCount();
-                        GRAPH_BUILDER_ANNOTATION_LOG.info("    {} - {}", name, count);
+                        DATA_IMPORT_ISSUES_LOG.info("    {} - {}", name, count);
                 }
         }
 }

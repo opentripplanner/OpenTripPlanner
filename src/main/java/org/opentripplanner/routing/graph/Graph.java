@@ -579,7 +579,7 @@ public class Graph implements Serializable {
     // Infer the time period covered by the transit feed
     public void updateTransitFeedValidity(
             CalendarServiceData data,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         long now = new Date().getTime() / 1000;
         final long SEC_IN_DAY = 24 * 60 * 60;
@@ -603,7 +603,7 @@ public class Graph implements Serializable {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                annotationStore.add(new NoFutureDates(agency));
+                issueStore.add(new NoFutureDates(agency));
             }
         }
     }

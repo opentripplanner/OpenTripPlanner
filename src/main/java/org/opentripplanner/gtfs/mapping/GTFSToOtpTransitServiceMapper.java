@@ -45,10 +45,10 @@ public class GTFSToOtpTransitServiceMapper {
             routeMapper, fareAttributeMapper
     );
 
-    private final DataImportIssueStore annotationStore;
+    private final DataImportIssueStore issueStore;
 
-    GTFSToOtpTransitServiceMapper(DataImportIssueStore annotationStore) {
-        this.annotationStore = annotationStore;
+    GTFSToOtpTransitServiceMapper(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
     }
 
     /**
@@ -56,9 +56,9 @@ public class GTFSToOtpTransitServiceMapper {
      */
     public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
             GtfsRelationalDao data,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
-        return new GTFSToOtpTransitServiceMapper(annotationStore).map(data);
+        return new GTFSToOtpTransitServiceMapper(issueStore).map(data);
     }
 
     private OtpTransitServiceBuilder map(GtfsRelationalDao data) {
@@ -95,8 +95,8 @@ public class GTFSToOtpTransitServiceMapper {
         }
         new LinkStopsAndParentStationsTogether(
                 builder.getStations(),
-                builder.getStops(),
-                annotationStore)
+                builder.getStops(), issueStore
+        )
             .link(data.getAllStops());
     }
 }

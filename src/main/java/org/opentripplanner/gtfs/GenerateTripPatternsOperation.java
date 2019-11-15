@@ -6,6 +6,7 @@ import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
@@ -14,7 +15,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -37,7 +37,7 @@ public class GenerateTripPatternsOperation {
     private static final int UNKNOWN_DIRECTION_ID = -1;
 
     private final OtpTransitServiceBuilder transitDaoBuilder;
-    private final DataImportIssueStore annotationStore;
+    private final DataImportIssueStore issueStore;
     private final Deduplicator deduplicator;
     private final Set<FeedScopedId> calendarServiceIds;
 
@@ -50,10 +50,10 @@ public class GenerateTripPatternsOperation {
 
 
 
-    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, DataImportIssueStore annotationStore,
+    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, DataImportIssueStore issueStore,
             Deduplicator deduplicator, Set<FeedScopedId> calendarServiceIds) {
         this.transitDaoBuilder = builder;
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
         this.deduplicator = deduplicator;
         this.calendarServiceIds = calendarServiceIds;
         this.tripPatterns = transitDaoBuilder.getTripPatterns();
@@ -101,7 +101,7 @@ public class GenerateTripPatternsOperation {
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
         if (!calendarServiceIds.contains(trip.getServiceId())) {
-            annotationStore.add(new TripUndefinedService(trip));
+            issueStore.add(new TripUndefinedService(trip));
             return; // Invalid trip, skip it, it will break later
         }
 
@@ -110,7 +110,7 @@ public class GenerateTripPatternsOperation {
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
         if (stopTimes.size() < 2) {
-            annotationStore.add(new TripDegenerate(trip));
+            issueStore.add(new TripDegenerate(trip));
             return;
         }
 

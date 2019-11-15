@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.ParentStationNotFoundAnnotation;
+import org.opentripplanner.graph_builder.annotation.ParentStationNotFound;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -20,17 +20,18 @@ class LinkStopsAndParentStationsTogether {
     private final EntityById<FeedScopedId, Station> otpStations;
     private final EntityById<FeedScopedId, Stop> otpStops;
 
-    private final DataImportIssueStore annotationStore;
+    private final DataImportIssueStore issueStore;
 
     private static Logger LOG = LoggerFactory.getLogger(LinkStopsAndParentStationsTogether.class);
 
     LinkStopsAndParentStationsTogether(
             EntityById<FeedScopedId, Station> stations,
             EntityById<FeedScopedId, Stop> stops,
-            DataImportIssueStore annotationStore) {
+            DataImportIssueStore issueStore
+    ) {
         this.otpStations = stations;
         this.otpStops = stops;
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
     }
 
     void link(Collection<org.onebusaway.gtfs.model.Stop> gtfsStops) {
@@ -41,8 +42,8 @@ class LinkStopsAndParentStationsTogether {
                 Station otpStation = getOtpParentStation(gtfsStop);
 
                 if (otpStation == null) {
-                    annotationStore.add(
-                            new ParentStationNotFoundAnnotation(
+                    issueStore.add(
+                            new ParentStationNotFound(
                                     otpStop,
                                     gtfsStop.getParentStation()
                             )

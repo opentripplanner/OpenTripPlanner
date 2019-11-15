@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Stop;
 
-public class ParentStationNotFoundAnnotation implements DataImportIssue {
+public class ParentStationNotFound implements DataImportIssue {
 
     public static final String FMT = "Parent station %s not found. Stop %s will not be linked to a "
             + "parent station.";
@@ -11,7 +11,7 @@ public class ParentStationNotFoundAnnotation implements DataImportIssue {
 
     final Stop stop;
 
-    public ParentStationNotFoundAnnotation(Stop stop, String parentStop){
+    public ParentStationNotFound(Stop stop, String parentStop){
     	this.stop = stop;
     	this.parentStop = parentStop;
     }

@@ -25,7 +25,7 @@ import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOV
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
-    private final DataImportIssueStore addBuilderAnnotation;
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
@@ -38,17 +38,17 @@ class CalendarMapper {
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById,
-            DataImportIssueStore addBuilderAnnotation
+            DataImportIssueStore issueStore
     ) {
         this.idFactory = idFactory;
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
         this.operatingPeriodById = operatingPeriodById;
         this.dayTypeById = dayTypeById;
-        this.addBuilderAnnotation = addBuilderAnnotation;
+        this.issueStore = issueStore;
     }
 
-    protected void addBuilderAnnotation(DataImportIssue annotation) {
-        addBuilderAnnotation.add(annotation);
+    protected void addDataImportIssue(DataImportIssue issue) {
+        issueStore.add(issue);
     }
 
     Collection<ServiceCalendarDate> mapToCalendarDates(DayTypeRefsToServiceIdAdapter dayTypeRefs) {
@@ -64,7 +64,7 @@ class CalendarMapper {
         Set<LocalDateTime> dates = dayTypeAssignmentMapper.mergeDates();
 
         if (dates.isEmpty()) {
-            addBuilderAnnotation(new ServiceCodeDoesNotContainServiceDates(serviceId));
+            addDataImportIssue(new ServiceCodeDoesNotContainServiceDates(serviceId));
             // Add one date exception when list is empty to ensure serviceId is not lost
             LocalDateTime today = LocalDate.now().atStartOfDay();
             return Collections.singleton(

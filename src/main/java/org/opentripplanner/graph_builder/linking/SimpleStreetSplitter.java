@@ -78,7 +78,7 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
-    private DataImportIssueStore annotationStore;
+    private DataImportIssueStore issueStore;
 
     public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
@@ -112,8 +112,9 @@ public class SimpleStreetSplitter {
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
-        SpatialIndex transitStopIndex, boolean destructiveSplitting, DataImportIssueStore annotationStore) {
-        this.annotationStore = annotationStore;
+        SpatialIndex transitStopIndex, boolean destructiveSplitting, DataImportIssueStore issueStore
+    ) {
+        this.issueStore = issueStore;
         this.graph = graph;
         this.transitStopIndex = transitStopIndex;
         this.destructiveSplitting = destructiveSplitting;
@@ -139,8 +140,8 @@ public class SimpleStreetSplitter {
      * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
      * @param graph
      */
-    public SimpleStreetSplitter(Graph graph, DataImportIssueStore annotationStore) {
-        this(graph, null, null, true, annotationStore);
+    public SimpleStreetSplitter(Graph graph, DataImportIssueStore issueStore) {
+        this(graph, null, null, true, issueStore);
     }
 
     public SimpleStreetSplitter(Graph graph) {
@@ -156,11 +157,11 @@ public class SimpleStreetSplitter {
 
                 if (!link(v)) {
                     if (v instanceof TransitStopVertex)
-                        annotationStore.add(new StopUnlinked((TransitStopVertex) v));
+                        issueStore.add(new StopUnlinked((TransitStopVertex) v));
                     else if (v instanceof BikeRentalStationVertex)
-                        annotationStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
+                        issueStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
                     else if (v instanceof BikeParkVertex)
-                        annotationStore.add(new BikeParkUnlinked((BikeParkVertex) v));
+                        issueStore.add(new BikeParkUnlinked((BikeParkVertex) v));
                 };
             }
         }
@@ -301,8 +302,7 @@ public class SimpleStreetSplitter {
                 double distanceDegreesLatitude = distances.get(candidateEdges.get(0));
                 int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
                 if (distanceMeters > WARNING_DISTANCE_METERS) {
-                    // Registering an annotation but not logging because tests produce thousands of these warnings.
-                    annotationStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
+                    issueStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
                 }
             }
 

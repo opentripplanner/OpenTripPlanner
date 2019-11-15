@@ -9,13 +9,13 @@ import org.rutebanken.netex.model.Quay;
 import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
 class StopMapper {
-    private final DataImportIssueStore annotationStore;
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
 
-    StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore annotationStore) {
+    StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
         this.idFactory = idFactory;
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -33,7 +33,7 @@ class StopMapper {
                 }
         );
         if (!locationOk) {
-                annotationStore.add(new QuayWithoutCoordinates(quay.getId()));
+                issueStore.add(new QuayWithoutCoordinates(quay.getId()));
             return null;
         }
         stop.setId(idFactory.createId(quay.getId()));

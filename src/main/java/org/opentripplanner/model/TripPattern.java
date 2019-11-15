@@ -375,7 +375,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public static void generateUniqueNames (
             Collection<TripPattern> tableTripPatterns,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         LOG.info("Generating unique names for stop patterns on each route.");
         Set<String> usedRouteNames = Sets.newHashSet();
@@ -395,7 +395,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
                 String generatedRouteName;
                 do generatedRouteName = routeName + " " + (i++);
                 while (usedRouteNames.contains(generatedRouteName));
-                annotationStore.add(new NonUniqueRouteName(generatedRouteName));
+                issueStore.add(new NonUniqueRouteName(generatedRouteName));
                 routeName = generatedRouteName;
             }
             usedRouteNames.add(routeName);

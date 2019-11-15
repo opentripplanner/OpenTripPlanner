@@ -88,7 +88,7 @@ This table lists the possible settings that can be defined in a `build-config.js
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`htmlAnnotations` |  Generate nice HTML report of Graph errors/warnings (annotations) | boolean | false |
+`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
 `transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
 `parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
@@ -109,7 +109,7 @@ config key | description | value type | value default | notes
 `staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
-`maxHtmlAnnotationsPerFile` | If number of annotations is larger then specified number annotations will be split in multiple files | int | 1,000 | 
+`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
 `maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
 `islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
 `islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 

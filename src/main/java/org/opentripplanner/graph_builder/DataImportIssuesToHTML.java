@@ -2,16 +2,11 @@ package org.opentripplanner.graph_builder;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.common.collect.*;
-
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.*;
-import java.util.logging.Level;
-
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultiset;
+import com.google.common.collect.Lists;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multiset;
 import org.apache.commons.io.FileUtils;
 import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -19,42 +14,54 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.logging.Level;
+
 /**
- * This class generates nice HTML graph annotations reports 
+ * This class generates a nice HTML graph import data issue report.
  * 
  * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived classes.
  * @author mabu
  */
-public class AnnotationsToHTML implements GraphBuilderModule {
+public class DataImportIssuesToHTML implements GraphBuilderModule {
 
-    private static Logger LOG = LoggerFactory.getLogger(AnnotationsToHTML.class); 
+    private static Logger LOG = LoggerFactory.getLogger(DataImportIssuesToHTML.class);
 
     //Path to output folder
     private File outPath;
 
-    //If there are more then this number annotations are split into multiple files
-    //This is because browsers aren't made for giant HTML files which can be made with 500k annotations
-    private int maxNumberOfAnnotationsPerFile;
+    //If there are more then this number of issues the report are split into multiple files
+    //This is because browsers aren't made for giant HTML files which can be made with 500k lines
+    private int maxNumberOfIssuesPerFile;
 
 
-    //This counts all occurrences of HTML annotations classes
-    //If one annotation class is split into two files it has two entries in this Multiset
+    //This counts all occurrences of HTML issue type
+    //If one issue type is split into two files it has two entries in this Multiset
     //IT is used to show numbers in HTML files name and links
-    Multiset<String> annotationClassOccurences;
+    private Multiset<String> issueTypeOccurrences;
 
-    //List of writers which are used for actual writing annotations to HTML
+    //List of writers which are used for actual writing issues to HTML
     List<HTMLWriter> writers;
 
-    //Key is classname, value is annotation message
-    //Multimap because there are multiple annotations for each classname
-    private Multimap<String, String> annotations;
+    //Key is classname, value is issue message
+    //Multimap because there are multiple issues for each classname
+    private Multimap<String, String> issues;
   
-    public AnnotationsToHTML (File outpath, int maxNumberOfAnnotationsPerFile) {
+    public DataImportIssuesToHTML(File outpath, int maxNumberOfIssuesPerFile) {
         this.outPath = outpath;
-        annotations = ArrayListMultimap.create();
-        this.maxNumberOfAnnotationsPerFile = maxNumberOfAnnotationsPerFile;
+        this.issues = ArrayListMultimap.create();
+        this.maxNumberOfIssuesPerFile = maxNumberOfIssuesPerFile;
         this.writers = new ArrayList<>();
-        this.annotationClassOccurences = HashMultiset.create();
+        this.issueTypeOccurrences = HashMultiset.create();
     }
 
 
@@ -62,7 +69,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
 
         if (outPath == null) {
@@ -92,74 +99,77 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
 
-        //Groups annotations in multimap according to annotation class
-        for (DataImportIssue annotation : annotationStore.getAnnotations()) {
-            //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
-            // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
-            addAnnotation(annotation);
+        //Groups issues in multimap according to issue type
+        for (DataImportIssue it : issueStore.getIssues()) {
+            //writer.println("<p>" + it.getHTMLMessage() + "</p>");
+            // writer.println("<small>" + it.getClass().getSimpleName()+"</small>");
+            addIssue(it);
 
         }
-        LOG.info("Creating Annotations log");
+        LOG.info("Creating data import issue log");
 
 
-        //Creates list of HTML writers. Each writer has whole class of HTML annotations
-        //Or multiple HTML writers can have parts of one class of HTML annotations if number
-        // of annotations is larger than maxNumberOfAnnotationsPerFile
-        for (Map.Entry<String, Collection<String>> entry: annotations.asMap().entrySet()) {
-            List<String> annotationsList;
+        //Creates list of HTML writers. Each writer has whole class of HTML issues
+        //Or multiple HTML writers can have parts of one class of HTML issues if number
+        // of issues is larger than maxNumberOfIssuesPerFile.
+        for (Map.Entry<String, Collection<String>> entry: issues.asMap().entrySet()) {
+            List<String> issueList;
             if (entry.getValue() instanceof List) {
-                annotationsList = (List<String>) entry.getValue();
+                issueList = (List<String>) entry.getValue();
             } else {
-                annotationsList = new ArrayList<>(entry.getValue());
+                issueList = new ArrayList<>(entry.getValue());
             }
-            addAnnotations(entry.getKey(), annotationsList);
+            addIssues(entry.getKey(), issueList);
         }
 
         //Actual writing to the file is made here since
-        // this is the first place where actual number of files is known (because it depends on annotations count)
+        // this is the first place where actual number of files is known (because it depends on
+        // the issue count)
         for (HTMLWriter writer : writers) {
-            writer.writeFile(annotationClassOccurences, false);
+            writer.writeFile(issueTypeOccurrences, false);
         }
 
         try {
             HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
-            indexFileWriter.writeFile(annotationClassOccurences, true);
+            indexFileWriter.writeFile(issueTypeOccurrences, true);
         } catch (FileNotFoundException e) {
             LOG.error("Index file coudn't be created:{}", e);
         }
 
-        LOG.info("Annotated logs are in {}", outPath);
+        LOG.info("Data import issue logs are in {}", outPath);
 
 
     }
 
     /**
-     * Creates file with given class of annotations
+     * Creates file with given type of issues
      *
-     * If number of annotations is larger then maxNumberOfAnnotationsPerFile multiple files are generated.
-     * And named annotationClassName1,2,3 etc.
+     * If number of issues is larger then 'maxNumberOfIssuesPerFile' multiple files are generated.
+     * And named issueClassName1,2,3 etc.
      *
-     * @param annotationClassName name of annotation class and then also filename
-     * @param annotations list of all annotations with that class
+     * @param issueTypeName name of import data issue class and then also filename
+     * @param issues list of all import data issue with that class
      */
-    private void addAnnotations(String annotationClassName, List<String> annotations) {
+    private void addIssues(String issueTypeName, List<String> issues) {
         try {
             HTMLWriter file_writer;
-            if (annotations.size() > 1.2*maxNumberOfAnnotationsPerFile) {
-                LOG.debug("Number of annotations is very large. Splitting: {}", annotationClassName);
-                List<List<String>> partitions = Lists.partition(annotations, maxNumberOfAnnotationsPerFile);
+            if (issues.size() > 1.2* maxNumberOfIssuesPerFile) {
+                LOG.debug("Number of issues is very large. Splitting: {}", issueTypeName);
+                List<List<String>> partitions = Lists.partition(issues,
+                    maxNumberOfIssuesPerFile
+                );
                 for (List<String> partition: partitions) {
-                    annotationClassOccurences.add(annotationClassName);
-                    int labelCount = annotationClassOccurences.count(annotationClassName);
-                    file_writer =new HTMLWriter(annotationClassName+Integer.toString(labelCount), partition);
+                    issueTypeOccurrences.add(issueTypeName);
+                    int labelCount = issueTypeOccurrences.count(issueTypeName);
+                    file_writer =new HTMLWriter(issueTypeName+Integer.toString(labelCount), partition);
                     writers.add(file_writer);
                 }
 
             } else {
-                annotationClassOccurences.add(annotationClassName);
-                int labelCount = annotationClassOccurences.count(annotationClassName);
-                file_writer = new HTMLWriter(annotationClassName + Integer.toString(labelCount),
-                    annotations);
+                issueTypeOccurrences.add(issueTypeName);
+                int labelCount = issueTypeOccurrences.count(issueTypeName);
+                file_writer = new HTMLWriter(issueTypeName + Integer.toString(labelCount),
+                    issues);
                 writers.add(file_writer);
             }
         } catch (FileNotFoundException ex) {
@@ -173,33 +183,32 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     }
 
     /**
-     * Groups annotations according to annotation class name
+     * Groups issues according to issue type, using the classname as type name.
      *
-     * All annotations are saved together in multimap where key is annotation classname
-     * and values are list of annotations with that class
-     * @param annotation
+     * All issues are saved together in multimap where key is issue classname
+     * and values are list of issue with that class
      */
-    private void addAnnotation(DataImportIssue annotation) {
-        String className = annotation.getClass().getSimpleName();
-        annotations.put(className, annotation.getHTMLMessage());
+    private void addIssue(DataImportIssue issue) {
+        String issueTypeName = issue.getClass().getSimpleName();
+        issues.put(issueTypeName, issue.getHTMLMessage());
 
     }
 
     class HTMLWriter {
         private PrintStream out;
 
-        private Multimap<String, String> writerAnnotations;
+        private Multimap<String, String> writerIssues;
 
-        private String annotationClassName;
+        private String issueTypeName;
 
-        public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
+        public HTMLWriter(String key, Collection<String> issues) throws FileNotFoundException {
             LOG.debug("Making file: {}", key);
             File newFile = new File(outPath, key +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            writerAnnotations = ArrayListMultimap.create();
-            writerAnnotations.putAll(key, annotations);
-            annotationClassName = key;
+            writerIssues = ArrayListMultimap.create();
+            writerIssues.putAll(key, issues);
+            issueTypeName = key;
         }
 
         public HTMLWriter(String filename, Multimap<String, String> curMap)
@@ -208,8 +217,8 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             File newFile = new File(outPath, filename +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            writerAnnotations = curMap;
-            annotationClassName = filename;
+            writerIssues = curMap;
+            issueTypeName = filename;
         }
 
         private void writeFile(Multiset<String> classes, boolean isIndexFile) {
@@ -258,18 +267,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "";
             println(css);
             println("</head><body>");
-            println(String.format("<h1>OpenTripPlanner annotations log for %s</h1>", annotationClassName));
+            println(String.format("<h1>OpenTripPlanner data import issue log for %s</h1>", issueTypeName));
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
             println("<p>");
             //adds links to the other HTML files
-            for (Multiset.Entry<String> htmlAnnotationClass : classes.entrySet()) {
-                String label_name = htmlAnnotationClass.getElement();
+            for (Multiset.Entry<String> htmlIssueType : classes.entrySet()) {
+                String label_name = htmlIssueType.getElement();
                 String label;
                 int currentCount = 1;
                 //it needs to add link to every file even if they are split
-                while (currentCount <= htmlAnnotationClass.getCount()) {
+                while (currentCount <= htmlIssueType.getCount()) {
                     label = label_name + currentCount;
-                    if (label.equals(annotationClassName)) {
+                    if (label.equals(issueTypeName)) {
                         println(String.format("<button class='pure-button pure-button-disabled button-%s'>%s</button>",
                             label_name.toLowerCase(), label));
                     } else {
@@ -282,7 +291,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("</p>");
             if (!isIndexFile) {
                 println("<ul id=\"log\">");
-                writeAnnotations();
+                writeIssues();
                 println("</ul>");
             }
 
@@ -292,12 +301,12 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
 
         /**
-         * Writes annotations as LI html elements
+         * Writes issues as LI html elements
          */
-        private void writeAnnotations() {
-            String annotationFMT = "<li>%s</li>";
-            for (Map.Entry<String, String> annotation: writerAnnotations.entries()) {
-                print(String.format(annotationFMT, annotation.getValue()));
+        private void writeIssues() {
+            String FMT = "<li>%s</li>";
+            for (Map.Entry<String, String> it: writerIssues.entries()) {
+                print(String.format(FMT, it.getValue()));
             }
         }
 
@@ -316,7 +325,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
         
         /**
-         * Generates JSON from annotations variable which is used by Javascript
+         * Generates JSON from issue variable which is used by Javascript
          * to display HTML report
          */
         private void writeJson() {
@@ -326,11 +335,11 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 ObjectMapper mapper = new ObjectMapper();
                 JsonGenerator jsonGenerator = mapper.getJsonFactory().createJsonGenerator(out);
                 
-                mapper.writeValue(jsonGenerator, writerAnnotations.asMap());
+                mapper.writeValue(jsonGenerator, writerIssues.asMap());
                 out.println(";");
 
             } catch (IOException ex) {
-                java.util.logging.Logger.getLogger(AnnotationsToHTML.class.getName()).log(Level.SEVERE, null, ex);
+                java.util.logging.Logger.getLogger(DataImportIssuesToHTML.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

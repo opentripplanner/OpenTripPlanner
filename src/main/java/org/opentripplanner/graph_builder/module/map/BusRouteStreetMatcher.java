@@ -48,7 +48,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
 
         //Mapbuilder needs transit index

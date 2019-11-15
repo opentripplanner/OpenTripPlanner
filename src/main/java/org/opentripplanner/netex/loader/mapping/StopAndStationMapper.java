@@ -54,10 +54,10 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(idFactory);
-        this.stopMapper = new StopMapper(idFactory, annotationStore);
+        this.stopMapper = new StopMapper(idFactory, issueStore);
         this.quayIndex = quayIndex;
     }
 

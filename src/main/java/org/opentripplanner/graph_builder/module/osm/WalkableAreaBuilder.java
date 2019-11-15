@@ -72,7 +72,7 @@ public class WalkableAreaBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-    private DataImportIssueStore annotationStore;
+    private DataImportIssueStore issueStore;
 
     public static final int MAX_AREA_NODES = 500;
 
@@ -92,13 +92,14 @@ public class WalkableAreaBuilder {
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
-            StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore annotationStore) {
+            StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore
+    ) {
         this.graph = graph;
         this.osmdb = osmdb;
         this.wayPropertySet = wayPropertySet;
         this.edgeFactory = edgeFactory;
         this.handler = handler;
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -227,14 +228,14 @@ public class WalkableAreaBuilder {
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
             if (visibilityPoints.size() > MAX_AREA_NODES) {
-                annotationStore.add(
+                issueStore.add(
                         new AreaTooComplicated(
                                 group.getSomeOSMObject().getId(), visibilityPoints.size()));
                 continue;
             }
 
             if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                annotationStore.add(
+                issueStore.add(
                         new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
                 continue;
             }

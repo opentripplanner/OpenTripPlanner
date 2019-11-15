@@ -319,9 +319,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
-    private DefaultListModel<DataImportIssue> annotationMatchesModel;
+    private DefaultListModel<DataImportIssue> issueMatchesModel;
 
-    private JList<DataImportIssue> annotationMatches;
+    private JList<DataImportIssue> issueMatches;
     
     private DefaultListModel<String> metadataModel;
 
@@ -781,30 +781,29 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
-        // This is where matched annotations from an annotation search go
-        annotationMatches = new JList<DataImportIssue>();
-        annotationMatches.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                @SuppressWarnings("unchecked")
-				JList<DataImportIssue> theList = (JList<DataImportIssue>) e.getSource();
-                
-                DataImportIssue anno = theList.getSelectedValue();
-                if (anno == null)
-                    return;
-                showGraph.drawAnotation(anno);
+        // This is where matched issues from an issue search go
+        issueMatches = new JList<>();
+        issueMatches.addListSelectionListener(e -> {
+            @SuppressWarnings("unchecked")
+            JList<DataImportIssue> theList = (JList<DataImportIssue>) e.getSource();
+
+            DataImportIssue issue = theList.getSelectedValue();
+            if (issue == null) {
+              return;
             }
+            showGraph.drawIssue(issue);
         });
 
-        annotationMatchesModel = new DefaultListModel<DataImportIssue>();
-        annotationMatches.setModel(annotationMatchesModel);
-        JScrollPane amScrollPane = new JScrollPane(annotationMatches);
-        amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        rightPanelTabs.addTab("annotations", amScrollPane);
+        issueMatchesModel = new DefaultListModel<DataImportIssue>();
+        issueMatches.setModel(issueMatchesModel);
+        JScrollPane imScrollPane = new JScrollPane(issueMatches);
+        imScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        rightPanelTabs.addTab("issues", imScrollPane);
 
         Dimension size = new Dimension(200, 1600);
 
-        amScrollPane.setMaximumSize(size);
-        amScrollPane.setPreferredSize(size);
+        imScrollPane.setMaximumSize(size);
+        imScrollPane.setPreferredSize(size);
         stScrollPane.setMaximumSize(size);
         stScrollPane.setPreferredSize(size);
         mdScrollPane.setMaximumSize(size);

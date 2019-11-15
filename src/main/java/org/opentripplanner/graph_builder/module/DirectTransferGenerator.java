@@ -50,7 +50,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         /* Initialize graph index which is needed by the nearby stop finder. */
         if (graph.index == null) {
@@ -99,7 +99,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
             if (n == 0) {
-                annotationStore.add(new StopNotLinkedForTransfers(ts0));
+                issueStore.add(new StopNotLinkedForTransfers(ts0));
             }
             nTransfersTotal += n;
         }

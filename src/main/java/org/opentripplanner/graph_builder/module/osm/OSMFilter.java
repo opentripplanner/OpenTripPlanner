@@ -137,7 +137,7 @@ public class OSMFilter {
      */
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
             StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking,
-            DataImportIssueStore annotationStore) {
+            DataImportIssueStore issueStore) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
 
         /*
@@ -181,7 +181,7 @@ public class OSMFilter {
                 (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))) {
             permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
             if (forceBikes) {
-                annotationStore.add(new ConflictingBikeTags(way.getId()));
+                issueStore.add(new ConflictingBikeTags(way.getId()));
             }
         }
 

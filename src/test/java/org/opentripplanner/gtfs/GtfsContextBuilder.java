@@ -37,7 +37,7 @@ public class GtfsContextBuilder {
 
     private CalendarService calendarService = null;
 
-    private DataImportIssueStore annotationStore = null;
+    private DataImportIssueStore issueStore = null;
 
     private Deduplicator deduplicator;
 
@@ -58,7 +58,7 @@ public class GtfsContextBuilder {
         );
         return new GtfsContextBuilder(
                 feedId,
-                transitBuilder).withAddBuilderAnnotation(new DataImportIssueStore(false)
+                transitBuilder).withDataImportIssueStore(new DataImportIssueStore(false)
         );
     }
 
@@ -75,25 +75,25 @@ public class GtfsContextBuilder {
         return transitBuilder;
     }
 
-    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(
+    public GtfsContextBuilder withIssueStoreAndDeduplicator(
             Graph graph
     ) {
-        return withGraphBuilderAnnotationsAndDeduplicator(
+        return withIssueStoreAndDeduplicator(
                 graph,
                 new DataImportIssueStore(false)
         );
     }
 
-    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(
+    public GtfsContextBuilder withIssueStoreAndDeduplicator(
             Graph graph,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
-        return withAddBuilderAnnotation(annotationStore)
+        return withDataImportIssueStore(issueStore)
                 .withDeduplicator(graph.deduplicator);
     }
 
-    public GtfsContextBuilder withAddBuilderAnnotation(DataImportIssueStore annotationStore) {
-        this.annotationStore = annotationStore;
+    public GtfsContextBuilder withDataImportIssueStore(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
         return this;
     }
 
@@ -202,15 +202,13 @@ public class GtfsContextBuilder {
 
     private void repairStopTimesForEachTrip() {
         new RepairStopTimesForEachTripOperation(
-                transitBuilder.getStopTimesSortedByTrip(),
-                annotationStore
+                transitBuilder.getStopTimesSortedByTrip(), issueStore
         ).run();
     }
 
     private void generateTripPatterns() {
         new GenerateTripPatternsOperation(
-                transitBuilder,
-                annotationStore,
+                transitBuilder, issueStore,
                 deduplicator(),
                 calendarService().getServiceIds()
         ).run();

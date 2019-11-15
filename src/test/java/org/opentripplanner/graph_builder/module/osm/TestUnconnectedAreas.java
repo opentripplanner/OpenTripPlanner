@@ -1,12 +1,6 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import java.io.File;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
@@ -16,6 +10,11 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 
 public class TestUnconnectedAreas extends TestCase {
 
@@ -32,7 +31,7 @@ public class TestUnconnectedAreas extends TestCase {
 
         Graph gg = new Graph();
 
-        DataImportIssueStore annotationStore = new DataImportIssueStore(true);
+        DataImportIssueStore issueStore = new DataImportIssueStore(true);
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
@@ -40,9 +39,9 @@ public class TestUnconnectedAreas extends TestCase {
         File file = new File(getClass().getResource("P+R.osm.gz").getFile());
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>(), annotationStore);
+        loader.buildGraph(gg, new HashMap<Class<?>, Object>(), issueStore);
 
-        assertEquals(1, annotationStore.getAnnotations().size());
+        assertEquals(1, issueStore.getIssues().size());
 
         int nParkAndRide = 0;
         int nParkAndRideLink = 0;

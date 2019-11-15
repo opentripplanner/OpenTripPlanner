@@ -31,7 +31,7 @@ public class EmbedConfig implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         try {
             graph.builderConfig = serializedConfiguration(builderConfig);

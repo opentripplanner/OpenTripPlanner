@@ -32,7 +32,7 @@ public class StopsAlerts implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));

@@ -52,7 +52,7 @@ public class NetexMapper {
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
 
 
-    private final DataImportIssueStore annotationStore;
+    private final DataImportIssueStore issueStore;
 
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
@@ -65,12 +65,12 @@ public class NetexMapper {
             OtpTransitServiceBuilder transitBuilder,
             String agencyId,
             Deduplicator deduplicator,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(agencyId);
-        this.annotationStore = annotationStore;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -119,7 +119,8 @@ public class NetexMapper {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
             StopAndStationMapper stopMapper = new StopAndStationMapper(idFactory, netexIndex.getQuayById(),
-                    annotationStore);
+                issueStore
+            );
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
             transitBuilder.getStops().addAll(stopMapper.resultStops);
             transitBuilder.getStations().addAll(stopMapper.resultStations);
@@ -196,7 +197,7 @@ public class NetexMapper {
                 idFactory,
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
                 netexIndex.getOperatingPeriodById(),
-                netexIndex.getDayTypeById(), annotationStore
+                netexIndex.getDayTypeById(), issueStore
         );
 
         for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.getDayTypeRefs()) {

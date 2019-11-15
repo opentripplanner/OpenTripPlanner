@@ -3,17 +3,32 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.*;
+import org.opentripplanner.graph_builder.annotation.LevelAmbiguous;
+import org.opentripplanner.graph_builder.annotation.TooManyAreasInRelation;
+import org.opentripplanner.graph_builder.annotation.TurnRestrictionBad;
+import org.opentripplanner.graph_builder.annotation.TurnRestrictionException;
+import org.opentripplanner.graph_builder.annotation.TurnRestrictionUnknown;
+import org.opentripplanner.graph_builder.annotation.UnableToProcessPublicTransportationRelation;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -22,13 +37,22 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OSMDatabase implements OpenStreetMapContentHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private DataImportIssueStore annotationStore;
+    private DataImportIssueStore issueStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
@@ -102,8 +126,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     public boolean noZeroLevels = true;
 
-    public OSMDatabase(DataImportIssueStore annotationStore) {
-        this.annotationStore = annotationStore;
+    public OSMDatabase(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
     }
 
     public OSMNode getNode(Long nodeId) {
@@ -556,13 +580,17 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             OSMLevel level = OSMLevel.DEFAULT;
             if (way.hasTag("level")) { // TODO: floating-point levels &c.
                 levelName = way.getTag("level");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels, annotationStore);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels,
+                    issueStore
+                );
             } else if (way.hasTag("layer")) {
                 levelName = way.getTag("layer");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels, annotationStore);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels,
+                    issueStore
+                );
             }
             if (level == null || (!level.reliable)) {
-                annotationStore.add(new LevelAmbiguous(levelName, way.getId()));
+                issueStore.add(new LevelAmbiguous(levelName, way.getId()));
                 level = OSMLevel.DEFAULT;
             }
             wayLevels.put(way, level);
@@ -739,7 +767,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            annotationStore.add(new TurnRestrictionBad(relation.getId(),
+            issueStore.add(new TurnRestrictionBad(relation.getId(),
                 "One of from|via|to edges are empty in relation"));
             return;
         }
@@ -752,7 +780,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
-                    annotationStore.add(new TurnRestrictionException(via, from));
+                    issueStore.add(new TurnRestrictionException(via, from));
                 }
             }
         }
@@ -783,7 +811,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U,
                 relation.getId());
         } else {
-            annotationStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
+            issueStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
             return;
         }
         tag.modes = modes.clone();
@@ -812,7 +840,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     private void processLevelMap(OSMRelation relation) {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
-                Source.LEVEL_MAP, true, annotationStore);
+                Source.LEVEL_MAP, true, issueStore
+        );
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
                 OSMWay way = waysById.get(member.getRef());
@@ -889,13 +918,13 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
                 if (platformArea == null)
                     platformArea = areaWaysById.get(member.getRef());
                 else
-                    annotationStore.add(new TooManyAreasInRelation(relation.getId()));
+                    issueStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
                     && relationsById.containsKey(member.getRef())) {
                 if (platformArea == null)
                     platformArea = relationsById.get(member.getRef());
                 else
-                    annotationStore.add(new TooManyAreasInRelation(relation.getId()));
+                    issueStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
                 platformsNodes.add(nodesById.get(member.getRef()));
             }
@@ -903,7 +932,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         if (platformArea != null && !platformsNodes.isEmpty())
             stopsInAreas.put(platformArea, platformsNodes);
         else
-            annotationStore.add(new UnableToProcessPublicTransportationRelation(relation.getId()));
+            issueStore.add(new UnableToProcessPublicTransportationRelation(relation.getId()));
     }
 
     private String addUniqueName(String routes, String name) {

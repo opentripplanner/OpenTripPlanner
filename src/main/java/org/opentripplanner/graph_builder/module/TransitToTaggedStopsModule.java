@@ -10,8 +10,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -53,7 +53,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            DataImportIssueStore annotationStore
+            DataImportIssueStore issueStore
     ) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
@@ -80,6 +80,8 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
                 boolean wheelchairAccessible = ts.hasWheelchairEntrance();
                 if (!connectVertexToStop(ts, wheelchairAccessible)) {
                     LOG.debug("Could not connect " + ts.getStop().getCode() + " at " + ts.getCoordinate().toString());
+
+                    // TODO OTP2 - Why is this commented out? Is it not a problem or is it to nosey?
                     //LOG.warn(graph.addBuilderAnnotation(new StopUnlinked(ts)));
                 }
             }

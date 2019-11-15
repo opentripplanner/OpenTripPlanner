@@ -94,13 +94,13 @@ public class GraphBuilder implements Runnable {
             builder.checkInputs();
         }
 
-        DataImportIssueStore annotationStore = new DataImportIssueStore(true);
+        DataImportIssueStore issueStore = new DataImportIssueStore(true);
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilderModule load : graphBuilderModules)
-            load.buildGraph(graph, extra, annotationStore);
+            load.buildGraph(graph, extra, issueStore);
 
-        annotationStore.summarize();
+        issueStore.summarize();
         if (serializeGraph) {
             try {
                 graph.save(graphFile);
@@ -293,8 +293,8 @@ public class GraphBuilder implements Runnable {
             }
         }
         graphBuilder.addModule(new EmbedConfig(config.builderConfig(), config.routerConfig()));
-        if (builderParams.htmlAnnotations) {
-            graphBuilder.addModule(new AnnotationsToHTML(params.getGraphDirectory(), builderParams.maxHtmlAnnotationsPerFile));
+        if (builderParams.dataImportReport) {
+            graphBuilder.addModule(new DataImportIssuesToHTML(params.getGraphDirectory(), builderParams.maxDataImportIssuesPerFile));
         }
         graphBuilder.serializeGraph = !params.inMemory;
         return graphBuilder;
