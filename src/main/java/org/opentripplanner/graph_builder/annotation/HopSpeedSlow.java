@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Trip;
 
-public class HopSpeedSlow extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class HopSpeedSlow implements DataImportIssue {
 
     public static final String FMT = "Very slow speed of %.2f kph over %.1fm on route %s trip %s " +
     		"stop sequence %d.";

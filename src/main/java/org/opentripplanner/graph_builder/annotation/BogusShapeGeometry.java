@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.FeedScopedId;
 
-public class BogusShapeGeometry extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class BogusShapeGeometry implements DataImportIssue {
 
     public static final String FMT = "Shape geometry for shape_id %s does not have two distinct points.";
     

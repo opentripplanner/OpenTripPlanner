@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Edge;
 
-public class VertexShapeError extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class VertexShapeError implements DataImportIssue {
 
     public static final String FMT = "Transit edge %s has shape geometry which is far from its " +
     		"start/end vertices. This could be caused by bad shape geometry, or by incorrect " +

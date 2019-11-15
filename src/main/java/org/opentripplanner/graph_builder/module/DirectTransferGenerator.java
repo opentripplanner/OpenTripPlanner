@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -50,7 +50,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         /* Initialize graph index which is needed by the nearby stop finder. */
         if (graph.index == null) {

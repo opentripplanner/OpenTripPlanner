@@ -10,8 +10,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.annotation.ParkAndRideUnlinked;
 import org.opentripplanner.graph_builder.annotation.StreetCarSpeedZero;
@@ -84,7 +83,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     private static Logger LOG = LoggerFactory.getLogger(OpenStreetMapModule.class);
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     // Private members that are only read or written internally.
 
@@ -193,7 +192,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         this.annotationStore = annotationStore;
         OSMDatabase osmdb = new OSMDatabase(annotationStore);

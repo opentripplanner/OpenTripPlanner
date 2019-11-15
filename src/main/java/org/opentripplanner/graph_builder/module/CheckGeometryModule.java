@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.BogusEdgeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusVertexGeometry;
 import org.opentripplanner.graph_builder.annotation.VertexShapeError;
@@ -46,7 +46,7 @@ public class CheckGeometryModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         for (Vertex gv : graph.getVertices()) {
             if (Double.isNaN(gv.getCoordinate().x) || Double.isNaN(gv.getCoordinate().y)) {

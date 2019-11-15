@@ -3,7 +3,7 @@ package org.opentripplanner.netex.loader.mapping;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
@@ -31,7 +31,7 @@ public class CalendarMapperTest {
                 new HierarchicalMultimap<>(),
                 new HierarchicalMapById<>(),
                 new HierarchicalMapById<>(),
-                new BuilderAnnotationStore(false)
+                new DataImportIssueStore(false)
         );
 
         dayTypeRefs = DayTypeRefsToServiceIdAdapter.create(

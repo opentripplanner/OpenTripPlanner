@@ -94,7 +94,7 @@ public class GraphBuilder implements Runnable {
             builder.checkInputs();
         }
 
-        BuilderAnnotationStore annotationStore = new BuilderAnnotationStore(true);
+        DataImportIssueStore annotationStore = new DataImportIssueStore(true);
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilderModule load : graphBuilderModules)

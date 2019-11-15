@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.StopTime;
 
-public class NegativeDwellTime extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class NegativeDwellTime implements DataImportIssue {
 
     public static final String FMT = "Negative time dwell at %s; we will assume it is zero.";
     

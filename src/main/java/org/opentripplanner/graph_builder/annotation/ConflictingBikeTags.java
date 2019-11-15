@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class ConflictingBikeTags extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class ConflictingBikeTags implements DataImportIssue {
 
     public static final String FMT = "Conflicting tags bicycle:[yes|designated] and cycleway: " +
     		"dismount on way %s, assuming dismount";

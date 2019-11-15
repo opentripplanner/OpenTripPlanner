@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs;
 import gnu.trove.list.TIntList;
 import gnu.trove.list.array.TIntArrayList;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.HopSpeedFast;
 import org.opentripplanner.graph_builder.annotation.HopSpeedSlow;
 import org.opentripplanner.graph_builder.annotation.HopZeroTime;
@@ -34,9 +34,9 @@ public class RepairStopTimesForEachTripOperation {
 
     private final TripStopTimes stopTimesByTrip;
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
-    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, BuilderAnnotationStore annotationStore) {
+    public RepairStopTimesForEachTripOperation(TripStopTimes stopTimesByTrip, DataImportIssueStore annotationStore) {
         this.stopTimesByTrip = stopTimesByTrip;
         this.annotationStore = annotationStore;
     }

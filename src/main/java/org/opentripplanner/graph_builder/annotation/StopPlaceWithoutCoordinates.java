@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class StopPlaceWithoutCoordinates extends GraphBuilderAnnotation {
+public class StopPlaceWithoutCoordinates implements DataImportIssue {
 
     public static final String FMT = "%s  does not contain any coordinates.";
 

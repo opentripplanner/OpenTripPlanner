@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.graph_builder.module.osm.WalkableAreaBuilder;
 
-public class AreaTooComplicated extends GraphBuilderAnnotation {
+public class AreaTooComplicated implements DataImportIssue {
 
         public static final String FMT = "Area %s is too complicated (%s > " + WalkableAreaBuilder.MAX_AREA_NODES + ")";
 

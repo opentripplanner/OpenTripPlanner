@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.FeedScopedId;
 
-public class TimeMissingForTrip extends GraphBuilderAnnotation {
+public class TimeMissingForTrip implements DataImportIssue {
 
     public static final String FMT = "Time missing for trip %s";
 

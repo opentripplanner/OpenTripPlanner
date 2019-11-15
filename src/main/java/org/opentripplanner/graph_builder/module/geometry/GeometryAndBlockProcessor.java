@@ -17,7 +17,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
 import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
@@ -56,7 +56,7 @@ public class GeometryAndBlockProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
@@ -91,11 +91,11 @@ public class GeometryAndBlockProcessor {
     }
 
     public void run(Graph graph) {
-        run(graph, new BuilderAnnotationStore(false));
+        run(graph, new DataImportIssueStore(false));
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
-    public void run(Graph graph, BuilderAnnotationStore annotationStore) {
+    public void run(Graph graph, DataImportIssueStore annotationStore) {
         this.annotationStore = annotationStore;
 
         fareServiceFactory.processGtfs(transitService);

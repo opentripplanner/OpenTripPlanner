@@ -1,10 +1,8 @@
 package org.opentripplanner.visualizer;
 
-import com.google.common.collect.Sets;
 import javassist.Modifier;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -49,7 +47,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 /**
  * Exit on window close.
@@ -322,9 +319,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
-    private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
+    private DefaultListModel<DataImportIssue> annotationMatchesModel;
 
-    private JList<GraphBuilderAnnotation> annotationMatches;
+    private JList<DataImportIssue> annotationMatches;
     
     private DefaultListModel<String> metadataModel;
 
@@ -785,20 +782,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
         // This is where matched annotations from an annotation search go
-        annotationMatches = new JList<GraphBuilderAnnotation>();
+        annotationMatches = new JList<DataImportIssue>();
         annotationMatches.addListSelectionListener(new ListSelectionListener() {
             public void valueChanged(ListSelectionEvent e) {
                 @SuppressWarnings("unchecked")
-				JList<GraphBuilderAnnotation> theList = (JList<GraphBuilderAnnotation>) e.getSource();
+				JList<DataImportIssue> theList = (JList<DataImportIssue>) e.getSource();
                 
-                GraphBuilderAnnotation anno = theList.getSelectedValue();
+                DataImportIssue anno = theList.getSelectedValue();
                 if (anno == null)
                     return;
                 showGraph.drawAnotation(anno);
             }
         });
 
-        annotationMatchesModel = new DefaultListModel<GraphBuilderAnnotation>();
+        annotationMatchesModel = new DefaultListModel<DataImportIssue>();
         annotationMatches.setModel(annotationMatchesModel);
         JScrollPane amScrollPane = new JScrollPane(annotationMatches);
         amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);

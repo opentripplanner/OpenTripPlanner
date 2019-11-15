@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class TurnRestrictionBad extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TurnRestrictionBad implements DataImportIssue {
 
     public static final String FMT = "Bad turn restriction at relation %s. Reason: %s";
     public static final String HTMLFMT = "Bad turn restriction at relation <a href='http://www.openstreetmap.org/relation/%s'>%s</a>. Reason: %s";

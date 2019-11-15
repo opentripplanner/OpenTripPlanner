@@ -1,6 +1,6 @@
 package org.opentripplanner.netex;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -59,7 +59,7 @@ public class NetexModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
 
         graph.clearTimeZone();

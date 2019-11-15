@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.graph_builder.module.osm.WalkableAreaBuilder;
 
-public class AreaNotEpsilonValid extends GraphBuilderAnnotation {
+public class AreaNotEpsilonValid implements DataImportIssue {
 
         public static final String FMT = "Area %s is not epsilon-valid (epsilon = " + WalkableAreaBuilder.VISIBILITY_EPSILON + ")";
 

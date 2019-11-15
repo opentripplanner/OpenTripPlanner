@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Trip;
 
-public class HopSpeedFast extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class HopSpeedFast implements DataImportIssue {
 
     public static final String FMT = "Excessive speed of %d kph over %.1fm on route %s trip %s " +
     		"stop sequence %d.";

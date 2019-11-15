@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.HierarchicalVersionMapById;
@@ -95,7 +95,7 @@ public class StopAndStationMapperTest {
         StopAndStationMapper stopMapper = new StopAndStationMapper(
                 MappingSupport.ID_FACTORY,
                 quaysById,
-                new BuilderAnnotationStore(false)
+                new DataImportIssueStore(false)
         );
 
         stopMapper.mapParentAndChildStops(stopPlaces);

@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class UnableToProcessPublicTransportationRelation extends GraphBuilderAnnotation {
+public class UnableToProcessPublicTransportationRelation implements DataImportIssue {
 
     public static final String FMT = "Unable to process public transportation relation %s";
 

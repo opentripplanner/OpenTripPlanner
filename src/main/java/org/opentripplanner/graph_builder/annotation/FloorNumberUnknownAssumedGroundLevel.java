@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class FloorNumberUnknownAssumedGroundLevel extends GraphBuilderAnnotation {
+public class FloorNumberUnknownAssumedGroundLevel implements DataImportIssue {
 
         public static final String FMT = "Could not determine floor number for layer %s, assumed to be ground-level.";
 

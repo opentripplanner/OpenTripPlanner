@@ -3,9 +3,7 @@ package org.opentripplanner.graph_builder.annotation;
 import gnu.trove.list.TIntList;
 import org.opentripplanner.model.Trip;
 
-public class RepeatedStops extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class RepeatedStops implements DataImportIssue {
 
     public static final String FMT = "Trip %s visits stops repeatedly. Removed duplicates at stop sequence numbers %s.";
     

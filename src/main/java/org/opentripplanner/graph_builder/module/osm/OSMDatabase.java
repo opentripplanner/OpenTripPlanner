@@ -9,7 +9,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.*;
@@ -28,7 +28,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
@@ -102,7 +102,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      */
     public boolean noZeroLevels = true;
 
-    public OSMDatabase(BuilderAnnotationStore annotationStore) {
+    public OSMDatabase(DataImportIssueStore annotationStore) {
         this.annotationStore = annotationStore;
     }
 

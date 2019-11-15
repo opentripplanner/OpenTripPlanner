@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Trip;
 
-public class TripDuplicate extends GraphBuilderAnnotation {
-
-   private static final long serialVersionUID = 1L;
+public class TripDuplicate implements DataImportIssue {
 
    public static final String FMT = "Possible GTFS feed error: Duplicate trip (skipping). " +
    		"New: %s Existing: %s";

@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -10,8 +10,6 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.io.BufferedReader;
 
 /**
  *
@@ -139,7 +137,7 @@ public class OSMFilter {
      */
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
             StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking,
-            BuilderAnnotationStore annotationStore) {
+            DataImportIssueStore annotationStore) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
 
         /*
@@ -193,7 +191,7 @@ public class OSMFilter {
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
             StreetTraversalPermission def, Graph graph) {
         return getPermissionsForWay(way, def, graph, false, false,
-                new BuilderAnnotationStore(false));
+                new DataImportIssueStore(false));
     }
 
     /**

@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.bike;
 import java.util.Collection;
 import java.util.HashMap;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -34,7 +34,7 @@ public class BikeRentalModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
 
         LOG.info("Building bike rental stations from static source...");

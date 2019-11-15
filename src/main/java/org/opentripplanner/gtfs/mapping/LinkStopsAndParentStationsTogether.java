@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.ParentStationNotFoundAnnotation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
@@ -20,14 +20,14 @@ class LinkStopsAndParentStationsTogether {
     private final EntityById<FeedScopedId, Station> otpStations;
     private final EntityById<FeedScopedId, Stop> otpStops;
 
-    private final BuilderAnnotationStore annotationStore;
+    private final DataImportIssueStore annotationStore;
 
     private static Logger LOG = LoggerFactory.getLogger(LinkStopsAndParentStationsTogether.class);
 
     LinkStopsAndParentStationsTogether(
             EntityById<FeedScopedId, Station> stations,
             EntityById<FeedScopedId, Stop> stops,
-            BuilderAnnotationStore annotationStore) {
+            DataImportIssueStore annotationStore) {
         this.otpStations = stations;
         this.otpStops = stops;
         this.annotationStore = annotationStore;

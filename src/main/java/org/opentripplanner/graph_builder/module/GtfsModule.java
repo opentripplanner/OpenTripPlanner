@@ -16,7 +16,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
@@ -51,7 +51,7 @@ public class GtfsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     private EntityHandler counter = new EntityCounter();
 
@@ -89,7 +89,7 @@ public class GtfsModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         this.annotationStore = annotationStore;
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.graph_builder.annotation.ServiceCodeDoesNotContainServiceDates;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -25,7 +25,7 @@ import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOV
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
-    private final BuilderAnnotationStore addBuilderAnnotation;
+    private final DataImportIssueStore addBuilderAnnotation;
 
     private final FeedScopedIdFactory idFactory;
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
@@ -38,7 +38,7 @@ class CalendarMapper {
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
             ReadOnlyHierarchicalMapById<DayType> dayTypeById,
-            BuilderAnnotationStore addBuilderAnnotation
+            DataImportIssueStore addBuilderAnnotation
     ) {
         this.idFactory = idFactory;
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
@@ -47,7 +47,7 @@ class CalendarMapper {
         this.addBuilderAnnotation = addBuilderAnnotation;
     }
 
-    protected void addBuilderAnnotation(GraphBuilderAnnotation annotation) {
+    protected void addBuilderAnnotation(DataImportIssue annotation) {
         addBuilderAnnotation.add(annotation);
     }
 

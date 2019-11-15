@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
 
-public class ElevationPropagationLimit extends GraphBuilderAnnotation {
+public class ElevationPropagationLimit implements DataImportIssue {
 
         private static final String FMT = "While propagating elevations, hit 2km distance limit at %s ";
 
@@ -15,6 +15,11 @@ public class ElevationPropagationLimit extends GraphBuilderAnnotation {
         @Override
         public String getMessage() {
                 return String.format(FMT, vertex);
+        }
+
+        @Override
+        public Vertex getReferencedVertex() {
+                return this.vertex;
         }
 
 }

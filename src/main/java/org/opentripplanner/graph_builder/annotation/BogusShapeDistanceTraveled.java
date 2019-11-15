@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.StopTime;
 
-public class BogusShapeDistanceTraveled extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class BogusShapeDistanceTraveled implements DataImportIssue {
 
     public static final String FMT = "The shape_dist_traveled field for stoptime %s is wrong -- " +
     		"either it is the same as the value for the previous stoptime, or it is greater " +

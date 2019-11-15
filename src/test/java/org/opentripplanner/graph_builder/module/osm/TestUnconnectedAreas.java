@@ -8,7 +8,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
@@ -32,7 +32,7 @@ public class TestUnconnectedAreas extends TestCase {
 
         Graph gg = new Graph();
 
-        BuilderAnnotationStore annotationStore = new BuilderAnnotationStore(true);
+        DataImportIssueStore annotationStore = new DataImportIssueStore(true);
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());

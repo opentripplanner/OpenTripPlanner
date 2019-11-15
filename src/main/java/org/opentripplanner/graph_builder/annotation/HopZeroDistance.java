@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Trip;
 
-public class HopZeroDistance extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class HopZeroDistance implements DataImportIssue {
 
     public static final String FMT = "Zero-distance hop in %d seconds on trip %s stop sequence %d.";
     

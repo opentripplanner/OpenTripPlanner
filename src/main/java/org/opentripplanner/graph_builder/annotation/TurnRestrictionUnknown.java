@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class TurnRestrictionUnknown extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TurnRestrictionUnknown implements DataImportIssue {
 
     public static final String FMT = "Invalid turn restriction tag %s in turn restriction %d";
 

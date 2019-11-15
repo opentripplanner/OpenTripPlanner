@@ -3,9 +3,7 @@ package org.opentripplanner.graph_builder.annotation;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
-public class NonStationParentStation extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class NonStationParentStation implements DataImportIssue {
 
     public static final String FMT = "Stop %s contains a parentStation (%s) with a location_type != 1.";
     

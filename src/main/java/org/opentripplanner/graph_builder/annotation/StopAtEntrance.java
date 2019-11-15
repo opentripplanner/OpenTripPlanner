@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.StopTime;
 
-public class StopAtEntrance extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class StopAtEntrance implements DataImportIssue {
 
     public static final String FMT = "The stoptime %s stops at an entrance. ";
     

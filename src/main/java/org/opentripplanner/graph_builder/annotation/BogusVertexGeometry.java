@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.routing.graph.Vertex;
 
-public class BogusVertexGeometry extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class BogusVertexGeometry implements DataImportIssue {
 
     public static final String FMT = "Vertex %s has NaN location; this will cause all sorts of " +
     		"problems. This is probably caused by a bug in the graph builder, but could " +

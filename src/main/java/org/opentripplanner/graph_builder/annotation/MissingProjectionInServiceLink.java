@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class MissingProjectionInServiceLink extends GraphBuilderAnnotation {
+public class MissingProjectionInServiceLink implements DataImportIssue {
 
         public static final String FMT = "Creating straight line path between Quays for ServiceLink with missing projection: %s";
 

@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class ServiceCodeDoesNotContainServiceDates extends GraphBuilderAnnotation {
-        private static final long serialVersionUID = 1L;
+public class ServiceCodeDoesNotContainServiceDates implements DataImportIssue {
 
         public static final String FMT = "ServiceCode %s does not contain any serviceDates";
 

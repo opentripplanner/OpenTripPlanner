@@ -12,7 +12,7 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -375,7 +375,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public static void generateUniqueNames (
             Collection<TripPattern> tableTripPatterns,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         LOG.info("Generating unique names for stop patterns on each route.");
         Set<String> usedRouteNames = Sets.newHashSet();

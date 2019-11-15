@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.QuayWithoutCoordinates;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -9,11 +9,11 @@ import org.rutebanken.netex.model.Quay;
 import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
 class StopMapper {
-    private final BuilderAnnotationStore annotationStore;
+    private final DataImportIssueStore annotationStore;
 
     private final FeedScopedIdFactory idFactory;
 
-    StopMapper(FeedScopedIdFactory idFactory, BuilderAnnotationStore annotationStore) {
+    StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore annotationStore) {
         this.idFactory = idFactory;
         this.annotationStore = annotationStore;
     }

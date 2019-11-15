@@ -13,7 +13,7 @@ import java.util.*;
 import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -22,7 +22,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class generates nice HTML graph annotations reports 
  * 
- * They are created with the help of getHTMLMessage function in {@link GraphBuilderAnnotation} derived classes.
+ * They are created with the help of getHTMLMessage function in {@link DataImportIssue} derived classes.
  * @author mabu
  */
 public class AnnotationsToHTML implements GraphBuilderModule {
@@ -62,7 +62,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
 
         if (outPath == null) {
@@ -93,7 +93,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
         //Groups annotations in multimap according to annotation class
-        for (GraphBuilderAnnotation annotation : annotationStore.getAnnotations()) {
+        for (DataImportIssue annotation : annotationStore.getAnnotations()) {
             //writer.println("<p>" + annotation.getHTMLMessage() + "</p>");
             // writer.println("<small>" + annotation.getClass().getSimpleName()+"</small>");
             addAnnotation(annotation);
@@ -179,7 +179,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
      * and values are list of annotations with that class
      * @param annotation
      */
-    private void addAnnotation(GraphBuilderAnnotation annotation) {
+    private void addAnnotation(DataImportIssue annotation) {
         String className = annotation.getClass().getSimpleName();
         annotations.put(className, annotation.getHTMLMessage());
 

@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class Graphwide extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class Graphwide implements DataImportIssue {
 
     String message;
     

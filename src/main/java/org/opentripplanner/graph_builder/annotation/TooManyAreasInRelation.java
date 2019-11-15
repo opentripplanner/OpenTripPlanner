@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class TooManyAreasInRelation extends GraphBuilderAnnotation {
+public class TooManyAreasInRelation implements DataImportIssue {
 
     public static final String FMT = "Too many areas in relation %s";
 

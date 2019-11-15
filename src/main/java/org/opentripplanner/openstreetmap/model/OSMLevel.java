@@ -7,7 +7,7 @@ import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownAssumedGroundLevel;
 import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownGuessedFromAltitude;
 import org.slf4j.Logger;
@@ -53,7 +53,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
     public static OSMLevel fromString (
             String spec, Source source,
             boolean incrementNonNegative,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
 
         /*  extract any altitude information after the @ character */
@@ -139,7 +139,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             String specList,
             Source source,
             boolean incrementNonNegative,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
 
         List<String> levelSpecs = new ArrayList<String>();
@@ -170,7 +170,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
             String specList,
             Source source,
             boolean incrementNonNegative,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         Map<String, OSMLevel> map = new HashMap<String, OSMLevel>();
         for (OSMLevel level :

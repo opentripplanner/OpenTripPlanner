@@ -1,12 +1,9 @@
 package org.opentripplanner.graph_builder.annotation;
 
-import java.io.Serializable;
 import org.opentripplanner.graph_builder.AnnotationsToHTML;
 
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Represents noteworthy events or errors that occur during the graphbuilding process.
@@ -26,26 +23,19 @@ import org.slf4j.LoggerFactory;
  * 
  * @author andrewbyrd
  */
-public abstract class GraphBuilderAnnotation implements Serializable {
+public interface DataImportIssue {
 
-    private static final long serialVersionUID = 20121004L;
+    String getMessage();
 
-    public String toString() {
-        return "GraphBuilderAnnotation: " + this.getMessage();
+    default String getHTMLMessage() {
+        return this.getMessage();
     }
 
-    public abstract String getMessage();
-
-    public String getHTMLMessage() {
-        return this.getMessage().replace("<", "&lt;").replace(">", "&gt;");
-    }
-
-    public Edge getReferencedEdge() {
+    default Edge getReferencedEdge() {
         return null;
     }
 
-    public Vertex getReferencedVertex() {
+    default Vertex getReferencedVertex() {
         return null;
     }
-
 }

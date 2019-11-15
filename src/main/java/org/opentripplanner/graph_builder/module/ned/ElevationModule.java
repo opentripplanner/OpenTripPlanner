@@ -10,7 +10,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
 import org.opentripplanner.graph_builder.annotation.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
@@ -46,7 +46,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     private ElevationGridCoverageFactory gridCoverageFactory;
 
@@ -90,7 +90,7 @@ public class ElevationModule implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         this.annotationStore = annotationStore;
 

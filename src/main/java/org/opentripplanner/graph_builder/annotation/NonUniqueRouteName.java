@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class NonUniqueRouteName extends GraphBuilderAnnotation {
+public class NonUniqueRouteName implements DataImportIssue {
 
         public static final String FMT = "Route had non-unique name. Generated one to ensure uniqueness of TripPattern names: %s";
 

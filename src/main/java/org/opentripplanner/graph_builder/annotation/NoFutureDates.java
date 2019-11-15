@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class NoFutureDates extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class NoFutureDates implements DataImportIssue {
 
     public static final String FMT = "Agency %s has no calendar dates which are after today; " +
     		"no trips will be plannable on this agency";

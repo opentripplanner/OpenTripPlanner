@@ -6,8 +6,8 @@ import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -47,13 +47,13 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     private AStar aStar = new AStar();
     private GtfsContext context;
     private String feedId;
-    private BuilderAnnotationStore annotationStore;
+    private DataImportIssueStore annotationStore;
 
     public void setUp() throws Exception {
 
         graph = new Graph();
 
-        this.annotationStore = new BuilderAnnotationStore(true);
+        this.annotationStore = new DataImportIssueStore(true);
 
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withGraphBuilderAnnotationsAndDeduplicator(graph)
@@ -94,7 +94,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
 
     public void testAnnotation() {
         boolean found = false;
-        for (GraphBuilderAnnotation annotation : annotationStore.getAnnotations()) {
+        for (DataImportIssue annotation : annotationStore.getAnnotations()) {
             if (annotation instanceof NegativeHopTime) {
                 NegativeHopTime nht = (NegativeHopTime) annotation;
                 assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());

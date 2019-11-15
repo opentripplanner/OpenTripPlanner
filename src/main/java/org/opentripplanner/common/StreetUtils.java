@@ -3,7 +3,7 @@ package org.opentripplanner.common;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -27,7 +27,7 @@ public class StreetUtils {
     private static int islandCounter = 0;
 
     public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
-            int islandWithStopMaxSize, String islandLogName, BuilderAnnotationStore annotationStore) {
+            int islandWithStopMaxSize, String islandLogName, DataImportIssueStore annotationStore) {
         LOG.debug("pruning");
         PrintWriter islandLog = null;
         if (islandLogName != null && !islandLogName.isEmpty()) {
@@ -130,7 +130,7 @@ public class StreetUtils {
     private static void depedestrianizeOrRemove(
             Graph graph,
             Subgraph island,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         //iterate over the street vertex of the subgraph
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {

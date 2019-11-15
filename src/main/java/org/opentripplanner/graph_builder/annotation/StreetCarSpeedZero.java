@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class StreetCarSpeedZero extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 6872784791854835184L;
+public class StreetCarSpeedZero implements DataImportIssue {
 
     public static final String FMT = "Way %s has car speed zero";
     public static final String HTMLFMT = "Way <a href=\"http://www.openstreetmap.org/way/%d\">\"%d\"</a> has car speed zero";

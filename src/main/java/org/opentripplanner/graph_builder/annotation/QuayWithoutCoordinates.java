@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class QuayWithoutCoordinates extends GraphBuilderAnnotation {
+public class QuayWithoutCoordinates implements DataImportIssue {
 
     public static final String FMT = "Quay %s does not contain any coordinates.";
 

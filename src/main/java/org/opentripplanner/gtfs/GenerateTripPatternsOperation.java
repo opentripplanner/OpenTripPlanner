@@ -3,7 +3,7 @@ package org.opentripplanner.gtfs;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.annotation.TripDegenerate;
 import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
 import org.opentripplanner.model.FeedScopedId;
@@ -37,7 +37,7 @@ public class GenerateTripPatternsOperation {
     private static final int UNKNOWN_DIRECTION_ID = -1;
 
     private final OtpTransitServiceBuilder transitDaoBuilder;
-    private final BuilderAnnotationStore annotationStore;
+    private final DataImportIssueStore annotationStore;
     private final Deduplicator deduplicator;
     private final Set<FeedScopedId> calendarServiceIds;
 
@@ -50,7 +50,7 @@ public class GenerateTripPatternsOperation {
 
 
 
-    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, BuilderAnnotationStore annotationStore,
+    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, DataImportIssueStore annotationStore,
             Deduplicator deduplicator, Set<FeedScopedId> calendarServiceIds) {
         this.transitDaoBuilder = builder;
         this.annotationStore = annotationStore;

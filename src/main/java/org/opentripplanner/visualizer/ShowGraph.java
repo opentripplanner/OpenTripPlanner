@@ -12,7 +12,7 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.LinkedBlockingQueue;
 
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -1056,7 +1056,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         drawLevel = DRAW_ALL;
     }
 
-    public void drawAnotation(GraphBuilderAnnotation anno) {
+    public void drawAnotation(DataImportIssue anno) {
         Envelope env = new Envelope();
 
         Edge e = anno.getReferencedEdge();

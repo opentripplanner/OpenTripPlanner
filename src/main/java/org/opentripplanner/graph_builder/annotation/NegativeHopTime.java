@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.StopTime;
 
-public class NegativeHopTime extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class NegativeHopTime implements DataImportIssue {
 
     public static final String FMT = "Negative time hop between %s and %s; skipping the entire trip. " +
     		"This might be caused by the use of 00:xx instead of 24:xx for stoptimes after midnight.";

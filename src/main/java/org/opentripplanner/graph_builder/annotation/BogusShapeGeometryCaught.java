@@ -3,9 +3,7 @@ package org.opentripplanner.graph_builder.annotation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopTime;
 
-public class BogusShapeGeometryCaught extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class BogusShapeGeometryCaught implements DataImportIssue {
 
     public static final String FMT = "Shape geometry for shape_id %s cannot be used with stop " +
     		"times %s and %s; using straight-line path instead";

@@ -9,8 +9,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -84,7 +83,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph, new BuilderAnnotationStore(false));
+        linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike park station service needs a graph writer runnable
         bikeService = graph.getService(BikeRentalStationService.class, true);
     }

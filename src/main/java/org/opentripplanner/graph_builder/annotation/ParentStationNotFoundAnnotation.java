@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Stop;
 
-public class ParentStationNotFoundAnnotation extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class ParentStationNotFoundAnnotation implements DataImportIssue {
 
     public static final String FMT = "Parent station %s not found. Stop %s will not be linked to a "
             + "parent station.";

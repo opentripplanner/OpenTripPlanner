@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class TurnRestrictionException extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TurnRestrictionException implements DataImportIssue {
 
     public static final String FMT = "Turn restriction with bicycle exception at node %s from %s";
 

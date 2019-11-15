@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.annotation;
 
-public class LevelAmbiguous extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class LevelAmbiguous implements DataImportIssue {
 
     public static final String FMT = "Could not infer floor number for layer called '%s' at %s. " +
     		"Vertical movement will still be possible, but elevator cost might be incorrect. " +

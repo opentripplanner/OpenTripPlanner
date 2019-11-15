@@ -2,7 +2,7 @@ package org.opentripplanner.netex.loader.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
@@ -54,7 +54,7 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         this.stationMapper = new StationMapper(idFactory);
         this.stopMapper = new StopMapper(idFactory, annotationStore);

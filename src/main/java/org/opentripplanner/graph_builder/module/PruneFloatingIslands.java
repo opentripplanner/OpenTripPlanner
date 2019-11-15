@@ -6,7 +6,7 @@ import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.StreetUtils;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.*;
@@ -59,7 +59,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     public void buildGraph(
             Graph graph,
             HashMap<Class<?>, Object> extra,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         LOG.info("Pruning isolated islands in street network");
         

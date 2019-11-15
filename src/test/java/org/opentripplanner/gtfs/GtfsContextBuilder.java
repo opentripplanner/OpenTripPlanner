@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs;
 
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.CalendarService;
@@ -38,7 +37,7 @@ public class GtfsContextBuilder {
 
     private CalendarService calendarService = null;
 
-    private BuilderAnnotationStore annotationStore = null;
+    private DataImportIssueStore annotationStore = null;
 
     private Deduplicator deduplicator;
 
@@ -55,11 +54,11 @@ public class GtfsContextBuilder {
         GtfsFeedId feedId = gtfsImport.getFeedId();
         OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsImport.getDao(),
-                new BuilderAnnotationStore(false)
+                new DataImportIssueStore(false)
         );
         return new GtfsContextBuilder(
                 feedId,
-                transitBuilder).withAddBuilderAnnotation(new BuilderAnnotationStore(false)
+                transitBuilder).withAddBuilderAnnotation(new DataImportIssueStore(false)
         );
     }
 
@@ -81,19 +80,19 @@ public class GtfsContextBuilder {
     ) {
         return withGraphBuilderAnnotationsAndDeduplicator(
                 graph,
-                new BuilderAnnotationStore(false)
+                new DataImportIssueStore(false)
         );
     }
 
     public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(
             Graph graph,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         return withAddBuilderAnnotation(annotationStore)
                 .withDeduplicator(graph.deduplicator);
     }
 
-    public GtfsContextBuilder withAddBuilderAnnotation(BuilderAnnotationStore annotationStore) {
+    public GtfsContextBuilder withAddBuilderAnnotation(DataImportIssueStore annotationStore) {
         this.annotationStore = annotationStore;
         return this;
     }

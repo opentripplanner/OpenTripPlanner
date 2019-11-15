@@ -2,7 +2,7 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
-import org.opentripplanner.graph_builder.BuilderAnnotationStore;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 /**
@@ -45,9 +45,9 @@ public class GTFSToOtpTransitServiceMapper {
             routeMapper, fareAttributeMapper
     );
 
-    private final BuilderAnnotationStore annotationStore;
+    private final DataImportIssueStore annotationStore;
 
-    GTFSToOtpTransitServiceMapper(BuilderAnnotationStore annotationStore) {
+    GTFSToOtpTransitServiceMapper(DataImportIssueStore annotationStore) {
         this.annotationStore = annotationStore;
     }
 
@@ -56,7 +56,7 @@ public class GTFSToOtpTransitServiceMapper {
      */
     public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
             GtfsRelationalDao data,
-            BuilderAnnotationStore annotationStore
+            DataImportIssueStore annotationStore
     ) {
         return new GTFSToOtpTransitServiceMapper(annotationStore).map(data);
     }

@@ -2,9 +2,7 @@ package org.opentripplanner.graph_builder.annotation;
 
 import org.opentripplanner.model.Trip;
 
-public class TripDuplicateDeparture extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TripDuplicateDeparture implements DataImportIssue {
 
     public static final String FMT = "Possible GTFS feed error: Duplicate first departure time. " +
     		"New trip: %s Existing trip: %s This will be handled correctly but inefficiently.";
