@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<code_scheme name="OpenTripPlanner v2">
+<code_scheme name="OpenTripPlanner v2" version="1">
   <option name="OTHER_INDENT_OPTIONS">
     <value>
       <option name="INDENT_SIZE" value="2" />
@@ -8,14 +8,19 @@
     </value>
   </option>
   <option name="RIGHT_MARGIN" value="100" />
+  <option name="FORMATTER_TAGS_ENABLED" value="true" />
   <JSCodeStyleSettings version="0">
     <option name="INDENT_CHAINED_CALLS" value="false" />
   </JSCodeStyleSettings>
   <JavaCodeStyleSettings>
     <option name="ANNOTATION_PARAMETER_WRAP" value="5" />
+    <option name="CLASS_NAMES_IN_JAVADOC" value="3" />
     <option name="CLASS_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
     <option name="NAMES_COUNT_TO_USE_IMPORT_ON_DEMAND" value="999" />
     <option name="JD_DO_NOT_WRAP_ONE_LINE_COMMENTS" value="true" />
+    <option name="JD_KEEP_EMPTY_PARAMETER" value="false" />
+    <option name="JD_KEEP_EMPTY_EXCEPTION" value="false" />
+    <option name="JD_KEEP_EMPTY_RETURN" value="false" />
   </JavaCodeStyleSettings>
   <Python>
     <option name="USE_CONTINUATION_INDENT_FOR_ARGUMENTS" value="true" />
@@ -67,6 +72,7 @@
     <option name="BINARY_OPERATION_SIGN_ON_NEXT_LINE" value="true" />
     <option name="TERNARY_OPERATION_WRAP" value="5" />
     <option name="TERNARY_OPERATION_SIGNS_ON_NEXT_LINE" value="true" />
+    <option name="KEEP_SIMPLE_BLOCKS_IN_ONE_LINE" value="true" />
     <option name="KEEP_SIMPLE_METHODS_IN_ONE_LINE" value="true" />
     <option name="KEEP_SIMPLE_LAMBDAS_IN_ONE_LINE" value="true" />
     <option name="KEEP_SIMPLE_CLASSES_IN_ONE_LINE" value="true" />
