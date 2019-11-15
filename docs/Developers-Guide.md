@@ -199,7 +199,7 @@ OTP.
 
 ## Code style
 
-The OTP code style is described on a separate [style guide page](developersguide/Codestyle.md).
+The OTP code style is described on a separate [style guide page](Codestyle.md).
 
 
 ## Continuous Integration
