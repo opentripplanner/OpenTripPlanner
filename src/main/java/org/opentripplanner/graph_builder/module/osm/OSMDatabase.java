@@ -15,11 +15,11 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
+import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
 import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
 import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
-import org.opentripplanner.graph_builder.issues.UnableToProcessPublicTransportationRelation;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
@@ -711,8 +711,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /**
      * Handler for a new Area (single way area or multipolygon relations)
-     * 
-     * @param area
      */
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
@@ -751,8 +749,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /**
      * Store turn restrictions.
-     * 
-     * @param relation
      */
     private void processRestriction(OSMRelation relation) {
         long from = -1, to = -1, via = -1;
@@ -835,8 +831,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /**
      * Process an OSM level map.
-     * 
-     * @param relation
      */
     private void processLevelMap(OSMRelation relation) {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
@@ -863,8 +857,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
     /**
      * Handle route=road relations.
-     * 
-     * @param relation
      */
     private void processRoad(OSMRelation relation) {
         for (OSMRelationMember member : relation.getMembers()) {
@@ -905,7 +897,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
      * TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
      * areas by creating relations .
      * 
-     * @param relation
      * @author hannesj
      * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
      */
@@ -932,7 +923,7 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         if (platformArea != null && !platformsNodes.isEmpty())
             stopsInAreas.put(platformArea, platformsNodes);
         else
-            issueStore.add(new UnableToProcessPublicTransportationRelation(relation.getId()));
+            issueStore.add(new PublicTransportRelationSkipped(relation.getId()));
     }
 
     private String addUniqueName(String routes, String name) {
@@ -947,10 +938,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     
     /**
      * Check if a point is within an epsilon of a node.
-     * @param p
-     * @param n
-     * @param epsilon
-     * @return
      */
     private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
     	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
@@ -958,10 +945,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     
     /**
      * Check if two nodes are within an epsilon.
-     * @param a
-     * @param b
-     * @param epsilon
-     * @return
      */
     private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
     	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;

@@ -101,6 +101,7 @@ public class GraphBuilder implements Runnable {
             load.buildGraph(graph, extra, issueStore);
 
         issueStore.summarize();
+
         if (serializeGraph) {
             try {
                 graph.save(graphFile);
