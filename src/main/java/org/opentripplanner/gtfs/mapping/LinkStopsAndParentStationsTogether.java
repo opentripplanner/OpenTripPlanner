@@ -1,7 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.ParentStationNotFound;
+import org.opentripplanner.graph_builder.issues.ParentStationNotFound;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;

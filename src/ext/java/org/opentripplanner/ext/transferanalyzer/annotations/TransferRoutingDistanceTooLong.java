@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
-import org.opentripplanner.graph_builder.annotation.DataImportIssue;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;

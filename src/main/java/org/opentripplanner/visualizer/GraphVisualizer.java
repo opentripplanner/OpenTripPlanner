@@ -2,7 +2,7 @@ package org.opentripplanner.visualizer;
 
 import javassist.Modifier;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.annotation.DataImportIssue;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;

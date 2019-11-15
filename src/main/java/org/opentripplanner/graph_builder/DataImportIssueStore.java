@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import org.opentripplanner.graph_builder.annotation.DataImportIssue;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

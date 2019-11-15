@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.QuayWithoutCoordinates;
+import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.rutebanken.netex.model.Quay;

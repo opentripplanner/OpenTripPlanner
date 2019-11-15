@@ -1,8 +1,8 @@
 package org.opentripplanner.openstreetmap.model;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownAssumedGroundLevel;
-import org.opentripplanner.graph_builder.annotation.FloorNumberUnknownGuessedFromAltitude;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownAssumedGroundLevel;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownGuessedFromAltitude;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

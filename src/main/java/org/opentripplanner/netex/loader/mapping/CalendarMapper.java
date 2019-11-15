@@ -1,8 +1,8 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.annotation.DataImportIssue;
-import org.opentripplanner.graph_builder.annotation.ServiceCodeDoesNotContainServiceDates;
+import org.opentripplanner.graph_builder.issues.ServiceCodeDoesNotContainServiceDates;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
