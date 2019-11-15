@@ -6,6 +6,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import gnu.trove.map.TIntObjectMap;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TIntObjectHashMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
 import org.opentripplanner.util.MapUtils;
 
 /** basic union-find data structure with path compression */
@@ -55,11 +59,11 @@ public class DisjointSet<T> {
     }
     
     public List<Set<T>> sets() {
-        HashMap<Integer, Set<T>> out = new HashMap<Integer, Set<T>>();
+        TLongObjectMap<Set<T>> out = new TLongObjectHashMap<>();
         for (Map.Entry<T, Integer> entry : setMapping.entrySet()) {
             MapUtils.addToMapSet(out, compact(entry.getValue()), entry.getKey());
         }
-        return new ArrayList<Set<T>>(out.values());
+        return new ArrayList<>(out.valueCollection());
     }
 
     private int compact(int i) {

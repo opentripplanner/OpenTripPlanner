@@ -9,6 +9,7 @@ import java.util.List;
 import java.io.File;
 import java.net.URLDecoder;
 
+import gnu.trove.list.TLongList;
 import org.junit.Test;
 
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -37,10 +38,10 @@ public class OpenStreetMapParserTest {
 
         OSMWay wayA = osmdb.getWay(13490353L);
         assertEquals(13490353, wayA.getId());
-        List<Long> nodeRefsA = wayA.getNodeRefs();
+        TLongList nodeRefsA = wayA.getNodeRefs();
         assertEquals(2, nodeRefsA.size());
-        assertEquals(123978834, nodeRefsA.get(0).longValue());
-        assertEquals(123980465, nodeRefsA.get(1).longValue());
+        assertEquals(123978834, nodeRefsA.get(0));
+        assertEquals(123980465, nodeRefsA.get(1));
         assertTrue(wayA.hasTag("highway"));
         assertEquals("Potlatch 0.9a", wayA.getTag("created_by"));
         assertEquals("secondary", wayA.getTag("highway"));
