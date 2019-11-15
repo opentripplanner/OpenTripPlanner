@@ -1,17 +1,10 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Arrays;
-import java.util.HashMap;
 import java.util.Set;
 
 /**
@@ -27,8 +20,6 @@ public class StateEditor {
     private static final Logger LOG = LoggerFactory.getLogger(StateEditor.class);
 
     protected State child;
-
-    private boolean extensionsModified = false;
 
     private boolean spawned = false;
 
@@ -125,35 +116,11 @@ public class StateEditor {
         return child;
     }
 
-    public boolean isMaxPreTransitTimeExceeded(RoutingRequest options) {
-        return child.preTransitTime > options.maxPreTransitTime;
-    }
-
     public String toString() {
         return "<StateEditor " + child + ">";
     }
 
     /* PUBLIC METHODS TO MODIFY A STATE BEFORE IT IS USED */
-
-    /**
-     * Put a new value into the State extensions map. This will always clone the extensions map
-     * before it is modified the first time, making sure that other references to the map in earlier
-     * States are unaffected.
-     */
-    @SuppressWarnings("unchecked")
-    public void setExtension(Object key, Object value) {
-        cloneStateDataAsNeeded();
-        if (!extensionsModified) {
-            HashMap<Object, Object> newExtensions;
-            if (child.stateData.extensions == null)
-                newExtensions = new HashMap<Object, Object>(4);
-            else
-                newExtensions = (HashMap<Object, Object>) child.stateData.extensions.clone();
-            child.stateData.extensions = newExtensions;
-            extensionsModified = true;
-        }
-        child.stateData.extensions.put(key, value);
-    }
 
     /**
      * Tell the stateEditor to return null when makeState() is called, no matter what other editing
@@ -209,51 +176,13 @@ public class StateEditor {
         child.walkDistance += length;
     }
 
-    public void incrementPreTransitTime(int seconds) {
-        if (seconds < 0) {
-            LOG.warn("A state's pre-transit time is being incremented by a negative amount.");
-            defectiveTraversal = true;
-            return;
-        }
-        child.preTransitTime += seconds;
-    }
-
-    public void incrementNumBoardings() {
-        cloneStateDataAsNeeded();
-        child.stateData.numBoardings++;
-        setEverBoarded(true);
-    }
-
     /* Basic Setters */
-
-    public void setTripTimes(TripTimes tripTimes) {
-        cloneStateDataAsNeeded();
-        child.stateData.tripTimes = tripTimes;
-    }
-
-    public void setTripId(FeedScopedId tripId) {
-        cloneStateDataAsNeeded();
-        child.stateData.tripId = tripId;
-    }
-
-    public void setPreviousTrip(Trip previousTrip) {
-        cloneStateDataAsNeeded();
-        child.stateData.previousTrip = previousTrip;
-    }
 
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
     
-    /**
-     * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
-     * This happens in Analyst.
-     */
-    public void setInitialWaitTimeSeconds(long initialWaitTimeSeconds) {
-        cloneStateDataAsNeeded();
-        child.stateData.initialWaitTime = initialWaitTimeSeconds;
-    }
-    
+
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
@@ -270,58 +199,8 @@ public class StateEditor {
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /** 
-     * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
-     * the planner used and the arrival of the trip after that.
-     */
-    public void setLastNextArrivalDelta (int lastNextArrivalDelta) {
-        cloneStateDataAsNeeded();
-        child.stateData.lastNextArrivalDelta = lastNextArrivalDelta;
-    }
-
     public void setWalkDistance(double walkDistance) {
         child.walkDistance = walkDistance;
-    }
-
-    public void setPreTransitTime(int preTransitTime) {
-        child.preTransitTime = preTransitTime;
-    }
-
-    public void setZone(String zone) {
-        if (zone == null) {
-            if (child.stateData.zone != null) {
-                cloneStateDataAsNeeded();
-                child.stateData.zone = zone;
-            }
-        } else if (!zone.equals(child.stateData.zone)) {
-            cloneStateDataAsNeeded();
-            child.stateData.zone = zone;
-        }
-    }
-
-    public void setRoute(FeedScopedId routeId) {
-        cloneStateDataAsNeeded();
-        child.stateData.route = routeId;
-        // unlike tripId, routeId is not set to null when alighting
-        // but do a null check anyway
-        if (routeId != null) {
-            FeedScopedId[] oldRouteSequence = child.stateData.routeSequence;
-            //LOG.debug("old route seq {}", Arrays.asList(oldRouteSequence));
-            int oldLength = oldRouteSequence.length;
-            child.stateData.routeSequence = Arrays.copyOf(oldRouteSequence, oldLength + 1);
-            child.stateData.routeSequence[oldLength] = routeId;
-            //LOG.debug("new route seq {}", Arrays.asList(child.stateData.routeSequence)); // array will be interpreted as varargs
-        }
-    }
-
-    public void setNumBoardings(int numBoardings) {
-        cloneStateDataAsNeeded();
-        child.stateData.numBoardings = numBoardings;
-    }
-
-    public void setEverBoarded(boolean everBoarded) {
-        cloneStateDataAsNeeded();
-        child.stateData.everBoarded = true;
     }
 
     public void beginVehicleRenting(TraverseMode vehicleMode) {
@@ -361,16 +240,6 @@ public class StateEditor {
         }
     }
 
-    public void setPreviousStop(Stop previousStop) {
-        cloneStateDataAsNeeded();
-        child.stateData.previousStop = previousStop;
-    }
-
-    public void setLastAlightedTimeSeconds(long lastAlightedTimeSeconds) {
-        cloneStateDataAsNeeded();
-        child.stateData.lastAlightedTime = lastAlightedTimeSeconds;
-    }
-
     public void setTimeSeconds(long seconds) {
         child.time = seconds * 1000;
     }
@@ -381,21 +250,13 @@ public class StateEditor {
     }
 
     /**
-     * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
-     * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
+     * Set non-incremental state values from an existing state.
+     * Incremental values are not currently set.
      * 
      * @param state
      */
     public void setFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.route = state.stateData.route;
-        child.stateData.tripTimes = state.stateData.tripTimes;
-        child.stateData.tripId = state.stateData.tripId;
-        child.stateData.serviceDay = state.stateData.serviceDay;
-        child.stateData.previousTrip = state.stateData.previousTrip;
-        child.stateData.previousStop = state.stateData.previousStop;
-        child.stateData.zone = state.stateData.zone;
-        child.stateData.extensions = state.stateData.extensions;
         child.stateData.usingRentedBike = state.stateData.usingRentedBike;
         child.stateData.carParked = state.stateData.carParked;
         child.stateData.bikeParked = state.stateData.bikeParked;
@@ -411,15 +272,6 @@ public class StateEditor {
 
     /* PUBLIC GETTER METHODS */
 
-    /*
-     * Allow patches to see the State being edited, so they can decide whether to apply their
-     * transformations to the traversal result or not.
-     */
-
-    public Object getExtension(Object key) {
-        return child.getExtension(key);
-    }
-
     public long getTimeSeconds() {
         return child.getTimeSeconds();
     }
@@ -428,44 +280,12 @@ public class StateEditor {
         return child.getElapsedTimeSeconds();
     }
 
-    public FeedScopedId getTripId() {
-        return child.getTripId();
-    }
-
-    public Trip getPreviousTrip() {
-        return child.getPreviousTrip();
-    }
-    
-    public String getZone() {
-        return child.getZone();
-    }
-
-    public FeedScopedId getRoute() {
-        return child.getRoute();
-    }
-
-    public int getNumBoardings() {
-        return child.getNumBoardings();
-    }
-
-    public boolean isEverBoarded() {
-        return child.isEverBoarded();
-    }
-
     public boolean isRentingBike() {
         return child.isBikeRenting();
     }
 
-    public long getLastAlightedTimeSeconds() {
-        return child.getLastAlightedTimeSeconds();
-    }
-
     public double getWalkDistance() {
         return child.getWalkDistance();
-    }
-
-    public int getPreTransitTime() {
-        return child.getPreTransitTime();
     }
 
     public Vertex getVertex() {
@@ -484,23 +304,9 @@ public class StateEditor {
             child.stateData = child.stateData.clone();
     }
 
-    public void alightTransit() {
-        cloneStateDataAsNeeded();
-        child.stateData.lastTransitWalk = child.getWalkDistance();
-    }
-
-    public void setLastPattern(TripPattern pattern) {
-        cloneStateDataAsNeeded();
-        child.stateData.lastPattern = pattern;
-    }
     public void setOptions(RoutingRequest options) {
         cloneStateDataAsNeeded();
         child.stateData.opt = options;
-    }
-
-    public void setServiceDay(ServiceDay day) {
-        cloneStateDataAsNeeded();
-        child.stateData.serviceDay = day;
     }
 
     public void setBikeRentalNetwork(Set<String> networks) {

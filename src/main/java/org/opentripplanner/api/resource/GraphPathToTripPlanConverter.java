@@ -66,10 +66,14 @@ import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
 
+// TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
+//      to decide where real-time updates should be applied to the itinerary.
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
- * are also bundled together here.
+ * are also bundled together here. This only produces itineraries for non-transit searches, as well as
+ * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
+ * by {@link org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper}.
  */
 public abstract class GraphPathToTripPlanConverter {
 
@@ -179,13 +183,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         Graph graph = path.getRoutingContext().graph;
 
-        FareService fareService = graph.getService(FareService.class);
-
         State[][] legsStates = sliceStates(states);
-
-        if (fareService != null) {
-            itinerary.fare = fareService.getCost(path);
-        }
 
         for (State[] legStates : legsStates) {
             itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
@@ -213,10 +211,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         itinerary.walkDistance = lastState.getWalkDistance();
 
-        itinerary.transfers = lastState.getNumBoardings();
-        if (itinerary.transfers > 0) {
-            itinerary.transfers--;
-        }
+        itinerary.transfers = 0;
 
         return itinerary;
     }
@@ -347,8 +342,6 @@ public abstract class GraphPathToTripPlanConverter {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addTripFields(leg, states, requestedLocale);
-
         addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
@@ -365,7 +358,6 @@ public abstract class GraphPathToTripPlanConverter {
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
-        if (leg.isTransitLeg()) addRealTimeData(leg, states);
 
         return leg;
     }
@@ -796,47 +788,6 @@ public abstract class GraphPathToTripPlanConverter {
     }
 
     /**
-     * Add trip-related fields to a {@link Leg}.
-     *
-     * @param leg The leg to add the trip-related fields to
-     * @param states The states that go with the leg
-     */
-    private static void addTripFields(Leg leg, State[] states, Locale requestedLocale) {
-        Trip trip = states[states.length - 1].getBackTrip();
-
-        if (trip != null) {
-            Route route = trip.getRoute();
-            Agency agency = route.getAgency();
-            ServiceDay serviceDay = states[states.length - 1].getServiceDay();
-
-            leg.agencyId = agency.getId();
-            leg.agencyName = agency.getName();
-            leg.agencyUrl = agency.getUrl();
-            leg.agencyBrandingUrl = agency.getBrandingUrl();
-            leg.headsign = states[1].backEdge.getDirection();
-            leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
-            leg.routeColor = route.getColor();
-            leg.routeId = route.getId();
-            leg.routeLongName = route.getLongName();
-            leg.routeShortName = route.getShortName();
-            leg.routeTextColor = route.getTextColor();
-            leg.routeType = route.getType();
-            leg.routeBrandingUrl = route.getBrandingUrl();
-            leg.tripId = trip.getId();
-            leg.tripShortName = trip.getTripShortName();
-            leg.tripBlockId = trip.getBlockId();
-
-            if (serviceDay != null) {
-                leg.serviceDate = serviceDay.getServiceDate().getAsString();
-            }
-
-            if (leg.headsign == null) {
-                leg.headsign = trip.getTripHeadsign();
-            }
-        }
-    }
-
-    /**
      * Add {@link Place} fields to a {@link Leg}.
      * There is some code duplication because of subtle differences between departure, arrival and
      * intermediate stops.
@@ -855,11 +806,10 @@ public abstract class GraphPathToTripPlanConverter {
                 ((TransitStopVertex) firstVertex).getStop(): null;
         Stop lastStop = lastVertex instanceof TransitStopVertex ?
                 ((TransitStopVertex) lastVertex).getStop(): null;
-        TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
-        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
+        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, null, requestedLocale);
         leg.from.arrival = null;
-        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
+        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, null, requestedLocale);
         leg.to.departure = null;
 
         if (showIntermediateStops) {
@@ -884,7 +834,7 @@ public abstract class GraphPathToTripPlanConverter {
                 previousStop = currentStop;
                 if (currentStop == lastStop) break;
 
-                leg.intermediateStops.add(makePlace(states[i], vertex, edges[i], currentStop, tripTimes, requestedLocale));
+                leg.intermediateStops.add(makePlace(states[i], vertex, edges[i], currentStop, null, requestedLocale));
             }
         }
     }
@@ -934,24 +884,6 @@ public abstract class GraphPathToTripPlanConverter {
         }
 
         return place;
-    }
-
-    /**
-     * Add information about real-time data to a {@link Leg}.
-     *
-     * @param leg The leg to add the real-time information to
-     * @param states The states that go with the leg
-     */
-    private static void addRealTimeData(Leg leg, State[] states) {
-        TripTimes tripTimes = states[states.length - 1].getTripTimes();
-
-        if (tripTimes != null && !tripTimes.isScheduled()) {
-            leg.realTime = true;
-            if (leg.from.stopIndex != null) {
-                leg.departureDelay = tripTimes.getDepartureDelay(leg.from.stopIndex);
-            }
-            leg.arrivalDelay = tripTimes.getArrivalDelay(leg.to.stopIndex);
-        }
     }
 
     /**

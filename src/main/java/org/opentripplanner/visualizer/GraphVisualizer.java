@@ -155,7 +155,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			stateListModel.addElement( "carParked:"+st.isCarParked() );
 			stateListModel.addElement( "walkDistance:"+st.getWalkDistance() );
 			stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
-			stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
 			outputList.setModel( stateListModel );
 			
 			lastStateClicked = st;
@@ -273,7 +272,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
 			String startTime = shortDateFormat.format(new Date(gp.getStartTime()*1000));
 			String endTime = shortDateFormat.format(new Date(gp.getEndTime()*1000));
-			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+(gp.getDuration()/60.0)+" walk:"+gp.getWalkDistance()+" nTrips:"+gp.getTrips().size();
+			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+(gp.getDuration()/60.0)+" walk:"+gp.getWalkDistance();
 		}
 	}
 
