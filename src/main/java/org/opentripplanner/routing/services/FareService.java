@@ -1,13 +1,13 @@
 package org.opentripplanner.routing.services;
 
+import com.conveyal.r5.otp2.api.path.Path;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.spt.GraphPath;
 
 /**
- * Computes a fare for a given GraphPath.
- * @author novalis
+ * Computes a fare for a given sequence of Rides.
  *
  */
 public interface FareService {
-	public Fare getCost(GraphPath path);
+	Fare getCost(Path<TripSchedule> path);
 }
