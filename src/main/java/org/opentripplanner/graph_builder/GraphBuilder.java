@@ -18,8 +18,7 @@ import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.CommandLineParameters;
@@ -176,10 +175,11 @@ public class GraphBuilder implements Runnable {
             return null;
         }
         if ( hasOsm ) {
-            List<OpenStreetMapProvider> osmProviders = Lists.newArrayList();
+            List<BinaryOpenStreetMapProvider> osmProviders = Lists.newArrayList();
             for (File osmFile : osmFiles) {
-                OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
-                osmProviders.add(osmProvider);
+                BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
+                provider.setPath(osmFile);
+                osmProviders.add(provider);
             }
             OpenStreetMapModule osmModule = new OpenStreetMapModule(osmProviders);
             DefaultStreetEdgeFactory streetEdgeFactory = new DefaultStreetEdgeFactory();
@@ -318,8 +318,6 @@ public class GraphBuilder implements Runnable {
             }
             if (buildConfig.netex.moduleFileMatches(name)) return NETEX;
             if (name.endsWith(".pbf")) return OSM;
-            if (name.endsWith(".osm")) return OSM;
-            if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
             if (GraphConfig.isGraphConfigFile(name)) return CONFIG;

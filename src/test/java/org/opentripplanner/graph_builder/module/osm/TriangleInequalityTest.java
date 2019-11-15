@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
-import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -41,9 +41,9 @@ public class TriangleInequalityTest {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
-        File file = new File(URLDecoder.decode(TriangleInequalityTest.class.getResource("NYC_small.osm.gz").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(TriangleInequalityTest.class.getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);

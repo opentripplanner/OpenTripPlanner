@@ -20,11 +20,11 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -103,7 +103,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     /**
      * Providers of OSM data.
      */
-    private List<OpenStreetMapProvider> _providers = new ArrayList<OpenStreetMapProvider>();
+    private List<BinaryOpenStreetMapProvider> _providers = new ArrayList<BinaryOpenStreetMapProvider>();
 
     /**
      * Allows for arbitrary custom naming of edges.
@@ -149,14 +149,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     /**
      * The source for OSM map data
      */
-    public void setProvider(OpenStreetMapProvider provider) {
+    public void setProvider(BinaryOpenStreetMapProvider provider) {
         _providers.add(provider);
     }
 
     /**
      * Multiple sources for OSM map data
      */
-    public void setProviders(List<OpenStreetMapProvider> providers) {
+    public void setProviders(List<BinaryOpenStreetMapProvider> providers) {
         _providers.addAll(providers);
     }
 
@@ -179,7 +179,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     /**
      * Construct and set providers all at once.
      */
-    public OpenStreetMapModule(List<OpenStreetMapProvider> providers) {
+    public OpenStreetMapModule(List<BinaryOpenStreetMapProvider> providers) {
         this.setProviders(providers);
     }
 
@@ -190,7 +190,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         OSMDatabase osmdb = new OSMDatabase();
         Handler handler = new Handler(graph, osmdb);
-        for (OpenStreetMapProvider provider : _providers) {
+        for (BinaryOpenStreetMapProvider provider : _providers) {
             LOG.info("Gathering OSM from provider: " + provider);
             provider.readOSM(osmdb);
         }
@@ -1267,7 +1267,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
     @Override
     public void checkInputs() {
-        for (OpenStreetMapProvider provider : _providers) {
+        for (BinaryOpenStreetMapProvider provider : _providers) {
             provider.checkInputs();
         }
     }

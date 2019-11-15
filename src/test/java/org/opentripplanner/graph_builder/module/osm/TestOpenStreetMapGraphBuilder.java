@@ -5,7 +5,7 @@ import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -46,9 +46,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
-        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.gz").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -104,9 +104,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
-        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.gz").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);
@@ -159,9 +159,9 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
-        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.gz").getFile(), "UTF-8"));
+        File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), "UTF-8"));
 
         provider.setPath(file);
         loader.setProvider(provider);

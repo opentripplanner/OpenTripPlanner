@@ -8,7 +8,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
-import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -33,8 +33,8 @@ public class TestUnconnectedAreas extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
-        File file = new File(getClass().getResource("P+R.osm.gz").getFile());
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
+        File file = new File(getClass().getResource("P+R.osm.pbf").getFile());
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(gg, new HashMap<Class<?>, Object>());
@@ -69,8 +69,8 @@ public class TestUnconnectedAreas extends TestCase {
     	
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
-        File file = new File(getClass().getResource("hackett_pr.osm.gz").getFile());
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
+        File file = new File(getClass().getResource("hackett_pr.osm.pbf").getFile());
         provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(g, new HashMap<Class<?>, Object>());
@@ -132,7 +132,7 @@ public class TestUnconnectedAreas extends TestCase {
      */
      @Test
      public void testRoadPassingOverNode () throws Exception {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm", 1, 2);
+    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 assertTrue(connections.contains("osm:node:-10"));
      }
      
@@ -142,7 +142,7 @@ public class TestUnconnectedAreas extends TestCase {
       */
      @Test
      public void testAreaPassingOverNode () throws Exception {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm", 1, 2);
+    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 assertTrue(connections.contains("osm:node:-10"));
      }
      
@@ -152,7 +152,7 @@ public class TestUnconnectedAreas extends TestCase {
       */
      @Test
      public void testRoadPassingOverDuplicatedNode () throws Exception {
-    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm", 1, 2);
+    	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 
     	 // depending on what order everything comes out of the spatial index, we will inject one of
     	 // the duplicated nodes into the way. When we get to the other ringsegments, we will just inject
@@ -169,7 +169,7 @@ public class TestUnconnectedAreas extends TestCase {
      	
          OpenStreetMapModule loader = new OpenStreetMapModule();
          loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-         FileBasedOpenStreetMapProviderImpl provider = new FileBasedOpenStreetMapProviderImpl();
+         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
          File file = new File(getClass().getResource(fn).getFile());
          provider.setPath(file);
          loader.setProvider(provider);
