@@ -9,6 +9,7 @@
 - Added NeTEx notices (#2824)
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import (#2813)
+- New Java Code Style (part of #2755)
 - Cleanup and rename Graph Builder Annotations, now Data Import Issues (#2871)
 
 ## Ported over from the 1.x
