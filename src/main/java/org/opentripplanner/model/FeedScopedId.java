@@ -110,6 +110,10 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
         }
     }
 
+    public static boolean isValidString(String value) throws IllegalArgumentException {
+        return value != null && value.indexOf(ID_SEPARATOR) > -1;
+    }
+
     /**
      * Given an {@link FeedScopedId} object, creates a string representation of the
      * form "agencyId_entityId"

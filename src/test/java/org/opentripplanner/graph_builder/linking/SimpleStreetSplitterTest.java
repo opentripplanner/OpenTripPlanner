@@ -31,7 +31,7 @@ public class SimpleStreetSplitterTest {
      */
     @Test
     public void testFindEndVertexForParkAndRide(){
-        GenericLocation genericLocation = new GenericLocation(10,23);
+        GenericLocation genericLocation = new GenericLocation(10.0,23.0);
 
         RoutingRequest routingRequest = new RoutingRequest();
         routingRequest.setMode(TraverseMode.CAR);

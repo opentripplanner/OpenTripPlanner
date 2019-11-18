@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.api.common.LocationMatcher;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -461,8 +462,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions = this;
 
         // So that they are never null.
-        from = new GenericLocation();
-        to = new GenericLocation();
+        from = new GenericLocation(null, null);
+        to = new GenericLocation(null, null);
     }
 
     public RoutingRequest(TraverseModeSet modes) {
@@ -689,11 +690,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final static int MIN_SIMILARITY = 1000;
 
     public void setFromString(String from) {
-        this.from = GenericLocation.fromOldStyleString(from);
+        this.from = LocationMatcher.fromOldStyleString(from);
     }
 
     public void setToString(String to) {
-        this.to = GenericLocation.fromOldStyleString(to);
+        this.to = LocationMatcher.fromOldStyleString(to);
     }
 
     /**
@@ -765,7 +766,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
-            intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
+            intermediatePlaces.add(LocationMatcher.fromOldStyleString(place));
         }
     }
 
@@ -809,11 +810,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public NamedPlace getFromPlace() {
-        return this.from.getNamedPlace();
+        return new NamedPlace(this.from);
     }
 
     public NamedPlace getToPlace() {
-        return this.to.getNamedPlace();
+        return new NamedPlace(this.to);
     }
 
     /* INSTANCE METHODS */

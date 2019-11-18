@@ -306,7 +306,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     ) {
         // Check if Stop/StopCollection is found by FeedScopeId
         Set<Vertex> transitStopVertices =
-                graph.index.getStopVerticesById(location.stopCollectionId);
+                graph.index.getStopVerticesById(location.placeId);
         if (transitStopVertices != null) {
             return transitStopVertices;
         }

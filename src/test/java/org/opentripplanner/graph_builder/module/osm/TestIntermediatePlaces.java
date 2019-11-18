@@ -17,7 +17,6 @@ import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.util.Calendar;
 import java.util.List;

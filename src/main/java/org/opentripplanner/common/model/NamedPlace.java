@@ -22,8 +22,8 @@ public class NamedPlace {
         this.place = place;
     }
 
-    public NamedPlace(String place) {
-        this.place = place;
+    public NamedPlace(GenericLocation location) {
+        this(location.label, location.placeId.toString());
     }
 
     public String getRepresentation() {

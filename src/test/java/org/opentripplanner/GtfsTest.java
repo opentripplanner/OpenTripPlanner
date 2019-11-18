@@ -4,11 +4,11 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
+import org.opentripplanner.api.common.LocationMatcher;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -108,10 +108,10 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.from = (new GenericLocation(null, feedId.getId() + ":" + fromVertex));
+            routingRequest.from = LocationMatcher.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.to = new GenericLocation(null, feedId.getId() + ":" + toVertex);
+            routingRequest.to = LocationMatcher.getGenericLocation(null, feedId.getId() + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
             routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));

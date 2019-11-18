@@ -21,6 +21,8 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
@@ -161,9 +163,9 @@ public class GraphIndex {
         // Make a normal OTP routing request so we can traverse edges and use GenericAStar
         // TODO make a function that builds normal routing requests from profile requests
         RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.from = new GenericLocation(lat, lon);
+        rr.from = new GenericLocation(null, null, lat, lon);
         // FIXME requires destination to be set, not necessary for analyst
-        rr.to = new GenericLocation(lat, lon);
+        rr.to = new GenericLocation(null, null, lat, lon);
         rr.oneToMany = true;
         rr.setRoutingContext(graph);
         rr.walkSpeed = 1;
@@ -457,18 +459,40 @@ public class GraphIndex {
      * @return The associated TransitStopVertex or all underlying TransitStopVertices
      */
     public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+        Collection<Stop> stops = getStopsForId(id);
+
+        if (stops == null) {
+            return null;
+        }
+
+        return stops.stream().map(stopVertexForStop::get).collect(Collectors.toSet());
+    }
+
+    private Collection<Stop> getStopsForId(FeedScopedId id) {
+
+        // GroupOfStations
+        GroupOfStations groupOfStations = graph.groupOfStationsById.get(id);
+        if (groupOfStations != null) {
+            return groupOfStations.getChildStops();
+        }
+
+        // Multimodal station
+        MultiModalStation multiModalStation = graph.multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return multiModalStation.getChildStops();
+        }
+
         // Station
         Station station = graph.stationById.get(id);
         if (station != null) {
-            return station.getChildStops().stream()
-                    .map(s -> graph.index.stopVertexForStop.get(s))
-                    .collect(Collectors.toSet());
+            return station.getChildStops();
         }
         // Single stop
         Stop stop = graph.index.stopForId.get(id);
         if (stop != null) {
-            return Collections.singleton(this.stopVertexForStop.get(stop));
+            return Collections.singleton(stop);
         }
+
         return null;
     }
 }
