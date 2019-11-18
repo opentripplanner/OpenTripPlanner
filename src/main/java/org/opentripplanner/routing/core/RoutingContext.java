@@ -4,35 +4,23 @@ import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.CalendarService;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TimetableSnapshot;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.error.TransitTimesException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -69,34 +57,7 @@ public class RoutingContext implements Cloneable {
     // TODO(flamholz): figure out a better way.
     public Edge originBackEdge;
 
-    // public final Calendar calendar;
-    public final CalendarService calendarService;
-
-    public final Map<FeedScopedId, Set<ServiceDate>> serviceDatesByServiceId = new HashMap<FeedScopedId, Set<ServiceDate>>();
-
     public RemainingWeightHeuristic remainingWeightHeuristic;
-
-    public final TransferTable transferTable;
-
-    /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
-    public final TimetableSnapshot timetableSnapshot;
-
-    /**
-     * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
-     * duration of a search so the same options cannot be used for multiple searches concurrently. To do so this cache would need to be moved into
-     * StateData, with all that entails.
-     */
-    public ArrayList<ServiceDay> serviceDays;
-
-    /**
-     * The search will be aborted if it is still running after this time (in milliseconds since the epoch). A negative or zero value implies no limit.
-     * This provides an absolute timeout, whereas the maxComputationTime is relative to the beginning of an individual search. While the two might
-     * seem equivalent, we trigger search retries in various places where it is difficult to update relative timeout value. The earlier of the two
-     * timeouts is applied.
-     */
-    public long searchAbortTime = 0;
-
-    public Vertex startingStop;
 
     /** An object that accumulates profiling and debugging info for inclusion in the response. */
     public DebugOutput debugOutput = new DebugOutput();
@@ -187,25 +148,6 @@ public class RoutingContext implements Cloneable {
         this.graph = graph;
         this.debugOutput.startedCalculating();
 
-        // The following block contains potentially resource-intensive things that are only relevant for transit.
-        // In normal searches the impact is low, because the routing context is only constructed once at the beginning
-        // of the search, but when computing transfers or doing large batch jobs, repeatedly re-constructing useless
-        // transit-specific information can have an impact.
-        if (opt.modes.isTransit()) {
-            // the graph's snapshot may be frequently updated.
-            // Grab a reference to ensure a coherent view of the timetables throughout this search.
-            if (routingRequest.ignoreRealtimeUpdates) {
-                timetableSnapshot = null;
-            } else {
-                timetableSnapshot = graph.getTimetableSnapshot();
-            }
-            calendarService = graph.getCalendarService();
-            setServiceDays();
-        } else {
-            timetableSnapshot = null;
-            calendarService = null;
-        }
-
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
         if (findPlaces) {
@@ -242,7 +184,6 @@ public class RoutingContext implements Cloneable {
         origin = opt.arriveBy ? toVertex : fromVertex;
         originBackEdge = opt.arriveBy ? toBackEdge : fromBackEdge;
         target = opt.arriveBy ? fromVertex : toVertex;
-        transferTable = graph.getTransferTable();
         remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
 
         if (this.origin != null) {
@@ -259,8 +200,8 @@ public class RoutingContext implements Cloneable {
 
     /* INSTANCE METHODS */
 
-    public void check() {
-        ArrayList<String> notFound = new ArrayList<String>();
+    void checkIfVerticesFound() {
+        ArrayList<String> notFound = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
         if (fromVertex == null) {
@@ -274,64 +215,6 @@ public class RoutingContext implements Cloneable {
         if (notFound.size() > 0) {
             throw new VertexNotFoundException(notFound);
         }
-        if (opt.modes.isTransit() && !graph.transitFeedCovers(opt.dateTime)) {
-            // user wants a path through the transit network,
-            // but the date provided is outside those covered by the transit feed.
-            throw new TransitTimesException();
-        }
-    }
-
-    /**
-     * Cache ServiceDay objects representing which services are running yesterday, today, and tomorrow relative to the search time. This information
-     * is very heavily used (at every transit boarding) and Date operations were identified as a performance bottleneck. Must be called after the
-     * TraverseOptions already has a CalendarService set.
-     */
-    private void setServiceDays() {
-        Calendar c = Calendar.getInstance();
-        c.setTime(new Date(opt.getSecondsSinceEpoch() * 1000));
-        c.setTimeZone(graph.getTimeZone());
-
-        final ServiceDate serviceDate = new ServiceDate(c);
-        this.serviceDays = new ArrayList<ServiceDay>(3);
-        if (calendarService == null && graph.getCalendarService() != null
-                && (opt.modes == null || opt.modes.contains(TraverseMode.TRANSIT))) {
-            LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
-            return;
-        }
-
-        for (String feedId : graph.getFeedIds()) {
-            for (Agency agency : graph.getAgencies(feedId)) {
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(), calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(), calendarService, agency.getId()));
-            }
-        }
-    }
-
-    private static <T> void addIfNotExists(ArrayList<T> list, T item) {
-        if (!list.contains(item)) {
-            list.add(item);
-        }
-    }
-
-    /** Check if the start and end locations are accessible. */
-    public boolean isAccessible() {
-        if (opt.wheelchairAccessible) {
-            return isWheelchairAccessible(fromVertex) && isWheelchairAccessible(toVertex);
-        }
-        return true;
-    }
-
-    // this could be handled by method overloading on Vertex
-    public boolean isWheelchairAccessible(Vertex v) {
-        if (v instanceof TransitStopVertex) {
-            TransitStopVertex ts = (TransitStopVertex) v;
-            return ts.hasWheelchairEntrance();
-        } else if (v instanceof StreetLocation) {
-            StreetLocation sl = (StreetLocation) v;
-            return sl.isWheelchairAccessible();
-        }
-        return true;
     }
 
     /**

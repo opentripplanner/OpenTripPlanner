@@ -1,7 +1,8 @@
 package org.opentripplanner.graph_builder.module;
 
 import com.google.common.collect.Iterables;
-import org.opentripplanner.graph_builder.annotation.StopNotLinkedForTransfers;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
@@ -46,7 +47,11 @@ public class DirectTransferGenerator implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            DataImportIssueStore issueStore
+    ) {
         /* Initialize graph index which is needed by the nearby stop finder. */
         if (graph.index == null) {
             graph.index = new GraphIndex(graph);
@@ -94,7 +99,7 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
             if (n == 0) {
-                LOG.debug(graph.addBuilderAnnotation(new StopNotLinkedForTransfers(ts0)));
+                issueStore.add(new StopNotLinkedForTransfers(ts0));
             }
             nTransfersTotal += n;
         }

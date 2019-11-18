@@ -141,8 +141,6 @@ public class PlannerResource extends RoutingResource {
                 for (GraphPath path : paths) {
                     sb.append(path.getDuration());
                     sb.append(' ');
-                    sb.append(path.getTrips().size());
-                    sb.append(' ');
                 }
             }
             router.requestLogger.info(sb.toString());

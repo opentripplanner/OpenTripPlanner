@@ -963,7 +963,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             // graphService.getGraph(routerId)
             this.rctx = new RoutingContext(this, graph);
             // check after back reference is established, to allow temp edge cleanup on exceptions
-            this.rctx.check();
+            this.rctx.checkIfVerticesFound();
         } else {
             if (rctx.graph == graph) {
                 LOG.debug("keeping existing routing context");

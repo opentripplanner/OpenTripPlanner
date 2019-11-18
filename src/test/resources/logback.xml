@@ -31,5 +31,6 @@
   <!-- Avoid printing many warnings about stops off the edge of the OSM map in tests. -->
   <logger name="org.opentripplanner.graph_builder.linking.SimpleStreetSplitter" level="error" />
 
-
+  <!-- Graph builder data import logs a summary at INFO level and issues at DEBUG level -->
+  <logger name="DATA_IMPORT_ISSUES" level="info" />
 </configuration>

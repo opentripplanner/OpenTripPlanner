@@ -257,7 +257,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (options.arriveBy) {
                 // Branch search to "unparked" CAR mode ASAP after transit has been used.
                 // Final WALK check prevents infinite recursion.
-                if (s0.isCarParked() && s0.isEverBoarded() && currMode == TraverseMode.WALK) {
+                if (s0.isCarParked() && currMode == TraverseMode.WALK) {
                     editor = doTraverse(s0, options, TraverseMode.CAR);
                     if (editor != null) {
                         editor.setCarParked(false); // Also has the effect of switching to CAR
@@ -474,22 +474,6 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if (!traverseMode.isDriving()) {
             s1.incrementWalkDistance(getEffectiveBikeDistance());
-        }
-
-        /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        if (options.kissAndRide || options.parkAndRide) {
-            if (options.arriveBy) {
-                if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
-            } else {
-                if (!s0.isEverBoarded()) s1.incrementPreTransitTime(roundedTime);
-            }
-            if (s1.isMaxPreTransitTimeExceeded(options)) {
-                if (options.softPreTransitLimiting) {
-                    weight += calculateOverageWeight(s0.getPreTransitTime(), s1.getPreTransitTime(),
-                            options.maxPreTransitTime, options.preTransitPenalty,
-                                    options.preTransitOverageRate);
-                } else return null;
-            }
         }
 
         s1.incrementTimeInSeconds(roundedTime);

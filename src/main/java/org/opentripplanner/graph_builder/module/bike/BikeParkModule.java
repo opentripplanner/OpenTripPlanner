@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.module.bike;
 
-import java.util.Collection;
-import java.util.HashMap;
-
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -12,6 +10,9 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.bike_park.BikeParkDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.HashMap;
 
 /**
  * This graph builder allow one to statically build bike park using the same source as the dynamic
@@ -34,7 +35,11 @@ public class BikeParkModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            DataImportIssueStore issueStore
+    ) {
 
         LOG.info("Building bike parks from static source...");
         BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);
