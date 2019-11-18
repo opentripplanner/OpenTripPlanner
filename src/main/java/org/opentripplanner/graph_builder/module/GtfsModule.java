@@ -16,7 +16,9 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.gtfs.GenerateTripPatternsOperation;
 import org.opentripplanner.gtfs.RepairStopTimesForEachTripOperation;
@@ -26,7 +28,6 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -49,6 +50,8 @@ import static org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper.map
 public class GtfsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsModule.class);
+
+    private DataImportIssueStore issueStore;
 
     private EntityHandler counter = new EntityCounter();
 
@@ -83,7 +86,13 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            DataImportIssueStore issueStore
+    ) {
+        this.issueStore = issueStore;
+
         // we're about to add another agency to the graph, so clear the cached timezone
         // in case it should change
         // OTP doesn't currently support multiple time zones in a single graph;
@@ -106,7 +115,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(
                         loadBundle(gtfsBundle),
-                        graph
+                        issueStore
                 );
 
                 calendarServiceData.add(builder.buildCalendarServiceData());
@@ -121,7 +130,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 addTransitModelToGraph(graph, gtfsBundle, transitModel);
 
-                createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph);
+                createGeometryAndBlockProcessor(gtfsBundle, transitModel).run(graph, issueStore);
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
@@ -132,7 +141,7 @@ public class GtfsModule implements GraphBuilderModule {
                 org.opentripplanner.model.calendar.CalendarServiceData.class,
                 calendarServiceData
         );
-        graph.updateTransitFeedValidity(calendarServiceData);
+        graph.updateTransitFeedValidity(calendarServiceData, issueStore);
 
         graph.hasTransit = true;
         graph.calculateTransitCenter();
@@ -146,7 +155,7 @@ public class GtfsModule implements GraphBuilderModule {
      * This method have side-effects, the {@code stopTimesByTrip} is updated.
      */
     private void repairStopTimesForEachTrip(Graph graph, TripStopTimes stopTimesByTrip) {
-        new RepairStopTimesForEachTripOperation(stopTimesByTrip, graph).run();
+        new RepairStopTimesForEachTripOperation(stopTimesByTrip, issueStore).run();
     }
 
     /**
@@ -154,7 +163,7 @@ public class GtfsModule implements GraphBuilderModule {
      */
     private void createTripPatterns(Graph graph, OtpTransitServiceBuilder builder, Set<FeedScopedId> calServiceIds) {
         GenerateTripPatternsOperation buildTPOp = new GenerateTripPatternsOperation(
-                builder, graph, graph.deduplicator, calServiceIds
+                builder, this.issueStore, graph.deduplicator, calServiceIds
         );
         buildTPOp.run();
         graph.hasFrequencyService = graph.hasFrequencyService || buildTPOp.hasFrequencyBasedTrips();

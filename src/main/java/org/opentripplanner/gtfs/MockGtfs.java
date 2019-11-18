@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.mapping.AgencyAndIdMapper;
 import org.opentripplanner.gtfs.mapping.GTFSToOtpTransitServiceMapper;
 import org.opentripplanner.model.FeedScopedId;
@@ -44,14 +45,14 @@ public class MockGtfs {
     public OtpTransitServiceBuilder read() throws IOException {
         return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsDelegate.read(),
-                annotation -> null
+                new DataImportIssueStore(false)
         );
     }
 
     public OtpTransitServiceBuilder read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
         return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsDelegate.read(reader),
-                annotation -> null
+                new DataImportIssueStore(false)
         );
     }
 

@@ -10,7 +10,9 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
-import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ElevationFlattened;
+import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -43,6 +45,8 @@ import java.util.List;
 public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
+
+    private DataImportIssueStore issueStore;
 
     private ElevationGridCoverageFactory gridCoverageFactory;
 
@@ -83,7 +87,13 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(
+            Graph graph,
+            HashMap<Class<?>, Object> extra,
+            DataImportIssueStore issueStore
+    ) {
+        this.issueStore = issueStore;
+
         graph.setDistanceBetweenElevationSamples(this.distanceBetweenSamplesM);
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
@@ -257,7 +267,7 @@ public class ElevationModule implements GraphBuilderModule {
             //limit elevation propagation to at max 2km; this prevents an infinite loop
             //in the case of islands missing elevation (and some other cases)
             if (bestDistance == Double.MAX_VALUE && state.distance > 2000) {
-                log.warn("While propagating elevations, hit 2km distance limit at " + state.vertex);
+                issueStore.add(new ElevationPropagationLimit(state.vertex));
                 bestDistance = state.distance;
                 bestElevation = state.initialElevation;
             }
@@ -313,7 +323,7 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 
                     if (edge.setElevationProfile(profile, true)) {
-                        log.trace(graph.addBuilderAnnotation(new ElevationFlattened(edge)));
+                        issueStore.add(new ElevationFlattened(edge));
                     }
                 }
             }
@@ -365,7 +375,7 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
+            issueStore.add(new ElevationFlattened(ee));
         }
     }
 
