@@ -21,27 +21,31 @@ import java.util.regex.Pattern;
 public class GenericLocation implements Cloneable, Serializable {
 
     /**
-     * The name of the place, if provided.
+     * The name of the place, if provided. This is pass-through information and does not affect
+     * routing in any way.
      */
-    public final String name;
+    public final String label;
 
     /**
-     * The identifier of the place, if provided. May be a lat,lng string or a vertex ID.
+     * Refers to a specific element in the OTP model. This can currently be a Stop or StopCollection.
      */
-    public final String place;
+    public final FeedScopedId placeId;
 
     /**
-     * This can be a Stop or StopCollection
+     * Coordinates of the location. These can be used by themselves or as a fallback if placeId is
+     * not found.
      */
-    // TODO Get this from the request
-    public final FeedScopedId stopCollectionId = new FeedScopedId("test", "test");
+    public final Double lat;
 
-    /**
-     * Coordinates of the place, if provided.
-     */
-    public Double lat;
+    public final Double lng;
 
-    public Double lng;
+    public GenericLocation(String label, FeedScopedId placeId, Double lat, Double lng) {
+        this.label = label;
+        this.placeId = placeId;
+        this.lat = lat;
+        this.lng = lng;
+    }
+
 
     /**
      * Observed heading if any.
@@ -72,7 +76,7 @@ public class GenericLocation implements Cloneable, Serializable {
      * Constructs an empty GenericLocation.
      */
     public GenericLocation() {
-        this.name = "";
+        this.label = "";
         this.place = "";
     }
 
@@ -80,7 +84,7 @@ public class GenericLocation implements Cloneable, Serializable {
      * Constructs a GenericLocation with coordinates only.
      */
     public GenericLocation(double lat, double lng) {
-        this.name = "";
+        this.label = "";
         this.place = "";
         this.lat = lat;
         this.lng = lng;
@@ -97,7 +101,7 @@ public class GenericLocation implements Cloneable, Serializable {
      * Constructs a GenericLocation with coordinates and heading.
      */
     public GenericLocation(double lat, double lng, double heading) {
-        this.name = "";
+        this.label = "";
         this.place = "";
         this.lat = lat;
         this.lng = lng;
@@ -113,8 +117,8 @@ public class GenericLocation implements Cloneable, Serializable {
      * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
      * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
      */
-    public GenericLocation(String name, String place) {
-        this.name = name;
+    public GenericLocation(String label, String place) {
+        this.label = label;
         this.place = place;
 
         if (place == null) {
@@ -134,17 +138,8 @@ public class GenericLocation implements Cloneable, Serializable {
 
     }
 
-    /**
-     * Same as above, but draws name and place string from a NamedPlace object.
-     *
-     * @param np
-     */
-    public GenericLocation(NamedPlace np) {
-        this(np.name, np.place);
-    }
-
-    public GenericLocation(String name, String vertexId, Double lat, Double lng) {
-        this.name = name;
+    public GenericLocation(String label, String vertexId, Double lat, Double lng) {
+        this.label = label;
         // TODO OTP2 - this.vertexId = vertexId;
         this.lat = lat;
         this.lng = lng;
@@ -178,7 +173,7 @@ public class GenericLocation implements Cloneable, Serializable {
 
     /** Returns true if this.name is set. */
     public boolean hasName() {
-        return name != null && !name.isEmpty();
+        return label != null && !label.isEmpty();
     }
 
     /** Returns true if this.place is set. */
@@ -195,7 +190,7 @@ public class GenericLocation implements Cloneable, Serializable {
     }
 
     public NamedPlace getNamedPlace() {
-        return new NamedPlace(this.name, this.place);
+        return new NamedPlace(this.label, this.place);
     }
 
     /**
@@ -207,47 +202,5 @@ public class GenericLocation implements Cloneable, Serializable {
             return null;
         }
         return new Coordinate(this.lng, this.lat);
-    }
-
-    /**
-     * Represents the location as an old-style string for clients that relied on that behavior.
-     *
-     * TODO(flamholz): clients should stop relying on these being strings and then we can return a string here that fully represents the contents of
-     * the object.
-     */
-    @Override
-    public String toString() {
-        if (this.place != null && !this.place.isEmpty()) {
-            if (this.name == null || this.name.isEmpty()) {
-                return this.place;
-            } else {
-                return String.format("%s::%s", this.name, this.place);
-            }
-        }
-
-        return String.format("%s,%s", this.lat, this.lng);
-    }
-
-    /**
-     * Returns a descriptive string that has the information that I wish toString() returned.
-     */
-    public String toDescriptiveString() {
-        StringBuilder sb = new StringBuilder();
-        sb.append("<GenericLocation lat,lng=").append(this.lat).append(",").append(this.lng);
-        if (this.hasHeading()) {
-            sb.append(" heading=").append(this.heading);
-        }
-        sb.append(">");
-        return sb.toString();
-    }
-
-    @Override
-    public GenericLocation clone() {
-        try {
-            return (GenericLocation) super.clone();
-        } catch (CloneNotSupportedException e) {
-            /* this will never happen since our super is the cloneable object */
-            throw new RuntimeException(e);
-        }
     }
 }

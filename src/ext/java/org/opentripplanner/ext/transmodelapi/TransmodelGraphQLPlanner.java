@@ -172,7 +172,7 @@ public class TransmodelGraphQLPlanner {
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
-        return new GenericLocation(name, placeRef, lat, lon);
+        return new GenericLocation(name, mappingUtil.fromIdString(placeRef), lat, lon);
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {

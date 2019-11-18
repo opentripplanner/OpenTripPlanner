@@ -14,18 +14,14 @@ import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -43,7 +39,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
@@ -103,8 +98,8 @@ public abstract class GraphPathToTripPlanConverter {
         Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
         Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
 
-        from.orig = request.from.name;
-        to.orig = request.to.name;
+        from.orig = request.from.label;
+        to.orig = request.to.label;
 
         TripPlan plan = new TripPlan(from, to, request.getDateTime());
 

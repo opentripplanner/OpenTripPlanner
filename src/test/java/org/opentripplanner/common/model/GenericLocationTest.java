@@ -10,7 +10,7 @@ public class GenericLocationTest {
     @Test
     public void testEmpty() {
         GenericLocation loc = new GenericLocation();
-        assertEquals("", loc.name);
+        assertEquals("", loc.label);
         assertEquals("", loc.place);
         
         NamedPlace np = loc.getNamedPlace();
@@ -27,7 +27,7 @@ public class GenericLocationTest {
     @Test
     public void testFromNamePlace() {
         GenericLocation loc = new GenericLocation("name", "12345");
-        assertEquals("name", loc.name);
+        assertEquals("name", loc.label);
         assertEquals("12345", loc.place);
         
         NamedPlace np = loc.getNamedPlace();
@@ -46,7 +46,7 @@ public class GenericLocationTest {
     @Test
     public void testFromNamePlaceWithCoord() {
         GenericLocation loc = new GenericLocation("name", "-1.0,2.5");
-        assertEquals("name", loc.name);
+        assertEquals("name", loc.label);
         assertEquals("-1.0,2.5", loc.place);
 
 
@@ -71,7 +71,7 @@ public class GenericLocationTest {
     @Test
     public void testFromOldStyleString() {
         GenericLocation loc = GenericLocation.fromOldStyleString("name::12345");
-        assertEquals("name", loc.name);
+        assertEquals("name", loc.label);
         assertEquals("12345", loc.place);
         
         NamedPlace np = loc.getNamedPlace();
@@ -99,7 +99,7 @@ public class GenericLocationTest {
     @Test
     public void testFromOldStyleStringWithCoord() {
         GenericLocation loc = GenericLocation.fromOldStyleString("name::1.0,2.5");
-        assertEquals("name", loc.name);
+        assertEquals("name", loc.label);
         assertEquals("1.0,2.5", loc.place);
         
         NamedPlace np = loc.getNamedPlace();
@@ -190,17 +190,17 @@ public class GenericLocationTest {
     public void testFromOldStyleStringIncomplete() {
         String input = "0::";
         GenericLocation loc = GenericLocation.fromOldStyleString(input);
-        assertEquals("0", loc.name);
+        assertEquals("0", loc.label);
         assertEquals("", loc.place);
 
         input = "::1";
         loc = GenericLocation.fromOldStyleString(input);
-        assertEquals("", loc.name);
+        assertEquals("", loc.label);
         assertEquals("1", loc.place);
 
         input = "::";
         loc = GenericLocation.fromOldStyleString(input);
-        assertEquals("", loc.name);
+        assertEquals("", loc.label);
         assertEquals("", loc.place);
     }
 }

@@ -551,14 +551,14 @@ public class SimpleStreetSplitter {
         //TODO: add nice name
         String name;
 
-        if (location.name == null || location.name.isEmpty()) {
+        if (location.label == null || location.label.isEmpty()) {
             if (endVertex) {
                 name = "Destination";
             } else {
                 name = "Origin";
             }
         } else {
-            name = location.name;
+            name = location.label;
         }
         TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
             coord, new NonLocalizedString(name), endVertex);
