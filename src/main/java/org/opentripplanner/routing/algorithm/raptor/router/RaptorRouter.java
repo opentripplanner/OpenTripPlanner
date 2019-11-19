@@ -34,100 +34,110 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateM
  * Does a complete transit search, including access and egress legs.
  */
 public class RaptorRouter {
-    private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
 
-    private static final RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(
-            // TODO - Load turning parameters from config file
-            new TuningParameters() {}
+  private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
+
+  private static final RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(
+      // TODO - Load turning parameters from config file
+      new TuningParameters() {
+      }
+  );
+
+  private final RaptorRoutingRequestTransitData otpRRDataProvider;
+
+  private final TransitLayer transitLayer;
+
+  private final RoutingRequest request;
+
+  //TODO Naming
+  public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
+    double startTime = System.currentTimeMillis();
+    ZonedDateTime startOfTime = calculateStartOfTime(request);
+    this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
+        transitLayer, startOfTime, 2, request.modes, request.walkSpeed
     );
+    LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
+    this.transitLayer = transitLayer;
+    this.request = request;
+  }
 
-    private final RaptorRoutingRequestTransitData otpRRDataProvider;
+  public Collection<Itinerary> route() {
 
-    private final TransitLayer transitLayer;
+    /* Prepare access/egress transfers */
 
-    private final RoutingRequest request;
+    double startTimeAccessEgress = System.currentTimeMillis();
 
-    //TODO Naming
-    public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
-        double startTime = System.currentTimeMillis();
-        ZonedDateTime startOfTime = calculateStartOfTime(request);
-        this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
-                transitLayer, startOfTime, 2, request.modes, request.walkSpeed
-        );
-        LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
-        this.transitLayer = transitLayer;
-        this.request = request;
-    }
+    Map<Stop, Transfer> accessTransfers =
+        AccessEgressRouter.streetSearch(request, false, 2000);
+    Map<Stop, Transfer> egressTransfers =
+        AccessEgressRouter.streetSearch(request, true, 2000);
 
-    public Collection<Itinerary> route() {
+    TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
+        transitLayer);
 
-        /* Prepare access/egress transfers */
+    Collection<TransferLeg> accessTimes = accessEgressLegMapper
+        .map(accessTransfers, request.walkSpeed);
+    Collection<TransferLeg> egressTimes = accessEgressLegMapper
+        .map(egressTransfers, request.walkSpeed);
 
-        double startTimeAccessEgress = System.currentTimeMillis();
+    LOG.info("Access/egress routing took {} ms",
+        System.currentTimeMillis() - startTimeAccessEgress);
 
-        Map<Stop, Transfer> accessTransfers =
-            AccessEgressRouter.streetSearch(request, false, 2000);
-        Map<Stop, Transfer> egressTransfers =
-            AccessEgressRouter.streetSearch(request, true, 2000);
+    /* Prepare transit search */
 
-        TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(transitLayer);
+    double startTimeRouting = System.currentTimeMillis();
 
-        Collection<TransferLeg> accessTimes = accessEgressLegMapper.map(accessTransfers, request.walkSpeed);
-        Collection<TransferLeg> egressTimes = accessEgressLegMapper.map(egressTransfers, request.walkSpeed);
+    int departureTime = secondsSinceStartOfTime(otpRRDataProvider.getStartOfTime(),
+        request.getDateTime().toInstant());
 
-        LOG.info("Access/egress routing took {} ms", System.currentTimeMillis() - startTimeAccessEgress);
+    // TODO Expose parameters
+    // TODO Remove parameters from API
+    RequestBuilder builder = new RequestBuilder();
+    builder.profile(RangeRaptorProfile.STANDARD)
+        .searchParams()
+        .earliestDepartureTime(departureTime)
+        .searchWindowInSeconds(request.raptorSearchWindow)
+        .addAccessStops(accessTimes)
+        .addEgressStops(egressTimes)
+        .boardSlackInSeconds(request.boardSlack)
+        .timetableEnabled(true);
 
-        /* Prepare transit search */
+    //TODO Check in combination with timetableEnabled
+    //builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
 
-        double startTimeRouting = System.currentTimeMillis();
+    RangeRaptorRequest rangeRaptorRequest = builder.build();
 
-        int departureTime = secondsSinceStartOfTime(otpRRDataProvider.getStartOfTime(), request.getDateTime().toInstant());
+    /* Route transit */
 
-        // TODO Expose parameters
-        // TODO Remove parameters from API
-        RequestBuilder builder = new RequestBuilder();
-        builder.profile(RangeRaptorProfile.STANDARD)
-                .searchParams()
-                .earliestDepartureTime(departureTime)
-                .searchWindowInSeconds(request.raptorSearchWindow)
-                .addAccessStops(accessTimes)
-                .addEgressStops(egressTimes)
-                .boardSlackInSeconds(request.boardSlack)
-                .timetableEnabled(true);
+    // We know this cast is correct because we have instantiated rangeRaptorService as RangeRaptorService<TripSchedule>
+    @SuppressWarnings("unchecked")
+    Collection<Path<TripSchedule>> paths = rangeRaptorService
+        .route(rangeRaptorRequest, this.otpRRDataProvider);
 
-        //TODO Check in combination with timetableEnabled
-        //builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+    LOG.info("Found {} itineraries", paths.size());
 
-        RangeRaptorRequest rangeRaptorRequest = builder.build();
+    LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
-        /* Route transit */
+    /* Create itineraries */
 
-        // We know this cast is correct because we have instantiated rangeRaptorService as RangeRaptorService<TripSchedule>
-        @SuppressWarnings("unchecked")
-        Collection<Path<TripSchedule>> paths = rangeRaptorService.route(rangeRaptorRequest, this.otpRRDataProvider);
+    double startItineraries = System.currentTimeMillis();
 
-        LOG.info("Found {} itineraries", paths.size());
+    ItineraryMapper itineraryMapper = new ItineraryMapper(transitLayer,
+        otpRRDataProvider.getStartOfTime(), request, accessTransfers, egressTransfers);
 
-        LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
+    List<Itinerary> itineraries = paths.stream()
+        .map(itineraryMapper::createItinerary)
+        .collect(Collectors.toList());
 
-        /* Create itineraries */
+    LOG.info("Creating itineraries took {} ms", itineraries.size(),
+        System.currentTimeMillis() - startItineraries);
 
-        double startItineraries = System.currentTimeMillis();
+    return itineraries;
+  }
 
-        ItineraryMapper itineraryMapper = new ItineraryMapper(transitLayer, otpRRDataProvider.getStartOfTime(), request, accessTransfers, egressTransfers);
-
-        List<Itinerary> itineraries = paths.stream()
-                .map(itineraryMapper::createItinerary)
-                .collect(Collectors.toList());
-
-        LOG.info("Creating itineraries took {} ms", itineraries.size(), System.currentTimeMillis() - startItineraries);
-
-        return itineraries;
-    }
-
-    private ZonedDateTime calculateStartOfTime(RoutingRequest request) {
-        ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
-        ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
-        return DateMapper.asStartOfService(zdt);
-    }
+  private ZonedDateTime calculateStartOfTime(RoutingRequest request) {
+    ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
+    ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
+    return DateMapper.asStartOfService(zdt);
+  }
 }

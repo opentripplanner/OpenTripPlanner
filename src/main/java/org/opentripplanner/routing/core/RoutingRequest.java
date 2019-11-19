@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
@@ -33,7 +32,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 /**
@@ -79,7 +77,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * If true, the tree will be allowed to grow in all directions, rather than being directed
      * toward a single target. This parameter only apply to access/egress AStar searches,
      * not transit searches in Raptor.
+     *
+     * @deprecated TODO OTP2 - This looks like an A Star implementation detail. Should be moved to
+*                               an A Star specific request class
      */
+    @Deprecated
     public boolean oneToMany = false;
 
     /**
@@ -196,8 +198,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Whether the trip must be wheelchair accessible.
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. This is not implemented
-     *                       in Raptor jet.
+     * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
+ *                      a walk-only search.
      */
     @Deprecated
     public boolean wheelchairAccessible = false;
@@ -206,9 +208,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
+    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
@@ -233,7 +236,12 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
      * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
      */
+    @Deprecated
     public int transferPenalty = 0;
 
     /**
@@ -249,7 +257,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
-     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
+     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
+     *
+     *  @deprecated TODO OTP2 Regression. This is currently used in A Star search, but has no meaning if it
+ *                            is not implemented in Raptor. It should be part of a weight-based
+ *                            Raptor-search.
+     */
+    @Deprecated
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
@@ -321,13 +335,28 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double waitReluctance = 1.0;
 
-    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding) */
+    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)
+     *
+     * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
+ *                          either. It could be a part of itinerary-filtering after a Raptor search.
+     * */
+    @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
+    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle.
+     *
+     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
+     *                          after a Raptor search.
+     * */
+    @Deprecated
     public int walkBoardCost = 60 * 10;
 
-    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
+    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
+     *
+     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
+     *                          after a Raptor search.
+     * */
+    @Deprecated
     public int bikeBoardCost = 60 * 10;
 
     /**
@@ -470,23 +499,16 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int raptorSearchWindow = 40 * 60;
 
     /**
-     * Extensions to the trip planner will require additional traversal options beyond the default
-     * set. We provide an extension point for adding arbitrary parameters with an
-     * extension-specific key.
-     */
-    public Map<Object, Object> extensions = new HashMap<Object, Object>();
-
-    /**
      * For the bike triangle, how important time is.
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
-    public double triangleTimeFactor;
+    public double bikeTriangleTimeFactor;
 
     /** For the bike triangle, how important slope is */
-    public double triangleSlopeFactor;
+    public double bikeTriangleSlopeFactor;
 
     /** For the bike triangle, how important safety is */
-    public double triangleSafetyFactor;
+    public double bikeTriangleSafetyFactor;
 
     /** Options specifically for the case that you are walking a bicycle. */
     public RoutingRequest bikeWalkingOptions;
@@ -567,15 +589,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public FeedScopedId startingTransitTripId;
 
     public boolean walkingBike;
-
-    public boolean softWalkLimiting = true;
-    public boolean softPreTransitLimiting = true;
-
-    public double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-    public double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
-
-    public double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
-    public double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
     /*
       Additional flags affecting mode transitions.
@@ -725,32 +738,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-
-
     /**
      * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
      */
     public void freezeTraverseMode() {
         bikeWalkingOptions = clone();
         bikeWalkingOptions.bikeWalkingOptions = new RoutingRequest(new TraverseModeSet());
-    }
-
-    /**
-     * Add an extension parameter with the specified key. Extensions allow you to add arbitrary traversal options.
-     */
-    public void putExtension(Object key, Object value) {
-        extensions.put(key, value);
-    }
-
-    /** Determine if a particular extension parameter is present for the specified key. */
-    public boolean containsExtension(Object key) {
-        return extensions.containsKey(key);
-    }
-
-    /** Get the extension parameter with the specified key. */
-    @SuppressWarnings("unchecked")
-    public <T> T getExtension(Object key) {
-        return (T) extensions.get(key);
     }
 
     /** Returns the model that computes the cost of intersection traversal. */
@@ -963,19 +956,19 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.intermediatePlaces.add(location);
     }
 
-    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
-        this.triangleSafetyFactor = triangleSafetyFactor;
-        bikeWalkingOptions.triangleSafetyFactor = triangleSafetyFactor;
+    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
+        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
+        bikeWalkingOptions.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
     }
 
-    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
-        this.triangleSlopeFactor = triangleSlopeFactor;
-        bikeWalkingOptions.triangleSlopeFactor = triangleSlopeFactor;
+    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
+        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
+        bikeWalkingOptions.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
     }
 
-    public void setTriangleTimeFactor(double triangleTimeFactor) {
-        this.triangleTimeFactor = triangleTimeFactor;
-        bikeWalkingOptions.triangleTimeFactor = triangleTimeFactor;
+    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
+        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
+        bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
     public NamedPlace getFromPlace() {
@@ -1280,9 +1273,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         safe /= total;
         slope /= total;
         time /= total;
-        this.triangleSafetyFactor = safe;
-        this.triangleSlopeFactor = slope;
-        this.triangleTimeFactor = time;
+        this.bikeTriangleSafetyFactor = safe;
+        this.bikeTriangleSlopeFactor = slope;
+        this.bikeTriangleTimeFactor = time;
     }
 
     public static void assertTriangleParameters(

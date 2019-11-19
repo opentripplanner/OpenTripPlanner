@@ -666,9 +666,9 @@ public abstract class RoutingResource {
                 RoutingRequest.assertTriangleParameters(
                         triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
                 );
-                request.setTriangleSafetyFactor(triangleSafetyFactor);
-                request.setTriangleSlopeFactor(triangleSlopeFactor);
-                request.setTriangleTimeFactor(triangleTimeFactor);
+                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
+                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
+                request.setBikeTriangleTimeFactor(triangleTimeFactor);
             }
         }
 

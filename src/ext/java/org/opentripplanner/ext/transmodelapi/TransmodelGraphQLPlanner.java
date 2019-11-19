@@ -210,10 +210,10 @@ public class TransmodelGraphQLPlanner {
 
         if (optimize == OptimizeType.TRIANGLE) {
             try {
-                request.assertTriangleParameters(request.triangleSafetyFactor, request.triangleTimeFactor, request.triangleSlopeFactor);
-                callWith.argument("triangle.safetyFactor", request::setTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setTriangleTimeFactor);
+                request.assertTriangleParameters(request.bikeTriangleSafetyFactor, request.bikeTriangleTimeFactor, request.bikeTriangleSlopeFactor);
+                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
+                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
+                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
             } catch (ParameterException e) {
                 throw new RuntimeException(e);
             }
