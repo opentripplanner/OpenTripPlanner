@@ -244,7 +244,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("whiteListed.authorities", authorities -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
 
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
-        callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
+        // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
         callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
 
