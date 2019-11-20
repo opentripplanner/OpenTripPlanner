@@ -842,7 +842,7 @@ public abstract class RoutingResource {
             // first TNC before transit.  (See StateEditor.boardHailedCar)
             if (this.modes != null && this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
                 if (companies == null) {
-                    throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_REQUEST_INVALID);
+                companies = "NOAPI";
                 }
 
                 request.setTransportationNetworkCompanies(companies);
