@@ -59,6 +59,8 @@ public class TransportationNetworkCompanyUpdater implements GraphUpdater {
                 source = new UberTransportationNetworkCompanyDataSource(config);
             } else if (sourceType.equals("lyft")) {
                 source = new LyftTransportationNetworkCompanyDataSource(config);
+            } else if (sourceType.equals("no-api")) {
+                source = new NoApiTransportationNetworkCompanyDataSource(config);
             }
         }
 
