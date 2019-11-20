@@ -6,11 +6,11 @@ import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -35,7 +35,7 @@ public class TimetableSnapshotTest {
         Graph graph = new Graph();
         GtfsContext context = GtfsContextBuilder
                 .contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .withIssueStoreAndDeduplicator(graph)
                 .build();
 
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);

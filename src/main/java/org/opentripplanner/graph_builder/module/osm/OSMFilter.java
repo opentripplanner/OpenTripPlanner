@@ -1,7 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.ConflictingBikeTags;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ConflictingBikeTags;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -135,7 +136,8 @@ public class OSMFilter {
      * @return
      */
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
-            StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking) {
+            StreetTraversalPermission def, Graph graph, boolean banDiscouragedWalking, boolean banDiscouragedBiking,
+            DataImportIssueStore issueStore) {
         StreetTraversalPermission permissions = getPermissionsForEntity(way, def);
 
         /*
@@ -179,7 +181,7 @@ public class OSMFilter {
                 (banDiscouragedBiking && way.hasTag("bicycle") && way.getTag("bicycle").equals("discouraged"))) {
             permissions = permissions.remove(StreetTraversalPermission.BICYCLE);
             if (forceBikes) {
-                LOG.warn(graph.addBuilderAnnotation(new ConflictingBikeTags(way.getId())));
+                issueStore.add(new ConflictingBikeTags(way.getId()));
             }
         }
 
@@ -188,7 +190,8 @@ public class OSMFilter {
 
     public static StreetTraversalPermission getPermissionsForWay(OSMWay way,
             StreetTraversalPermission def, Graph graph) {
-        return getPermissionsForWay(way, def, graph, false, false);
+        return getPermissionsForWay(way, def, graph, false, false,
+                new DataImportIssueStore(false));
     }
 
     /**

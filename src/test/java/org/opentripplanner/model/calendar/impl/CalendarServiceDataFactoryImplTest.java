@@ -3,6 +3,7 @@ package org.opentripplanner.model.calendar.impl;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.Agency;
@@ -136,7 +137,8 @@ public class CalendarServiceDataFactoryImplTest {
 
     private static GtfsContext createCtxBuilder() throws IOException {
         GtfsContextBuilder ctxBuilder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS);
-        OtpTransitServiceBuilder builder = ctxBuilder.getTransitBuilder();
+        OtpTransitServiceBuilder builder = ctxBuilder.withDataImportIssueStore(
+                new DataImportIssueStore(false)).getTransitBuilder();
         Agency agency = agency(builder);
 
         // Supplement test data with at least one entity in all collections

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -8,9 +8,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 /**
  * Represents two stops that are close to each other where no route is found between them using OSM data
  */
-public class TransferCouldNotBeRouted extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TransferCouldNotBeRouted implements DataImportIssue {
 
     private static final String FMT = "Connection between stop %s and stop %s could not be routed. " +
             "Euclidean distance is %.0f.";

@@ -2,6 +2,7 @@ package org.opentripplanner.netex.loader.mapping;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
@@ -51,6 +52,8 @@ public class NetexMapper {
     private final Multimap<String, Station> stationsByMultiModalStationRfs = ArrayListMultimap.create();
 
 
+    private final DataImportIssueStore issueStore;
+
     /**
      * This is needed to assign a notice to a stop time. It is not part of the target OTPTransitService,
      * so we need to temporally cash this here.
@@ -58,10 +61,16 @@ public class NetexMapper {
     private final Map<String, StopTime> stopTimesByNetexId = new HashMap<>();
 
 
-    public NetexMapper(OtpTransitServiceBuilder transitBuilder, String agencyId, Deduplicator deduplicator) {
+    public NetexMapper(
+            OtpTransitServiceBuilder transitBuilder,
+            String agencyId,
+            Deduplicator deduplicator,
+            DataImportIssueStore issueStore
+    ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
         this.idFactory = new FeedScopedIdFactory(agencyId);
+        this.issueStore = issueStore;
     }
 
     /**
@@ -109,7 +118,9 @@ public class NetexMapper {
     private void mapStopPlaceAndQuays(NetexImportDataIndexReadOnlyView netexIndex) {
         for (String stopPlaceId : netexIndex.getStopPlaceById().localKeys()) {
             Collection<StopPlace> stopPlaceAllVersions = netexIndex.getStopPlaceById().lookup(stopPlaceId);
-            StopAndStationMapper stopMapper = new StopAndStationMapper(idFactory, netexIndex.getQuayById());
+            StopAndStationMapper stopMapper = new StopAndStationMapper(idFactory, netexIndex.getQuayById(),
+                issueStore
+            );
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
             transitBuilder.getStops().addAll(stopMapper.resultStops);
             transitBuilder.getStations().addAll(stopMapper.resultStations);
@@ -186,7 +197,7 @@ public class NetexMapper {
                 idFactory,
                 netexIndex.getDayTypeAssignmentByDayTypeId(),
                 netexIndex.getOperatingPeriodById(),
-                netexIndex.getDayTypeById()
+                netexIndex.getDayTypeById(), issueStore
         );
 
         for (DayTypeRefsToServiceIdAdapter dayTypeRefs : netexIndex.getDayTypeRefs()) {

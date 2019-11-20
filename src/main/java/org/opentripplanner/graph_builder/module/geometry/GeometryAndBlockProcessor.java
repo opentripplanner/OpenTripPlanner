@@ -17,9 +17,10 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.BogusShapeDistanceTraveled;
-import org.opentripplanner.graph_builder.annotation.BogusShapeGeometry;
-import org.opentripplanner.graph_builder.annotation.BogusShapeGeometryCaught;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BogusShapeDistanceTraveled;
+import org.opentripplanner.graph_builder.issues.BogusShapeGeometry;
+import org.opentripplanner.graph_builder.issues.BogusShapeGeometryCaught;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
@@ -55,6 +56,8 @@ public class GeometryAndBlockProcessor {
 
     private static final Logger LOG = LoggerFactory.getLogger(GeometryAndBlockProcessor.class);
 
+    private DataImportIssueStore issueStore;
+
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     private OtpTransitService transitService;
@@ -87,8 +90,14 @@ public class GeometryAndBlockProcessor {
         this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     }
 
-    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
     public void run(Graph graph) {
+        run(graph, new DataImportIssueStore(false));
+    }
+
+    /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    public void run(Graph graph, DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
+
         fareServiceFactory.processGtfs(transitService);
 
         /* Assign 0-based numeric codes to all GTFS service IDs. */
@@ -110,7 +119,7 @@ public class GeometryAndBlockProcessor {
         TripPattern.generateUniqueIds(tripPatterns);
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
-        TripPattern.generateUniqueNames(tripPatterns);
+        TripPattern.generateUniqueNames(tripPatterns, issueStore);
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
@@ -340,7 +349,7 @@ public class GeometryAndBlockProcessor {
                 LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
                 geoms[i] = geometry;
                 //this warning is not strictly correct, but will do
-                LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
+                issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
             }
             return geoms;
         }
@@ -439,7 +448,7 @@ public class GeometryAndBlockProcessor {
         double[] distances = getDistanceForShapeId(shapeId);
 
         if (distances == null) {
-            LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometry(shapeId)));
+            issueStore.add(new BogusShapeGeometry(shapeId));
             return null;
         } else {
             LinearLocation startIndex = getSegmentFraction(distances, startDistance);
@@ -447,7 +456,7 @@ public class GeometryAndBlockProcessor {
 
             if (equals(startIndex, endIndex)) {
                 //bogus shape_dist_traveled
-                graph.addBuilderAnnotation(new BogusShapeDistanceTraveled(st1));
+                issueStore.add(new BogusShapeDistanceTraveled(st1));
                 return createSimpleGeometry(st0.getStop(), st1.getStop());
             }
             LineString line = getLineStringForShapeId(shapeId);
@@ -522,7 +531,7 @@ public class GeometryAndBlockProcessor {
             geometry = geometryFactory.createLineString(sequence);
 
             if (!isValid(geometry, st0.getStop(), st1.getStop())) {
-                LOG.warn(graph.addBuilderAnnotation(new BogusShapeGeometryCaught(shapeId, st0, st1)));
+                issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }

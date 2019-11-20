@@ -6,9 +6,11 @@ import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.NegativeHopTime;
+import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
@@ -19,7 +21,6 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -46,17 +47,21 @@ public class TestGeometryAndBlockProcessor extends TestCase {
     private AStar aStar = new AStar();
     private GtfsContext context;
     private String feedId;
+    private DataImportIssueStore issueStore;
 
     public void setUp() throws Exception {
 
         graph = new Graph();
+
+        this.issueStore = new DataImportIssueStore(true);
+
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .withIssueStoreAndDeduplicator(graph)
                 .build();
 
         feedId = context.getFeedId().getId();
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
-        factory.run(graph);
+        factory.run(graph, issueStore);
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );
@@ -87,11 +92,11 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
     }
 
-    public void testAnnotation() {
+    public void testIssue() {
         boolean found = false;
-        for (GraphBuilderAnnotation annotation : graph.getBuilderAnnotations()) {
-            if (annotation instanceof NegativeHopTime) {
-                NegativeHopTime nht = (NegativeHopTime) annotation;
+        for (DataImportIssue it : issueStore.getIssues()) {
+            if (it instanceof NegativeHopTime) {
+                NegativeHopTime nht = (NegativeHopTime) it;
                 assertTrue(nht.st0.getDepartureTime() > nht.st1.getArrivalTime());
                 found = true;
             }

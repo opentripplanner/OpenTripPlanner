@@ -1,20 +1,23 @@
 package org.opentripplanner.routing.bike_rental;
 
+import com.conveyal.r5.otp2.api.path.Path;
+import com.conveyal.r5.otp2.api.path.PathLeg;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.WrappedCurrency;
+import org.opentripplanner.routing.services.FareService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.io.Serializable;
 import java.util.Currency;
 import java.util.List;
 
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
+/**
+ * This appears to be used in combination with transit using an AddingMultipleFareService.
+ */
 public class TimeBasedBikeRentalFareService implements FareService, Serializable {
 
     private static final long serialVersionUID = 5226621661906177942L;
@@ -32,39 +35,30 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
         this.pricing_by_second = pricingBySecond;
     }
 
-    @Override
-    public Fare getCost(GraphPath path) {
-        int cost = 0;
-        long start = -1;
-
-        for (State state : path.states) {
-            if (state.getVertex() instanceof BikeRentalStationVertex
-                    && state.getBackState().getVertex() instanceof BikeRentalStationVertex) {
-                if (start == -1) {
-                    start = state.getTimeSeconds();
-                } else {
-                    int time_on_bike = (int) (state.getTimeSeconds() - start);
-                    int ride_cost = -1;
-                    for (P2<Integer> bracket : pricing_by_second) {
-                        int time = bracket.first;
-                        if (time_on_bike < time) {
-                            ride_cost = bracket.second;
-                            break;
-                        }
-                    }
-                    if (ride_cost == -1) {
-                        log.warn("Bike rental has no associated pricing (too long?) : "
-                                + time_on_bike + " seconds");
-                    } else {
-                        cost += ride_cost;
-                    }
-                    start = -1;
-                }
+    // FIXME we need to test if the leg is a bike rental leg.
+    //       OTP2 doesn't handle non walk access or egress yet.
+    private int getLegCost(PathLeg<TripSchedule> pathLeg) {
+        int rideCost = 0;
+        int rideTime = pathLeg.duration();
+        for (P2<Integer> bracket : pricing_by_second) {
+            int time = bracket.first;
+            if (rideTime < time) {
+                rideCost = bracket.second;
+                // FIXME this break seems to exit at the first matching bracket rather than the last.
+                break;
             }
         }
+        return rideCost;
+    }
+
+    @Override
+    public Fare getCost(Path<TripSchedule> path) {
+
+        int rideCost = getLegCost(path.accessLeg());
+        rideCost += getLegCost(path.egressLeg());
 
         Fare fare = new Fare();
-        fare.addFare(FareType.regular, new WrappedCurrency(currency), cost);
+        fare.addFare(FareType.regular, new WrappedCurrency(currency), rideCost);
         return fare;
     }
 }

@@ -1,5 +1,8 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.ServiceCodeDoesNotContainServiceDates;
 import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
@@ -8,8 +11,6 @@ import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.OperatingPeriod;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -24,7 +25,7 @@ import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOV
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed
 class CalendarMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(CalendarMapper.class);
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
     private final ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId;
@@ -36,12 +37,18 @@ class CalendarMapper {
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalMap<String, Collection<DayTypeAssignment>> dayTypeAssignmentByDayTypeId,
             ReadOnlyHierarchicalMapById<OperatingPeriod> operatingPeriodById,
-            ReadOnlyHierarchicalMapById<DayType> dayTypeById
+            ReadOnlyHierarchicalMapById<DayType> dayTypeById,
+            DataImportIssueStore issueStore
     ) {
         this.idFactory = idFactory;
         this.dayTypeAssignmentByDayTypeId = dayTypeAssignmentByDayTypeId;
         this.operatingPeriodById = operatingPeriodById;
         this.dayTypeById = dayTypeById;
+        this.issueStore = issueStore;
+    }
+
+    protected void addDataImportIssue(DataImportIssue issue) {
+        issueStore.add(issue);
     }
 
     Collection<ServiceCalendarDate> mapToCalendarDates(DayTypeRefsToServiceIdAdapter dayTypeRefs) {
@@ -57,7 +64,7 @@ class CalendarMapper {
         Set<LocalDateTime> dates = dayTypeAssignmentMapper.mergeDates();
 
         if (dates.isEmpty()) {
-            LOG.warn("ServiceCode " + serviceId + " does not contain any serviceDates");
+            addDataImportIssue(new ServiceCodeDoesNotContainServiceDates(serviceId));
             // Add one date exception when list is empty to ensure serviceId is not lost
             LocalDateTime today = LocalDate.now().atStartOfDay();
             return Collections.singleton(

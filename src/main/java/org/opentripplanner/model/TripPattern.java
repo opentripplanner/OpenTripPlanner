@@ -12,6 +12,8 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
@@ -261,31 +263,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return (perStopFlags[stopIndex] & MASK_PICKUP) >> SHIFT_PICKUP;
     }
 
-    /**
-     * Gets the number of scheduled trips on this pattern. Note that when stop time updates are
-     * being applied, there may be other Timetables for this pattern which contain a larger number
-     * of trips. However, all trips with indexes from 0 through getNumTrips()-1 will always
-     * correspond to the scheduled trips.
-     */
-    public int getNumScheduledTrips () {
-        return trips.size();
-    }
-
-
-    public TripTimes getResolvedTripTimes(Trip trip, State state0) {
-        // This is horrible but it works for now.
-        int tripIndex = this.trips.indexOf(trip);
-        return getResolvedTripTimes(tripIndex, state0);
-    }
-
-    public TripTimes getResolvedTripTimes(int tripIndex, State state0) {
-        ServiceDay serviceDay = state0.getServiceDay();
-        RoutingRequest options = state0.getOptions();
-        Timetable timetable = getUpdatedTimetable(options, serviceDay);
-        return timetable.getTripTimes(tripIndex);
-    }
-
-
     /* METHODS THAT DELEGATE TO THE SCHEDULED TIMETABLE */
 
     // TODO: These should probably be deprecated. That would require grabbing the scheduled timetable,
@@ -318,17 +295,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         if (this.route != freq.tripTimes.trip.getRoute()) {
             LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip, route);
         }
-    }
-
-    /**
-     * Rather than the scheduled timetable, get the one that has been updated with real-time updates.
-     * The view is consistent across a single request, and depends on the routing context in the request.
-     */
-    public Timetable getUpdatedTimetable (RoutingRequest req, ServiceDay sd) {
-        if (req != null && req.rctx != null && req.rctx.timetableSnapshot != null && sd != null) {
-            return req.rctx.timetableSnapshot.resolve(this, sd.getServiceDate());
-        }
-        return scheduledTimetable;
     }
 
     private static String stopNameAndId (Stop stop) {
@@ -371,7 +337,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      * combination will create unique names). from, to, via, express. Then concatenate all necessary
      * fields. Express should really be determined from number of stops and/or run time of trips.
      */
-    public static void generateUniqueNames (Collection<TripPattern> tableTripPatterns) {
+    public static void generateUniqueNames (
+            Collection<TripPattern> tableTripPatterns,
+            DataImportIssueStore issueStore
+    ) {
         LOG.info("Generating unique names for stop patterns on each route.");
         Set<String> usedRouteNames = Sets.newHashSet();
         Map<Route, String> uniqueRouteNames = Maps.newHashMap();
@@ -390,7 +359,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
                 String generatedRouteName;
                 do generatedRouteName = routeName + " " + (i++);
                 while (usedRouteNames.contains(generatedRouteName));
-                LOG.warn("Route had non-unique name. Generated one to ensure uniqueness of TripPattern names: {}", generatedRouteName);
+                issueStore.add(new NonUniqueRouteName(generatedRouteName));
                 routeName = generatedRouteName;
             }
             usedRouteNames.add(routeName);
