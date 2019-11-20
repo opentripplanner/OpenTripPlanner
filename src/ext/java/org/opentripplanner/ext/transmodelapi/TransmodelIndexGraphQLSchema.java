@@ -362,7 +362,7 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLInputObjectType locationType;
 
-    //private GraphQLObjectType keyValueType;
+    private GraphQLObjectType keyValueType;
 
     //private GraphQLObjectType brandingType;
 
@@ -508,29 +508,29 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> ((Transfer) environment.getSource()).getToTrip())
                         .build())
                 .build();
-        /*
+
         keyValueType = GraphQLObjectType.newObject()
                 .name("KeyValue")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("key")
                         .description("Identifier of value.")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((KeyValue) environment.getSource()).getKey())
+                        .dataFetcher(environment -> null)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("value")
                         .description("The actual value")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((KeyValue) environment.getSource()).getValue())
+                        .dataFetcher(environment -> null)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("typeOfKey")
                         .description("Identifier of type of key")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((KeyValue) environment.getSource()).getTypeOfKey())
+                        .dataFetcher(environment -> null)
                         .build())
                 .build();
-        */
+
 
         /*
         brandingType = GraphQLObjectType.newObject()
@@ -600,24 +600,25 @@ public class TransmodelIndexGraphQLSchema {
 
         bookingArrangementType = GraphQLObjectType.newObject()
                                          .name("BookingArrangement")
-                /*
+            /*
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("bookingAccess")
                                                         .description("Who has access to book service?")
                                                         .type(bookingAccessEnum)
                                                         .build())
+             */
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("bookingMethods")
                                                         .description("How should service be booked?")
-                                                        .type(new GraphQLList(bookingMethodEnum))
+                                                        .type(Scalars.GraphQLString)
                                                         .build())
+            /*
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("bookWhen")
                                                         .description("When should service be booked?")
                                                         .type(purchaseWhenEnum)
                                                         .build())
-
-                 */
+             */
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("latestBookingTime")
                                                         .description("Latest time service can be booked. ISO 8601 timestamp")
@@ -1614,10 +1615,9 @@ public class TransmodelIndexGraphQLSchema {
                         .name("stopPlace")
                         .description("The stop place to which this quay belongs to.")
                         .type(stopPlaceType)
-                        .dataFetcher(environment -> {
-                                Station station = ((Stop) environment.getSource()).getParentStation();
-                                return station == null ? null : station.getId();
-                        })
+                        .dataFetcher(environment ->
+                                ((Stop) environment.getSource()).getParentStation()
+                        )
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("wheelchairAccessible")
@@ -2401,25 +2401,18 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                         .dataFetcher(dataFetchingEnvironment -> null)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("keyValues")
-                        .description("List of keyValue pairs for the line.")
-                        .type(new GraphQLList(keyValueType))
-                        .dataFetcher(environment -> ((Route) environment.getSource()).getKeyValues())
-                        .build())
-                           .field(GraphQLFieldDefinition.newFieldDefinition()
-                                          .name("flexibleLineType")
-                                          .description("Type of flexible line, or null if line is not flexible.")
-                                          .type(flexibleLineTypeEnum)
-                                          .dataFetcher(environment -> ((Route) environment.getSource()).getFlexibleRouteType())
-                                          .build())
-                           .field(GraphQLFieldDefinition.newFieldDefinition()
-                                          .name("bookingArrangements")
-                                          .description("Booking arrangements for flexible line.")
-                                          .type(bookingArrangementType)
-                                          .build())
-                 */
+                    .name("flexibleLineType")
+                    .description("Type of flexible line, or null if line is not flexible.")
+                    .type(Scalars.GraphQLString)
+                    .dataFetcher(environment -> null)
+                    .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("bookingArrangements")
+                    .description("Booking arrangements for flexible line.")
+                    .type(bookingArrangementType)
+                    .dataFetcher(environment -> null)
+                    .build())
                 .build();
 
         organisationType = GraphQLObjectType.newObject()
@@ -3808,6 +3801,12 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLLong)
                         .dataFetcher(environment -> ((Leg) environment.getSource()).getDuration())
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("directDuration")
+                    .type(Scalars.GraphQLLong)
+                    .description("NOT IMPLEMENTED")
+                    .dataFetcher(environment -> ((Leg) environment.getSource()).getDuration())
+                    .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("pointsOnLink")
                         .description("The legs's geometry.")
