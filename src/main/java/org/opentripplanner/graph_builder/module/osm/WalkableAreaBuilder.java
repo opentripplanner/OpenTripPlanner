@@ -12,6 +12,9 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.AreaNotEpsilonValid;
+import org.opentripplanner.graph_builder.issues.AreaTooComplicated;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule.Handler;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMNode;
@@ -69,9 +72,11 @@ public class WalkableAreaBuilder {
 
     private static Logger LOG = LoggerFactory.getLogger(WalkableAreaBuilder.class);
 
-    private final int MAX_AREA_NODES = 500;
+    private DataImportIssueStore issueStore;
 
-    private static final double VISIBILITY_EPSILON = 0.000000001;
+    public static final int MAX_AREA_NODES = 500;
+
+    public static final double VISIBILITY_EPSILON = 0.000000001;
 
     private Graph graph;
 
@@ -87,12 +92,14 @@ public class WalkableAreaBuilder {
     private HashMap<Coordinate, IntersectionVertex> areaBoundaryVertexForCoordinate = new HashMap<Coordinate, IntersectionVertex>();
 
     public WalkableAreaBuilder(Graph graph, OSMDatabase osmdb, WayPropertySet wayPropertySet,
-            StreetEdgeFactory edgeFactory, Handler handler) {
+            StreetEdgeFactory edgeFactory, Handler handler, DataImportIssueStore issueStore
+    ) {
         this.graph = graph;
         this.osmdb = osmdb;
         this.wayPropertySet = wayPropertySet;
         this.edgeFactory = edgeFactory;
         this.handler = handler;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -221,14 +228,15 @@ public class WalkableAreaBuilder {
             // FIXME: temporary hard limit on size of
             // areas to prevent way explosion
             if (visibilityPoints.size() > MAX_AREA_NODES) {
-                LOG.warn("Area " + group.getSomeOSMObject() + " is too complicated ("
-                        + visibilityPoints.size() + " > " + MAX_AREA_NODES);
+                issueStore.add(
+                        new AreaTooComplicated(
+                                group.getSomeOSMObject().getId(), visibilityPoints.size()));
                 continue;
             }
 
             if (!areaEnv.is_valid(VISIBILITY_EPSILON)) {
-                LOG.warn("Area " + group.getSomeOSMObject() + " is not epsilon-valid (epsilon = "
-                        + VISIBILITY_EPSILON + ")");
+                issueStore.add(
+                        new AreaNotEpsilonValid(group.getSomeOSMObject().getId()));
                 continue;
             }
 

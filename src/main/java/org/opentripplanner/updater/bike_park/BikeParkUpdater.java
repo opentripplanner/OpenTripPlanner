@@ -1,17 +1,15 @@
 package org.opentripplanner.updater.bike_park;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
-import java.util.prefs.Preferences;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -85,7 +83,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph);
+        linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike park station service needs a graph writer runnable
         bikeService = graph.getService(BikeRentalStationService.class, true);
     }
@@ -129,7 +127,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
                     bikeParkVertex = new BikeParkVertex(graph, bikePark);
                     if (!linker.link(bikeParkVertex)) {
                         // the toString includes the text "Bike park"
-                        LOG.warn("{} not near any streets; it will not be usable.", bikePark);
+                        LOG.info("Bike park {} unlinked", bikeParkVertex);
                     }
                     verticesByPark.put(bikePark, bikeParkVertex);
                     new BikeParkEdge(bikeParkVertex);

@@ -11,6 +11,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -73,10 +74,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         if (!hashGrid) {
             ((STRtree) edgeTree).build();
             ((STRtree) transitStopTree).build();
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph, null, null, false);
+            simpleStreetSplitter = new SimpleStreetSplitter(
+                    this.graph,
+                    null,
+                    null,
+                    false,
+                    new DataImportIssueStore(
+                            false)
+            );
         } else {
-            simpleStreetSplitter = new SimpleStreetSplitter(this.graph,
-                (HashGridSpatialIndex<Edge>) edgeTree, transitStopTree, false);
+            simpleStreetSplitter = new SimpleStreetSplitter(
+                    this.graph,
+                    (HashGridSpatialIndex<Edge>) edgeTree,
+                    transitStopTree,
+                    false,
+                    new DataImportIssueStore(false)
+            );
         }
 
     }

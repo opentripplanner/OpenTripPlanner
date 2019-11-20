@@ -3,12 +3,17 @@ package org.opentripplanner.common;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
-import org.opentripplanner.graph_builder.annotation.GraphConnectivity;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.GraphConnectivity;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.ElevatorEdge;
+import org.opentripplanner.routing.edgetype.FreeEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.StreetTransitLink;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -18,7 +23,13 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.PrintWriter;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.LinkedList;
+import java.util.Map;
+import java.util.Queue;
 
 public class StreetUtils {
 
@@ -26,7 +37,7 @@ public class StreetUtils {
     private static int islandCounter = 0;
 
     public static void pruneFloatingIslands(Graph graph, int maxIslandSize, 
-            int islandWithStopMaxSize, String islandLogName) {
+            int islandWithStopMaxSize, String islandLogName, DataImportIssueStore issueStore) {
         LOG.debug("pruning");
         PrintWriter islandLog = null;
         if (islandLogName != null && !islandLogName.isEmpty()) {
@@ -107,13 +118,13 @@ public class StreetUtils {
             if(island.stopSize() > 0){
             //for islands with stops
                 if (island.streetSize() < islandWithStopMaxSize) {
-                    depedestrianizeOrRemove(graph, island);
+                    depedestrianizeOrRemove(graph, island, issueStore);
                     hadRemoved = true;
                 }
             }else{
             //for islands without stops
                 if (island.streetSize() < maxIslandSize) {
-                    depedestrianizeOrRemove(graph, island);
+                    depedestrianizeOrRemove(graph, island, issueStore);
                     hadRemoved = true;
                 }
             }
@@ -122,11 +133,15 @@ public class StreetUtils {
             }
         }
         if (graph.removeEdgelessVertices() > 0) {
-            LOG.warn("Removed edgeless vertices after pruning islands");
+            LOG.info("Removed edgeless vertices after pruning islands");
         }
     }
 
-    private static void depedestrianizeOrRemove(Graph graph, Subgraph island) {
+    private static void depedestrianizeOrRemove(
+            Graph graph,
+            Subgraph island,
+            DataImportIssueStore issueStore
+    ) {
         //iterate over the street vertex of the subgraph
         for (Iterator<Vertex> vIter = island.streetIterator(); vIter.hasNext();) {
             Vertex v = vIter.next();
@@ -163,7 +178,7 @@ public class StreetUtils {
                 }
             }
         }
-        LOG.debug(graph.addBuilderAnnotation(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize())));
+        issueStore.add(new GraphConnectivity(island.getRepresentativeVertex(), island.streetSize()));
     }
 
     private static Subgraph computeConnectedSubgraph(

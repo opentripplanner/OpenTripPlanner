@@ -3,6 +3,7 @@ package org.opentripplanner.netex;
 import com.google.common.collect.Multimap;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
@@ -55,7 +56,8 @@ public class NetexLoaderSmokeTest {
         netexBundle.checkInputs();
 
         // When
-        OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(new Deduplicator());
+        OtpTransitServiceBuilder transitBuilder =
+                netexBundle.loadBundle(new Deduplicator(), new DataImportIssueStore(false));
 
         // Then - smoke test model
         OtpTransitService otpModel = transitBuilder.build();
