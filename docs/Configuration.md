@@ -413,7 +413,7 @@ The complete list of modes are:
 
 - `CAR_HAIL`: Hailing a car from a transportation network company such as Lyft or Uber and then riding in the vehicle for part or the entirety of the route. OTP will still use its underlying graph to calculate driving directions, so car leg results will likely contain different travel time estimates than those quoted from the TNC providers. If service is not available at a particular pickup location, this can cause a TNC availability error which can result in an itinerary not being able to be calculated.
 
-    _Prerequisite:_ API keys for the respective TNC providers must be added in `router-config.json`.
+    _Prerequisite:_ At least one TNC updater must be added in `router-config.json`.
 
 - `MICROMOBILITY`: Riding on a lightweight motorized vehicle for the entirety of the route or taking said vehicle onto public transport and riding again from the arrival station to the destination. This mode could theoretically also be used to model human power while pedaling a bicycle.
 
@@ -714,11 +714,32 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
-#### TNC Configuration
+#### Transportation Network Company Configuration
 
-It is possible to add either Uber or Lyft as a TNC updater, assuming that either of those companies allow you to access their APIs. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
+A transportation network company (TNC) is a company that provides on-demand car hailing services. When one of these updaters is configured it is possible to plan trips where part or all of the journey involves a passenger being picked up, transported in a car and then dropped off at another location.
+
+A TNC updater can be configured with either a company that has an API for determining arrival and ride estimates, or with a simple "No API" updater that always returns a default arrival estimate and 0 duration and $0 ride estimates.
+
+For the TNC updaters with APIs, it is possible to add either Uber or Lyft as a TNC updater, assuming that either of those companies allow you to access their APIs. OTP provides helper methods for making authenticated requests to each provider's API and also for verifying that TNC service exists when making certain routing requests that use a TNC for part or all of the trip.
 
 For each TNC updater, you have to manually determine what the ride type ids are for wheelchair-accessible services in the area that OTP will be planning trips in.
+
+##### No API
+
+- Add one entry in the `updater` field of `router-config.json` in the format:
+
+```JSON
+{
+    "type": "transportation-network-company-updater",
+    "sourceType": "no-api",
+    "defaultArrivalTimeSeconds": 123,
+    "isWheelChairAccessible": true
+}
+```
+
+If the `defaultArrivalTimeSeconds` is set in the config, this value will always be returned as the default arrival estimate. Otherwise, a default arrival estimate of 0 seconds is used.
+
+If the `isWheelChairAccessible` is set to true, then the arrival and ride estimates will show that the ride type of the TNC allows wheelchairs.
 
 ##### Uber
 
