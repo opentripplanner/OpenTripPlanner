@@ -77,7 +77,7 @@ public final class RangeRaptorWorker<T extends TripScheduleInfo, S extends Worke
 
     private final Collection<TransferLeg> accessLegs;
 
-    private boolean matchBoardingAlightExactInFirstRound;
+    private final boolean matchBoardingAlightExactInFirstRound;
 
     /**
      * The life cycle is used to publish life cycle events to everyone who
@@ -103,8 +103,8 @@ public final class RangeRaptorWorker<T extends TripScheduleInfo, S extends Worke
         this.calculator = calculator;
         this.timers = timers;
         this.accessLegs = accessLegs;
-        // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to "everyone"
-        // by providing access to it in the context.
+        // We do a cast here to avoid exposing the round tracker  and the life cycle publisher to
+        // "everyone" by providing access to it in the context.
         this.roundTracker = (RoundTracker) roundProvider;
         this.lifeCycle = lifeCyclePublisher;
         this.matchBoardingAlightExactInFirstRound = !waitAtBeginningEnabled;

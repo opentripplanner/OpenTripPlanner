@@ -27,6 +27,7 @@ import java.util.function.Consumer;
 
 
 public class SpeedTestRequest {
+
     /**
      * This is used to expand the search window for all test cases to test the effect of long windows.
      * <p/>
@@ -46,25 +47,16 @@ public class SpeedTestRequest {
         }
     };
 
+    private final ZoneId inputZoneId;
     private final TestCase testCase;
     private final SpeedTestCmdLineOpts opts;
-    private final LocalDate date = LocalDate.of(2019, 11, 11);
-    //public String description;
-    //public int numberOfItineraries;
+    private final LocalDate date = LocalDate.of(2019, 11, 14);
 
-    SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts) {
+    SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts, ZoneId inputZoneId) {
         this.testCase = testCase;
         this.opts = opts;
+        this.inputZoneId = inputZoneId;
     }
-
-    // maxWalkTime = 20;
-    // maxTripDurationMinutes = 1200; // Not in use by the "new" RR or McRR
-    // description = testCase.origin + " -> " + testCase.destination;
-    // fromTime = testCase.departureTime;
-    // toTime = request.fromTime + testCase.window;
-    // date = LocalDate.of(2019, 1, 28);
-
-    // numberOfItineraries = opts.numOfItineraries();
 
     public TestCase tc() { return testCase; }
     public LocalDate getDepartureDate() {
@@ -72,12 +64,12 @@ public class SpeedTestRequest {
     }
     public Date getDepartureTimestamp() {
         return new Date(
-                date.atStartOfDay(ZoneId.of("Europe/Oslo")).toInstant().toEpochMilli()
+                date.atStartOfDay(inputZoneId).toInstant().toEpochMilli()
                         + testCase.departureTime * 1000
         );
     }
     ZonedDateTime getDepartureDateWithZone() {
-        return ZonedDateTime.of(date, LocalTime.NOON, ZoneId.of("Europe/Oslo"));
+        return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
     }
     public int getArrivalTime() {
         return testCase.arrivalTime;

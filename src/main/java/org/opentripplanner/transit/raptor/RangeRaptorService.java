@@ -40,7 +40,7 @@ public class RangeRaptorService<T extends TripScheduleInfo> {
 
     public Collection<Path<T>> route(RangeRaptorRequest<T> request, TransitDataProvider<T> transitData) {
         if (request.profile() == RangeRaptorProfile.MULTI_CRITERIA) {
-            return createMcWorker(transitData, request);
+            return routeUsingMcWorker(transitData, request);
         } else {
             return routeUsingStdWorker(transitData, request);
         }
@@ -63,7 +63,7 @@ public class RangeRaptorService<T extends TripScheduleInfo> {
         return config.createStdWorker(transitData, request).route();
     }
 
-    private Collection<Path<T>> createMcWorker(TransitDataProvider<T> transitData, RangeRaptorRequest<T> request) {
+    private Collection<Path<T>> routeUsingMcWorker(TransitDataProvider<T> transitData, RangeRaptorRequest<T> request) {
         HeuristicSearch<T> fwdHeur;
         HeuristicSearch<T> revHeur;
         Heuristics destinationArrivalHeuristicsCheck = null;

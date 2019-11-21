@@ -24,6 +24,7 @@ import org.opentripplanner.transit.raptor.util.AvgTimer;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -39,7 +40,6 @@ import java.util.stream.Collectors;
 public class SpeedTest {
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
-
 
     private final Graph graph;
     private final TransitLayer transitLayer;
@@ -63,7 +63,7 @@ public class SpeedTest {
     private RangeRaptorService<TripSchedule> service;
 
 
-    public SpeedTest(Graph graph, CommandLineOpts opts) {
+    private SpeedTest(Graph graph, CommandLineOpts opts) {
         this.graph = graph;
         this.opts = opts;
         this.transitLayer = TransitLayerMapper.map(graph);
@@ -117,7 +117,7 @@ public class SpeedTest {
 
         if (!limitTestCases) {
             // Warm up JIT compiler by running one of the longer searches
-            runSingleTestCase(tripPlans, testCases.get(25), opts, true);
+            runSingleTestCase(tripPlans, testCases.get(1), opts, true);
         }
         ResultPrinter.logSingleTestHeader(routeProfile);
 
@@ -152,11 +152,11 @@ public class SpeedTest {
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, SpeedTestCmdLineOpts opts, boolean ignoreResults) {
         try {
-            final SpeedTestRequest request = new SpeedTestRequest(testCase, opts);
+            final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, getTimeZoneId());
 
             if (opts.compareHeuristics()) {
                 TOT_TIMER.start();
-                SpeedTestRequest heurReq = new SpeedTestRequest(testCase, opts);
+                SpeedTestRequest heurReq = new SpeedTestRequest(testCase, opts, getTimeZoneId());
                 compareHeuristics(heurReq, request);
                 TOT_TIMER.stop();
             } else {
@@ -255,6 +255,10 @@ public class SpeedTest {
         }
     }
 
+    private ZoneId getTimeZoneId() {
+        return graph.getTimeZone().toZoneId();
+    }
+
     private RangeRaptorRequest<TripSchedule> heuristicRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
@@ -295,7 +299,7 @@ public class SpeedTest {
         ZonedDateTime startOfTime = request.getDepartureDateWithZone();
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
-                startOfTime,
+                request.getDepartureDateWithZone().toInstant(),
                 2,
                 request.getTransitModes(),
                 request.getWalkSpeedMeterPrSecond()
