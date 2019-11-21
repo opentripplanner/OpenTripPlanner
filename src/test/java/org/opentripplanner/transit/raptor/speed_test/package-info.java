@@ -8,5 +8,8 @@
  * To run the SpeedTest use the {@code --help} option to se the documentation. There is not much
  * documentation on this tool, hopefully with time, we will add more doc and maybe automate
  * part of this test.
+ * <p>
+ * Example input files and setup is included in the resource test folder:
+ * {@code /raptor/speedtest/norway}.
  */
 package org.opentripplanner.transit.raptor.speed_test;
