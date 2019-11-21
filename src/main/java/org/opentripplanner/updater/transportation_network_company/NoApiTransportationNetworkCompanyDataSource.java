@@ -36,6 +36,7 @@ public class NoApiTransportationNetworkCompanyDataSource extends TransportationN
      */
     public NoApiTransportationNetworkCompanyDataSource(JsonNode config) {
         defaultArrivalTimeSeconds = config.path("defaultArrivalTimeSeconds").asInt();
+        isWheelChairAccessible = config.path("isWheelChairAccessible").asBoolean();
     }
 
     /**
