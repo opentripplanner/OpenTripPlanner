@@ -79,7 +79,7 @@ config key | description | value type | value default | notes
 `subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
 `streets` | Include street input files (OSM/PBF) | boolean | true | 
 `embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
-`areaVisibility` | Perform visibility calculations on OSM areas (these calculations can be time consuming) | boolean | true |
+`areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
 `platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
 `matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
 `fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
@@ -87,7 +87,7 @@ config key | description | value type | value default | notes
 `elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
 `staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
@@ -137,7 +137,6 @@ yield very realistic transfer time expectations. This works particularly well in
 the layering of non-intersecting ways is less prevalent. Here's an example in the Netherlands:
 
 <iframe width="425" height="350" frameborder="0" scrolling="no" marginheight="0" marginwidth="0" src="http://www.openstreetmap.org/export/embed.html?bbox=4.70502644777298%2C52.01675028000761%2C4.7070810198783875%2C52.01813190694357&amp;layer=mapnik" style="border: 1px solid black"></iframe><small><a href="http://www.openstreetmap.org/#map=19/52.01744/4.70605">View Larger Map</a></small>
-
 When such micro-mapping data is not available, we need to rely on information from GTFS including how stops are grouped
 into stations and a table of transfer timings where available. During the graph build, OTP can create preferential
 connections between each pair of stops in the same station to favor in-station transfers:
@@ -297,10 +296,11 @@ It is possible to adjust how OSM data is interpreted by OpenTripPlanner when bui
 OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
 You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
 
-There are currently 2 wayPropertySets defined;
+There are currently 3 wayPropertySets defined;
 
 - `default` which is based on California/US mapping standard
 - `norway` which is adjusted to rules and speeds in Norway
+- `uk` which is adjusted to rules and speed in the UK
 
 To add your own custom property set have a look at `org.opentripplanner.graph_builder.module.osm.NorwayWayPropertySet` and `org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySet`. If you choose to mainly rely on the default rules, make sure you add your own rules first before applying the default ones. The mechanism is that for any two identical tags, OTP will use the first one.
 
@@ -349,7 +349,7 @@ internally that are not exposed via the API. You may want to change the default 
 i.e. the value which will be applied unless it is overridden in a web API request.
 
 A full list of them can be found in the RoutingRequest class
-[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.3.0/org/opentripplanner/routing/core/RoutingRequest.html).
+[in the Javadoc](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/routing/core/RoutingRequest.html).
 Any public field or setter method in this class can be given a default value using the routingDefaults section of
 `router-config.json` as follows:
 
@@ -362,6 +362,78 @@ Any public field or setter method in this class can be given a default value usi
     }
 }
 ```
+
+## Routing modes
+
+The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
+of routes.
+
+Some modes (mostly bicycle and car) also have optional qualifiers `RENT` and `PARK` to specify if vehicles are to be parked at a station or rented. In theory
+this can also apply to other modes but makes sense only in select cases which are listed below.
+
+Whether a transport mode is available highly depends on the input feeds (GTFS, OSM, bike sharing feeds) and the graph building options supplied to OTP.
+
+The complete list of modes are:
+
+- `WALK`: Walking some or all of the route.
+
+- `TRANSIT`: General catch-all for all public transport modes.
+
+- `BICYCLE`: Cycling for the entirety of the route or taking a bicycle onto the public transport and cycling from the arrival station to the destination.
+
+- `BICYCLE_RENT`: Taking a rented, shared-mobility bike for part or the entirety of the route.  
+
+    _Prerequisite:_ Vehicle positions need to be added to OTP either as static stations or dynamic data feeds. 
+
+    For dynamic bike positions configure an input feed. See [Configuring real-time updaters](Configuration.md#configuring-real-time-updaters).
+
+    For static stations check the graph building documentation for the property `staticBikeRental`.
+
+- `BICYCLE_PARK`: Leaving the bicycle at the departure station and walking from the arrival station to the destination.
+
+    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary bicycle journey.
+
+    _Prerequisite:_ Bicycle parking stations present in the OSM file and visible to OTP by enabling the property `staticBikeParkAndRide` during graph build.
+
+- `CAR`: Driving your own car the entirety of the route. 
+
+    If this is combined with `TRANSIT` it will return routes with a 
+    [Kiss & Ride](https://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride_/_kiss_and_fly) component. This means that the car is not parked in a permanent
+    parking area but rather the passenger is dropped off (for example, at an airport) and the driver continues driving the car away from the drop off
+    location.
+
+- `CAR_PARK`: Driving a car to the park-and-ride facilities near a station and taking public transport.
+
+    This mode needs to be combined with at least one transit mode (or `TRANSIT`) otherwise it behaves like an ordinary car journey.
+
+    _Prerequisite:_ Park-and-ride areas near the station need to be present in the OSM input file.
+
+
+The following modes are 1-to-1 mappings from the [GTFS `route_type`](https://developers.google.com/transit/gtfs/reference/#routestxt):
+
+- `TRAM`: Tram, streetcar, or light rail. Used for any light rail or street-level system within a metropolitan area.
+
+- `SUBWAY`: Subway or metro. Used for any underground rail system within a metropolitan area.
+
+- `RAIL`: Used for intercity or long-distance travel.
+
+- `BUS`: Used for short- and long-distance bus routes.
+
+- `FERRY`: Ferry. Used for short- and long-distance boat service.
+
+- `CABLE_CAR`: Cable car. Used for street-level cable cars where the cable runs beneath the car.
+
+- `GONDOLA`: Gondola or suspended cable car. Typically used for aerial cable cars where the car is suspended from the cable.
+
+- `FUNICULAR`: Funicular. Used for any rail system that moves on steep inclines with a cable traction system.
+
+Lastly, this mode is part of the [Extended GTFS route types](https://developers.google.com/transit/gtfs/reference/extended-route-types):
+
+- `AIRPLANE`: Taking an airplane.
+
+Note that there are conceptual overlaps between `TRAM`, `SUBWAY` and `RAIL` and some transport providers categorize their routes differently to others.
+In other words, what is considered a `SUBWAY` in one city might be of type `RAIL` in another. Study your input GTFS feed carefully to 
+find out the appropriate mapping in your region.
 
 ### Drive-to-transit routing defaults
 
@@ -621,4 +693,4 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 
 # Configure using command-line arguments
 
-Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.3.0/org/opentripplanner/standalone/CommandLineParameters.html).
+Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/standalone/CommandLineParameters.html).
