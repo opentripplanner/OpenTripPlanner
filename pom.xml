@@ -81,7 +81,7 @@
         <!-- Lib versions - keep list sorted on property name -->
         <geotools.version>21.2</geotools.version>
         <geotools.wfs.version>16.5</geotools.wfs.version>
-        <jackson.version>2.9.7</jackson.version>
+        <jackson.version>2.10.1</jackson.version>
         <jersey.version>2.18</jersey.version>
         <!-- Other properties -->
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
@@ -792,7 +792,7 @@
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-compress</artifactId>
-            <version>1.18</version>
+            <version>1.19</version>
         </dependency>
         <dependency>
             <groupId>commons-discovery</groupId>
