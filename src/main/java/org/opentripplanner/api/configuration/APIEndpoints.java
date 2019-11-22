@@ -8,6 +8,7 @@ import org.opentripplanner.api.resource.PlannerResource;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
+import org.opentripplanner.ext.readiness_endpoint.HealthAPI;
 import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
 import org.opentripplanner.util.OTPFeature;
@@ -25,6 +26,7 @@ import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
+import static org.opentripplanner.util.OTPFeature.HealthAPI;
 
 /**
  * Configure API resource endpoints.
@@ -48,6 +50,7 @@ public class APIEndpoints {
         addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
 
         // Sandbox extension APIs
+        addIfEnabled(HealthAPI, HealthAPI.class);
         addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
         addIfEnabled(SandboxAPITransmodelApi, TransmodelIndexAPI.class);
     }
