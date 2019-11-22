@@ -1,14 +1,17 @@
 package org.opentripplanner.openstreetmap.model;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownAssumedGroundLevel;
+import org.opentripplanner.graph_builder.issues.FloorNumberUnknownGuessedFromAltitude;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class OSMLevel implements Comparable<OSMLevel> {
 
@@ -47,7 +50,11 @@ public class OSMLevel implements Comparable<OSMLevel> {
      * makes an OSMLevel from one of the semicolon-separated fields in an OSM
      * level map relation's levels= tag.
      */
-    public static OSMLevel fromString (String spec, Source source, boolean incrementNonNegative) {
+    public static OSMLevel fromString (
+            String spec, Source source,
+            boolean incrementNonNegative,
+            DataImportIssueStore issueStore
+    ) {
 
         /*  extract any altitude information after the @ character */
         Double altitude = null;
@@ -109,7 +116,8 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* fall back on altitude when necessary */
         if (floorNumber == null && altitude != null) {
             floorNumber = (int)(altitude / METERS_PER_FLOOR);
-            LOG.warn("Could not determine floor number for layer {}. Guessed {} (0-based) from altitude.", spec, floorNumber);
+            issueStore.add(
+                    new FloorNumberUnknownGuessedFromAltitude(spec, floorNumber));
             reliable = false;
         }
 
@@ -120,14 +128,19 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* signal failure to extract any useful level information */
         if (floorNumber == null) {
             floorNumber = 0;
-            LOG.warn("Could not determine floor number for layer {}, assumed to be ground-level.", 
-                 spec, floorNumber);
+            issueStore.add(
+                    new FloorNumberUnknownAssumedGroundLevel(spec, floorNumber));
             reliable = false;
         }
         return new OSMLevel(floorNumber, altitude, shortName, longName, source, reliable);
     }
 
-    public static List<OSMLevel> fromSpecList (String specList, Source source, boolean incrementNonNegative) {
+    public static List<OSMLevel> fromSpecList (
+            String specList,
+            Source source,
+            boolean incrementNonNegative,
+            DataImportIssueStore issueStore
+    ) {
 
         List<String> levelSpecs = new ArrayList<String>();
 
@@ -148,14 +161,20 @@ public class OSMLevel implements Comparable<OSMLevel> {
         /* build an OSMLevel for each level spec in the list */
         List<OSMLevel> levels = new ArrayList<OSMLevel>();
         for (String spec : levelSpecs) {
-            levels.add(fromString(spec, source, incrementNonNegative));
+            levels.add(fromString(spec, source, incrementNonNegative, issueStore));
         }
         return levels;
     }
 
-    public static Map<String, OSMLevel> mapFromSpecList (String specList, Source source, boolean incrementNonNegative) {
+    public static Map<String, OSMLevel> mapFromSpecList (
+            String specList,
+            Source source,
+            boolean incrementNonNegative,
+            DataImportIssueStore issueStore
+    ) {
         Map<String, OSMLevel> map = new HashMap<String, OSMLevel>();
-        for (OSMLevel level : fromSpecList(specList, source, incrementNonNegative)) {
+        for (OSMLevel level :
+                fromSpecList(specList, source, incrementNonNegative, issueStore)) {
             map.put(level.shortName, level);
         }
         return map;

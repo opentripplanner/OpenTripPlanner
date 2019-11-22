@@ -3,13 +3,13 @@ package org.opentripplanner.routing.alertpatch;
 import junit.framework.TestCase;
 import org.junit.Ignore;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -43,7 +43,7 @@ public class AlertPatchTest extends TestCase {
         graph = new Graph();
 
         GtfsContext context = contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .withIssueStoreAndDeduplicator(graph)
                 .build();
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);

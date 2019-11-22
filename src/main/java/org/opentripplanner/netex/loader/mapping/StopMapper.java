@@ -1,20 +1,21 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.rutebanken.netex.model.Quay;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
 class StopMapper {
-    private static final Logger LOG = LoggerFactory.getLogger(StopMapper.class);
+    private final DataImportIssueStore issueStore;
 
     private final FeedScopedIdFactory idFactory;
 
-    StopMapper(FeedScopedIdFactory idFactory) {
+    StopMapper(FeedScopedIdFactory idFactory, DataImportIssueStore issueStore) {
         this.idFactory = idFactory;
+        this.issueStore = issueStore;
     }
 
     /**
@@ -32,7 +33,7 @@ class StopMapper {
                 }
         );
         if (!locationOk) {
-            LOG.warn("Quay {} does not contain any coordinates. Quay is ignored.", quay.getId());
+                issueStore.add(new QuayWithoutCoordinates(quay.getId()));
             return null;
         }
         stop.setId(idFactory.createId(quay.getId()));

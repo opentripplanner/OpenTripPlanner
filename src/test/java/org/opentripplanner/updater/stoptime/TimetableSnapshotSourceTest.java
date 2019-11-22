@@ -10,6 +10,7 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -19,7 +20,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -55,7 +55,7 @@ public class TimetableSnapshotSourceTest {
     @BeforeClass
     public static void setUpClass() throws Exception {
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
-                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .withIssueStoreAndDeduplicator(graph)
                 .turnOnSetAgencyToFeedIdForAllElements()
                 .build();
 

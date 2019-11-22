@@ -28,15 +28,16 @@ public class GraphBuilderParameters {
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
     /**
-     * Generates nice HTML report of Graph errors/warnings (annotations). They are stored in the same location as the graph.
+     * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
+     * as the graph.
      */
-    public final boolean htmlAnnotations;
+    public final boolean dataImportReport;
 
     /**
-     * If number of annotations is larger then specified number annotations will be split in multiple files.
-     * Since browsers have problems opening large HTML files.
+     * If the number of issues is larger then {@link #maxDataImportIssuesPerFile}, then the files
+     * will be split in multiple files. Since browsers have problems opening large HTML files.
      */
-    public final int maxHtmlAnnotationsPerFile;
+    public final int maxDataImportIssuesPerFile;
 
     /**
      * Include all transit input files (GTFS) from scanned directory.
@@ -191,7 +192,7 @@ public class GraphBuilderParameters {
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
     public GraphBuilderParameters(JsonNode config) {
-        htmlAnnotations = config.path("htmlAnnotations").asBoolean(false);
+        dataImportReport = config.path("dataImportReport").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
         parentStopLinking = config.path("parentStopLinking").asBoolean(false);
@@ -211,7 +212,7 @@ public class GraphBuilderParameters {
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
-        maxHtmlAnnotationsPerFile = config.path("maxHtmlAnnotationsPerFile").asInt(1000);
+        maxDataImportIssuesPerFile = config.path("maxDataImportIssuesPerFile").asInt(1000);
         maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
         pruningThresholdIslandWithoutStops = config.path("islandWithoutStopsMaxSize").asInt(40);
         pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
