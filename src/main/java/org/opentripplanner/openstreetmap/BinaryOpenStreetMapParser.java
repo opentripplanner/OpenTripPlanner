@@ -1,6 +1,6 @@
-package org.opentripplanner.openstreetmap.impl;
+package org.opentripplanner.openstreetmap;
 
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
+import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.openstreetmap.model.*;
 
 import java.util.HashMap;
@@ -16,14 +16,15 @@ import crosby.binary.Osmformat;
  * @since 0.4
  */
 public class BinaryOpenStreetMapParser extends BinaryParser {
-    private OpenStreetMapContentHandler handler;
+
+    private OSMDatabase osmdb;
     private boolean parseWays = true;
     private boolean parseRelations = true;
     private boolean parseNodes = true;
     private Map<String, String> stringTable = new HashMap<String, String>();
 
-    public BinaryOpenStreetMapParser(OpenStreetMapContentHandler handler) {
-        this.handler = handler;
+    public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
+        this.osmdb = osmdb;
     }
 
     // The strings are already being pulled from a string table in the PBF file,
@@ -65,7 +66,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 tmp.addTag(tag);
             }
 
-            handler.addNode(tmp);
+            osmdb.addNode(tmp);
         }
     }
 
@@ -109,7 +110,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 j++; // Skip over the '0' delimiter.
             }
 
-            handler.addNode(tmp);
+            osmdb.addNode(tmp);
         }
     }
 
@@ -141,7 +142,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 lastId = j + lastId;
             }
 
-            handler.addWay(tmp);
+            osmdb.addWay(tmp);
         }
     }
 
@@ -187,7 +188,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
                 tmp.addMember(relMember);
             }
 
-            handler.addRelation(tmp);
+            osmdb.addRelation(tmp);
         }
     }
 
@@ -206,8 +207,6 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     /**
      * Should relations be parsed
-     * 
-     * @see OpenStreetMapContentHandler
      */
     public void setParseWays(boolean parseWays) {
         this.parseWays = parseWays;
@@ -215,8 +214,6 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     /**
      * Should relations be parsed
-     * 
-     * @see OpenStreetMapContentHandler
      */
     public void setParseRelations(boolean parseRelations) {
         this.parseRelations = parseRelations;
@@ -224,8 +221,6 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     /**
      * Should nodes be parsed
-     * 
-     * @see OpenStreetMapContentHandler
      */
     public void setParseNodes(boolean parseNodes) {
         this.parseNodes = parseNodes;
