@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
@@ -650,14 +651,16 @@ public class OSMDatabase {
                     // relation includes way which does not exist in the data. Skip.
                     continue RELATION;
                 }
-                for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
-                    long nodeId = iter.next();
-                    if (!nodesById.containsKey(nodeId)) {
+                TLongIterator wayNodeIterator = way.getNodeRefs().iterator();
+                while (wayNodeIterator.hasNext()) {
+                    long nodeId = wayNodeIterator.next();
+                    if (nodesById.containsKey(nodeId)) {
+                        MapUtils.addToMapSet(areasForNode, nodeId, way);
+                    } else {
                         // this area is missing some nodes, perhaps because it is on
                         // the edge of the region, so we will simply not route on it.
                         continue RELATION;
                     }
-                    MapUtils.addToMapSet(areasForNode, nodeId, way);
                 }
                 if (role.equals("inner")) {
                     innerWays.add(way);
