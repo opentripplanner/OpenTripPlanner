@@ -5,6 +5,8 @@ import java.util.List;
 
 public class OSMWay extends OSMWithTags {
 
+    // TODO use trove primitive int list
+
     private List<Long> nodes = new ArrayList<Long>();
 
     public void addNodeRef(OSMNodeRef nodeRef) {

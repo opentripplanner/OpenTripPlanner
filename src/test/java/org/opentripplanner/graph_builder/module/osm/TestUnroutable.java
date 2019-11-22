@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Maps;
 import junit.framework.TestCase;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -33,7 +33,7 @@ public class TestUnroutable extends TestCase {
     public void setUp() throws Exception {
         OpenStreetMapModule osmBuilder = new OpenStreetMapModule();
         osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
         URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
         File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), "UTF-8"));
         provider.setPath(osmDataFile);

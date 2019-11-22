@@ -29,7 +29,6 @@ import org.opentripplanner.openstreetmap.model.OSMRelationMember;
 import org.opentripplanner.openstreetmap.model.OSMTag;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapContentHandler;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -48,7 +47,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-public class OSMDatabase implements OpenStreetMapContentHandler {
+public class OSMDatabase {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
 
@@ -134,8 +133,20 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return nodesById.get(nodeId);
     }
 
+    public OSMWay getWay(Long nodeId) {
+        return waysById.get(nodeId);
+    }
+
     public Collection<OSMWay> getWays() {
         return Collections.unmodifiableCollection(waysById.values());
+    }
+
+    public int nodeCount() {
+        return nodesById.size();
+    }
+
+    public int wayCount() {
+        return waysById.size();
     }
 
     public Collection<OSMNode> getBikeRentalNodes() {
@@ -191,7 +202,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
         return waysNodeIds.contains(nodeId);
     }
 
-    @Override
     public void addNode(OSMNode node) {
         if (node.isBikeRental()) {
             bikeRentalNodes.put(node.getId(), node);
@@ -214,7 +224,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             LOG.debug("nodes=" + nodesById.size());
     }
 
-    @Override
     public void addWay(OSMWay way) {
         /* only add ways once */
         long wayId = way.getId();
@@ -254,7 +263,6 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             LOG.debug("ways=" + waysById.size());
     }
 
-    @Override
     public void addRelation(OSMRelation relation) {
         if (relationsById.containsKey(relation.getId()))
             return;
@@ -288,12 +296,16 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
             LOG.debug("relations=" + relationsById.size());
     }
 
-    @Override
+    /**
+     * Called after the first phase, when all relations are loaded.
+     */
     public void doneFirstPhaseRelations() {
         // nothing to do here
     }
 
-    @Override
+    /**
+     * Called after the second phase, when all ways are loaded.
+     */
     public void doneSecondPhaseWays() {
         // This copies relevant tags to the ways (highway=*) where it doesn't exist, so that
         // the way purging keeps the needed way around.
@@ -310,9 +322,9 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
     }
 
     /**
+     * Called after the third and final phase, when all nodes are loaded.
      * After all relations, ways, and nodes are loaded, handle areas.
      */
-    @Override
     public void doneThirdPhaseNodes() {
         processMultipolygonRelations();
         processSingleWayAreas();
