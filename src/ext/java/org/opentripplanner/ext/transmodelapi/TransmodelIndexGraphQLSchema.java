@@ -2815,7 +2815,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .distinct()
                                 .filter(station -> {
                                     String authority = env.getArgument("authority");
-                                    return authority == null || station.getId().getAgencyId().equalsIgnoreCase(authority);
+                                    return authority == null || station.getId().getFeedId().equalsIgnoreCase(authority);
                                 });
 
                                 if (Boolean.TRUE.equals(env.getArgument("filterByInUse"))){
@@ -2925,7 +2925,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .stream()
                                 .map(TransitStopVertex::getStop)
                                 .filter(stop -> environment.getArgument("authority") == null ||
-                                        stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("authority")))
+                                        stop.getId().getFeedId().equalsIgnoreCase(environment.getArgument("authority")))
                                 .filter(stop -> !Boolean.TRUE.equals(environment.getArgument("filterByInUse"))
                                                         || !index.getPatternsForStop(stop,true).isEmpty())
                                 .collect(Collectors.toList()))
@@ -2966,7 +2966,7 @@ public class TransmodelIndexGraphQLSchema {
                                         environment.getArgument("radius"))
                                         .stream()
                                         .filter(stopAndDistance -> environment.getArgument("authority") == null ||
-                                                stopAndDistance.stop.getId().getAgencyId()
+                                                stopAndDistance.stop.getId().getFeedId()
                                                         .equalsIgnoreCase(environment.getArgument("authority")))
                                         .sorted(Comparator.comparing(s -> s.distance))
                                         .collect(Collectors.toList());

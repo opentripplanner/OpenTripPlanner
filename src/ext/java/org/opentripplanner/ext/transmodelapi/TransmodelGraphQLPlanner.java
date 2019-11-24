@@ -360,7 +360,7 @@ public class TransmodelGraphQLPlanner {
 
             FeedScopedId stopId = stopVertex.getStop().getId();
 
-            return stopId.getAgencyId().concat(":").concat(stopId.getId());
+            return stopId.getFeedId().concat(":").concat(stopId.getId());
         } else {
             return vertexId;
         }

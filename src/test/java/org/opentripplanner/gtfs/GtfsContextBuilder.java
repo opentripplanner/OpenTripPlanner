@@ -169,32 +169,32 @@ public class GtfsContextBuilder {
     private void setAgencyToFeedIdForAllElements() {
 
         for (ShapePoint shapePoint : transitBuilder.getShapePoints()) {
-            shapePoint.getShapeId().setAgencyId(this.feedId.getId());
+            shapePoint.getShapeId().setFeedId(this.feedId.getId());
         }
         for (Route route : transitBuilder.getRoutes().values()) {
-            route.getId().setAgencyId(this.feedId.getId());
+            route.getId().setFeedId(this.feedId.getId());
         }
         for (Stop stop : transitBuilder.getStops().values()) {
-            stop.getId().setAgencyId(this.feedId.getId());
+            stop.getId().setFeedId(this.feedId.getId());
         }
 
         for (Trip trip : transitBuilder.getTripsById().values()) {
-            trip.getId().setAgencyId(this.feedId.getId());
+            trip.getId().setFeedId(this.feedId.getId());
         }
 
         for (ServiceCalendar serviceCalendar : transitBuilder.getCalendars()) {
-            serviceCalendar.getServiceId().setAgencyId(this.feedId.getId());
+            serviceCalendar.getServiceId().setFeedId(this.feedId.getId());
         }
         for (ServiceCalendarDate serviceCalendarDate : transitBuilder.getCalendarDates()) {
-            serviceCalendarDate.getServiceId().setAgencyId(this.feedId.getId());
+            serviceCalendarDate.getServiceId().setFeedId(this.feedId.getId());
         }
 
         for (FareAttribute fareAttribute : transitBuilder.getFareAttributes()) {
-            fareAttribute.getId().setAgencyId(this.feedId.getId());
+            fareAttribute.getId().setFeedId(this.feedId.getId());
         }
 
         for (Pathway pathway : transitBuilder.getPathways()) {
-            pathway.getId().setAgencyId(this.feedId.getId());
+            pathway.getId().setFeedId(this.feedId.getId());
         }
 
         transitBuilder.regenerateIndexes();

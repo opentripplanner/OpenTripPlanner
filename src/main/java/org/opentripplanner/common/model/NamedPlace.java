@@ -23,7 +23,7 @@ public class NamedPlace {
     }
 
     public NamedPlace(GenericLocation location) {
-        this(location.label, location.placeId.toString());
+        this(location.label, location.stopId.toString());
     }
 
     public String getRepresentation() {

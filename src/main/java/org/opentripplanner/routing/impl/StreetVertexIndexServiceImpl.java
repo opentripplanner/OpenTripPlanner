@@ -13,7 +13,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
-import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
@@ -319,7 +318,7 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     ) {
         // Check if Stop/StopCollection is found by FeedScopeId
         Set<Vertex> transitStopVertices =
-                graph.index.getStopVerticesById(location.placeId);
+                graph.index.getStopVerticesById(location.stopId);
         if (transitStopVertices != null) {
             return transitStopVertices;
         }

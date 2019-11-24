@@ -228,7 +228,7 @@ public class IndexGraphQLSchema {
                 .name("parentStation")
                 .type(stopType)
                 .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
-                    ((Stop) environment.getSource()).getId().getAgencyId(),
+                    ((Stop) environment.getSource()).getId().getFeedId(),
                     ((Stop) environment.getSource()).getParentStation().getId().getId())))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1003,7 +1003,7 @@ public class IndexGraphQLSchema {
                     .stream()
                     .map(TransitStopVertex::getStop)
                     .filter(stop -> environment.getArgument("agency") == null || stop.getId()
-                        .getAgencyId().equalsIgnoreCase(environment.getArgument("agency")))
+                        .getFeedId().equalsIgnoreCase(environment.getArgument("agency")))
                     .collect(Collectors.toList()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1040,7 +1040,7 @@ public class IndexGraphQLSchema {
                     )
                         .stream()
                         .filter(stopAndDistance -> environment.getArgument("agency") == null ||
-                            stopAndDistance.stop.getId().getAgencyId()
+                            stopAndDistance.stop.getId().getFeedId()
                                 .equalsIgnoreCase(environment.getArgument("agency")))
                         .sorted(Comparator.comparing(s -> (float) s.distance))
                         .collect(Collectors.toList()))

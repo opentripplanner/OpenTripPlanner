@@ -15,9 +15,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -510,8 +507,8 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
-            pattern.setId(new FeedScopedId(routeId.getAgencyId(), id));
+            String id = String.format("%s:%s:%s:%02d", routeId.getFeedId(), routeId.getId(), direction, count);
+            pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
         }
     }
 
@@ -588,7 +585,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
-        return route.getId().getAgencyId();
+        return route.getId().getFeedId();
     }
 
     private static Coordinate coordinate(Stop s) {

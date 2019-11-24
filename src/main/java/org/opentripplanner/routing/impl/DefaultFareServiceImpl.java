@@ -310,11 +310,11 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
         String startZone = firstRide.startZone;
         String endZone = firstRide.endZone;
         // stops don't really have an agency id, they have the per-feed default id
-        String feedId = firstRide.firstStop.getId().getAgencyId();  
+        String feedId = firstRide.firstStop.getId().getFeedId();
         long lastRideStartTime = firstRide.startTime;
         long lastRideEndTime = firstRide.endTime;
         for (Ride ride : rides) {
-            if ( ! ride.firstStop.getId().getAgencyId().equals(feedId)) {
+            if ( ! ride.firstStop.getId().getFeedId().equals(feedId)) {
                 LOG.debug("skipped multi-feed ride sequence {}", rides);
                 return new FareAndId(Float.POSITIVE_INFINITY, null);
             }
@@ -338,7 +338,7 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             FareAttribute attribute = ruleSet.getFareAttribute();
             // fares also don't really have an agency id, they will have the per-feed default id
             // check only if the fare is not mapped to an agency
-            if (!ruleSet.hasAgencyDefined() && !attribute.getId().getAgencyId().equals(feedId))
+            if (!ruleSet.hasAgencyDefined() && !attribute.getId().getFeedId().equals(feedId))
                 continue;
             
             if (ruleSet.matches(agencies, startZone, endZone, zones, routes, trips)) {

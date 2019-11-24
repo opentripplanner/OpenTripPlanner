@@ -22,7 +22,7 @@ public class StopAgencyAndIdArrayListAdapter extends
         }
         ArrayList<AgencyAndIdType> result = new ArrayList<AgencyAndIdType>();
         for (Stop a : arg)
-            result.add(new AgencyAndIdType(a.getId().getAgencyId(), a.getId().getId()));
+            result.add(new AgencyAndIdType(a.getId().getFeedId(), a.getId().getId()));
         return result;
     }
 

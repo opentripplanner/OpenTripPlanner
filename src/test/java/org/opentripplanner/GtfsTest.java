@@ -150,9 +150,9 @@ public abstract class GtfsTest extends TestCase {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());
-        assertEquals(feedId.getId(), leg.to.stopId.getAgencyId());
+        assertEquals(feedId.getId(), leg.to.stopId.getFeedId());
         if (fromStopId != null) {
-            assertEquals(feedId.getId(), leg.from.stopId.getAgencyId());
+            assertEquals(feedId.getId(), leg.from.stopId.getFeedId());
             assertEquals(fromStopId, leg.from.stopId.getId());
         } else {
             assertNull(leg.from.stopId);

@@ -285,7 +285,7 @@ public class SiriFuzzyTripMatcher {
         //First, assume same agency
 
         Stop firstStop = index.stopForId.values().stream().findFirst().get();
-        FeedScopedId id = new FeedScopedId(firstStop.getId().getAgencyId(), siriStopId);
+        FeedScopedId id = new FeedScopedId(firstStop.getId().getFeedId(), siriStopId);
         if (index.stopForId.containsKey(id)) {
             return id;
         }

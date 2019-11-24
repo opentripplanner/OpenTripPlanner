@@ -586,12 +586,12 @@ public class Graph implements Serializable {
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
         for (FeedScopedId sid : data.getServiceIds()) {
-            agencies.add(sid.getAgencyId());
+            agencies.add(sid.getFeedId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.
                 long t = sd.getAsDate(getTimeZone()).getTime() / 1000;
                 if (t > now) {
-                    agenciesWithFutureDates.add(sid.getAgencyId());
+                    agenciesWithFutureDates.add(sid.getFeedId());
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;

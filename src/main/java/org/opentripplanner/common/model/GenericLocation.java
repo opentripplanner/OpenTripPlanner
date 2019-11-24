@@ -11,7 +11,7 @@ import org.opentripplanner.model.FeedScopedId;
 public class GenericLocation {
 
     /**
-     * The name of the place, if provided. This is pass-through information and does not affect
+     * A label for the place, if provided. This is pass-through information and does not affect
      * routing in any way.
      */
     public final String label;
@@ -19,7 +19,7 @@ public class GenericLocation {
     /**
      * Refers to a specific element in the OTP model. This can currently be a Stop or StopCollection.
      */
-    public final FeedScopedId placeId;
+    public final FeedScopedId stopId;
 
     /**
      * Coordinates of the location. These can be used by themselves or as a fallback if placeId is
@@ -29,16 +29,16 @@ public class GenericLocation {
 
     public final Double lng;
 
-    public GenericLocation(String label, FeedScopedId placeId, Double lat, Double lng) {
+    public GenericLocation(String label, FeedScopedId stopId, Double lat, Double lng) {
         this.label = label;
-        this.placeId = placeId;
+        this.stopId = stopId;
         this.lat = lat;
         this.lng = lng;
     }
 
     public GenericLocation(Double lat, Double lng) {
         this.label = null;
-        this.placeId = null;
+        this.stopId = null;
         this.lat = lat;
         this.lng = lng;
     }
