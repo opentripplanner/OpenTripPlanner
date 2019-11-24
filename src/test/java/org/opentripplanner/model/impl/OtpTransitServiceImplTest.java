@@ -69,7 +69,7 @@ public class OtpTransitServiceImplTest {
         Collection<FareAttribute> fareAttributes = subject.getAllFareAttributes();
 
         assertEquals(1, fareAttributes.size());
-        assertEquals("<FareAttribute agency_FA>", first(fareAttributes).toString());
+        assertEquals("<FareAttribute agency:FA>", first(fareAttributes).toString());
     }
 
     @Test
@@ -96,7 +96,7 @@ public class OtpTransitServiceImplTest {
         Collection<Pathway> pathways = subject.getAllPathways();
 
         assertEquals(4, pathways.size());
-        assertEquals("<Pathway Z_pathways_1_1>", first(pathways).toString());
+        assertEquals("<Pathway Z:pathways_1_1>", first(pathways).toString());
     }
 
     @Test
@@ -104,7 +104,7 @@ public class OtpTransitServiceImplTest {
         Collection<Transfer> transfers = subject.getAllTransfers();
 
         assertEquals(9, transfers.size());
-        assertEquals("<Transfer stop=Z_F..Z_E>", first(transfers).toString());
+        assertEquals("<Transfer stop=Z:F..Z:E>", first(transfers).toString());
     }
 
     @Test
@@ -112,7 +112,7 @@ public class OtpTransitServiceImplTest {
         Collection<Station> stations = subject.getAllStations();
 
         assertEquals(1, stations.size());
-        assertEquals("<Station Z_station>", first(stations).toString());
+        assertEquals("<Station Z:station>", first(stations).toString());
     }
 
     @Test
@@ -120,7 +120,7 @@ public class OtpTransitServiceImplTest {
         Collection<Stop> stops = subject.getAllStops();
 
         assertEquals(22, stops.size());
-        assertEquals("<Stop Z_A>", first(stops).toString());
+        assertEquals("<Stop Z:A>", first(stops).toString());
     }
 
     @Test
@@ -131,7 +131,7 @@ public class OtpTransitServiceImplTest {
         }
 
         assertEquals(80, stopTimes.size());
-        assertEquals("StopTime(seq=1 stop=Z_A trip=agency_1.1 times=00:00:00-00:00:00)",
+        assertEquals("StopTime(seq=1 stop=Z:A trip=agency:1.1 times=00:00:00-00:00:00)",
                 first(stopTimes).toString());
     }
 
@@ -140,19 +140,19 @@ public class OtpTransitServiceImplTest {
         Collection<Trip> trips = subject.getAllTrips();
 
         assertEquals(33, trips.size());
-        assertEquals("<Trip agency_1.1>", first(trips).toString());
+        assertEquals("<Trip agency:1.1>", first(trips).toString());
     }
 
     @Test
     public void testGetStopForId() {
         Stop stop = subject.getStopForId(new FeedScopedId("Z", "P"));
-        assertEquals("<Stop Z_P>", stop.toString());
+        assertEquals("<Stop Z:P>", stop.toString());
     }
 
     @Test
     public void testGetStopsForStation() {
         List<Stop> stops = new ArrayList<>(subject.getStationForId(STATION_ID).getChildStops());
-        assertEquals("[<Stop Z_A>]", stops.toString());
+        assertEquals("[<Stop Z:A>]", stops.toString());
     }
 
     @Test
@@ -165,7 +165,7 @@ public class OtpTransitServiceImplTest {
     @Test
     public void testGetStopTimesForTrip() {
         List<StopTime> stopTimes = subject.getStopTimesForTrip(first(subject.getAllTrips()));
-        assertEquals("[<Stop Z_A>, <Stop Z_B>, <Stop Z_C>]",
+        assertEquals("[<Stop Z:A>, <Stop Z:B>, <Stop Z:C>]",
                 stopTimes.stream().map(StopTime::getStop).collect(toList()).toString());
     }
 
@@ -174,7 +174,7 @@ public class OtpTransitServiceImplTest {
         Collection<FeedScopedId> serviceIds = subject.getAllServiceIds();
 
         assertEquals(2, serviceIds.size());
-        assertEquals("Z_alldays", first(serviceIds).toString());
+        assertEquals("Z:alldays", first(serviceIds).toString());
     }
 
     private static FareRule createFareRule() {
