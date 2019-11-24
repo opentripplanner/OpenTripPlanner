@@ -310,7 +310,7 @@ public class ItineraryMapper {
     }
 
     private Place mapLocationToPlace(GenericLocation location) {
-        if (location.label.isEmpty()) {
+        if (location.label == null || location.label.isEmpty()) {
             return new Place(location.lng, location.lat, String.format("%.6f, %.6f", location.lat, location.lng));
         } else {
             return new Place(location.lng, location.lat, location.label);
