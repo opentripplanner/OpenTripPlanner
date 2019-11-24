@@ -4,17 +4,14 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.api.common.LocationMatcher;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.model.FeedScopedId;
 
-import java.util.Arrays;
-import java.util.List;
-
-public class LocationMatcherTest {
+public class LocationStringParserTest {
 
     @Test
     public void testFromOldStyleString() {
-        GenericLocation loc = LocationMatcher.fromOldStyleString("name::12345");
+        GenericLocation loc = LocationStringParser.fromOldStyleString("name::12345");
         assertEquals("name", loc.label);
         assertNull(loc.placeId);
         assertNull(loc.lat);
@@ -24,21 +21,21 @@ public class LocationMatcherTest {
     
     @Test
     public void testWithLabelAndCoord () {
-        GenericLocation loc = LocationMatcher.fromOldStyleString("name::1.0,2.5");
+        GenericLocation loc = LocationStringParser.fromOldStyleString("name::1.0,2.5");
         assertEquals("name", loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(1.0), loc.lat);
         assertEquals(Double.valueOf(2.5), loc.lng);
         assertEquals(new Coordinate(2.5, 1.0), loc.getCoordinate());
 
-        loc = LocationMatcher.fromOldStyleString("Label Label::-15.0,  200");
+        loc = LocationStringParser.fromOldStyleString("Label Label::-15.0,  200");
         assertEquals("Label Label", loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(-15.0), loc.lat);
         assertEquals(Double.valueOf(200), loc.lng);
         assertEquals(new Coordinate(200, -15), loc.getCoordinate());
 
-        loc = LocationMatcher.fromOldStyleString("A Label::122,-22.3");
+        loc = LocationStringParser.fromOldStyleString("A Label::122,-22.3");
         assertEquals("A Label", loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(122), loc.lat);
@@ -48,14 +45,14 @@ public class LocationMatcherTest {
 
     @Test
     public void testWithId () {
-        GenericLocation loc = LocationMatcher.fromOldStyleString("name::aFeed:A1B2C3");
+        GenericLocation loc = LocationStringParser.fromOldStyleString("name::aFeed:A1B2C3");
         assertEquals("name", loc.label);
         assertEquals(loc.placeId, new FeedScopedId("aFeed", "A1B2C3"));
         assertNull(loc.lat);
         assertNull(loc.lng);
         assertNull(loc.getCoordinate());
 
-        loc = LocationMatcher.fromOldStyleString("feed:4321");
+        loc = LocationStringParser.fromOldStyleString("feed:4321");
         assertNull(loc.label);
         assertEquals(loc.placeId, new FeedScopedId("feed", "4321"));
         assertNull(loc.lat);
@@ -65,21 +62,21 @@ public class LocationMatcherTest {
 
     @Test
     public void testWithCoordOnly () {
-        GenericLocation loc = LocationMatcher.fromOldStyleString("1.0,2.5");
+        GenericLocation loc = LocationStringParser.fromOldStyleString("1.0,2.5");
         assertNull(loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(1.0), loc.lat);
         assertEquals(Double.valueOf(2.5), loc.lng);
         assertEquals(new Coordinate(2.5, 1.0), loc.getCoordinate());
 
-        loc = LocationMatcher.fromOldStyleString("    -15.0,  200");
+        loc = LocationStringParser.fromOldStyleString("    -15.0,  200");
         assertNull(loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(-15.0), loc.lat);
         assertEquals(Double.valueOf(200), loc.lng);
         assertEquals(new Coordinate(200, -15), loc.getCoordinate());
 
-        loc = LocationMatcher.fromOldStyleString("122,-22.3   ");
+        loc = LocationStringParser.fromOldStyleString("122,-22.3   ");
         assertNull(loc.label);
         assertNull(loc.placeId);
         assertEquals(Double.valueOf(122), loc.lat);
@@ -90,17 +87,17 @@ public class LocationMatcherTest {
     @Test
     public void testFromOldStyleStringIncomplete() {
         String input = "0::";
-        GenericLocation loc = LocationMatcher.fromOldStyleString(input);
+        GenericLocation loc = LocationStringParser.fromOldStyleString(input);
         assertEquals("0", loc.label);
         assertNull(loc.placeId);
 
         input = "::1";
-        loc = LocationMatcher.fromOldStyleString(input);
+        loc = LocationStringParser.fromOldStyleString(input);
         assertEquals("", loc.label);
         assertNull(loc.placeId );
 
         input = "::";
-        loc = LocationMatcher.fromOldStyleString(input);
+        loc = LocationStringParser.fromOldStyleString(input);
         assertEquals("", loc.label);
         assertNull(loc.placeId);
     }

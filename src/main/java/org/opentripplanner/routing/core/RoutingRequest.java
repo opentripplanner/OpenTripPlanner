@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.api.common.LocationMatcher;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -690,11 +690,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final static int MIN_SIMILARITY = 1000;
 
     public void setFromString(String from) {
-        this.from = LocationMatcher.fromOldStyleString(from);
+        this.from = LocationStringParser.fromOldStyleString(from);
     }
 
     public void setToString(String to) {
-        this.to = LocationMatcher.fromOldStyleString(to);
+        this.to = LocationStringParser.fromOldStyleString(to);
     }
 
     /**
@@ -766,7 +766,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
-            intermediatePlaces.add(LocationMatcher.fromOldStyleString(place));
+            intermediatePlaces.add(LocationStringParser.fromOldStyleString(place));
         }
     }
 

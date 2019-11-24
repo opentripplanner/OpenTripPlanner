@@ -18,7 +18,7 @@ import java.util.regex.Pattern;
  *
  * See LocationMatcherTest for examples of valid strings.
  */
-public class LocationMatcher {
+public class LocationStringParser {
 
         // Pattern for matching a latitude or longitude string: an optional '-' character followed
         // by one or more digits, and an optional (decimal point followed by one or more digits).

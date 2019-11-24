@@ -4,7 +4,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
-import org.opentripplanner.api.common.LocationMatcher;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
@@ -108,10 +108,10 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.from = LocationMatcher.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
+            routingRequest.from = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.to = LocationMatcher.getGenericLocation(null, feedId.getId() + ":" + toVertex);
+            routingRequest.to = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
             routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
