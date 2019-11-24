@@ -15,7 +15,6 @@ import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
@@ -60,7 +59,7 @@ public class RoutingContextDestroyTest {
         createStreetEdge(a, b, "a -> b");
         createStreetEdge(b, a, "b -> a");
         createStreetEdge(a, c, "a -> c");
-        g.index(new DefaultStreetVertexIndexFactory());
+        g.index();
     }
 
     @Test public void temporaryChangesRemovedOnContextDestroy() {

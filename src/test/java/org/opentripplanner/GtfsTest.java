@@ -18,7 +18,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
@@ -69,7 +68,7 @@ public abstract class GtfsTest extends TestCase {
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies(feedId.getId()).iterator().next().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
         graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);

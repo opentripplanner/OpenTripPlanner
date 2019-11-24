@@ -13,7 +13,6 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
@@ -48,7 +47,7 @@ public class TestIntermediatePlaces {
             Graph graph = FakeGraph.buildGraphNoTransit();
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
-            graph.index(new DefaultStreetVertexIndexFactory());
+            graph.index();
             Router router = ConstantsForTests.forTestGraph(graph);
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();

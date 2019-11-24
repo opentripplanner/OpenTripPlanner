@@ -50,10 +50,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -126,7 +124,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndexService streetIndex;
+    public transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -668,8 +666,8 @@ public class Graph implements Serializable {
      * serialization. 
      * TODO: do we really need a factory for different street vertex indexes?
      */
-    public void index (StreetVertexIndexFactory indexFactory) {
-        streetIndex = indexFactory.newIndex(this);
+    public void index () {
+        streetIndex = new StreetVertexIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
@@ -692,7 +690,7 @@ public class Graph implements Serializable {
         }
         serializedGraphObject.reconstructEdgeLists();
         LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
         return graph;
     }
 

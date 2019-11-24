@@ -20,8 +20,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -54,7 +53,7 @@ public class NearbyStopFinder {
     private AStar astar;
 
     /* Fields used when finding stops without a street network. */
-    private StreetVertexIndexService streetIndex;
+    private StreetVertexIndex streetIndex;
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
@@ -79,7 +78,7 @@ public class NearbyStopFinder {
             // but we don't have much of a choice here. Use the default walking speed to convert.
         } else {
             // FIXME use the vertex index already in the graph if it exists.
-            streetIndex = new StreetVertexIndexServiceImpl(graph);
+            streetIndex = new StreetVertexIndex(graph);
         }
     }
 

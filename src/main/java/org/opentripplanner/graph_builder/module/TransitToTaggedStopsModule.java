@@ -9,7 +9,7 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransitToTaggedStopsModule.class);
 
-    StreetVertexIndexServiceImpl index;
+    StreetVertexIndex index;
     private double searchRadiusM = 250;
     private double searchRadiusLat = SphericalDistanceLibrary.metersToDegrees(searchRadiusM);
 
@@ -57,7 +57,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     ) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
-        index = new StreetVertexIndexServiceImpl(graph);
+        index = new StreetVertexIndex(graph);
 
         // iterate over a copy of vertex list because it will be modified
         ArrayList<Vertex> vertices = new ArrayList<>();
