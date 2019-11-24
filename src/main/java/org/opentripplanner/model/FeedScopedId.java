@@ -5,7 +5,12 @@ import java.io.Serializable;
 
 public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
-    private static final char ID_SEPARATOR = '_';
+    /**
+     * One Bus Away uses the underscore as a scope separator between Agency and ID. In OTP we use
+     * feed IDs instead of agency IDs as scope, and they are separated with a colon when
+     * represented together in String form.
+     */
+    private static final char ID_SEPARATOR = ':';
 
     private static final long serialVersionUID = 1L;
 

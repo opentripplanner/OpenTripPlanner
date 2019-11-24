@@ -7,66 +7,72 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * This class is kept so that the REST API can parse input strings and match them to a
- * GenericLocation.
+ * This class is used by the REST API to parse strings representing the from and to places for a
+ * search. These strings can contain a user-specified name for the location, as well as a
+ * latitude and longitude or a stop ID. We'd rather not be parsing multiple data items out of a
+ * single string, and will avoid doing so in OTP2, but this is how the OTP1 REST API works and we're
+ * keeping this parsing logic so we can keep providing that legacy API.
+ *
+ * These from/to strings are in the following format: An optional place name followed by two colons,
+ * then either a latitude and longitude or a feed-scoped ID for a stop or stop collection (station).
+ *
+ * See LocationMatcherTest for examples of valid strings.
  */
 public class LocationMatcher {
 
-        // Pattern for matching lat,lng strings, i.e. an optional '-' character followed by
-        // one or more digits, and an optional (decimal point followed by one or more digits).
+        // Pattern for matching a latitude or longitude string: an optional '-' character followed
+        // by one or more digits, and an optional (decimal point followed by one or more digits).
         private static final String _doublePattern = "-{0,1}\\d+(\\.\\d+){0,1}";
 
-        // We want to ignore any number of non-digit characters at the beginning of the string, except
-        // that signs are also non-digits. So ignore any number of non-(digit or sign or decimal point).
+        // The pattern for a latitude and longitude together. For some reason this is designed to
+        // ignore any number of non-digit characters except +/- signs at the beginning of the
+        // string. So it ignores any number of non-(digit or sign or decimal point).
         // Regex has been rewritten following https://bugs.openjdk.java.net/browse/JDK-8189343
         // from "[^[\\d&&[-|+|.]]]*(" to "[\\D&&[^-+.]]*("
-        private static final Pattern _latLonPattern = Pattern.compile("[\\D&&[^-+.]]*(" + _doublePattern
-                + ")(\\s*,\\s*|\\s+)(" + _doublePattern + ")\\D*");
+        private static final Pattern _latLonPattern = Pattern.compile(
+            "[\\D&&[^-+.]]*("
+            + _doublePattern
+            + ")(\\s*,\\s*|\\s+)("
+            + _doublePattern
+            + ")\\D*"
+        );
 
         /**
-         * Creates the GenericLocation by parsing a "name::place" string, where "place" is a latitude,longitude string or a vertex ID.
-         *
-         * @param input
-         * @return
+         * Creates the GenericLocation by parsing a "name::place" string, where "place" is a
+         * geographic coordinate string (latitude,longitude) or a feed scoped ID (feedId:stopId).
          */
         public static GenericLocation fromOldStyleString(String input) {
-                String name = "";
+                String name = null;
                 String place = input;
                 if (input.contains("::")) {
-                        String[] parts = input.split("::", 2);
-                        name = parts[0];
-                        place = parts[1];
+                    String[] parts = input.split("::", 2);
+                    name = parts[0];
+                    place = parts[1];
                 }
                 return getGenericLocation(name, place);
         }
 
         /**
-         * Construct from a name, place pair.
-         * Parses latitude, longitude data, heading and numeric edge ID out of the place string.
-         * Note that if the place string does not appear to contain a lat/lon pair, heading, or edge ID
-         * the GenericLocation will be missing that information but will still retain the place string,
-         * which will be interpreted during routing context construction as a vertex label within the
-         * graph for the appropriate routerId (by StreetVertexIndexServiceImpl.getVertexForLocation()).
-         * TODO: Perhaps the interpretation as a vertex label should be done here for clarity.
+         * Construct from two Strings, a label and a place. The label is an arbitrary user specified
+         * name for the location that can pass through to the routing response unchanged.
+         * The place contains latitude and longitude or a stop ID.
          */
         public static GenericLocation getGenericLocation(String label, String place) {
-                if (place == null) {
-                        return null;
-                }
+            if (place == null) {
+                return null;
+            }
 
-                Double lat = null;
-                Double lon = null;
-                FeedScopedId placeId = null;
+            Double lat = null;
+            Double lon = null;
+            FeedScopedId placeId = null;
 
-                Matcher matcher = _latLonPattern.matcher(place);
-                if (matcher.find()) {
-                        lat = Double.parseDouble(matcher.group(1));
-                        lon = Double.parseDouble(matcher.group(4));
-                        if (FeedScopedId.isValidString(matcher.group(0))) {
-                                placeId = FeedScopedId.convertFromString(matcher.group(0));
-                        }
-                }
-
-                return new GenericLocation(label, placeId, lat, lon);
+            Matcher matcher = _latLonPattern.matcher(place);
+            if (matcher.find()) {
+                lat = Double.parseDouble(matcher.group(1));
+                lon = Double.parseDouble(matcher.group(4));
+            } else if (FeedScopedId.isValidString(place)) {
+                placeId = FeedScopedId.convertFromString(place);
+            }
+            return new GenericLocation(label, placeId, lat, lon);
         }
 }
