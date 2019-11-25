@@ -99,11 +99,6 @@ public class ItineraryMapper {
 
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
 
-        FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
-        if (fareService != null) {
-            itinerary.fare = fareService.getCost(path);
-        }
-
         while (!pathLeg.isEgressLeg()) {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {

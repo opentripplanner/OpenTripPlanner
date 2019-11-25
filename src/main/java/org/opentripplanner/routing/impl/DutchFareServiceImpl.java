@@ -6,6 +6,8 @@ import java.util.List;
 
 import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -189,13 +191,13 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     @Override
-    public Fare getCost(Path path) {
+    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
         Currency euros = Currency.getInstance("EUR");
         // Use the usual process from the default fare service, but force the currency to Euros.
         // The default process assumes there is only one currency per set of fare rules and looks at any old rule to
         // guess what the currency is. This doesn't work on the Dutch data which has distances mixed in with Euros to
         // account for distance-derived fares.
-        Fare fare = super.getCost(path);
+        Fare fare = super.getCost(path, transitLayer);
         if (fare != null) {
             for (Money money : fare.fare.values()) {
                 money.setCurrency(euros);

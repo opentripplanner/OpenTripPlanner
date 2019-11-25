@@ -12,8 +12,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
-import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.Router;
@@ -100,7 +99,8 @@ public class ConstantsForTests {
             // Add street data from OSM
             {
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
-                OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
+                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider();
+                osmProvider.setPath(osmFile);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(portlandGraph, new HashMap<>());
@@ -137,7 +137,8 @@ public class ConstantsForTests {
             // Add street data from OSM
             {
                 File osmFile = new File(OSLO_EAST_OSM);
-                OpenStreetMapProvider osmProvider = new AnyFileBasedOpenStreetMapProviderImpl(osmFile);
+                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider();
+                osmProvider.setPath(osmFile);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(minNetexGraph, new HashMap<>());

@@ -3,7 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
-import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
+import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -69,7 +69,7 @@ public class PlatformLinkerTest {
         loader.platformEntriesLinking = true;
         loader.skipVisibility = true;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(
                 URLDecoder.decode(FakeGraph.class.getResource("osm/skoyen.osm.pbf").getFile(),
