@@ -3,6 +3,7 @@ package org.opentripplanner.routing.bike_rental;
 import com.conveyal.r5.otp2.api.path.Path;
 import com.conveyal.r5.otp2.api.path.PathLeg;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -52,7 +53,7 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path) {
+    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
 
         int rideCost = getLegCost(path.accessLeg());
         rideCost += getLegCost(path.egressLeg());
