@@ -12,12 +12,9 @@ import java.util.Map;
 import java.util.Set;
 
 import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
-import com.conveyal.r5.otp2.api.path.TransitPathLeg;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -28,73 +25,6 @@ import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-/** A set of edges on a single route, with associated information for calculating fares */
-class Ride {
-    
-    String agency; // route agency
-
-    FeedScopedId route;
-
-    FeedScopedId trip;
-    
-    Set<String> zones;
-
-    String startZone;
-
-    String endZone;
-
-    long startTime;
-
-    long endTime;
-
-    // in DefaultFareServiceImpl classifier is just the TraverseMode
-    // it can be used differently in custom fare services
-    public Object classifier;
-
-    public Stop firstStop;
-
-    public Stop lastStop;
-
-    public Ride() {
-        zones = new HashSet<String>();
-    }
-
-    public String toString() {
-        StringBuilder builder = new StringBuilder();
-        builder.append("Ride");
-        if (startZone != null) {
-            builder.append("(from zone ");
-            builder.append(startZone);
-        }
-        if (endZone != null) {
-            builder.append(" to zone ");
-            builder.append(endZone);
-        }
-        builder.append(" on route ");
-        builder.append(route);
-        if (zones.size() > 0) {
-            builder.append(" through zones ");
-            boolean first = true;
-            for (String zone : zones) {
-                if (first) {
-                    first = false;
-                } else {
-                    builder.append(",");
-                }
-                builder.append(zone);
-            }
-        }
-        builder.append(" at ");
-        builder.append(startTime);
-        if (classifier != null) {
-            builder.append(", classified by ");
-            builder.append(classifier.toString());
-        }
-        builder.append(")");
-        return builder.toString();
-    }
-}
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {
@@ -160,9 +90,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path) {
+    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
 
-        List<Ride> rides = ridesForRaptorPath(path);
+        List<Ride> rides = RideMapper.ridesForRaptorPath(path, transitLayer);
+
         // If there are no rides, there's no fare.
         if (rides.size() == 0) {
             return null;
@@ -387,45 +318,6 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 			break;
     	}
     	return fare.getPrice();
-    }
-
-    /**
-     * Convert transit legs in a Raptor Path into Rides, which are used by FareServices to calculate
-     * fares. Adapted from from previously used method DefaultFareServiceImpl.createRides().
-     */
-    public static List<Ride> ridesForRaptorPath(Path path) {
-        List<Ride> rides = new ArrayList<>();
-        for (PathLeg leg = path.accessLeg().nextLeg(); !leg.isEgressLeg(); leg = leg.nextLeg()) {
-            if (leg.isTransitLeg()) {
-                rides.add(rideForTransitPathLeg(leg.asTransitLeg()));
-            }
-        }
-        return rides;
-    }
-
-    public static Ride rideForTransitPathLeg(TransitPathLeg leg) {
-        TransitPathLeg<TripSchedule> transitPathLeg = leg.asTransitLeg();
-        TripSchedule tripSchedule = transitPathLeg.trip();
-        Ride ride = new Ride();
-        TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
-        int fromStopIndexInPattern = transitPathLeg.fromStop();
-        int toStopIndexInPattern = transitPathLeg.fromStop();
-        ride.firstStop = tripPattern.getStop(fromStopIndexInPattern);
-        ride.lastStop = tripPattern.getStop(toStopIndexInPattern);
-        ride.startZone = ride.firstStop.getZone();
-        ride.endZone = ride.lastStop.getZone();
-        for (int s = fromStopIndexInPattern; s <= toStopIndexInPattern; s++) {
-            ride.zones.add(tripPattern.getStop(s).getZone());
-        }
-        ride.agency = tripPattern.route.getAgency().getId();
-        ride.route = tripPattern.route.getId();
-        ride.trip = tripSchedule.getOriginalTripTimes().trip.getId();
-        // TODO verify that times are in seconds after midnight
-        ride.startTime = transitPathLeg.fromTime();
-        ride.endTime  = transitPathLeg.toTime();
-        // In the default fare service, we classify rides by mode.
-        ride.classifier = tripPattern.mode;
-        return ride;
     }
 
 }

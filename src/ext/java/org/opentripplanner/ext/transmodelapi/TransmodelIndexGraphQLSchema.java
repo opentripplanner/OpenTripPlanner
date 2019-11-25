@@ -2069,7 +2069,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("publicCode")
                         .type(Scalars.GraphQLString)
                         .description("Publicly announced code for service journey, differentiating it from other service journeys for the same line. NOT IMPLEMENTED")
-                        .dataFetcher(environment -> null)
+                        .dataFetcher(environment -> "")
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2325,7 +2325,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("publicCode")
                         .type(Scalars.GraphQLString)
                         .description("Publicly announced code for line, differentiating it from other lines for the same operator.")
-                        .dataFetcher(environment -> (((Route) environment.getSource()).getShortName()))
+                        .dataFetcher(environment -> "")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
@@ -3313,10 +3313,10 @@ public class TransmodelIndexGraphQLSchema {
                                 .findFirst()
                                 .orElse(null))
                         .build())
-                /*
+
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikeRentalStationsByBbox")
-                        .description("Get all bike rental stations within the specified bounding box.")
+                        .description("Get all bike rental stations within the specified bounding box. NOT IMPLEMENTED")
                         .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
                         .argument(GraphQLArgument.newArgument()
                                 .name("minimumLatitude")
@@ -3334,18 +3334,8 @@ public class TransmodelIndexGraphQLSchema {
                                 .name("maximumLongitude")
                                 .type(Scalars.GraphQLFloat)
                                 .build())
-                        .dataFetcher(environment -> index.graph.streetIndex
-                                .getBikeRentalStationForEnvelope(new Envelope(
-                                        new Coordinate(environment.getArgument("minimumLongitude"),
-                                                environment.getArgument("minimumLatitude")),
-                                        new Coordinate(environment.getArgument("maximumLongitude"),
-                                                environment.getArgument("maximumLatitude")))).stream()
-                                        .map(b -> b.getStation())
-                                        .sorted((s1, s2) -> s1.getName().toString().compareTo(s2.getName().toString()))
-                                        .collect(Collectors.toList())
-                                )
+                        .dataFetcher(environment -> Collections.emptyList())
                         .build())
-                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikePark")
                         .description("Get a single bike park based on its id")
