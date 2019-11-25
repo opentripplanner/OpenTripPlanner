@@ -16,7 +16,7 @@ import java.util.regex.Pattern;
  * These from/to strings are in the following format: An optional place name followed by two colons,
  * then either a latitude and longitude or a feed-scoped ID for a stop or stop collection (station).
  *
- * See LocationMatcherTest for examples of valid strings.
+ * See LocationStringParserTest for examples of valid strings.
  */
 public class LocationStringParser {
 
