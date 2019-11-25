@@ -164,9 +164,17 @@ public class NearbyStopFinder {
                 }
             }
         }
-        /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        if (originVertices instanceof TransitStopVertex) {
-            stopsFound.add(new StopAtDistance((TransitStopVertex)originVertices, 0));
+        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
+        for (Vertex vertex : originVertices) {
+            if (vertex instanceof TransitStopVertex) {
+                stopsFound.add(
+                    new StopAtDistance(
+                        (TransitStopVertex) vertex,
+                        0,
+                        Collections.emptyList(),
+                        null
+                    ));
+            }
         }
         if (removeTempEdges) {
             routingRequest.cleanup();
@@ -194,8 +202,11 @@ public class NearbyStopFinder {
             double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
             if (distance < radiusMeters) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
-                StopAtDistance sd = new StopAtDistance(ts1, distance);
-                sd.geom = geometryFactory.createLineString(coordinates);
+                StopAtDistance sd = new StopAtDistance(
+                    ts1, distance,
+                    null,
+                    geometryFactory.createLineString(coordinates)
+                );
                 stopsFound.add(sd);
             }
         }
@@ -207,23 +218,30 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public TransitStopVertex tstop;
-        public double      dist;
-        public LineString  geom;
-        public List<Edge>  edges;
+        public final TransitStopVertex tstop;
+        public final double distance;
+        public final LineString geometry;
+        public final List<Edge>  edges;
 
-        public StopAtDistance(TransitStopVertex tstop, double dist) {
+        public StopAtDistance(
+            TransitStopVertex tstop,
+            double distance,
+            List<Edge> edges,
+            LineString geometry
+        ) {
             this.tstop = tstop;
-            this.dist = dist;
+            this.distance = distance;
+            this.edges = edges;
+            this.geometry = geometry;
         }
 
         @Override
         public int compareTo(StopAtDistance that) {
-            return (int) (this.dist) - (int) (that.dist);
+            return (int) (this.distance) - (int) (that.distance);
         }
 
         public String toString() {
-            return String.format("stop %s at %.1f meters", tstop, dist);
+            return String.format("stop %s at %.1f meters", tstop, distance);
         }
 
     }
@@ -260,10 +278,12 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), effectiveWalkDistance);
-        sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
-        sd.edges = edges;
-        return sd;
+        return
+            new StopAtDistance(
+                (TransitStopVertex) state.getVertex(),
+                effectiveWalkDistance, edges,
+                geometryFactory.createLineString(
+                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())));
     }
 
 
