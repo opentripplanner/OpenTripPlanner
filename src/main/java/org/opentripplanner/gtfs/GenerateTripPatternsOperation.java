@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
@@ -99,6 +100,14 @@ public class GenerateTripPatternsOperation {
     }
 
     private void buildTripPatternForTrip(Trip trip) {
+        // TODO: move to a validator module
+        try {
+            GtfsLibrary.getTraverseMode(trip.getRoute());
+        } catch (IllegalArgumentException e) {
+            issueStore.add(new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getType())));
+            return;
+        }
+
         // TODO: move to a validator module
         if (!calendarServiceIds.contains(trip.getServiceId())) {
             issueStore.add(new TripUndefinedService(trip));
