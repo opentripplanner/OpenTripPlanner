@@ -5,6 +5,7 @@ import com.conveyal.r5.otp2.api.path.PathLeg;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
@@ -84,10 +85,10 @@ public class NycFareServiceImpl implements FareService, Serializable {
 	public NycFareServiceImpl() { }
 
 	@Override
-	public Fare getCost(Path<TripSchedule> path) {
+	public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
 
-		// Convert the Raptor transit results into Rides, used by the Fare service.
-		List<Ride> rides = createRides(path);
+		// Use custom ride-categorizing method instead of the usual mapper from default fare service.
+		List<Ride> rides = createRides(path, transitLayer);
 
 		// There are no rides, so there's no fare.
 		if (rides.size() == 0) {
@@ -308,7 +309,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 		return fare;
 	}
 
-	private static List<Ride> createRides (Path<TripSchedule> path) {
+	private static List<Ride> createRides (Path<TripSchedule> path, TransitLayer transitLayer) {
 		List<Ride> rides = new ArrayList<>();
 		for (PathLeg<TripSchedule> leg = path.accessLeg(); ! leg.isEgressLeg(); leg = leg.nextLeg()) {
 			if (leg.isTransferLeg()) {
@@ -317,7 +318,7 @@ public class NycFareServiceImpl implements FareService, Serializable {
 				rides.add(ride);
 				continue;
 			} else if (leg.isTransitLeg()) {
-				Ride ride = DefaultFareServiceImpl.rideForTransitPathLeg(leg.asTransitLeg());
+				Ride ride = RideMapper.rideForTransitPathLeg(leg.asTransitLeg(), transitLayer);
 				// It seems like we should do something more sophisticated than just ignore
 				// agency IDs we don't recognize.
 				if (!AGENCIES.contains(ride.agency)) {
