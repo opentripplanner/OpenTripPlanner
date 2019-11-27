@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 
 /**
  * Preferences for how to traverse the graph.
@@ -77,7 +76,7 @@ public class TraversalRequirements {
     private static void initFromRoutingRequest(TraversalRequirements req, RoutingRequest options) {
         req.modes = options.modes.clone();
         req.wheelchairAccessible = options.wheelchairAccessible;
-        req.maxWheelchairSlope = options.maxSlope;
+        req.maxWheelchairSlope = options.maxWheelchairSlope;
         req.maxWalkDistance = options.maxWalkDistance;
     }
 
