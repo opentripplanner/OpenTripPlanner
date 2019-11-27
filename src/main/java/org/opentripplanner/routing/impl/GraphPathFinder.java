@@ -169,7 +169,7 @@ public class GraphPathFinder {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
-                relaxedRequest.maxSlope = Double.MAX_VALUE;
+                relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
                 request.rctx.slopeRestrictionRemoved = true;
                 paths = getGraphPathsConsideringIntermediates(relaxedRequest);
             }
