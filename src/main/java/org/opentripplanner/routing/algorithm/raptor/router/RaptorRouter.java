@@ -7,6 +7,7 @@ import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
+import eu.datex2.siri13.schema._1_0._1_0.ItoM;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
@@ -18,11 +19,15 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.impl.Ride;
+import org.opentripplanner.routing.impl.RideMapper;
+import org.opentripplanner.routing.services.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
@@ -122,12 +127,28 @@ public class RaptorRouter {
 
     double startItineraries = System.currentTimeMillis();
 
-    ItineraryMapper itineraryMapper = new ItineraryMapper(transitLayer,
-        otpRRDataProvider.getStartOfTime(), request, accessTransfers, egressTransfers);
+        ItineraryMapper itineraryMapper = new ItineraryMapper(
+                transitLayer,
+                otpRRDataProvider.getStartOfTime(),
+                request,
+                accessTransfers,
+                egressTransfers
+        );
 
-    List<Itinerary> itineraries = paths.stream()
-        .map(itineraryMapper::createItinerary)
-        .collect(Collectors.toList());
+        FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
+
+        List<Itinerary> itineraries = new ArrayList<>();
+        for (Path path : paths) {
+            // Convert the Raptor/Astar paths to OTP API Itineraries
+            Itinerary itinerary = itineraryMapper.createItinerary(path);
+            // Decorate the Itineraries with fare information.
+            // Itinerary and Leg are API model classes, lacking internal object references needed for effective
+            // fare calculation. We derive the fares from the internal Path objects and add them to the itinerary.
+            if (fareService != null) {
+                itinerary.fare = fareService.getCost(path, transitLayer);
+            }
+            itineraries.add(itinerary);
+        }
 
     LOG.info("Creating itineraries took {} ms", itineraries.size(),
         System.currentTimeMillis() - startItineraries);
