@@ -70,7 +70,7 @@ public class PlannerResource extends RoutingResource {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
-            router = otpServer.getRouter(request.routerId);
+            router = otpServer.getRouter(null);
             request.setRoutingContext(router.graph);
 
             List<Itinerary> itineraries = new ArrayList<>();

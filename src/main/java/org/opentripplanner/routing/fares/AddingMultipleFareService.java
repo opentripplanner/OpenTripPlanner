@@ -4,10 +4,12 @@ import java.io.Serializable;
 import java.util.List;
 
 import com.conveyal.r5.otp2.api.path.Path;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.impl.Ride;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 
@@ -22,12 +24,12 @@ public class AddingMultipleFareService implements FareService, Serializable {
     }
 
     @Override
-    public Fare getCost(Path<TripSchedule> path) {
+    public Fare getCost(Path<TripSchedule> path, TransitLayer transitLayer) {
 
         Fare fare = null;
 
         for (FareService subService : subServices) {
-            Fare subFare = subService.getCost(path);
+            Fare subFare = subService.getCost(path, transitLayer);
             if (subFare == null) {
                 // No fare, next one please
                 continue;

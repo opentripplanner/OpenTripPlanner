@@ -210,10 +210,10 @@ public class TransmodelGraphQLPlanner {
 
         if (optimize == OptimizeType.TRIANGLE) {
             try {
-                request.assertTriangleParameters(request.triangleSafetyFactor, request.triangleTimeFactor, request.triangleSlopeFactor);
-                callWith.argument("triangle.safetyFactor", request::setTriangleSafetyFactor);
-                callWith.argument("triangle.slopeFactor", request::setTriangleSlopeFactor);
-                callWith.argument("triangle.timeFactor", request::setTriangleTimeFactor);
+                request.assertTriangleParameters(request.bikeTriangleSafetyFactor, request.bikeTriangleTimeFactor, request.bikeTriangleSlopeFactor);
+                callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
+                callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
+                callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
             } catch (ParameterException e) {
                 throw new RuntimeException(e);
             }
@@ -244,7 +244,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("whiteListed.authorities", authorities -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
 
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
-        callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
+        // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
         callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
 
