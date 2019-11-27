@@ -53,18 +53,18 @@ public class TestTriangle extends TestCase {
         options.bikeSpeed = 6.0;
         options.walkReluctance = 1;
 
-        options.setTriangleSafetyFactor(0);
-        options.setTriangleSlopeFactor(0);
-        options.setTriangleTimeFactor(1);
+        options.setBikeTriangleSafetyFactor(0);
+        options.setBikeTriangleSlopeFactor(0);
+        options.setBikeTriangleTimeFactor(1);
         State startState = new State(v1, options);
         State result = testStreet.traverse(startState);
         double timeWeight = result.getWeight();
         double expectedTimeWeight = slopeSpeedLength / options.getSpeed(TraverseMode.BICYCLE);
         assertTrue(Math.abs(expectedTimeWeight - timeWeight) < 0.00001);
 
-        options.setTriangleSafetyFactor(0);
-        options.setTriangleSlopeFactor(1);
-        options.setTriangleTimeFactor(0);
+        options.setBikeTriangleSafetyFactor(0);
+        options.setBikeTriangleSlopeFactor(1);
+        options.setBikeTriangleTimeFactor(0);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double slopeWeight = result.getWeight();
@@ -73,9 +73,9 @@ public class TestTriangle extends TestCase {
         assertTrue(length * 1.5 / options.getSpeed(TraverseMode.BICYCLE) < slopeWeight);
         assertTrue(length * 1.5 * 10 / options.getSpeed(TraverseMode.BICYCLE) > slopeWeight);
 
-        options.setTriangleSafetyFactor(1);
-        options.setTriangleSlopeFactor(0);
-        options.setTriangleTimeFactor(0);
+        options.setBikeTriangleSafetyFactor(1);
+        options.setBikeTriangleSlopeFactor(0);
+        options.setBikeTriangleTimeFactor(0);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double safetyWeight = result.getWeight();
@@ -84,9 +84,9 @@ public class TestTriangle extends TestCase {
         assertTrue(Math.abs(expectedSafetyWeight - safetyWeight) < 0.00001);
 
         final double ONE_THIRD = 1/3.0;
-        options.setTriangleSafetyFactor(ONE_THIRD);
-        options.setTriangleSlopeFactor(ONE_THIRD);
-        options.setTriangleTimeFactor(ONE_THIRD);
+        options.setBikeTriangleSafetyFactor(ONE_THIRD);
+        options.setBikeTriangleSlopeFactor(ONE_THIRD);
+        options.setBikeTriangleTimeFactor(ONE_THIRD);
         startState = new State(v1, options);
         result = testStreet.traverse(startState);
         double averageWeight = result.getWeight();
