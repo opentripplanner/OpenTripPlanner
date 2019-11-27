@@ -57,7 +57,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.PriorityQueue;
 import java.util.Set;
 import java.util.concurrent.Executors;
 
@@ -269,6 +268,16 @@ public class GraphIndex {
 
         for (TripPattern pattern : patternsForStop.get(stop)) {
 
+            // The bounded priority Q is used to keep a sorted short list of trip times. We can not
+            // relay on the trip times to be in order because of real-time updates. This code can
+            // probably be optimized, and the trip search in the Raptor search does almost the same
+            // thing. This is no part of a routing request, but is a used frequently in some
+            // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and
+            // hotel lobbies). Setting the numberOfDepartures and timeRange to a big number for a
+            // transit hub could result in a DOS attack, but there are probably other more effective
+            // ways to do it.
+            //
+            // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
             MinMaxPriorityQueue<TripTimeShort> pq = MinMaxPriorityQueue
                     .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.serviceDay + tts.realtimeDeparture))
                     .maximumSize(numberOfDepartures)
