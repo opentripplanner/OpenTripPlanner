@@ -1,6 +1,7 @@
 package org.opentripplanner.geocoder.bano;
 
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -15,9 +16,12 @@ public class BanoGeocoderTest {
 
     /**
      * TODO -- This unit-test rely on an on-line API to be up and running, which may not be the case
-     * if a network connection is not active or the server is down.
+     *          if a network connection is not active or the server is down.
+     *          This test is ignored for now, as the API keeps changing, and we don't want the OTP
+     *          build to fail when this happens.
      */
     @Test
+    @Ignore
     public void testOnLine() throws IOException {
         assumeConnectedToInternet();
 
