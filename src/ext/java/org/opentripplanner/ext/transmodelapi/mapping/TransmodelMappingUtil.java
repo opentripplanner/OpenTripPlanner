@@ -2,11 +2,14 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.PlaceType;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.time.LocalDate;
@@ -133,6 +136,24 @@ public class TransmodelMappingUtil {
         }
 
         return inputTypes.stream().map(pt -> mapPlaceType(pt)).distinct().collect(Collectors.toList());
+    }
+
+    public MonoOrMultiModalStation getMonoOrMultiModalStation(
+        String idString,
+        Map<FeedScopedId, Station> stationById,
+        Map<FeedScopedId, MultiModalStation> multiModalStationById,
+        Map<Station, MultiModalStation> multimodalStationForStations
+    ) {
+        FeedScopedId id = fromIdString(idString);
+        Station station = stationById.get(id);
+        if (station != null) {
+            return new MonoOrMultiModalStation(station, multimodalStationForStations.get(station));
+        }
+        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return new MonoOrMultiModalStation(multiModalStation);
+        }
+        return null;
     }
 
     private PlaceType mapPlaceType(TransmodelPlaceType transmodelType){

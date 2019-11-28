@@ -80,6 +80,7 @@ public class GraphIndex {
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    public final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
     final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
@@ -139,6 +140,11 @@ public class GraphIndex {
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
+        }
+        for (MultiModalStation multiModalStation : graph.multiModalStationById.values()) {
+            for (Station childStation : multiModalStation.getChildStations()) {
+                multiModalStationForStations.put(childStation, multiModalStation);
+            }
         }
 
         // Copy these two service indexes from the graph until we have better ones.
