@@ -1,6 +1,7 @@
 package org.opentripplanner.geocoder.bano;
 
 import org.junit.Assume;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -14,10 +15,16 @@ import java.net.UnknownHostException;
 public class BanoGeocoderTest {
 
     /**
-     * TODO -- This unit-test rely on an on-line API to be up and running, which may not be the case
-     * if a network connection is not active or the server is down.
+     * NOTE! THIS TEST RELAY ON AN ON-LINE EXTERNAL API (Bano Geocoder) TO BE UP AN RUNNING, WHICH
+     * MAY NOT BE THE CASE. HENCE THE '@Ignore'.
+     * <p>
+     * The test is kept here to be able to run it manually and to let downstream forks enable it,
+     * but please do not include this in the main OTP GitHub, when failing it interrupts everyone's
+     * work. It have failed twice in 2019, each time taking several hours to merge, review and
+     * verify various forks and branches. Just at Entur we have more than 10 branches failing.
      */
     @Test
+    @Ignore
     public void testOnLine() throws IOException {
         assumeConnectedToInternet();
 
