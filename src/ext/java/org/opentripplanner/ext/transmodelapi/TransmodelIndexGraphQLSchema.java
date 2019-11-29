@@ -1992,14 +1992,14 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> {
                             // TODO OTP2 - Fix it!
                             //TripTimeShort tripTimeShort = environment.getSource();
-                            return null; //index.getNoticesByEntity(tripTimeShort.stopTimeId);
+                            return Collections.emptyList(); //index.getNoticesByEntity(tripTimeShort.stopTimeId);
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("situations")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                         .description("Get all relevant situations for this EstimatedCall. NOT IMPLEMENTED")
-                        .dataFetcher(environment -> null)
+                        .dataFetcher(environment -> Collections.emptyList())
                         .build())
                  .field(GraphQLFieldDefinition.newFieldDefinition()
                          .name("bookingArrangements")
