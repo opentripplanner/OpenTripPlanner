@@ -7,7 +7,6 @@ import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
-import eu.datex2.siri13.schema._1_0._1_0.ItoM;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
@@ -19,8 +18,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.impl.Ride;
-import org.opentripplanner.routing.impl.RideMapper;
 import org.opentripplanner.routing.services.FareService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +28,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper.secondsSinceStartOfTime;
 

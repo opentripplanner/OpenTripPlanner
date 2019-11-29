@@ -20,8 +20,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -29,6 +28,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
@@ -53,7 +53,7 @@ public class NearbyStopFinder {
     private AStar astar;
 
     /* Fields used when finding stops without a street network. */
-    private StreetVertexIndexService streetIndex;
+    private StreetVertexIndex streetIndex;
 
     /**
      * Construct a NearbyStopFinder for the given graph and search radius, choosing whether to search via the street
@@ -78,7 +78,7 @@ public class NearbyStopFinder {
             // but we don't have much of a choice here. Use the default walking speed to convert.
         } else {
             // FIXME use the vertex index already in the graph if it exists.
-            streetIndex = new StreetVertexIndexServiceImpl(graph);
+            streetIndex = new StreetVertexIndex(graph);
         }
     }
 
@@ -128,7 +128,7 @@ public class NearbyStopFinder {
      * Return all stops within a certain radius of the given vertex, using network distance along streets.
      * If the origin vertex is a StopVertex, the result will include it.
      *
-     * @param originVertex the origin point of the street search
+     * @param originVertices the origin point of the street search
      * @param reverseDirection if true the paths returned instead originate at the nearby stops and have the
      *                         originVertex as the destination
      * @param removeTempEdges after creating a new routing request and routing context, remove all the temporary
@@ -138,13 +138,13 @@ public class NearbyStopFinder {
      *                        This is a stopgap solution until we rethink the lifecycle of RoutingContext.
      */
     public List<StopAtDistance> findNearbyStopsViaStreets (
-            Vertex originVertex,
+            Set<Vertex> originVertices,
             boolean reverseDirection,
             boolean removeTempEdges
     ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.setRoutingContext(graph, originVertex, null);
+        routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
@@ -157,15 +157,23 @@ public class NearbyStopFinder {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
-                if (targetVertex == originVertex) continue;
+                if (originVertices.contains(targetVertex)) continue;
                 if (targetVertex instanceof TransitStopVertex) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
         }
-        /* Add the origin vertex if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        if (originVertex instanceof TransitStopVertex) {
-            stopsFound.add(new StopAtDistance((TransitStopVertex)originVertex, 0));
+        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
+        for (Vertex vertex : originVertices) {
+            if (vertex instanceof TransitStopVertex) {
+                stopsFound.add(
+                    new StopAtDistance(
+                        (TransitStopVertex) vertex,
+                        0,
+                        Collections.emptyList(),
+                        null
+                    ));
+            }
         }
         if (removeTempEdges) {
             routingRequest.cleanup();
@@ -175,7 +183,11 @@ public class NearbyStopFinder {
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
-        return findNearbyStopsViaStreets(originVertex, false, true);
+        return findNearbyStopsViaStreets(
+                Collections.singleton(originVertex),
+                false,
+                true
+        );
     }
 
     /**
@@ -189,8 +201,11 @@ public class NearbyStopFinder {
             double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
             if (distance < radiusMeters) {
                 Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
-                StopAtDistance sd = new StopAtDistance(ts1, distance);
-                sd.geom = geometryFactory.createLineString(coordinates);
+                StopAtDistance sd = new StopAtDistance(
+                    ts1, distance,
+                    null,
+                    geometryFactory.createLineString(coordinates)
+                );
                 stopsFound.add(sd);
             }
         }
@@ -202,23 +217,30 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public TransitStopVertex tstop;
-        public double      dist;
-        public LineString  geom;
-        public List<Edge>  edges;
+        public final TransitStopVertex tstop;
+        public final double distance;
+        public final LineString geometry;
+        public final List<Edge>  edges;
 
-        public StopAtDistance(TransitStopVertex tstop, double dist) {
+        public StopAtDistance(
+            TransitStopVertex tstop,
+            double distance,
+            List<Edge> edges,
+            LineString geometry
+        ) {
             this.tstop = tstop;
-            this.dist = dist;
+            this.distance = distance;
+            this.edges = edges;
+            this.geometry = geometry;
         }
 
         @Override
         public int compareTo(StopAtDistance that) {
-            return (int) (this.dist) - (int) (that.dist);
+            return (int) (this.distance) - (int) (that.distance);
         }
 
         public String toString() {
-            return String.format("stop %s at %.1f meters", tstop, dist);
+            return String.format("stop %s at %.1f meters", tstop, distance);
         }
 
     }
@@ -255,10 +277,12 @@ public class NearbyStopFinder {
             coordinateList.add(lastState.getVertex().getCoordinate());
             coordinates = new CoordinateArrayListSequence(coordinateList);
         }
-        StopAtDistance sd = new StopAtDistance((TransitStopVertex) state.getVertex(), effectiveWalkDistance);
-        sd.geom = geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray()));
-        sd.edges = edges;
-        return sd;
+        return
+            new StopAtDistance(
+                (TransitStopVertex) state.getVertex(),
+                effectiveWalkDistance, edges,
+                geometryFactory.createLineString(
+                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())));
     }
 
 

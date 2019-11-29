@@ -29,7 +29,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -76,7 +76,7 @@ public class IndexAPI {
     @QueryParam("refs") private boolean refs = false;
 
     private final GraphIndex index;
-    private final StreetVertexIndexService streetIndex;
+    private final StreetVertexIndex streetIndex;
     private final ObjectMapper deserializer = new ObjectMapper();
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {

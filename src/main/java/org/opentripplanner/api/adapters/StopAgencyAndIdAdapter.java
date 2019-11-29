@@ -19,7 +19,7 @@ public class StopAgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, Stop> {
             return null;
         }
         FeedScopedId id = arg.getId();
-        return new AgencyAndIdType(id.getAgencyId(), id.getId());
+        return new AgencyAndIdType(id.getFeedId(), id.getId());
     }
 
 }

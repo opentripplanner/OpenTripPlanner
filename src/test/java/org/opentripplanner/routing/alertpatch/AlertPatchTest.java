@@ -13,7 +13,6 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.util.TestUtils;
@@ -51,7 +50,7 @@ public class AlertPatchTest extends TestCase {
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
 
         feedId = context.getFeedId().getId();
     }

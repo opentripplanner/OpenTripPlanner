@@ -38,6 +38,7 @@ import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -108,7 +109,7 @@ public class SimpleStreetSplitter {
      * NOTE: Only one SimpleStreetSplitter should be active on a graph at any given time.
      *
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
-     * @param transitStopIndex Index of all transitStops which is generated in {@link org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl}
+     * @param transitStopIndex Index of all transitStops which is generated in {@link StreetVertexIndex}
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
@@ -559,14 +560,14 @@ public class SimpleStreetSplitter {
         //TODO: add nice name
         String name;
 
-        if (location.name == null || location.name.isEmpty()) {
+        if (location.label == null || location.label.isEmpty()) {
             if (endVertex) {
                 name = "Destination";
             } else {
                 name = "Origin";
             }
         } else {
-            name = location.name;
+            name = location.label;
         }
         TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
             coord, new NonLocalizedString(name), endVertex);

@@ -79,7 +79,7 @@ public class StopAndStationMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Stop result = subject.map(STOP);
 
-        assertEquals("A_1", result.getId().toString());
+        assertEquals("A:1", result.getId().toString());
         assertEquals(CODE, result.getCode());
         assertEquals(DESC, result.getDescription());
         assertEquals(LAT, result.getLat(), 0.0001d);

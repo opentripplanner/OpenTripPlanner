@@ -54,7 +54,7 @@ public class ShapePointMapperTest {
         assertEquals(LAT, result.getLat(), 0.0001d);
         assertEquals(LON, result.getLon(), 0.0001d);
         assertEquals(SEQUENCE, result.getSequence());
-        assertEquals("A_1", result.getShapeId().toString());
+        assertEquals("A:1", result.getShapeId().toString());
     }
 
     @Test

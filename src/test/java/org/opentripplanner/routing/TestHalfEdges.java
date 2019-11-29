@@ -25,7 +25,7 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -140,7 +140,7 @@ public class TestHalfEdges {
         turns.add(left);
         turns.add(leftBack);
 
-        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
 
@@ -148,7 +148,7 @@ public class TestHalfEdges {
         endTurns.add(right);
         endTurns.add(rightBack);
 
-        TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
+        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
                 filter(endTurns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(right.getGeometry()), true);
 
@@ -212,10 +212,10 @@ public class TestHalfEdges {
          */
 
         options = new RoutingRequest(new TraverseModeSet(TraverseMode.BICYCLE));
-        start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start1", new NonLocalizedString("start1"),
+        start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start1", new NonLocalizedString("start1"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(top.getGeometry()), false);
-        end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "end1", new NonLocalizedString("end1"),
+        end = StreetVertexIndex.createTemporaryStreetLocation(graph, "end1", new NonLocalizedString("end1"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.95).getCoordinate(bottom.getGeometry()), true);
 
@@ -236,10 +236,10 @@ public class TestHalfEdges {
         assertEquals(nVertices, graph.getVertices().size());
         assertEquals(nEdges, graph.getEdges().size());
 
-        start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start2", new NonLocalizedString("start2"),
+        start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start2", new NonLocalizedString("start2"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(top.getGeometry()), false);
-        end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "end2", new NonLocalizedString("end2"),
+        end = StreetVertexIndex.createTemporaryStreetLocation(graph, "end2", new NonLocalizedString("end2"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.55).getCoordinate(bottom.getGeometry()), true);
 
@@ -269,11 +269,11 @@ public class TestHalfEdges {
         turns.add(left);
         turns.add(leftBack);
 
-        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
 
-        TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
+        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()), true);
 
@@ -304,11 +304,11 @@ public class TestHalfEdges {
         HashSet<Edge> turns = new HashSet<Edge>();
         turns.add(left);
 
-        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.8).getCoordinate(left.getGeometry()), false);
 
-        TemporaryStreetLocation end = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
+        TemporaryStreetLocation end = StreetVertexIndex.createTemporaryStreetLocation(graph, "end", new NonLocalizedString("end"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), true);
 
@@ -347,7 +347,7 @@ public class TestHalfEdges {
         graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
         graph.streetNotesService.addStaticNote(leftBack, alert, StreetNotesService.ALWAYS_MATCHER);
 
-        TemporaryStreetLocation start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
+        TemporaryStreetLocation start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
 
@@ -383,7 +383,7 @@ public class TestHalfEdges {
 
         req.setWheelchairAccessible(true);
 
-        start = StreetVertexIndexServiceImpl.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
+        start = StreetVertexIndex.createTemporaryStreetLocation(graph, "start", new NonLocalizedString("start"),
                 filter(turns, StreetEdge.class),
                 new LinearLocation(0, 0.4).getCoordinate(left.getGeometry()), false);
 
@@ -403,7 +403,7 @@ public class TestHalfEdges {
 
     @Test
     public void testStreetLocationFinder() {
-        StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
+        StreetVertexIndex finder = new StreetVertexIndex(graph);
         // test that the local stop finder finds stops
         GenericLocation loc = new GenericLocation(40.01, -74.005000001);
         assertTrue(finder.getNearbyTransitStops(loc.getCoordinate(), 100).size() > 0);

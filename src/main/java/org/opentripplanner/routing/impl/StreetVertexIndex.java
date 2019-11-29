@@ -19,7 +19,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.I18NString;
@@ -36,7 +35,7 @@ import java.util.*;
  * intersection, based on input latitude and longitude. Instantiating this class is expensive,
  * because it creates a spatial index of all of the intersections in the graph.
  */
-public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
+public class StreetVertexIndex {
 
     private Graph graph;
 
@@ -50,15 +49,15 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
     // If a point is within MAX_CORNER_DISTANCE, it is treated as at the corner.
     private static final double MAX_CORNER_DISTANCE_METERS = 10;
 
-    static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndexServiceImpl.class);
+    static final Logger LOG = LoggerFactory.getLogger(StreetVertexIndex.class);
 
     private SimpleStreetSplitter simpleStreetSplitter;
 
-    public StreetVertexIndexServiceImpl(Graph graph) {
+    public StreetVertexIndex(Graph graph) {
         this(graph, true);
     }
 
-    public StreetVertexIndexServiceImpl(Graph graph, boolean hashGrid) {
+    public StreetVertexIndex(Graph graph, boolean hashGrid) {
         this.graph = graph;
         if (hashGrid) {
             edgeTree = new HashGridSpatialIndex<>();
@@ -223,8 +222,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
 
     /**
      * Get all transit stops within a given distance of a coordinate
+     * @return The transit stops within a certain radius of the given location.
      */
-    @Override
     public List<TransitStopVertex> getNearbyTransitStops(Coordinate coordinate, double radius) {
         Envelope env = new Envelope(coordinate);
         env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(radius, coordinate.y),
@@ -239,8 +238,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return results;
     }
 
+    /**
+     * Returns the vertices intersecting with the specified envelope.
+     */
     @SuppressWarnings("unchecked")
-    @Override
     public List<Vertex> getVerticesForEnvelope(Envelope envelope) {
         List<Vertex> vertices = verticesTree.query(envelope);
         // Here we assume vertices list modifiable
@@ -252,8 +253,11 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return vertices;
     }
 
+    /**
+     * Return the edges whose geometry intersect with the specified envelope. Warning: edges w/o
+     * geometry will not be indexed.
+     */
     @SuppressWarnings("unchecked")
-    @Override
     public Collection<Edge> getEdgesForEnvelope(Envelope envelope) {
         List<Edge> edges = edgeTree.query(envelope);
         for (Iterator<Edge> ie = edges.iterator(); ie.hasNext();) {
@@ -266,8 +270,10 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return edges;
     }
 
+    /**
+     * @return The transit stops within an envelope.
+     */
     @SuppressWarnings("unchecked")
-    @Override
     public List<TransitStopVertex> getTransitStopForEnvelope(Envelope envelope) {
         List<TransitStopVertex> stopVertices = transitStopTree.query(envelope);
         for (Iterator<TransitStopVertex> its = stopVertices.iterator(); its.hasNext();) {
@@ -305,26 +311,33 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         }
         return nearest;
     }
-    
-    @Override
-    public Vertex getVertexForLocation(GenericLocation loc, RoutingRequest options,
-                                       boolean endVertex) {
-        Coordinate c = loc.getCoordinate();
-        if (c != null) {
+
+    /**
+     * Gets a set of vertices corresponding to the location provided. It first tries to match a
+     * Stop/StopCollection by id, and if not successful it uses the coordinates if provided.
+     * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
+     */
+    public Set<Vertex> getVerticesForLocation(
+            GenericLocation location,
+            RoutingRequest options,
+            boolean endVertex
+    ) {
+        // Check if Stop/StopCollection is found by FeedScopeId
+        Set<Vertex> transitStopVertices =
+                graph.index.getStopVerticesById(location.stopId);
+        if (transitStopVertices != null) {
+            return transitStopVertices;
+        }
+
+        // Check if coordinate is provided and connect it to graph
+        Coordinate coordinate = location.getCoordinate();
+        if (coordinate != null) {
             //return getClosestVertex(loc, options, endVertex);
-            return simpleStreetSplitter.getClosestVertex(loc, options, endVertex);
+            return Collections.singleton(
+                    simpleStreetSplitter.getClosestVertex(location, options, endVertex));
         }
 
-        // No Coordinate available.
-        String place = loc.place;
-        if (place == null) {
-            return null;
-        }
-
-        // did not match lat/lon, interpret place as a vertex label.
-        // this should probably only be used in tests,
-        // though it does allow routing from stop to stop.
-        return graph.getVertex(place);
+        return null;
     }
 
     @Override
@@ -332,4 +345,22 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         return getClass().getName() + " -- edgeTree: " + edgeTree.toString() + " -- verticesTree: " + verticesTree.toString();
     }
 
+    /**
+     * Finds the appropriate vertex for this location.
+     * @param endVertex: whether this is a start vertex (if it's false) or end vertex (if it's true)
+     */
+    public Vertex getVertexForLocation(
+            GenericLocation location,
+            RoutingRequest options,
+            boolean endVertex
+    ) {
+        // Check if coordinate is provided and connect it to graph
+        Coordinate coordinate = location.getCoordinate();
+        if (coordinate != null) {
+            //return getClosestVertex(loc, options, endVertex);
+            return simpleStreetSplitter.getClosestVertex(location, options, endVertex);
+        }
+
+        return null;
+    }
 }

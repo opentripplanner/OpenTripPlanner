@@ -56,7 +56,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
         float cost = 0f;
         String agencyId = null;
         for (Ride ride : rides) {
-            agencyId = ride.route.getAgencyId();
+            agencyId = ride.route.getFeedId();
             if (agencyId.equals("BART")) {
                 if (bartBlock == null) {
                     bartBlock = new ArrayList<Ride>();

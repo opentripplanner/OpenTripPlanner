@@ -45,7 +45,7 @@ public class ServiceCalendarDateMapperTest {
 
         assertEquals(DATE.getAsString(), result.getDate().getAsString());
         assertEquals(EXCEPTION_TYPE, result.getExceptionType());
-        assertEquals("A_1", result.getServiceId().toString());
+        assertEquals("A:1", result.getServiceId().toString());
 
     }
 

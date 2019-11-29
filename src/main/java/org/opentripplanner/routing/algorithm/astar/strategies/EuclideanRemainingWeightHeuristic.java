@@ -20,10 +20,12 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     private double lon;
     private double maxStreetSpeed;
 
+    // TODO This currently only uses the first toVertex. If there are multiple toVertices, it will
+    //      not work correctly.
     @Override
     public void initialize(RoutingRequest options, long abortTime) {
         RoutingRequest req = options;
-        Vertex target = req.rctx.target;
+        Vertex target = req.rctx.toVertices.iterator().next();
         maxStreetSpeed = req.getStreetSpeedUpperBound();
 
         if (target.getDegreeIn() == 1) {

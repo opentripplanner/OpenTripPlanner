@@ -19,7 +19,7 @@ public class TripsModelInfo implements Serializable {
         this.numberOfTrips = number;
         this.calendarId = calendarId;
         this.id = tripId.getId();
-        this.agency = tripId.getAgencyId();
+        this.agency = tripId.getFeedId();
     }
 
     public TripsModelInfo() {

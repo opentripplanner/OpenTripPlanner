@@ -17,7 +17,7 @@ public class FeedScopedIdMapperTest {
 
         FeedScopedId mappedId = mapAgencyAndId(inputId);
 
-        assertEquals("A", mappedId.getAgencyId());
+        assertEquals("A", mappedId.getFeedId());
         assertEquals("1", mappedId.getId());
     }
 
@@ -27,7 +27,7 @@ public class FeedScopedIdMapperTest {
 
         FeedScopedId mappedId = mapAgencyAndId(inputId);
 
-        assertNull(mappedId.getAgencyId());
+        assertNull(mappedId.getFeedId());
         assertNull(mappedId.getId());
     }
 }

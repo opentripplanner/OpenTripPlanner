@@ -5,7 +5,6 @@ import com.beust.jcommander.ParameterException;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.standalone.config.GraphConfig;
 import org.opentripplanner.util.ThrowableUtils;
@@ -88,7 +87,7 @@ public class OTPMain {
                 /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
                 if (params.inMemory) {
                     Graph graph = graphBuilder.getGraph();
-                    graph.index(new DefaultStreetVertexIndexFactory());
+                    graph.index();
                     // FIXME: This router config retrieval is too complex.
                     router = new Router(graph);
                     router.startup(appConstruction.configuration().getGraphConfig(params.getGraphDirectory()).routerConfig());

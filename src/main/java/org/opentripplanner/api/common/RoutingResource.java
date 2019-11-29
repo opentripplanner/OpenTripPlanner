@@ -595,10 +595,10 @@ public abstract class RoutingResource {
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
         if (fromPlace != null)
-            request.setFromString(fromPlace);
+            request.from = LocationStringParser.fromOldStyleString(fromPlace);
 
         if (toPlace != null)
-            request.setToString(toPlace);
+            request.to = LocationStringParser.fromOldStyleString(toPlace);
 
         {
             //FIXME: move into setter method on routing request

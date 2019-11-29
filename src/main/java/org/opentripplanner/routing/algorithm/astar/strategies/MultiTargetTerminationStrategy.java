@@ -31,7 +31,7 @@ public class MultiTargetTerminationStrategy implements SearchTerminationStrategy
      * targets have been reached.
      */
     @Override
-    public boolean shouldSearchTerminate(Vertex origin, Vertex target, State current,
+    public boolean shouldSearchTerminate(Set<Vertex> origin, Set<Vertex> target, State current,
                                          ShortestPathTree spt, RoutingRequest traverseOptions) {
         Vertex currentVertex = current.getVertex();
                 

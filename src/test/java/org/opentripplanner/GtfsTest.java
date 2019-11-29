@@ -4,11 +4,11 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -18,7 +18,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.Router;
@@ -69,7 +68,7 @@ public abstract class GtfsTest extends TestCase {
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies(feedId.getId()).iterator().next().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
         graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
@@ -108,10 +107,10 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setArriveBy(dateTime < 0);
         routingRequest.dateTime = Math.abs(dateTime);
         if (fromVertex != null && !fromVertex.isEmpty()) {
-            routingRequest.from = (new GenericLocation(null, feedId.getId() + ":" + fromVertex));
+            routingRequest.from = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + fromVertex);
         }
         if (toVertex != null && !toVertex.isEmpty()) {
-            routingRequest.to = new GenericLocation(null, feedId.getId() + ":" + toVertex);
+            routingRequest.to = LocationStringParser.getGenericLocation(null, feedId.getId() + ":" + toVertex);
         }
         if (onTripId != null && !onTripId.isEmpty()) {
             routingRequest.startingTransitTripId = (new FeedScopedId(feedId.getId(), onTripId));
@@ -150,9 +149,9 @@ public abstract class GtfsTest extends TestCase {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());
-        assertEquals(feedId.getId(), leg.to.stopId.getAgencyId());
+        assertEquals(feedId.getId(), leg.to.stopId.getFeedId());
         if (fromStopId != null) {
-            assertEquals(feedId.getId(), leg.from.stopId.getAgencyId());
+            assertEquals(feedId.getId(), leg.from.stopId.getFeedId());
             assertEquals(fromStopId, leg.from.stopId.getId());
         } else {
             assertNull(leg.from.stopId);

@@ -70,15 +70,15 @@ public class TripMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Trip result = subject.map(TRIP);
 
-        assertEquals("A_1", result.getId().toString());
+        assertEquals("A:1", result.getId().toString());
         assertEquals(BIKES_ALLOWED, result.getBikesAllowed());
         assertEquals(BLOCK_ID, result.getBlockId());
         assertEquals(DIRECTION_ID, result.getDirectionId());
         assertEquals(FARE_ID, result.getFareId());
         assertNotNull(result.getRoute());
         assertEquals(ROUTE_SHORT_NAME, result.getRouteShortName());
-        assertEquals("A_1", result.getServiceId().toString());
-        assertEquals("A_1", result.getShapeId().toString());
+        assertEquals("A:1", result.getServiceId().toString());
+        assertEquals("A:1", result.getShapeId().toString());
         assertEquals(TRIP_HEADSIGN, result.getTripHeadsign());
         assertEquals(TRIP_SHORT_NAME, result.getTripShortName());
         assertEquals(WHEELCHAIR_ACCESSIBLE, result.getWheelchairAccessible());

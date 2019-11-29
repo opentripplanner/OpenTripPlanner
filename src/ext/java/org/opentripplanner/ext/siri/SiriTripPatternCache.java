@@ -68,7 +68,7 @@ public class SiriTripPatternCache {
 
             // Generate unique code for trip pattern
             //TODO - SIRI: Is this a good way to generate new trippPattern.id?
-            tripPattern.setId(new FeedScopedId(trip.getId().getAgencyId(), generateUniqueTripPatternCode(tripPattern)));
+            tripPattern.setId(new FeedScopedId(trip.getId().getFeedId(), generateUniqueTripPatternCode(tripPattern)));
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
             tripPattern.setServiceCodes(graph.serviceCodes);
@@ -170,7 +170,7 @@ public class SiriTripPatternCache {
             counter++;
         }
         // OBA library uses underscore as separator, we're moving toward colon.
-        String code = String.format("%s:%s:%s:rt#%d", routeId.getAgencyId(), routeId.getId(), direction, counter);
+        String code = String.format("%s:%s:%s:rt#%d", routeId.getFeedId(), routeId.getId(), direction, counter);
         return code;
     }
 
