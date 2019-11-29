@@ -44,6 +44,14 @@ import java.util.TimeZone;
  * All defaults should be specified here in the RoutingRequest, NOT as annotations on query parameters in web services
  * that create RoutingRequests. This establishes a priority chain for default values:
  * RoutingRequest field initializers, then JSON router config, then query parameters.
+ *
+ * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor router or other
+ * non-transit routing (walk, bike, car etc.)
+ *
+ * TODO OTP2 Many fields are deprecated in this class, the reason is documented in the
+ *           RoutingResource class, not here. Eventually the field will be removed from this
+ *           class, but we want to keep it in the RoutingResource as long as we support the
+ *           REST API.
  */
 public class RoutingRequest implements Cloneable, Serializable {
 
@@ -62,77 +70,151 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The complete list of incoming query parameters. */
     public final HashMap<String, String> parameters = new HashMap<String, String>();
 
-    /** The router ID -- internal ID to switch between router implementation (or graphs) */
-    public String routerId = "";
-
     /** The start location */
     public GenericLocation from;
 
     /** The end location */
     public GenericLocation to;
 
-    /** If true, the tree will be allowed to grow in all directions, rather than being directed toward a single target. */
+    /**
+     * If true, the tree will be allowed to grow in all directions, rather than being directed
+     * toward a single target. This parameter only apply to access/egress AStar searches,
+     * not transit searches in Raptor.
+     *
+     * @deprecated TODO OTP2 - This looks like an A Star implementation detail. Should be moved to
+*                               an A Star specific request class
+     */
+    @Deprecated
     public boolean oneToMany = false;
 
-    /** An ordered list of intermediate locations to be visited. */
+    /**
+     * An ordered list of intermediate locations to be visited.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2. Must be re-implemented
+     *                       - using raptor.
+     */
+    @Deprecated
     public List<GenericLocation> intermediatePlaces;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for access/egress legs.
      * Defaults to unlimited.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
+    @Deprecated
     public double maxWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum distance (in meters) the user is willing to walk for transfer legs.
      * Defaults to unlimited. Currently set to be the same value as maxWalkDistance.
+     *
+     * @Deprecated TODO OTP2 This is replaced by a similar build parameter. This parameter do
+     *                       not exist in the REST API - so it can be removed safely from here.
      */
+    @Deprecated
     public double maxTransferWalkDistance = Double.MAX_VALUE;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
      * large graphs the search becomes very slow.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
+    @Deprecated
     public int maxPreTransitTime = 30 * 60;
 
-    /** The worst possible time (latest for depart-by and earliest for arrive-by) to accept */
+    /**
+     * The worst possible time (latest for depart-by and earliest for arrive-by) to accept
+     *
+     * @Deprecated TODO OTP2 This is a parameter specific to the AStar and work as a cut-off.
+     *                       Raptor have a similar concept, the search window. This parameter
+     *                       do not belong in the request object, is should be pushed down into
+     *                       AStar and then we need to find a way to resolve the search time
+     *                       window. There is more than one strategy for this.
+     */
+    @Deprecated
     public long worstTime = Long.MAX_VALUE;
 
-    /** The worst possible weight that we will accept when planning a trip. */
+    /**
+     * The worst possible weight that we will accept when planning a trip.
+     *
+     * @deprecated TODO OTP2 This is not in use, and sub-optimal to prune a search on. It should
+     *                       be removed.
+     */
+    @Deprecated
     public double maxWeight = Double.MAX_VALUE;
 
-    /** The maximum duration of a returned itinerary, in hours. */
+    /**
+     * The maximum duration of a returned itinerary, in hours.
+     *
+     * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
+     *                       post search filter to reduce number of itineraries down to an
+     *                       acceptable number, but there are probably better ways to do that.
+     */
+    @Deprecated
     public double maxHours = Double.MAX_VALUE;
 
-    /** Whether maxHours limit should consider wait/idle time between the itinerary and the requested arrive/depart time. */
+    /**
+     * Whether maxHours limit should consider wait/idle time between the itinerary and the
+     * requested arrive/depart time.
+     *
+     * @deprecated see {@link #maxHours}
+     */
+    @Deprecated
     public boolean useRequestedDateTimeInMaxHours = false;
 
-    /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
+    /**
+     * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
+     */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
-    /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
+    /**
+     * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
+     * optimize for transit time.
+     *
+     * @deprecated TODO OTP2 this should be completely removed and done only with individual cost
+     *                       parameters
+     *                       Also: apparently OptimizeType only affects BICYCLE mode traversal of
+     *                       street segments. If this is the case it should be very well
+     *                       documented and carried over into the Enum name.
+     */
+    @Deprecated
     public OptimizeType optimize = OptimizeType.QUICK;
-    // TODO this should be completely removed and done only with individual cost parameters
-    // Also: apparently OptimizeType only affects BICYCLE mode traversal of street segments.
-    // If this is the case it should be very well documented and carried over into the Enum name.
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
 
-    /** Whether the trip should depart at dateTime (false, the default), or arrive at dateTime. */
+    /**
+     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
+     *
+     * @deprecated TODO OTP2 Regression. Needs to be implemented in Raptor.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2885
+     */
+     @Deprecated
     public boolean arriveBy = false;
 
-    /** Whether the trip must be wheelchair accessible. */
+    /**
+     * Whether the trip must be wheelchair accessible.
+     * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
+ *                      a walk-only search.
+     */
+    @Deprecated
     public boolean wheelchairAccessible = false;
 
     /** The maximum number of itineraries to return. */
     public int numItineraries = 3;
 
     /** The maximum slope of streets for wheelchair trips. */
-    public double maxSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
+    public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
 
     /** Whether the planner should return intermediate stops lists for transit legs. */
+    // TODO OTP2 Maybe this should be up to the API?
     public boolean showIntermediateStops = false;
 
     /** max walk/bike speed along streets, in meters per second */
@@ -148,27 +230,48 @@ public class RoutingRequest implements Cloneable, Serializable {
      * An extra penalty added on transfers (i.e. all boardings except the first one).
      * Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a
      * vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived
-     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even 
-     * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this 
-     * can lead to absurd results. Consider a trip in New York from Grand Army 
-     * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to 
-     * wait until midnight, when the 4 train runs local the whole way. The actual fastest route is 
+     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even
+     * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this
+     * can lead to absurd results. Consider a trip in New York from Grand Army
+     * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to
+     * wait until midnight, when the 4 train runs local the whole way. The actual fastest route is
      * the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour.
-     * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they 
-     * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. 
+     * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
+     * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
      */
+    @Deprecated
     public int transferPenalty = 0;
+
+    /**
+     * Penalty for using a non-preferred transfer
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
+     */
+    @Deprecated
+    public int nonpreferredTransferPenalty = 180;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
-     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.*/
+     *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
+     *
+     *  @deprecated TODO OTP2 Regression. This is currently used in A Star search, but has no meaning if it
+ *                            is not implemented in Raptor. It should be part of a weight-based
+ *                            Raptor-search.
+     */
+    @Deprecated
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
-    
+
     /** Multiplicative factor on expected turning time. */
     public double turnReluctance = 1.0;
 
@@ -235,124 +338,188 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double waitReluctance = 1.0;
 
-    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding) */
+    /** How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)
+     *
+     * @deprecated TODO OTP2 Probably a regression, but I'm not sure it worked correctly in OTP 1.X
+ *                          either. It could be a part of itinerary-filtering after a Raptor search.
+     * */
+    @Deprecated
     public double waitAtBeginningFactor = 0.4;
 
-    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle. */
+    /** This prevents unnecessary transfers by adding a cost for boarding a vehicle.
+     *
+     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
+     *                          after a Raptor search.
+     * */
+    @Deprecated
     public int walkBoardCost = 60 * 10;
 
-    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot. */
+    /** Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.
+     *
+     * @Deprecated TODO OTP2 - Regression. Could be implemented as a part of itinerary-filtering
+     *                          after a Raptor search.
+     * */
+    @Deprecated
     public int bikeBoardCost = 60 * 10;
+
+    /**
+     * Do not use certain named agencies
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
+    public HashSet<String> bannedAgencies = new HashSet<String>();
+
+    /**
+     * Only use certain named agencies
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
+    public HashSet<String> whiteListedAgencies = new HashSet<String>();
+
+
+    /**
+     * Set of preferred agencies by user.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
+    public HashSet<String> preferredAgencies = new HashSet<String>();
+
+    /**
+     * Set of unpreferred agencies for given user.
+     */
+    @Deprecated
+    public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
     /**
      * Do not use certain named routes.
      * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
      * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
      */
+    @Deprecated
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
-    /** Only use certain named routes */
+    /** Only use certain named routes
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     */
+    @Deprecated
     public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
-    /** Do not use certain named agencies */
-    public HashSet<String> bannedAgencies = new HashSet<String>();
-
-    /** Only use certain named agencies */
-    public HashSet<String> whiteListedAgencies = new HashSet<String>();
-
-    /** Do not use certain trips */
-    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
-
-    /** Set of preferred routes by user. */
+    /** Set of preferred routes by user.
+     *
+     * @deprecated TODO OTP2 Needs to be implemented
+     */
+    @Deprecated
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
-    
-    /** Set of preferred agencies by user. */
-    public HashSet<String> preferredAgencies = new HashSet<String>();
 
     /**
-     * Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing
-     * to wait for preferred route.
+     * Penalty added for using every route that is not preferred if user set any route as preferred.
+     * We return number of seconds that we are willing to wait for preferred route.
+     *
+     * @deprecated TODO OTP2 Needs to be implemented
      */
+    @Deprecated
     public int otherThanPreferredRoutesPenalty = 300;
 
-    /** Set of unpreferred routes for given user. */
+    /**
+     * Set of unpreferred routes for given user.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
-    
-    /** Set of unpreferred agencies for given user. */
-    public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
     /**
-     * Penalty added for using every unpreferred route. We return number of seconds that we are willing to wait for preferred route.
+     * Penalty added for using every unpreferred route. We return number of seconds that we are
+     * willing to wait for preferred route.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
      */
+    @Deprecated
     public int useUnpreferredRoutesPenalty = 300;
 
     /**
-     * A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and
-     * boarding another. This time is in addition to time it might take to walk between transit stops. This time should also be overridden by specific
-     * transfer timing information in transfers.txt
+     * Do not use certain trips
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
+    public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
+
+    /**
+     * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
+     * must pass between exiting one transit vehicle and boarding another. This time is in addition
+     * to time it might take to walk between transit stops. This time should also be overridden by
+     * specific transfer timing information in transfers.txt
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
      */
     // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
+    @Deprecated
     public int transferSlack = 0;
 
-    /** Invariant: boardSlack + alightSlack ≤ transferSlack. */
+    /**
+     * Invariant: boardSlack + alightSlack ≤ transferSlack.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     */
+    @Deprecated
     public int boardSlack = 0;
 
+    /**
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     */
+    @Deprecated
     public int alightSlack = 0;
 
+    /**
+     * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
+     *                        here. Instead the client should be able to pass in a parameter for
+     *                        the max number of additional/extra transfers relative to the best
+     *                        trip (with the fewest possible transfers) within constraint of the
+     *                        other search parameters.
+     *                        This might be to complicated to explain to the customer, so we
+     *                        might stick to the old limit, but that have side-effects that you
+     *                        might not find any trips on a day where a critical part of the
+     *                        trip is not available, because of some real-time disruption.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     */
+    @Deprecated
     public int maxTransfers = 2;
 
     /**
      * Raptor search window in seconds.
+     *
+     * TODO OTP2 This needs to be exposed on the API, maybe not as is. There are
+     *           a few possibilities. Other alternatives are:
+     *           {@code earliest/latest departure/arrival time}
      */
     public int raptorSearchWindow = 40 * 60;
 
     /**
-     * Extensions to the trip planner will require additional traversal options beyond the default 
-     * set. We provide an extension point for adding arbitrary parameters with an 
-     * extension-specific key.
-     */
-    public Map<Object, Object> extensions = new HashMap<Object, Object>();
-
-    /** Penalty for using a non-preferred transfer */
-    public int nonpreferredTransferPenalty = 180;
-
-    /**
-     * For the bike triangle, how important time is. 
+     * For the bike triangle, how important time is.
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
-    public double triangleTimeFactor;
+    public double bikeTriangleTimeFactor;
 
     /** For the bike triangle, how important slope is */
-    public double triangleSlopeFactor;
+    public double bikeTriangleSlopeFactor;
 
     /** For the bike triangle, how important safety is */
-    public double triangleSafetyFactor;
+    public double bikeTriangleSafetyFactor;
 
     /** Options specifically for the case that you are walking a bicycle. */
     public RoutingRequest bikeWalkingOptions;
-
-    /** This is true when a GraphPath is being traversed in reverse for optimization purposes. */
-    public boolean reverseOptimizing = false;
 
     /**
      * Whether or not bike rental availability information will be used to plan bike rental trips
      */
     public boolean useBikeRentalAvailabilityInformation = false;
-
-    /**
-     * The maximum wait time in seconds the user is willing to delay trip start. Only effective in Analyst.
-     */
-    public long clampInitialWait = -1;
-
-    /**
-     * When true, reverse optimize this search on the fly whenever needed, rather than reverse-optimizing the entire path when it's done.
-     */
-    public boolean reverseOptimizeOnTheFly = false;
-
-    /**
-     * When true, do a full reversed search to compact the legs of the GraphPath.
-     */
-    public boolean compactLegsByReversedSearch = false;
 
     /**
      * If true, cost turns as they would be in a country where driving occurs on the right; otherwise, cost them as they would be in a country where
@@ -371,15 +538,22 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
     public double carAccelerationSpeed = 2.9;
-    
+
     /**
      * When true, realtime updates are ignored during this search.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
+    @Deprecated
     public boolean ignoreRealtimeUpdates = false;
 
     /**
      * If true, the remaining weight heuristic is disabled. Currently only implemented for the long
      * distance path service.
+     *
+     * This is used by the Street search only.
+     *
+     * TODO OTP2 Can we merge this with the 'oneToMany' option?
      */
     public boolean disableRemainingWeightHeuristic = false;
 
@@ -389,7 +563,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
      * initial states with different times and vertices from a single TraverseOptions, without setting all the transit
      * context or building temporary vertices (with all the exception-throwing checks that entails).
-     * 
+     *
      * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying
      * RoutingContext (and vice versa) so that both do not need to be passed/injected separately into tight inner loops
      * within routing algorithms. These references should be set to null when the request scope is torn down -- the
@@ -398,22 +572,26 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public RoutingContext rctx;
 
-    /** A transit stop that this trip must start from */
+    /**
+     * A transit stop that this trip must start from
+     *
+     * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
+     *                       the fromPlace parameter. Is is used for onBoard routing only?
+     */
+    @Deprecated
     public FeedScopedId startingTransitStopId;
-    
-    /** A trip where this trip must start from (depart-onboard routing) */
+
+    /**
+     * A trip where this trip must start from (depart-onboard routing)
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
+     */
+    @Deprecated
     public FeedScopedId startingTransitTripId;
 
     public boolean walkingBike;
-
-    public boolean softWalkLimiting = true;
-    public boolean softPreTransitLimiting = true;
-
-    public double softWalkPenalty = 60.0; // a jump in cost when stepping over the walking limit
-    public double softWalkOverageRate = 5.0; // a jump in cost for every meter over the walking limit
-
-    public double preTransitPenalty = 300.0; // a jump in cost when stepping over the pre-transit time limit
-    public double preTransitOverageRate = 10.0; // a jump in cost for every second over the pre-transit time limit
 
     /*
       Additional flags affecting mode transitions.
@@ -424,14 +602,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
 
-    /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
-    // TODO remove
-    public boolean longDistance = false;
-
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
 
-    /** Accept only paths that use transit (no street-only paths). */
+    /**
+     * Accept only paths that use transit (no street-only paths).
+     *
+     * @Deprecated TODO OTP2 Regression. Not currently working in OTP2. This is only used in the
+     *                       deprecated Transmodel GraphQL API.
+     *
+     */
+    @Deprecated
     public boolean onlyTransitTrips = false;
 
     /** Option to disable the default filtering of GTFS-RT alerts by time. */
@@ -440,7 +621,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Whether to apply the ellipsoid→geoid offset to all elevations in the response */
     public boolean geoidElevation = false;
 
-    /** Which path comparator to use */
+    /** Which path comparator to use
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2 at the moment.
+     */
+    @Deprecated
     public String pathComparator = null;
 
     /** Saves split edge which can be split on origin/destination search
@@ -556,8 +741,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-
-
     /**
      * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
      */
@@ -566,29 +749,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions.bikeWalkingOptions = new RoutingRequest(new TraverseModeSet());
     }
 
-    /**
-     * Add an extension parameter with the specified key. Extensions allow you to add arbitrary traversal options.
-     */
-    public void putExtension(Object key, Object value) {
-        extensions.put(key, value);
-    }
-
-    /** Determine if a particular extension parameter is present for the specified key. */
-    public boolean containsExtension(Object key) {
-        return extensions.containsKey(key);
-    }
-
-    /** Get the extension parameter with the specified key. */
-    @SuppressWarnings("unchecked")
-    public <T> T getExtension(Object key) {
-        return (T) extensions.get(key);
-    }
-
     /** Returns the model that computes the cost of intersection traversal. */
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-    
+
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
@@ -596,10 +761,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (modes.isTransit()) {
             return maxWalkDistance;
         } else {
-            return Double.MAX_VALUE;            
+            return Double.MAX_VALUE;
         }
     }
-    
+
     public void setWalkBoardCost(int walkBoardCost) {
         if (walkBoardCost < 0) {
             this.walkBoardCost = 0;
@@ -608,7 +773,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.walkBoardCost = walkBoardCost;
         }
     }
-    
+
     public void setBikeBoardCost(int bikeBoardCost) {
         if (bikeBoardCost < 0) {
             this.bikeBoardCost = 0;
@@ -617,7 +782,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.bikeBoardCost = bikeBoardCost;
         }
     }
-    
+
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
             preferredAgencies = new HashSet<>();
@@ -633,7 +798,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferredRoutes = RouteMatcher.emptyMatcher();
         }
     }
-    
+
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
         if(penalty < 0) penalty = 0;
         this.otherThanPreferredRoutesPenalty = penalty;
@@ -794,19 +959,19 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.intermediatePlaces.add(location);
     }
 
-    public void setTriangleSafetyFactor(double triangleSafetyFactor) {
-        this.triangleSafetyFactor = triangleSafetyFactor;
-        bikeWalkingOptions.triangleSafetyFactor = triangleSafetyFactor;
+    public void setBikeTriangleSafetyFactor(double bikeTriangleSafetyFactor) {
+        this.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
+        bikeWalkingOptions.bikeTriangleSafetyFactor = bikeTriangleSafetyFactor;
     }
 
-    public void setTriangleSlopeFactor(double triangleSlopeFactor) {
-        this.triangleSlopeFactor = triangleSlopeFactor;
-        bikeWalkingOptions.triangleSlopeFactor = triangleSlopeFactor;
+    public void setBikeTriangleSlopeFactor(double bikeTriangleSlopeFactor) {
+        this.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
+        bikeWalkingOptions.bikeTriangleSlopeFactor = bikeTriangleSlopeFactor;
     }
 
-    public void setTriangleTimeFactor(double triangleTimeFactor) {
-        this.triangleTimeFactor = triangleTimeFactor;
-        bikeWalkingOptions.triangleTimeFactor = triangleTimeFactor;
+    public void setBikeTriangleTimeFactor(double bikeTriangleTimeFactor) {
+        this.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
+        bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
     public NamedPlace getFromPlace() {
@@ -845,7 +1010,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest reversedClone() {
         RoutingRequest ret = this.clone();
         ret.setArriveBy(!ret.arriveBy);
-        ret.reverseOptimizing = !ret.reverseOptimizing; // this is not strictly correct
         ret.useBikeRentalAvailabilityInformation = false;
         return ret;
     }
@@ -1126,9 +1290,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         safe /= total;
         slope /= total;
         time /= total;
-        this.triangleSafetyFactor = safe;
-        this.triangleSlopeFactor = slope;
-        this.triangleTimeFactor = time;
+        this.bikeTriangleSafetyFactor = safe;
+        this.bikeTriangleSlopeFactor = slope;
+        this.bikeTriangleTimeFactor = time;
     }
 
     public static void assertTriangleParameters(

@@ -144,7 +144,6 @@ public class NearbyStopFinder {
     ) {
 
         RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.clampInitialWait = 0L;
         routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);

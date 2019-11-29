@@ -275,10 +275,7 @@ public class AStar {
                 runState.foundPathWeight = runState.u.getWeight();
                 runState.options.rctx.debugOutput.foundPath();
                 // new GraphPath(runState.u, false).dump();
-                /* Only find one path at a time in long distance mode. */
-                if (runState.options.longDistance) {
-                    break;
-                }
+
                 /* Break out of the search if we've found the requested number of paths. */
                 if (runState.targetAcceptedStates.size() >= runState.options.getNumItineraries()) {
                     LOG.debug("total vertices visited {}", runState.nVisited);
