@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -30,6 +31,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -44,7 +47,11 @@ import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
  * It is modular: GraphBuilderModules are placed in a list and run in sequence.
  */
 public class GraphBuilder implements Runnable {
-    
+
+    private static String GRAPH_FILENAME = "Graph.obj";
+
+    private static String OSM_GRAPH_FILENAME = "osmGraph.obj";
+
     private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     private List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
@@ -57,7 +64,7 @@ public class GraphBuilder implements Runnable {
     private boolean serializeGraph = true;
 
     private GraphBuilder(File path) {
-        graphFile = new File(path, "Graph.obj");
+        graphFile = new File(path, GRAPH_FILENAME);
     }
 
     private void addModule(GraphBuilderModule loader) {
@@ -66,6 +73,10 @@ public class GraphBuilder implements Runnable {
 
     public Graph getGraph() {
         return this.graph;
+    }
+
+    public void setGraph(Graph graph) {
+        this.graph = graph;
     }
 
     public void run() {
@@ -136,6 +147,19 @@ public class GraphBuilder implements Runnable {
         GraphBuilderParameters builderParams = new GraphBuilderParameters(config.builderConfig());
 
         GraphBuilder graphBuilder = new GraphBuilder(dir);
+
+        if (params.loadOSMGraph) {
+            File graphFile = new File(dir, OSM_GRAPH_FILENAME);
+            try {
+                Graph osmGraph = Graph.load(new FileInputStream(graphFile));
+                if (osmGraph.hasTransit) {
+                    throw new IllegalArgumentException("OSM graph cannot contain transit data.");
+                }
+                graphBuilder.setGraph(osmGraph);
+            } catch (FileNotFoundException ex) {
+                throw new IllegalArgumentException("OSM graph not found.");
+            }
+        }
 
         // Load the router config JSON to fail fast, but we will only apply it later when a router
         // starts up
