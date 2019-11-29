@@ -1943,17 +1943,34 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("forBoarding")
-                        .type(Scalars.GraphQLBoolean)
-                        .description("Whether vehicle may be boarded at quay. NOT IMPLEMENTED")
-                        .dataFetcher(environment -> false)
-                        .build())
+                    .name("forBoarding")
+                    .type(Scalars.GraphQLBoolean)
+                    .description("Whether vehicle may be boarded at quay.")
+                    .dataFetcher(environment -> {
+                        if (((TripTimeShort) environment.getSource()).pickupType >= 0) {
+                            //Realtime-updated
+                            return ((TripTimeShort) environment.getSource()).pickupType != PICKDROP_NONE;
+                        }
+                        return index.patternForTrip
+                            .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                            .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                    })
+                    .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("forAlighting")
-                        .type(Scalars.GraphQLBoolean)
-                        .description("Whether vehicle may be alighted at quay. NOT IMPLEMENTED")
-                        .dataFetcher(environment -> false)
-                        .build())
+                    .name("forAlighting")
+                    .type(Scalars.GraphQLBoolean)
+                    .description("Whether vehicle may be alighted at quay.")
+                    .dataFetcher(environment -> {
+                        if (((TripTimeShort) environment.getSource()).dropoffType >= 0) {
+                            //Realtime-updated
+                            return ((TripTimeShort) environment.getSource()).dropoffType != PICKDROP_NONE;
+                        }
+                        return index.patternForTrip
+                            .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
+                            .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+
+                    })
+                    .build())
 
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("requestStop")

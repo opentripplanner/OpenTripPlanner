@@ -56,6 +56,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.util.HttpToGraphQLMapper.mapHttpQuerryParamsToQLParams;
 
@@ -251,7 +252,13 @@ public class IndexAPI {
                                          @QueryParam("omitNonPickups") boolean omitNonPickups) {
         Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-        return Response.status(Status.OK).entity(index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )).build();
+
+        List<org.opentripplanner.api.model.StopTimesInPattern> stopTimesInPatterns =
+            index.stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )
+                .stream().map(org.opentripplanner.api.model.StopTimesInPattern::new)
+                .collect(Collectors.toList());
+
+        return Response.status(Status.OK).entity(stopTimesInPatterns).build();
     }
 
     /**
