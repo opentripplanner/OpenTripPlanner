@@ -2,13 +2,13 @@ package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Maps;
+import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
-import org.apache.lucene.util.PriorityQueue;
 import org.joda.time.LocalDate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
@@ -54,6 +54,7 @@ import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -271,15 +272,20 @@ public class GraphIndex {
 
         for (TripPattern pattern : patternsForStop.get(stop)) {
 
-            // Use the Lucene PriorityQueue, which has a fixed size
-            PriorityQueue<TripTimeShort> pq = new PriorityQueue<TripTimeShort>(numberOfDepartures) {
-                @Override
-                protected boolean lessThan(TripTimeShort tripTimeShort, TripTimeShort t1) {
-                    // Calculate exact timestamp
-                    return (tripTimeShort.serviceDay + tripTimeShort.realtimeDeparture) >
-                            (t1.serviceDay + t1.realtimeDeparture);
-                }
-            };
+            // The bounded priority Q is used to keep a sorted short list of trip times. We can not
+            // relay on the trip times to be in order because of real-time updates. This code can
+            // probably be optimized, and the trip search in the Raptor search does almost the same
+            // thing. This is no part of a routing request, but is a used frequently in some
+            // operation like Entur for "departure boards" (apps, widgets, screens on platforms, and
+            // hotel lobbies). Setting the numberOfDepartures and timeRange to a big number for a
+            // transit hub could result in a DOS attack, but there are probably other more effective
+            // ways to do it.
+            //
+            // The {@link MinMaxPriorityQueue} is marked beta, but we do not have a god alternative.
+            MinMaxPriorityQueue<TripTimeShort> pq = MinMaxPriorityQueue
+                    .orderedBy(Comparator.comparing((TripTimeShort tts) -> tts.serviceDay + tts.realtimeDeparture))
+                    .maximumSize(numberOfDepartures)
+                    .create();
 
             // Loop through all possible days
             for (ServiceDate serviceDate : serviceDates) {
@@ -302,7 +308,7 @@ public class GraphIndex {
                             if (!sd.serviceRunning(t.serviceCode)) continue;
                             if (t.getDepartureTime(sidx) != -1 &&
                                     t.getDepartureTime(sidx) >= secondsSinceMidnight) {
-                                pq.insertWithOverflow(new TripTimeShort(t, sidx, stop, sd));
+                                pq.add(new TripTimeShort(t, sidx, stop, sd));
                             }
                         }
 
@@ -315,7 +321,14 @@ public class GraphIndex {
                                     freq.tripTimes.getDepartureTime(0);
                             int i = 0;
                             while (departureTime <= lastDeparture && i < numberOfDepartures) {
-                                pq.insertWithOverflow(new TripTimeShort(freq.materialize(sidx, departureTime, true), sidx, stop, sd));
+                                pq.add(
+                                    new TripTimeShort(
+                                        freq.materialize(sidx, departureTime, true),
+                                        sidx,
+                                        stop,
+                                        sd
+                                    )
+                                );
                                 departureTime += freq.headway;
                                 i++;
                             }
@@ -328,7 +341,7 @@ public class GraphIndex {
             if (pq.size() != 0) {
                 StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
                 while (pq.size() != 0) {
-                    stopTimes.times.add(0, pq.pop());
+                    stopTimes.times.add(0, pq.poll());
                 }
                 ret.add(stopTimes);
             }

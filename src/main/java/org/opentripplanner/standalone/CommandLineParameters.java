@@ -57,6 +57,11 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = {"--load"}, description = "Load the Graph.obj in the specified directory.")
     public boolean load;
 
+    @Parameter(names = {"--loadOSMGraph"}, description = "When building a graph, load the "
+            + "osmGraph.obj file and build on top of it. You must have previously built a graph "
+            + "without transit data and renamed it to osmGraph.obj.")
+    public boolean loadOSMGraph;
+
     /* Options for the server sub-task. */
 
     @Parameter(names = {"--bindAddress"},

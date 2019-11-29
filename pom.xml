@@ -487,9 +487,9 @@
           Maven tries to download from every other repository and fails before checking central.
           Do not change the id from central2 to central, otherwise the entry will be ignored. -->
         <repository>
-            <id>central2</id>
-            <name>check central first to avoid a lot of not found warnings</name>
-            <url>https://repo1.maven.org/maven2</url>
+          <id>central2</id>
+          <name>Check central first to avoid a lot of not found warnings</name>
+          <url>https://repo.maven.apache.org/maven2</url>
         </repository>
         <repository>
             <id>osgeo</id>
@@ -499,12 +499,7 @@
         <repository>
             <id>geosolutions</id>
             <name>GeoSolutions Repository</name>
-            <url>http://maven.geo-solutions.it</url>
-        </repository>
-        <repository>
-          <id>sonatype-oss</id>
-          <name>Sonatype OSS</name>
-          <url>https://oss.sonatype.org/content/repositories/snapshots/</url>
+            <url>http://maven.geo-solutions.it/</url>
         </repository>
         <repository>
             <id>conveyal</id>
@@ -514,7 +509,7 @@
         <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
-            <url>http://nexus.onebusaway.org/content/repositories/releases/</url>
+            <url>http://nexus.onebusaway.org/nexus/content/repositories/releases/</url>
         </repository>
     </repositories>
 
@@ -615,12 +610,6 @@
             <artifactId>netex-java-model</artifactId>
             <version>1.0.8</version>
         </dependency>
-        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
-        <dependency>
-            <groupId>org.glassfish.jaxb</groupId>
-            <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.0-b170127.1453</version>
-        </dependency>
 
         <!-- SIRI -->
         <dependency>
@@ -640,6 +629,7 @@
             <artifactId>jaxb-api</artifactId>
             <version>2.3.1</version>
         </dependency>
+        <!-- JAXB API Implementation no longer supplied with Java 11+ -->
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
@@ -715,13 +705,13 @@
             <artifactId>async-http-client</artifactId>
             <version>1.8.12</version>
         </dependency>
-
         <!-- OTHER DEPENDENCIES -->
         <dependency>
             <groupId>javax.servlet</groupId>
             <artifactId>servlet-api</artifactId>
             <version>2.5</version>
-            <scope>provided</scope> <!-- this dependency is provided by the servlet container -->
+            <!-- this dependency is provided by the servlet container, but we want to ensure the expected version. -->
+            <scope>provided</scope>
         </dependency>
         <dependency>
             <groupId>javax.annotation</groupId>
@@ -759,23 +749,12 @@
             <artifactId>joda-time</artifactId>
             <version>2.1</version>
         </dependency>
-        <!-- PNGJ is used for making Analyst TimeGrids-->
-        <dependency>
-            <groupId>ar.com.hjg</groupId>
-            <artifactId>pngj</artifactId>
-            <version>2.0.1</version>
-        </dependency>
         <!-- FlexJSON deserializes JSON in Nominatim/Yahoo/Google geocoder modules. -->
         <!-- Could be done with Jackson JSON trees. -->
         <dependency>
             <groupId>net.sf.flexjson</groupId>
             <artifactId>flexjson</artifactId>
             <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>commons-discovery</groupId>
-            <artifactId>commons-discovery</artifactId>
-            <version>0.4</version>
         </dependency>
         <!-- Used in DegreeGridNEDTileSource to fetch tiles from Amazon S3 -->
         <dependency>
@@ -795,59 +774,15 @@
             <artifactId>jcommander</artifactId>
             <version>1.78</version>
         </dependency>
-        <!-- CSV parser -->
-        <dependency>
-            <groupId>net.sourceforge.javacsv</groupId>
-            <artifactId>javacsv</artifactId>
-            <version>2.0</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.httpcomponents</groupId>
-            <artifactId>httpclient</artifactId>
-            <version>4.5.5</version>
-        </dependency>
-        <dependency>
-          <groupId>commons-codec</groupId>
-          <artifactId>commons-codec</artifactId>
-          <version>1.11</version>
-        </dependency>
         <dependency>
             <groupId>org.apache.commons</groupId>
             <artifactId>commons-math3</artifactId>
             <version>3.6.1</version>
         </dependency>
-
-        <!-- Lucene for sophisticated text search -->
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-core</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queries</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-analyzers-common</artifactId>
-            <version>4.7.1</version>
-        </dependency>
-        <dependency>
-            <groupId>org.apache.lucene</groupId>
-            <artifactId>lucene-queryparser</artifactId>
-            <version>4.7.1</version>
-        </dependency>
         <dependency>
             <groupId>com.graphql-java</groupId>
             <artifactId>graphql-java</artifactId>
             <version>9.2</version>
-        </dependency>
-        <!-- Support for OTP scripting -->
-        <dependency>
-            <groupId>bsf</groupId>
-            <artifactId>bsf</artifactId>
-            <version>2.4.0</version>
         </dependency>
         <!-- For RAPTOR routing -->
         <dependency>
