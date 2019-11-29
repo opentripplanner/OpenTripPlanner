@@ -12,6 +12,7 @@
 - Combined OSM loaders, removing several rarely used ones (#2878)
 - New Java Code Style (part of #2755)
 - Cleanup and rename Graph Builder Annotations, now Data Import Issues (#2871)
+- Bugfix for graph building crashing on unsupported modes (#2899)
 - Add command line parameter for building partial graphs (#2583)
 
 ## Ported over from the 1.x
