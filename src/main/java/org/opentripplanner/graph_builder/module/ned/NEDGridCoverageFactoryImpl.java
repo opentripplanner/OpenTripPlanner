@@ -23,7 +23,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 /**
- * A coverage factory that works off of the NED caches from {@link NEDDownloader}.
+ * A coverage factory that works off of the NED caches from NED tile sources.
  */
 public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory {
 
@@ -36,7 +36,7 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private File cacheDirectory;
 
-    public NEDTileSource tileSource = new NEDDownloader();
+    public NEDTileSource tileSource;
 
     private List<VerticalDatum> datums;
 
