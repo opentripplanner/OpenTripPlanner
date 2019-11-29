@@ -707,6 +707,13 @@
         </dependency>
         <!-- OTHER DEPENDENCIES -->
         <dependency>
+            <groupId>javax.servlet</groupId>
+            <artifactId>servlet-api</artifactId>
+            <version>2.5</version>
+            <!-- this dependency is provided by the servlet container, but we want to ensure the expected version. -->
+            <scope>provided</scope>
+        </dependency>
+        <dependency>
             <groupId>javax.annotation</groupId>
             <artifactId>jsr250-api</artifactId>
             <version>1.0</version>
