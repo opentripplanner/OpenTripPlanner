@@ -98,8 +98,9 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                 TransferInfo transferInfo = new TransferInfo(
                         originStop,
                         destStop,
-                        euclideanStop.dist,
-                        streetStop.dist);
+                        euclideanStop.distance,
+                        streetStop.distance
+                );
 
                 /* Log transfer where the street distance is too long compared to the euclidean distance */
                 if (transferInfo.ratio > MIN_RATIO_TO_LOG && transferInfo.streetDistance > MIN_STREET_DISTANCE_TO_LOG) {
@@ -115,7 +116,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                         new TransferInfo(
                                 originStop,
                                 destStop,
-                                euclideanStop.dist,
+                                euclideanStop.distance,
                                 -1));
             }
         }

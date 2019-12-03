@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
@@ -32,6 +33,8 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -644,8 +647,8 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions = this;
 
         // So that they are never null.
-        from = new GenericLocation();
-        to = new GenericLocation();
+        from = new GenericLocation(null, null);
+        to = new GenericLocation(null, null);
     }
 
     public RoutingRequest(TraverseModeSet modes) {
@@ -852,11 +855,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     public final static int MIN_SIMILARITY = 1000;
 
     public void setFromString(String from) {
-        this.from = GenericLocation.fromOldStyleString(from);
+        this.from = LocationStringParser.fromOldStyleString(from);
     }
 
     public void setToString(String to) {
-        this.to = GenericLocation.fromOldStyleString(to);
+        this.to = LocationStringParser.fromOldStyleString(to);
     }
 
     /**
@@ -928,7 +931,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setIntermediatePlacesFromStrings(List<String> intermediates) {
         this.intermediatePlaces = new ArrayList<GenericLocation>(intermediates.size());
         for (String place : intermediates) {
-            intermediatePlaces.add(GenericLocation.fromOldStyleString(place));
+            intermediatePlaces.add(LocationStringParser.fromOldStyleString(place));
         }
     }
 
@@ -972,11 +975,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public NamedPlace getFromPlace() {
-        return this.from.getNamedPlace();
+        return new NamedPlace(this.from);
     }
 
     public NamedPlace getToPlace() {
-        return this.to.getNamedPlace();
+        return new NamedPlace(this.to);
     }
 
     /* INSTANCE METHODS */
@@ -1045,6 +1048,20 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setRoutingContext(Graph graph, Vertex from, Vertex to) {
         setRoutingContext(graph, null, from, to);
+    }
+
+    public void setRoutingContext(Graph graph, Set<Vertex> from, Set<Vertex> to) {
+        setRoutingContext(graph, null, from, to);
+    }
+
+    public void setRoutingContext(Graph graph, Edge fromBackEdge, Set<Vertex> from, Set<Vertex> to) {
+        // normally you would want to tear down the routing context...
+        // but this method is mostly used in tests, and teardown interferes with testHalfEdges
+        // FIXME here, or in test, and/or in other places like TSP that use this method
+        // if (rctx != null)
+        // this.rctx.destroy();
+        this.rctx = new RoutingContext(this, graph, from, to);
+        this.rctx.originBackEdge = fromBackEdge;
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */

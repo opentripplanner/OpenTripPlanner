@@ -667,17 +667,20 @@ public class TransmodelIndexGraphQLSchema {
                 .description("Input format for specifying a location through either a place reference (id), coordinates or both. If both place and coordinates are provided the place ref will be used if found, coordinates will only be used if place is not known.")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("name")
-                        .description("The name of the location.")
+                        .description("The name of the location. This is pass-through information"
+                                + "and is not used in routing.")
                         .type(Scalars.GraphQLString)
                         .build())
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("place")
-                        .description("Id for the place.")
+                        .description("The id of an element in the OTP model. Currently supports"
+                                + " Quay, StopPlace, multimodal StopPlace, and GroupOfStopPlaces.")
                         .type(Scalars.GraphQLString)
                         .build())
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("coordinates")
-                        .description("Coordinates for the location")
+                        .description("Coordinates for the location. This can be used alone or as"
+                                + " fallback if the place id is not found.")
                         .type(coordinateInputType)
                         .build())
                 .build();
@@ -2833,7 +2836,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .distinct()
                                 .filter(station -> {
                                     String authority = env.getArgument("authority");
-                                    return authority == null || station.getId().getAgencyId().equalsIgnoreCase(authority);
+                                    return authority == null || station.getId().getFeedId().equalsIgnoreCase(authority);
                                 });
 
                                 if (Boolean.TRUE.equals(env.getArgument("filterByInUse"))){
@@ -2943,7 +2946,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .stream()
                                 .map(TransitStopVertex::getStop)
                                 .filter(stop -> environment.getArgument("authority") == null ||
-                                        stop.getId().getAgencyId().equalsIgnoreCase(environment.getArgument("authority")))
+                                        stop.getId().getFeedId().equalsIgnoreCase(environment.getArgument("authority")))
                                 .filter(stop -> !Boolean.TRUE.equals(environment.getArgument("filterByInUse"))
                                                         || !index.getPatternsForStop(stop,true).isEmpty())
                                 .collect(Collectors.toList()))
@@ -2984,7 +2987,7 @@ public class TransmodelIndexGraphQLSchema {
                                         environment.getArgument("radius"))
                                         .stream()
                                         .filter(stopAndDistance -> environment.getArgument("authority") == null ||
-                                                stopAndDistance.stop.getId().getAgencyId()
+                                                stopAndDistance.stop.getId().getFeedId()
                                                         .equalsIgnoreCase(environment.getArgument("authority")))
                                         .sorted(Comparator.comparing(s -> s.distance))
                                         .collect(Collectors.toList());

@@ -21,7 +21,6 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -63,7 +62,7 @@ public class TimetableSnapshotSourceTest {
 
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.run(graph);
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
 
         final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
 

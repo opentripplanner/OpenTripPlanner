@@ -118,7 +118,7 @@ public class NetexLoaderSmokeTest {
         assertEquals("N/A", quay.getName());
         assertEquals(59.909803, quay.getLat(), 0.000001);
         assertEquals(10.748062, quay.getLon(), 0.000001);
-        assertEquals("RB_NSR:StopPlace:3995", quay.getParentStation().getId().toString());
+        assertEquals("RB:NSR:StopPlace:3995", quay.getParentStation().getId().toString());
         assertEquals("L", quay.getCode());
         assertEquals(16, stops.size());
     }
@@ -137,8 +137,8 @@ public class NetexLoaderSmokeTest {
         TripPattern p = map.get(fId("RUT:JourneyPattern:12-1"));
         assertEquals("Jernbanetorget", p.getDirection());
         assertEquals("RB", p.getFeedId());
-        assertEquals("[<Stop RB_NSR:Quay:7203>, <Stop RB_NSR:Quay:8027>]", p.getStops().toString());
-        assertEquals("[<Trip RB_RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());
+        assertEquals("[<Stop RB:NSR:Quay:7203>, <Stop RB:NSR:Quay:8027>]", p.getStops().toString());
+        assertEquals("[<Trip RB:RUT:ServiceJourney:12-101375-1000>]", p.getTrips().toString());
 
         // TODO OTP2 - Why?
         assertNull(p.getServices());
@@ -176,7 +176,7 @@ public class NetexLoaderSmokeTest {
         List<Notice> list = list(map.get(key));
         if(list.size() == 0) fail("Notice not found: " + key + " -> <Notice " + code + ", " + text + ">\n\t" + map);
         Notice n = list.get(0);
-        assertTrue(n.getId().toString().startsWith("RB_RUT:Notice:"));
+        assertTrue(n.getId().toString().startsWith("RB:RUT:Notice:"));
         assertEquals(code, n.getPublicCode());
         assertEquals(text, n.getText());
         assertEquals(1, list.size());

@@ -8,7 +8,6 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 import java.io.File;
@@ -72,7 +71,7 @@ public class GraphSerializationTest {
         // This graph does not make an ideal test because it doesn't have any street data.
         // TODO switch to another graph that has both GTFS and OSM data
         Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
-        originalGraph.index(new DefaultStreetVertexIndexFactory());
+        originalGraph.index();
         // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
         // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
         // We also skip some deeply buried weak-value hash maps, which refuse to tell you what their keys are.
@@ -110,7 +109,7 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     private void testRoundTrip (Graph originalGraph) throws Exception {
-        originalGraph.index(new DefaultStreetVertexIndexFactory());
+        originalGraph.index();
         // The cached timezone in the graph is transient and lazy-initialized.
         // Previous tests may have caused a timezone to be cached.
         originalGraph.clearTimeZone();

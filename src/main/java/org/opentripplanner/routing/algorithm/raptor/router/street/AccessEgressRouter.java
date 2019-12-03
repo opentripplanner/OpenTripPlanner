@@ -12,6 +12,7 @@ import org.slf4j.LoggerFactory;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 /**
@@ -31,13 +32,13 @@ public class AccessEgressRouter {
      * @return Transfer objects by access/egress stop
      */
     public static Map<Stop, Transfer> streetSearch (RoutingRequest rr, boolean fromTarget, int distanceMeters) {
-        Vertex vertex = fromTarget ? rr.rctx.toVertex : rr.rctx.fromVertex;
+        Set<Vertex> vertices = fromTarget ? rr.rctx.toVertices : rr.rctx.fromVertices;
 
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
         // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
         // target vertex will be cleaned up at the end of the super-request, and we don't want that to happen twice.
         List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
-                nearbyStopFinder.findNearbyStopsViaStreets(vertex, fromTarget, false);
+                nearbyStopFinder.findNearbyStopsViaStreets(vertices, fromTarget, false);
 
         Map<Stop, Transfer> result = new HashMap<>();
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {

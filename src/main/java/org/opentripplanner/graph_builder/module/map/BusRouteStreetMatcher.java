@@ -11,7 +11,6 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,8 +50,8 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
             DataImportIssueStore issueStore
     ) {
 
-        //Mapbuilder needs transit index
-        graph.index(new DefaultStreetVertexIndexFactory());
+        // Mapbuilder needs transit index
+        graph.index();
 
         StreetMatcher matcher = new StreetMatcher(graph);
         EdgesForRoute edgesForRoute = new EdgesForRoute();

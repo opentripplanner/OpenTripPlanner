@@ -103,7 +103,7 @@ public class RouteMatcher implements Cloneable, Serializable {
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
         String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
-        if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getAgencyId(),
+        if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
                 routeName)))
             return true;
         if (routeNames.contains(routeName))
@@ -118,7 +118,7 @@ public class RouteMatcher implements Cloneable, Serializable {
     public String asString() {
         StringBuilder builder = new StringBuilder();
         for (FeedScopedId id : agencyAndRouteIds) {
-            builder.append(id.getAgencyId() + "__" + id.getId());
+            builder.append(id.getFeedId() + "__" + id.getId());
             builder.append(",");
         }
         for (T2<String, String> agencyIdAndRouteName : agencyIdAndRouteNames) {

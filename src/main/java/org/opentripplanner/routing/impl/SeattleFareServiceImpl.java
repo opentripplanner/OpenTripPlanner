@@ -12,7 +12,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
 
     @Override
     protected float addFares(List<Ride> ride0, List<Ride> ride1, float cost0, float cost1) {
-        String feedId = ride0.get(0).firstStop.getId().getAgencyId();
+        String feedId = ride0.get(0).firstStop.getId().getFeedId();
         String agencyId = ride0.get(0).agency;
         if (KCM_FEED_ID.equals(feedId) && KCM_AGENCY_ID.equals(agencyId)) {
             for (Ride r : Iterables.concat(ride0, ride1)) {
@@ -26,7 +26,7 @@ public class SeattleFareServiceImpl extends DefaultFareServiceImpl {
     }
 
     private static boolean isCorrectAgency(Ride r, String feedId, String agencyId) {
-        String rideFeedId = r.firstStop.getId().getAgencyId();
+        String rideFeedId = r.firstStop.getId().getFeedId();
         String rideAgencyId = r.agency;
         return feedId.equals(rideFeedId) && agencyId.equals(rideAgencyId);
     }

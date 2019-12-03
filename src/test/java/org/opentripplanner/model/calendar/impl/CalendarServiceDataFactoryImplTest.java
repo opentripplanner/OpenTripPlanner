@@ -73,7 +73,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     @Test
     public void testDataGetServiceIds() throws IOException {
-        assertEquals("[F_alldays, F_weekdays]", toString(data.getServiceIds()));
+        assertEquals("[F:alldays, F:weekdays]", toString(data.getServiceIds()));
     }
 
     @Test
@@ -97,20 +97,20 @@ public class CalendarServiceDataFactoryImplTest {
     @Test
     public void testServiceGetServiceIdsOnDate() throws IOException {
         Set<FeedScopedId> servicesOnFriday = calendarService.getServiceIdsOnDate(A_FRIDAY);
-        assertEquals("[F_alldays, F_weekdays]", sort(servicesOnFriday).toString());
+        assertEquals("[F:alldays, F:weekdays]", sort(servicesOnFriday).toString());
 
         Set<FeedScopedId> servicesOnSunday = calendarService.getServiceIdsOnDate(A_SUNDAY);
-        assertEquals("[F_alldays]", servicesOnSunday.toString());
+        assertEquals("[F:alldays]", servicesOnSunday.toString());
 
         // Test exclusion of serviceCalendarDate
         Set<FeedScopedId> servicesOnMonday = calendarService.getServiceIdsOnDate(A_MONDAY);
-        assertEquals("[F_weekdays]", servicesOnMonday.toString());
+        assertEquals("[F:weekdays]", servicesOnMonday.toString());
     }
 
     @Test
     public void testServiceGetServiceIds() throws IOException {
         Set<FeedScopedId> serviceIds = calendarService.getServiceIds();
-        assertEquals("[F_alldays, F_weekdays]", sort(serviceIds).toString());
+        assertEquals("[F:alldays, F:weekdays]", sort(serviceIds).toString());
     }
 
     @Test

@@ -8,7 +8,6 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -31,7 +30,7 @@ public class GraphStatisticsResourceTest {
         graph.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
 
         long expStops = graph.index.stopForId.size();
         expResult = "{data={graphStatistics={stops=" + expStops + "}}}";

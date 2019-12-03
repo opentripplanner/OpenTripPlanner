@@ -50,10 +50,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -126,7 +124,7 @@ public class Graph implements Serializable {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndexService streetIndex;
+    public transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -586,12 +584,12 @@ public class Graph implements Serializable {
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
         for (FeedScopedId sid : data.getServiceIds()) {
-            agencies.add(sid.getAgencyId());
+            agencies.add(sid.getFeedId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.
                 long t = sd.getAsDate(getTimeZone()).getTime() / 1000;
                 if (t > now) {
-                    agenciesWithFutureDates.add(sid.getAgencyId());
+                    agenciesWithFutureDates.add(sid.getFeedId());
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
@@ -668,8 +666,8 @@ public class Graph implements Serializable {
      * serialization. 
      * TODO: do we really need a factory for different street vertex indexes?
      */
-    public void index (StreetVertexIndexFactory indexFactory) {
-        streetIndex = indexFactory.newIndex(this);
+    public void index () {
+        streetIndex = new StreetVertexIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
@@ -692,7 +690,7 @@ public class Graph implements Serializable {
         }
         serializedGraphObject.reconstructEdgeLists();
         LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
         return graph;
     }
 

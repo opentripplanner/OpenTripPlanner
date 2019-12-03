@@ -59,7 +59,7 @@ public class OtpTransitServiceBuilderTest {
 
         assertEquals(1, calendarDates.size());
         assertEquals(
-                "<CalendarDate serviceId=F_weekdays date=2017-08-31 exception=2>",
+                "<CalendarDate serviceId=F:weekdays date=2017-08-31 exception=2>",
                 first(calendarDates).toString());
     }
 
@@ -68,7 +68,7 @@ public class OtpTransitServiceBuilderTest {
         Collection<ServiceCalendar> calendars = subject.getCalendars();
 
         assertEquals(2, calendars.size());
-        assertEquals("<ServiceCalendar F_alldays [1111111]>", first(calendars).toString());
+        assertEquals("<ServiceCalendar F:alldays [1111111]>", first(calendars).toString());
     }
 
     @Test
@@ -77,7 +77,7 @@ public class OtpTransitServiceBuilderTest {
 
         assertEquals(2, frequencies.size());
         assertEquals(
-                "<Frequency trip=agency_15.1 start=06:00:00 end=10:00:01>",
+                "<Frequency trip=agency:15.1 start=06:00:00 end=10:00:01>",
                 first(frequencies).toString()
         );
     }
@@ -87,7 +87,7 @@ public class OtpTransitServiceBuilderTest {
         Collection<Route> routes = subject.getRoutes().values();
 
         assertEquals(18, routes.size());
-        assertEquals("<Route agency_1 1>", first(routes).toString());
+        assertEquals("<Route agency:1 1>", first(routes).toString());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class OtpTransitServiceBuilderTest {
         Collection<ShapePoint> shapePoints = subject.getShapePoints();
 
         assertEquals(9, shapePoints.size());
-        assertEquals("<ShapePoint F_4 #1 (41.0,-75.0)>", first(shapePoints).toString());
+        assertEquals("<ShapePoint F:4 #1 (41.0,-75.0)>", first(shapePoints).toString());
     }
 
 

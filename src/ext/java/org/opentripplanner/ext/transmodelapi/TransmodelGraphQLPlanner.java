@@ -72,8 +72,13 @@ public class TransmodelGraphQLPlanner {
         try {
             List<Itinerary> itineraries = new ArrayList<>();
 
+            // TODO This currently only calculates the distances between the first fromVertex
+            //      and the first toVertex
             if (request.modes.getNonTransitSet().isValid()) {
-                double distance = SphericalDistanceLibrary.distance(request.rctx.origin.getCoordinate(), request.rctx.target.getCoordinate());
+                double distance = SphericalDistanceLibrary.distance(
+                        request.rctx.fromVertices.iterator().next().getCoordinate(),
+                        request.rctx.toVertices.iterator().next().getCoordinate()
+                );
                 double limit = request.maxWalkDistance * 2;
                 // Handle int overflow, in which case the multiplication will be less than zero
                 if (limit < 0 || distance < limit) {
@@ -167,7 +172,7 @@ public class TransmodelGraphQLPlanner {
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
-        return new GenericLocation(name, placeRef, lat, lon);
+        return new GenericLocation(name, mappingUtil.fromIdString(placeRef), lat, lon);
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
@@ -355,7 +360,7 @@ public class TransmodelGraphQLPlanner {
 
             FeedScopedId stopId = stopVertex.getStop().getId();
 
-            return stopId.getAgencyId().concat(":").concat(stopId.getId());
+            return stopId.getFeedId().concat(":").concat(stopId.getId());
         } else {
             return vertexId;
         }
