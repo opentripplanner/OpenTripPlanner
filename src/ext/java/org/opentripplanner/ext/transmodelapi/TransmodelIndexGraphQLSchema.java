@@ -1612,7 +1612,13 @@ public class TransmodelIndexGraphQLSchema {
                         .description("The stop place to which this quay belongs to.")
                         .type(stopPlaceType)
                         .dataFetcher(environment ->
-                                ((Stop) environment.getSource()).getParentStation()
+                            {
+                                Station station = ((Stop) environment.getSource()).getParentStation();
+                                return new MonoOrMultiModalStation(
+                                    station,
+                                    graph.index.multiModalStationForStations.get(station)
+                                );
+                            }
                         )
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
