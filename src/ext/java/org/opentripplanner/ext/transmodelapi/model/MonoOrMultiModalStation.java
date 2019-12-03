@@ -46,7 +46,10 @@ public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
       this.url = station.getUrl();
       this.timezone = station.getTimezone();
       this.childStops = station.getChildStops();
-      this.parentStation = new MonoOrMultiModalStation(parentStation);
+      this.parentStation =
+          parentStation != null
+              ? new MonoOrMultiModalStation(parentStation)
+              : null;
   }
 
   public MonoOrMultiModalStation(MultiModalStation multiModalStation) {
