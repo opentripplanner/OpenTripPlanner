@@ -10,6 +10,7 @@ import uk.org.siri.siri20.Siri;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
@@ -35,7 +36,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     private String requestorRef;
     private int timeout;
 
-    private static Map<String, String> requestHeaders;
+    private static Map<String, String> requestHeaders = new HashMap<>();
 
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
