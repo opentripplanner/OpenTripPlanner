@@ -73,4 +73,48 @@ public class Ride {
         builder.append(")");
         return builder.toString();
     }
+
+    public String getAgency() {
+        return agency;
+    }
+
+    public FeedScopedId getRoute() {
+        return route;
+    }
+
+    public FeedScopedId getTrip() {
+        return trip;
+    }
+
+    public Set<String> getZones() {
+        return zones;
+    }
+
+    public String getStartZone() {
+        return startZone;
+    }
+
+    public String getEndZone() {
+        return endZone;
+    }
+
+    public long getStartTime() {
+        return startTime;
+    }
+
+    public long getEndTime() {
+        return endTime;
+    }
+
+    public Object getClassifier() {
+        return classifier;
+    }
+
+    public Stop getFirstStop() {
+        return firstStop;
+    }
+
+    public Stop getLastStop() {
+        return lastStop;
+    }
 }
