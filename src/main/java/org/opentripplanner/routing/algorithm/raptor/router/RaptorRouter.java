@@ -57,7 +57,7 @@ public class RaptorRouter {
     this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
         transitLayer, startOfTime, 2, request.modes, request.walkSpeed
     );
-    LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
+    LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
     this.transitLayer = transitLayer;
     this.request = request;
   }
@@ -81,7 +81,7 @@ public class RaptorRouter {
     Collection<TransferLeg> egressTimes = accessEgressLegMapper
         .map(egressTransfers, request.walkSpeed);
 
-    LOG.info("Access/egress routing took {} ms",
+    LOG.debug("Access/egress routing took {} ms",
         System.currentTimeMillis() - startTimeAccessEgress);
 
     /* Prepare transit search */
@@ -115,9 +115,9 @@ public class RaptorRouter {
     Collection<Path<TripSchedule>> paths = rangeRaptorService
         .route(rangeRaptorRequest, this.otpRRDataProvider);
 
-    LOG.info("Found {} itineraries", paths.size());
+    LOG.debug("Found {} itineraries", paths.size());
 
-    LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
+    LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
     /* Create itineraries */
 
@@ -146,7 +146,7 @@ public class RaptorRouter {
             itineraries.add(itinerary);
         }
 
-    LOG.info("Creating itineraries took {} ms", itineraries.size(),
+    LOG.debug("Creating itineraries took {} ms", itineraries.size(),
         System.currentTimeMillis() - startItineraries);
 
     return itineraries;

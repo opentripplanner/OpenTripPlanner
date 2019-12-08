@@ -55,7 +55,7 @@ public class PlannerResource extends RoutingResource {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
-         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords 
+         * TODO: from/to inputs should be converted / geocoded / etc... here, and maybe send coords
          *       or vertex ids to planner (or error back to user)
          * TODO: org.opentripplanner.routing.module.PathServiceImpl has COOORD parsing. Abstract that
          *       out so it's used here too...
@@ -182,7 +182,7 @@ public class PlannerResource extends RoutingResource {
         itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
                 .limit(request.numItineraries).collect(Collectors.toList());
         tripPlan.itinerary = itineraries;
-        LOG.info("Returning {} itineraries", itineraries.size());
+        LOG.debug("Returning {} itineraries", itineraries.size());
         return tripPlan;
     }
 }

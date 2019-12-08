@@ -67,7 +67,7 @@ public class GrizzlyServer {
      * an HttpServer and NetworkListener manually so we can set the number of threads and other details.
      */
     public void run() {
-        
+
         LOG.info("Starting OTP Grizzly server on ports {} (HTTP) and {} (HTTPS) of interface {}",
             params.port, params.securePort, params.bindAddress);
         LOG.info("OTP server graph directory is: {}", params.graphDirectory);
