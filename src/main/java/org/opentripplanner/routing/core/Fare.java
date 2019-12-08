@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -13,10 +11,6 @@ import java.util.Map;
  * </p>
  */
 public class Fare {
-
-    public static enum FareType implements Serializable {
-        regular, student, senior, tram, special, youth
-    }
 
     /**
      * A mapping from {@link FareType} to {@link Money}.

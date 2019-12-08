@@ -8,10 +8,10 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.routing.graph.Graph;
@@ -32,7 +32,7 @@ import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 public class TestFares extends TestCase {
 
     private AStar aStar = new AStar();
-    
+
     public void testBasic() throws Exception {
 
         Graph gg = new Graph();
@@ -53,9 +53,9 @@ public class TestFares extends TestCase {
         path = spt.getPath(gg.getVertex(feedId + ":Mountain View Caltrain"), true);
 
         FareService fareService = gg.getService(FareService.class);
-        
+
         Fare cost = null; // was: fareService.getCost(path);
-        assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 425));
+        assertEquals(cost.getFare(StandardFareType.regular), new Money(new WrappedCurrency("USD"), 425));
     }
 
     public void testPortland() throws Exception {
@@ -76,7 +76,7 @@ public class TestFares extends TestCase {
 
         FareService fareService = gg.getService(FareService.class);
         Fare cost = null; // was: fareService.getCost(path);
-        assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(FareType.regular));
+        assertEquals(new Money(new WrappedCurrency("USD"), 200), cost.getFare(StandardFareType.regular));
 
         // long trip
 
@@ -88,9 +88,9 @@ public class TestFares extends TestCase {
         path = spt.getPath(gg.getVertex(feedId + ":1252"), true);
         assertNotNull(path);
         cost = null; // was: fareService.getCost(path);
-        
+
         //assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 460));
-        
+
         // complex trip
         options.maxTransfers = 5;
         startTime = TestUtils.dateInSeconds("America/Los_Angeles", 2009, 11, 1, 14, 0, 0);
@@ -106,28 +106,28 @@ public class TestFares extends TestCase {
         // thread on gtfs-changes.
         // assertEquals(cost.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 430));
     }
-    
-    
+
+
     public void testKCM() throws Exception {
-    	
+
     	Graph gg = new Graph();
         GtfsContext context = contextBuilder(ConstantsForTests.KCM_GTFS).build();
-        
+
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);
         factory.setFareServiceFactory(new SeattleFareServiceFactory());
-        
+
         factory.run(gg);
         gg.putService(
                 CalendarServiceData.class, context.getCalendarServiceData()
         );
         RoutingRequest options = new RoutingRequest();
         String feedId = gg.getFeedIds().iterator().next();
-       
+
         String vertex0 = feedId + ":2010";
         String vertex1 = feedId + ":2140";
         ShortestPathTree spt;
         GraphPath path = null;
-        
+
         FareService fareService = gg.getService(FareService.class);
 
         options.dateTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 5, 0, 0);
@@ -136,8 +136,8 @@ public class TestFares extends TestCase {
         path = spt.getPath(gg.getVertex(vertex1), true);
 
         Fare costOffPeak = null; // was: fareService.getCost(path);
-        assertEquals(costOffPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 250));
-        
+        assertEquals(costOffPeak.getFare(StandardFareType.regular), new Money(new WrappedCurrency("USD"), 250));
+
         long onPeakStartTime = TestUtils.dateInSeconds("America/Los_Angeles", 2016, 5, 24, 8, 0, 0);
         options.dateTime = onPeakStartTime;
         options.setRoutingContext(gg, vertex0, vertex1);
@@ -145,8 +145,8 @@ public class TestFares extends TestCase {
         path = spt.getPath(gg.getVertex(vertex1), true);
 
         Fare costOnPeak = null; // was: fareService.getCost(path);
-        assertEquals(costOnPeak.getFare(FareType.regular), new Money(new WrappedCurrency("USD"), 275));
-        
+        assertEquals(costOnPeak.getFare(StandardFareType.regular), new Money(new WrappedCurrency("USD"), 275));
+
     }
 
     public void testFareComponent() throws Exception {
@@ -172,7 +172,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":B"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
@@ -190,7 +190,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":C"), true);
         fare = null; // was:  fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));
@@ -204,7 +204,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":D"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "BD"));
@@ -216,7 +216,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":G"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
@@ -228,7 +228,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":E"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "CD"));
@@ -239,7 +239,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":G"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 1);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "EG"));
@@ -251,7 +251,7 @@ public class TestFares extends TestCase {
         spt = aStar.getShortestPathTree(options);
         path = spt.getPath(gg.getVertex(feedId+":D"), true);
         fare = null; // was: fareService.getCost(path);
-        fareComponents = fare.getDetails(FareType.regular);
+        fareComponents = fare.getDetails(StandardFareType.regular);
         assertEquals(fareComponents.size(), 2);
         assertEquals(fareComponents.get(0).price, tenUSD);
         assertEquals(fareComponents.get(0).fareId, new FeedScopedId(feedId, "AB"));

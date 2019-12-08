@@ -7,11 +7,10 @@ import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
-import org.opentripplanner.routing.impl.Ride;
+import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.spt.GraphPath;
 
 public class AddingMultipleFareService implements FareService, Serializable {
 
@@ -41,7 +40,7 @@ public class AddingMultipleFareService implements FareService, Serializable {
                 // Merge subFare with existing fare
                 // Must use a temporary as we need to keep fare clean during the loop on FareType
                 Fare newFare = new Fare(fare);
-                for (FareType fareType : FareType.values()) {
+                for (FareType fareType : StandardFareType.values()) {
                     Money cost = fare.getFare(fareType);
                     Money subCost = subFare.getFare(fareType);
                     if (cost == null && subCost == null) {
@@ -56,10 +55,10 @@ public class AddingMultipleFareService implements FareService, Serializable {
                          * probably want the "regular" bike fare to be added to the "student"
                          * transit fare too. Here we assume "regular" as a sane default value.
                          */
-                        subCost = subFare.getFare(FareType.regular);
+                        subCost = subFare.getFare(StandardFareType.regular);
                     } else if (cost == null && subCost != null) {
                         /* Same, but the other way around. */
-                        cost = fare.getFare(FareType.regular);
+                        cost = fare.getFare(StandardFareType.regular);
                     }
 
                     if (cost != null && subCost != null) {

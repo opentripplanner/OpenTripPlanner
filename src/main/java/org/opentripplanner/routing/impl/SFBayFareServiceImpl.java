@@ -10,15 +10,16 @@ import java.util.Set;
 
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
 
     public SFBayFareServiceImpl(Collection<FareRuleSet> regularFareRules) {
-        addFareRules(FareType.regular, regularFareRules);
+        addFareRules(StandardFareType.regular, regularFareRules);
     }
 
     private static final long serialVersionUID = 20120229L;
@@ -34,7 +35,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
     public static final Set<String> SFMTA_BART_TRANSFER_STOPS = new HashSet<String>(Arrays.asList(
             "EMBR", "MONT", "POWL", "CIVC", "16TH", "24TH", "GLEN", "BALB", "DALY"));
     public static final String SFMTA_BART_FREE_TRANSFER_STOP = "DALY";
-    
+
     @Override
     protected boolean populateFare(Fare fare, Currency currency, FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
@@ -74,7 +75,7 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                     if (ride.classifier == TraverseMode.CABLE_CAR) {
                         // no transfers issued or accepted
                         cost += CABLE_CAR_FARE;
-                    } else if (sfmtaTransferIssued == null || 
+                    } else if (sfmtaTransferIssued == null ||
                         sfmtaTransferIssued + SFMTA_TRANSFER_DURATION < ride.endTime) {
                         sfmtaTransferIssued = ride.startTime;
                         if (alightedBart != null &&
@@ -86,9 +87,9 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
                             } else {
                                 cost += SFMTA_BART_TRANSFER_FARE;
                             }
-                        } else { 
+                        } else {
                             // no transfer, basic fare
-                            cost += SFMTA_BASE_FARE; 
+                            cost += SFMTA_BASE_FARE;
                         }
                     } else {
                         // SFMTA-SFMTA non-cable-car transfer within time limit, no cost
@@ -101,8 +102,8 @@ public class SFBayFareServiceImpl extends DefaultFareServiceImpl {
         if (bartBlock != null) {
             // finalize outstanding bart block, if any
             cost += calculateCost(fareType, bartBlock, fareRules);
-        }        
+        }
         return cost;
     }
-    
+
 }

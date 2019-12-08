@@ -8,10 +8,8 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
-import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.fares.MultipleFareServiceFactory;
+import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.slf4j.Logger;
@@ -36,7 +34,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     public FareService makeFareService() {
         DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
-        fareService.addFareRules(FareType.regular, regularFareRules.values());
+        fareService.addFareRules(StandardFareType.regular, regularFareRules.values());
         return fareService;
     }
 

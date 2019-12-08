@@ -6,7 +6,8 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.Fare.FareType;
+import org.opentripplanner.routing.core.FareType;
+import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class TimeBasedBikeRentalFareService implements FareService, Serializable
         rideCost += getLegCost(path.egressLeg());
 
         Fare fare = new Fare();
-        fare.addFare(FareType.regular, new WrappedCurrency(currency), rideCost);
+        fare.addFare(StandardFareType.regular, new WrappedCurrency(currency), rideCost);
         return fare;
     }
 }
