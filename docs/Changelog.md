@@ -5,7 +5,8 @@
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
-- NeTEx import support (#2769).
+- NeTEx import support (#2769)
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
 - Added NeTEx notices (#2824)
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import (#2813)

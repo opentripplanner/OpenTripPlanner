@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.transit;
 
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -35,7 +36,13 @@ public class EgressAccessRouter {
         this.graph = graph;
         this.transitLayer = transitLayer;
         this.request = request;
-        this.splitter = new SimpleStreetSplitter(graph, null, null, false);
+        this.splitter = new SimpleStreetSplitter(
+                graph,
+                null,
+                null,
+                false,
+                new DataImportIssueStore(false)
+        );
     }
 
     public void route() {
@@ -66,8 +73,7 @@ public class EgressAccessRouter {
             splitter.link(vertex);
         }
 
-        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
-                nearbyStopFinder.findNearbyStopsViaStreets(vertex, !fromOrigin, false);
+        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(vertex);
 
         if(stopAtDistanceList.isEmpty()) {
             throw new RuntimeException("Point not near a road: " + place);
@@ -77,7 +83,7 @@ public class EgressAccessRouter {
 
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
             int stopIndex = transitLayer.getIndexByStop(stopAtDistance.tstop.getStop());
-            int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistance)
+            int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             res.put(stopIndex, accessTimeSec);
         }
