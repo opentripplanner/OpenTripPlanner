@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
@@ -57,7 +58,7 @@ public class GraphBuilder implements Runnable {
     private List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
 
     private final File graphFile;
-    
+
     private Graph graph = new Graph();
 
     /** Should the graph be serialized to disk after being created or not? */
@@ -105,7 +106,7 @@ public class GraphBuilder implements Runnable {
         }
 
         DataImportIssueStore issueStore = new DataImportIssueStore(true);
-        
+
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
         for (GraphBuilderModule load : graphBuilderModules)
             load.buildGraph(graph, extra, issueStore);
@@ -145,7 +146,7 @@ public class GraphBuilder implements Runnable {
 
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         GraphBuilderParameters builderParams = new GraphBuilderParameters(config.builderConfig());
-
+        ComponentAnnotationConfigurator.getInstance().fromConfig(config.builderConfig());
         GraphBuilder graphBuilder = new GraphBuilder(dir);
 
         if (params.loadOSMGraph) {
