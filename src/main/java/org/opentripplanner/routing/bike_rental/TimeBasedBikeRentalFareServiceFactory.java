@@ -8,6 +8,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.services.FareService;
@@ -16,7 +18,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
+@Component(key = "bike-rental-time-based",type = ServiceType.ServiceFactory)
 public class TimeBasedBikeRentalFareServiceFactory implements FareServiceFactory {
 
     private static Logger log = LoggerFactory

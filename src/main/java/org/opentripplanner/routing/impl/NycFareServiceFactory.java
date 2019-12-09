@@ -1,11 +1,13 @@
 package org.opentripplanner.routing.impl;
 
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
-
+@Component(key = "new-york",type = ServiceType.ServiceFactory)
 public class NycFareServiceFactory implements FareServiceFactory {
 
     public FareService makeFareService() {

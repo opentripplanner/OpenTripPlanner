@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.FeedScopedId;
@@ -26,6 +27,7 @@ import java.util.Map;
  * @author novalis
  *
  */
+@Component(key = "default", type = ServiceType.ServiceFactory)
 public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);

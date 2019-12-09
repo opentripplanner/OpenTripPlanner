@@ -3,10 +3,11 @@ package org.opentripplanner.routing.impl;
 import java.util.HashMap;
 import java.util.Map;
 
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
@@ -15,6 +16,7 @@ import org.slf4j.LoggerFactory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 
+@Component(key = "seattle",type = ServiceType.ServiceFactory)
 public class SeattleFareServiceFactory extends DefaultFareServiceFactory {
 
     @SuppressWarnings("unused")
