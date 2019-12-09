@@ -53,7 +53,7 @@ class GroupOfStationsMapper {
         );
 
         if (!locationOk) {
-            // TODO OTP2 - This should be an annotation
+            // TODO OTP2 - This should be an data import issue
             LOG.warn(
                     "MultiModal station {} does not contain any coordinates.",
                     groupOfStations.getId()

@@ -70,13 +70,18 @@ public class PlannerResource extends RoutingResource {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
-            router = otpServer.getRouter(request.routerId);
+            router = otpServer.getRouter(null);
             request.setRoutingContext(router.graph);
 
             List<Itinerary> itineraries = new ArrayList<>();
 
+            // TODO This currently only calculates the distances between the first fromVertex
+            //      and the first toVertex
             if (request.modes.getNonTransitSet().isValid()) {
-                double distance = SphericalDistanceLibrary.distance(request.rctx.origin.getCoordinate(), request.rctx.target.getCoordinate());
+                double distance = SphericalDistanceLibrary.distance(
+                        request.rctx.fromVertices.iterator().next().getCoordinate(),
+                        request.rctx.toVertices.iterator().next().getCoordinate()
+                );
                 double limit = request.maxWalkDistance * 2;
                 // Handle int overflow, in which case the multiplication will be less than zero
                 if (limit < 0 || distance < limit) {

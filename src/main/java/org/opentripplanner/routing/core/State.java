@@ -6,6 +6,8 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.Set;
 
@@ -41,11 +43,24 @@ public class State implements Cloneable {
 
     /**
      * Create an initial state representing the beginning of a search for the given routing context.
-     * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all 
+     * Initial "parent-less" states can only be created at the beginning of a trip. elsewhere, all
      * states must be created from a parent and associated with an edge.
      */
+    public static Collection<State> getStates(RoutingRequest request) {
+        Collection<State> states = new ArrayList<>();
+        for (Vertex vertex : request.rctx.fromVertices) {
+            states.add(new State(vertex, request.rctx.originBackEdge, request.getSecondsSinceEpoch(), request));
+        }
+        return states;
+    }
+
     public State(RoutingRequest opt) {
-        this(opt.rctx.origin, opt.rctx.originBackEdge, opt.getSecondsSinceEpoch(), opt);
+        this(
+                opt.rctx.fromVertices == null ? null : opt.rctx.fromVertices.iterator().next(),
+                opt.rctx.originBackEdge,
+                opt.getSecondsSinceEpoch(),
+                opt
+        );
     }
 
     /**

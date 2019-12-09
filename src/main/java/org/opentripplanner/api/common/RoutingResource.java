@@ -45,7 +45,11 @@ public abstract class RoutingResource {
      * the path, not the query parameters. However, the class RoutingResource is not annotated with
      * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
      * path parameter should be included in the path annotations of all its subclasses.
+     *
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2760
      */
+    @Deprecated
     @PathParam("routerId") 
     public String routerId;
 
@@ -59,7 +63,14 @@ public abstract class RoutingResource {
     @QueryParam("toPlace")
     protected String toPlace;
 
-    /** An ordered list of intermediate locations to be visited (see the fromPlace for format). Parameter can be specified multiple times. */
+    /**
+     * An ordered list of intermediate locations to be visited (see the fromPlace for format).
+     * Parameter can be specified multiple times.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2. Must be re-implemented
+     *                       - using raptor.
+     */
+    @Deprecated
     @QueryParam("intermediatePlaces")
     protected List<String> intermediatePlaces;
 
@@ -71,22 +82,46 @@ public abstract class RoutingResource {
     @QueryParam("time")
     protected String time;
     
-    /** Whether the trip should depart or arrive at the specified date and time. */
+    /**
+     * Whether the trip should depart or arrive at the specified date and time.
+     *
+     * @deprecated TODO OTP2 Regression. Needs to be implemented in Raptor.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2885
+     */
+    @Deprecated
     @QueryParam("arriveBy")
     protected Boolean arriveBy;
     
-    /** Whether the trip must be wheelchair accessible. */
+    /**
+     * Whether the trip must be wheelchair accessible.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. This is not implemented
+     *                       in Raptor jet.
+     */
+    @Deprecated
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
 
-    /** The maximum distance (in meters) the user is willing to walk. Defaults to unlimited. */
+    /**
+     * The maximum distance (in meters) the user is willing to walk. Defaults to unlimited.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     */
+    @Deprecated
     @QueryParam("maxWalkDistance")
     protected Double maxWalkDistance;
 
     /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). Defaults to unlimited.
+     *
+     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
+    @Deprecated
     @QueryParam("maxPreTransitTime")
     protected Integer maxPreTransitTime;
 
@@ -149,13 +184,24 @@ public abstract class RoutingResource {
     @QueryParam("triangleTimeFactor")
     protected Double triangleTimeFactor;
 
-    /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
+    /**
+     * The set of characteristics that the user wants to optimize for. @See OptimizeType.
+     *
+     * @deprecated TODO OTP2 this should be completely removed and done only with individual cost
+     *                       parameters
+     *                       Also: apparently OptimizeType only affects BICYCLE mode traversal of
+     *                       street segments. If this is the case it should be very well
+     *                       documented and carried over into the Enum name.
+     */
+    @Deprecated
     @QueryParam("optimize")
     protected OptimizeType optimize;
     
     /**
-     * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
-     * <p>The possible values of the comma-separated list are:</p>
+     * The set of modes that a user is willing to use, with qualifiers stating whether vehicles
+     * should be parked, rented, etc.
+     * <p>
+     * The possible values of the comma-separated list are:
      *
      * <ul>
      *  <li>WALK</li>
@@ -176,16 +222,20 @@ public abstract class RoutingResource {
      *  <li>AIRPLANE</li>
      * </ul>
      *
-     * <p>
-     *   For a more complete discussion of this parameter see <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
-     * </p>
+     *   For a more complete discussion of this parameter see
+     *   <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
      */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
 
-    /** The minimum time, in seconds, between successive trips on different vehicles.
-     *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
-     *  transfers over longer distances might use a longer time. */
+    /**
+     * The minimum time, in seconds, between successive trips on different vehicles.
+     * This is designed to allow for imperfect schedule adherence. This is a minimum;
+     * transfers over longer distances might use a longer time.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
+     */
+    @Deprecated
     @QueryParam("minTransferTime")
     protected Integer minTransferTime;
 
@@ -194,36 +244,47 @@ public abstract class RoutingResource {
     protected Integer numItineraries;
 
     /**
-     * The list of preferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name)
-     * or Trimet__42 (two underscores, 42 is the route internal ID).
+     * The comma-separated list of preferred agencies.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @QueryParam("preferredRoutes")
-    protected String preferredRoutes;
-
-    /** Penalty added for using every route that is not preferred if user set any route as preferred, i.e. number of seconds that we are willing
-     * to wait for preferred route. */
-    @QueryParam("otherThanPreferredRoutesPenalty")
-    protected Integer otherThanPreferredRoutesPenalty;
-    
-    /** The comma-separated list of preferred agencies. */
+    @Deprecated
     @QueryParam("preferredAgencies")
     protected String preferredAgencies;
     
+
     /**
-     * The list of unpreferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
-     * underscores, 42 is the route internal ID).
+     * The comma-separated list of unpreferred agencies.
+     *
+     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @QueryParam("unpreferredRoutes")
-    protected String unpreferredRoutes;
-    
-    /** The comma-separated list of unpreferred agencies. */
+    @Deprecated
     @QueryParam("unpreferredAgencies")
     protected String unpreferredAgencies;
 
-    /** Whether intermediate stops -- those that the itinerary passes in a vehicle, but 
-     *  does not board or alight at -- should be returned in the response.  For example,
-     *  on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and
-     *  Atlantic Avenue should be included. */
+    /**
+     * The comma-separated list of banned agencies.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     */
+    @QueryParam("bannedAgencies")
+    protected String bannedAgencies;
+
+    /**
+     * Functions the same as banned agencies, except only the listed agencies are allowed.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     */
+    @QueryParam("whiteListedAgencies")
+    protected String whiteListedAgencies;
+
+
+    /**
+     * Whether intermediate stops -- those that the itinerary passes in a vehicle, but
+     * does not board or alight at -- should be returned in the response.  For example,
+     * on a Q train trip from Prospect Park to DeKalb Avenue, whether 7th Avenue and
+     * Atlantic Avenue should be included.
+     */
     @QueryParam("showIntermediateStops")
     protected Boolean showIntermediateStops;
 
@@ -240,61 +301,96 @@ public abstract class RoutingResource {
      */
     @QueryParam("bikeBoardCost")
     protected Integer bikeBoardCost;
-    
+
     /**
-     * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
-     * (two underscores, 42 is the route internal ID).
+     * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so
+     * TriMet_100 (100 is route short name) or Trimet__42 (two underscores, 42 is the route
+     * internal ID).
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
+    @Deprecated
     @QueryParam("bannedRoutes")
     protected String bannedRoutes;
 
     /**
      * Functions the same as bannnedRoutes, except only the listed routes are allowed.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
     @QueryParam("whiteListedRoutes")
+    @Deprecated
     protected String whiteListedRoutes;
-    
-    /** The comma-separated list of banned agencies. */
-    @QueryParam("bannedAgencies")
-    protected String bannedAgencies;
 
     /**
-     * Functions the same as banned agencies, except only the listed agencies are allowed.
+     * The list of preferred routes. The format is agency_[routename][_routeid], so TriMet_100
+     * (100 is route short name) or Trimet__42 (two underscores, 42 is the route internal ID).
+     *
+     * @deprecated TODO OTP2 Needs to be implemented
      */
-    @QueryParam("whiteListedAgencies")
-    protected String whiteListedAgencies;
-    
-    /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
+    @Deprecated
+    @QueryParam("preferredRoutes")
+    protected String preferredRoutes;
+
+    /**
+     * The list of unpreferred routes. The format is agency_[routename][_routeid], so TriMet_100
+     * (100 is route short name) or Trimet__42 (two underscores, 42 is the route internal ID).
+     *
+     * @deprecated TODO OTP2 Needs to be implemented
+     */
+    @Deprecated
+    @QueryParam("unpreferredRoutes")
+    protected String unpreferredRoutes;
+
+    /**
+     * Penalty added for using every route that is not preferred if user set any route as
+     *  preferred, i.e. number of seconds that we are willing to wait for preferred route.
+     *
+     * @deprecated TODO OTP2 Needs to be implemented
+     */
+    @Deprecated
+    @QueryParam("otherThanPreferredRoutesPenalty")
+    protected Integer otherThanPreferredRoutesPenalty;
+
+    /**
+     * The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
+    @Deprecated
     @QueryParam("bannedTrips")
     protected String bannedTrips;
 
-    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
+    /**
+     * A comma-separated list of banned stops. A stop is banned by ignoring its
      * pre-board and pre-alight edges. This means the stop will be reachable via the
      * street network. Also, it is still possible to travel through the stop. Just
      * boarding and alighting is prohibited.
      * The format is agencyId_stopId, so: TriMet_2107
-     * @deprecated This no longer works in OTP2, see issue #2843.
+     *
+     * @deprecated TODO OTP2 This no longer works in OTP2, see issue #2843.
      */
     @Deprecated
     @QueryParam("bannedStops")
     protected String bannedStops;
     
-    /** A comma-separated list of banned stops. A stop is banned by ignoring its 
+    /**
+     * A comma-separated list of banned stops. A stop is banned by ignoring its
      * pre-board and pre-alight edges. This means the stop will be reachable via the
      * street network. It is not possible to travel through the stop.
      * For example, this parameter can be used when a train station is destroyed, such
      * that no trains can drive through the station anymore.
      * The format is agencyId_stopId, so: TriMet_2107
-     * @deprecated This no longer works in OTP2, see issue #2843.
+     *
+     * @deprecated TODO OTP2 This no longer works in OTP2, see issue #2843.
      */
     @Deprecated
     @QueryParam("bannedStopsHard")
     protected String bannedStopsHard;
     
     /**
-     * An additional penalty added to boardings after the first.  The value is in OTP's
+     * An additional penalty added to boardings after the first. The value is in OTP's
      * internal weight units, which are roughly equivalent to seconds.  Set this to a high
      * value to discourage transfers.  Of course, transfers that save significant
      * time or walking will still be taken.
@@ -309,26 +405,67 @@ public abstract class RoutingResource {
      * value to discourage transfers that are not preferred. Of course, transfers that save
      * significant time or walking will still be taken.
      * When no preferred or timed transfer is defined, this value is ignored.
+     *
+     * TODO OTP2 This JavaDoc needs clarification. What is a "preferred" Transfer, the GTFS
+     *           specification do not have "preferred Transfers". The GTFS spec transfer
+     *           type 0 is _Recommended transfer point_ - is this what is meant?
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
      */
+    @Deprecated
     @QueryParam("nonpreferredTransferPenalty")
     protected Integer nonpreferredTransferPenalty;
     
-    /** The maximum number of transfers (that is, one plus the maximum number of boardings)
-     *  that a trip will be allowed.  Larger values will slow performance, but could give
-     *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
-     *  org.opentripplanner.api.ws.Planner. */
+    /**
+     * The maximum number of transfers (that is, one plus the maximum number of boardings)
+     * that a trip will be allowed.
+     *
+     * Consider using the {@link #transferPenalty} instead of this parameter.
+     *
+     * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
+     *                        here. Instead the client should be able to pass in a parameter for
+     *                        the max number of additional/extra transfers relative to the best
+     *                        trip (with the fewest possible transfers) within constraint of the
+     *                        other search parameters.
+     *                        This might be to complicated to explain to the customer, so we
+     *                        might stick to the old limit, but that have side-effects that you
+     *                        might not find any trips on a day where a critical part of the
+     *                        trip is not available, because of some real-time disruption.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     */
+    @Deprecated
     @QueryParam("maxTransfers")
     protected Integer maxTransfers;
 
-    /** If true, goal direction is turned off and a full path tree is built (specify only once) */
+    /**
+     * If true, goal direction is turned off and a full path tree is built (specify only once)
+     *
+     * @Deprecated - This is not supported in OTP2 any more.
+     */
+    @Deprecated
     @QueryParam("batch")
     protected Boolean batch;
-
-    /** A transit stop required to be the first stop in the search (AgencyId_StopId) */
+    /**
+     * A transit stop required to be the first stop in the search (AgencyId_StopId)
+     *
+     * @deprecated TODO OTP2 Is this in use, what is is used for. It seems to overlap with
+     *                       the fromPlace parameter. Is is used for onBoard routing only?
+     */
+    @Deprecated
     @QueryParam("startTransitStopId")
     protected String startTransitStopId;
 
-    /** A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId) */
+
+    /**
+     * A transit trip acting as a starting "state" for depart-onboard routing (AgencyId_TripId)
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2. We might not implement the
+     *                       old functionality the same way, but we will try to map this parameter
+     *                       so it does work similar as before.
+     */
+    @Deprecated
     @QueryParam("startTransitTripId")
     protected String startTransitTripId;
 
@@ -345,20 +482,37 @@ public abstract class RoutingResource {
      * A value of 0 means that initial wait time will not be subtracted out (will be clamped to 0).
      * A value of -1 (the default) means that clamping is disabled, so any amount of initial wait 
      * time will be subtracted out.
+     *
+     * @deprecated This parameter is not in use any more.
      */
+    @Deprecated
     @QueryParam("clampInitialWait")
     protected Long clampInitialWait;
 
     /**
+     * THIS PARAMETER IS NO LONGER IN USE.
+     *
      * If true, this trip will be reverse-optimized on the fly. Otherwise, reverse-optimization
      * will occur once a trip has been chosen (in Analyst, it will not be done at all).
+     *
+     * @deprecated This parameter is not in use any more after the transit search switched from
+     *             AStar to Raptor.
      */
+    @Deprecated
     @QueryParam("reverseOptimizeOnTheFly")
     protected Boolean reverseOptimizeOnTheFly;
-        
+
+    /**
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     */
+    @Deprecated
     @QueryParam("boardSlack")
     private Integer boardSlack;
-    
+
+    /**
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
+     */
+    @Deprecated
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -367,7 +521,10 @@ public abstract class RoutingResource {
 
     /**
      * If true, realtime updates are ignored during this search.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
+    @Deprecated
     @QueryParam("ignoreRealtimeUpdates")
     protected Boolean ignoreRealtimeUpdates;
 
@@ -378,10 +535,22 @@ public abstract class RoutingResource {
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
 
+    /**
+     * @deprecated TODO OTP2 This is not useful as a search parameter, but could be used as a
+     *                       post search filter to reduce number of itineraries down to an
+     *                       acceptable number, but there are probably better ways to do that.
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     */
+    @Deprecated
     @QueryParam("maxHours")
     private Double maxHours;
 
+    /**
+     * @deprecated see {@link #maxHours}
+     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
+     */
     @QueryParam("useRequestedDateTimeInMaxHours")
+    @Deprecated
     private Boolean useRequestedDateTimeInMaxHours;
 
     @QueryParam("disableAlertFiltering")
@@ -396,7 +565,10 @@ public abstract class RoutingResource {
     /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";
      * otherwise it uses default sorting. More sorting methods may be added in the future.
+     *
+     * @deprecated TODO OTP2 Regression. Not currently working in OTP2 at the moment.
      */
+    @Deprecated
     @QueryParam("pathComparator")
     private String pathComparator;
 
@@ -419,14 +591,14 @@ public abstract class RoutingResource {
     protected RoutingRequest buildRequest() throws ParameterException {
         Router router = otpServer.getRouter(routerId);
         RoutingRequest request = router.defaultRoutingRequest.clone();
-        request.routerId = routerId;
+
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
         if (fromPlace != null)
-            request.setFromString(fromPlace);
+            request.from = LocationStringParser.fromOldStyleString(fromPlace);
 
         if (toPlace != null)
-            request.setToString(toPlace);
+            request.to = LocationStringParser.fromOldStyleString(toPlace);
 
         {
             //FIXME: move into setter method on routing request
@@ -494,9 +666,9 @@ public abstract class RoutingResource {
                 RoutingRequest.assertTriangleParameters(
                         triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
                 );
-                request.setTriangleSafetyFactor(triangleSafetyFactor);
-                request.setTriangleSlopeFactor(triangleSlopeFactor);
-                request.setTriangleTimeFactor(triangleTimeFactor);
+                request.setBikeTriangleSafetyFactor(triangleSafetyFactor);
+                request.setBikeTriangleSlopeFactor(triangleSlopeFactor);
+                request.setBikeTriangleTimeFactor(triangleTimeFactor);
             }
         }
 
@@ -598,12 +770,6 @@ public abstract class RoutingResource {
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
             request.startingTransitTripId = FeedScopedId.convertFromString(startTransitTripId);
-
-        if (clampInitialWait != null)
-            request.clampInitialWait = clampInitialWait;
-
-        if (reverseOptimizeOnTheFly != null)
-            request.reverseOptimizeOnTheFly = reverseOptimizeOnTheFly;
 
         if (ignoreRealtimeUpdates != null)
             request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;

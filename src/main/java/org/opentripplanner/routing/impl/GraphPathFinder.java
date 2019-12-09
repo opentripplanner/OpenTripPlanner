@@ -60,10 +60,8 @@ public class GraphPathFinder {
     }
 
     /**
-     * Repeatedly build shortest path trees, retaining the best path to the destination after each try.
-     * For search N, all trips used in itineraries retained from trips 0..(N-1) are "banned" to create variety.
-     * The goal direction heuristic is reused between tries, which means the later tries have more information to
-     * work with (in the case of the more sophisticated bidirectional heuristic, which improves over time).
+     * This no longer does "trip banning" to find multiple itineraries.
+     * It just searches once trying to find a non-transit path.
      */
     public List<GraphPath> getPaths(RoutingRequest options) {
         if (options == null) {
@@ -110,46 +108,35 @@ public class GraphPathFinder {
         if (options.maxWalkDistance > CLAMP_MAX_WALK) options.maxWalkDistance = CLAMP_MAX_WALK;
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
-        List<GraphPath> paths = Lists.newArrayList();
-        while (paths.size() < options.numItineraries) {
-            // TODO pull all this timeout logic into a function near org.opentripplanner.util.DateUtils.absoluteTimeout()
-            int timeoutIndex = paths.size();
-            if (timeoutIndex >= router.timeouts.length) {
-                timeoutIndex = router.timeouts.length - 1;
-            }
-            double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
-            timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
-            timeout /= 1000; // Convert milliseconds to seconds
-            if (timeout <= 0) {
-                // Catch the case where advancing to the next (lower) timeout value means the search is timed out
-                // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".
-                options.rctx.aborted = true;
-                break;
-            }
-            // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
-            aStar.getShortestPathTree(options, timeout);
 
-            if (options.rctx.aborted) {
-                break; // Search timed out or was gracefully aborted for some other reason.
-            }
-            List<GraphPath> newPaths = aStar.getPathsToTarget();
-            if (newPaths.isEmpty()) {
-                break;
-            }
-
-            paths.addAll(newPaths.stream()
-                    .filter(path -> {
-                        double duration = options.useRequestedDateTimeInMaxHours
-                            ? options.arriveBy
-                                ? options.dateTime - path.getStartTime()
-                                : path.getEndTime() - options.dateTime
-                            : path.getDuration();
-                        return duration < options.maxHours * 60 * 60;
-                    })
-                    .collect(Collectors.toList()));
-
-            LOG.debug("we have {} paths", paths.size());
+        int timeoutIndex = 0;
+        if (timeoutIndex >= router.timeouts.length) {
+            timeoutIndex = router.timeouts.length - 1;
         }
+        double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
+        timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
+        timeout /= 1000; // Convert milliseconds to seconds
+        if (timeout <= 0) {
+            // Catch the case where advancing to the next (lower) timeout value means the search is timed out
+            // before it even begins. Passing a negative relative timeout in the SPT call would mean "no timeout".
+            options.rctx.aborted = true;
+            return null;
+        }
+        // Don't dig through the SPT object, just ask the A star algorithm for the states that reached the target.
+        aStar.getShortestPathTree(options, timeout);
+
+        List<GraphPath> paths = aStar.getPathsToTarget().stream()
+                .filter(path -> {
+                    double duration = options.useRequestedDateTimeInMaxHours
+                        ? options.arriveBy
+                            ? options.dateTime - path.getStartTime()
+                            : path.getEndTime() - options.dateTime
+                        : path.getDuration();
+                    return duration < options.maxHours * 60 * 60;
+                })
+                .collect(Collectors.toList());
+
+        LOG.debug("we have {} paths", paths.size());
         LOG.debug("END SEARCH ({} msec)", System.currentTimeMillis() - searchBeginTime);
         Collections.sort(paths, options.getPathComparator(options.arriveBy));
         return paths;
@@ -169,7 +156,7 @@ public class GraphPathFinder {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
-                relaxedRequest.maxSlope = Double.MAX_VALUE;
+                relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
                 request.rctx.slopeRestrictionRemoved = true;
                 paths = getGraphPathsConsideringIntermediates(relaxedRequest);
             }

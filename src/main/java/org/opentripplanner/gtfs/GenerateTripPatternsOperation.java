@@ -3,8 +3,11 @@ package org.opentripplanner.gtfs;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.ListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.graph_builder.annotation.TripDegenerate;
-import org.opentripplanner.graph_builder.annotation.TripUndefinedService;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
+import org.opentripplanner.graph_builder.issues.TripDegenerate;
+import org.opentripplanner.graph_builder.issues.TripUndefinedService;
+import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
@@ -13,8 +16,6 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -37,7 +38,7 @@ public class GenerateTripPatternsOperation {
     private static final int UNKNOWN_DIRECTION_ID = -1;
 
     private final OtpTransitServiceBuilder transitDaoBuilder;
-    private final AddBuilderAnnotation builderAnnotation;
+    private final DataImportIssueStore issueStore;
     private final Deduplicator deduplicator;
     private final Set<FeedScopedId> calendarServiceIds;
 
@@ -50,10 +51,10 @@ public class GenerateTripPatternsOperation {
 
 
 
-    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, AddBuilderAnnotation builderAnnotation,
+    public GenerateTripPatternsOperation(OtpTransitServiceBuilder builder, DataImportIssueStore issueStore,
             Deduplicator deduplicator, Set<FeedScopedId> calendarServiceIds) {
         this.transitDaoBuilder = builder;
-        this.builderAnnotation = builderAnnotation;
+        this.issueStore = issueStore;
         this.deduplicator = deduplicator;
         this.calendarServiceIds = calendarServiceIds;
         this.tripPatterns = transitDaoBuilder.getTripPatterns();
@@ -100,8 +101,17 @@ public class GenerateTripPatternsOperation {
 
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
+        try {
+            // Check that the mode is supported
+            GtfsLibrary.getTraverseMode(trip.getRoute());
+        } catch (IllegalArgumentException e) {
+            issueStore.add(new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getType())));
+            return;
+        }
+
+        // TODO: move to a validator module
         if (!calendarServiceIds.contains(trip.getServiceId())) {
-            LOG.warn(builderAnnotation.addBuilderAnnotation(new TripUndefinedService(trip)));
+            issueStore.add(new TripUndefinedService(trip));
             return; // Invalid trip, skip it, it will break later
         }
 
@@ -110,7 +120,7 @@ public class GenerateTripPatternsOperation {
 
         // If after filtering this trip does not contain at least 2 stoptimes, it does not serve any purpose.
         if (stopTimes.size() < 2) {
-            LOG.warn(builderAnnotation.addBuilderAnnotation(new TripDegenerate(trip)));
+            issueStore.add(new TripDegenerate(trip));
             return;
         }
 

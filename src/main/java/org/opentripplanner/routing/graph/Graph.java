@@ -6,13 +6,11 @@ import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.HashMultiset;
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Multiset;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
@@ -25,8 +23,8 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
@@ -52,10 +50,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.services.StreetVertexIndexFactory;
-import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -89,7 +85,7 @@ import java.util.prefs.Preferences;
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
-public class Graph implements Serializable, AddBuilderAnnotation {
+public class Graph implements Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(Graph.class);
 
@@ -128,7 +124,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
 
     private transient CalendarService calendarService;
 
-    public transient StreetVertexIndexService streetIndex;
+    public transient StreetVertexIndex streetIndex;
 
     public transient GraphIndex index;
 
@@ -141,8 +137,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
-
-    private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
@@ -581,18 +575,21 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     // Infer the time period covered by the transit feed
-    public void updateTransitFeedValidity(CalendarServiceData data) {
+    public void updateTransitFeedValidity(
+            CalendarServiceData data,
+            DataImportIssueStore issueStore
+    ) {
         long now = new Date().getTime() / 1000;
         final long SEC_IN_DAY = 24 * 60 * 60;
         HashSet<String> agenciesWithFutureDates = new HashSet<String>();
         HashSet<String> agencies = new HashSet<String>();
         for (FeedScopedId sid : data.getServiceIds()) {
-            agencies.add(sid.getAgencyId());
+            agencies.add(sid.getFeedId());
             for (ServiceDate sd : data.getServiceDatesForServiceId(sid)) {
                 // Adjust for timezone, assuming there is only one per graph.
                 long t = sd.getAsDate(getTimeZone()).getTime() / 1000;
                 if (t > now) {
-                    agenciesWithFutureDates.add(sid.getAgencyId());
+                    agenciesWithFutureDates.add(sid.getFeedId());
                 }
                 // assume feed is unreliable after midnight on last service day
                 long u = t + SEC_IN_DAY;
@@ -604,7 +601,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         for (String agency : agencies) {
             if (!agenciesWithFutureDates.contains(agency)) {
-                LOG.warn(this.addBuilderAnnotation(new NoFutureDates(agency)));
+                issueStore.add(new NoFutureDates(agency));
             }
         }
     }
@@ -644,25 +641,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
     }
 
     /**
-     * Add a graph builder annotation to this graph's list of graph builder annotations. The return value of this method is the annotation's message,
-     * which allows for a single-line idiom that creates, registers, and logs a new graph builder annotation:
-     * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
-     * 
-     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message is still returned. This
-     * allows annotation registration to be turned off, saving memory and disk space when the user is not interested in annotations.
-     */
-    public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
-        String ret = gba.getMessage();
-        if (this.graphBuilderAnnotations != null)
-            this.graphBuilderAnnotations.add(gba);
-        return ret;
-    }
-
-    public List<GraphBuilderAnnotation> getBuilderAnnotations() {
-        return this.graphBuilderAnnotations;
-    }
-
-    /**
      * Adds mode of transport to transit modes in graph
      * @param mode
      */
@@ -688,8 +666,8 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      * serialization. 
      * TODO: do we really need a factory for different street vertex indexes?
      */
-    public void index (StreetVertexIndexFactory indexFactory) {
-        streetIndex = indexFactory.newIndex(this);
+    public void index () {
+        streetIndex = new StreetVertexIndex(this);
         LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
@@ -712,7 +690,7 @@ public class Graph implements Serializable, AddBuilderAnnotation {
         }
         serializedGraphObject.reconstructEdgeLists();
         LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index(new DefaultStreetVertexIndexFactory());
+        graph.index();
         return graph;
     }
 
@@ -844,19 +822,6 @@ public class Graph implements Serializable, AddBuilderAnnotation {
      */
     public void clearTimeZone () {
         this.timeZone = null;
-    }
-
-    public void summarizeBuilderAnnotations() {
-        List<GraphBuilderAnnotation> gbas = this.graphBuilderAnnotations;
-        Multiset<Class<? extends GraphBuilderAnnotation>> classes = HashMultiset.create();
-        LOG.info("Summary (number of each type of annotation):");
-        for (GraphBuilderAnnotation gba : gbas)
-            classes.add(gba.getClass());
-        for (Multiset.Entry<Class<? extends GraphBuilderAnnotation>> e : classes.entrySet()) {
-            String name = e.getElement().getSimpleName();
-            int count = e.getCount();
-            LOG.info("    {} - {}", name, count);
-        }
     }
 
     /**

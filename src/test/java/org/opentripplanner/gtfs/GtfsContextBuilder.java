@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs;
 
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.CalendarService;
@@ -16,7 +16,6 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
@@ -38,7 +37,7 @@ public class GtfsContextBuilder {
 
     private CalendarService calendarService = null;
 
-    private AddBuilderAnnotation addBuilderAnnotation = null;
+    private DataImportIssueStore issueStore = null;
 
     private Deduplicator deduplicator;
 
@@ -55,9 +54,12 @@ public class GtfsContextBuilder {
         GtfsFeedId feedId = gtfsImport.getFeedId();
         OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsImport.getDao(),
-                annotation -> null
+                new DataImportIssueStore(false)
         );
-        return new GtfsContextBuilder(feedId, transitBuilder);
+        return new GtfsContextBuilder(
+                feedId,
+                transitBuilder).withDataImportIssueStore(new DataImportIssueStore(false)
+        );
     }
 
     public GtfsContextBuilder(GtfsFeedId feedId, OtpTransitServiceBuilder transitBuilder) {
@@ -73,13 +75,25 @@ public class GtfsContextBuilder {
         return transitBuilder;
     }
 
-    public GtfsContextBuilder withGraphBuilderAnnotationsAndDeduplicator(Graph graph) {
-        return withAddBuilderAnnotation(graph)
+    public GtfsContextBuilder withIssueStoreAndDeduplicator(
+            Graph graph
+    ) {
+        return withIssueStoreAndDeduplicator(
+                graph,
+                new DataImportIssueStore(false)
+        );
+    }
+
+    public GtfsContextBuilder withIssueStoreAndDeduplicator(
+            Graph graph,
+            DataImportIssueStore issueStore
+    ) {
+        return withDataImportIssueStore(issueStore)
                 .withDeduplicator(graph.deduplicator);
     }
 
-    public GtfsContextBuilder withAddBuilderAnnotation(AddBuilderAnnotation addBuilderAnnotation) {
-        this.addBuilderAnnotation = addBuilderAnnotation;
+    public GtfsContextBuilder withDataImportIssueStore(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
         return this;
     }
 
@@ -155,32 +169,32 @@ public class GtfsContextBuilder {
     private void setAgencyToFeedIdForAllElements() {
 
         for (ShapePoint shapePoint : transitBuilder.getShapePoints()) {
-            shapePoint.getShapeId().setAgencyId(this.feedId.getId());
+            shapePoint.getShapeId().setFeedId(this.feedId.getId());
         }
         for (Route route : transitBuilder.getRoutes().values()) {
-            route.getId().setAgencyId(this.feedId.getId());
+            route.getId().setFeedId(this.feedId.getId());
         }
         for (Stop stop : transitBuilder.getStops().values()) {
-            stop.getId().setAgencyId(this.feedId.getId());
+            stop.getId().setFeedId(this.feedId.getId());
         }
 
         for (Trip trip : transitBuilder.getTripsById().values()) {
-            trip.getId().setAgencyId(this.feedId.getId());
+            trip.getId().setFeedId(this.feedId.getId());
         }
 
         for (ServiceCalendar serviceCalendar : transitBuilder.getCalendars()) {
-            serviceCalendar.getServiceId().setAgencyId(this.feedId.getId());
+            serviceCalendar.getServiceId().setFeedId(this.feedId.getId());
         }
         for (ServiceCalendarDate serviceCalendarDate : transitBuilder.getCalendarDates()) {
-            serviceCalendarDate.getServiceId().setAgencyId(this.feedId.getId());
+            serviceCalendarDate.getServiceId().setFeedId(this.feedId.getId());
         }
 
         for (FareAttribute fareAttribute : transitBuilder.getFareAttributes()) {
-            fareAttribute.getId().setAgencyId(this.feedId.getId());
+            fareAttribute.getId().setFeedId(this.feedId.getId());
         }
 
         for (Pathway pathway : transitBuilder.getPathways()) {
-            pathway.getId().setAgencyId(this.feedId.getId());
+            pathway.getId().setFeedId(this.feedId.getId());
         }
 
         transitBuilder.regenerateIndexes();
@@ -188,15 +202,13 @@ public class GtfsContextBuilder {
 
     private void repairStopTimesForEachTrip() {
         new RepairStopTimesForEachTripOperation(
-                transitBuilder.getStopTimesSortedByTrip(),
-                addBuilderAnnotation()
+                transitBuilder.getStopTimesSortedByTrip(), issueStore
         ).run();
     }
 
     private void generateTripPatterns() {
         new GenerateTripPatternsOperation(
-                transitBuilder,
-                addBuilderAnnotation(),
+                transitBuilder, issueStore,
                 deduplicator(),
                 calendarService().getServiceIds()
         ).run();
@@ -207,13 +219,6 @@ public class GtfsContextBuilder {
             calendarService = new CalendarServiceImpl(transitBuilder.buildCalendarServiceData());
         }
         return calendarService;
-    }
-
-    private AddBuilderAnnotation addBuilderAnnotation() {
-        if (addBuilderAnnotation == null) {
-            addBuilderAnnotation = GraphBuilderAnnotation::getMessage;
-        }
-        return addBuilderAnnotation;
     }
 
     private Deduplicator deduplicator() {

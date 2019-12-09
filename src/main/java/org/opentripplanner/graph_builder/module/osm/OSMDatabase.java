@@ -3,23 +3,38 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
-import gnu.trove.iterator.TIntIterator;
 import gnu.trove.iterator.TLongIterator;
 import gnu.trove.list.TLongList;
 import gnu.trove.map.TLongObjectMap;
 import gnu.trove.map.hash.TLongObjectHashMap;
 import gnu.trove.set.TLongSet;
 import gnu.trove.set.hash.TLongHashSet;
-import org.locationtech.jts.geom.*;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.common.RepeatingTimePeriod;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.*;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.LevelAmbiguous;
+import org.opentripplanner.graph_builder.issues.PublicTransportRelationSkipped;
+import org.opentripplanner.graph_builder.issues.TooManyAreasInRelation;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionBad;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionException;
+import org.opentripplanner.graph_builder.issues.TurnRestrictionUnknown;
 import org.opentripplanner.graph_builder.module.osm.TurnRestrictionTag.Direction;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMLevel.Source;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -27,11 +42,22 @@ import org.opentripplanner.util.MapUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 public class OSMDatabase {
 
     private static Logger LOG = LoggerFactory.getLogger(OSMDatabase.class);
+
+    private DataImportIssueStore issueStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
     private TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
@@ -93,9 +119,6 @@ public class OSMDatabase {
      */
     private Map<OSMWithTags, Set<OSMNode>> stopsInAreas = new HashMap<OSMWithTags, Set<OSMNode>>();
 
-    /* List of graph annotations registered during building, to add to the graph. */
-    private List<GraphBuilderAnnotation> annotations = new ArrayList<>();
-
     /*
      * ID of the next virtual node we create during building phase. Negative to prevent conflicts
      * with existing ones.
@@ -107,6 +130,10 @@ public class OSMDatabase {
      * in the United States. This does not affect floor names from level maps.
      */
     public boolean noZeroLevels = true;
+
+    public OSMDatabase(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
+    }
 
     public OSMNode getNode(Long nodeId) {
         return nodesById.get(nodeId);
@@ -179,10 +206,6 @@ public class OSMDatabase {
 
     public boolean isNodeBelongsToWay(Long nodeId) {
         return waysNodeIds.contains(nodeId);
-    }
-
-    public Collection<GraphBuilderAnnotation> getAnnotations() {
-        return Collections.unmodifiableList(annotations);
     }
 
     public void addNode(OSMNode node) {
@@ -576,13 +599,17 @@ public class OSMDatabase {
             OSMLevel level = OSMLevel.DEFAULT;
             if (way.hasTag("level")) { // TODO: floating-point levels &c.
                 levelName = way.getTag("level");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LEVEL_TAG, noZeroLevels,
+                    issueStore
+                );
             } else if (way.hasTag("layer")) {
                 levelName = way.getTag("layer");
-                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels);
+                level = OSMLevel.fromString(levelName, OSMLevel.Source.LAYER_TAG, noZeroLevels,
+                    issueStore
+                );
             }
             if (level == null || (!level.reliable)) {
-                LOG.warn(addBuilderAnnotation(new LevelAmbiguous(levelName, way.getId())));
+                issueStore.add(new LevelAmbiguous(levelName, way.getId()));
                 level = OSMLevel.DEFAULT;
             }
             wayLevels.put(way, level);
@@ -706,8 +733,6 @@ public class OSMDatabase {
 
     /**
      * Handler for a new Area (single way area or multipolygon relations)
-     * 
-     * @param area
      */
     private void newArea(Area area) {
         StreetTraversalPermission permissions = OSMFilter.getPermissionsForEntity(area.parent,
@@ -746,8 +771,6 @@ public class OSMDatabase {
 
     /**
      * Store turn restrictions.
-     * 
-     * @param relation
      */
     private void processRestriction(OSMRelation relation) {
         long from = -1, to = -1, via = -1;
@@ -762,8 +785,8 @@ public class OSMDatabase {
             }
         }
         if (from == -1 || to == -1 || via == -1) {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionBad(relation.getId(),
-                "One of from|via|to edges are empty in relation")));
+            issueStore.add(new TurnRestrictionBad(relation.getId(),
+                "One of from|via|to edges are empty in relation"));
             return;
         }
 
@@ -775,7 +798,7 @@ public class OSMDatabase {
                     modes.setCar(false);
                 } else if (m.equals("bicycle")) {
                     modes.setBicycle(false);
-                    LOG.debug(addBuilderAnnotation(new TurnRestrictionException(via, from)));
+                    issueStore.add(new TurnRestrictionException(via, from));
                 }
             }
         }
@@ -806,7 +829,7 @@ public class OSMDatabase {
             tag = new TurnRestrictionTag(via, TurnRestrictionType.ONLY_TURN, Direction.U,
                 relation.getId());
         } else {
-            LOG.warn(addBuilderAnnotation(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction"))));
+            issueStore.add(new TurnRestrictionUnknown(relation.getId(), relation.getTag("restriction")));
             return;
         }
         tag.modes = modes.clone();
@@ -830,12 +853,11 @@ public class OSMDatabase {
 
     /**
      * Process an OSM level map.
-     * 
-     * @param relation
      */
     private void processLevelMap(OSMRelation relation) {
         Map<String, OSMLevel> levels = OSMLevel.mapFromSpecList(relation.getTag("levels"),
-                Source.LEVEL_MAP, true);
+                Source.LEVEL_MAP, true, issueStore
+        );
         for (OSMRelationMember member : relation.getMembers()) {
             if ("way".equals(member.getType()) && waysById.containsKey(member.getRef())) {
                 OSMWay way = waysById.get(member.getRef());
@@ -857,8 +879,6 @@ public class OSMDatabase {
 
     /**
      * Handle route=road relations.
-     * 
-     * @param relation
      */
     private void processRoad(OSMRelation relation) {
         for (OSMRelationMember member : relation.getMembers()) {
@@ -899,7 +919,6 @@ public class OSMDatabase {
      * TransitToTaggedStopsGraphBuilder by enabling us to have unconnected stop nodes within the
      * areas by creating relations .
      * 
-     * @param relation
      * @author hannesj
      * @see "http://wiki.openstreetmap.org/wiki/Tag:public_transport%3Dstop_area"
      */
@@ -912,13 +931,13 @@ public class OSMDatabase {
                 if (platformArea == null)
                     platformArea = areaWaysById.get(member.getRef());
                 else
-                    LOG.warn("Too many areas in relation " + relation.getId());
+                    issueStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("relation".equals(member.getType()) && "platform".equals(member.getRole())
                     && relationsById.containsKey(member.getRef())) {
                 if (platformArea == null)
                     platformArea = relationsById.get(member.getRef());
                 else
-                    LOG.warn("Too many areas in relation " + relation.getId());
+                    issueStore.add(new TooManyAreasInRelation(relation.getId()));
             } else if ("node".equals(member.getType()) && nodesById.containsKey(member.getRef())) {
                 platformsNodes.add(nodesById.get(member.getRef()));
             }
@@ -926,7 +945,7 @@ public class OSMDatabase {
         if (platformArea != null && !platformsNodes.isEmpty())
             stopsInAreas.put(platformArea, platformsNodes);
         else
-            LOG.warn("Unable to process public transportation relation " + relation.getId());
+            issueStore.add(new PublicTransportRelationSkipped(relation.getId()));
     }
 
     private String addUniqueName(String routes, String name) {
@@ -938,18 +957,9 @@ public class OSMDatabase {
         }
         return routes + ", " + name;
     }
-
-    private String addBuilderAnnotation(GraphBuilderAnnotation annotation) {
-        annotations.add(annotation);
-        return annotation.getMessage();
-    }
     
     /**
      * Check if a point is within an epsilon of a node.
-     * @param p
-     * @param n
-     * @param epsilon
-     * @return
      */
     private static boolean checkIntersectionDistance(Point p, OSMNode n, double epsilon) {
     	return Math.abs(p.getY() - n.lat) < epsilon && Math.abs(p.getX() - n.lon) < epsilon;
@@ -957,10 +967,6 @@ public class OSMDatabase {
     
     /**
      * Check if two nodes are within an epsilon.
-     * @param a
-     * @param b
-     * @param epsilon
-     * @return
      */
     private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
     	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;

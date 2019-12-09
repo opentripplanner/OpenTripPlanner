@@ -20,7 +20,7 @@ public class GtfsLibrary {
     }
 
     public static String convertIdToString(FeedScopedId aid) {
-        return aid.getAgencyId() + ID_SEPARATOR + aid.getId();
+        return aid.getFeedId() + ID_SEPARATOR + aid.getId();
     }
 
     /** @return the route's short name, or the long name if the short name is null. */

@@ -1,10 +1,8 @@
 package org.opentripplanner.visualizer;
 
-import com.google.common.collect.Sets;
 import javassist.Modifier;
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
-import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -49,7 +47,6 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import java.util.Set;
 
 /**
  * Exit on window close.
@@ -321,9 +318,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
-    private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
+    private DefaultListModel<DataImportIssue> issueMatchesModel;
 
-    private JList<GraphBuilderAnnotation> annotationMatches;
+    private JList<DataImportIssue> issueMatches;
     
     private DefaultListModel<String> metadataModel;
 
@@ -783,30 +780,29 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         mdScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
         rightPanelTabs.addTab("metadata", mdScrollPane);
 
-        // This is where matched annotations from an annotation search go
-        annotationMatches = new JList<GraphBuilderAnnotation>();
-        annotationMatches.addListSelectionListener(new ListSelectionListener() {
-            public void valueChanged(ListSelectionEvent e) {
-                @SuppressWarnings("unchecked")
-				JList<GraphBuilderAnnotation> theList = (JList<GraphBuilderAnnotation>) e.getSource();
-                
-                GraphBuilderAnnotation anno = theList.getSelectedValue();
-                if (anno == null)
-                    return;
-                showGraph.drawAnotation(anno);
+        // This is where matched issues from an issue search go
+        issueMatches = new JList<>();
+        issueMatches.addListSelectionListener(e -> {
+            @SuppressWarnings("unchecked")
+            JList<DataImportIssue> theList = (JList<DataImportIssue>) e.getSource();
+
+            DataImportIssue issue = theList.getSelectedValue();
+            if (issue == null) {
+              return;
             }
+            showGraph.drawIssue(issue);
         });
 
-        annotationMatchesModel = new DefaultListModel<GraphBuilderAnnotation>();
-        annotationMatches.setModel(annotationMatchesModel);
-        JScrollPane amScrollPane = new JScrollPane(annotationMatches);
-        amScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
-        rightPanelTabs.addTab("annotations", amScrollPane);
+        issueMatchesModel = new DefaultListModel<DataImportIssue>();
+        issueMatches.setModel(issueMatchesModel);
+        JScrollPane imScrollPane = new JScrollPane(issueMatches);
+        imScrollPane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_ALWAYS);
+        rightPanelTabs.addTab("issues", imScrollPane);
 
         Dimension size = new Dimension(200, 1600);
 
-        amScrollPane.setMaximumSize(size);
-        amScrollPane.setPreferredSize(size);
+        imScrollPane.setMaximumSize(size);
+        imScrollPane.setPreferredSize(size);
         stScrollPane.setMaximumSize(size);
         stScrollPane.setPreferredSize(size);
         mdScrollPane.setMaximumSize(size);
@@ -937,15 +933,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
             }
         });
         buttonPanel.add(traceButton);
-
-        // annotation search button
-        JButton annotationButton = new JButton("Find annotations");
-        annotationButton.addActionListener(new ActionListener() {
-            public void actionPerformed(ActionEvent e) {
-                findAnnotation();
-            }
-        });
-        buttonPanel.add(annotationButton);
 
         JButton findEdgeByIdButton = new JButton("Find edge ID");
         findEdgeByIdButton.addActionListener(e -> {
@@ -1383,9 +1370,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         options.setToString(to);
         options.walkSpeed = Float.parseFloat(walkSpeed.getText());
         options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-        options.softWalkLimiting = ( softWalkLimiting.isSelected() );
-        options.softWalkPenalty = (Float.parseFloat(softWalkPenalty.getText()));
-        options.softWalkOverageRate = (Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;
         System.out.println("--------");
         System.out.println("Path from " + from + " to " + to + " at " + when);
@@ -1442,40 +1426,6 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		}
 		pathsList.setModel(data);
 	}
-
-    protected void findAnnotation() {
-        Set<Class<? extends GraphBuilderAnnotation>> gbaClasses = Sets.newHashSet();
-        for (GraphBuilderAnnotation gba : graph.getBuilderAnnotations()) {
-            gbaClasses.add(gba.getClass());
-        }
-
-        @SuppressWarnings("unchecked")
-        Class<? extends GraphBuilderAnnotation> variety = (Class<? extends GraphBuilderAnnotation>) JOptionPane
-                .showInputDialog(null, // parentComponent; TODO: set correctly
-                        "Select the type of annotation to find", // question
-                        "Select annotation", // title
-                        JOptionPane.QUESTION_MESSAGE, // message type
-                        null, // no icon
-                        gbaClasses.toArray(), // options (built above)
-                        StopUnlinked.class // default value
-                );
-
-        // User clicked cancel
-        if (variety == null)
-            return;
-
-        // loop over the annotations and save the ones of the requested type
-        annotationMatchesModel.clear();
-        for (GraphBuilderAnnotation anno : graph.getBuilderAnnotations()) {
-            if (variety.isInstance(anno)) {
-                annotationMatchesModel.addElement(anno);
-            }
-        }
-
-        System.out.println("Found " + annotationMatchesModel.getSize() + " annotations of type "
-                + variety);
-
-    }
 
     public void verticesSelected(final List<Vertex> selected) {
         // sort vertices by name

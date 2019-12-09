@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transferanalyzer.annotations;
 
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -9,9 +9,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
  * Represents two stops where the routing distance between them (using OSM data) is much longer than the euclidean
  * distance
  */
-public class TransferRoutingDistanceTooLong extends GraphBuilderAnnotation {
-
-    private static final long serialVersionUID = 1L;
+public class TransferRoutingDistanceTooLong implements DataImportIssue {
 
     private static final String FMT = "Routing distance between stop %s and stop %s is %.0f times longer than the " +
             "euclidean distance. Street distance: %.2f, direct distance: %.2f.";

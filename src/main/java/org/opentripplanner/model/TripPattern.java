@@ -12,10 +12,9 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -335,7 +334,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      * combination will create unique names). from, to, via, express. Then concatenate all necessary
      * fields. Express should really be determined from number of stops and/or run time of trips.
      */
-    public static void generateUniqueNames (Collection<TripPattern> tableTripPatterns) {
+    public static void generateUniqueNames (
+            Collection<TripPattern> tableTripPatterns,
+            DataImportIssueStore issueStore
+    ) {
         LOG.info("Generating unique names for stop patterns on each route.");
         Set<String> usedRouteNames = Sets.newHashSet();
         Map<Route, String> uniqueRouteNames = Maps.newHashMap();
@@ -354,7 +356,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
                 String generatedRouteName;
                 do generatedRouteName = routeName + " " + (i++);
                 while (usedRouteNames.contains(generatedRouteName));
-                LOG.warn("Route had non-unique name. Generated one to ensure uniqueness of TripPattern names: {}", generatedRouteName);
+                issueStore.add(new NonUniqueRouteName(generatedRouteName));
                 routeName = generatedRouteName;
             }
             usedRouteNames.add(routeName);
@@ -505,8 +507,8 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%s:%02d", routeId.getAgencyId(), routeId.getId(), direction, count);
-            pattern.setId(new FeedScopedId(routeId.getAgencyId(), id));
+            String id = String.format("%s:%s:%s:%02d", routeId.getFeedId(), routeId.getId(), direction, count);
+            pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
         }
     }
 
@@ -583,7 +585,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public String getFeedId() {
         // The feed id is the same as the agency id on the route, this allows us to obtain it from there.
-        return route.getId().getAgencyId();
+        return route.getId().getFeedId();
     }
 
     private static Coordinate coordinate(Stop s) {

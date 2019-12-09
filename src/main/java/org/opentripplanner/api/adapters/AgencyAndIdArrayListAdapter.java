@@ -25,7 +25,7 @@ public class AgencyAndIdArrayListAdapter extends XmlAdapter<ArrayList<AgencyAndI
             return null;
         }
         ArrayList<AgencyAndIdType> result = new ArrayList<AgencyAndIdType>();
-        for(FeedScopedId a:arg) result.add(new AgencyAndIdType(a.getAgencyId(), a.getId()));
+        for(FeedScopedId a:arg) result.add(new AgencyAndIdType(a.getFeedId(), a.getId()));
         return result;
     }
 

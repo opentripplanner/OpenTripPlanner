@@ -195,7 +195,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (!isWheelchairAccessible()) {
                 return false;
             }
-            if (getMaxSlope() > options.maxSlope) {
+            if (getMaxSlope() > options.maxWheelchairSlope) {
                 return false;
             }
         }
@@ -347,9 +347,9 @@ public class StreetEdge extends Edge implements Cloneable {
                 double safety = bicycleSafetyFactor * getDistanceMeters();
                 // TODO This computation is not coherent with the one for FLAT
                 double slope = getEffectiveBikeWorkCost();
-                weight = quick * options.triangleTimeFactor + slope
-                        * options.triangleSlopeFactor + safety
-                        * options.triangleSafetyFactor;
+                weight = quick * options.bikeTriangleTimeFactor + slope
+                        * options.bikeTriangleSlopeFactor + safety
+                        * options.bikeTriangleSafetyFactor;
                 weight /= speed;
                 break;
             default:

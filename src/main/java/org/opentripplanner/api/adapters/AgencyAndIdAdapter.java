@@ -19,7 +19,7 @@ public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedScopedId
         if (arg == null) {
             return null;
         }
-        return new AgencyAndIdType(arg.getAgencyId(), arg.getId());
+        return new AgencyAndIdType(arg.getFeedId(), arg.getId());
     }
 
 }

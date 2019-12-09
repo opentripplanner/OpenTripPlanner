@@ -16,10 +16,11 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.graph_builder.annotation.BikeParkUnlinked;
-import org.opentripplanner.graph_builder.annotation.BikeRentalStationUnlinked;
-import org.opentripplanner.graph_builder.annotation.StopLinkedTooFar;
-import org.opentripplanner.graph_builder.annotation.StopUnlinked;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.graph_builder.issues.BikeParkUnlinked;
+import org.opentripplanner.graph_builder.issues.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
+import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -37,6 +38,7 @@ import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
@@ -77,6 +79,8 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
+    private DataImportIssueStore issueStore;
+
     public static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
     private Boolean addExtraEdgesToAreas = false;
@@ -105,11 +109,13 @@ public class SimpleStreetSplitter {
      * NOTE: Only one SimpleStreetSplitter should be active on a graph at any given time.
      *
      * @param hashGridSpatialIndex If not null this index is used instead of creating new one
-     * @param transitStopIndex Index of all transitStops which is generated in {@link org.opentripplanner.routing.impl.StreetVertexIndexServiceImpl}
+     * @param transitStopIndex Index of all transitStops which is generated in {@link StreetVertexIndex}
      * @param destructiveSplitting If true splitting is permanent (Used when linking transit stops etc.) when false Splitting is only for duration of a request. Since they are made from temporary vertices and edges.
      */
     public SimpleStreetSplitter(Graph graph, HashGridSpatialIndex<Edge> hashGridSpatialIndex,
-        SpatialIndex transitStopIndex, boolean destructiveSplitting) {
+        SpatialIndex transitStopIndex, boolean destructiveSplitting, DataImportIssueStore issueStore
+    ) {
+        this.issueStore = issueStore;
         this.graph = graph;
         this.transitStopIndex = transitStopIndex;
         this.destructiveSplitting = destructiveSplitting;
@@ -135,8 +141,12 @@ public class SimpleStreetSplitter {
      * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
      * @param graph
      */
+    public SimpleStreetSplitter(Graph graph, DataImportIssueStore issueStore) {
+        this(graph, null, null, true, issueStore);
+    }
+
     public SimpleStreetSplitter(Graph graph) {
-        this(graph, null, null, true);
+        this(graph, new DataImportIssueStore(false));
     }
 
     /** Link all relevant vertices to the street network */
@@ -148,11 +158,11 @@ public class SimpleStreetSplitter {
 
                 if (!link(v)) {
                     if (v instanceof TransitStopVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new StopUnlinked((TransitStopVertex) v)));
+                        issueStore.add(new StopUnlinked((TransitStopVertex) v));
                     else if (v instanceof BikeRentalStationVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new BikeRentalStationUnlinked((BikeRentalStationVertex) v)));
+                        issueStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
                     else if (v instanceof BikeParkVertex)
-                        LOG.warn(graph.addBuilderAnnotation(new BikeParkUnlinked((BikeParkVertex) v)));
+                        issueStore.add(new BikeParkUnlinked((BikeParkVertex) v));
                 };
             }
         }
@@ -293,8 +303,7 @@ public class SimpleStreetSplitter {
                 double distanceDegreesLatitude = distances.get(candidateEdges.get(0));
                 int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
                 if (distanceMeters > WARNING_DISTANCE_METERS) {
-                    // Registering an annotation but not logging because tests produce thousands of these warnings.
-                    graph.addBuilderAnnotation(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
+                    issueStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
                 }
             }
 
@@ -551,14 +560,14 @@ public class SimpleStreetSplitter {
         //TODO: add nice name
         String name;
 
-        if (location.name == null || location.name.isEmpty()) {
+        if (location.label == null || location.label.isEmpty()) {
             if (endVertex) {
                 name = "Destination";
             } else {
                 name = "Origin";
             }
         } else {
-            name = location.name;
+            name = location.label;
         }
         TemporaryStreetLocation closest = new TemporaryStreetLocation(UUID.randomUUID().toString(),
             coord, new NonLocalizedString(name), endVertex);

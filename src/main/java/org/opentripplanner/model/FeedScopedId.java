@@ -5,11 +5,16 @@ import java.io.Serializable;
 
 public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
-    private static final char ID_SEPARATOR = '_';
+    /**
+     * One Bus Away uses the underscore as a scope separator between Agency and ID. In OTP we use
+     * feed IDs instead of agency IDs as scope, and they are separated with a colon when
+     * represented together in String form.
+     */
+    private static final char ID_SEPARATOR = ':';
 
     private static final long serialVersionUID = 1L;
 
-    private String agencyId;
+    private String feedId;
 
     private String id;
 
@@ -17,17 +22,17 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     }
 
-    public FeedScopedId(String agencyId, String id) {
-        this.agencyId = agencyId;
+    public FeedScopedId(String feedId, String id) {
+        this.feedId = feedId;
         this.id = id;
     }
 
-    public String getAgencyId() {
-        return agencyId;
+    public String getFeedId() {
+        return feedId;
     }
 
-    public void setAgencyId(String agencyId) {
-        this.agencyId = agencyId;
+    public void setFeedId(String feedId) {
+        this.feedId = feedId;
     }
 
     public String getId() {
@@ -39,11 +44,11 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
     }
 
     public boolean hasValues() {
-        return this.agencyId != null && this.id != null;
+        return this.feedId != null && this.id != null;
     }
 
     public int compareTo(FeedScopedId o) {
-        int c = this.agencyId.compareTo(o.agencyId);
+        int c = this.feedId.compareTo(o.feedId);
         if (c == 0)
             c = this.id.compareTo(o.id);
         return c;
@@ -67,7 +72,7 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     @Override
     public int hashCode() {
-        return agencyId.hashCode() ^ id.hashCode();
+        return feedId.hashCode() ^ id.hashCode();
     }
 
     @Override
@@ -79,7 +84,7 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
         if (!(obj instanceof FeedScopedId))
             return false;
         FeedScopedId other = (FeedScopedId) obj;
-        if (!agencyId.equals(other.agencyId))
+        if (!feedId.equals(other.feedId))
             return false;
         if (!id.equals(other.id))
             return false;
@@ -110,6 +115,10 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
         }
     }
 
+    public static boolean isValidString(String value) throws IllegalArgumentException {
+        return value != null && value.indexOf(ID_SEPARATOR) > -1;
+    }
+
     /**
      * Given an {@link FeedScopedId} object, creates a string representation of the
      * form "agencyId_entityId"
@@ -120,7 +129,7 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
     public static String convertToString(FeedScopedId aid) {
         if (aid == null)
             return null;
-        return concatenateId(aid.getAgencyId(), aid.getId());
+        return concatenateId(aid.getFeedId(), aid.getId());
     }
 
     /**

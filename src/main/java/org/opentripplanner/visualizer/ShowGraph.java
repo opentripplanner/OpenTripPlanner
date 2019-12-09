@@ -1,18 +1,9 @@
 package org.opentripplanner.visualizer;
 
-import java.awt.Point;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseMotionAdapter;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
-import java.text.DecimalFormat;
-import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.LinkedBlockingQueue;
-
-import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.index.strtree.STRtree;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -26,14 +17,28 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import processing.core.PApplet;
 import processing.core.PFont;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.index.strtree.STRtree;
+import java.awt.*;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionAdapter;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.text.DecimalFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Queue;
+import java.util.Set;
+import java.util.concurrent.LinkedBlockingQueue;
 
 /**
  * Processing applet to show a map of the graph. The user can: - Use mouse wheel to zoom (or right drag, or ctrl-drag) - Left drag to pan around the
@@ -428,7 +433,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
     }
 
     /**
-     * Zoom to an envelope. Used for annotation zoom.
+     * Zoom to an envelope. Used for issue zoom.
      * 
      * @author mattwigway
      */
@@ -1056,7 +1061,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         drawLevel = DRAW_ALL;
     }
 
-    public void drawAnotation(GraphBuilderAnnotation anno) {
+    public void drawIssue(DataImportIssue anno) {
         Envelope env = new Envelope();
 
         Edge e = anno.getReferencedEdge();

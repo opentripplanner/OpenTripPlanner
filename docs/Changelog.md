@@ -10,6 +10,11 @@
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import (#2813)
 - Combined OSM loaders, removing several rarely used ones (#2878)
+- New Java Code Style (part of #2755)
+- Cleanup and rename Graph Builder Annotations, now Data Import Issues (#2871)
+- Bugfix for graph building crashing on unsupported modes (#2899)
+- Add command line parameter for building partial graphs (#2583)
+- Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices (#2887) 
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

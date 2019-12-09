@@ -28,7 +28,7 @@ public class FeedScopedIdSerializer extends JsonSerializer<FeedScopedId> {
     @Override
     public void serialize(FeedScopedId a, JsonGenerator gen, SerializerProvider prov)
             throws IOException, JsonProcessingException {
-        gen.writeString(a.getAgencyId() + SEPARATOR + a.getId());
+        gen.writeString(a.getFeedId() + SEPARATOR + a.getId());
     }
 
     // Gets around type erasure, allowing

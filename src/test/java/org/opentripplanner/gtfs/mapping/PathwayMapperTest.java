@@ -55,7 +55,7 @@ public class PathwayMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Pathway result = subject.map(PATHWAY);
 
-        assertEquals("A_1", result.getId().toString());
+        assertEquals("A:1", result.getId().toString());
         assertNotNull(result.getFromStop());
         assertNotNull(result.getToStop());
         assertEquals(PATHWAY_TYPE, result.getPathwayType());

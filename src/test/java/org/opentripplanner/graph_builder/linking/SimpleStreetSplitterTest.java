@@ -4,6 +4,7 @@ package org.opentripplanner.graph_builder.linking;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -22,7 +23,7 @@ public class SimpleStreetSplitterTest {
     @Before
     public void buildSpy(){
         Graph graph = new Graph();
-        SimpleStreetSplitter simpleStreetSplitter = new SimpleStreetSplitter(graph, null, null,false);
+        SimpleStreetSplitter simpleStreetSplitter = new SimpleStreetSplitter(graph, null, null,false, new DataImportIssueStore(false));
         spySimpleStreetSplitter = spy(simpleStreetSplitter);
     }
 
@@ -31,7 +32,7 @@ public class SimpleStreetSplitterTest {
      */
     @Test
     public void testFindEndVertexForParkAndRide(){
-        GenericLocation genericLocation = new GenericLocation(10,23);
+        GenericLocation genericLocation = new GenericLocation(10.0,23.0);
 
         RoutingRequest routingRequest = new RoutingRequest();
         routingRequest.setMode(TraverseMode.CAR);

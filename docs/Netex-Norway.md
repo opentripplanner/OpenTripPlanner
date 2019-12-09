@@ -23,7 +23,7 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
   "osmWayPropertySet": "norway",
   "islandWithoutStopsMaxSize": 5,
   "islandWithStopsMaxSize": 5,
-  "htmlAnnotations": true,
+  "dataImportReport": true,
   "netex" : {
     "moduleFilePattern" : ".*-netex\\.zip",
     "sharedFilePattern" : "_stops.xml",

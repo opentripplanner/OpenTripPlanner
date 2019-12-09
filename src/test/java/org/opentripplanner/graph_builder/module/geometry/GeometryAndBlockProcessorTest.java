@@ -28,7 +28,7 @@ public class GeometryAndBlockProcessorTest {
         Graph graph = new Graph();
 
         GtfsContext context = new GtfsContextBuilder(feedId, gtfs.read())
-                .withGraphBuilderAnnotationsAndDeduplicator(graph)
+                .withIssueStoreAndDeduplicator(graph)
                 .build();
 
         GeometryAndBlockProcessor factory = new GeometryAndBlockProcessor(context);

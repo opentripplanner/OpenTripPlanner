@@ -2,8 +2,8 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
-import org.opentripplanner.routing.graph.AddBuilderAnnotation;
 
 /**
  * This class is responsible for mapping between GTFS DAO objects and into OTP Transit model.
@@ -45,10 +45,10 @@ public class GTFSToOtpTransitServiceMapper {
             routeMapper, fareAttributeMapper
     );
 
-    private final AddBuilderAnnotation addBuilderAnnotation;
+    private final DataImportIssueStore issueStore;
 
-    GTFSToOtpTransitServiceMapper(AddBuilderAnnotation addBuilderAnnotation) {
-        this.addBuilderAnnotation = addBuilderAnnotation;
+    GTFSToOtpTransitServiceMapper(DataImportIssueStore issueStore) {
+        this.issueStore = issueStore;
     }
 
     /**
@@ -56,9 +56,9 @@ public class GTFSToOtpTransitServiceMapper {
      */
     public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
             GtfsRelationalDao data,
-            AddBuilderAnnotation addBuilderAnnotation
+            DataImportIssueStore issueStore
     ) {
-        return new GTFSToOtpTransitServiceMapper(addBuilderAnnotation).map(data);
+        return new GTFSToOtpTransitServiceMapper(issueStore).map(data);
     }
 
     private OtpTransitServiceBuilder map(GtfsRelationalDao data) {
@@ -95,8 +95,8 @@ public class GTFSToOtpTransitServiceMapper {
         }
         new LinkStopsAndParentStationsTogether(
                 builder.getStations(),
-                builder.getStops(),
-                addBuilderAnnotation)
+                builder.getStops(), issueStore
+        )
             .link(data.getAllStops());
     }
 }

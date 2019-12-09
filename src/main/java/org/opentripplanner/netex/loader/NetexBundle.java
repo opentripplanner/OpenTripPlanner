@@ -1,9 +1,10 @@
 package org.opentripplanner.netex.loader;
 
+import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
-import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.netex.loader.mapping.NetexMapper;
+import org.opentripplanner.netex.loader.parser.NetexDocumentParser;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.PublicationDeliveryStructure;
 import org.slf4j.Logger;
@@ -42,13 +43,20 @@ public class NetexBundle {
     private final String netexFeedId;
 
 
-    public NetexBundle(String netexFeedId, NetexZipFileHierarchy fileHierarchy) {
+    public NetexBundle(
+            String netexFeedId,
+            NetexZipFileHierarchy fileHierarchy
+
+    ) {
         this.netexFeedId = netexFeedId;
         this.fileHierarchy = fileHierarchy;
     }
 
     /** load the bundle, map it to the OTP transit model and return */
-    public OtpTransitServiceBuilder loadBundle(Deduplicator deduplicator) {
+    public OtpTransitServiceBuilder loadBundle(
+            Deduplicator deduplicator,
+            DataImportIssueStore issueStore
+    ) {
         LOG.info("reading {}", fileHierarchy.filename());
 
         // Store result in a mutable OTP Transit Model
@@ -56,7 +64,7 @@ public class NetexBundle {
 
         // init parser and mapper
         xmlParser = new NetexXmlParser();
-        otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator);
+        otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
 
         // Load data
         fileHierarchy.load(this::loadZipFileEntries);
