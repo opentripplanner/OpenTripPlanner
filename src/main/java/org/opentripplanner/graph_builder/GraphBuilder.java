@@ -141,12 +141,11 @@ public class GraphBuilder implements Runnable {
         List<File> osmFiles =  Lists.newArrayList();
         File demFile = null;
         File dir = params.getGraphDirectory();
-
+        ComponentAnnotationConfigurator.getInstance().fromConfig(config.builderConfig());
         LOG.info("Searching for graph builder input files in {}", dir);
 
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         GraphBuilderParameters builderParams = new GraphBuilderParameters(config.builderConfig());
-        ComponentAnnotationConfigurator.getInstance().fromConfig(config.builderConfig());
         GraphBuilder graphBuilder = new GraphBuilder(dir);
 
         if (params.loadOSMGraph) {
