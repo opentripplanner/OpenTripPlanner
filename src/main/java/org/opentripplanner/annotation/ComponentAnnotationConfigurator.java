@@ -44,7 +44,7 @@ public class ComponentAnnotationConfigurator {
   public void fromConfig(JsonNode config) {
     Set<String> packages = Sets
         .newHashSet("org.opentripplanner.updater", "org.opentripplanner.routing");
-    if (config.has(COMPONENTS_PACKAGE) && config.path(COMPONENTS_PACKAGE).isArray()) {
+    if (config!=null && config.has(COMPONENTS_PACKAGE) && config.path(COMPONENTS_PACKAGE).isArray()) {
       config.path(COMPONENTS_PACKAGE).forEach(node -> packages.add(node.asText()));
     }
     scanPackages(packages);

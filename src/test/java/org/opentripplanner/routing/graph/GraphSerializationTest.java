@@ -3,10 +3,12 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.object_differ.ObjectDiffer;
 import org.geotools.util.WeakValueHashMap;
 import org.jets3t.service.io.TempFile;
+import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
@@ -30,6 +32,11 @@ import static org.junit.Assert.assertFalse;
  * Created by abyrd on 2018-10-26
  */
 public class GraphSerializationTest {
+
+    @Before
+    public void loadFareConfigurator(){
+        ComponentAnnotationConfigurator.getInstance().fromConfig(null);
+    }
 
     /**
      * Tests GTFS based graph serialization to file.

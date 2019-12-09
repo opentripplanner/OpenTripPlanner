@@ -1,8 +1,10 @@
 package org.opentripplanner.netex;
 
 import com.google.common.collect.Multimap;
+import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -40,6 +42,11 @@ import static org.junit.Assert.fail;
  * to test that the different parts of the NeTEx works together.
  */
 public class NetexLoaderSmokeTest {
+
+    @Before
+    public void loadFareConfigurator(){
+        ComponentAnnotationConfigurator.getInstance().fromConfig(null);
+    }
     /**
      * This test load a very simple Netex data set and do assertions on it.
      * For each type we assert some of the most important fields for one element
