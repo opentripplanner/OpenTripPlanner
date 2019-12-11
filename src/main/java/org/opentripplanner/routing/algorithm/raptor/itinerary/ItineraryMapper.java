@@ -99,10 +99,13 @@ public class ItineraryMapper {
 
         PathLeg<TripSchedule> pathLeg = path.accessLeg().nextLeg();
 
+        boolean firstLeg = true;
+
         while (!pathLeg.isEgressLeg()) {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {
-                Leg transitLeg = mapTransitLeg(request, pathLeg.asTransitLeg());
+                Leg transitLeg = mapTransitLeg(request, pathLeg.asTransitLeg(), firstLeg);
+                firstLeg = false;
                 itinerary.addLeg(transitLeg);
                 // Increment counters
                 itinerary.transitTime += pathLeg.duration();
@@ -147,7 +150,8 @@ public class ItineraryMapper {
 
     private Leg mapTransitLeg(
             RoutingRequest request,
-            TransitPathLeg<TripSchedule> pathLeg
+            TransitPathLeg<TripSchedule> pathLeg,
+            boolean firstLeg
     ) {
         Leg leg = new Leg();
 
@@ -221,6 +225,13 @@ public class ItineraryMapper {
         //    - See e2118e0a -> GraphPathToTripPlanConverter#fixupLegs(List<Leg>, State[][]))
         // leg.alightRule = <Assign here>;
         // leg.boardRule =  <Assign here>;
+
+        GraphPathToTripPlanConverter.addAlertPatchesToLeg(
+            request.getRoutingContext().graph,
+            leg,
+            firstLeg,
+            request.locale
+        );
 
         return leg;
     }
