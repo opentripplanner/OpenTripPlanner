@@ -496,7 +496,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public static boolean idsAreUnique(Collection<TripPattern> tripPatterns) {
         Set<FeedScopedId> seen = new HashSet<>();
-        return tripPatterns.stream().map(t -> t.id).allMatch(seen::add);
+        return tripPatterns.stream().map(t -> t.id).allMatch(t -> t != null && seen.add(t));
     }
 
     /**
