@@ -116,7 +116,7 @@ public class GeometryAndBlockProcessor {
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
         /* Generate unique short IDs for all the TableTripPatterns. */
-        if (!TripPattern.idsAreUnique(tripPatterns)) {
+        if (!TripPattern.idsAreUniqueAndNotNull(tripPatterns)) {
             TripPattern.generateUniqueIds(tripPatterns);
         }
 
