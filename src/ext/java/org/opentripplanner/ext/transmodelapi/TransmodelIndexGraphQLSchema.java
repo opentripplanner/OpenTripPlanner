@@ -3925,9 +3925,9 @@ public class TransmodelIndexGraphQLSchema {
                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("situations")
-                        .description("All relevant situations for this leg. NOT IMPLEMENTED")
+                        .description("All relevant situations for this leg")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                        .dataFetcher(environment -> new ArrayList<>())
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).alertPatches)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("steps")
