@@ -5,7 +5,7 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.opentripplanner.ext.examples.statistics.api.model.StatisticsGraphQLSchemaFactory;
 import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
 import javax.ws.rs.Consumes;

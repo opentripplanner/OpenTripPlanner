@@ -1,13 +1,13 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 
-import static org.opentripplanner.standalone.GraphBuilderParameters.enumValueOf;
+import static org.opentripplanner.standalone.config.GraphBuilderParameters.enumValueOf;
 import static org.junit.Assert.*;
-import static org.opentripplanner.standalone.GraphBuilderParametersTest.AnEnum.*;
+import static org.opentripplanner.standalone.config.GraphBuilderParametersTest.AnEnum.A;
 
 
 public class GraphBuilderParametersTest {
@@ -15,7 +15,7 @@ public class GraphBuilderParametersTest {
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
     private static final String KEY = "key";
-    private static final AnEnum DEFAULT = B;
+    private static final AnEnum DEFAULT = AnEnum.B;
 
 
     @Test

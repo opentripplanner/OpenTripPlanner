@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.server;
 
 import org.glassfish.grizzly.http.CompressionConfig;
 import org.glassfish.grizzly.http.server.CLStaticHttpHandler;
@@ -10,6 +10,7 @@ import org.glassfish.grizzly.ssl.SSLContextConfigurator;
 import org.glassfish.grizzly.ssl.SSLEngineConfigurator;
 import org.glassfish.grizzly.threadpool.ThreadPoolConfig;
 import org.glassfish.jersey.server.ContainerFactory;
+import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.slf4j.bridge.SLF4JBridgeHandler;
@@ -37,7 +38,7 @@ public class GrizzlyServer {
     private Application app;
 
     /** Construct a Grizzly server with the given IoC injector and command line parameters. */
-    GrizzlyServer (CommandLineParameters params, Application app) {
+    public GrizzlyServer (CommandLineParameters params, Application app) {
         this.params = params;
         this.app = app;
     }

@@ -17,8 +17,8 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.util.ResourceBundleSingleton;
