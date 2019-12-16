@@ -49,14 +49,17 @@ public class ActuatorAPI {
     @GET
     @Path("/health")
     public Response health() {
-        Collection<String> waitingUpdaters = router.graph.updaterManager.waitingUpdaters();
+        if (router.graph.updaterManager != null) {
+            Collection<String> waitingUpdaters = router.graph.updaterManager.waitingUpdaters();
 
-        if (!waitingUpdaters.isEmpty()) {
-            LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
-            throw new WebApplicationException(Response.status(Response.Status.NOT_FOUND)
-                .entity("Graph ready, waiting for updaters: " + waitingUpdaters + "\n")
-                .type("text/plain")
-                .build());
+            if (!waitingUpdaters.isEmpty()) {
+                LOG.info("Graph ready, waiting for updaters: {}", waitingUpdaters);
+                throw new WebApplicationException(Response
+                    .status(Response.Status.NOT_FOUND)
+                    .entity("Graph ready, waiting for updaters: " + waitingUpdaters + "\n")
+                    .type("text/plain")
+                    .build());
+            }
         }
 
         return Response.status(Response.Status.OK).entity(
