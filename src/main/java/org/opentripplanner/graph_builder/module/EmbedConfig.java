@@ -18,12 +18,12 @@ import java.util.HashMap;
 public class EmbedConfig implements GraphBuilderModule {
 
     /* We are storing the JSON as a string because JsonNodes are not serializable. */
-    private final JsonNode builderConfig;
+    private final JsonNode buildConfig;
     private final JsonNode routerConfig;
 
     // maybe save the GraphBuilderParameters instead of the JSON
-    public EmbedConfig(JsonNode builderConfig, JsonNode routerConfig) {
-        this.builderConfig = builderConfig;
+    public EmbedConfig(JsonNode buildConfig, JsonNode routerConfig) {
+        this.buildConfig = buildConfig;
         this.routerConfig = routerConfig;
     }
 
@@ -34,7 +34,7 @@ public class EmbedConfig implements GraphBuilderModule {
             DataImportIssueStore issueStore
     ) {
         try {
-            graph.builderConfig = serializedConfiguration(builderConfig);
+            graph.buildConfig = serializedConfiguration(buildConfig);
             graph.routerConfig = serializedConfiguration(routerConfig);
         } catch (Exception ex) {
             throw new RuntimeException(ex);

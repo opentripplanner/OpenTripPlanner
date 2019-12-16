@@ -118,7 +118,7 @@ config key | description | value type | value default | notes
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 
-This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
 
 ## Reaching a subway platform
 

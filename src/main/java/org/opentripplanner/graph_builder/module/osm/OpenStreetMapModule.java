@@ -129,9 +129,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public boolean staticBikeRental;
 
     /**
-     * Whether we should create car P+R stations from OSM data. The default value is true. In normal operation it is
-     * set by the JSON graph builder configuration, but it is also initialized to "true" here to provide the default
-     * behavior in tests.
+     * Whether we should create car P+R stations from OSM data. The default value is true. In normal
+     * operation it is set by the JSON graph build configuration, but it is also initialized to
+     * "true" here to provide the default behavior in tests.
      */
     public boolean staticParkAndRide = true;
 

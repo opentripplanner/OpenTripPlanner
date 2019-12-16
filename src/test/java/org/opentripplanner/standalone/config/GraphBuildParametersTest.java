@@ -5,12 +5,12 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 
 
-import static org.opentripplanner.standalone.config.GraphBuilderParameters.enumValueOf;
+import static org.opentripplanner.standalone.config.GraphBuildParameters.enumValueOf;
 import static org.junit.Assert.*;
-import static org.opentripplanner.standalone.config.GraphBuilderParametersTest.AnEnum.A;
+import static org.opentripplanner.standalone.config.GraphBuildParametersTest.AnEnum.A;
 
 
-public class GraphBuilderParametersTest {
+public class GraphBuildParametersTest {
     enum AnEnum { A, B }
 
     private static final ObjectMapper OBJECT_MAPPER = new ObjectMapper();
