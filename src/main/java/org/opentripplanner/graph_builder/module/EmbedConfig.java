@@ -51,5 +51,4 @@ public class EmbedConfig implements GraphBuilderModule {
         ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
         return config.isMissingNode() ? null : writer.writeValueAsString(config);
     }
-
 }

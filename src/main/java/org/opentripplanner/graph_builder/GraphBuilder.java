@@ -47,7 +47,7 @@ import static org.opentripplanner.netex.configure.NetexConfig.netexModule;
  */
 public class GraphBuilder implements Runnable {
 
-    private static String GRAPH_FILENAME = "Graph.obj";
+    private static String GRAPH_FILENAME = "graph.obj";
 
     private static String OSM_GRAPH_FILENAME = "osmGraph.obj";
 
@@ -345,7 +345,7 @@ public class GraphBuilder implements Runnable {
             if (buildConfig.netex.moduleFileMatches(name)) return NETEX;
             if (name.endsWith(".pbf")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
-            if (name.equals("Graph.obj")) return GRAPH;
+            if (name.equals("graph.obj")) return GRAPH;
             if (GraphConfig.isGraphConfigFile(name)) return CONFIG;
             return OTHER;
         }

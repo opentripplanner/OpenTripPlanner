@@ -40,7 +40,7 @@ Once you have the graph inputs (the OSM PBF file, the Netex ZIP file, and the `b
 
 `java -Xmx10G otp2.jar --build /path/to/graph/inputs`
 
-This should produce a file `Graph.obj` in the same directory as your inputs. Building this Norway graph takes approximately 16 minutes (without elevation data, as configured above), and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under light use.
+This should produce a file `graph.obj` in the same directory as your inputs. Building this Norway graph takes approximately 16 minutes (without elevation data, as configured above), and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under light use.
 
 You can then start up an OTP server with a command like this:
 
@@ -50,7 +50,7 @@ You can then start up an OTP server with a command like this:
 
 ## Adding SIRI Realtime Data
 
-Another important feature in OTP2 is the ability to use [SIRI realtime data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information). Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply realtime updates on top of schedule data. While technically a distinct specification from Netex, both Netex and SIRI use the Transmodel vocabulary, allowing SIRI messages to reference entities in Netex schedule data. Like GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in the `router-config.json` file, which is placed in the same directory as the `Graph.obj` file and loaded at server startup.
+Another important feature in OTP2 is the ability to use [SIRI realtime data](https://en.wikipedia.org/wiki/Service_Interface_for_Real_Time_Information). Within the EU data standards, SIRI is analogous to GTFS-RT: a way to apply realtime updates on top of schedule data. While technically a distinct specification from Netex, both Netex and SIRI use the Transmodel vocabulary, allowing SIRI messages to reference entities in Netex schedule data. Like GTFS-RT, SIRI is consumed by OTP2 using "graph updaters" which are configured in the `router-config.json` file, which is placed in the same directory as the `graph.obj` file and loaded at server startup.
 
 ```json
 {
