@@ -76,4 +76,11 @@ public interface OtpDataStoreConfig {
      * The URI to the street graph object file to load and/or save.
      */
     URI streetGraph();
+
+    /**
+     * URI to the OTP status file directory where the opt status file will be created.
+     * <p>
+     * This parameter is optional. The {@link #baseDirectory()} is used in {@code null}.
+     */
+    URI getOtpStatusDir();
 }

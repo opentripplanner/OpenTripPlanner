@@ -45,6 +45,8 @@ public class OtpDataStoreTest {
     private static final String GTFS_FILENAME = "gtfs.zip";
     private static final String GRAPH_FILENAME = "graph.obj";
     private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
+    private static final String OTP_STATUS_DIR = "status";
+    private static final String OTP_STATUS_FILENAME = "my-otp-status";
     private static final String REPORT_FILENAME = "report";
     private static final String UTF_8 = "UTF-8";
     private static final long D2000_01_01 = ZonedDateTime.parse("2000-01-01T12:00+01:00")
@@ -70,6 +72,7 @@ public class OtpDataStoreTest {
         OtpDataStore store = new DataStoreFactory(config()).open();
         assertNoneExistingFile(store.getGraph(), GRAPH_FILENAME, GRAPH);
         assertNoneExistingFile(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
+        assertOtpStatusFile(store.getOtpStatusDir(), baseDir);
         assertNoneExistingFile(store.getBuildReportDir(), REPORT_FILENAME, REPORT);
 
         assertEquals("[]", store.listExistingSourcesFor(CONFIG).toString());
@@ -99,6 +102,7 @@ public class OtpDataStoreTest {
         assertExistingSource(store.getGraph(), GRAPH_FILENAME, GRAPH);
         assertExistingSource(store.getStreetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         assertReportExist(store.getBuildReportDir());
+        assertOtpStatusFile(store.getOtpStatusDir(), baseDir);
 
         assertExistingSources(store.listExistingSourcesFor(OSM), OSM_FILENAME);
         assertExistingSources(store.listExistingSourcesFor(DEM), DEM_FILENAME);
@@ -133,17 +137,22 @@ public class OtpDataStoreTest {
                 + "%n      osm: ['%s'],"
                 + "%n      gtfs: ['%s'],"
                 + "%n      graph: '%s',"
+                + "%n      otpStatusDir: '%s',"
+                + "%n      otpStatusFilename: '%s',"
                 + "%n      buildReportDir: '%s'"
                 + "%n  }"
                 + "%n}",
                 uri + OSM_FILENAME,
                 uri + GTFS_FILENAME,
                 uri + GRAPH_FILENAME,
+                uri + OTP_STATUS_DIR,
+                OTP_STATUS_FILENAME,
                 uri + REPORT_FILENAME
         ).replace('\'', '\"');
 
-        // Create build-config  and a unknown file in the 'baseDir'
+        // Create build-config, otp-status  and a unknown file in the 'baseDir'
         write(baseDir, BUILD_CONFIG_FILENAME, buildConfigJson);
+        writeToDir(baseDir, OTP_STATUS_DIR, OTP_STATUS_FILENAME + ".inProgress");
         write(baseDir, "unknown.txt", "Data");
 
         // Save osm, gtfs, graph, and report in 'tempDataDir'- the URI location,
@@ -176,6 +185,7 @@ public class OtpDataStoreTest {
                 + "GTFS data:gtfs.zip, "
                 + "OSM data:osm.pbf, "
                 + "REPORT data:report, "
+                + "UNKNOWN base:status, "
                 + "UNKNOWN base:unknown.txt",
                 result
         );
@@ -256,6 +266,13 @@ public class OtpDataStoreTest {
         assertTrue(report.exists());
         assertTrue(report.isWritable());
         assertEquals(report.content().toString(), 1, report.content().size());
+    }
+
+    private static void assertOtpStatusFile(CompositeDataSource dir, File path) {
+        assertEquals(OTP_STATUS, dir.type());
+        assertEquals(path.getName(), dir.name());
+        assertTrue(dir.exists());
+        assertTrue(dir.isWritable());
     }
 
     private OtpDataStoreConfig config() {

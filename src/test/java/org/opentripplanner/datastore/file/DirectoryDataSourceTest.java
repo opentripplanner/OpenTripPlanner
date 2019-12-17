@@ -17,6 +17,7 @@ import java.util.stream.Collectors;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.datastore.FileType.OTP_STATUS;
 import static org.opentripplanner.datastore.FileType.REPORT;
 
 public class DirectoryDataSourceTest {
@@ -96,6 +97,46 @@ public class DirectoryDataSourceTest {
         assertEquals("[]", toString(subject.content()));
 
         subject.close();
+    }
+
+    @Test
+    public void testMoveEntry() throws IOException {
+        // Given:
+        String source = "a.inProgress";
+        String target = "a.ok";
+
+        CompositeDataSource subject = new DirectoryDataSource(tempDir, OTP_STATUS);
+        IOUtils.write("OK", subject.entry(source).asOutputStream(), UTF_8);
+
+        // Assert source exist and target does not (before it is moved)
+        assertFalse(new File(tempDir, target).exists());
+        assertTrue(new File(tempDir, source).exists());
+
+        // When:
+        subject.rename(source, target);
+
+        // Then assert target exist and source does not (after it is moved)
+        assertTrue(new File(tempDir, target).exists());
+        assertFalse(new File(tempDir, source).exists());
+    }
+
+    @Test
+    public void testDeleteEntry() throws IOException {
+        // Given a file:
+        String filename = "a.txt";
+        File file = new File(tempDir, filename);
+        FileUtils.write(file, "OK", UTF_8);
+
+        CompositeDataSource subject = new DirectoryDataSource(tempDir, OTP_STATUS);
+
+        // Then assert file exist
+        assertTrue(file.exists());
+
+        // When:
+        subject.delete(filename);
+
+        // Then assert target do NOT exist after delete
+        assertFalse(file.exists());
     }
 
     private String toString(Collection<DataSource> sources) {

@@ -116,6 +116,27 @@ public class StorageParameters {
     public final List<URI> netex = new ArrayList<>();
 
     /**
+     * URI to the OTP status file directory where the opt status file will be created.
+     * <p>
+     * Example: {@code "otpStatus" : "file:///Users/kelvin/otp" }
+     * <p>
+     * This parameter is optional.
+     */
+    public final URI otpStatusDir;
+
+    /**
+     * The otp status "base" filename WITHOUT any extension. When OTP start the file is
+     * created with the extension ".inProgress" and then when OTP exit the file extension is
+     * changed to ".ok" or ".failed".
+     * <p>
+     * Example: {@code "otpStatus" : "otp-status" }
+     * <p>
+     * This parameter is optional. If not set no synchronisation file is created.
+     */
+    public final String otpStatusFilename;
+
+
+    /**
      * URI to the directory where the graph build report should be written to. The html report is
      * written into this directory. If the directory exist, any existing files are deleted.
      * If it does not exist, it is created.
@@ -134,6 +155,8 @@ public class StorageParameters {
         this.dem.addAll(uris("dem", node));
         this.gtfs.addAll(uris("gtfs", node));
         this.netex.addAll(uris("netex", node));
+        this.otpStatusDir = uriFromJson("otpStatusDir", node);
+        this.otpStatusFilename = node.path("otpStatusFilename").asText(null);
         this.buildReportDir = uriFromJson("buildReportDir", node);
     }
 

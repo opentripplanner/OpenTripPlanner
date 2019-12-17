@@ -4,6 +4,7 @@ import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.graph_builder.BuildStatusFile;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.CommandLineParameters;
@@ -37,10 +38,13 @@ public class OTPMain {
         }
         catch (OtpAppException ae) {
             LOG.error(ae.getMessage());
+            BuildStatusFile.exitStatusFailed();
             System.exit(100);
         }
         catch (Exception e) {
             LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);
+            // Set builder status to failed if it exist and not already set to ok.
+            BuildStatusFile.exitStatusFailed();
             System.exit(-1);
         }
     }
@@ -103,6 +107,8 @@ public class OTPMain {
 
         /* Start graph builder if requested. */
         if (params.doBuildStreet() || params.doBuildTransit()) {
+            app.startBuilderStatusFile();
+
             GraphBuilder graphBuilder = app.createGraphBuilder(graph);
             if (graphBuilder != null) {
                 graphBuilder.run();
@@ -111,6 +117,7 @@ public class OTPMain {
             } else {
                 throw new IllegalStateException("An error occurred while building the graph.");
             }
+            BuildStatusFile.exitStatusOk();
         }
 
         if(graph == null) {

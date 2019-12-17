@@ -71,4 +71,9 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     public URI streetGraph() {
         return config.streetGraph;
     }
+
+    @Override
+    public URI getOtpStatusDir() {
+        return config.otpStatusDir;
+    }
 }

@@ -36,4 +36,27 @@ public interface CompositeDataSource extends DataSource, Closeable {
                 + " do not support DELETE. Can not delete: " + path()
         );
     }
+
+    /**
+     * Delete content in store/container/directory.
+     */
+    default void delete(String entry) {
+        throw new UnsupportedOperationException(
+                "This datasource type " + getClass().getSimpleName()
+                + " do not support DELETE entry. Can not delete " + entry
+                + " in " + path() + "."
+        );
+    }
+
+    /**
+     * Rename content inside store/container/directory.
+     */
+    default void rename(String currentEntryName, String newEntryName) {
+        throw new UnsupportedOperationException(
+                "This datasource type " + getClass().getSimpleName()
+                + " do not support rename entry by name. "
+                + "Can not rename from: " + currentEntryName + " to " + newEntryName
+                + " in " + path() + "."
+        );
+    }
 }

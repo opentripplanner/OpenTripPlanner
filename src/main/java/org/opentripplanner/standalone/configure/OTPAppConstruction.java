@@ -2,10 +2,11 @@ package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
+import org.opentripplanner.graph_builder.BuildStatusFile;
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPApplication;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -56,6 +57,13 @@ public class OTPAppConstruction {
             this.store = new DataStoreFactory(config.createDataStoreConfig()).open();
         }
         return store;
+    }
+
+    public void startBuilderStatusFile() {
+        BuildStatusFile.start(
+            store().getOtpStatusDir(),
+            config.buildConfig().storage.otpStatusFilename
+        );
     }
 
     /**

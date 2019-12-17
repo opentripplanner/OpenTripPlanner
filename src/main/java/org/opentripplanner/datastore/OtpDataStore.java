@@ -23,8 +23,10 @@ import static org.opentripplanner.datastore.FileType.GRAPH;
 import static org.opentripplanner.datastore.FileType.GTFS;
 import static org.opentripplanner.datastore.FileType.NETEX;
 import static org.opentripplanner.datastore.FileType.OSM;
+import static org.opentripplanner.datastore.FileType.OTP_STATUS;
 import static org.opentripplanner.datastore.FileType.REPORT;
 import static org.opentripplanner.datastore.FileType.UNKNOWN;
+import static org.opentripplanner.datastore.base.LocalDataSourceRepository.PARENT_DIRECTORY;
 
 /**
  * The responsibility of this class is to provide access to all data sources OTP uses like the
@@ -54,6 +56,7 @@ public class OtpDataStore {
     /* Named resources available for both reading and writing. */
     private DataSource streetGraph;
     private DataSource graph;
+    private CompositeDataSource otpStatusDir;
     private CompositeDataSource buildReportDir;
 
     /**
@@ -84,6 +87,7 @@ public class OtpDataStore {
 
         streetGraph = findSingleSource(config.streetGraph(), STREET_GRAPH_FILENAME, GRAPH);
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
+        otpStatusDir = findCompositeSource(config.getOtpStatusDir(), PARENT_DIRECTORY, OTP_STATUS);
         buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
 
         addAll(Arrays.asList(streetGraph, graph, buildReportDir));
@@ -122,6 +126,11 @@ public class OtpDataStore {
     @NotNull
     public DataSource getGraph() {
         return graph;
+    }
+
+    @NotNull
+    public CompositeDataSource getOtpStatusDir() {
+        return otpStatusDir;
     }
 
     @NotNull
