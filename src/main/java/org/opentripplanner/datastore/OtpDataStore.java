@@ -86,8 +86,6 @@ public class OtpDataStore {
         graph = findSingleSource(config.graph(), GRAPH_FILENAME, GRAPH);
         buildReportDir = findCompositeSource(config.reportDirectory(), BUILD_REPORT_DIR, REPORT);
 
-        // The 'otp-status-file' is skipped, since we do not know the file, just the directory at
-        // this point.
         addAll(Arrays.asList(streetGraph, graph, buildReportDir));
 
         // Also read in unknown sources in case the data input source is miss-spelled,

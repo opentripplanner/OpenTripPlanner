@@ -6,6 +6,10 @@ import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.base.DataSourceRepository;
 import org.opentripplanner.datastore.file.FileDataSourceRepository;
+import org.opentripplanner.ext.datastore.gs.GsDataSourceRepository;
+import org.opentripplanner.util.OTPFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -26,6 +30,8 @@ import java.util.List;
  * all tasks to the underlying implementations.
  */
 public class DataStoreFactory {
+
+    private static final Logger LOG = LoggerFactory.getLogger(DataStoreFactory.class);
 
     private final OtpDataStoreConfig config;
 
@@ -53,12 +59,11 @@ public class DataStoreFactory {
     public OtpDataStore open() {
         List<DataSourceRepository> repositories = new ArrayList<>();
 
-        // TODO OTP2 - This is the place to add support for other data sources
-        //if (enable-data-source) {
-        //    LOG.info("enabled DS...");
-        //    repositories.add(new-data-source);
-        //}
-
+        // Adding Google Cloud Storage, if the config file contains URIs with prefix "gs:"
+        if (OTPFeature.GoogleCloudStorage.isOn()) {
+            LOG.info("Google Cloud Store Repository enabled - GS resources detected.");
+            repositories.add(new GsDataSourceRepository(config.gsCredentials()));
+        }
         // The file data storage repository should be last, to allow
         // other repositories to "override" and grab files analyzing the
         // datasource uri passed in

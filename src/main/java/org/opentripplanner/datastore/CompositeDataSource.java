@@ -6,7 +6,7 @@ import java.util.Collection;
 /**
  * A composite data source contain a collection of other {@link DataSource}s.
  * <p>
- * Example: file-directories and zip files with gtfs or netex data.
+ * Example are file directories and zip files with gtfs or netex data.
  */
 public interface CompositeDataSource extends DataSource, Closeable {
 

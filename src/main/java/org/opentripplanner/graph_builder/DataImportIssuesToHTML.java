@@ -147,7 +147,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
      */
     private void addIssues(String issueTypeName, List<String> issues) {
         HTMLWriter file_writer;
-        if (issues.size() > 1.2 * maxNumberOfIssuesPerFile) {
+        if (issues.size() > 1.2* maxNumberOfIssuesPerFile) {
             LOG.debug("Number of issues is very large. Splitting: {}", issueTypeName);
             List<List<String>> partitions = Lists.partition(issues,
                 maxNumberOfIssuesPerFile

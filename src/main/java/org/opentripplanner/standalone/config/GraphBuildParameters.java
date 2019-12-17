@@ -28,7 +28,6 @@ public class GraphBuildParameters {
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
-
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
      */
