@@ -5,11 +5,12 @@ package org.opentripplanner.common;
  */
 public class LoggingUtil {
 
-    public static String human (int n) {
-        if (n >= 1000000000) return String.format("%.1fG", n/1000000000.0);
-        if (n >= 1000000) return String.format("%.1fM", n/1000000.0);
-        if (n >= 1000) return String.format("%dk", n/1000);
-        else return String.format("%d", n);
+    public static String fileSizeToString(long n) {
+        if (n >= 1_000_000_000) return String.format("%.1f GB", n/1_000_000_000.0);
+        if (n >= 1_000_000) return String.format("%.1f MB", n/1_000_000.0);
+        if (n >= 1_000) return String.format("%d kb", n/1_000);
+        if (n == 1) return String.format("%d byte", n);
+        else return String.format("%d bytes", n);
     }
 
 }
