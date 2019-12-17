@@ -6,6 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.reflect.ReflectionLibrary;
+import org.opentripplanner.util.EnvironmentVariableReplacer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -177,6 +178,9 @@ public class ConfigLoader {
             if(jsonAsString == null) {
                 return MissingNode.getInstance();
             }
+            EnvironmentVariableReplacer envReplacer = new EnvironmentVariableReplacer();
+            jsonAsString = envReplacer.replace(jsonAsString);
+
             return mapper.readTree(jsonAsString);
         }
         catch (IOException e) {

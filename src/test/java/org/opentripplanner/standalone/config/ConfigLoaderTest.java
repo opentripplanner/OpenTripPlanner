@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -87,6 +88,38 @@ public class ConfigLoaderTest {
         // then:
         assertEquals("value", node.path("key").asText());
     }
+
+    @Test
+    public void testResolveEnvironmentVariables() {
+        // Given: a environment variable (with a alphanumeric name less then 20 characters)
+        Map.Entry<String, String> envVar = System.getenv().entrySet()
+                .stream()
+                .filter(e -> e.getValue().matches("\\w{1,20}"))
+                .findFirst()
+                .orElse(null);
+
+        String eKey = "key-not-found";
+        String eValue = "${" + eKey + "}";
+
+        if(envVar != null) {
+            eKey = envVar.getKey();
+            eValue = envVar.getValue();
+        }
+
+        String json = json(
+                "{",
+                "  // A comment",
+                "  key-a: '${not-existing-env-variable}',",
+                "  'key-b': '${" + eKey + "}'",
+                "}"
+        );
+
+        JsonNode node = ConfigLoader.fromString(json, "test_resolveEnvironmentVariables");
+
+        assertEquals("${not-existing-env-variable}", node.path("key-a").asText(null));
+        assertEquals(eKey + " = " + eValue, eValue, node.path("key-b").asText(null));
+    }
+
 
     @Test
     public void configFailsIfBaseDirectoryDoesNotExist() {
