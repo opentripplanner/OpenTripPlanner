@@ -15,6 +15,7 @@ import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.kryo.HashBiMapSerializer;
+import org.opentripplanner.datastore.DataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,20 +69,24 @@ public class SerializedGraphObject implements Serializable {
 
     public void save(File file) throws IOException {
         try {
-            save(new FileOutputStream(file));
+            save(new FileOutputStream(file), file.getName());
         } catch (Exception e) {
             file.delete(); // remove half-written file
             throw e;
         }
     }
 
-    public void save(OutputStream outputStream) {
+    public void save(DataSource target) {
+        save(target.asOutputStream(), target.name());
+    }
+
+    public void save(OutputStream outputStream, String graphName) {
         Kryo kryo = SerializedGraphObject.makeKryo();
         LOG.debug("Consolidating edges...");
         Output output = new Output(outputStream);
         kryo.writeClassAndObject(output, this);
         output.close();
-        LOG.info("Graph written.");
+        LOG.info("Graph written: {}", graphName);
         // Summarize serialized classes and associated serializers to stdout:
         // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
     }

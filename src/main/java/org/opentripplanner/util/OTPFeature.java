@@ -1,11 +1,10 @@
 package org.opentripplanner.util;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.validation.constraints.NotNull;
 import java.util.Arrays;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -60,31 +59,18 @@ public enum OTPFeature {
     /**
      * Configure features using given JSON.
      */
-    public static void configure(@NotNull JsonNode otpConfig) {
-        JsonNode features = otpConfig.path("featuresEnabled");
+    public static void configure(Function<OTPFeature, Boolean> enableFeature) {
         for (OTPFeature feature : values()) {
-            setFeatureFromConfig(feature, features.path(feature.name()));
+            Boolean value = enableFeature.apply(feature);
+            if(value != null) {
+                feature.set(value);
+            }
         }
         logFeatureSetup();
     }
 
 
     /* private members */
-
-    private static void setFeatureFromConfig(OTPFeature feature, JsonNode node) {
-        if (!node.isMissingNode()) {
-            if(node.isBoolean()) {
-                feature.set(node.booleanValue());
-            }
-            else {
-                throw new IllegalArgumentException(
-                        "Feature values is not boolean 'true' or 'false'." +
-                        " Unable to parse value for feature '" + feature.name() + "'. Value: '" +
-                        node.asText() + "'"
-                );
-            }
-        }
-    }
 
     private static void logFeatureSetup() {
         LOG.info("Features turned on: \n\t" + valuesAsString(true));

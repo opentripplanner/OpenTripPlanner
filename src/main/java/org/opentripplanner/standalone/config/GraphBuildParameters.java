@@ -28,6 +28,13 @@ public class GraphBuildParameters {
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
+
+    /**
+     * The raw JsonNode three kept for reference and (de)serialization.
+     */
+    public final JsonNode rawJson;
+
+
     /**
      * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
      * as the graph.
@@ -122,24 +129,35 @@ public class GraphBuildParameters {
     public final WayPropertySetSource wayPropertySet;
 
     /**
+     * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS,
+     * one for WAYS and last one for NODES. Instead of reading the data source 3 times it might be
+     * faster to cache the entire osm file im memory. The trade off is of cause that OTP might use
+     * more memory while loading osm data. You can use this parameter to choose what is best for
+     * your deployment depending on your infrastructure. Set the parameter to {@code true} to cache
+     * the data, and to {@code false} to read the stream from the source each time. The default
+     * value is {@code false}.
+     */
+    public final boolean osmCacheDataInMem;
+
+    /**
      * Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs.
      */
-    public boolean staticBikeRental = false;
+    public boolean staticBikeRental;
 
     /**
      * Whether we should create car P+R stations from OSM data.
      */
-    public boolean staticParkAndRide = true;
+    public boolean staticParkAndRide;
 
     /**
      * Whether we should create bike P+R stations from OSM data.
      */
-    public boolean staticBikeParkAndRide = false;
+    public boolean staticBikeParkAndRide;
 
     /**
      * Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle
      */
-    public int maxInterlineDistance = 200;
+    public int maxInterlineDistance;
 
     /**
      * This field indicates the pruning threshold for islands without stops.
@@ -187,12 +205,23 @@ public class GraphBuildParameters {
     public final NetexParameters netex;
 
     /**
+     * Otp auto detect input and output files using the command line supplied paths. This parameter
+     * make it possible to override this by specifying a path for each file. All parameters in the
+     * storage section is optional, and the fallback is to use the auto detection. It is OK to
+     * autodetect some file and specify the path to others.
+     */
+    public final StorageParameters storage;
+
+
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
     public GraphBuildParameters(JsonNode config) {
+        rawJson = config;
         dataImportReport = config.path("dataImportReport").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
@@ -210,6 +239,7 @@ public class GraphBuildParameters {
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
         wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));
+        osmCacheDataInMem = config.path("osmCacheDataInMem").asBoolean(false);
         staticBikeRental = config.path("staticBikeRental").asBoolean(false);
         staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
         staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
@@ -222,8 +252,10 @@ public class GraphBuildParameters {
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
         distanceBetweenElevationSamples = config.path("distanceBetweenElevationSamples").asDouble(
-                CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS);
+                CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
+        );
         netex = new NetexParameters(config.path("netex"));
+        storage = new StorageParameters(config.path("storage"));
     }
 
 
@@ -238,5 +270,10 @@ public class GraphBuildParameters {
             throw new IllegalArgumentException("The graph build parameter " + propertyName
                     + " value '" + valueAsString + "' is not in legal. Expected one of " + legalValues + ".");
         }
+    }
+
+    public int getSubwayAccessTimeSeconds() {
+        // Convert access time in minutes to seconds
+        return (int)(subwayAccessTime * 60.0);
     }
 }

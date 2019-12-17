@@ -2,8 +2,6 @@ package org.opentripplanner.standalone.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.BaseEncoding;
-import java.security.Principal;
-import java.util.Map;
 
 import javax.annotation.Priority;
 import javax.ws.rs.Priorities;
@@ -14,6 +12,8 @@ import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.Response;
 import javax.ws.rs.core.Response.Status;
 import javax.ws.rs.core.SecurityContext;
+import java.security.Principal;
+import java.util.Map;
 
 /** 
  * This ContainerRequestFilter adds basic authentication support to the Grizzly + Jersey server.
@@ -28,7 +28,7 @@ import javax.ws.rs.core.SecurityContext;
  */
 @Priority(Priorities.AUTHENTICATION)
 // Authentication priority comes before Authorization, which is handled by RolesAllowedDynamicFeature
-public class AuthFilter implements ContainerRequestFilter {
+class AuthFilter implements ContainerRequestFilter {
 
     private final Map<String, String> passwords = Maps.newHashMap(); // roles are same as user names
 

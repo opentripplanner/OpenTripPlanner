@@ -1,13 +1,18 @@
 package org.opentripplanner.standalone.configure;
 
+import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.graph_builder.GraphBuilder;
+import org.opentripplanner.graph_builder.GraphBuilderDataSources;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPApplication;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Application;
 
@@ -27,48 +32,66 @@ import javax.ws.rs.core.Application;
  */
 public class OTPAppConstruction {
 
-    private final OTPConfiguration configuration;
-    private final CommandLineParameters commandLineParameters;
+    private static final Logger LOG = LoggerFactory.getLogger(OTPAppConstruction.class);
 
-    private Router router = null;
+    private final OTPConfiguration config;
+
+    private OtpDataStore store = null;
     private OTPServer server = null;
+    private GraphBuilderDataSources graphBuilderDataSources = null;
 
     /**
      * Create a new OTP configuration instance for a given directory.
      */
     public OTPAppConstruction(CommandLineParameters commandLineParameters) {
-        this.commandLineParameters = commandLineParameters;
-        this.configuration = new OTPConfiguration(commandLineParameters.getGraphDirectory());
+        this.config = new OTPConfiguration(commandLineParameters);
+        initializeFeatures();
+    }
 
-        // Initialize features from configuration file.
-        OTPFeature.configure(configuration().otpConfig());
+    /**
+     * Create or retrieve a data store witch provide access to files, remote or local.
+     */
+    public OtpDataStore store() {
+        if(store == null) {
+            this.store = new DataStoreFactory(config.createDataStoreConfig()).open();
+        }
+        return store;
     }
 
     /**
      * Create a new Grizzly server - call this method once, the new instance is created
      * every time this method is called.
      */
-    public GrizzlyServer createGrizzlyServer() {
-        return new GrizzlyServer(commandLineParameters, createApplication());
+    public GrizzlyServer createGrizzlyServer(Router router) {
+        return new GrizzlyServer(config.getCli(), createApplication(router));
+    }
+
+    public void validateConfigAndDatasources() {
+        // Load Graph Builder Data Sources to validate it.
+        graphBuilderDataSources();
     }
 
     /**
      * Create the default graph builder.
+     * @param baseGraph the base graph to add more data on to of.
      */
-    public GraphBuilder createDefaultGraphBuilder() {
+    public GraphBuilder createGraphBuilder(Graph baseGraph) {
+        LOG.info("Wiring up and configuring graph builder task.");
         return GraphBuilder.create(
-                commandLineParameters,
-                configuration().getGraphConfig(commandLineParameters.getGraphDirectory())
+                config.buildConfig(),
+                graphBuilderDataSources(),
+                config.createEmbedConfig(),
+                baseGraph
         );
     }
 
     /**
-     * Return OTP application file configuration.
+     * Return router configuration as loaded from the 'router-config.json' file.
      * <p>
      * The method is {@code public} to allow test access.
      */
-    public OTPConfiguration configuration() {
-        return configuration;
+    public OTPConfiguration config() {
+        return config;
     }
 
     /**
@@ -77,19 +100,30 @@ public class OTPAppConstruction {
      * <p>
      * The method is {@code public} to allow test access.
      */
-    public OTPServer server() {
+    public OTPServer server(Router router) {
         if (server == null) {
-            server = new OTPServer(commandLineParameters, router);
+            server = new OTPServer(config.getCli(), router);
         }
         return server;
     }
 
-    private Application createApplication() {
-        return new OTPApplication(server(), !commandLineParameters.insecure);
+    private GraphBuilderDataSources graphBuilderDataSources() {
+        if(graphBuilderDataSources == null) {
+            graphBuilderDataSources = GraphBuilderDataSources.create(
+                    config.getCli(),
+                    config.buildConfig(),
+                    store()
+            );
+        }
+        return graphBuilderDataSources;
     }
 
-    public void setRouter (Router router) {
-        this.router = router;
+    private void initializeFeatures() {
+        // Initialize features from configuration file.
+        OTPFeature.configure(config::isFeatureEnabled);
     }
 
+    private Application createApplication(Router router) {
+        return new OTPApplication(server(router), !config.getCli().insecure);
+    }
 }

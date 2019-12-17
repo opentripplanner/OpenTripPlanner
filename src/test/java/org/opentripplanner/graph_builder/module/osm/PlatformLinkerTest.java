@@ -69,13 +69,13 @@ public class PlatformLinkerTest {
         loader.platformEntriesLinking = true;
         loader.skipVisibility = true;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(
                 URLDecoder.decode(FakeGraph.class.getResource("osm/skoyen.osm.pbf").getFile(),
                         "UTF-8"));
 
-        provider.setPath(file);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
+
         loader.setProvider(provider);
         loader.buildGraph(gg, new HashMap<>());
 

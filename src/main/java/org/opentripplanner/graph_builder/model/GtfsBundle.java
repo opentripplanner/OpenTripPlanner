@@ -1,27 +1,27 @@
 package org.opentripplanner.graph_builder.model;
 
-import java.io.File;
-import java.io.IOException;
-import java.net.URL;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.zip.ZipFile;
-
 import org.apache.http.client.ClientProtocolException;
 import org.onebusaway.csv_entities.CsvInputSource;
-import org.onebusaway.csv_entities.FileCsvInputSource;
-import org.onebusaway.csv_entities.ZipFileCsvInputSource;
-import org.opentripplanner.graph_builder.module.DownloadableGtfsInputSource;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URL;
+import java.util.HashMap;
+import java.util.Map;
 
 public class GtfsBundle {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
-    private File path;
+    private final CompositeDataSource dataSource;
 
     private URL url;
 
@@ -57,59 +57,51 @@ public class GtfsBundle {
 
     public File cacheDirectory = null; // null means use default from GtfsGB || system temp dir 
 
-    public GtfsBundle() {
-    }
-    
+
+    /** Used by unit tests */
     public GtfsBundle(File gtfsFile) {
-        this.setPath(gtfsFile);
+        this(DataStoreFactory.compositeSource(gtfsFile, FileType.GTFS));
     }
 
-    public void setPath(File path) {
-        this.path = path;
+    public GtfsBundle(CompositeDataSource dataSource) {
+        this.dataSource = dataSource;
     }
 
     public void setUrl(URL url) {
         this.url = url;
     }
 
-    public void setCsvInputSource(CsvInputSource csvInputSource) {
-        this.csvInputSource = csvInputSource;
-    }
-    
-    public String getDataKey() {
-        return path + ";" + url + ";" + (csvInputSource != null ? csvInputSource.hashCode() : "");
-    }
-    
-    public CsvInputSource getCsvInputSource() throws IOException {
+    public CsvInputSource getCsvInputSource() {
         if (csvInputSource == null) {
-            if (path != null) {
-                if (path.isDirectory()) {
-                    csvInputSource = new FileCsvInputSource(path);
-                } else {
-                    csvInputSource = new ZipFileCsvInputSource(new ZipFile(path));
+            csvInputSource = new CsvInputSource() {
+                @Override
+                public boolean hasResource(String s) {
+                    return dataSource.content().stream().anyMatch(it -> it.name().equals(s));
                 }
-            } else if (url != null) {
-                DownloadableGtfsInputSource isrc = new DownloadableGtfsInputSource();
-                isrc.setUrl(url);
-                if (cacheDirectory != null)
-                    isrc.setCacheDirectory(cacheDirectory);
-                if (useCached != null)
-                    isrc.useCached = useCached;
-                csvInputSource = isrc;
-            }
+
+                @Override
+                public InputStream getResource(String s) {
+                    return dataSource.entry(s).asInputStream();
+                }
+
+                @Override
+                public void close() { }
+            };
         }
         return csvInputSource;
     }
 
-    public String toString () {
-        String src; 
-        if (path != null) {
-            src = path.toString();
-        } else if (url != null) {
-            src = url.toString();
-        } else {
-            src = "(no source)";
+    public void close() {
+        try {
+            dataSource.close();
         }
+        catch (IOException e) {
+            LOG.warn("Failed to close datasource {}, details: {}", dataSource.path(), e.getLocalizedMessage(), e);
+        }
+    }
+
+    public String toString () {
+        String src = dataSource.path();
         if (feedId != null) {
             src += " (" + feedId.getId() + ")";
         }
@@ -121,26 +113,13 @@ public class GtfsBundle {
      */
     public GtfsFeedId getFeedId() {
         if (feedId == null) {
-            try {
-                feedId = new GtfsFeedId.Builder().fromGtfsFeed(getCsvInputSource()).build();
-            } catch (IOException e) {
-                LOG.error("Failed to fetch feedId from feed_info.");
-                throw new RuntimeException(e);
-            }
+            feedId = new GtfsFeedId.Builder().fromGtfsFeed(getCsvInputSource()).build();
         }
         return feedId;
     }
 
     public void setFeedId(GtfsFeedId feedId) {
         this.feedId = feedId;
-    }
-
-    public Map<String, String> getAgencyIdMappings() {
-        return agencyIdMappings;
-    }
-
-    public void setAgencyIdMappings(Map<String, String> agencyIdMappings) {
-        this.agencyIdMappings = agencyIdMappings;
     }
 
     /**
@@ -180,13 +159,11 @@ public class GtfsBundle {
             LOG.warn("unknown CSV source type; cannot check inputs");
             return;
         }
-        if (path != null) {
-            if (!path.exists()) {
-                throw new RuntimeException("GTFS Path " + path + " does not exist.");
-            }
-            if (!path.canRead()) {
-                throw new RuntimeException("GTFS Path " + path + " cannot be read.");
-            }
+        if (!dataSource.exists()) {
+                throw new RuntimeException(
+                        "GTFS Path " + dataSource.path() + " does not exist or "
+                                + "cannot be read."
+                );
         } else if (url != null) {
             try {
                 HttpUtils.testUrl(url.toExternalForm());
@@ -196,7 +173,6 @@ public class GtfsBundle {
                 throw new RuntimeException("GTFS url " + url.toExternalForm() + " cannot be read.\n" + e);
             }
         }
-
     }
 
     public double getMaxStopToShapeSnapDistance() {
