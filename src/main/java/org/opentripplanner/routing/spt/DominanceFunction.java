@@ -41,6 +41,9 @@ public abstract class DominanceFunction implements Serializable {
      */
     public boolean betterOrEqualAndComparable(State a, State b) {
 
+        // Get the routing request to be able to enable skipping some checks that are only active in certain scenarios.
+        RoutingRequest req = a.getContext().opt;
+
         // States before boarding transit and after riding transit are incomparable.
         // This allows returning transit options even when walking to the destination is the optimal strategy.
         if (a.isEverBoarded() != b.isEverBoarded()) {
@@ -60,38 +63,76 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // Does one state represent riding a rented bike and the other represent walking before/after rental?
-        if (a.isBikeRenting() != b.isBikeRenting()) {
-            return false;
-        }
-
-        // In case of bike renting, different networks (ie incompatible bikes) are not comparable
-        if (a.isBikeRenting()) {
-            if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks()))
+        if (req.allowBikeRental) {
+            // Does one state represent riding a rented bike and the other represent walking before/after rental?
+            if (a.isBikeRenting() != b.isBikeRenting()) {
                 return false;
+            }
+
+            // In case of bike renting, different networks (ie incompatible bikes) are not comparable
+            if (a.isBikeRenting()) {
+                if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks()))
+                    return false;
+            }
         }
 
-        // Does one state represent driving a car and the other represent walking after the car was parked?
-        if (a.isCarParked() != b.isCarParked()) {
-            return false;
+        if (req.parkAndRide) {
+            // Does one state represent driving a car and the other represent walking after the car was parked?
+            if (a.isCarParked() != b.isCarParked()) {
+                return false;
+            }
         }
 
-        // Does one state represent riding a bike and the other represent walking after the bike was parked?
-        if (a.isBikeParked() != b.isBikeParked()) {
-            return false;
+        if (req.bikeParkAndRide) {
+            // Does one state represent riding a bike and the other represent walking after the bike was parked?
+            if (a.isBikeParked() != b.isBikeParked()) {
+                return false;
+            }
         }
 
-        // Does one state represent using a hailed car and the other using another mode?
-        if (a.isUsingHailedCar() != b.isUsingHailedCar()) {
-            return false;
-        }
-        // Does one state represent using a hailed car before transit and the other using a hailed car after?
-        if (a.stateData.hasHailedCarPreTransit() != b.stateData.hasHailedCarPreTransit()) {
-            return false;
-        }
-        // Does one state represent using a hailed car before transit and the other using a hailed car after?
-        if (a.stateData.hasHailedCarPostTransit() != b.stateData.hasHailedCarPostTransit()) {
-            return false;
+        // There are a number of states that are allowed to not dominate each other when the request allows for the use
+        // of a TNC vehicle. The states that are allowed to not dominate each other are as follows:
+        //
+        // a = walking from origin to a TNC pickup point
+        // b = In a TNC vehicle prior to taking transit
+        // c = walking after having taken a TNC vehicle prior to taking transit
+        // d = On transit
+        // e = Walking after transit to a TNC pickup point
+        // f = In a TNC vehicle after taking transit
+        // g = Walking after having taken a TNC vehicle after taking transit
+        //
+        // Given these possibilities it can be shown in the following state machine diagram that various conditions will
+        // be met that allow certain states to not overlap. The diagram has the following state flag checks:
+        //
+        // H = is either state in a hailed vehicle?
+        // B = has one state hailed a car before transit?
+        // A = has one state hailed a car after transit?
+        // T = has one state ever boarded transit?
+        // TV = is one state only possible when the state is on a transit vertex?
+        //
+        // |   | H | B | A | T | TV |
+        // |---|---|---|---|---|----|
+        // | a |   |   |   |   |    |
+        // | b | T | T |   |   |    |
+        // | c |   | T |   |   |    |
+        // | d |   | T |   | T |  T |
+        // | e |   | T |   | T |    |
+        // | f | T | T | T | T |    |
+        // | g |   | T | T | T |    |
+        //
+        if (req.useTransportationNetworkCompany) {
+            // Does one state represent using a hailed car and the other using another mode?
+            if (a.isUsingHailedCar() != b.isUsingHailedCar()) {
+                return false;
+            }
+            // Does one state represent using a hailed car before transit and the other using a hailed car after?
+            if (a.stateData.hasHailedCarPreTransit() != b.stateData.hasHailedCarPreTransit()) {
+                return false;
+            }
+            // Does one state represent using a hailed car before transit and the other using a hailed car after?
+            if (a.stateData.hasHailedCarPostTransit() != b.stateData.hasHailedCarPostTransit()) {
+                return false;
+            }
         }
 
         // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
