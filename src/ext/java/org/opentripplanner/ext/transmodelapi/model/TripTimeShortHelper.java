@@ -34,10 +34,8 @@ public class TripTimeShortHelper {
         if (timetableSnapshot != null) {
             // Check if realtime-data is available for trip
 
-            // TODO OTP2 - Insert SIRI FeedId here ...
-            String feedId = "TODO OTP2 - Fix Siri Feed Id" ; //timetableSnapshotSource.getFeedId();
             TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(
-                    feedId, trip.getId().getId(), serviceDate);
+                    trip.getId(), serviceDate);
             if (pattern == null) {
                 pattern = index.patternForTrip.get(trip);
             }

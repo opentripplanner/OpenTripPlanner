@@ -494,6 +494,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return trips.get(0).getTripHeadsign();
     }
 
+    public static boolean idsAreUnique(Collection<TripPattern> tripPatterns) {
+        Set<FeedScopedId> seen = new HashSet<>();
+        return tripPatterns.stream().map(t -> t.id).allMatch(seen::add);
+    }
+
     /**
      * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, the direction and
      * an integer.
@@ -507,7 +512,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%s:%02d", routeId.getFeedId(), routeId.getId(), direction, count);
+            String id = String.format("%s:%s:%02d", routeId.getId(), direction, count);
             pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
         }
     }

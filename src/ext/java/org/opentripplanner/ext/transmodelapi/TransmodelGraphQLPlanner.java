@@ -88,7 +88,7 @@ public class TransmodelGraphQLPlanner {
 
 
             if (request.modes.isTransit()) {
-                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.transitLayer);
+                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.realtimeTransitLayer);
                 itineraries.addAll(raptorRouter.route());
             }
 

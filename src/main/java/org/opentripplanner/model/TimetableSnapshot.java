@@ -48,21 +48,15 @@ public class TimetableSnapshot {
      * TODO shouldn't this be a static class?
      */
     protected class TripIdAndServiceDate {
-        private final String feedId;
-        private final String tripId;
+        private final FeedScopedId tripId;
         private final ServiceDate serviceDate;
         
-        public TripIdAndServiceDate(final String feedId, final String tripId, final ServiceDate serviceDate) {
-            this.feedId = feedId;
+        public TripIdAndServiceDate(final FeedScopedId tripId, final ServiceDate serviceDate) {
             this.tripId = tripId;
             this.serviceDate = serviceDate;
         }
 
-        public String getFeedId() {
-            return feedId;
-        }
-
-        public String getTripId() {
+        public FeedScopedId getTripId() {
             return tripId;
         }
 
@@ -73,7 +67,7 @@ public class TimetableSnapshot {
 
         @Override
         public int hashCode() {
-            int result = Objects.hash(tripId, serviceDate, feedId);
+            int result = Objects.hash(tripId, serviceDate);
             return result;
         }
 
@@ -87,8 +81,7 @@ public class TimetableSnapshot {
                 return false;
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
             boolean result = Objects.equals(this.tripId, other.tripId) &&
-                    Objects.equals(this.serviceDate, other.serviceDate) &&
-                    Objects.equals(this.feedId, other.feedId);
+                    Objects.equals(this.serviceDate, other.serviceDate);
             return result;
         }
     }
@@ -161,13 +154,12 @@ public class TimetableSnapshot {
      * a trip that didn't exist yet in the trip pattern.
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      *
-     * @param feedId feed id the trip id belongs to
-     * @param tripId trip id (without agency)
+     * @param tripId trip id
      * @param serviceDate service date
      * @return last added trip pattern; null if trip never was added to a trip pattern
      */
-    public TripPattern getLastAddedTripPattern(String feedId, String tripId, ServiceDate serviceDate) {
-        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
+    public TripPattern getLastAddedTripPattern(FeedScopedId tripId, ServiceDate serviceDate) {
+        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
         TripPattern pattern = lastAddedTripPattern.get(tripIdAndServiceDate);
         return pattern;
     }
@@ -181,7 +173,7 @@ public class TimetableSnapshot {
      * @param serviceDate service day for which this update is valid
      * @return whether or not the update was actually applied
      */
-    public boolean update(String feedId, TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+    public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(pattern);
         Preconditions.checkNotNull(serviceDate);
@@ -220,8 +212,8 @@ public class TimetableSnapshot {
             // Trip not found, add it
             tt.addTripTimes(updatedTripTimes);
             // Remember this pattern for the added trip id and service date
-            String tripId = updatedTripTimes.trip.getId().getId();
-            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
+            FeedScopedId tripId = updatedTripTimes.trip.getId();
+            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
         } else {
             // Set updated trip times of trip
@@ -304,7 +296,10 @@ public class TimetableSnapshot {
      * @return true if the lastAddedTripPattern changed as a result of the call
      */
     protected boolean clearLastAddedTripPattern(String feedId) {
-        return lastAddedTripPattern.keySet().removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getFeedId()));
+        return lastAddedTripPattern.keySet().removeIf(
+            lastAddedTripPattern ->
+                feedId.equals(lastAddedTripPattern.getTripId().getFeedId())
+        );
     }
 
     /**
