@@ -137,7 +137,8 @@ public class Router {
         LOG.info("Creating transit layer for Raptor routing.");
         if (graph.hasTransit && graph.index != null) {
             graph.transitLayer = TransitLayerMapper.map(graph);
-            graph.realtimeTransitLayer = graph.transitLayer;
+            // TODO Clone instead of map twice
+            graph.realtimeTransitLayer = TransitLayerMapper.map(graph);
         } else {
             LOG.warn("Cannot create Raptor data, that requires the graph to have transit data and be indexed.");
         }

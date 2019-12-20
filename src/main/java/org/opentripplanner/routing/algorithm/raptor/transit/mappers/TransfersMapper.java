@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;

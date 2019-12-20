@@ -1948,30 +1948,22 @@ public class TransmodelIndexGraphQLSchema {
                     .name("forBoarding")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether vehicle may be boarded at quay.")
-                    .dataFetcher(environment -> {
-                        if (((TripTimeShort) environment.getSource()).pickupType >= 0) {
-                            //Realtime-updated
-                            return ((TripTimeShort) environment.getSource()).pickupType != PICKDROP_NONE;
-                        }
-                        return index.patternForTrip
+                    .dataFetcher(environment ->
+                        index.patternForTrip
                             .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
-                            .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
-                    })
+                            .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE
+                    )
                     .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("forAlighting")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether vehicle may be alighted at quay.")
-                    .dataFetcher(environment -> {
-                        if (((TripTimeShort) environment.getSource()).dropoffType >= 0) {
-                            //Realtime-updated
-                            return ((TripTimeShort) environment.getSource()).dropoffType != PICKDROP_NONE;
-                        }
-                        return index.patternForTrip
+                    .dataFetcher(environment ->
+                        index.patternForTrip
                             .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
-                            .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                            .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE
 
-                    })
+                    )
                     .build())
 
                 .field(GraphQLFieldDefinition.newFieldDefinition()

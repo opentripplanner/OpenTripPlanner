@@ -9,6 +9,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
@@ -48,6 +49,8 @@ public class TransitLayerMapper {
 
     private final TimetableSnapshot timetableSnapshot;
 
+    private int patternIdCounter = 0;
+
     private TransitLayerMapper(Graph graph) {
         this.graph = graph;
         this.timetableSnapshot = graph.getTimetableSnapshot();
@@ -71,10 +74,10 @@ public class TransitLayerMapper {
         LOG.info("Mapping complete.");
 
         return new TransitLayer(
-                tripPatternsByStopByDate,
-                transferByStopIndex,
-                stopIndex.stops,
-                stopIndex.indexByStop
+            tripPatternsByStopByDate,
+            transferByStopIndex,
+            stopIndex,
+            patternIdCounter
         );
     }
 
@@ -115,7 +118,7 @@ public class TransitLayerMapper {
             // This may be somewhat inefficient since we copy all patterns into a Set even when none have been added.
             // However references to the TripPatternCache are private, and none is held by the timetableSnapshot so
             // this is simpler.
-            allTripPatterns = new HashSet(allTripPatterns);
+            allTripPatterns = new HashSet<>(allTripPatterns);
             allTripPatterns.addAll(timetableSnapshot.getAllRealtimeTripPatterns());
         }
 
@@ -159,7 +162,7 @@ public class TransitLayerMapper {
                 // trips pre-filtered for the specified date, that needs to be investigated. But in
                 // any case we might end up with a scheduled timetable, which can include
                 // non-running trips. So filter the trips according to which service IDs are running
-                // on the given day.
+                // on the given day.0
                 Timetable timetable = oldTripPattern.scheduledTimetable;
                 if (timetableSnapshot != null) {
                     timetable = timetableSnapshot.resolve(oldTripPattern, serviceDate);
@@ -190,14 +193,15 @@ public class TransitLayerMapper {
                         // tt -> tt.toTripSchedulImpl(oldTripPattern)
                     );
                     newTripSchedules.add(tripSchedule);
-                } 
-                TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
-                TripPatternForDate tripPatternForDate = new TripPatternForDate(
-                        newTripPattern,
+                }
+                if (!newTripSchedules.isEmpty()) {
+                    TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
+                    TripPatternForDate tripPatternForDate = new TripPatternForDate(newTripPattern,
                         newTripSchedules,
                         localDate
-                );
-                values.add(tripPatternForDate);
+                    );
+                    values.add(tripPatternForDate);
+                }
             }
             tripPatternsForDates.put(localDate, values);
         }
@@ -209,32 +213,32 @@ public class TransitLayerMapper {
      * Do this conversion up front (rather than lazily on demand) to ensure pattern IDs match
      * the sequence of patterns in source data.
      */
-    private static Map<org.opentripplanner.model.TripPattern, TripPattern> mapOldTripPatternToRaptorTripPattern(
+    private Map<org.opentripplanner.model.TripPattern, TripPattern> mapOldTripPatternToRaptorTripPattern(
             StopIndexForRaptor stopIndex,
             Collection<org.opentripplanner.model.TripPattern> oldTripPatterns
     ) {
         Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
         newTripPatternForOld = new HashMap<>();
-        int patternId = 0;
 
         for (org.opentripplanner.model.TripPattern oldTripPattern : oldTripPatterns) {
             TripPattern newTripPattern = new TripPattern(
-                    patternId++,
+                    patternIdCounter++,
                     // TripPatternForDate should never access the tripTimes inside the TripPattern,
                     // so I've left them null.
                     // No TripSchedules in the pattern itself; put them in the TripPatternForDate
                     null,
                     oldTripPattern.mode,
-                    stopIndex.listStopIndexesForStops(oldTripPattern.stopPattern.stops)
+                    stopIndex.listStopIndexesForStops(oldTripPattern.stopPattern.stops),
+                    oldTripPattern
             );
             newTripPatternForOld.put(oldTripPattern, newTripPattern);
         }
         return newTripPatternForOld;
     }
 
-    // TODO About 80% of the mapping time is spent in this method. Should be consider pre-sorting these before
-    // TODO serializing the graph?
-    private static List<TripTimes> getSortedTripTimes (Timetable timetable) {
+    // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
+    //      optimized for sorting nearly sorted list
+    static List<TripTimes> getSortedTripTimes (Timetable timetable) {
         return timetable.tripTimes.stream()
                 .sorted(Comparator.comparing(t -> t.getArrivalTime(0)))
                 .collect(Collectors.toList());

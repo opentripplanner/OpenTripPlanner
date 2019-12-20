@@ -31,9 +31,9 @@ public class MergeTripPatternForDatesTest {
         ZonedDateTime startOfTime = DateMapper.asStartOfService(second, ZoneId.of("Europe/London"));
 
         // Total available trip patterns
-        TripPattern tripPattern1 = new TripPattern(1, tripSchedules, null, null);
-        TripPattern tripPattern2 = new TripPattern(2, tripSchedules, null, null);
-        TripPattern tripPattern3 = new TripPattern(3, tripSchedules, null, null);
+        TripPattern tripPattern1 = new TripPattern(1, tripSchedules, null, null, null);
+        TripPattern tripPattern2 = new TripPattern(2, tripSchedules, null, null, null);
+        TripPattern tripPattern3 = new TripPattern(3, tripSchedules, null, null, null);
 
         List<Map<Integer, TripPatternForDate>> tripPatternsForDates = new ArrayList<>();
 

@@ -1,7 +1,6 @@
-package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
+package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -23,11 +22,11 @@ import java.util.Map;
  * The scope of instances of this class is limited to the mapping process, the final state is
  * stored in the {@link TransitLayer}.
  */
-class StopIndexForRaptor {
-    final List<Stop> stops;
-    final Map<Stop, Integer> indexByStop = new HashMap<>();
+public class StopIndexForRaptor {
+    public final List<Stop> stops;
+    public final Map<Stop, Integer> indexByStop = new HashMap<>();
 
-    StopIndexForRaptor(Collection<Stop> stops) {
+    public StopIndexForRaptor(Collection<Stop> stops) {
         this.stops = new ArrayList<>(stops);
         initializeIndexByStop();
     }
@@ -35,7 +34,7 @@ class StopIndexForRaptor {
     /**
      * Create map between stop and index used by Raptor to stop objects in original graph
      */
-    private void initializeIndexByStop() {
+    void initializeIndexByStop() {
         for(int i = 0; i< stops.size(); ++i) {
             indexByStop.put(stops.get(i), i);
         }
@@ -44,7 +43,7 @@ class StopIndexForRaptor {
     /**
      * Create a list of stop indexes for a given list of stops.
      */
-    int[] listStopIndexesForStops(Stop[] stops) {
+    public int[] listStopIndexesForStops(Stop[] stops) {
         int[] stopIndex = new int[stops.length];
 
         for (int i = 0; i < stops.length; i++) {

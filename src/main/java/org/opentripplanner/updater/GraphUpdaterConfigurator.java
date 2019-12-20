@@ -3,7 +3,6 @@ package org.opentripplanner.updater;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorTransitLayerGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
@@ -94,9 +93,6 @@ public abstract class GraphUpdaterConfigurator {
                 }
                 else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
-                }
-                else if (type.equals("raptor-transit-layer")) {
-                    updater = new RaptorTransitLayerGraphUpdater();
                 }
                 else if (type.equals("siri-et-updater")) {
                     updater = new SiriETUpdater();

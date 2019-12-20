@@ -3,17 +3,20 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 import org.opentripplanner.model.Stop;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransitLayer {
 
     /**
      * Transit data required for routing
      */
-    private final Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
+    private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
 
     /**
      * Index of outer list is from stop index, inner list index has no specific meaning.
@@ -24,39 +27,60 @@ public class TransitLayer {
     /**
      * Maps to original graph to retrieve additional data
      */
-    private final List<Stop> stopsByIndex;
+    private final StopIndexForRaptor stopIndex;
+
+    private final AtomicInteger patternIdCounter;
 
 
-    private final Map<Stop, Integer> indexByStop;
-
-
-
-    public TransitLayer(Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate,
-            List<List<Transfer>> transferByStopIndex, List<Stop> stopsByIndex,
-            Map<Stop, Integer> indexByStop) {
-        this.tripPatternsForDate = tripPatternsForDate;
+    public TransitLayer(
+        Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate,
+        List<List<Transfer>> transferByStopIndex,
+        StopIndexForRaptor stopIndex,
+        int largestPatternId
+    ) {
+        this.tripPatternsForDate = new HashMap<>(tripPatternsForDate);
         this.transferByStopIndex = transferByStopIndex;
-        this.stopsByIndex = stopsByIndex;
-        this.indexByStop = indexByStop;
+        this.stopIndex = stopIndex;
+        this.patternIdCounter = new AtomicInteger(largestPatternId);
     }
 
     public int getStopCount() {
-        return stopsByIndex.size();
+        return stopIndex.stops.size();
     }
 
     public int getIndexByStop(Stop stop) {
-        return indexByStop.get(stop);
+        return stopIndex.indexByStop.get(stop);
     }
 
-    public Stop getStopByIndex(int stopIndex) {
-        return stopIndex != -1 ? stopsByIndex.get(stopIndex) : null;
+    public Stop getStopByIndex(int index) {
+        return index != -1 ? stopIndex.stops.get(index) : null;
+    }
+
+    public StopIndexForRaptor getStopIndex() {
+        return this.stopIndex;
+    }
+
+    public List<List<Transfer>> getTransferByStopIndex() {
+        return this.transferByStopIndex;
+    }
+
+    public List<TripPatternForDate> getTripPatternsForDateCopy(LocalDate date) {
+        List<TripPatternForDate> tripPatternForDate = tripPatternsForDate.get(date);
+        return tripPatternForDate != null ? new ArrayList<>(tripPatternsForDate.get(date)) : null;
     }
 
     public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
         return tripPatternsForDate.getOrDefault(date, Collections.emptyList());
     }
 
-    public List<List<Transfer>> getTransferByStopIndex() {
-        return this.transferByStopIndex;
+    public void replaceTripPatternsForDate(
+        LocalDate date,
+        List<TripPatternForDate> tripPatternForDates
+    ) {
+        this.tripPatternsForDate.replace(date, tripPatternForDates);
+    }
+
+    public int incrementAndGetPatternId() {
+        return patternIdCounter.incrementAndGet();
     }
 }

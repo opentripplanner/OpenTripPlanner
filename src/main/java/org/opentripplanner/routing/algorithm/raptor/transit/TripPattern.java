@@ -11,15 +11,18 @@ public class TripPattern {
     // TODO These are only used in an intermediary step during mapping and could be deleted after the mapping has been refactored
     private final List<TripSchedule> tripSchedules;
 
+    private final org.opentripplanner.model.TripPattern orignalTripPattern;
+
     private final TraverseMode transitMode;
 
     private final int[] stopIndexes;
 
-    public TripPattern(int id, List<TripSchedule> tripSchedules, TraverseMode transitMode, int[] stopIndexes) {
+    public TripPattern(int id, List<TripSchedule> tripSchedules, TraverseMode transitMode, int[] stopIndexes, org.opentripplanner.model.TripPattern orignalTripPattern) {
         this.id = id;
         this.tripSchedules = tripSchedules;
         this.transitMode = transitMode;
         this.stopIndexes = stopIndexes;
+        this.orignalTripPattern = orignalTripPattern;
     }
 
     public int getId() { return id; }
@@ -35,6 +38,8 @@ public class TripPattern {
     public int[] getStopIndexes() {
         return stopIndexes;
     }
+
+    public org.opentripplanner.model.TripPattern getOriginalTripPattern() { return this.orignalTripPattern; }
 
     /**
      * See {@link com.conveyal.r5.otp2.api.transit.TripPatternInfo#stopIndex(int)}

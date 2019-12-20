@@ -2,6 +2,8 @@ package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -102,7 +104,7 @@ public class TimetableSnapshot {
     /**
      * <p>
      * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
-     * service date as a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)}
+     * service date as a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)}
      * with trip times of a trip that didn't exist yet in the trip pattern.
      * </p>
      * <p>
@@ -128,7 +130,7 @@ public class TimetableSnapshot {
      * A set of all timetables which have been modified and are waiting to be indexed. When
      * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
      */
-    private Set<Timetable> dirtyTimetables = new HashSet<Timetable>();
+    private Set<Timetable> dirtyTimetables = new HashSet<>();
 
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
@@ -150,7 +152,7 @@ public class TimetableSnapshot {
     
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
-     * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of
+     * a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with trip times of
      * a trip that didn't exist yet in the trip pattern.
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      *
@@ -192,8 +194,8 @@ public class TimetableSnapshot {
             if(sortedTimetables == null) {
                 sortedTimetables = new TreeSet<Timetable>(new SortedTimetableComparator());
             } else {
-                SortedSet<Timetable> temp =
-                        new TreeSet<Timetable>(new SortedTimetableComparator());
+                SortedSet<Timetable> temp;
+                temp = new TreeSet<Timetable>(new SortedTimetableComparator());
                 temp.addAll(sortedTimetables);
                 sortedTimetables = temp;
             }
@@ -236,11 +238,11 @@ public class TimetableSnapshot {
      * @return an immutable copy of this TimetableSnapshot with all updates applied
      */
     public TimetableSnapshot commit() {
-        return commit(false);
+        return commit(null, false);
     }
 
     @SuppressWarnings("unchecked")
-    public TimetableSnapshot commit(boolean force) {
+    public TimetableSnapshot commit(TransitLayer realtimeTransitLayer, boolean force) {
         if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
@@ -253,6 +255,9 @@ public class TimetableSnapshot {
         ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
         ret.lastAddedTripPattern = (HashMap<TripIdAndServiceDate, TripPattern>)
                 this.lastAddedTripPattern.clone();
+
+        TransitLayerUpdater.update(dirtyTimetables, realtimeTransitLayer);
+
         this.dirtyTimetables.clear();
         this.dirty = false;
 
