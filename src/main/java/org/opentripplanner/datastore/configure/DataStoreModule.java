@@ -8,6 +8,7 @@ import java.util.List;
 import javax.annotation.Nullable;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
+import org.opentripplanner.datastore.api.AmazonS3DSRepository;
 import org.opentripplanner.datastore.api.CompositeDataSource;
 import org.opentripplanner.datastore.api.FileType;
 import org.opentripplanner.datastore.api.GoogleStorageDSRepository;
@@ -50,10 +51,14 @@ public abstract class DataStoreModule {
   public static OtpDataStore provideDataStore(
     @OtpBaseDirectory File baseDirectory,
     OtpDataStoreConfig config,
+    @Nullable @AmazonS3DSRepository DataSourceRepository s3Repository,
     @Nullable @GoogleStorageDSRepository DataSourceRepository gsRepository
   ) {
     List<DataSourceRepository> repositories = new ArrayList<>();
 
+    if (s3Repository != null) {
+      repositories.add(s3Repository);
+    }
     if (gsRepository != null) {
       repositories.add(gsRepository);
     }

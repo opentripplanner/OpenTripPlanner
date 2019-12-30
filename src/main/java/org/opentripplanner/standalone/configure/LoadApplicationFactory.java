@@ -5,6 +5,7 @@ import dagger.Component;
 import javax.inject.Singleton;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreModule;
+import org.opentripplanner.ext.datastore.aws.AwsDataSourceModule;
 import org.opentripplanner.ext.datastore.gs.GsDataSourceModule;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
@@ -17,7 +18,14 @@ import org.opentripplanner.transit.service.TransitModel;
  * Dagger dependency injection Factory to create components for the OTP load application phase.
  */
 @Singleton
-@Component(modules = { LoadConfigModule.class, DataStoreModule.class, GsDataSourceModule.class })
+@Component(
+  modules = {
+    LoadConfigModule.class,
+    DataStoreModule.class,
+    GsDataSourceModule.class,
+    AwsDataSourceModule.class,
+  }
+)
 public interface LoadApplicationFactory {
   OtpDataStore datastore();
 
