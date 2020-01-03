@@ -88,6 +88,7 @@ class ResultPrinter {
     private static String logLine(String label, String formatValue, Object... args) {
         return logLine(true, label, formatValue, args);
     }
+
     private static String logLine(boolean enable, String label, String formatValues, Object... args) {
         return enable ? (String.format("%n%-20s: ", label) + String.format(formatValues, args)) : "";
     }

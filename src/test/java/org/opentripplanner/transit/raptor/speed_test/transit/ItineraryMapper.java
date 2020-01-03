@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
+import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -44,17 +44,24 @@ public class ItineraryMapper {
         ItinerarySet itineraries = new ItinerarySet();
 
         for (Path<TripSchedule> p : paths) {
-            streetRouter.route(request);
-            // GraphPath accessPath = streetRouter.accessTimesInSecondsByStopIndex;
-            // GraphPath egressPath = streetRouter.egressTimesInSecondsByStopIndex;
-            // SpeedTestItinerary itinerary = mapper.createItinerary(p, accessPath, egressPath);
-            // itineraries.add(itinerary);
+            int accessToStopIndex = p.accessLeg().toStop();
+            int egressToStopIndex = p.egressLeg().fromStop();
+
+            SpeedTestItinerary itinerary = mapper.createItinerary(
+                    p,
+                    streetRouter.getAccessPath(accessToStopIndex),
+                    streetRouter.getEgressPath(egressToStopIndex)
+            );
+            itineraries.add(itinerary);
         }
         return itineraries;
     }
 
-
-    private SpeedTestItinerary createItinerary(Path<TripSchedule> path, GraphPath accessPath, GraphPath egressPath) {
+    private SpeedTestItinerary createItinerary(
+            Path<TripSchedule> path,
+            NearbyStopFinder.StopAtDistance accessPath,
+            NearbyStopFinder.StopAtDistance egressPath
+    ) {
         SpeedTestItinerary itinerary = new SpeedTestItinerary();
         if (path == null) {
             return null;
@@ -66,17 +73,6 @@ public class ItineraryMapper {
         itinerary.weight = path.cost();
 
         int numberOfTransits = 0;
-        int accessTime = accessPath.getDuration();
-        int egressTime = egressPath.getDuration();
-
-        /*
-        TODO TGR -
-        List<Coordinate> acessCoords = accessPath.getEdges().stream()
-                .map(t -> new Coordinate(accessPath.getEdge(t).getGeometry().getCoordinate().x, accessPath.getEdge(t).getGeometry().getCoordinate().y)).collect(Collectors.toList());
-        List<Coordinate> egressCoords = egressPath.getEdges().stream()
-                .map(t -> new Coordinate(egressPath.getEdge(t).getGeometry().getCoordinate().x, egressPath.getEdge(t).getGeometry().getCoordinate().y)).collect(Collectors.toList());
-        Collections.reverse(egressCoords);
-        */
 
         // Access leg
         Leg leg = new Leg();
@@ -88,9 +84,10 @@ public class ItineraryMapper {
         leg.to = new PlaceAPI(request.tc().toPlace);
         leg.mode = "WALK";
 
-        // TODO TGR
+        // TODO TGR - This could be nice to visualize for debugging purposes, but...
         //leg.legGeometry = PolylineEncoder.createEncodings(acessCoords);
-        //leg.distance = distanceMMToMeters(accessPath.getDistance());
+
+        leg.distance = accessPath.distance;
 
         itinerary.addLeg(leg);
 
@@ -160,28 +157,6 @@ public class ItineraryMapper {
                 leg.routeLongName = routeInfo.getLongName();
                 leg.mode = tripSchedule.getOriginalTripPattern().mode.toString();
 
-                /*
-                List<Coordinate> transitLegCoordinates = new ArrayList<>();
-                boolean boarded = false;
-                for (int j = 0; j < tripPattern.stops.length; j++) {
-                    if (!boarded && tripSchedule.tripSchedule().departures[j] == it.fromTime()) {
-                        boarded = true;
-                    }
-                    if (boarded) {
-                        transitLegCoordinates.add(
-                                new Coordinate(
-                                        stop(tripPattern.stops[j]).locLon(),
-                                        stop(tripPattern.stops[j]).locLat()
-                                ));
-                    }
-                    if (boarded && tripSchedule.tripSchedule().arrivals[j] == it.toTime()) {
-                        break;
-                    }
-                }
-
-                leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
-                 */
-
                 leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
                 leg.endTime = createCalendar(request.getDepartureDate(), it.toTime());
             }
@@ -195,7 +170,7 @@ public class ItineraryMapper {
 
         Stop lastStop = stop(egressLeg.fromStop());
         leg.startTime = createCalendar(request.getDepartureDate(), egressLeg.fromTime());
-        leg.endTime = createCalendar(request.getDepartureDate(), egressLeg.fromTime() + egressTime);
+        leg.endTime = createCalendar(request.getDepartureDate(), egressLeg.toTime());
         leg.from = new PlaceAPI(lastStop.locLat(), lastStop.locLon(), lastStop.name());
         leg.from.stopIndex = egressLeg.fromStop();
         leg.from.stopId = new FeedScopedId("RB", lastStop.id());
@@ -204,7 +179,7 @@ public class ItineraryMapper {
 
         // TODO TGR
         // leg.legGeometry = PolylineEncoder.createEncodings(egressCoords);
-        // leg.distance = distanceMMToMeters (egressPath.getDistance());
+        leg.distance = egressPath.distance;
 
         itinerary.addLeg(leg);
 
@@ -226,23 +201,6 @@ public class ItineraryMapper {
         return new Stop(transitLayer.getStopByIndex(stopIndex));
     }
 
-    private GraphPath getWalkLegCoordinates(int originStop, int destinationStop) {
-        return null;
-        /*
-        GraphPath sr = new StreetRouter(transportNetwork.streetLayer);
-        sr.profileRequest = new ProfileRequest();
-        int originStreetVertex = transitLayer().streetVertexForStop.get(originStop);
-        sr.setOrigin(originStreetVertex);
-        sr.quantityToMinimize = StreetRouter.State.RoutingVariable.DURATION_SECONDS;
-        sr.distanceLimitMeters = 1000;
-        sr.route();
-        StreetRouter.State transferState = sr.getStateAtVertex(transitLayer().streetVertexForStop
-                .get(destinationStop));
-        return new GraphPath(transferState, transportNetwork, false);
-
-         */
-    }
-
     private Calendar createCalendar(LocalDate date, int timeinSeconds) {
         Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
         calendar.set(date.getYear(), date.getMonth().getValue(), date.getDayOfMonth()
@@ -250,11 +208,6 @@ public class ItineraryMapper {
         calendar.add(Calendar.SECOND, timeinSeconds);
         return calendar;
     }
-
-    private double distanceMMToMeters(int distanceMm) {
-        return (double) (distanceMm / 1000);
-    }
-
 
     /**
      * This class is just a wrapper around the 'transportNetwork' to make it easy to
