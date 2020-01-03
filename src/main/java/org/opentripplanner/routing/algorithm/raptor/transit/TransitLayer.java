@@ -9,7 +9,6 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicInteger;
 
 public class TransitLayer {
 
@@ -29,19 +28,14 @@ public class TransitLayer {
      */
     private final StopIndexForRaptor stopIndex;
 
-    private final AtomicInteger patternIdCounter;
-
-
     public TransitLayer(
         Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate,
         List<List<Transfer>> transferByStopIndex,
-        StopIndexForRaptor stopIndex,
-        int largestPatternId
+        StopIndexForRaptor stopIndex
     ) {
         this.tripPatternsForDate = new HashMap<>(tripPatternsForDate);
         this.transferByStopIndex = transferByStopIndex;
         this.stopIndex = stopIndex;
-        this.patternIdCounter = new AtomicInteger(largestPatternId);
     }
 
     public int getStopCount() {
@@ -73,14 +67,14 @@ public class TransitLayer {
         return tripPatternsForDate.getOrDefault(date, Collections.emptyList());
     }
 
+    /**
+     * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
+     * to the HashMap implementation.
+     */
     public void replaceTripPatternsForDate(
         LocalDate date,
         List<TripPatternForDate> tripPatternForDates
     ) {
         this.tripPatternsForDate.replace(date, tripPatternForDates);
-    }
-
-    public int incrementAndGetPatternId() {
-        return patternIdCounter.incrementAndGet();
     }
 }

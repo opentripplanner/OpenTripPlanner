@@ -10,6 +10,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
@@ -139,6 +140,10 @@ public class Router {
             graph.transitLayer = TransitLayerMapper.map(graph);
             // TODO Clone instead of map twice
             graph.realtimeTransitLayer = TransitLayerMapper.map(graph);
+            graph.transitLayerUpdater = new TransitLayerUpdater(
+                graph.realtimeTransitLayer,
+                graph.index.getServiceCodesRunningForDate()
+            );
         } else {
             LOG.warn("Cannot create Raptor data, that requires the graph to have transit data and be indexed.");
         }

@@ -2,7 +2,6 @@ package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -242,7 +241,7 @@ public class TimetableSnapshot {
     }
 
     @SuppressWarnings("unchecked")
-    public TimetableSnapshot commit(TransitLayer realtimeTransitLayer, boolean force) {
+    public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
         if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
@@ -256,7 +255,9 @@ public class TimetableSnapshot {
         ret.lastAddedTripPattern = (HashMap<TripIdAndServiceDate, TripPattern>)
                 this.lastAddedTripPattern.clone();
 
-        TransitLayerUpdater.update(dirtyTimetables, realtimeTransitLayer);
+        if (transitLayerUpdater != null) {
+            transitLayerUpdater.update(dirtyTimetables);
+        }
 
         this.dirtyTimetables.clear();
         this.dirty = false;

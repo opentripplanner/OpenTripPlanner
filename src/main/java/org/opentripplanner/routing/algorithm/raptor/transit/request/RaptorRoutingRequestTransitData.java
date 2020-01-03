@@ -4,6 +4,7 @@ import com.conveyal.r5.otp2.api.transit.IntIterator;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import com.conveyal.r5.otp2.api.transit.TransitDataProvider;
 import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -56,7 +57,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
 
         LocalDate localDate = localDateForStartOfTime(startOfTime);
 
-        List<Map<Integer, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
+        List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
                 localDate, dayRange, transitModes
         );
         List<TripPatternForDates> tripPatternForDateList = MergeTripPatternForDates
@@ -95,7 +96,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
         return startOfTime;
     }
 
-    private Map<Integer, TripPatternForDate> listActiveTripPatterns(LocalDate date,
+    private Map<FeedScopedId, TripPatternForDate> listActiveTripPatterns(LocalDate date,
             TraverseModeSet transitModes) {
 
         return transitLayer.getTripPatternsForDate(date).stream()
@@ -103,12 +104,12 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
                 .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
     }
 
-    private List<Map<Integer, TripPatternForDate>> getTripPatternsForDateRange(
+    private List<Map<FeedScopedId, TripPatternForDate>> getTripPatternsForDateRange(
             LocalDate startDate,
             int dayRange,
             TraverseModeSet transitModes
     ) {
-        List<Map<Integer, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
+        List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
 
         // Start at yesterdays date to account for trips that cross midnight. This is also
         // accounted for in TripPatternForDates.

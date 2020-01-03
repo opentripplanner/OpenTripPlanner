@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 
@@ -20,21 +21,21 @@ import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateM
 
 public class MergeTripPatternForDates {
 
-    public static List<TripPatternForDates> merge(List<Map<Integer, TripPatternForDate>> tripPatternForDateList, ZonedDateTime startOfTime) {
+    public static List<TripPatternForDates> merge(List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDateList, ZonedDateTime startOfTime) {
         List<TripPatternForDates> combinedList = new ArrayList<>();
 
         // Extract all distinct TripPatterns across the search days
-        Map<Integer, TripPattern> allTripPatternsById = tripPatternForDateList.stream().flatMap(t -> t.values().stream())
+        Map<FeedScopedId, TripPattern> allTripPatternsById = tripPatternForDateList.stream().flatMap(t -> t.values().stream())
                 .map(TripPatternForDate::getTripPattern)
                 .distinct()
                 .collect(Collectors.toMap(TripPattern::getId, t -> t));
 
         // For each TripPattern, time expand each TripPatternForDate and merge into a single TripPatternForDates
-        for (Map.Entry<Integer, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
+        for (Map.Entry<FeedScopedId, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
             List<TripPatternForDate> tripPatterns = new ArrayList<>();
             List<Integer> offsets = new ArrayList<>();
 
-            for (Map<Integer, TripPatternForDate> tripPatternById : tripPatternForDateList) {
+            for (Map<FeedScopedId, TripPatternForDate> tripPatternById : tripPatternForDateList) {
                 TripPatternForDate tripPatternForDate = tripPatternById.get(patternEntry.getKey());
                 if (tripPatternForDate != null) {
                     tripPatterns.add(tripPatternForDate);
