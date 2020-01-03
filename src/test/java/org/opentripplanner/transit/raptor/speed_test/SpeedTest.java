@@ -25,7 +25,6 @@ import org.opentripplanner.transit.raptor.util.AvgTimer;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -53,6 +52,7 @@ public class SpeedTest {
     private int nAdditionalTransfers;
     private SpeedTestProfile routeProfile;
     private SpeedTestProfile heuristicProfile;
+    private final EgressAccessRouter streetRouter;
     private List<Integer> numOfPathsFound = new ArrayList<>();
     private Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
@@ -67,29 +67,35 @@ public class SpeedTest {
         this.graph = graph;
         this.opts = opts;
         this.transitLayer = TransitLayerMapper.map(graph);
+        this.streetRouter = new EgressAccessRouter(graph, transitLayer);
     }
 
     public static void main(String[] args) throws Exception {
+        // Given the following setup
         AvgTimer.NOOP = false;
         SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
         Graph graph = GraphLoader.loadGraph(new File(opts.rootDir(), "Graph.obj"));
-        new SpeedTest(graph, opts).runTest();
+
+        // create a new test
+        SpeedTest speedTest = new SpeedTest(graph, opts);
+
+        // and run it
+        speedTest.runTest();
     }
 
     private void runTest() throws Exception {
         final SpeedTestCmdLineOpts opts = (SpeedTestCmdLineOpts) this.opts;
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
+        final boolean compareHeuristics = opts.compareHeuristics();
         nAdditionalTransfers = opts.numOfExtraTransfers();
         service = new RangeRaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
-        boolean skipFirstProfile;
 
         initProfileStatistics();
 
-        skipFirstProfile = opts.compareHeuristics();
 
         for (int i = 0; i < nSamples; ++i) {
-            setupSingleTest(speedTestProfiles, i, nSamples, skipFirstProfile);
+            setupSingleTest(speedTestProfiles, i, nSamples, compareHeuristics);
             runSingleTest(opts, i+1, nSamples);
         }
         printProfileStatistics();
@@ -185,8 +191,7 @@ public class SpeedTest {
     public TripPlan route(SpeedTestRequest request, int latestArrivalTime) {
         try {
             Collection<Path<TripSchedule>> paths;
-            EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, request);
-            streetRouter.route();
+            streetRouter.route(request);
 
             // -------------------------------------------------------- [ WORKER ROUTE ]
 
@@ -223,8 +228,7 @@ public class SpeedTest {
     }
 
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
-        EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, heurReq);
-        streetRouter.route();
+        streetRouter.route(heurReq);
         TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
         int latestArrivalTime = routeReq.getArrivalTime();
 
@@ -240,13 +244,20 @@ public class SpeedTest {
         TIMER_WORKER.stop();
     }
 
-    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample, int nSamples, boolean skipFirstProfile) {
-        if (skipFirstProfile) {
+    private void setupSingleTest(
+            SpeedTestProfile[] profilesToRun,
+            int sample,
+            int nSamples,
+            boolean compareHeuristics
+    ) {
+        if (compareHeuristics) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
         } else {
+            heuristicProfile = null;
             routeProfile = profilesToRun[sample % profilesToRun.length];
         }
+
         // Enable flag to test the effect of counting down the number of additional transfers limit
         if (TEST_NUM_OF_ADDITIONAL_TRANSFERS) {
             // sample start at 1 .. nSamples(inclusive)
@@ -296,7 +307,6 @@ public class SpeedTest {
     }
 
     private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
-        ZonedDateTime startOfTime = request.getDepartureDateWithZone();
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),

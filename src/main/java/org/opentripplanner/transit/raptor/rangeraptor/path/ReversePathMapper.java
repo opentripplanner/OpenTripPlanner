@@ -32,7 +32,7 @@ public final class ReversePathMapper<T extends TripScheduleInfo> implements Path
     }
 
     @Override
-    public Path<T> mapToPath(final org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<T> to) {
+    public Path<T> mapToPath(final DestinationArrival<T> to) {
         ArrivalView<T> from;
         AccessPathLeg<T> accessLeg;
 

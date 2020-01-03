@@ -66,7 +66,7 @@ public interface ArrivalView<T extends TripScheduleInfo> {
     /**
      * The previous stop arrival state or {@code null} if first arrival (access stop arrival).
      */
-    org.opentripplanner.transit.raptor.api.view.ArrivalView<T> previous();
+    ArrivalView<T> previous();
 
     /* Access stop arrival */
 

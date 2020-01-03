@@ -141,7 +141,7 @@ public class SearchContext<T extends TripScheduleInfo> {
      */
     private static TransitCalculator createCalculator(RangeRaptorRequest<?> r, TuningParameters t) {
         SearchParams s = r.searchParams();
-        return r.searchForward() ? new org.opentripplanner.transit.raptor.rangeraptor.transit.ForwardSearchTransitCalculator(s, t) : new org.opentripplanner.transit.raptor.rangeraptor.transit.ReverseSearchTransitCalculator(s, t);
+        return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
     }
 
     private DebugRequest<T> debugRequest(RangeRaptorRequest<T> request) {

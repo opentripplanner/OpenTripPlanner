@@ -39,12 +39,12 @@ class ItineraryResultMapper {
         AGENCY_NAMES_SHORT.put("Østfold fylkeskommune", "Øst");
     }
 
-    static Collection<org.opentripplanner.transit.raptor.speed_test.testcase.Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
+    static Collection<Result> map(final String testCaseId, Collection<Itinerary> itineraries) {
         return itineraries.stream().map(it -> map(testCaseId, it)).collect(Collectors.toList());
     }
 
-    private static org.opentripplanner.transit.raptor.speed_test.testcase.Result map(String testCaseId, Itinerary itinerary) {
-        org.opentripplanner.transit.raptor.speed_test.testcase.Result result = new org.opentripplanner.transit.raptor.speed_test.testcase.Result(
+    private static Result map(String testCaseId, Itinerary itinerary) {
+        Result result = new Result(
                 testCaseId,
                 itinerary.transfers,
                 itinerary.duration.intValue(),

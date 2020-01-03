@@ -78,7 +78,7 @@ public class StdRangeRaptorConfig<T extends TripScheduleInfo> {
     /* private factory methods */
 
     private StdRangeRaptorWorkerState<T> createState() {
-        new org.opentripplanner.transit.raptor.rangeraptor.standard.configure.VerifyRequestIsValid(ctx).verify();
+        new VerifyRequestIsValid(ctx).verify();
         switch (ctx.profile()) {
             case STANDARD:
             case NO_WAIT_STD:

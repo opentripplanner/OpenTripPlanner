@@ -57,7 +57,7 @@ public final class EgressPathLeg<T extends TripScheduleInfo> implements PathLeg<
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.path.EgressPathLeg<?> that = (org.opentripplanner.transit.raptor.api.path.EgressPathLeg<?>) o;
+        EgressPathLeg<?> that = (EgressPathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&
                 toTime == that.toTime;

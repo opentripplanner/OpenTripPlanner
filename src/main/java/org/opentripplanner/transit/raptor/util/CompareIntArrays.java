@@ -84,7 +84,7 @@ public class CompareIntArrays {
             int unreached,
             int[] stops
     ) {
-        org.opentripplanner.transit.raptor.util.CompareIntArrays s = new org.opentripplanner.transit.raptor.util.CompareIntArrays(label, aName, bName, unreached, mapValue, comparator);
+        CompareIntArrays s = new CompareIntArrays(label, aName, bName, unreached, mapValue, comparator);
         int size;
 
         if(stops != null && stops.length > 0) {

@@ -40,7 +40,7 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return stops;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> addStops(Collection<Integer> stops) {
+    public DebugRequestBuilder<T> addStops(Collection<Integer> stops) {
         this.stops.addAll(stops);
         return this;
     }
@@ -49,7 +49,7 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return path;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> addPath(Collection<Integer> path) {
+    public DebugRequestBuilder<T> addPath(Collection<Integer> path) {
         if(!path.isEmpty()) {
             throw new IllegalStateException("The API support only one debug path. Existing: " + this.path + ", new: " + path);
         }
@@ -61,7 +61,7 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return debugPathFromStopIndex;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> debugPathFromStopIndex(Integer debugPathStartAtStopIndex) {
+    public DebugRequestBuilder<T> debugPathFromStopIndex(Integer debugPathStartAtStopIndex) {
         this.debugPathFromStopIndex = debugPathStartAtStopIndex;
         return this;
     }
@@ -70,7 +70,7 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return stopArrivalListener;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> stopArrivalListener(Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener) {
+    public DebugRequestBuilder<T> stopArrivalListener(Consumer<DebugEvent<ArrivalView<T>>> stopArrivalListener) {
         this.stopArrivalListener = stopArrivalListener;
         return this;
     }
@@ -79,7 +79,7 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return pathFilteringListener;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> pathFilteringListener(Consumer<DebugEvent<Path<T>>> pathFilteringListener) {
+    public DebugRequestBuilder<T> pathFilteringListener(Consumer<DebugEvent<Path<T>>> pathFilteringListener) {
         this.pathFilteringListener = pathFilteringListener;
         return this;
     }
@@ -88,12 +88,12 @@ public class DebugRequestBuilder<T extends TripScheduleInfo> {
         return logger;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> logger(DebugLogger logger) {
+    public DebugRequestBuilder<T> logger(DebugLogger logger) {
         this.logger = logger;
         return this;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.DebugRequestBuilder<T> reverseDebugRequest() {
+    public DebugRequestBuilder<T> reverseDebugRequest() {
         Collections.reverse(this.path);
         return this;
     }

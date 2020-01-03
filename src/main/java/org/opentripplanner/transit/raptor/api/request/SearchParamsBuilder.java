@@ -50,7 +50,7 @@ public class SearchParamsBuilder {
         return earliestDepartureTime;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder earliestDepartureTime(int earliestDepartureTime) {
+    public SearchParamsBuilder earliestDepartureTime(int earliestDepartureTime) {
         this.earliestDepartureTime = earliestDepartureTime;
         return this;
     }
@@ -59,7 +59,7 @@ public class SearchParamsBuilder {
         return latestArrivalTime;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder latestArrivalTime(int latestArrivalTime) {
+    public SearchParamsBuilder latestArrivalTime(int latestArrivalTime) {
         this.latestArrivalTime = latestArrivalTime;
         return this;
     }
@@ -68,11 +68,11 @@ public class SearchParamsBuilder {
         return searchWindowInSeconds;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder searchOneIterationOnly() {
+    public SearchParamsBuilder searchOneIterationOnly() {
         return searchWindowInSeconds(0);
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder searchWindowInSeconds(int searchWindowInSeconds) {
+    public SearchParamsBuilder searchWindowInSeconds(int searchWindowInSeconds) {
         this.searchWindowInSeconds = searchWindowInSeconds;
         return this;
     }
@@ -81,7 +81,7 @@ public class SearchParamsBuilder {
         return arrivedBy;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder arrivedBy(boolean arrivedBy) {
+    public SearchParamsBuilder arrivedBy(boolean arrivedBy) {
         this.arrivedBy = arrivedBy;
         return this;
     }
@@ -90,7 +90,7 @@ public class SearchParamsBuilder {
         return boardSlackInSeconds;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder boardSlackInSeconds(int boardSlackInSeconds) {
+    public SearchParamsBuilder boardSlackInSeconds(int boardSlackInSeconds) {
         this.boardSlackInSeconds = boardSlackInSeconds;
         return this;
     }
@@ -100,7 +100,7 @@ public class SearchParamsBuilder {
         return numberOfAdditionalTransfers;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder numberOfAdditionalTransfers(int numberOfAdditionalTransfers) {
+    public SearchParamsBuilder numberOfAdditionalTransfers(int numberOfAdditionalTransfers) {
         this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;
         return this;
     }
@@ -109,7 +109,7 @@ public class SearchParamsBuilder {
         return relaxCostAtDestination;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder relaxCostAtDestination(double relaxCostAtDestination) {
+    public SearchParamsBuilder relaxCostAtDestination(double relaxCostAtDestination) {
         this.relaxCostAtDestination = relaxCostAtDestination;
         return this;
     }
@@ -118,7 +118,7 @@ public class SearchParamsBuilder {
         return timetableEnabled;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder timetableEnabled(boolean enable) {
+    public SearchParamsBuilder timetableEnabled(boolean enable) {
         this.timetableEnabled = enable;
         return this;
     }
@@ -127,7 +127,7 @@ public class SearchParamsBuilder {
         return waitAtBeginningEnabled;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder waitAtBeginningEnabled(boolean enable) {
+    public SearchParamsBuilder waitAtBeginningEnabled(boolean enable) {
         this.waitAtBeginningEnabled = enable;
         return this;
     }
@@ -136,7 +136,7 @@ public class SearchParamsBuilder {
         return stopFilter;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder stopFilter(BitSet stopFilter) {
+    public SearchParamsBuilder stopFilter(BitSet stopFilter) {
         this.stopFilter = stopFilter;
         return this;
     }
@@ -145,12 +145,12 @@ public class SearchParamsBuilder {
         return accessLegs;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder addAccessStop(TransferLeg accessLeg) {
+    public SearchParamsBuilder addAccessStop(TransferLeg accessLeg) {
         this.accessLegs.add(accessLeg);
         return this;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder addAccessStops(Iterable<TransferLeg> accessLegs) {
+    public SearchParamsBuilder addAccessStops(Iterable<TransferLeg> accessLegs) {
         for (TransferLeg it : accessLegs) {
             addAccessStop(it);
         }
@@ -161,12 +161,12 @@ public class SearchParamsBuilder {
         return egressLegs;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder addEgressStop(TransferLeg egressLeg) {
+    public SearchParamsBuilder addEgressStop(TransferLeg egressLeg) {
         this.egressLegs.add(egressLeg);
         return this;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder addEgressStops(Iterable<TransferLeg> egressLegs) {
+    public SearchParamsBuilder addEgressStops(Iterable<TransferLeg> egressLegs) {
         for (TransferLeg it : egressLegs) {
             addEgressStop(it);
         }

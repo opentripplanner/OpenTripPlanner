@@ -1,8 +1,6 @@
 package org.opentripplanner.transit.raptor.api.debug;
 
 
-
-
 /**
  * Debug events hold information about an internal event in the Raptor Algorithm. The element
  * may be a stop arrivals, a destination arrival or path.
@@ -34,16 +32,16 @@ public class DebugEvent<E> {
         this.reason = reason;
     }
 
-    public static <E> org.opentripplanner.transit.raptor.api.debug.DebugEvent<E> accept(int iterationStartTime, E element) {
-        return new org.opentripplanner.transit.raptor.api.debug.DebugEvent<>(Action.ACCEPT, iterationStartTime, element, null, null);
+    public static <E> DebugEvent<E> accept(int iterationStartTime, E element) {
+        return new DebugEvent<>(Action.ACCEPT, iterationStartTime, element, null, null);
     }
 
-    public static <E> org.opentripplanner.transit.raptor.api.debug.DebugEvent<E> reject(int iterationStartTime, E element, E rejectedByElement, String reason) {
-        return new org.opentripplanner.transit.raptor.api.debug.DebugEvent<>(Action.REJECT, iterationStartTime, element, rejectedByElement, reason);
+    public static <E> DebugEvent<E> reject(int iterationStartTime, E element, E rejectedByElement, String reason) {
+        return new DebugEvent<>(Action.REJECT, iterationStartTime, element, rejectedByElement, reason);
     }
 
-    public static <E> org.opentripplanner.transit.raptor.api.debug.DebugEvent<E> drop(int iterationStartTime, E element, E droppedByElement, String reason) {
-        return new org.opentripplanner.transit.raptor.api.debug.DebugEvent<>(Action.DROP, iterationStartTime, element, droppedByElement, reason);
+    public static <E> DebugEvent<E> drop(int iterationStartTime, E element, E droppedByElement, String reason) {
+        return new DebugEvent<>(Action.DROP, iterationStartTime, element, droppedByElement, reason);
     }
 
     /**

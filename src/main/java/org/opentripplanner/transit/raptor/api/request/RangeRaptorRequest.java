@@ -25,8 +25,8 @@ public class RangeRaptorRequest<T extends TripScheduleInfo> {
     private final DebugRequest<T> debug;
 
 
-    static <T extends TripScheduleInfo> org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest<T> defaults() {
-        return new org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest<>();
+    static <T extends TripScheduleInfo> RangeRaptorRequest<T> defaults() {
+        return new RangeRaptorRequest<>();
     }
 
     private RangeRaptorRequest() {
@@ -141,7 +141,7 @@ public class RangeRaptorRequest<T extends TripScheduleInfo> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest<?> that = (org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest<?>) o;
+        RangeRaptorRequest<?> that = (RangeRaptorRequest<?>) o;
         return profile == that.profile &&
                 Objects.equals(searchParams, that.searchParams) &&
                 Objects.equals(mcCostParams, that.mcCostParams) &&

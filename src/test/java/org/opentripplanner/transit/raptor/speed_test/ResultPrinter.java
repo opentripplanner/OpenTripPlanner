@@ -30,7 +30,13 @@ class ResultPrinter {
         }
     }
 
-    static void printResult(String status, TestCase tc, long lapTime, boolean printItineraries, String errorDetails) {
+    private static void printResult(
+            String status,
+            TestCase tc,
+            long lapTime,
+            boolean printItineraries,
+            String errorDetails
+    ) {
         if(printItineraries || !tc.success()) {
             System.err.printf(
                     "SpeedTest %-7s  %4d ms  %-66s %s %n",
@@ -43,14 +49,15 @@ class ResultPrinter {
         }
     }
 
-    public static void logSingleTestResult(
+    static void logSingleTestResult(
             SpeedTestProfile profile,
             List<Integer> numOfPathsFound,
             int sample,
             int nSamples,
             int nSuccess,
             int tcSize,
-            String totalTimeInSeconds) {
+            String totalTimeInSeconds
+    ) {
         System.err.println(
                 "\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ SUMMARY " + profile + " ]" +
                 "\n" + String.join("\n", AvgTimer.listResults()) +
@@ -70,7 +77,7 @@ class ResultPrinter {
         result.forEach((k,v) -> printProfileResultLine(k.name(), v, labelMaxLen));
     }
 
-    static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {
+    private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {
         if(!v.isEmpty()) {
             String values = "[ " + v.stream().map(it -> String.format("%4d", it)).reduce((a, b) -> a + ", " + b).orElse("") + " ]";
             double avg = v.stream().mapToInt(it -> it).average().orElse(0d);
@@ -85,7 +92,7 @@ class ResultPrinter {
         return enable ? (String.format("%n%-20s: ", label) + String.format(formatValues, args)) : "";
     }
 
-    public static void logSingleTestHeader(SpeedTestProfile profile) {
+    static void logSingleTestHeader(SpeedTestProfile profile) {
         System.err.println("\n- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - [ START " + profile + " ]");
     }
 }

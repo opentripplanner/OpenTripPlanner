@@ -18,35 +18,46 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public class EgressAccessRouter {
     private static final Logger LOG = LoggerFactory.getLogger(EgressAccessRouter.class);
+    private static final AvgTimer TIMER_INIT = AvgTimer.timerMilliSec("EgressAccessRouter:init");
+    private static final AvgTimer TIMER_ROUTE = AvgTimer.timerMilliSec("EgressAccessRouter:route");
 
-    private static final AvgTimer TIMER = AvgTimer.timerMilliSec("EgressAccessRouter:route");
     private final TransitLayer transitLayer;
     private final Graph graph;
     private final SimpleStreetSplitter splitter;
-    private final SpeedTestRequest request;
 
     public TIntIntMap egressTimesInSecondsByStopIndex;
     public TIntIntMap accessTimesInSecondsByStopIndex;
 
-    public EgressAccessRouter(Graph graph, TransitLayer transitLayer, SpeedTestRequest request) {
-        this.graph = graph;
-        this.transitLayer = transitLayer;
-        this.request = request;
-        this.splitter = new SimpleStreetSplitter(
-                graph,
-                null,
-                null,
-                false,
-                new DataImportIssueStore(false)
-        );
+    public EgressAccessRouter(Graph graph, TransitLayer transitLayer) {
+        try {
+            TIMER_INIT.start();
+            this.graph = graph;
+            this.transitLayer = transitLayer;
+
+            this.splitter = new SimpleStreetSplitter(
+                    graph,
+                    null,
+                    null,
+                    false,
+                    new DataImportIssueStore(false)
+            );
+        }
+        catch (RuntimeException e) {
+            TIMER_INIT.failIfStarted();
+            throw e;
+        }
+        finally {
+            TIMER_INIT.stop();
+        }
     }
 
-    public void route() {
-        TIMER.time(() -> {
+    public void route(SpeedTestRequest request) {
+        TIMER_ROUTE.time(() -> {
             // Search for access to / egress from transit on streets.
             NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(
                     graph, request.getAccessEgressMaxWalkDistanceMeters(), true
@@ -73,7 +84,12 @@ public class EgressAccessRouter {
             splitter.link(vertex);
         }
 
-        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(vertex);
+        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
+                nearbyStopFinder.findNearbyStopsViaStreets(
+                        Set.of(vertex),
+                        !fromOrigin,
+                        false
+                );
 
         if(stopAtDistanceList.isEmpty()) {
             throw new RuntimeException("Point not near a road: " + place);

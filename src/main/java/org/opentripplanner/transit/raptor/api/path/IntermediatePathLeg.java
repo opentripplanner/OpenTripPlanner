@@ -50,7 +50,7 @@ public abstract class IntermediatePathLeg<T extends TripScheduleInfo> implements
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.path.IntermediatePathLeg<?> that = (org.opentripplanner.transit.raptor.api.path.IntermediatePathLeg<?>) o;
+        IntermediatePathLeg<?> that = (IntermediatePathLeg<?>) o;
         return fromStop == that.fromStop &&
                 fromTime == that.fromTime &&
                 toStop == that.toStop &&

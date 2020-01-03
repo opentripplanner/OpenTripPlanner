@@ -54,11 +54,11 @@ public enum RangeRaptorProfile {
         return abbreviation;
     }
 
-    public boolean is(org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile candidate) {
+    public boolean is(RangeRaptorProfile candidate) {
         return this == candidate;
     }
 
-    public boolean isOneOf(org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile... candidates) {
+    public boolean isOneOf(RangeRaptorProfile... candidates) {
         return Stream.of(candidates).anyMatch(this::is);
     }
 }

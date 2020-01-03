@@ -23,7 +23,7 @@ public final class ForwardPathMapper<T extends TripScheduleInfo> implements Path
     }
 
     @Override
-    public Path<T> mapToPath(final org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<T> destinationArrival) {
+    public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
         ArrivalView<T> from;
         ArrivalView<T> to;
         PathLeg<T> lastLeg;

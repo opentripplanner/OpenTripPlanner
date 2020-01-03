@@ -21,7 +21,7 @@ import java.util.Collection;
 public final class DebugStopArrivalsState<T extends TripScheduleInfo> implements StopArrivalsState<T> {
 
     private final StopArrivalsState<T> delegate;
-    private final org.opentripplanner.transit.raptor.rangeraptor.standard.debug.StateDebugger<T> debug;
+    private final StateDebugger<T> debug;
 
     /**
      * Create a Standard range raptor state for the given context
@@ -32,7 +32,7 @@ public final class DebugStopArrivalsState<T extends TripScheduleInfo> implements
             StopsCursor<T> stopsCursor,
             StopArrivalsState<T> delegate
     ) {
-        this.debug = new org.opentripplanner.transit.raptor.rangeraptor.standard.debug.StateDebugger<>(stopsCursor, roundProvider, dFactory);
+        this.debug = new StateDebugger<>(stopsCursor, roundProvider, dFactory);
         this.delegate = delegate;
     }
 

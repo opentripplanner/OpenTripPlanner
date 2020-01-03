@@ -44,11 +44,11 @@ public class ItineraryMapper {
         ItinerarySet itineraries = new ItinerarySet();
 
         for (Path<TripSchedule> p : paths) {
-            streetRouter.route();
-            //GraphPath accessPath = streetRouter.accessTimesInSecondsByStopIndex;
-            //GraphPath egressPath = streetRouter.egressTimesInSecondsByStopIndex;
-            //SpeedTestItinerary itinerary = mapper.createItinerary(p, accessPath, egressPath);
-            //itineraries.add(itinerary);
+            streetRouter.route(request);
+            // GraphPath accessPath = streetRouter.accessTimesInSecondsByStopIndex;
+            // GraphPath egressPath = streetRouter.egressTimesInSecondsByStopIndex;
+            // SpeedTestItinerary itinerary = mapper.createItinerary(p, accessPath, egressPath);
+            // itineraries.add(itinerary);
         }
         return itineraries;
     }

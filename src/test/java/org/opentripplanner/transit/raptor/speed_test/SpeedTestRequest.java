@@ -161,7 +161,7 @@ public class SpeedTestRequest {
             return;
         }
 
-        DebugLogger<TripSchedule> logger = new DebugLogger<>(debugLoggerEnabled);
+        SpeedTestDebugLogger<TripSchedule> logger = new SpeedTestDebugLogger<>(debugLoggerEnabled);
 
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)

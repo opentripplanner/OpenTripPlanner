@@ -20,7 +20,7 @@ public class McCostParamsBuilder {
         return boardCost;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.McCostParamsBuilder boardCost(int boardCost) {
+    public McCostParamsBuilder boardCost(int boardCost) {
         this.boardCost = boardCost;
         return this;
     }
@@ -29,7 +29,7 @@ public class McCostParamsBuilder {
         return walkReluctanceFactor;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.McCostParamsBuilder walkReluctanceFactor(double walkReluctanceFactor) {
+    public McCostParamsBuilder walkReluctanceFactor(double walkReluctanceFactor) {
         this.walkReluctanceFactor = walkReluctanceFactor;
         return this;
     }
@@ -38,7 +38,7 @@ public class McCostParamsBuilder {
         return waitReluctanceFactor;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
+    public McCostParamsBuilder waitReluctanceFactor(double waitReluctanceFactor) {
         this.waitReluctanceFactor = waitReluctanceFactor;
         return this;
     }
