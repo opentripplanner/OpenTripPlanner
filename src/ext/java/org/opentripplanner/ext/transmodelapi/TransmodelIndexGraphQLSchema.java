@@ -36,6 +36,7 @@ import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
@@ -1403,7 +1404,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("id")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment ->
-                                mappingUtil.toIdString(((Station) environment.getSource()).getId()))
+                                mappingUtil.toIdString(((MonoOrMultiModalStation) environment.getSource()).getId()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
@@ -1412,17 +1413,17 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("latitude")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> (((Station) environment.getSource()).getLat()))
+                        .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLat()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("longitude")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> (((Station) environment.getSource()).getLon()))
+                        .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getLon()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("description")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> (((Station) environment.getSource()).getDescription()))
+                        .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getDescription()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("wheelchairBoarding")
@@ -1458,7 +1459,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("adjacentSites")
                         .description("This stop place's adjacent sites")
                         .type(new GraphQLList(Scalars.GraphQLString))
-                        .dataFetcher(environment -> ((Station) environment.getSource()).getAdjacentSites())
+                        .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getAdjacentSites())
                         .build())
                  */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1478,7 +1479,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .defaultValue(Boolean.FALSE)
                                 .build())
                         .dataFetcher(environment -> {
-                            Collection<Stop> quays = ((Station) environment.getSource()).getChildStops();
+                            Collection<Stop> quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
                             if (Boolean.TRUE.equals(environment.getArgument("filterByInUse"))) {
                                 quays=quays.stream().filter(stop ->  !index.getPatternsForStop(stop,true).isEmpty()).collect(Collectors.toList());
                             }
@@ -1486,11 +1487,15 @@ public class TransmodelIndexGraphQLSchema {
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("parent")
-                        .description("Returns parent stop for this stop")
-                        .type(stopPlaceType)
-                        .dataFetcher(environment -> null)
-                        .build())
+                    .name("parent")
+                    .description("Returns parent stop for this stop")
+                    .type(stopPlaceType)
+                    .dataFetcher(
+                        environment -> (
+                            ((MonoOrMultiModalStation) environment.getSource())
+                                .getParentStation()
+                        ))
+                    .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("estimatedCalls")
                         .description("List of visits to this stop place as part of vehicle journeys.")
@@ -1534,7 +1539,7 @@ public class TransmodelIndexGraphQLSchema {
                             Integer departuresPerLineAndDestinationDisplay = environment.getArgument("numberOfDeparturesPerLineAndDestinationDisplay");
                             int timeRage = environment.getArgument("timeRange");
 
-                            Station station = environment.getSource();
+                            MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
 
                             Set<String> authorityIds = new HashSet();
                             Set<FeedScopedId> lineIds = new HashSet();
@@ -1554,7 +1559,7 @@ public class TransmodelIndexGraphQLSchema {
                             Long startTimeMs = environment.getArgument("startTime") == null ? 0l : environment.getArgument("startTime");
                             Long startTimeSeconds = startTimeMs / 1000;
 
-                            return station.getChildStops()
+                            return monoOrMultiModalStation.getChildStops()
                                     .stream()
                                     .flatMap(singleStop ->
                                             getTripTimesForStop(
@@ -1948,24 +1953,31 @@ public class TransmodelIndexGraphQLSchema {
                     .name("forBoarding")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether vehicle may be boarded at quay.")
-                    .dataFetcher(environment ->
-                        index.patternForTrip
+                    .dataFetcher(environment -> {
+                        if (((TripTimeShort) environment.getSource()).pickupType >= 0) {
+                            //Realtime-updated
+                            return ((TripTimeShort) environment.getSource()).pickupType != PICKDROP_NONE;
+                        }
+                        return index.patternForTrip
                             .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
-                            .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE
-                    )
+                            .getBoardType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
+                    })
                     .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("forAlighting")
                     .type(Scalars.GraphQLBoolean)
                     .description("Whether vehicle may be alighted at quay.")
-                    .dataFetcher(environment ->
-                        index.patternForTrip
+                    .dataFetcher(environment -> {
+                        if (((TripTimeShort) environment.getSource()).dropoffType >= 0) {
+                            //Realtime-updated
+                            return ((TripTimeShort) environment.getSource()).dropoffType != PICKDROP_NONE;
+                        }
+                        return index.patternForTrip
                             .get(index.tripForId.get(((TripTimeShort) environment.getSource()).tripId))
-                            .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE
+                            .getAlightType(((TripTimeShort) environment.getSource()).stopIndex) != PICKDROP_NONE;
 
-                    )
+                    })
                     .build())
-
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("requestStop")
                         .type(Scalars.GraphQLBoolean)
@@ -2029,7 +2041,7 @@ public class TransmodelIndexGraphQLSchema {
                  */
                 .build();
 
-        serviceJourneyType =serviceJourneyType = GraphQLObjectType.newObject()
+        serviceJourneyType = GraphQLObjectType.newObject()
                 .name("ServiceJourney")
                 .description("A planned vehicle journey with passengers.")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2743,9 +2755,15 @@ public class TransmodelIndexGraphQLSchema {
                         .argument(GraphQLArgument.newArgument()
                                 .name("id")
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
-                                .build())
-                        .dataFetcher(environment -> index.graph.stationById
-                                .get(mappingUtil.fromIdString(environment.getArgument("id"))))
+                                    .build())
+                        .dataFetcher(environment ->
+                            mappingUtil.getMonoOrMultiModalStation(
+                                environment.getArgument("id"),
+                                index.graph.stationById,
+                                index.graph.multiModalStationById,
+                                index.multiModalStationForStations
+                            )
+                        )
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("stopPlaces")
@@ -2759,7 +2777,12 @@ public class TransmodelIndexGraphQLSchema {
                             if ((environment.getArgument("ids") instanceof List)) {
                                 return ((List<String>) environment.getArgument("ids"))
                                         .stream()
-                                        .map(id -> index.graph.stationById.get(mappingUtil.fromIdString(id)))
+                                        .map(id -> mappingUtil.getMonoOrMultiModalStation(
+                                            id,
+                                            index.graph.stationById,
+                                            index.graph.multiModalStationById,
+                                            index.multiModalStationForStations
+                                        ))
                                         .collect(Collectors.toList());
                             }
                             return new ArrayList<>(index.graph.stationById.values());

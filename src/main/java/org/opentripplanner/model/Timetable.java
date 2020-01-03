@@ -434,19 +434,4 @@ public class Timetable implements Serializable {
             tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }
     }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        Timetable timetable = (Timetable) o;
-        return Objects.equals(pattern, timetable.pattern) && Objects.equals(serviceDate,
-            timetable.serviceDate
-        );
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(pattern, serviceDate);
-    }
 }

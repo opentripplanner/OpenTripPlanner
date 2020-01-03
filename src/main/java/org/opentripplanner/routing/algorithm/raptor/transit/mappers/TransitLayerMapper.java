@@ -60,7 +60,8 @@ public class TransitLayerMapper {
         return new TransitLayer(
             tripPatternsByStopByDate,
             transferByStopIndex,
-            stopIndex
+            stopIndex,
+            graph.getTimeZone().toZoneId()
         );
     }
 

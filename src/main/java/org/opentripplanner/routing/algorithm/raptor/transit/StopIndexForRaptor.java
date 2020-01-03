@@ -23,11 +23,11 @@ import java.util.Map;
  * stored in the {@link TransitLayer}.
  */
 public class StopIndexForRaptor {
-    public final List<Stop> stops;
+    public final List<Stop> stopsByIndex;
     public final Map<Stop, Integer> indexByStop = new HashMap<>();
 
     public StopIndexForRaptor(Collection<Stop> stops) {
-        this.stops = new ArrayList<>(stops);
+        this.stopsByIndex = new ArrayList<>(stops);
         initializeIndexByStop();
     }
 
@@ -35,8 +35,8 @@ public class StopIndexForRaptor {
      * Create map between stop and index used by Raptor to stop objects in original graph
      */
     void initializeIndexByStop() {
-        for(int i = 0; i< stops.size(); ++i) {
-            indexByStop.put(stops.get(i), i);
+        for(int i = 0; i< stopsByIndex.size(); ++i) {
+            indexByStop.put(stopsByIndex.get(i), i);
         }
     }
 

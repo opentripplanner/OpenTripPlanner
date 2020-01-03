@@ -47,7 +47,7 @@ public class TripPattern {
     }
 
     /**
-     * See {@link com.conveyal.r5.otp2.api.transit.TripPatternInfo#stopIndex(int)}
+     * See {@link org.opentripplanner.transit.raptor.api.transit.TripPatternInfo#stopIndex(int)}
      */
     public int stopIndex(int stopPositionInPattern) {
         return stopIndexes[stopPositionInPattern];

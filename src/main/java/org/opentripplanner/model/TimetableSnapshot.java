@@ -191,10 +191,10 @@ public class TimetableSnapshot {
             tt = new Timetable(tt, serviceDate);
             SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
             if(sortedTimetables == null) {
-                sortedTimetables = new TreeSet<Timetable>(new SortedTimetableComparator());
+                sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
             } else {
-                SortedSet<Timetable> temp;
-                temp = new TreeSet<Timetable>(new SortedTimetableComparator());
+                SortedSet<Timetable> temp =
+                    new TreeSet<>(new SortedTimetableComparator());
                 temp.addAll(sortedTimetables);
                 sortedTimetables = temp;
             }
