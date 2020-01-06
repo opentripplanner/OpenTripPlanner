@@ -31,6 +31,19 @@ public class TransitLayer {
 
   private final ZoneId transitDataZoneId;
 
+  /**
+   * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
+   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
+   * entire keys and their values in the map.
+   */
+  public TransitLayer(TransitLayer transitLayer) {
+    this(
+        transitLayer.tripPatternsForDate,
+        transitLayer.transferByStopIndex,
+        transitLayer.stopIndex,
+        transitLayer.transitDataZoneId
+    );
+  }
 
   public TransitLayer(
       Map<LocalDate,

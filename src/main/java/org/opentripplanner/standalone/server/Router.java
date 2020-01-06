@@ -9,6 +9,7 @@ import ch.qos.logback.core.FileAppender;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.reflect.ReflectiveInitializer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -137,8 +138,7 @@ public class Router {
         LOG.info("Creating transit layer for Raptor routing.");
         if (graph.hasTransit && graph.index != null) {
             graph.transitLayer = TransitLayerMapper.map(graph);
-            // TODO Clone instead of map twice
-            graph.realtimeTransitLayer = TransitLayerMapper.map(graph);
+            graph.realtimeTransitLayer = new TransitLayer(graph.transitLayer);
             graph.transitLayerUpdater = new TransitLayerUpdater(
                 graph.realtimeTransitLayer,
                 graph.index.getServiceCodesRunningForDate()
