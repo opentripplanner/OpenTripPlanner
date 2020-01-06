@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.server;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
@@ -48,7 +48,7 @@ public class OTPApplication extends Application {
      * @param server The OTP server to wrap
      * @param secure Should this server require authentication over HTTPS to access secure resources, e.g. /routers?
      */
-    OTPApplication (OTPServer server, boolean secure) {
+    public OTPApplication (OTPServer server, boolean secure) {
         this.server = server;
         this.secure = secure;
     }

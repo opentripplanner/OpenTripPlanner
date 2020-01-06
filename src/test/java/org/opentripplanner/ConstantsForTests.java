@@ -14,8 +14,8 @@ import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.GraphBuilderParameters;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 
 import java.io.File;

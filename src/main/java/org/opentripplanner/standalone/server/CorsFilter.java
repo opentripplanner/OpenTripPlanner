@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.server;
 
 import java.io.IOException;
 

@@ -1,7 +1,6 @@
 package org.opentripplanner.graph_builder;
 
 import com.google.common.collect.Lists;
-import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
@@ -22,9 +21,9 @@ import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFacto
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.S3BucketConfig;
+import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.config.GraphBuilderParameters;
+import org.opentripplanner.standalone.config.S3BucketConfig;
 import org.opentripplanner.standalone.config.GraphConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;

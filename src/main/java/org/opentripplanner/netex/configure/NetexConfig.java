@@ -3,8 +3,8 @@ package org.opentripplanner.netex.configure;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.netex.loader.NetexZipFileHierarchy;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.NetexParameters;
+import org.opentripplanner.standalone.config.GraphBuilderParameters;
+import org.opentripplanner.standalone.config.NetexParameters;
 
 import java.io.File;
 import java.util.ArrayList;
