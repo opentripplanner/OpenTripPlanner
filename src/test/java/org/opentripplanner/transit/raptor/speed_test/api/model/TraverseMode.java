@@ -14,17 +14,17 @@ public enum TraverseMode {
     TRANSIT, LEG_SWITCH,
     AIRPLANE, CAR_PARK, CAR_PICKUP;
 
-    private static HashMap<Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode>, Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode>> setMap =
-            new HashMap<Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode>, Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode>>();
+    private static HashMap<Set<TraverseMode>, Set<TraverseMode>> setMap =
+            new HashMap<Set<TraverseMode>, Set<TraverseMode>>();
 
-    public static Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode> internSet (Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode> modeSet) {
+    public static Set<TraverseMode> internSet (Set<TraverseMode> modeSet) {
         if (modeSet == null)
             return null;
-        Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode> ret = setMap.get(modeSet);
+        Set<TraverseMode> ret = setMap.get(modeSet);
         if (ret == null) {
-            EnumSet<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode> backingSet = EnumSet.noneOf(org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode.class);
+            EnumSet<TraverseMode> backingSet = EnumSet.noneOf(TraverseMode.class);
             backingSet.addAll(modeSet);
-            Set<org.opentripplanner.transit.raptor.speed_test.api.model.TraverseMode> unmodifiableSet = Collections.unmodifiableSet(backingSet);
+            Set<TraverseMode> unmodifiableSet = Collections.unmodifiableSet(backingSet);
             setMap.put(unmodifiableSet, unmodifiableSet);
             ret = unmodifiableSet;
         }

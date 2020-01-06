@@ -65,8 +65,8 @@ public class SearchParams {
         this.egressLegs = Collections.unmodifiableList(new ArrayList<>(builder.egressLegs()));
     }
 
-    static org.opentripplanner.transit.raptor.api.request.SearchParams defaults() {
-        return new org.opentripplanner.transit.raptor.api.request.SearchParams();
+    static SearchParams defaults() {
+        return new SearchParams();
     }
 
     /**
@@ -255,7 +255,7 @@ public class SearchParams {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.request.SearchParams that = (org.opentripplanner.transit.raptor.api.request.SearchParams) o;
+        SearchParams that = (SearchParams) o;
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&
                 searchWindowInSeconds == that.searchWindowInSeconds &&

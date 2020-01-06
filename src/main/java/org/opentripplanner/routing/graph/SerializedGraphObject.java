@@ -27,7 +27,7 @@ import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * This is the class that get serialized/deserialized into/from the file <em>Graph.obj</em>.
+ * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
  * The Graph object does not contain a collection of edges. The set of edges is generated on demand
  * from the vertices. However, when serializing, we intentionally do not serialize the vertices'

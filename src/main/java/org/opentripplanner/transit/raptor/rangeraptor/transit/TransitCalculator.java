@@ -188,9 +188,9 @@ public interface TransitCalculator {
      * </ul>
      * @param forward if true create a calculator for forward search, if false search
      */
-    static org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator testDummyCalculator(int boardSlackInSeconds, boolean forward) {
+    static TransitCalculator testDummyCalculator(int boardSlackInSeconds, boolean forward) {
         return forward
-                ? new org.opentripplanner.transit.raptor.rangeraptor.transit.ForwardSearchTransitCalculator(
+                ? new ForwardSearchTransitCalculator(
                         10,
                         boardSlackInSeconds,
                         hm2time(8,0),
@@ -198,7 +198,7 @@ public interface TransitCalculator {
                         -1,
                         60
                 )
-                : new org.opentripplanner.transit.raptor.rangeraptor.transit.ReverseSearchTransitCalculator(
+                : new ReverseSearchTransitCalculator(
                         10,
                         boardSlackInSeconds,
                         hm2time(8,0),

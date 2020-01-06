@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.slf4j.Logger;

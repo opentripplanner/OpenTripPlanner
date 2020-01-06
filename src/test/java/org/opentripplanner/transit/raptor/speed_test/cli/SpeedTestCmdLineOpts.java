@@ -31,16 +31,17 @@ public class SpeedTestCmdLineOpts extends CommandLineOpts {
     }
 
     public int numOfItineraries() {
-        return Integer.valueOf(cmd.getOptionValue(NUM_OF_ITINERARIES, "3"));
+        return Integer.parseInt(cmd.getOptionValue(NUM_OF_ITINERARIES, "3"));
     }
 
     public int numberOfTestsSamplesToRun() {
-        int dftLen = compareHeuristics() ? profiles().length - 1 : profiles().length;
-        return Integer.valueOf(cmd.getOptionValue(SAMPLE_TEST_N_TIMES, Integer.toString(dftLen)));
+        int dftLen = profiles().length - (compareHeuristics() ? 1 : 0);
+        String dftLenAsStr = Integer.toString(dftLen);
+        return Integer.parseInt(cmd.getOptionValue(SAMPLE_TEST_N_TIMES, dftLenAsStr));
     }
 
     public int numOfExtraTransfers() {
-        return Integer.valueOf(cmd.getOptionValue(NUM_OF_ADD_TRANSFERS, "5"));
+        return Integer.parseInt(cmd.getOptionValue(NUM_OF_ADD_TRANSFERS, "5"));
     }
 
     public SpeedTestProfile[] profiles() {

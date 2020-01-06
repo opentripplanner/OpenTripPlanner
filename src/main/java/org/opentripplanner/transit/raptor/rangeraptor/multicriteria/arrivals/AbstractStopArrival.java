@@ -12,16 +12,16 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  */
 public abstract class AbstractStopArrival<T extends TripScheduleInfo> implements ArrivalView<T> {
 
-    public static <T extends TripScheduleInfo> ParetoComparator<org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
+    public static <T extends TripScheduleInfo> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
         // This is important with respect to performance. Using logical OR(||) is faster than boolean OR(|)
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival<T>> compareArrivalTimeAndRound() {
+    public static <T extends TripScheduleInfo> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
     }
 
-    private final org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival<T> previous;
+    private final AbstractStopArrival<T> previous;
 
     /**
      * We want transits to dominate transfers so we increment the round not only between RangeRaptor rounds,
@@ -50,7 +50,7 @@ public abstract class AbstractStopArrival<T extends TripScheduleInfo> implements
      * @param travelDuration the time duration is seconds for the entire trip found
      * @param additionalCost the accumulated cost at this stop arrival
      */
-    AbstractStopArrival(org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival<T> previous, int stop, int departureTime, int arrivalTime, int travelDuration, int additionalCost) {
+    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int departureTime, int arrivalTime, int travelDuration, int additionalCost) {
         this.previous = previous;
         this.paretoRound = previous.paretoRound + (isTransitFollowedByTransit() ? 2 : 1);
         this.stop = stop;
@@ -106,7 +106,7 @@ public abstract class AbstractStopArrival<T extends TripScheduleInfo> implements
     }
 
     @Override
-    public final org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival<T> previous() {
+    public final AbstractStopArrival<T> previous() {
         return previous;
     }
 

@@ -1,14 +1,15 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.graph_builder.GraphBuilder;
-import org.opentripplanner.routing.impl.GraphLoader;
-import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.OTPConfiguration;
+import org.opentripplanner.standalone.server.GrizzlyServer;
+import org.opentripplanner.standalone.server.OTPApplication;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.OTPFeature;
-import org.opentripplanner.visualizer.GraphVisualizer;
 
 import javax.ws.rs.core.Application;
-import java.io.File;
 
 /**
  * This class is responsible for creating the top level services like {@link OTPConfiguration}
@@ -47,14 +48,14 @@ public class OTPAppConstruction {
      * Create a new Grizzly server - call this method once, the new instance is created
      * every time this method is called.
      */
-    GrizzlyServer createGrizzlyServer() {
+    public GrizzlyServer createGrizzlyServer() {
         return new GrizzlyServer(commandLineParameters, createApplication());
     }
 
     /**
      * Create the default graph builder.
      */
-    GraphBuilder createDefaultGraphBuilder() {
+    public GraphBuilder createDefaultGraphBuilder() {
         return GraphBuilder.create(
                 commandLineParameters,
                 configuration().getGraphConfig(commandLineParameters.getGraphDirectory())

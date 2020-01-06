@@ -15,7 +15,7 @@ import java.util.regex.Pattern;
  * This class is responsible for holding information about a test result - a single
  * itinerary. The result can be expected or actual, both represented by this class.
  */
-class Result implements Comparable<org.opentripplanner.transit.raptor.speed_test.testcase.Result> {
+class Result implements Comparable<Result> {
     private static final Pattern STOPS_PATTERN = Pattern.compile(" - (\\d+) - ");
     /**
      * The status is not final; This allows to update the status when matching expected and actual results.
@@ -51,7 +51,7 @@ class Result implements Comparable<org.opentripplanner.transit.raptor.speed_test
     }
 
     @Override
-    public int compareTo(org.opentripplanner.transit.raptor.speed_test.testcase.Result o) {
+    public int compareTo(Result o) {
         // Sort first arrival first
         int res = endTime.compareTo(o.endTime);
         if(res == 0) {
@@ -72,7 +72,7 @@ class Result implements Comparable<org.opentripplanner.transit.raptor.speed_test
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.speed_test.testcase.Result result = (org.opentripplanner.transit.raptor.speed_test.testcase.Result) o;
+        Result result = (Result) o;
         return Objects.equals(startTime, result.startTime) &&
                 Objects.equals(endTime, result.endTime) &&
                 Objects.equals(cost, result.cost) &&

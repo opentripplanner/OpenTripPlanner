@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
-import org.opentripplanner.transit.raptor.speed_test.cli.CommandLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
@@ -25,7 +24,6 @@ import org.opentripplanner.transit.raptor.util.AvgTimer;
 import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -49,10 +47,11 @@ public class SpeedTest {
     private final AvgTimer TIMER_WORKER = AvgTimer.timerMilliSec("SpeedTest:route Worker");
     private final AvgTimer TIMER_COLLECT_RESULTS = AvgTimer.timerMilliSec("SpeedTest: Collect Results");
 
-    private CommandLineOpts opts;
+    private final SpeedTestCmdLineOpts opts;
     private int nAdditionalTransfers;
     private SpeedTestProfile routeProfile;
     private SpeedTestProfile heuristicProfile;
+    private final EgressAccessRouter streetRouter;
     private List<Integer> numOfPathsFound = new ArrayList<>();
     private Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
     private Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
@@ -63,41 +62,46 @@ public class SpeedTest {
     private RangeRaptorService<TripSchedule> service;
 
 
-    private SpeedTest(Graph graph, CommandLineOpts opts) {
+    private SpeedTest(Graph graph, SpeedTestCmdLineOpts opts) {
         this.graph = graph;
         this.opts = opts;
         this.transitLayer = TransitLayerMapper.map(graph);
+        this.streetRouter = new EgressAccessRouter(graph, transitLayer);
+        this.nAdditionalTransfers = opts.numOfExtraTransfers();
+
+        // Init Raptor Service
+        this.service = new RangeRaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
     }
 
     public static void main(String[] args) throws Exception {
-        AvgTimer.NOOP = false;
+        // Given the following setup
+        AvgTimer.enableTimers(true);
         SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
         Graph graph = GraphLoader.loadGraph(new File(opts.rootDir(), "Graph.obj"));
-        new SpeedTest(graph, opts).runTest();
+
+        // create a new test
+        SpeedTest speedTest = new SpeedTest(graph, opts);
+
+        // and run it
+        speedTest.runTest();
     }
 
     private void runTest() throws Exception {
-        final SpeedTestCmdLineOpts opts = (SpeedTestCmdLineOpts) this.opts;
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
-        nAdditionalTransfers = opts.numOfExtraTransfers();
-        service = new RangeRaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
-        boolean skipFirstProfile;
 
         initProfileStatistics();
 
-        skipFirstProfile = opts.compareHeuristics();
-
         for (int i = 0; i < nSamples; ++i) {
-            setupSingleTest(speedTestProfiles, i, nSamples, skipFirstProfile);
-            runSingleTest(opts, i+1, nSamples);
+            setupSingleTest(speedTestProfiles, i, nSamples);
+            runSingleTest(i+1, nSamples);
         }
         printProfileStatistics();
 
         service.shutdown();
     }
 
-    private void runSingleTest(SpeedTestCmdLineOpts opts, int sample, int nSamples) throws Exception {
+    private void runSingleTest(int sample, int nSamples) throws Exception {
         CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
         List<TestCase> testCases = tcIO.readTestCasesFromFile();
         List<TripPlan> tripPlans = new ArrayList<>();
@@ -110,20 +114,23 @@ public class SpeedTest {
         forceGCToAvoidGCLater();
 
         List<String> testCaseIds = opts.testCases();
-        boolean limitTestCases = !testCaseIds.isEmpty();
-        List<TestCase> testCasesToRun = limitTestCases
-                ? testCases.stream().filter(it -> testCaseIds.contains(it.id)).collect(Collectors.toList())
-                : testCases;
+        List<TestCase> testCasesToRun;
 
-        if (!limitTestCases) {
-            // Warm up JIT compiler by running one of the longer searches
-            runSingleTestCase(tripPlans, testCases.get(1), opts, true);
+        if(testCaseIds.isEmpty()) {
+            testCasesToRun = testCases;
         }
-        ResultPrinter.logSingleTestHeader(routeProfile);
+        else {
+            testCasesToRun = testCases.stream().filter(it -> testCaseIds.contains(it.id)).collect(Collectors.toList());
+        }
 
+        // Warm up JIT compiler
+        runSingleTestCase(tripPlans, testCases.get(1), true);
+
+        ResultPrinter.logSingleTestHeader(routeProfile);
         AvgTimer.resetAll();
+
         for (TestCase testCase : testCasesToRun) {
-            nSuccess += runSingleTestCase(tripPlans, testCase, opts, false) ? 1 : 0;
+            nSuccess += runSingleTestCase(tripPlans, testCase, false) ? 1 : 0;
         }
 
         int tcSize = testCasesToRun.size();
@@ -143,14 +150,13 @@ public class SpeedTest {
     }
 
     private void initProfileStatistics() {
-        for (SpeedTestProfile key : SpeedTestProfile.values()) {
+        for (SpeedTestProfile key : opts.profiles()) {
             workerResults.put(key, new ArrayList<>());
             totalResults.put(key, new ArrayList<>());
         }
     }
 
-
-    private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, SpeedTestCmdLineOpts opts, boolean ignoreResults) {
+    private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
         try {
             final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, getTimeZoneId());
 
@@ -185,8 +191,7 @@ public class SpeedTest {
     public TripPlan route(SpeedTestRequest request, int latestArrivalTime) {
         try {
             Collection<Path<TripSchedule>> paths;
-            EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, request);
-            streetRouter.route();
+            streetRouter.route(request);
 
             // -------------------------------------------------------- [ WORKER ROUTE ]
 
@@ -223,8 +228,7 @@ public class SpeedTest {
     }
 
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
-        EgressAccessRouter streetRouter = new EgressAccessRouter(graph, transitLayer, heurReq);
-        streetRouter.route();
+        streetRouter.route(heurReq);
         TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
         int latestArrivalTime = routeReq.getArrivalTime();
 
@@ -240,13 +244,19 @@ public class SpeedTest {
         TIMER_WORKER.stop();
     }
 
-    private void setupSingleTest(SpeedTestProfile[] profilesToRun, int sample, int nSamples, boolean skipFirstProfile) {
-        if (skipFirstProfile) {
+    private void setupSingleTest(
+            SpeedTestProfile[] profilesToRun,
+            int sample,
+            int nSamples
+    ) {
+        if (opts.compareHeuristics()) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
         } else {
+            heuristicProfile = null;
             routeProfile = profilesToRun[sample % profilesToRun.length];
         }
+
         // Enable flag to test the effect of counting down the number of additional transfers limit
         if (TEST_NUM_OF_ADDITIONAL_TRANSFERS) {
             // sample start at 1 .. nSamples(inclusive)
@@ -296,7 +306,6 @@ public class SpeedTest {
     }
 
     private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
-        ZonedDateTime startOfTime = request.getDepartureDateWithZone();
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),

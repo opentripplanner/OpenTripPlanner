@@ -28,11 +28,11 @@ class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMark
     /**
      * Create a stop arrivals pareto set and attach a debugger is handler exist.
      */
-    static <T extends TripScheduleInfo> org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivalParetoSet<T> createStopArrivalSet(
+    static <T extends TripScheduleInfo> StopArrivalParetoSet<T> createStopArrivalSet(
             int stop,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
-        return new org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivalParetoSet<>(debugHandlerFactory.paretoSetStopArrivalListener(stop));
+        return new StopArrivalParetoSet<>(debugHandlerFactory.paretoSetStopArrivalListener(stop));
     }
 
     /**
@@ -40,7 +40,7 @@ class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMark
      * attach a {@link CalculateTransferToDestination} listener witch will create
      * new destination arrivals for each accepted egress stop arrival.
      */
-    static <T extends TripScheduleInfo> org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivalParetoSet<T> createEgressStopArrivalSet(
+    static <T extends TripScheduleInfo> StopArrivalParetoSet<T> createEgressStopArrivalSet(
             TransferLeg egressLeg,
             CostCalculator costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,
@@ -56,6 +56,6 @@ class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMark
             listener = new ParetoSetEventListenerComposite<>(debugListener, listener);
         }
 
-        return new org.opentripplanner.transit.raptor.rangeraptor.multicriteria.StopArrivalParetoSet<>(listener);
+        return new StopArrivalParetoSet<>(listener);
     }
 }

@@ -27,10 +27,10 @@ public final class Path<T extends TripScheduleInfo> {
      * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
      * creating the hole path.
      */
-    public static <T extends TripScheduleInfo> org.opentripplanner.transit.raptor.api.path.Path<T> dummyPath(
+    public static <T extends TripScheduleInfo> Path<T> dummyPath(
             int startTime, int endTime, int numberOfTransfers, int cost
     ) {
-        return new org.opentripplanner.transit.raptor.api.path.Path<>(startTime, endTime, numberOfTransfers, cost);
+        return new Path<>(startTime, endTime, numberOfTransfers, cost);
     }
 
     /** @see #dummyPath(int, int, int, int) */
@@ -153,7 +153,7 @@ public final class Path<T extends TripScheduleInfo> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.path.Path<?> path = (org.opentripplanner.transit.raptor.api.path.Path<?>) o;
+        Path<?> path = (Path<?>) o;
         return startTime == path.startTime &&
                 endTime == path.endTime &&
                 numberOfTransfers == path.numberOfTransfers &&

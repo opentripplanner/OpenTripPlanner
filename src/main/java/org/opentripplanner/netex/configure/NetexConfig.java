@@ -3,8 +3,8 @@ package org.opentripplanner.netex.configure;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.netex.loader.NetexZipFileHierarchy;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.NetexParameters;
+import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.NetexParameters;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,23 +18,23 @@ import java.util.List;
  * <p>
  * This class inject the build configuration. This way none of the other
  * classes in the `org.opentripplanner.netex` have dependencies to the
- * {@link GraphBuilderParameters}.
+ * {@link GraphBuildParameters}.
  * <p>
  * The naming convention used is close to the defacto standard used by Spring.
  */
 public class NetexConfig {
 
-    private final GraphBuilderParameters builderParams;
+    private final GraphBuildParameters builderParams;
 
-    private NetexConfig(GraphBuilderParameters builderParams) {
+    private NetexConfig(GraphBuildParameters builderParams) {
         this.builderParams = builderParams;
     }
 
-    public static NetexModule netexModule(GraphBuilderParameters builderParams, List<File> netexFiles) {
+    public static NetexModule netexModule(GraphBuildParameters builderParams, List<File> netexFiles) {
         return new NetexConfig(builderParams).netexModule(netexFiles);
     }
 
-    public static NetexBundle netexBundleForTest(GraphBuilderParameters builderParams, File netexZipFile) {
+    public static NetexBundle netexBundleForTest(GraphBuildParameters builderParams, File netexZipFile) {
         return new NetexConfig(builderParams).netexBundle(netexZipFile);
     }
 

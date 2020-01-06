@@ -38,14 +38,14 @@ public enum Optimization {
     PARETO_CHECK_AGAINST_DESTINATION;
 
 
-    public boolean is(org.opentripplanner.transit.raptor.api.request.Optimization other) {
+    public boolean is(Optimization other) {
         return this == other;
     }
 
     /**
      * Is this in the given collection?
      */
-    public boolean isOneOf(Collection<org.opentripplanner.transit.raptor.api.request.Optimization> others) {
+    public boolean isOneOf(Collection<Optimization> others) {
         return others.stream().anyMatch(this::is);
     }
 }

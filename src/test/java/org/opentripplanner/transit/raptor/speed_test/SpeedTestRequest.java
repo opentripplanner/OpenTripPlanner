@@ -21,7 +21,6 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
-import java.util.EnumSet;
 import java.util.List;
 import java.util.function.Consumer;
 
@@ -68,22 +67,24 @@ public class SpeedTestRequest {
                         + testCase.departureTime * 1000
         );
     }
+
     ZonedDateTime getDepartureDateWithZone() {
         return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
     }
+
     public int getArrivalTime() {
         return testCase.arrivalTime;
     }
+
     TraverseModeSet getTransitModes() {
         return new TraverseModeSet(TraverseMode.BUS, TraverseMode.RAIL, TraverseMode.SUBWAY, TraverseMode.TRAM);
     }
-    public EnumSet<TraverseMode> getAccessEgressModes() {
-        return EnumSet.of(TraverseMode.WALK);
-    }
+
     double getWalkSpeedMeterPrSecond() {
         // 1.4 m/s = ~ 5.0 km/t
         return 1.4;
     }
+
     public double getAccessEgressMaxWalkDistanceMeters() {
         return 300;
     }
@@ -125,8 +126,8 @@ public class SpeedTestRequest {
 
         builder.searchDirection(profile.forward);
 
-        addAccessEgressStopArrivals(streetRouter.accessTimesInSecondsByStopIndex, builder.searchParams()::addAccessStop);
-        addAccessEgressStopArrivals(streetRouter.egressTimesInSecondsByStopIndex, builder.searchParams()::addEgressStop);
+        addAccessEgressStopArrivals(streetRouter.getAccessTimesInSecondsByStopIndex(), builder.searchParams()::addAccessStop);
+        addAccessEgressStopArrivals(streetRouter.getEgressTimesInSecondsByStopIndex(), builder.searchParams()::addEgressStop);
 
         addDebugOptions(builder, opts);
 
@@ -161,7 +162,7 @@ public class SpeedTestRequest {
             return;
         }
 
-        DebugLogger<TripSchedule> logger = new DebugLogger<>(debugLoggerEnabled);
+        SpeedTestDebugLogger<TripSchedule> logger = new SpeedTestDebugLogger<>(debugLoggerEnabled);
 
         builder.debug()
                 .stopArrivalListener(logger::stopArrivalLister)

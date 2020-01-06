@@ -39,7 +39,7 @@ public class HeuristicSearch<T extends TripScheduleInfo> implements Worker<T> {
      * are added and if the sum is better than the given maxNumberOfTransferLimit, the flag in
      * the returned bit set is enabled.
      */
-    public BitSet stopFilter(org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch<T> other, final int numberOfAdditionalTransfers) {
+    public BitSet stopFilter(HeuristicSearch<T> other, final int numberOfAdditionalTransfers) {
         int maxNumberOfTransferLimit = numberOfAdditionalTransfers + heuristics.bestOverallJourneyNumOfTransfers();
         Heuristics h2 = other.heuristics();
         int n = heuristics.size();

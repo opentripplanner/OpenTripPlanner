@@ -15,7 +15,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.Router;
 
 import java.util.Calendar;
 import java.util.List;

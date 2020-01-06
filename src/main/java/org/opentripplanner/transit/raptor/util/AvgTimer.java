@@ -4,7 +4,6 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Random;
 import java.util.function.Function;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
@@ -20,24 +19,21 @@ import java.util.stream.Stream;
  *       AvgTimer:main t2      |   45   699  388 ms     55   21,4 s |    0 ms      0    0,0 s
  *       AvgTimer:main t3      |    4   692  375 ms    110   41,3 s |    0 ms      0    0,0 s
  * </pre>
- *
- * See the {@link #main(String[])} for usage and example code.
  */
 public abstract class AvgTimer {
-    public static boolean NOOP = true;
+    private static boolean NOOP = true;
     private static final String RESULT_TABLE_TITLE = "METHOD CALLS DURATION";
-    //    private static final Logger LOG = LoggerFactory.getLogger(AvgTimer.class);
 
     /**
      * Keep a list of methods in the order they are added, so that we can list all timers in the same
      * order for printing at the end of the program. This more or less will resemble the call stack.
      */
     private static List<String> methods = new ArrayList<>();
-    private static Map<String, org.opentripplanner.transit.raptor.util.AvgTimer> allTimers = new HashMap<>();
+    private static Map<String, AvgTimer> allTimers = new HashMap<>();
 
 
     protected final String method;
-    protected long startTime = 0;
+    private long startTime = 0;
     private long lapTime = 0;
     private long minTime = Long.MAX_VALUE;
     private long maxTime = -1;
@@ -47,34 +43,44 @@ public abstract class AvgTimer {
     private int counterFailed = 0;
 
 
-    /**
-     * @param method Use: <SimpleClassName>::<methodName>
-     */
     private AvgTimer(String method) {
         this.method = method;
     }
 
     /**
-     * @param method Use: <SimpleClassName>::<methodName>
+     * @param method Use: <SimpleClassName>:<methodName>
      */
-    public static org.opentripplanner.transit.raptor.util.AvgTimer timerMilliSec(final String method) {
-        return timer(method, NOOP ? AvgTimerNoop::new : AvgTimerMilliSec::new);
+    public static AvgTimer timerMilliSec(final String method) {
+        return timer(method, AvgTimerMilliSec::new);
     }
 
     /**
-     * @param method Use: <SimpleClassName>::<methodName>
+     * @param method Use: <SimpleClassName>:<methodName>
      */
-    public static org.opentripplanner.transit.raptor.util.AvgTimer timerMicroSec(final String method) {
-        return timer(method, NOOP ? AvgTimerNoop::new : AvgTimerMicroSec::new);
+    public static AvgTimer timerMicroSec(final String method) {
+        return timer(method, AvgTimerMicroSec::new);
     }
 
-    private static org.opentripplanner.transit.raptor.util.AvgTimer timer(final String method, final Function<String, ? extends org.opentripplanner.transit.raptor.util.AvgTimer> factory) {
+    /**
+     * This method MUST be called by the main() method BEFORE any timers are created. {@link
+     * AvgTimer}s are normally created when a class is loaded by the classloader; Hence to turn on
+     * performance timers, this method must be called before the class is loaded.
+     * <p>
+     * Performance Timers are off by default, use this method to enable the timers(turn it on).
+     * <p>
+     * If NOT enabled a NO-OP timer is used. The JIT compiler will inline the empty (no-op) methods
+     * with no overhead to the performance.
+     */
+    public static void enableTimers(boolean enable) {
+        NOOP = !enable;
+    }
+
+    private static AvgTimer timer(final String method, final Function<String, ? extends AvgTimer> factory) {
         return allTimers.computeIfAbsent(method, methid -> {
             methods.add(methid);
-            return factory.apply(methid);
+            return NOOP ? new NoopAvgTimer(method) : factory.apply(methid);
         });
     }
-
 
     public static List<String> listResults() {
         final int width = Math.max(
@@ -85,7 +91,7 @@ public abstract class AvgTimer {
         result.add(header1(width));
         result.add(header2(width));
         for (String method : methods) {
-            org.opentripplanner.transit.raptor.util.AvgTimer timer = allTimers.get(method);
+            AvgTimer timer = allTimers.get(method);
             if(timer.used()) {
                 result.add(timer.toString(width));
             }
@@ -98,7 +104,7 @@ public abstract class AvgTimer {
      * you may call this method after the warm up is done.
      */
     public static void resetAll() {
-        allTimers().forEach(org.opentripplanner.transit.raptor.util.AvgTimer::reset);
+        allTimers().forEach(AvgTimer::reset);
     }
 
     private void reset() {
@@ -193,7 +199,7 @@ public abstract class AvgTimer {
         );
     }
 
-    private static Stream<org.opentripplanner.transit.raptor.util.AvgTimer> allTimers() {
+    private static Stream<AvgTimer> allTimers() {
         return allTimers.values().stream();
     }
 
@@ -227,7 +233,7 @@ public abstract class AvgTimer {
     }
 
     private String str(long value) {
-        return value < 10_000 ? Long.toString(value) : Long.toString(value/1000) + "'";
+        return value < 10_000 ? Long.toString(value) : (value/1000) + "'";
     }
 
 
@@ -261,7 +267,7 @@ public abstract class AvgTimer {
     abstract String toSec(long time);
 
 
-    public static final class AvgTimerMilliSec extends org.opentripplanner.transit.raptor.util.AvgTimer {
+    public static final class AvgTimerMilliSec extends AvgTimer {
         private AvgTimerMilliSec(String method) {
             super(method);
         }
@@ -282,7 +288,7 @@ public abstract class AvgTimer {
         }
     }
 
-    public static final class AvgTimerMicroSec extends org.opentripplanner.transit.raptor.util.AvgTimer {
+    public static final class AvgTimerMicroSec extends AvgTimer {
         private AvgTimerMicroSec(String method) {
             super(method);
         }
@@ -303,94 +309,16 @@ public abstract class AvgTimer {
         }
     }
 
-    private static final class AvgTimerTest extends org.opentripplanner.transit.raptor.util.AvgTimer {
-        private static Random rnd = new Random(57);
-        private static long previousTime = 1_000_000;
-
-        private AvgTimerTest(String method) {
-            super(method);
-        }
-
-        @Override
-        long currentTime() {
-            previousTime += rnd.nextInt(700) + 3L;
-            return previousTime;
-        }
-
-        @Override
-        String unit() {
-            return "ms";
-        }
-
-        @Override
-        String toSec(long time) {
-            return String.format("%6.2f", time / 1000d);
-        }
-    }
-
-    private static final class AvgTimerNoop extends org.opentripplanner.transit.raptor.util.AvgTimer {
-        private AvgTimerNoop(String method) {
-            super(method);
-        }
-        @Override
-        public void start() { }
-        @Override
-        public void stop() { }
-        @Override
-        public void failIfStarted() { }
-        @Override
-        public void time(Runnable body) { body.run(); }
-        @Override
-        public <T> T timeAndReturn(Supplier<T> body) { return body.get();  }
-        @Override
-        public long lapTime() {
-            return 0;
-        }
-        @Override
-        long currentTime() { return 0; }
-        @Override
-        String unit() {
-            return "ms";
-        }
-        @Override
-        String toSec(long time) {
-            return "0";
-        }
-    }
-
-    public static void main(String[] args) {
-        // Change the #time() function to return a random time
-
-        org.opentripplanner.transit.raptor.util.AvgTimer t1 = timer("AvgTimer:main t1", AvgTimerTest::new);
-        org.opentripplanner.transit.raptor.util.AvgTimer t2 = timer("AvgTimer:main t2", AvgTimerTest::new);
-        org.opentripplanner.transit.raptor.util.AvgTimer t3 = timer("AvgTimer:main t3", AvgTimerTest::new);
-
-        for (int i = 0; i < 55; i++) {
-            final int counter = i;
-            try {
-                t1.time(() -> {
-                    t2.start();
-                    // Do something here
-                    t2.stop();
-
-                    int sum = t3.timeAndReturn(
-                            // Calculate something here
-                            () -> counter * 7
-                    );
-
-                    sum += t3.timeAndReturn(() -> counter * 13);
-
-                    if (counter % 10 == 5) {
-                        throw new IllegalStateException("Ex");
-                    }
-                });
-            } catch (Exception e) {
-                System.out.print(e.getMessage());
-            }
-        }
-        System.out.println("");
-        org.opentripplanner.transit.raptor.util.AvgTimer.listResults().forEach(
-                it -> System.out.println("  " + it)
-        );
+    private static final class NoopAvgTimer extends AvgTimer {
+        private NoopAvgTimer(String name) { super(name); }
+        @Override public void start() { }
+        @Override public void stop() { }
+        @Override public void failIfStarted() { }
+        @Override public void time(Runnable body) { body.run(); }
+        @Override public <T> T timeAndReturn(Supplier<T> body) { return body.get();  }
+        @Override public long lapTime() { return 0; }
+        @Override long currentTime() { return 0; }
+        @Override String unit() { return "ms"; }
+        @Override String toSec(long time) { return "0"; }
     }
 }

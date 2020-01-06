@@ -83,7 +83,7 @@ public class TestCase {
     /**
      * List all results found for this testcase.
      */
-    List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> actualResults() {
+    List<Result> actualResults() {
         return results.actualResults();
     }
 }

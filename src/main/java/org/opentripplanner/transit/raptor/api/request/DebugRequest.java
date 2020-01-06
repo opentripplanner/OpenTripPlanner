@@ -48,8 +48,8 @@ public class DebugRequest<T extends TripScheduleInfo> {
     /**
      * Return a debug request with defaults values.
      */
-    static <T extends TripScheduleInfo> org.opentripplanner.transit.raptor.api.request.DebugRequest<T> defaults() {
-        return new org.opentripplanner.transit.raptor.api.request.DebugRequest<>();
+    static <T extends TripScheduleInfo> DebugRequest<T> defaults() {
+        return new DebugRequest<>();
     }
 
     private final List<Integer> stops;
@@ -142,7 +142,7 @@ public class DebugRequest<T extends TripScheduleInfo> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.request.DebugRequest<?> that = (org.opentripplanner.transit.raptor.api.request.DebugRequest<?>) o;
+        DebugRequest<?> that = (DebugRequest<?>) o;
         return debugPathFromStopIndex == that.debugPathFromStopIndex &&
                 Objects.equals(stops, that.stops) &&
                 Objects.equals(path, that.path);

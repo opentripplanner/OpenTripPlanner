@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.server;
 
 import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.Logger;
@@ -14,7 +14,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayer
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.OTPConfiguration;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
 import org.opentripplanner.util.WorldEnvelope;

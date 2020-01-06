@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
+import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.debug.DebugTopic;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
@@ -12,7 +13,7 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrCompact;
 
-class DebugLogger<T extends TripScheduleInfo> implements org.opentripplanner.transit.raptor.api.debug.DebugLogger {
+class SpeedTestDebugLogger<T extends TripScheduleInfo> implements DebugLogger {
     private static int NOT_SET = Integer.MIN_VALUE;
 
     private final boolean enableDebugLogging;
@@ -21,7 +22,7 @@ class DebugLogger<T extends TripScheduleInfo> implements org.opentripplanner.tra
     private int lastRound = NOT_SET;
     private boolean pathHeader = true;
 
-    DebugLogger(boolean enableDebugLogging) {
+    SpeedTestDebugLogger(boolean enableDebugLogging) {
         this.enableDebugLogging = enableDebugLogging;
     }
 

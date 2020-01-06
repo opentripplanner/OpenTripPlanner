@@ -17,5 +17,5 @@ public interface PathMapper<T extends TripScheduleInfo> {
      * Build a path from a destination arrival - this maps between the domain of routing
      * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
      */
-     Path<T> mapToPath(final org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<T> destinationArrival);
+     Path<T> mapToPath(final DestinationArrival<T> destinationArrival);
 }

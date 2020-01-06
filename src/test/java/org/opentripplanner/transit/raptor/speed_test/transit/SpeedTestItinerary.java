@@ -49,7 +49,7 @@ public class SpeedTestItinerary extends Itinerary {
         agenciesHash = agencies.hashCode();
     }
 
-    static ParetoComparator<org.opentripplanner.transit.raptor.speed_test.transit.SpeedTestItinerary> paretoDominanceFunctions() {
+    static ParetoComparator<SpeedTestItinerary> paretoDominanceFunctions() {
         return (l, r) ->
                 l.transfers < r.transfers ||
                 l.durationSeconds < r.durationSeconds ||

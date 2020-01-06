@@ -1,4 +1,4 @@
-package org.opentripplanner.standalone;
+package org.opentripplanner.standalone.server;
 
 import com.google.common.collect.Maps;
 import com.google.common.io.BaseEncoding;

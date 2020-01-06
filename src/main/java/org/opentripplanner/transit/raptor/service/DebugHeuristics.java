@@ -38,7 +38,7 @@ public class DebugHeuristics {
     ) {
         DebugRequest<?> debug = request.debug();
         if (debug.logger().isEnabled(HEURISTICS)) {
-            new org.opentripplanner.transit.raptor.service.DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchForward());
+            new DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchForward());
         }
     }
 

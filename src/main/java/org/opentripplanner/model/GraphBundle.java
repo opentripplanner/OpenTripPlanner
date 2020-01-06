@@ -29,7 +29,7 @@ public final class GraphBundle implements Serializable {
     }
     
     public File getGraphPath() {
-        return new File(path,"Graph.obj");
+        return new File(path,"graph.obj");
     }
 
     public File getExtraClassPath() {

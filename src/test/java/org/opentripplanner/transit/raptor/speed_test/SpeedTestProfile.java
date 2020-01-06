@@ -101,21 +101,22 @@ public enum SpeedTestProfile {
         this.optimizations = Arrays.asList(optimizations);
     }
 
-    public static org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile[] parse(String profiles) {
-        return Arrays.stream(profiles.split(",")).map(org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile::parseOne).toArray(org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile[]::new);
+    public static SpeedTestProfile[] parse(String profiles) {
+        return Arrays.stream(profiles.split(",")).map(SpeedTestProfile::parseOne).toArray(SpeedTestProfile[]::new);
     }
 
     public static List<String> options() {
-        return Arrays.stream(values()).map(org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile::description).collect(Collectors.toList());
+        return Arrays.stream(values()).map(SpeedTestProfile::description).collect(Collectors.toList());
     }
+
 
     /* private methods */
 
-    private static org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile parseOne(String value) {
+    private static SpeedTestProfile parseOne(String value) {
         try {
             return valueOf(value);
         } catch (IllegalArgumentException ignore) {
-            for (org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile it : values()) {
+            for (SpeedTestProfile it : values()) {
                 if (it.shortName.equalsIgnoreCase(value)) {
                     return it;
                 }
@@ -123,7 +124,7 @@ public enum SpeedTestProfile {
             throw new IllegalArgumentException(
                     "Profile is not valid: '" + value + "'\nProfiles:\n\t" +
                             Arrays.stream(values())
-                                    .map(org.opentripplanner.transit.raptor.speed_test.SpeedTestProfile::description)
+                                    .map(SpeedTestProfile::description)
                                     .collect(Collectors.joining("\n\t"))
                                     .replace('.', ' ')
             );

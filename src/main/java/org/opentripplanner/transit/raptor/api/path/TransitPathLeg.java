@@ -41,7 +41,7 @@ public final class TransitPathLeg<T extends TripScheduleInfo> extends Intermedia
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!super.equals(o)) return false;
-        org.opentripplanner.transit.raptor.api.path.TransitPathLeg<?> that = (org.opentripplanner.transit.raptor.api.path.TransitPathLeg<?>) o;
+        TransitPathLeg<?> that = (TransitPathLeg<?>) o;
         return next.equals(that.next) &&
                 trip.equals(that.trip);
     }

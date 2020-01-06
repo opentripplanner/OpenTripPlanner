@@ -13,7 +13,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
 public interface TransitRoutingStrategy<T extends TripScheduleInfo> {
 
     /**
-     * Prepare the {@link org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy} to route using the given pattern and tripSearch.
+     * Prepare the {@link TransitRoutingStrategy} to route using the given pattern and tripSearch.
      */
     void prepareForTransitWith(TripPatternInfo<T> pattern, TripScheduleSearch<T> tripSearch);
 

@@ -12,18 +12,18 @@ import java.io.File;
  * router.
  */
 public class GraphConfig {
-    private static final String BUILDER_CONFIG_FILENAME = "build-config.json";
+    private static final String BUILD_CONFIG_FILENAME = "build-config.json";
     private static final String ROUTER_CONFIG_FILENAME = "router-config.json";
 
     private final File path;
     private final ObjectMapper parser;
-    private final ConfigFile builderConfig;
+    private final ConfigFile buildConfig;
     private final ConfigFile routerConfig;
 
     GraphConfig(File graphPath, ObjectMapper parser) {
         this.path = graphPath;
         this.parser = parser;
-        this.builderConfig = new ConfigFile(graphPath, BUILDER_CONFIG_FILENAME);
+        this.buildConfig = new ConfigFile(graphPath, BUILD_CONFIG_FILENAME);
         this.routerConfig = new ConfigFile(graphPath, ROUTER_CONFIG_FILENAME);
     }
 
@@ -35,13 +35,13 @@ public class GraphConfig {
     }
 
     /**
-     * Get the builder config, load from {@link #BUILDER_CONFIG_FILENAME} config file, if not loaded.
+     * Get the build config, load from {@link #BUILD_CONFIG_FILENAME} config file, if not loaded.
      * <p>
      * Returns a {@link MissingNode} if the file does not exist.
      * The program(OTP) exit, if the file contains syntax errors or cannot be parsed.
      */
-    public JsonNode builderConfig() {
-        return builderConfig.load(parser);
+    public JsonNode buildConfig() {
+        return buildConfig.load(parser);
     }
 
     /**
@@ -69,7 +69,7 @@ public class GraphConfig {
      * Test and return true if a filename matches one of the allowed configuration files.
      */
     public static boolean isGraphConfigFile(String filename) {
-        return BUILDER_CONFIG_FILENAME.equals(filename) ||
+        return BUILD_CONFIG_FILENAME.equals(filename) ||
                 ROUTER_CONFIG_FILENAME.equals(filename);
     }
 }

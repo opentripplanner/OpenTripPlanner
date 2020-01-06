@@ -7,7 +7,7 @@ import java.util.Objects;
  * This class define how to calculate the cost when cost is part of the multi-criteria pareto function.
  */
 public class McCostParams {
-    static final org.opentripplanner.transit.raptor.api.request.McCostParams DEFAULTS = new org.opentripplanner.transit.raptor.api.request.McCostParams();
+    static final McCostParams DEFAULTS = new McCostParams();
 
     private final int boardCost;
     private final double walkReluctanceFactor;
@@ -57,7 +57,7 @@ public class McCostParams {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.request.McCostParams that = (org.opentripplanner.transit.raptor.api.request.McCostParams) o;
+        McCostParams that = (McCostParams) o;
         return boardCost == that.boardCost &&
                 Double.compare(that.walkReluctanceFactor, walkReluctanceFactor) == 0 &&
                 Double.compare(that.waitReluctanceFactor, waitReluctanceFactor) == 0;

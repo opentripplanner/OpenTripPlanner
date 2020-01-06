@@ -14,9 +14,9 @@ import java.util.function.Consumer;
 public final class EgressStopArrivalState<T extends TripScheduleInfo> extends StopArrivalState<T> {
     private final int round;
     private final TransferLeg egressLeg;
-    private final Consumer<org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.EgressStopArrivalState<T>> transitCallback;
+    private final Consumer<EgressStopArrivalState<T>> transitCallback;
 
-    EgressStopArrivalState(int round, TransferLeg egressLeg, Consumer<org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.EgressStopArrivalState<T>> transitCallback) {
+    EgressStopArrivalState(int round, TransferLeg egressLeg, Consumer<EgressStopArrivalState<T>> transitCallback) {
         this.round = round;
         this.egressLeg = egressLeg;
         this.transitCallback = transitCallback;
