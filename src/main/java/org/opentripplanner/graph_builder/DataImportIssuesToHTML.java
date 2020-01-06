@@ -132,7 +132,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
             HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
             indexFileWriter.writeFile(issueTypeOccurrences, true);
         } catch (FileNotFoundException e) {
-            LOG.error("Index file coudn't be created:{}", e);
+            LOG.error("Index file coudn't be created: {}", e.getMessage(), e);
         }
 
         LOG.info("Data import issue logs are in {}", outPath);
@@ -172,7 +172,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                 writers.add(file_writer);
             }
         } catch (FileNotFoundException ex) {
-            LOG.error("Output folder not found:{} {}", outPath, ex);
+            LOG.error("Output folder not found: {}", outPath, ex);
         }
     }
 
