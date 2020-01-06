@@ -67,6 +67,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -113,7 +114,7 @@ public class Graph implements Serializable {
 
     private long transitServiceEnds = 0;
 
-    private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
+    private Map<Class<?>, Serializable> services = new HashMap<>();
 
     private TransferTable transferTable = new TransferTable();
 
@@ -509,31 +510,29 @@ public class Graph implements Serializable {
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T putService(Class<T> serviceType, T service) {
-        return (T) _services.put(serviceType, service);
+    public <T extends Serializable> T putService(Class<T> serviceType, T service) {
+        return (T) services.put(serviceType, service);
     }
 
-    public boolean hasService(Class<?> serviceType) {
-        return _services.containsKey(serviceType);
+    public boolean hasService(Class<? extends Serializable> serviceType) {
+        return services.containsKey(serviceType);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getService(Class<T> serviceType) {
-        return (T) _services.get(serviceType);
+    public <T extends Serializable> T getService(Class<T> serviceType) {
+        return (T) services.get(serviceType);
     }
 
-    public <T> T getService(Class<T> serviceType, boolean autoCreate) {
-        @SuppressWarnings("unchecked")
-        T t = (T) _services.get(serviceType);
+    public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
+        T t = (T)services.get(serviceType);
         if (t == null && autoCreate) {
             try {
-                t = (T)serviceType.newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+                t = serviceType.getDeclaredConstructor().newInstance();
+            }
+            catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
                 throw new RuntimeException(e);
             }
-            _services.put(serviceType, t);
+            services.put(serviceType, t);
         }
         return t;
     }
