@@ -1,17 +1,16 @@
 package org.opentripplanner.routing.fares;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-
-import com.conveyal.r5.otp2.api.path.Path;
 import junit.framework.TestCase;
-
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
+
+import java.util.ArrayList;
+import java.util.Arrays;
 
 /**
  * 
