@@ -1,7 +1,11 @@
 package org.opentripplanner.routing.impl;
 
+import com.conveyal.r5.otp2.api.path.Path;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 
@@ -13,8 +17,9 @@ import org.opentripplanner.routing.services.FareServiceFactory;
 class NoopFareServiceFactory implements FareServiceFactory {
     @Override
     public FareService makeFareService() {
-        return (path, transitLayer) -> null;
+        return new NoopFareService();
     }
+
     @Override
     public void processGtfs(OtpTransitService transitService) { }
 
@@ -24,5 +29,19 @@ class NoopFareServiceFactory implements FareServiceFactory {
     @Override
     public String toString() {
         return "NoopFareServiceFactory{}";
+    }
+
+    /**
+     * A Noop {@link FareService} implementation. Must be serializable; Hence
+     * have a default constructor.
+     */
+    private static class NoopFareService implements FareService {
+        private static final Long serialVersionUID = 1L;
+        @Override
+        public Fare getCost(
+                Path<TripSchedule> path, TransitLayer transitLayer
+        ) {
+            return null;
+        }
     }
 }
