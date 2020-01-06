@@ -14,7 +14,7 @@ import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.GraphBuilderParameters;
+import org.opentripplanner.standalone.config.GraphBuildParameters;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.standalone.config.OTPConfiguration;
 
@@ -145,7 +145,7 @@ public class ConstantsForTests {
             }
             // Add transit data from Netex
             {
-                GraphBuilderParameters builderParameters = createNetexBuilderParameters();
+                GraphBuildParameters builderParameters = createNetexBuilderParameters();
                 NetexModule module = NetexConfig.netexModule(builderParameters, Collections.singletonList(
                         new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
                 ));
@@ -182,12 +182,12 @@ public class ConstantsForTests {
     }
 
 
-    private static GraphBuilderParameters createNetexBuilderParameters() {
+    private static GraphBuildParameters createNetexBuilderParameters() {
         JsonNode buildConfig = new OTPConfiguration(null)
                 .getGraphConfig(new File(ConstantsForTests.NETEX_DIR))
-                .builderConfig();
+                .buildConfig();
 
-        return new GraphBuilderParameters(buildConfig);
+        return new GraphBuildParameters(buildConfig);
     }
 
     /**

@@ -53,7 +53,7 @@ public class CommandLineParameters implements Cloneable {
             description = "Do not save the graph after building, just start the server.")
     public boolean inMemory;
 
-    @Parameter(names = {"--load"}, description = "Load the Graph.obj in the specified directory.")
+    @Parameter(names = {"--load"}, description = "Load the graph.obj in the specified directory.")
     public boolean load;
 
     @Parameter(names = {"--loadOSMGraph"}, description = "When building a graph, load the "

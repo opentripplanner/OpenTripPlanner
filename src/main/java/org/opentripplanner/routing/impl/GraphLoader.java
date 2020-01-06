@@ -18,7 +18,7 @@ import java.io.InputStream;
  */
 public class GraphLoader {
 
-    private static final String GRAPH_FILENAME = "Graph.obj";
+    private static final String GRAPH_FILENAME = "graph.obj";
 
     private static final Logger LOG = LoggerFactory.getLogger(GraphLoader.class);
 

@@ -11,18 +11,19 @@ import java.util.Arrays;
 import java.util.List;
 
 /**
- * These are parameters that when changed, necessitate a Graph rebuild.
- * They are distinct from the RouterParameters which can be applied to a pre-built graph or on the fly at runtime.
- * Eventually both classes may be initialized from the same config file so make sure there is no overlap
- * in the JSON keys used.
+ * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from the
+ * RouterParameters which can be applied to a pre-built graph or on the fly at runtime. Eventually
+ * both classes may be initialized from the same config file so make sure there is no overlap in the
+ * JSON keys used.
  * <p>
- * These used to be command line parameters, but there were getting to be too many of them and besides, we want to
- * allow different graph builder configuration for each Graph.
+ * These used to be command line parameters, but there were getting to be too many of them and
+ * besides, we want to allow different graph build configuration for each Graph.
  * <p>
- * TODO maybe have only one giant config file and just annotate the parameters to indicate which ones trigger a rebuild
- * ...or just feed the same JSON tree to two different classes, one of which is the build configuration and the other is the router configuration.
+ * TODO maybe have only one giant config file and just annotate the parameters to indicate which
+ * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
+ * is the build configuration and the other is the router configuration.
  */
-public class GraphBuilderParameters {
+public class GraphBuildParameters {
 
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
@@ -191,7 +192,7 @@ public class GraphBuilderParameters {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-    public GraphBuilderParameters(JsonNode config) {
+    public GraphBuildParameters(JsonNode config) {
         dataImportReport = config.path("dataImportReport").asBoolean(false);
         transit = config.path("transit").asBoolean(true);
         useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
