@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import com.conveyal.r5.otp2.api.path.Path;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -8,6 +7,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.transit.raptor.api.path.Path;
 
 
 /**

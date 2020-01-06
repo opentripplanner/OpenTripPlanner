@@ -160,14 +160,14 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                 for (List<String> partition: partitions) {
                     issueTypeOccurrences.add(issueTypeName);
                     int labelCount = issueTypeOccurrences.count(issueTypeName);
-                    file_writer =new HTMLWriter(issueTypeName+Integer.toString(labelCount), partition);
+                    file_writer = new HTMLWriter(issueTypeName + labelCount, partition);
                     writers.add(file_writer);
                 }
 
             } else {
                 issueTypeOccurrences.add(issueTypeName);
                 int labelCount = issueTypeOccurrences.count(issueTypeName);
-                file_writer = new HTMLWriter(issueTypeName + Integer.toString(labelCount),
+                file_writer = new HTMLWriter(issueTypeName + labelCount,
                     issues);
                 writers.add(file_writer);
             }
@@ -222,7 +222,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
 
         private void writeFile(Multiset<String> classes, boolean isIndexFile) {
             println("<html><head><title>Graph report for " + outPath.getParentFile()
-                + "Graph.obj</title>");
+                + "graph.obj</title>");
             println("\t<meta charset=\"utf-8\">");
             println("<meta name='viewport' content='width=device-width, initial-scale=1'>");
             println("<script src='http://code.jquery.com/jquery-1.11.1.js'></script>");
@@ -267,7 +267,7 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
             println(css);
             println("</head><body>");
             println(String.format("<h1>OpenTripPlanner data import issue log for %s</h1>", issueTypeName));
-            println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
+            println("<h2>Graph report for " + outPath.getParentFile() + "graph.obj</h2>");
             println("<p>");
             //adds links to the other HTML files
             for (Multiset.Entry<String> htmlIssueType : classes.entrySet()) {

@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
@@ -11,6 +9,8 @@ import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

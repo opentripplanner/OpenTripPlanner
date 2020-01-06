@@ -22,8 +22,8 @@ import org.opentripplanner.api.parameter.MIMEImageFormat;
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose

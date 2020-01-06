@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -12,6 +11,7 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -229,10 +229,10 @@ public class DefaultFareServiceImpl implements FareService {
 
     private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
-        Set<String> zones = new HashSet<String>();
-        Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
-        Set<String> agencies = new HashSet<String>();
-        Set<FeedScopedId> trips = new HashSet<FeedScopedId>();
+        Set<String> zones = new HashSet<>();
+        Set<FeedScopedId> routes = new HashSet<>();
+        Set<String> agencies = new HashSet<>();
+        Set<FeedScopedId> trips = new HashSet<>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);

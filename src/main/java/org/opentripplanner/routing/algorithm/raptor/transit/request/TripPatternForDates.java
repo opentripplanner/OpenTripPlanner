@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 import java.util.Arrays;
 import java.util.List;

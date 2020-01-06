@@ -71,10 +71,11 @@ public class TransitLayerMapper {
         LOG.info("Mapping complete.");
 
         return new TransitLayer(
-                tripPatternsByStopByDate,
-                transferByStopIndex,
-                stopIndex.stops,
-                stopIndex.indexByStop
+            tripPatternsByStopByDate,
+            transferByStopIndex,
+            stopIndex.stops,
+            stopIndex.indexByStop,
+            graph.getTimeZone().toZoneId()
         );
     }
 

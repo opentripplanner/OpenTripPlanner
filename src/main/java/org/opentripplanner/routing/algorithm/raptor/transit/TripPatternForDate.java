@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import com.conveyal.r5.otp2.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 import java.time.LocalDate;
 import java.util.List;

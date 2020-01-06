@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.services;
 
-import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.raptor.api.path.Path;
 
 import java.io.Serializable;
 

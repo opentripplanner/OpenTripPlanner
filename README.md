@@ -26,4 +26,4 @@ TODO OTP2: Write a short sentence about the OTP2 work: Raptor, Ruter/Entur, NeTE
 
 ## Mailing Lists
 
-The main forums through which the OpenTripPlanner community organizes development and provides mutual assistance are our two Google discussion groups. Changes and extensions to OTP are debated on the developers' list (opentripplanner-dev). More general questions and announcements of interest to non-developer OTP users should be directed to the opentripplanner-users list.
+The main forums through which the OpenTripPlanner community organizes development and provides mutual assistance are our two Google discussion groups. Changes and extensions to OTP are debated on the developers' list - [opentripplanner-dev](https://groups.google.com/forum/#!forum/opentripplanner-dev). More general questions and announcements of interest to non-developer OTP users should be directed to the [opentripplanner-users](https://groups.google.com/forum/#!forum/opentripplanner-users) list.
