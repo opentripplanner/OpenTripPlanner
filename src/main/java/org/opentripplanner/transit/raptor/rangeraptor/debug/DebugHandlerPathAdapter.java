@@ -12,7 +12,7 @@ import java.util.List;
  *
  * @param <T> The TripSchedule type defined by the user of the range raptor API.
  */
-final class DebugHandlerPathAdapter <T extends TripScheduleInfo> extends org.opentripplanner.transit.raptor.rangeraptor.debug.AbstractDebugHandlerAdapter<Path<T>> {
+final class DebugHandlerPathAdapter <T extends TripScheduleInfo> extends AbstractDebugHandlerAdapter<Path<T>> {
 
     DebugHandlerPathAdapter(DebugRequest<T> debug, WorkerLifeCycle lifeCycle) {
         super(debug, debug.pathFilteringListener(), lifeCycle);

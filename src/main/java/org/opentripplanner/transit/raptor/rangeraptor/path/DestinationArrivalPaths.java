@@ -49,7 +49,7 @@ public class DestinationArrivalPaths<T extends TripScheduleInfo> {
 
     public void add(ArrivalView<T> egressStopArrival, TransferLeg egressLeg, int additionalCost) {
         int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
-        org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<T> destArrival = new org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
+        DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
 
         if (calculator.exceedsTimeLimit(arrivalTime)) {
             debugRejectByTimeLimitOptimization(destArrival);
@@ -93,7 +93,7 @@ public class DestinationArrivalPaths<T extends TripScheduleInfo> {
         reachedCurrentRound = false;
     }
 
-    private void debugRejectByTimeLimitOptimization(org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrival<T> destArrival) {
+    private void debugRejectByTimeLimitOptimization(DestinationArrival<T> destArrival) {
         if (debugHandler != null) {
             debugHandler.reject(destArrival.previous(), null, calculator.exceedsTimeLimitReason());
         }

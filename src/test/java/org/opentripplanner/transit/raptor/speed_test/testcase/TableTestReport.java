@@ -19,15 +19,15 @@ import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable
  */
 public class TableTestReport {
 
-    public static String report(List<org.opentripplanner.transit.raptor.speed_test.testcase.Result> results) {
+    public static String report(List<Result> results) {
         if (results.isEmpty()) {
             return "NO RESULTS FOUND FOR TEST CASE!";
         }
 
         Collections.sort(results);
 
-        org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable table = newTable();
-        for (org.opentripplanner.transit.raptor.speed_test.testcase.Result it : results) {
+        OutputTable table = newTable();
+        for (Result it : results) {
             addTo(table, it);
         }
         return table.toString();
@@ -36,14 +36,14 @@ public class TableTestReport {
 
     /* private methods */
 
-    private static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable newTable() {
-        return new org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable(
+    private static OutputTable newTable() {
+        return new OutputTable(
                         Arrays.asList(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
                         Arrays.asList("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
                 );
     }
 
-    private static void addTo(org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable table, org.opentripplanner.transit.raptor.speed_test.testcase.Result result) {
+    private static void addTo(OutputTable table, Result result) {
         boolean longFormat = true;
 
         table.addRow(

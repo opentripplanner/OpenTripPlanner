@@ -50,7 +50,7 @@ public final class AccessPathLeg<T extends TripScheduleInfo> implements PathLeg<
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        org.opentripplanner.transit.raptor.api.path.AccessPathLeg<?> that = (org.opentripplanner.transit.raptor.api.path.AccessPathLeg<?>) o;
+        AccessPathLeg<?> that = (AccessPathLeg<?>) o;
         return fromTime == that.fromTime &&
                 toStop == that.toStop &&
                 toTime == that.toTime &&

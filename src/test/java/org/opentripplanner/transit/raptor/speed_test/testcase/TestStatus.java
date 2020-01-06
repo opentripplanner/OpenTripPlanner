@@ -16,7 +16,7 @@ enum TestStatus {
         this.label = label;
     }
 
-    private boolean is(org.opentripplanner.transit.raptor.speed_test.testcase.TestStatus value) {
+    private boolean is(TestStatus value) {
         return this == value;
     }
 

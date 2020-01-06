@@ -13,7 +13,7 @@ import java.util.LinkedList;
  * @param <T> The TripSchedule type defined by the user of the range raptor API.
  */
 final class DebugHandlerStopArrivalAdapter<T extends TripScheduleInfo>
-        extends org.opentripplanner.transit.raptor.rangeraptor.debug.AbstractDebugHandlerAdapter<ArrivalView<T>> {
+        extends AbstractDebugHandlerAdapter<ArrivalView<T>> {
 
     DebugHandlerStopArrivalAdapter(DebugRequest<T> debug, WorkerLifeCycle lifeCycle) {
         super(debug, debug.stopArrivalListener(), lifeCycle);

@@ -57,7 +57,7 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return profile;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.RequestBuilder<T> profile(RangeRaptorProfile profile) {
+    public RequestBuilder<T> profile(RangeRaptorProfile profile) {
         this.profile = profile;
         return this;
     }
@@ -66,7 +66,7 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return searchForward;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.RequestBuilder<T> searchDirection(boolean searchForward) {
+    public RequestBuilder<T> searchDirection(boolean searchForward) {
         this.searchForward = searchForward;
         return this;
     }
@@ -75,12 +75,12 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return optimizations;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.RequestBuilder<T> enableOptimization(Optimization optimization) {
+    public RequestBuilder<T> enableOptimization(Optimization optimization) {
         this.optimizations.add(optimization);
         return this;
     }
 
-    public org.opentripplanner.transit.raptor.api.request.RequestBuilder<T> disableOptimization(Optimization optimization) {
+    public RequestBuilder<T> disableOptimization(Optimization optimization) {
         this.optimizations.remove(optimization);
         return this;
     }

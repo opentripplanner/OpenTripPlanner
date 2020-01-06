@@ -30,7 +30,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
     }
 
 
-    static final class Access<T extends TripScheduleInfo> extends org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter<T> {
+    static final class Access<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
         private final int departureTime;
         private final int arrivalTime;
 
@@ -61,7 +61,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
         }
     }
 
-    static final class Transit<T extends TripScheduleInfo> extends org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter<T> {
+    static final class Transit<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
         private final StopArrivalState<T> arrival;
         private final StopsCursor<T> cursor;
 
@@ -104,7 +104,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
         }
     }
 
-    static final class Transfer<T extends TripScheduleInfo> extends org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter<T> {
+    static final class Transfer<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
         private final StopArrivalState<T> arrival;
         private final StopsCursor<T> cursor;
 

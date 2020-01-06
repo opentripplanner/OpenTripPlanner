@@ -37,19 +37,19 @@ public class StopsCursor<T extends TripScheduleInfo> {
     /**
      * Return a fictive Transit arrival for the rejected transit stop arrival.
      */
-    public org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transit<T> rejectedTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
+    public StopArrivalViewAdapter.Transit<T> rejectedTransit(int round, int alightStop, int alightTime, T trip, int boardStop, int boardTime) {
             StopArrivalState<T> arrival = new StopArrivalState<>();
             arrival.arriveByTransit(alightTime, boardStop, boardTime, trip);
-            return new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transit<>(round, alightStop, arrival, this);
+            return new StopArrivalViewAdapter.Transit<>(round, alightStop, arrival, this);
     }
 
     /**
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
-    public org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transfer<T> rejectedTransfer(int round, int fromStop, TransferLeg transferLeg, int toStop, int arrivalTime) {
+    public StopArrivalViewAdapter.Transfer<T> rejectedTransfer(int round, int fromStop, TransferLeg transferLeg, int toStop, int arrivalTime) {
             StopArrivalState<T> arrival = new StopArrivalState<>();
             arrival.transferToStop(fromStop, arrivalTime, transferLeg.durationInSeconds());
-            return new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transfer<>(round, toStop, arrival, this);
+            return new StopArrivalViewAdapter.Transfer<>(round, toStop, arrival, this);
     }
 
     /**
@@ -68,9 +68,9 @@ public class StopsCursor<T extends TripScheduleInfo> {
      * @param stop the stop index to use.
      * @return the current transit state, if found
      */
-    public org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transit<T> transit(int round, int stop) {
+    public StopArrivalViewAdapter.Transit<T> transit(int round, int stop) {
         StopArrivalState<T> state = stops.get(round, stop);
-        return new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transit<>(round, stop, state, this);
+        return new StopArrivalViewAdapter.Transit<>(round, stop, state, this);
     }
 
     public ArrivalView<T> stop(int round, int stop) {
@@ -83,7 +83,7 @@ public class StopsCursor<T extends TripScheduleInfo> {
     private ArrivalView<T> newAccessView(int stop) {
         StopArrivalState<T> arrival = stops.get(0, stop);
         int departureTime = transitCalculator.minusDuration(arrival.time(), arrival.accessDuration());
-        return new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Access<>(stop, departureTime, arrival.time());
+        return new StopArrivalViewAdapter.Access<>(stop, departureTime, arrival.time());
     }
 
     /**
@@ -93,15 +93,15 @@ public class StopsCursor<T extends TripScheduleInfo> {
         StopArrivalState<T> state = stops.get(0, stop);
         int departureTime = transitCalculator.originDepartureTime(transitDepartureTime, state.accessDuration());
         int arrivalTime = transitCalculator.plusDuration(departureTime, state.accessDuration());
-        return new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Access<>(stop, departureTime, arrivalTime);
+        return new StopArrivalViewAdapter.Access<>(stop, departureTime, arrivalTime);
     }
 
     private ArrivalView<T> newTransitOrTransferView(int round, int stop) {
         StopArrivalState<T> state = stops.get(round, stop);
 
         return state.arrivedByTransfer()
-                ? new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transfer<>(round, stop, state, this)
-                : new org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view.StopArrivalViewAdapter.Transit<>(round, stop, state, this);
+                ? new StopArrivalViewAdapter.Transfer<>(round, stop, state, this)
+                : new StopArrivalViewAdapter.Transit<>(round, stop, state, this);
     }
 
     int departureTime(int arrivalTime, int legDuration) {

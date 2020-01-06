@@ -112,5 +112,5 @@ public interface PathLeg<T extends TripScheduleInfo> {
      *
      * @return Next leg in path.
      */
-    org.opentripplanner.transit.raptor.api.path.PathLeg<T> nextLeg();
+    PathLeg<T> nextLeg();
 }
