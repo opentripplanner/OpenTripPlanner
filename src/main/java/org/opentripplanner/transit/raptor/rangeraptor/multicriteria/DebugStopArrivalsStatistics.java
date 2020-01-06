@@ -1,0 +1,83 @@
+package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
+
+import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
+
+import static org.opentripplanner.transit.raptor.api.debug.DebugTopic.STOP_ARRIVALS_STATISTICS;
+
+
+/**
+ * Utility class to print some statistics about stop arrivals.
+ */
+class DebugStopArrivalsStatistics {
+    private final DebugLogger debugLogger;
+    private static boolean firstTime = true;
+
+
+
+    DebugStopArrivalsStatistics(DebugLogger debugLogger) {
+        this.debugLogger = debugLogger;
+    }
+
+    void debugStatInfo(StopArrivalParetoSet<?>[] stops) {
+        if(!debugLogger.isEnabled(STOP_ARRIVALS_STATISTICS)) return;
+
+        long total = 0;
+        long arrayLen = 0;
+        long numOfStops = 0;
+        int max = 0;
+
+        for (StopArrivalParetoSet stop : stops) {
+            if(stop != null) {
+                ++numOfStops;
+                total += stop.size();
+                max = Math.max(stop.size(), max);
+                arrayLen += stop.internalArrayLength();
+            }
+        }
+        double avg = ((double)total) / numOfStops;
+        double arrayLenAvg = ((double)arrayLen) / numOfStops;
+
+        if(firstTime) {
+            debugLogger.debug(
+                    STOP_ARRIVALS_STATISTICS,
+                    "Debug stop arrivals statistics. The number logged are: \n" +
+                    "  - For each stop the number of arrivals logged with:\n" +
+                    "    - Avarage number of arrivals for stops visited.\n" +
+                    "    - The maximum numbers of arriavels for any stop.\n" +
+                    "    - The total number of stop arrivals.\n" +
+                    "  - The capasity(array length) used.\n" +
+                    "    - The avarage array length for stops visited.\n" +
+                    "    - The total array length allocated.\n" +
+                    "  - The number of stops:\n" +
+                    "    - The number of stops visited.\n" +
+                    "    - The total number of stops.\n"
+            );
+            firstTime = false;
+        }
+        debugLogger.debug(
+                STOP_ARRIVALS_STATISTICS,
+                "Arrivals %5s %3s %6s (avg/max/tot)  -  Array Length: %5s %5s (avg/tot) -  Stops: %5s %5s (visited/tot)",
+                toStr(avg), toStr(max), toStr(total),
+                toStr(arrayLenAvg), toStr(arrayLen),
+                toStr(numOfStops), toStr(stops.length)
+        );
+    }
+
+
+    private static String toStr(long number) {
+        if(number > 1_000_000) {
+            return toStr(number/1_000_000.0) + "\"";
+        }
+        if(number > 1_000) {
+            return toStr(number/1_000.0) + "\'";
+        }
+        return Long.toString(number);
+    }
+
+    private static String toStr(double number) {
+        if(number > 10) {
+            return String.format("%.0f", number);
+        }
+        return String.format("%.1f", number);
+    }
+}
