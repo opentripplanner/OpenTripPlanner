@@ -6,17 +6,30 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * Replaces variables specified on the format ${variable} in a string with current system
- * environment variables
+ * Replaces environment variable placeholders specified on the format ${variable} in a text
+ * with the current system environment variable values.
  */
 public class EnvironmentVariableReplacer {
+    /**
+     * A pattern matching a placeholder like '${VAR_NAME}'. The placeholder must start with
+     * '${' and end with '}'. The environment variable name must consist of only alphanumerical
+     * characters(a-z, A-Z, 0-9) and underscore '_'.
+     */
+    private static Pattern PATTERN = Pattern.compile("\\$\\{(\\w+)}");
 
-    private static Pattern PATTERN = Pattern.compile("\\$\\{(\\w+)\\}|\\$(\\w+)");
 
-
-    public String replace(String s) {
+    /**
+     * Search for {@link #PATTERN}s and replace each placeholder with the value of the
+     * corresponding environment variable.
+     *
+     * @param source is used only to generate human friendly error message in case the text
+     *               contain a placeholder whitch can not be found.
+     * @throws IllegalArgumentException if a placeholder exist in the {@code text}, but the
+     *                                  environment variable do not exist.
+     */
+    public static String insertEnvironmentVariables(String text, String source) {
         Map<String, String> environmentVariables = new HashMap<>();
-        Matcher matcher = PATTERN.matcher(s);
+        Matcher matcher = PATTERN.matcher(text);
 
         while (matcher.find()) {
             String envVar = matcher.group(0);
@@ -28,14 +41,15 @@ public class EnvironmentVariableReplacer {
                 }
                 else {
                     throw new IllegalArgumentException(
-                            "Environment variable " + nameOnly + " not specified"
+                            "Environment variable name '" + nameOnly + "' in config '"
+                            + source + "' not found in the system environment variables."
                     );
                 }
             }
         }
         for (Map.Entry<String, String> entry : environmentVariables.entrySet()) {
-            s = s.replace(entry.getKey(), entry.getValue());
+            text = text.replace(entry.getKey(), entry.getValue());
         }
-        return s;
+        return text;
     }
 }
