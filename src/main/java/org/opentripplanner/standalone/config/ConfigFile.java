@@ -112,8 +112,7 @@ class ConfigFile {
         try {
             return mapper.readTree(jsonString);
         } catch (IOException e) {
-            LOG.error("Can't read embedded config.");
-            LOG.error(e.getMessage());
+            LOG.error("Can't read embedded config: {}", e.getLocalizedMessage());
             throw new RuntimeException(e.getLocalizedMessage(), e);
         }
     }
