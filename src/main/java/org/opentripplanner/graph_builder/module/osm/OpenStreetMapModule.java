@@ -537,7 +537,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
-                LOG.warn("P+R '{}' ({}) is not walk-accessible");
+                LOG.warn("P+R '{}' ({}) is not walk-accessible", creativeName, osmId);
                 // This does not prevent routing as we only use P+R for car dropoff,
                 // but this is an issue with OSM data.
             }

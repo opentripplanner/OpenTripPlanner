@@ -159,14 +159,11 @@ public class RaptorRouter {
       itineraries.add(itinerary);
   }
 
-    LOG.info(
-        "Creating itineraries took {} ms",
-        itineraries.size(),
-        System.currentTimeMillis() - startItineraries
+  LOG.info(
+            "Creating {} itineraries took {} ms",
+            itineraries.size(),
+          System.currentTimeMillis() - startItineraries
     );
-
-    LOG.info("Creating itineraries took {} ms", itineraries.size(),
-        System.currentTimeMillis() - startItineraries);
 
     return itineraries;
   }

@@ -438,9 +438,11 @@ public class OSMDatabase {
                          * This should never happen (intersection between two lines should be a
                          * point or a multi-point).
                          */
-                        LOG.error("Alien intersection type between {} ({}--{}) and {} ({}--{}): ",
+                        LOG.error(
+                                "Alien intersection type between {} ({}--{}) and {} ({}--{}): {}",
                                 way, nA, nB, ringSegment.area.parent, ringSegment.nA,
-                                ringSegment.nB, intersection);
+                                ringSegment.nB, intersection
+                        );
                         continue;
                     }
                     
@@ -463,7 +465,7 @@ public class OSMDatabase {
                         	// we would only add it the first time.
                         	continue;
                         
-                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nB, nA, epsilon))
+                        if (checkDistanceWithin(ringSegment.nA, nA, epsilon) || checkDistanceWithin(ringSegment.nB, nA, epsilon))
                                 LOG.info("Node {} in way {} is coincident but disconnected with area {}",
                                     	nA.getId(), way.getId(), ringSegment.area.parent.getId());
                     }
@@ -474,7 +476,7 @@ public class OSMDatabase {
                         if (ringSegment.ring.nodes.contains(splitNode))
                         	continue;
                         
-                        if (checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                        if (checkDistanceWithin(ringSegment.nA, nB, epsilon) || checkDistanceWithin(ringSegment.nB, nB, epsilon))
                             LOG.info("Node {} in way {} is coincident but disconnected with area {}",
                                 	nB.getId(), way.getId(), ringSegment.area.parent.getId());
                     }
@@ -488,10 +490,17 @@ public class OSMDatabase {
                     	
                     	way.addNodeRef(ringSegment.nA.getId(), i + 1);
                     	
-                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
-                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
+                        if (
+                                checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
+                                checkDistanceWithin(ringSegment.nA, nB, epsilon)
+                        ) {
+                            LOG.info(
+                                    "Node {} in area {} is coincident but disconnected with way {}",
+                                    ringSegment.nA.getId(),
+                                    ringSegment.area.parent.getId(),
+                                    way.getId()
+                            );
+                        }
                     	// restart loop over way segments as we may have more intersections
                         // as we haven't modified the ring, there is no need to modify the spatial index, so breaking here is fine 
                     	i--;
@@ -505,10 +514,16 @@ public class OSMDatabase {
                     	
                     	way.addNodeRef(ringSegment.nB.getId(), i + 1);
                     	
-                        if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                        if (
+                                checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
+                                checkDistanceWithin(ringSegment.nB, nB, epsilon)
+                        ) {
                             LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
+                                    ringSegment.nB.getId(),
+                                    ringSegment.area.parent.getId(),
+                                    way.getId()
+                            );
+                        }
                     	i--;
                     	break;
                     }
@@ -958,7 +973,7 @@ public class OSMDatabase {
     /**
      * Check if two nodes are within an epsilon.
      */
-    private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
+    private static boolean checkDistanceWithin(OSMNode a, OSMNode b, double epsilon) {
     	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
 	}
 }
