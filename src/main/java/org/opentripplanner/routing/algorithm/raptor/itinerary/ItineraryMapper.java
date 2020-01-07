@@ -1,11 +1,5 @@
 package org.opentripplanner.routing.algorithm.raptor.itinerary;
 
-import com.conveyal.r5.otp2.api.path.AccessPathLeg;
-import com.conveyal.r5.otp2.api.path.EgressPathLeg;
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
-import com.conveyal.r5.otp2.api.path.TransferPathLeg;
-import com.conveyal.r5.otp2.api.path.TransitPathLeg;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -33,6 +27,12 @@ import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
+import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

@@ -28,23 +28,23 @@ New York City and one for Portland, Oregon:
 └── graphs
     ├── nyc
     │   ├── build-config.json
-    │   ├── Graph.obj
+    │   ├── graph.obj
     │   ├── long-island-rail-road_20140216_0114.zip
     │   ├── mta-new-york-city-transit_20130212_0419.zip
     │   ├── new-york-city.osm.pbf
     │   └── port-authority-of-new-york-new-jersey_20150217_0111.zip
     └── pdx
         ├── build-config.json
-        ├── Graph.obj
+        ├── graph.obj
         ├── gtfs.zip
         ├── portland_oregon.osm.pbf
         └── router-config.json
 ```
 
 You can see that each of these subdirectories contains one or more GTFS feeds (which are just zip files full of
-comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `Graph.obj`.
+comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `graph.obj`.
 On startup, OTP scans router directories for input and configuration files,
-and can optionally store the resulting combined representation of the transportation network as Graph.obj in the
+and can optionally store the resulting combined representation of the transportation network as `graph.obj` in the
 same directory to avoid re-processing the data the next time it starts up. The `cache` directory is where OTP will
 store its local copies of resources fetched from the internet, such as US elevation tiles.
 
@@ -118,7 +118,7 @@ config key | description | value type | value default | notes
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
 
-This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
 
 ## Reaching a subway platform
 

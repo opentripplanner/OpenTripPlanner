@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;

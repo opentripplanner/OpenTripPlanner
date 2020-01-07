@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

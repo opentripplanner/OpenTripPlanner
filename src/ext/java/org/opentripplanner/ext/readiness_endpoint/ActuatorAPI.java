@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.readiness_endpoint;
 
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;

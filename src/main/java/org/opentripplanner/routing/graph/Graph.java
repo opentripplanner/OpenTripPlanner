@@ -158,7 +158,7 @@ public class Graph implements Serializable {
     private Coordinate center = null;
 
     /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public String builderConfig = null;
+    public String buildConfig = null;
 
     /** Embed a router configuration inside the graph, for starting up with a single file. */
     public String routerConfig = null;
