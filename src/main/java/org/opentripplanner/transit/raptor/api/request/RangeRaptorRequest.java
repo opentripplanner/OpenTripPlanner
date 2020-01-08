@@ -5,7 +5,6 @@ import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -42,8 +41,7 @@ public class RangeRaptorRequest<T extends TripScheduleInfo> {
         this.searchParams = builder.searchParams().build();
         this.profile = builder.profile();
         this.searchForward = builder.searchForward();
-        // TODO JAVA_9 - Cleanup next 3 lines: Set.of(...) and List.of(...)
-        this.optimizations = Collections.unmodifiableSet(EnumSet.copyOf(builder.optimizations()));
+        this.optimizations = Set.copyOf(builder.optimizations());
         this.mcCostParams = new McCostParams(builder.mcCostFactors());
         this.debug = builder.debug().build();
         verify();
