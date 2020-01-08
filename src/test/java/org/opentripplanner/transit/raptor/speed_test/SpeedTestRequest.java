@@ -10,7 +10,6 @@ import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
-import org.opentripplanner.transit.raptor.speed_test.cli.CommandLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
@@ -148,15 +147,13 @@ public class SpeedTestRequest {
         }
     }
 
-    private static void addDebugOptions(RequestBuilder<TripSchedule> builder, CommandLineOpts opts) {
+    private static void addDebugOptions(RequestBuilder<TripSchedule> builder, SpeedTestCmdLineOpts opts) {
         List<Integer> stops = opts.debugStops();
         List<Integer> path = opts.debugPath();
 
         boolean debugLoggerEnabled = opts.debugRequest() || opts.debug();
 
-        if(opts instanceof SpeedTestCmdLineOpts) {
-            debugLoggerEnabled = debugLoggerEnabled || ((SpeedTestCmdLineOpts)opts).compareHeuristics();
-        }
+        debugLoggerEnabled = debugLoggerEnabled || opts.compareHeuristics();
 
         if(!debugLoggerEnabled && stops.isEmpty() && path.isEmpty()) {
             return;
