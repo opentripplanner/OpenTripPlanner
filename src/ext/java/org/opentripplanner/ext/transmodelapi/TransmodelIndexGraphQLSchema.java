@@ -40,6 +40,7 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.gtfs.GtfsLibrary;
@@ -1757,13 +1758,13 @@ public class TransmodelIndexGraphQLSchema {
                         .type(stopTypeEnum)
                         .dataFetcher(environment -> (((Stop) environment.getSource()).getStopType()))
                         .build())
+                */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("flexibleArea")
                         .description("Geometry for flexible area.")
                         .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-                        .dataFetcher(environment -> (((Stop) environment.getSource()).getArea() != null ? ((Stop) environment.getSource()).getArea().getCoordinates() : null))
+                        .dataFetcher(environment -> (null))
                         .build())
-                */
                 .build();
 
         timetabledPassingTimeType = GraphQLObjectType.newObject()
