@@ -51,22 +51,24 @@ public class StorageParametersTest {
     @Test
     public void testCreateGoogleCloudStorageParameters() throws IOException {
         JsonNode node = MAPPER.readTree("{"
-                + " graph : 'file:/a/b/g.obj',\n"
+                + " gsCredentials : 'file:/cfile',\n"
+                + " graph : 'gs://b/g.obj',\n"
                 + " streetGraph : 'file:/b/bg.obj',\n"
                 + " osm : [ 'file:/b/osm.pbf' ],\n"
                 + " dem : [ 'file:/b/dem.tif' ],\n"
-                + " netex : [ 'file:/a/b/netex.zip' ],\n"
+                + " netex : [ 'gs://b/netex.zip' ],\n"
                 + " gtfs : [ 'file:/b/gtfs.zip' ],\n"
-                + " buildReportDir : 'file:/a/b/report'\n"
+                + " buildReportDir : 'gs://b/report'\n"
                 + "}");
         StorageParameters c =  new StorageParameters(node);
 
-        assertEquals("file:/a/b/g.obj", c.graph.toString());
+        assertEquals("file:/cfile", c.gsCredentials);
+        assertEquals("gs://b/g.obj", c.graph.toString());
         assertEquals("file:/b/bg.obj", c.streetGraph.toString());
         assertEquals("[file:/b/osm.pbf]", c.osm.toString());
         assertEquals("[file:/b/dem.tif]", c.dem.toString());
-        assertEquals("[file:/a/b/netex.zip]", c.netex.toString());
+        assertEquals("[gs://b/netex.zip]", c.netex.toString());
         assertEquals("[file:/b/gtfs.zip]", c.gtfs.toString());
-        assertEquals("file:/a/b/report", c.buildReportDir.toString());
+        assertEquals("gs://b/report", c.buildReportDir.toString());
     }
 }

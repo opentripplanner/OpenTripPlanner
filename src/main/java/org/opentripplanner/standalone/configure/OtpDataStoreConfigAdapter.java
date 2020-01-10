@@ -38,6 +38,11 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     }
 
     @Override
+    public String gsCredentials() {
+        return config.gsCredentials;
+    }
+
+    @Override
     public List<URI> osmFiles() {
         return config.osm;
     }

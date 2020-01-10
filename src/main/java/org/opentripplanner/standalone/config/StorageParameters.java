@@ -16,21 +16,46 @@ import java.util.List;
  * <pre>
  *     file:/a/b/c/filename.ext
  * </pre>
+ * Google Cloud Storage(GCS) access is supported. Use the following URI format:
+ * <pre>
+ *     gs://bucket-name/a/b/c/blobname.ext
+ * </pre>
  * <p>
  * Example {@code build-config.json}:
  * <pre>
  * {
  *     htmlAnnotations: true,
  *     storage: {
- *         osm: [ "file:/a/b/osm-oslo-mini.pbf" ],
+ *         gsCredentials: "${OTP_GOOGLE_SERVICE_ACCOUNT}",
+ *         osm: [ "gs://otp-test-bucket/a/b/osm-oslo-mini.pbf" ],
  *         dem: [ "file:/public/dem/norway.dem.tif" ],
- *         gtfs: ["file:/a/b/rut-gtfs.zip", "file:/a/b/vy-gtfs.zip"],
- *         buildReportDir: "file:/a/b/otp/build-report"
+ *         gtfs: ["gs://otp-bucket/rut-gtfs.zip", "gs://otp-bucket/vy-gtfs.zip"],
+ *         buildReportDir: "gs://otp-bucket/build-report"
  *     }
  *  }
  * </pre>
+ * In the example above, the Google cloud service credentials file resolved using an environment
+ * variable. The OSM and GTFS data is streamed from Google Cloud Storage, the elevation data is
+ * fetched from the local file system and the build report is stored in the cloud. All other
+ * artifacts like the loaded graph, saved graph and NeTEx files are loaded and written from/to the local
+ * base directory - it they exist.
  */
 public class StorageParameters {
+
+    /**
+     * Local file system path to Google Cloud Platform service accounts credentials file. The
+     * credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you
+     * need to provide a path the the service credentials. Environment variables in the path is
+     * resolved.
+     * <p>
+     * Example: {@code "credentialsFile" : "${MY_GOC_SERVICE}"} or {@code "app-1-3983f9f66728.json"
+     * : "~/"}
+     * <p>
+     * This is a path to a file on the local file system, not an URI.
+     * <p>
+     * This parameter is optional.
+     */
+    public final String gsCredentials;
 
     /**
      * URI to the street graph object file for reading and writing. The file is created or
@@ -102,6 +127,7 @@ public class StorageParameters {
     public final URI buildReportDir;
 
     StorageParameters(JsonNode node) {
+        this.gsCredentials = node.path("gsCredentials").asText(null);
         this.graph = uriFromJson("graph", node);
         this.streetGraph = uriFromJson("streetGraph", node);
         this.osm.addAll(uris("osm", node));
