@@ -1,8 +1,12 @@
 package org.opentripplanner.netex.configure;
 
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.netex.loader.NetexZipFileHierarchy;
+import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
 import org.opentripplanner.standalone.config.GraphBuildParameters;
 import org.opentripplanner.standalone.config.NetexParameters;
 
@@ -24,52 +28,54 @@ import java.util.List;
  */
 public class NetexConfig {
 
-    private final GraphBuildParameters builderParams;
+    private final GraphBuildParameters buildParams;
 
     private NetexConfig(GraphBuildParameters builderParams) {
-        this.builderParams = builderParams;
+        this.buildParams = builderParams;
     }
 
-    public static NetexModule netexModule(GraphBuildParameters builderParams, List<File> netexFiles) {
-        return new NetexConfig(builderParams).netexModule(netexFiles);
+
+    public static NetexModule netexModule(
+            GraphBuildParameters buildParams,
+            Iterable<DataSource> netexSources
+    ) {
+        return new NetexConfig(buildParams).netexModule(netexSources);
     }
 
     public static NetexBundle netexBundleForTest(GraphBuildParameters builderParams, File netexZipFile) {
-        return new NetexConfig(builderParams).netexBundle(netexZipFile);
+        return new NetexConfig(builderParams).netexBundle(new ZipFileDataSource(netexZipFile, FileType.NETEX));
     }
 
-
-    private NetexModule netexModule(List<File> netexFiles) {
+    private NetexModule netexModule(Iterable<DataSource> netexSources) {
         List<NetexBundle> netexBundles = new ArrayList<>();
 
-        for(File netexFile : netexFiles){
-            NetexBundle netexBundle = netexBundle(netexFile);
+        for(DataSource it : netexSources){
+            NetexBundle netexBundle = netexBundle((CompositeDataSource)it);
             netexBundles.add(netexBundle);
         }
 
         return new NetexModule(
-                builderParams.netex.netexFeedId,
-                builderParams.parentStopLinking,
-                builderParams.stationTransfers,
-                (int)(builderParams.subwayAccessTime * 60),
-                builderParams.maxInterlineDistance,
+                buildParams.netex.netexFeedId,
+                buildParams.parentStopLinking,
+                buildParams.stationTransfers,
+                buildParams.getSubwayAccessTimeSeconds(),
+                buildParams.maxInterlineDistance,
                 netexBundles
         );
     }
 
     /** public to enable testing */
-    private NetexBundle netexBundle(File netexFile) {
-        return new NetexBundle(builderParams.netex.netexFeedId, fileHierarchy(netexFile));
+    private NetexBundle netexBundle(CompositeDataSource source) {
+        return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source));
     }
 
-    private NetexZipFileHierarchy fileHierarchy(File netexFile){
-        NetexParameters c = builderParams.netex;
-        return new NetexZipFileHierarchy(
+    private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){
+        NetexParameters c = buildParams.netex;
+        return new NetexDataSourceHierarchy(source).prepare(
                 c.ignoreFilePattern,
                 c.sharedFilePattern,
                 c.sharedGroupFilePattern,
-                c.groupFilePattern,
-                netexFile
+                c.groupFilePattern
         );
     }
 }

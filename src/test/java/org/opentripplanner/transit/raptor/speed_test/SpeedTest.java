@@ -5,7 +5,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.transit.raptor.RangeRaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
@@ -77,7 +76,7 @@ public class SpeedTest {
         // Given the following setup
         AvgTimer.enableTimers(true);
         SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
-        Graph graph = GraphLoader.loadGraph(new File(opts.rootDir(), "Graph.obj"));
+        Graph graph = Graph.load(new File(opts.rootDir(), "Graph.obj"));
 
         // create a new test
         SpeedTest speedTest = new SpeedTest(graph, opts);

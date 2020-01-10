@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.loader;
 
+import org.opentripplanner.datastore.DataSource;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -10,9 +12,9 @@ import java.util.List;
  * entries.
  */
 class GroupEntries {
-    private final String name;
-    private final List<FileEntry> sharedEntries = new ArrayList<>();
-    private final List<FileEntry> independentEntries = new ArrayList<>();
+    private String name;
+    private List<DataSource> sharedEntries = new ArrayList<>();
+    private List<DataSource> entries = new ArrayList<>();
 
     GroupEntries(String name) {
         this.name = name;
@@ -22,19 +24,19 @@ class GroupEntries {
         return name;
     }
 
-    void addSharedEntry(FileEntry entry) {
+    void addSharedEntry(DataSource entry) {
         sharedEntries.add(entry);
     }
 
-    Collection<FileEntry> getSharedEntries() {
+    Collection<DataSource> sharedEntries() {
         return sharedEntries;
     }
 
-    void addIndependentEntries(FileEntry entry) {
-        independentEntries.add(entry);
+    void addIndependentEntries(DataSource entry) {
+        entries.add(entry);
     }
 
-    Collection<FileEntry> getIndependentEntries() {
-        return independentEntries;
+    Collection<DataSource> independentEntries() {
+        return entries;
     }
 }

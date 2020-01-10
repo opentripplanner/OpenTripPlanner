@@ -8,8 +8,6 @@ public class NetexParameters {
 
     private static final String EMPTY_STRING_PATTERN = "$^";
 
-    private static final String MODULE_FILE_PATTERN = ".*-netex.*\\.zip";
-
     private static final String IGNORE_FILE_PATTERN = EMPTY_STRING_PATTERN;
 
     private static final String SHARED_FILE_PATTERN = "shared-data\\.xml";
@@ -25,17 +23,6 @@ public class NetexParameters {
      * field in GTFS file feed_info.txt.
      */
     public final String netexFeedId;
-
-    /**
-     * This field is used to identify Netex module (zip) files. The format is
-     * a regular expression. The regular expression should match the name
-     * of the file including file extension, but not the directory path.
-     * <p>
-     * The pattern <code>'.*-netex.*\.zip'</code> matches <code>'norway-netex-no.zip'</code>
-     * <p>
-     * Default value is <code>'.*-netex.*\.zip'</code>
-     */
-    public final Pattern moduleFilePattern;
 
     /**
      * This field is used to exclude matching <em>files</em> in the module file(zip file entries).
@@ -98,16 +85,11 @@ public class NetexParameters {
     public final Pattern groupFilePattern;
 
     NetexParameters(JsonNode config) {
-        moduleFilePattern = pattern("moduleFilePattern", MODULE_FILE_PATTERN, config);
         ignoreFilePattern = pattern("ignoreFilePattern", IGNORE_FILE_PATTERN, config);
         sharedFilePattern = pattern("sharedFilePattern", SHARED_FILE_PATTERN, config);
         sharedGroupFilePattern = pattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN, config);
         groupFilePattern = pattern("groupFilePattern", GROUP_FILE_PATTERN, config);
         netexFeedId = text("netexFeedId", NETEX_FEED_ID, config);
-    }
-
-    public boolean moduleFileMatches(String name) {
-        return moduleFilePattern.matcher(name).matches();
     }
 
     private static Pattern pattern(String path, String defaultValue, JsonNode config) {

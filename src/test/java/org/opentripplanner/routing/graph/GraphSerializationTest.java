@@ -8,6 +8,8 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 
 import java.io.File;
@@ -109,16 +111,20 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     private void testRoundTrip (Graph originalGraph) throws Exception {
-        originalGraph.index();
         // The cached timezone in the graph is transient and lazy-initialized.
         // Previous tests may have caused a timezone to be cached.
         originalGraph.clearTimeZone();
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
-        originalGraph.save(tempFile);
+        originalGraph.save(new FileDataSource(tempFile, FileType.GRAPH));
         Graph copiedGraph1 = Graph.load(tempFile);
+        // Index both graph - we do no know if the original is indexed, because it is cached and
+        // might be indexed by other tests.
+        originalGraph.index();
+        copiedGraph1.index();
         assertNoDifferences(originalGraph, copiedGraph1);
         Graph copiedGraph2 = Graph.load(tempFile);
+        copiedGraph2.index();
         assertNoDifferences(copiedGraph1, copiedGraph2);
     }
 
@@ -132,9 +138,11 @@ public class GraphSerializationTest {
         // Other structures contain Maps with keys that have identity equality - these also cannot be compared yet.
         // We would need to apply a key extractor function to such maps, copying them into new maps.
         objectDiffer.ignoreFields(
+                "calendarService",
                 "incoming",
                 "outgoing",
                 "buildTime",
+                "tripPatternForId",
                 "transitLayer",
                 "realtimeTransitLayer"
         );
