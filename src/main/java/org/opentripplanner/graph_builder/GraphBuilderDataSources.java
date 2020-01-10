@@ -155,13 +155,18 @@ public class GraphBuilderDataSources {
         }
         else if (cli.load) {
             if (!store.getGraph().exists()) {
-                throw new OtpAppException("Unable to load graph, no graph file found.");
+                throw new OtpAppException(
+                        "Unable to load graph, no graph file found: %s",
+                        store.getGraph().path()
+                );
             }
         }
         else if (cli.loadStreet) {
             if (!store.getStreetGraph().exists()) {
                 throw new OtpAppException(
-                        "Unable to load street graph, no street graph file found, .");
+                        "Unable to load street graph, no street graph file found: %s",
+                        store.getStreetGraph().path()
+                );
             }
         }
     }

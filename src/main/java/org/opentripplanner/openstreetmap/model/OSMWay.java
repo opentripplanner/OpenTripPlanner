@@ -1,13 +1,14 @@
 package org.opentripplanner.openstreetmap.model;
 
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+
 import java.util.ArrayList;
 import java.util.List;
 
 public class OSMWay extends OSMWithTags {
 
-    // TODO use trove primitive int list
-
-    private List<Long> nodes = new ArrayList<Long>();
+    private TLongList nodes = new TLongArrayList();
 
     public void addNodeRef(OSMNodeRef nodeRef) {
         nodes.add(nodeRef.getRef());
@@ -18,10 +19,10 @@ public class OSMWay extends OSMWithTags {
     }
 
     public void addNodeRef(long nodeRef, int index) {
-        nodes.add(index, nodeRef);
+        nodes.insert(index, nodeRef);
     }
 
-    public List<Long> getNodeRefs() {
+    public TLongList getNodeRefs() {
         return nodes;
     }
 
