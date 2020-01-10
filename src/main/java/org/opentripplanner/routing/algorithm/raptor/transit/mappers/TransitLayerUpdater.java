@@ -8,6 +8,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -23,15 +24,17 @@ import java.util.stream.Collectors;
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TripPatternMapper.mapOldTripPatternToRaptorTripPattern;
 
 /**
- * Update the TransitLayer from a set of TimeTables. TripPatterns are matched on id and replaced
- * by their updated versions. A list of TripPatternsForDate is copied from the TransitLayer for
- * each relevant date, updated and then atomically replaced in the TransitLayer.
+ * Update the TransitLayer from a set of TimeTables. A shallow copy is made of the TransitLayer
+ * (this also includes a shallow copy of the TripPatternsForDate map). TripPatterns are matched on
+ * id and replaced by their updated versions. The realtime TransitLayer is then switched out
+ * with the updated copy in an atomic operation. This ensures that any TransitLayer that is
+ * referenced from the Graph is never changed.
  */
 public class TransitLayerUpdater {
 
   private static final Logger LOG = LoggerFactory.getLogger(TransitLayerUpdater.class);
 
-  private final TransitLayer transitLayer;
+  private final Graph graph;
 
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
 
@@ -43,22 +46,25 @@ public class TransitLayerUpdater {
                 tripPatternForDateMapCache = new HashMap<>();
 
   public TransitLayerUpdater(
-      TransitLayer transitLayer,
+      Graph graph,
       Map<ServiceDate, TIntSet> serviceCodesRunningForDate
   ) {
-    this.transitLayer = transitLayer;
+    this.graph = graph;
     this.serviceCodesRunningForDate = serviceCodesRunningForDate;
   }
 
   public void update(Set<Timetable> updatedTimetables) {
-    if (transitLayer == null) { return; }
+    // Make a shallow copy of the realtime transit layer
+    TransitLayer realtimeTransitLayer = new TransitLayer(graph.realtimeTransitLayer);
+
+    if (graph.realtimeTransitLayer == null) { return; }
 
     double startTime = System.currentTimeMillis();
 
     // Map TripPatterns for this update to Raptor TripPatterns
     final Map<org.opentripplanner.model.TripPattern, TripPattern>
         newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(
-            transitLayer.getStopIndex(),
+        realtimeTransitLayer.getStopIndex(),
             updatedTimetables.stream().map(t -> t.pattern).collect(Collectors.toSet()
         )
     );
@@ -78,7 +84,8 @@ public class TransitLayerUpdater {
     for (LocalDate date : timetablesByDate.keySet()) {
       Collection<Timetable> timetablesForDate = timetablesByDate.get(date);
 
-      List<TripPatternForDate> patternsForDate = transitLayer.getTripPatternsForDateCopy(date);
+      List<TripPatternForDate> patternsForDate =
+          realtimeTransitLayer.getTripPatternsForDateCopy(date);
 
       if (patternsForDate == null) {
         continue;
@@ -99,10 +106,13 @@ public class TransitLayerUpdater {
         }
       }
 
-      transitLayer.replaceTripPatternsForDate(
+      realtimeTransitLayer.replaceTripPatternsForDate(
           date,
           new ArrayList<>(patternsForDateMap.values())
       );
+
+      // Switch out the reference with the updated transit layer. This is an atomic operation.
+      graph.realtimeTransitLayer = realtimeTransitLayer;
 
       LOG.debug(
           "UPDATING {} tripPatterns took {} ms",

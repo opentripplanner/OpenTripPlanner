@@ -140,7 +140,7 @@ public class Router {
             graph.transitLayer = TransitLayerMapper.map(graph);
             graph.realtimeTransitLayer = new TransitLayer(graph.transitLayer);
             graph.transitLayerUpdater = new TransitLayerUpdater(
-                graph.realtimeTransitLayer,
+                graph,
                 graph.index.getServiceCodesRunningForDate()
             );
         } else {
