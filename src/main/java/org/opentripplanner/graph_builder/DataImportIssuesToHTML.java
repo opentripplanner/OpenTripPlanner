@@ -158,7 +158,6 @@ public class DataImportIssuesToHTML implements GraphBuilderModule {
                 file_writer =new HTMLWriter(issueTypeName + labelCount, partition);
                 writers.add(file_writer);
             }
-
         } else {
             issueTypeOccurrences.add(issueTypeName);
             int labelCount = issueTypeOccurrences.count(issueTypeName);

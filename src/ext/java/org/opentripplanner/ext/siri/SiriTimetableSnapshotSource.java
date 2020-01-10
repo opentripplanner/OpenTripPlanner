@@ -295,7 +295,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                                     }
                                 } catch (Throwable t) {
                                     // Since this is work in progress - catch everything to continue processing updates
-                                    LOG.warn("Adding ExtraJourney with id='{}' failed with '{}'.", journey.getEstimatedVehicleJourneyCode(), t.getMessage());
+                                    LOG.warn("Adding ExtraJourney with id='{}' failed, caused by '{}'.", journey.getEstimatedVehicleJourneyCode(), t.getMessage());
                                     skippedCounter++;
                                 }
                             } else {

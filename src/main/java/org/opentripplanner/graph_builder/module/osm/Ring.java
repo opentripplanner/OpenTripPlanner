@@ -5,6 +5,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
+import gnu.trove.list.TLongList;
+import gnu.trove.map.TLongObjectMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.visibility.VLPoint;
@@ -32,22 +34,7 @@ public class Ring {
     // equivalent to the ring representation, but used for JTS operations
     private Polygon jtsPolygon;
 
-    /**
-     * <p>
-     * Why is there a boolean parameter called javaSucks? Because otherwise the two constructors
-     * have the same erasure, meaning that even though Java has enough information at compile-time
-     * to figure out which constructor I am talking about, it intentionally throws this away in the
-     * interest of having worse run-time performance. Thanks, Java!
-     * </p>
-     * <p>
-     * Oh, and most people would solve this problem by making a static factory method but that won't
-     * work because then all of this class's outer classes would have to be static.
-     * </p>
-     *
-     * @param osmNodes
-     * @param javaSucks
-     */
-    public Ring(List<OSMNode> osmNodes, boolean javaSucks) {
+    public Ring(List<OSMNode> osmNodes) {
         ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
         nodes = osmNodes;
         for (OSMNode node : osmNodes) {
@@ -57,20 +44,20 @@ public class Ring {
         geometry = new VLPolygon(vertices);
     }
 
-    public Ring(List<Long> osmNodes, Map<Long, OSMNode> _nodes) {
+    public Ring(TLongList osmNodes, TLongObjectMap<OSMNode> _nodes) {
         ArrayList<VLPoint> vertices = new ArrayList<VLPoint>();
-        nodes = new ArrayList<OSMNode>(osmNodes.size());
-        for (long nodeId : osmNodes) {
+        nodes = new ArrayList<>(osmNodes.size());
+        osmNodes.forEach(nodeId -> {
             OSMNode node = _nodes.get(nodeId);
             if (nodes.contains(node)) {
-                // hopefully, this only happens in order to
-                // close polygons
-                continue;
+                // Hopefully, this only happens in order to close polygons. Next iteration.
+                return true;
             }
             VLPoint point = new VLPoint(node.lon, node.lat);
             nodes.add(node);
             vertices.add(point);
-        }
+            return true;
+        });
         geometry = new VLPolygon(vertices);
     }
 
