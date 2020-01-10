@@ -15,7 +15,6 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
@@ -72,7 +71,7 @@ class FareAndId {
  * See this thread on gtfs-changes explaining the proper interpretation of fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
-public class DefaultFareServiceImpl implements FareService, Serializable {
+public class DefaultFareServiceImpl implements FareService {
 
     private static final long serialVersionUID = 20120229L;
 
@@ -230,10 +229,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
-        Set<String> zones = new HashSet<String>();
-        Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
-        Set<String> agencies = new HashSet<String>();
-        Set<FeedScopedId> trips = new HashSet<FeedScopedId>();
+        Set<String> zones = new HashSet<>();
+        Set<FeedScopedId> routes = new HashSet<>();
+        Set<String> agencies = new HashSet<>();
+        Set<FeedScopedId> trips = new HashSet<>();
         int transfersUsed = -1;
         
         Ride firstRide = rides.get(0);

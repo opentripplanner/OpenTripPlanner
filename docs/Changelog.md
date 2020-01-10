@@ -17,6 +17,7 @@
 - Add command line parameter for building partial graphs (#2583)
 - Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices (#2887) 
 - New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- Ability to switch off the fare service(#2912).
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
