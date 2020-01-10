@@ -9,6 +9,7 @@ import org.junit.Test;
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -86,6 +87,58 @@ public class ConfigLoaderTest {
 
         // then:
         assertEquals("value", node.path("key").asText());
+    }
+
+    /**
+     * Test replacing environment variables in JSON config. The {@link ConfigLoader} should replace
+     * placeholders like '${ENV_NAME}' when converting a JSON string to a node tree.
+     * <p>
+     * This test pick a random system environment variable and insert it into the JSON string to
+     * be able to test the replace functionality. This is necessary to avoid changing the system
+     * environment variables and to apply this test on the {@link ConfigLoader} level.
+     */
+    @Test
+    public void testReplacementOfEnvironmentVariables() {
+        // Given: Search for a environment variable name containing only alphanumeric characters
+        //        and a value with less than 30 characters (avoid long values like paths for
+        //        readability). We will use this to insert it in the JSON and later see if the
+        //        ConfigLoader is able to replace the placeholder with the expected value.
+        Map.Entry<String, String> envVar = System.getenv().entrySet()
+                .stream()
+                .filter(e ->
+                        e.getKey().matches("\\w+") && e.getValue().length() < 30
+                )
+                .findFirst()
+                .orElse(null);
+
+        if(envVar == null) {
+            fail("No environment variable matching '\\w+' found.");
+        }
+
+        String eName = envVar.getKey();
+        String expectedValue = envVar.getValue();
+
+        // Create JSON with the environment variable inserted
+        String json = json("{  'key': '${" + eName + "}', 'key2':'${" + eName + "}' }");
+
+        // When: parse JSON
+        JsonNode node = ConfigLoader.fromString(json, "test");
+
+        // Then: verify that the JSON node have the expected value
+        String actualValue = node.path("key").asText(null);
+
+        assertEquals(expectedValue, actualValue);
+    }
+
+    /**
+     * Test replacing environment variables in config fails on a unknown environment variable.
+     */
+    @Test(expected = IllegalArgumentException.class)
+    public void testMissingEnvironmentVariable() {
+        ConfigLoader.fromString(
+                "{ key: '${none_existing_env_variable}' }",
+                "test"
+        );
     }
 
     @Test
