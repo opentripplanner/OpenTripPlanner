@@ -143,7 +143,7 @@ class AreaGroup {
             }
             shell.add(node);
         }
-        Ring ring = new Ring(shell, true);
+        Ring ring = new Ring(shell);
         // now the holes
         for (int i = 0; i < polygon.getNumInteriorRing(); ++i) {
             LineString interior = polygon.getInteriorRingN(i);
@@ -155,7 +155,7 @@ class AreaGroup {
                 }
                 hole.add(node);
             }
-            ring.holes.add(new Ring(hole, true));
+            ring.holes.add(new Ring(hole));
         }
 
         return ring;
