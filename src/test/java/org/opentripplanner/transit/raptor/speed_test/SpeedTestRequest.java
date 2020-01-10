@@ -45,10 +45,10 @@ public class SpeedTestRequest {
         }
     };
 
-    private final ZoneId inputZoneId;
     private final TestCase testCase;
     private final SpeedTestCmdLineOpts opts;
-    private final LocalDate date = LocalDate.of(2019, 11, 14);
+    private final ZoneId inputZoneId;
+    private final LocalDate date = LocalDate.of(2019, 11, 12);
 
     SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts, ZoneId inputZoneId) {
         this.testCase = testCase;
@@ -71,10 +71,6 @@ public class SpeedTestRequest {
         return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
     }
 
-    public int getArrivalTime() {
-        return testCase.arrivalTime;
-    }
-
     TraverseModeSet getTransitModes() {
         return new TraverseModeSet(TraverseMode.BUS, TraverseMode.RAIL, TraverseMode.SUBWAY, TraverseMode.TRAM);
     }
@@ -91,23 +87,31 @@ public class SpeedTestRequest {
 
     RangeRaptorRequest<TripSchedule> createRangeRaptorRequest(
             SpeedTestProfile profile,
-            int latestArrivalTime,
             int numOfExtraTransfers,
             boolean oneIterationOnly,
             EgressAccessRouter streetRouter
     ) {
         // Add half of the extra time to departure and half to the arrival
-        int expandDeltaSeconds = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
+        int expandSearchSec = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
 
 
         RequestBuilder<TripSchedule> builder = new RequestBuilder<>();
         builder.searchParams()
                 .boardSlackInSeconds(120)
                 .timetableEnabled(true)
-                .earliestDepartureTime(testCase.departureTime - expandDeltaSeconds)
-                .latestArrivalTime(latestArrivalTime + expandDeltaSeconds)
-                .searchWindowInSeconds(testCase.window + 2 * expandDeltaSeconds)
                 .numberOfAdditionalTransfers(numOfExtraTransfers);
+
+        if(testCase.departureTime != TestCase.NOT_SET) {
+            builder.searchParams().earliestDepartureTime(testCase.departureTime - expandSearchSec);
+        }
+
+        if(testCase.arrivalTime != TestCase.NOT_SET) {
+            builder.searchParams().latestArrivalTime(testCase.arrivalTime + expandSearchSec);
+        }
+
+        if(testCase.window != TestCase.NOT_SET) {
+            builder.searchParams().searchWindowInSeconds(testCase.window + 2 * expandSearchSec);
+        }
 
         if(oneIterationOnly) {
             builder.searchParams().searchOneIterationOnly();
@@ -138,7 +142,6 @@ public class SpeedTestRequest {
 
         return req;
     }
-
 
     private static void addAccessEgressStopArrivals(TIntIntMap timesToStopsInSeconds, Consumer<AccessEgressLeg> addStop) {
         for(TIntIntIterator it = timesToStopsInSeconds.iterator(); it.hasNext(); ) {

@@ -105,7 +105,7 @@ public class SpeedTestCmdLineOpts {
 
         // Search options
         options.addOption(PROFILES, "profiles", true, "A coma separated list of configuration profiles:\n" + String.join("\n", SpeedTestProfile.options()));
-        options.addOption(TEST_CASES, "testCases", true, "A coma separated list of test case numbers to run.");
+        options.addOption(TEST_CASES, "testCases", true, "A coma separated list of test case ids to run.");
         options.addOption(SAMPLE_TEST_N_TIMES, "sampleTestNTimes", true, "Repeat the test N times. Profiles are altered in a round robin fashion.");
         options.addOption(NUM_OF_ADD_TRANSFERS, "nExtraTransfers", true, "The maximum number of extra transfers allowed relative to the path with the fewest transfers.");
 
@@ -149,7 +149,7 @@ public class SpeedTestCmdLineOpts {
         return cmd.hasOption(COMPARE_HEURISTICS);
     }
 
-    public List<String> testCases() {
+    public List<String> testCaseIds() {
         return parseCSVList(TEST_CASES);
     }
 

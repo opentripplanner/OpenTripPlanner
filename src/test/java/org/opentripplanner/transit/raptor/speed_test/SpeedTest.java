@@ -20,6 +20,8 @@ import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.speed_test.transit.TripPlanSupport;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -37,6 +39,7 @@ import java.util.stream.Collectors;
  */
 public class SpeedTest {
 
+    private static final Logger LOG = LoggerFactory.getLogger(SpeedTest.class);
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
@@ -93,6 +96,7 @@ public class SpeedTest {
     }
 
     private void runTest() throws Exception {
+        LOG.info("Run Speed Test");
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
 
@@ -108,6 +112,8 @@ public class SpeedTest {
     }
 
     private void runSingleTest(int sample, int nSamples) throws Exception {
+        LOG.info("Run a single test sample (all test cases once)");
+
         CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
         List<TestCase> testCases = tcIO.readTestCasesFromFile();
         List<TripPlan> tripPlans = new ArrayList<>();
@@ -119,7 +125,7 @@ public class SpeedTest {
         // Force GC to avoid GC during the test
         forceGCToAvoidGCLater();
 
-        List<String> testCaseIds = opts.testCases();
+        List<String> testCaseIds = opts.testCaseIds();
         List<TestCase> testCasesToRun;
 
         if(testCaseIds.isEmpty()) {
@@ -174,7 +180,7 @@ public class SpeedTest {
             } else {
                 // Perform routing
                 TOT_TIMER.start();
-                TripPlan route = route(request, testCase.arrivalTime);
+                TripPlan route = route(request);
                 TOT_TIMER.stop();
 
                 if (!ignoreResults) {
@@ -194,7 +200,7 @@ public class SpeedTest {
     }
 
 
-    public TripPlan route(SpeedTestRequest request, int latestArrivalTime) {
+    public TripPlan route(SpeedTestRequest request) {
         try {
             Collection<Path<TripSchedule>> paths;
             streetRouter.route(request);
@@ -205,7 +211,7 @@ public class SpeedTest {
 
             TIMER_WORKER.start();
 
-            RangeRaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, latestArrivalTime, streetRouter);
+            RangeRaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, streetRouter);
 
             paths = service.route(req, transitData);
 
@@ -236,13 +242,12 @@ public class SpeedTest {
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
         streetRouter.route(heurReq);
         TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
-        int latestArrivalTime = routeReq.getArrivalTime();
 
         RangeRaptorRequest<TripSchedule> req1 = heuristicRequest(
-                heuristicProfile, heurReq, latestArrivalTime, streetRouter
+                heuristicProfile, heurReq, streetRouter
         );
         RangeRaptorRequest<TripSchedule> req2 = heuristicRequest(
-                routeProfile, routeReq, latestArrivalTime, streetRouter
+                routeProfile, routeReq, streetRouter
         );
 
         TIMER_WORKER.start();
@@ -255,6 +260,7 @@ public class SpeedTest {
             int sample,
             int nSamples
     ) {
+        LOG.info("Set up test");
         if (opts.compareHeuristics()) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
@@ -278,12 +284,10 @@ public class SpeedTest {
     private RangeRaptorRequest<TripSchedule> heuristicRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
-            int latestArrivalTime,
             EgressAccessRouter streetRouter
     ) {
         return request.createRangeRaptorRequest(
                 profile,
-                latestArrivalTime,
                 nAdditionalTransfers,
                 true,
                 streetRouter
@@ -294,11 +298,10 @@ public class SpeedTest {
     private RangeRaptorRequest<TripSchedule> rangeRaptorRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
-            int latestArrivalTime,
             EgressAccessRouter streetRouter
     ) {
         return request.createRangeRaptorRequest(
-                profile, latestArrivalTime, nAdditionalTransfers, false, streetRouter
+                profile, nAdditionalTransfers, false, streetRouter
         );
     }
 

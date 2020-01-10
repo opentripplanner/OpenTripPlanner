@@ -18,6 +18,8 @@ public class SearchParamsBuilder {
     private int numberOfAdditionalTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
+    // TODO OTP2 - Rename, this allow the search window to be extended bejond the
+    //           - "latest departure time".
     private boolean waitAtBeginningEnabled;
     private BitSet stopFilter;
     private final Collection<TransferLeg> accessLegs = new ArrayList<>();

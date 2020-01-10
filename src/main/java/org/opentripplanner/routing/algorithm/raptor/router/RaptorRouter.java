@@ -22,8 +22,6 @@ import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.ZoneId;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -31,6 +29,9 @@ import java.util.Map;
 
 /**
  * Does a complete transit search, including access and egress legs.
+ *
+ * TODO OTP2 - Rename to better reflect scope, does more than Raptor routing. This is
+ *           - THE router...
  */
 public class RaptorRouter {
 
@@ -49,8 +50,6 @@ public class RaptorRouter {
   public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
     double startTime = System.currentTimeMillis();
 
-    ZonedDateTime startOfTime = calculateStartOfTime(request);
-
     this.requestTransitDataProvider = new RaptorRoutingRequestTransitData(
         transitLayer,
         request.getDateTime().toInstant(),
@@ -61,12 +60,6 @@ public class RaptorRouter {
     LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
     this.transitLayer = transitLayer;
     this.request = request;
-  }
-
-  private ZonedDateTime calculateStartOfTime(RoutingRequest request) {
-    ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
-    ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
-    return DateMapper.asStartOfService(zdt);
   }
 
   public Collection<Itinerary> route() {
