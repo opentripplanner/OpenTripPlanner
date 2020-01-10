@@ -250,11 +250,12 @@ it is possible to define a multiplier that converts the elevation values from so
 
 ## Fares configuration
 
-By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
-For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
-`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
-by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
-are considered to be sub-fares).
+By default OTP will compute fares according to the GTFS specification if fare data is provided in
+your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex 
+scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and
+bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
+(all fields starting with `fare` are considered to be sub-fares).
 
 ```JSON
 // build-config.json
@@ -292,6 +293,15 @@ are considered to be sub-fares).
 }
 ```
 
+Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
+```JSON
+// build-config.json
+{
+  "fares": "off"
+}
+```
+
+
 The current list of custom fare type is:
 
 - `bike-rental-time-based` - accepting the following parameters:
@@ -300,6 +310,7 @@ The current list of custom fare type is:
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
+- `off` (no parameters)
 
 The current list of `combinationStrategy` is:
 

@@ -26,13 +26,12 @@ public class FakeGraph {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = getFileForResource("columbus.osm.pbf");
-        provider.setPath(file);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
+        loader.buildGraph(gg, new HashMap<>());
         return gg;
     }
 

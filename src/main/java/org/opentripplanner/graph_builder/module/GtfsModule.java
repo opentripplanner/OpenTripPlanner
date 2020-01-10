@@ -121,7 +121,7 @@ public class GtfsModule implements GraphBuilderModule {
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
                 // NB! The calls below have side effects - the builder state is updated!
-                repairStopTimesForEachTrip(graph, builder.getStopTimesSortedByTrip());
+                repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
 
                 // NB! The calls below have side effects - the builder state is updated!
                 createTripPatterns(graph, builder, calendarServiceData.getServiceIds());
@@ -134,6 +134,11 @@ public class GtfsModule implements GraphBuilderModule {
             }
         } catch (IOException e) {
             throw new RuntimeException(e);
+        }
+        finally {
+            // Note the close method of each bundle should NOT throw an exception, so this
+            // code should be safe without the try/catch block.
+            gtfsBundles.forEach(GtfsBundle::close);
         }
 
         // We need to save the calendar service data so we can use it later
@@ -154,7 +159,7 @@ public class GtfsModule implements GraphBuilderModule {
     /**
      * This method have side-effects, the {@code stopTimesByTrip} is updated.
      */
-    private void repairStopTimesForEachTrip(Graph graph, TripStopTimes stopTimesByTrip) {
+    private void repairStopTimesForEachTrip(TripStopTimes stopTimesByTrip) {
         new RepairStopTimesForEachTripOperation(stopTimesByTrip, issueStore).run();
     }
 

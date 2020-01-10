@@ -36,7 +36,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     
     @Before
     public void setUp() {
-        extra = new HashMap<Class<?>, Object>();
+        extra = new HashMap<>();
     }
 
     @Test
@@ -46,11 +46,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(gg, extra);
@@ -104,11 +103,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(gg, extra);
@@ -159,11 +157,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(graph, extra);

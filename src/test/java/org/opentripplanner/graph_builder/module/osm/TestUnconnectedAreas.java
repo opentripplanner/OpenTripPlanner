@@ -35,9 +35,8 @@ public class TestUnconnectedAreas extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
         File file = new File(getClass().getResource("P+R.osm.pbf").getFile());
-        provider.setPath(file);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
         loader.buildGraph(gg, new HashMap<Class<?>, Object>(), issueStore);
 
@@ -65,15 +64,14 @@ public class TestUnconnectedAreas extends TestCase {
      * Hackettstown, NJ, which demonstrates this behavior. See discussion in ticket 1605.
      */
     @Test
-    public void testCoincidentNodeUnconnectedParkAndRide () throws Exception {
+    public void testCoincidentNodeUnconnectedParkAndRide () {
     	
     	Graph g = new Graph();
     	
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
         File file = new File(getClass().getResource("hackett_pr.osm.pbf").getFile());
-        provider.setPath(file);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
         loader.buildGraph(g, new HashMap<Class<?>, Object>());
     	
@@ -153,7 +151,7 @@ public class TestUnconnectedAreas extends TestCase {
       * Additionally, the node of the ring is duplicated to test this corner case.
       */
      @Test
-     public void testRoadPassingOverDuplicatedNode () throws Exception {
+     public void testRoadPassingOverDuplicatedNode () {
     	 List<String> connections = testGeometricGraphWithClasspathFile("coincident_pr.osm.pbf", 1, 2);
     	 
     	 // depending on what order everything comes out of the spatial index, we will inject one of
@@ -171,11 +169,10 @@ public class TestUnconnectedAreas extends TestCase {
      	
          OpenStreetMapModule loader = new OpenStreetMapModule();
          loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
          File file = new File(getClass().getResource(fn).getFile());
-         provider.setPath(file);
+         BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
          loader.setProvider(provider);
-         loader.buildGraph(g, new HashMap<Class<?>, Object>());
+         loader.buildGraph(g, new HashMap<>());
 
          Vertex pr = null;
          
