@@ -4085,14 +4085,13 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(new GraphQLList(legType)))
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).legs)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("weight")
-                        .description("Weight of the itinerary. Used for debugging.")
+                        .description("Weight of the itinerary. Used for debugging. NOT IMPLEMENTED")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((Itinerary)environment.getSource()).weight)
+                        .dataFetcher(environment -> 0.0)
                         .build())
-                 */
+
                 .build();
 
         routingParametersType = GraphQLObjectType.newObject()
