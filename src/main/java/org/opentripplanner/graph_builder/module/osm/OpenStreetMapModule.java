@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Iterables;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -592,7 +594,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 long last = -1;
                 double lastLat = -1, lastLon = -1;
                 String lastLevel = null;
-                for (long nodeId : way.getNodeRefs()) {
+                for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
+                    long nodeId = iter.next();
                     OSMNode node = osmdb.getNode(nodeId);
                     if (node == null)
                         continue WAY;
@@ -950,14 +953,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void initIntersectionNodes() {
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
             for (OSMWay way : osmdb.getWays()) {
-                List<Long> nodes = way.getNodeRefs();
-                for (long node : nodes) {
+                TLongList nodes = way.getNodeRefs();
+                nodes.forEach(node -> {
                     if (possibleIntersectionNodes.contains(node)) {
                         intersectionNodes.put(node, null);
                     } else {
                         possibleIntersectionNodes.add(node);
                     }
-                }
+                    return true;
+                });
             }
             // Intersect ways at area boundaries if needed.
             for (Area area : Iterables.concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas())) {
