@@ -21,8 +21,8 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
@@ -85,6 +85,7 @@ public class GraphIndex {
     public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    public final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
     final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
@@ -144,6 +145,11 @@ public class GraphIndex {
         }
         for (Route route : patternsForRoute.asMap().keySet()) {
             routeForId.put(route.getId(), route);
+        }
+        for (MultiModalStation multiModalStation : graph.multiModalStationById.values()) {
+            for (Station childStation : multiModalStation.getChildStations()) {
+                multiModalStationForStations.put(childStation, multiModalStation);
+            }
         }
 
         // Copy these two service indexes from the graph until we have better ones.

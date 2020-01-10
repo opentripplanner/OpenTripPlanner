@@ -1,5 +1,7 @@
 package org.opentripplanner.util;
 
+import gnu.trove.map.TLongObjectMap;
+
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -11,25 +13,15 @@ import java.util.stream.Collectors;
 
 public class MapUtils {
 
-    /**
-     * An extremely common pattern: add an item to a set in a hash value, creating that set if
-     * necessary
-     * TODO: Replace with Guava
-     */
-    public static final <T, U> void addToMapSet(Map<T, Set<U>> mapList, T key, U value) {
-        Set<U> list = mapList.get(key);
-        if (list == null) {
-            list = new HashSet<U>();
-            mapList.put(key, list);
+    public static final <U> void addToMapSet(TLongObjectMap<Set<U>> mapSet, long key, U value) {
+        Set<U> set = mapSet.get(key);
+        if (set == null) {
+            set = new HashSet<U>();
+            mapSet.put(key, set);
         }
-        list.add(value);
+        set.add(value);
     }
 
-    /**
-     * An extremely common pattern: add an item to a list in a hash value, creating that list if
-     * necessary
-     * TODO: Replace with Guava
-     */
     public static final <T, U> void addToMapList(Map<T, List<U>> mapList, T key, U value) {
         List<U> list = mapList.get(key);
         if (list == null) {

@@ -17,6 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -61,7 +62,12 @@ public class GraphStats {
     
     public static void main(String[] args) {
         GraphStats graphStats = new GraphStats(args);
-        graphStats.run();
+        try {
+            graphStats.run();
+        }
+        catch (OtpAppException ignore) {
+            // The error is handled at a lover level
+        }
     }
     
     private GraphStats(String[] args) {
@@ -87,12 +93,7 @@ public class GraphStats {
 
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
-        try {
-            graph = Graph.load(graphFile);
-        } catch (Exception e) {
-            LOG.error("Exception while loading graph from " + graphFile);
-            return;
-        }
+        graph = Graph.load(graphFile);
 
         /* open output stream (same for all commands) */
         if (outPath != null) {

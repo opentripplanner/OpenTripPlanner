@@ -28,8 +28,4 @@ public class DateMapper {
     public static int secondsSinceStartOfTime(ZonedDateTime startOfTime, Instant instant) {
         return (int) Duration.between(startOfTime.toInstant(), instant).getSeconds();
     }
-
-    public static LocalDate localDateForStartOfTime(ZonedDateTime startOfTime) {
-        return startOfTime.toLocalDate();
-    }
 }

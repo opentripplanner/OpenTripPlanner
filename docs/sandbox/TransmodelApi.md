@@ -7,6 +7,7 @@
 
 ## Changelog
 - Initial version of Transmodel Graph QL API
+- Added support for multimodal StopPlaces
 
 ## Documentation
 

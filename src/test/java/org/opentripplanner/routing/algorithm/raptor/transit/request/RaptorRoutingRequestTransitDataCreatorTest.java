@@ -17,7 +17,7 @@ import java.util.Map;
 
 import static org.junit.Assert.*;
 
-public class MergeTripPatternForDatesTest {
+public class RaptorRoutingRequestTransitDataCreatorTest {
 
     @Test
     public void testMergeTripPatterns() {
@@ -57,7 +57,9 @@ public class MergeTripPatternForDatesTest {
         tripPatternsForDates.add(tripPatternForDatesById3);
 
         // Patterns containing trip schedules for all 3 days. Trip schedules for later days are offset in time when requested.
-        List<TripPatternForDates> combinedTripPatterns = MergeTripPatternForDates.merge(tripPatternsForDates, startOfTime);
+        List<TripPatternForDates> combinedTripPatterns = RaptorRoutingRequestTransitDataCreator.merge(
+            startOfTime, tripPatternsForDates
+        );
 
         // Check the number of trip schedules available for each pattern after combining dates in the search range
         assertEquals(2, combinedTripPatterns.get(0).numberOfTripSchedules());
