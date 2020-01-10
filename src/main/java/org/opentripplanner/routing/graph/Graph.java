@@ -735,8 +735,8 @@ public class Graph implements Serializable {
      * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index () {
+        LOG.info("Index graph...");
         streetIndex = new StreetVertexIndex(this);
-        LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
             // Skip frequency-based patterns which have no timetable (null)
@@ -744,6 +744,7 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
+        LOG.info("Index graph complete.");
     }
     
     /**
