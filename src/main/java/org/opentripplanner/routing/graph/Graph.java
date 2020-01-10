@@ -22,6 +22,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -57,12 +58,14 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -104,8 +107,9 @@ public class Graph implements Serializable {
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
     /**
-     * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
-     * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
+     * Allows a notice element to be attached to an object in the OTP model by its id and then
+     * retrieved by the API when navigating from that object. The map key is entity id:
+     * {@link TransitEntity#getId()}. The notice is part of the static transit data.
      */
     private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
 
@@ -653,9 +657,45 @@ public class Graph implements Serializable {
 
     /* (de) serialization */
 
-    public static Graph load(File file) throws IOException {
-        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
-        return load(new FileInputStream(file));
+    public void save(DataSource graphSource) {
+        LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
+        LOG.info("Writing graph " + graphSource.path() + " ...");
+        new SerializedGraphObject(this).save(graphSource);
+    }
+
+    public static Graph load(File file) {
+        try {
+            return load(new FileInputStream(file), file.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            LOG.error("Graph file not found: " + file, e);
+            throw new OtpAppException(e.getMessage());
+        }
+    }
+
+    public static Graph load(DataSource source) {
+        return load(source.asInputStream(), source.path());
+    }
+
+    public static Graph load(InputStream inputStream, String sourceDescription) {
+        // TODO store version information, halt load if versions mismatch
+        try(inputStream) {
+            LOG.info("Reading graph from '{}'", sourceDescription);
+            Input input = new Input(inputStream);
+            Kryo kryo = SerializedGraphObject.makeKryo();
+            SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
+            Graph graph = serializedGraphObject.graph;
+            LOG.debug("Graph read.");
+            if (graph.graphVersionMismatch()) {
+                throw new RuntimeException("Graph version mismatch detected.");
+            }
+            serializedGraphObject.reconstructEdgeLists();
+            LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            return graph;
+        }
+        catch (IOException e) {
+            LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -677,22 +717,6 @@ public class Graph implements Serializable {
         this.index = new GraphIndex(this);
     }
     
-    public static Graph load(InputStream in) {
-        // TODO store version information, halt load if versions mismatch
-        Input input = new Input(in);
-        Kryo kryo = SerializedGraphObject.makeKryo();
-        SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
-        Graph graph = serializedGraphObject.graph;
-        LOG.debug("Graph read.");
-        if (graph.graphVersionMismatch()) {
-            throw new RuntimeException("Graph version mismatch detected.");
-        }
-        serializedGraphObject.reconstructEdgeLists();
-        LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index();
-        return graph;
-    }
-
     /**
      * Compares the OTP version number stored in the graph with that of the currently running instance. Logs warnings explaining that mismatched
      * versions can cause problems.
@@ -724,12 +748,6 @@ public class Graph implements Serializable {
             LOG.info("This graph was built with the currently running version and commit of OTP.");
             return false;
         }
-    }
-
-    public void save(File file) throws IOException {
-        LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
-        LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        new SerializedGraphObject(this).save(file);
     }
 
     public CalendarService getCalendarService() {

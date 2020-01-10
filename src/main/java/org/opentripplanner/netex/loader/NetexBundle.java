@@ -1,5 +1,7 @@
 package org.opentripplanner.netex.loader;
 
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.NetexModule;
@@ -12,6 +14,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBException;
+import java.io.Closeable;
 import java.io.IOException;
 import java.util.Deque;
 import java.util.LinkedList;
@@ -19,22 +22,25 @@ import java.util.LinkedList;
 import static java.util.Collections.singletonList;
 
 /**
- * Loads/reads a NeTEx bundle of files(a zip file) and maps it into the OTP internal transit model.
+ * Loads/reads a NeTEx bundle of a data source(zip file/directory/cloud storage) and maps it into
+ * the OTP internal transit model.
  * <p>
  * The NeTEx loader will use a file naming convention to load files in a particular order and
  * keeping an index of entities to enable linking. The convention is documented here
  *{@link NetexParameters#sharedFilePattern} and here
- * {@link NetexZipFileHierarchy}.
+ * {@link NetexDataSourceHierarchy}.
  * <p>
  * This class is also responsible for logging progress and exception handling.
  */
-public class NetexBundle {
+public class NetexBundle implements Closeable {
     private static final Logger LOG = LoggerFactory.getLogger(NetexModule.class);
 
     /** stack of NeTEx elements needed to link the input to existing data */
     private Deque<NetexImportDataIndex> netexIndex = new LinkedList<>();
 
-    private final NetexZipFileHierarchy fileHierarchy;
+    private final CompositeDataSource source;
+
+    private final NetexDataSourceHierarchy hierarchy;
 
     /** maps the NeTEx XML document to OTP transit model. */
     private NetexMapper otpMapper;
@@ -46,11 +52,13 @@ public class NetexBundle {
 
     public NetexBundle(
             String netexFeedId,
-            NetexZipFileHierarchy fileHierarchy
+            CompositeDataSource source,
+            NetexDataSourceHierarchy hierarchy
 
     ) {
         this.netexFeedId = netexFeedId;
-        this.fileHierarchy = fileHierarchy;
+        this.source = source;
+        this.hierarchy = hierarchy;
     }
 
     /** load the bundle, map it to the OTP transit model and return */
@@ -58,7 +66,7 @@ public class NetexBundle {
             Deduplicator deduplicator,
             DataImportIssueStore issueStore
     ) {
-        LOG.info("reading {}", fileHierarchy.filename());
+        LOG.info("Reading {}", hierarchy.description());
 
         // Store result in a mutable OTP Transit Model
         OtpTransitServiceBuilder transitBuilder = new OtpTransitServiceBuilder();
@@ -68,38 +76,40 @@ public class NetexBundle {
         otpMapper = new NetexMapper(transitBuilder, netexFeedId, deduplicator, issueStore);
 
         // Load data
-        fileHierarchy.load(this::loadZipFileEntries);
+        loadZipFileEntries();
 
         return transitBuilder;
     }
 
     public void checkInputs() {
-        fileHierarchy.checkFileExist();
+        if (!source.exists()) {
+            throw new RuntimeException("NeTEx " + source.path() + " does not exist.");
+        }
     }
 
 
     /* private methods */
 
     /** Load all files entries in the bundle */
-    private void loadZipFileEntries(NetexZipFileHierarchy entries) {
+    private void loadZipFileEntries() {
 
         // Add a global(this zip file) shared NeTEX DAO
         netexIndex.addFirst(new NetexImportDataIndex());
 
         // Load global shared files
-        loadFilesThenMapToOtpTransitModel("shared file", entries.sharedEntries());
+        loadFilesThenMapToOtpTransitModel("shared file", hierarchy.sharedEntries());
 
-        for (GroupEntries group : entries.groups()) {
+        for (GroupEntries group : hierarchy.groups()) {
             LOG.info("reading group {}", group.name());
 
             newNetexImportDataScope(() -> {
                 // Load shared group files
                 loadFilesThenMapToOtpTransitModel(
                         "shared group file",
-                        group.getSharedEntries()
+                        group.sharedEntries()
                 );
 
-                for (FileEntry entry : group.getIndependentEntries()) {
+                for (DataSource entry : group.independentEntries()) {
                     newNetexImportDataScope(() -> {
                         // Load each independent file in group
                         loadFilesThenMapToOtpTransitModel("group file", singletonList(entry));
@@ -125,8 +135,8 @@ public class NetexBundle {
      * An attempt to map each entry, when read, would lead to missing references, since
      * the order entries are read is not enforced in any way.
      */
-    private void loadFilesThenMapToOtpTransitModel(String fileDescription, Iterable<FileEntry> entries) {
-        for (FileEntry entry : entries) {
+    private void loadFilesThenMapToOtpTransitModel(String fileDescription, Iterable<DataSource> entries) {
+        for (DataSource entry : entries) {
             // Load entry and store it in the index
             loadSingeFileEntry(fileDescription, entry);
         }
@@ -139,15 +149,20 @@ public class NetexBundle {
     }
 
     /** Load a single entry and store it in the index for later */
-    private void loadSingeFileEntry(String fileDescription, FileEntry entry) {
+    private void loadSingeFileEntry(String fileDescription, DataSource entry) {
         try {
-            LOG.info("reading entity {}: {}", fileDescription, entry.filename());
+            LOG.info("reading entity {}: {}", fileDescription, entry.name());
 
-            PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.toBytes());
+            PublicationDeliveryStructure doc = xmlParser.parseXmlDoc(entry.asBytes());
             NetexDocumentParser.parseAndPopulateIndex(index(), doc);
 
-        } catch (IOException | JAXBException e) {
+        } catch (JAXBException e) {
             throw new RuntimeException(e.getMessage(), e);
         }
+    }
+
+    @Override
+    public void close() throws IOException {
+        source.close();
     }
 }

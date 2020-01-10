@@ -33,10 +33,9 @@ public class TestUnroutable extends TestCase {
     public void setUp() throws Exception {
         OpenStreetMapModule osmBuilder = new OpenStreetMapModule();
         osmBuilder.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
         URL osmDataUrl = getClass().getResource("bridge_construction.osm.pbf");
         File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), "UTF-8"));
-        provider.setPath(osmDataFile);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(osmDataFile, true);
         osmBuilder.setProvider(provider);
         HashMap<Class<?>, Object> extra = Maps.newHashMap();
         osmBuilder.buildGraph(graph, extra); // TODO get rid of this "extra" thing
@@ -47,7 +46,7 @@ public class TestUnroutable extends TestCase {
      * therefore tagged highway=construction.
      * TODO also test unbuilt, proposed, raceways etc.
      */
-    public void testOnBoardRouting() throws Exception {
+    public void testOnBoardRouting() {
 
         RoutingRequest options = new RoutingRequest();
 

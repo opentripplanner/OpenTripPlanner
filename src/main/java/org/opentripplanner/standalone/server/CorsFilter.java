@@ -1,7 +1,5 @@
 package org.opentripplanner.standalone.server;
 
-import java.io.IOException;
-
 import javax.ws.rs.HttpMethod;
 import javax.ws.rs.container.ContainerRequestContext;
 import javax.ws.rs.container.ContainerRequestFilter;
@@ -9,6 +7,7 @@ import javax.ws.rs.container.ContainerResponseContext;
 import javax.ws.rs.container.ContainerResponseFilter;
 import javax.ws.rs.core.MultivaluedMap;
 import javax.ws.rs.core.Response;
+import java.io.IOException;
 
 /**
  * The Same Origin Policy states that JavaScript code (or other scripts) running on a web page may
@@ -20,7 +19,7 @@ import javax.ws.rs.core.Response;
  * browsers respect "Cross Origin Resource Sharing" (CORS) headers, so we
  * have switched to that system.
  */
-public class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
+class CorsFilter implements ContainerRequestFilter, ContainerResponseFilter {
 
     /**
      * CORS request filter.
