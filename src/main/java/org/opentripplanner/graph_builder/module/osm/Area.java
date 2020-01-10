@@ -6,6 +6,9 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 
+import gnu.trove.list.TLongList;
+import gnu.trove.list.array.TLongArrayList;
+import gnu.trove.map.TLongObjectMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
@@ -34,23 +37,23 @@ class Area {
     private MultiPolygon jtsMultiPolygon;
 
     Area(OSMWithTags parent, List<OSMWay> outerRingWays, List<OSMWay> innerRingWays,
-            Map<Long, OSMNode> _nodes) {
+         TLongObjectMap<OSMNode> _nodes) {
         this.parent = parent;
         // ring assignment
-        List<List<Long>> innerRingNodes = constructRings(innerRingWays);
-        List<List<Long>> outerRingNodes = constructRings(outerRingWays);
+        List<TLongList> innerRingNodes = constructRings(innerRingWays);
+        List<TLongList> outerRingNodes = constructRings(outerRingWays);
         if (innerRingNodes == null || outerRingNodes == null) {
             throw new AreaConstructionException();
         }
-        ArrayList<List<Long>> allRings = new ArrayList<List<Long>>(innerRingNodes);
+        ArrayList<TLongList> allRings = new ArrayList<>(innerRingNodes);
         allRings.addAll(outerRingNodes);
 
         List<Ring> innerRings = new ArrayList<Ring>();
         List<Ring> outerRings = new ArrayList<Ring>();
-        for (List<Long> ring : innerRingNodes) {
+        for (TLongList ring : innerRingNodes) {
             innerRings.add(new Ring(ring, _nodes));
         }
-        for (List<Long> ring : outerRingNodes) {
+        for (TLongList ring : outerRingNodes) {
             outerRings.add(new Ring(ring, _nodes));
         }
 
@@ -93,22 +96,22 @@ class Area {
         return jtsMultiPolygon;
     }
 
-    public List<List<Long>> constructRings(List<OSMWay> ways) {
+    public List<TLongList> constructRings(List<OSMWay> ways) {
         if (ways.size() == 0) {
             // no rings is no rings
             return Collections.emptyList();
         }
 
-        List<List<Long>> closedRings = new ArrayList<List<Long>>();
+        List<TLongList> closedRings = new ArrayList<>();
 
         ArrayListMultimap<Long, OSMWay> waysByEndpoint = ArrayListMultimap.create();
         for (OSMWay way : ways) {
-            List<Long> refs = way.getNodeRefs();
+            TLongList refs = way.getNodeRefs();
 
             long start = refs.get(0);
             long end = refs.get(refs.size() - 1);
             if (start == end) {
-                ArrayList<Long> ring = new ArrayList<Long>(refs);
+                TLongList ring = new TLongArrayList(refs);
                 closedRings.add(ring);
             } else {
                 waysByEndpoint.put(start, way);
@@ -116,19 +119,20 @@ class Area {
             }
         }
 
-        // precheck for impossible situations
-        List<Long> toRemove = new ArrayList<Long>();
+        // Precheck for impossible situations, and remove those.
+        TLongList endpointsToRemove = new TLongArrayList();
         for (Long endpoint : waysByEndpoint.keySet()) {
             Collection<OSMWay> list = waysByEndpoint.get(endpoint);
             if (list.size() % 2 == 1) {
-                return null;
+                endpointsToRemove.add(endpoint);
             }
         }
-        for (Long key : toRemove) {
-            waysByEndpoint.removeAll(key);
-        }
+        endpointsToRemove.forEach(endpoint -> {
+            waysByEndpoint.removeAll(endpoint);
+            return true;
+        });
 
-        List<Long> partialRing = new ArrayList<Long>();
+        TLongList partialRing = new TLongArrayList();
         if (waysByEndpoint.size() == 0) {
             return closedRings;
         }
@@ -138,7 +142,7 @@ class Area {
         for (Long endpoint : waysByEndpoint.keySet()) {
             List<OSMWay> list = waysByEndpoint.get(endpoint);
             firstWay = list.get(0);
-            List<Long> nodeRefs = firstWay.getNodeRefs();
+            TLongList nodeRefs = firstWay.getNodeRefs();
             partialRing.addAll(nodeRefs);
             firstEndpoint = nodeRefs.get(0);
             otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
@@ -154,20 +158,20 @@ class Area {
     }
 
     private boolean constructRingsRecursive(ArrayListMultimap<Long, OSMWay> waysByEndpoint,
-            List<Long> ring, List<List<Long>> closedRings, long endpoint) {
+                                            TLongList ring, List<TLongList> closedRings, long endpoint) {
 
         List<OSMWay> ways = new ArrayList<OSMWay>(waysByEndpoint.get(endpoint));
 
         for (OSMWay way : ways) {
             // remove this way from the map
-            List<Long> nodeRefs = way.getNodeRefs();
+            TLongList nodeRefs = way.getNodeRefs();
             long firstEndpoint = nodeRefs.get(0);
             long otherEndpoint = nodeRefs.get(nodeRefs.size() - 1);
 
             waysByEndpoint.remove(firstEndpoint, way);
             waysByEndpoint.remove(otherEndpoint, way);
 
-            ArrayList<Long> newRing = new ArrayList<Long>(ring.size() + nodeRefs.size());
+            TLongList newRing = new TLongArrayList(ring.size() + nodeRefs.size());
             long newFirstEndpoint;
             if (firstEndpoint == endpoint) {
                 for (int j = nodeRefs.size() - 1; j >= 1; --j) {
@@ -180,7 +184,7 @@ class Area {
                 newRing.addAll(ring);
                 newFirstEndpoint = firstEndpoint;
             }
-            if (newRing.get(newRing.size() - 1).equals(newRing.get(0))) {
+            if (newRing.get(newRing.size() - 1) == (newRing.get(0))) {
                 // ring closure
                 closedRings.add(newRing);
                 // if we're out of endpoints, then we have succeeded
@@ -189,7 +193,7 @@ class Area {
                 }
 
                 // otherwise, we need to start a new partial ring
-                newRing = new ArrayList<Long>();
+                newRing = new TLongArrayList();
                 OSMWay firstWay = null;
                 for (Long entry : waysByEndpoint.keySet()) {
                     List<OSMWay> list = waysByEndpoint.get(entry);

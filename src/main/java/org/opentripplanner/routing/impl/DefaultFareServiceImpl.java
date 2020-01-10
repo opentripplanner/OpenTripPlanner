@@ -1,19 +1,7 @@
 package org.opentripplanner.routing.impl;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.conveyal.r5.otp2.api.path.Path;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
@@ -23,8 +11,20 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {

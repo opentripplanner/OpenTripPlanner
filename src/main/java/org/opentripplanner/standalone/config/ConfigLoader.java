@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.commons.io.IOUtils;
 import org.opentripplanner.reflect.ReflectionLibrary;
-import org.opentripplanner.util.EnvironmentVariableReplacer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -16,6 +15,8 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
+
+import static org.opentripplanner.util.EnvironmentVariableReplacer.insertEnvironmentVariables;
 
 /**
  * Generic config file loader. This is used to load all configuration files.
@@ -61,11 +62,11 @@ public class ConfigLoader {
     }
 
     /**
-     * Generic method to parse the given json and return a JsonNode tree. The name is used
-     * to generate a proper error message in case the string is not a proper JSON document.
+     * Generic method to parse the given json and return a JsonNode tree. The {@code source} is
+     * used to generate a proper error message in case the string is not a proper JSON document.
      */
-    public static JsonNode fromString(String json, String name) {
-        return new ConfigLoader(null, json).stringToJsonNode(json, name);
+    public static JsonNode fromString(String json, String source) {
+        return new ConfigLoader(null, json).stringToJsonNode(json, source);
     }
 
     /**
@@ -170,16 +171,18 @@ public class ConfigLoader {
     }
 
     /**
-     * Convert a String into JsonNode. Comments and unquoted fields are allowed
-     * int he given {@code jsonAsString} input.
+     * Convert a String into JsonNode. Comments and unquoted fields are allowed in the given {@code
+     * jsonAsString} input.
+     *
+     * @param source is used only to generate a human friendly error message in case of an error
+     *               parsing the JSON or inserting environment variables.
      */
     private JsonNode stringToJsonNode(String jsonAsString, String source) {
         try {
             if(jsonAsString == null) {
                 return MissingNode.getInstance();
             }
-            EnvironmentVariableReplacer envReplacer = new EnvironmentVariableReplacer();
-            jsonAsString = envReplacer.replace(jsonAsString);
+            jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
             return mapper.readTree(jsonAsString);
         }

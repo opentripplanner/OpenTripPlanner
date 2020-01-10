@@ -58,12 +58,14 @@ import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
+import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectInputStream;
@@ -662,8 +664,13 @@ public class Graph implements Serializable {
         new SerializedGraphObject(this).save(graphSource);
     }
 
-    public static Graph load(File file) throws IOException {
-        return load(new FileInputStream(file), file.getAbsolutePath());
+    public static Graph load(File file) {
+        try {
+            return load(new FileInputStream(file), file.getAbsolutePath());
+        } catch (FileNotFoundException e) {
+            LOG.error("Graph file not found: " + file, e);
+            throw new OtpAppException(e.getMessage());
+        }
     }
 
     public static Graph load(DataSource source) {

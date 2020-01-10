@@ -10,7 +10,7 @@ import java.util.IllegalFormatException;
 /**
  * When an error situation happens inside OTP this exception can be used to terminate OTP or the
  * current request (http server). The message should contain enough information to the user to fix
- * the problem. Before OTP terminates the message wil be logged WITHOUT any stacktrace.
+ * the problem. Before OTP terminates the message will be logged WITHOUT any stacktrace.
  * <p>
  * Typical use cases for this exception is:
  * <ul>
@@ -21,7 +21,7 @@ import java.util.IllegalFormatException;
  *      </li>
  *      <li>The command line parameters don´t match the input files.</li>
  *      <li>
- *          When a exception occurs it is preferable to catch it at the right level, were the
+ *          When a exception occurs it is preferable to catch it at the right level, were most
  *          context information is available. At this point the exception should be logged
  *          with a stacktrace. Then this exception can be re-thrown to terminate the application
  *          or request.
