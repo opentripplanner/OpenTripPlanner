@@ -3,8 +3,8 @@ package org.opentripplanner.model.calendar.impl;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.slf4j.Logger;

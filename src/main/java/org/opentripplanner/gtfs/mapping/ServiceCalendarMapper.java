@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;

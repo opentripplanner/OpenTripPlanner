@@ -27,7 +27,7 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;

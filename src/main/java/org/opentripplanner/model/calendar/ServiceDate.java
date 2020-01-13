@@ -13,8 +13,8 @@ import java.util.regex.Pattern;
 
 /**
  * A general representation of a year-month-day tuple not tied to any locale and
- * used by the GTFS entities {@link org.opentripplanner.model.ServiceCalendar} and
- * {@link org.opentripplanner.model.ServiceCalendarDate} to represent service date ranges.
+ * used by the GTFS entities {@link ServiceCalendar} and
+ * {@link ServiceCalendarDate} to represent service date ranges.
  * A service date is a particular date when a particular GTFS service id is active.
  *
  * @author bdferris

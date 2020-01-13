@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.model.calendar;
 
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.io.Serializable;
 import java.util.Objects;

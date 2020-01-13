@@ -3,7 +3,7 @@ package org.opentripplanner.netex.loader.mapping;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ServiceCodeDoesNotContainServiceDates;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMapById;
@@ -19,8 +19,8 @@ import java.util.Collections;
 import java.util.Set;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_ADD;
-import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
+import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_ADD;
+import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 
 // TODO OTP2 - Add Unit tests
 //           - JavaDoc needed

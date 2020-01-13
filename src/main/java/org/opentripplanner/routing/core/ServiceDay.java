@@ -9,7 +9,7 @@ import java.util.TimeZone;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.routing.graph.Graph;
 
 /**
