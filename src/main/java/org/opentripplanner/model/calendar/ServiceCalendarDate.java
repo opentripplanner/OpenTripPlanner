@@ -7,44 +7,51 @@ import java.io.Serializable;
 import java.util.Objects;
 
 /**
- * @author bdferris
+ * This class explicitly activate or disable a service by date. It can be used in two ways.
+ * <ol>
+ *     <li>in conjunction with {@link ServiceCalendar} to define exceptions to the default service
+ *     patterns defined.
+ *     <li>Omit {@link ServiceCalendar} and use this class to specify each date of service.
+ * </ol>
  *
+ * This class is immutable.
  */
 public final class ServiceCalendarDate implements Serializable, Comparable<ServiceCalendarDate> {
 
     private static final long serialVersionUID = 1L;
 
+    /**
+     * Service has been added for the specified date.
+     */
     public static final int EXCEPTION_TYPE_ADD = 1;
+
+    /**
+     * Service has been removed for the specified date.
+     */
     public static final int EXCEPTION_TYPE_REMOVE = 2;
 
-    private FeedScopedId serviceId;
+    private final FeedScopedId serviceId;
 
-    private ServiceDate date;
+    private final ServiceDate date;
 
-    private int exceptionType;
+    private final int exceptionType;
+
+    public ServiceCalendarDate(FeedScopedId serviceId, ServiceDate date, int exceptionType) {
+        this.serviceId = serviceId;
+        this.date = date;
+        this.exceptionType =  exceptionType;
+    }
 
     public FeedScopedId getServiceId() {
         return serviceId;
-    }
-
-    public void setServiceId(FeedScopedId serviceId) {
-        this.serviceId = serviceId;
     }
 
     public ServiceDate getDate() {
         return date;
     }
 
-    public void setDate(ServiceDate date) {
-        this.date = date;
-    }
-
     public int getExceptionType() {
         return exceptionType;
-    }
-
-    public void setExceptionType(int exceptionType) {
-        this.exceptionType = exceptionType;
     }
 
     @Override

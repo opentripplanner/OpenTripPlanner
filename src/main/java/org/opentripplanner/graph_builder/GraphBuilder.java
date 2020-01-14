@@ -175,7 +175,7 @@ public class GraphBuilder implements Runnable {
                 gtfsBundle.maxInterlineDistance = config.maxInterlineDistance;
                 gtfsBundles.add(gtfsBundle);
             }
-            GtfsModule gtfsModule = new GtfsModule(gtfsBundles);
+            GtfsModule gtfsModule = new GtfsModule(gtfsBundles, config.getTransitServicePeriod());
             gtfsModule.setFareServiceFactory(config.fareServiceFactory);
             graphBuilder.addModule(gtfsModule);
         }

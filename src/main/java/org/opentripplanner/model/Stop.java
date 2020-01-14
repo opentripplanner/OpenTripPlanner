@@ -46,6 +46,10 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     public Stop() {}
 
+    public Stop(FeedScopedId id) {
+        this.id = id;
+    }
+
     @Override public FeedScopedId getId() {
         return id;
     }

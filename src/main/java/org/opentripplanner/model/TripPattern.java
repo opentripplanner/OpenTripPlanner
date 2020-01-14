@@ -34,6 +34,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -294,6 +295,20 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         }
     }
 
+    /**
+     * Remove all trips matching the given predicate.
+     * @param removeTrip it the predicate returns true
+     */
+    public void removeTrips(Predicate<Trip> removeTrip) {
+        trips.removeIf(removeTrip);
+        if(trips.isEmpty()) {
+            scheduledTimetable.tripTimes.clear();
+        }
+        else {
+            scheduledTimetable.tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
+        }
+    }
+
     private static String stopNameAndId (Stop stop) {
         return stop.getName() + " (" + GtfsLibrary.convertIdToString(stop.getId()) + ")";
     }
@@ -467,10 +482,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         for (Trip trip : trips) {
             FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
-                services.set(serviceCodes.get(trip.getServiceId()));
+                services.set(serviceCodes.get(serviceId));
             }
             else {
-                LOG.warn("ServiceCode " + serviceCodes.toString() + " not found.");
+                LOG.warn("Service " + serviceId + " not found in service codes not found.");
             }
         }
         scheduledTimetable.setServiceCodes (serviceCodes);

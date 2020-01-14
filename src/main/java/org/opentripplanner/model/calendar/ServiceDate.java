@@ -5,6 +5,7 @@ import java.io.Serializable;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.TimeZone;
@@ -17,10 +18,9 @@ import java.util.regex.Pattern;
  * {@link ServiceCalendarDate} to represent service date ranges.
  * A service date is a particular date when a particular GTFS service id is active.
  *
- * @author bdferris
- *
+ * This class is immutable.
  */
-public class ServiceDate implements Serializable, Comparable<ServiceDate> {
+public final class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
     private static final long serialVersionUID = 1L;
 
@@ -39,25 +39,46 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
     private final int day;
 
     /**
-     * Construct a new ServiceDate by specifying the numeric year, month, and day
+     * A uniq increasing number for any valid day between 0000-01-01 and 9999-12-31.
+     * Holes in the sequence is allowed to simplify the calculation.
+     *
+     * The value can safely be used for comparison, equals and hashCode.
+     */
+    private final int sequenceNumber;
+
+
+    /**
+     * Construct a new ServiceDate by specifying the numeric year, month, and day.
+     *
+     * The date must be a valid date between year 1900-01-01 and 9999-12-31.
      *
      * @param year - numeric year (ex. 2010)
      * @param month - numeric month of the year, where Jan = 1, Feb = 2, etc
-     * @param day - numeric day of month
+     * @param day - numeric day of month between 1 and 31.
      */
     public ServiceDate(int year, int month, int day) {
+        // Preconditions
+        verifyIsInRange(year, 0, 9999, "year");
+        verifyIsInRange(month, 1, 12, "month");
+        verifyIsInRange(day, 1, 31, "day");
+
         this.year = year;
         this.month = month;
         this.day = day;
-    }
 
-    public ServiceDate(ServiceDate o) {
-        this(o.year, o.month, o.day);
+        // The coefficient used are primes equals/larger then the maximum sum of the
+        // following terms.
+        // Month: max 31 days per month => 31 is a prime.
+        // Year: 31 days + 11 months * 31 days/month = max 372 days/year => 373 is a prime
+        this.sequenceNumber = 373 * year + 31 * (month-1) + day;
     }
 
     public ServiceDate(Calendar calendar) {
-        this(calendar.get(Calendar.YEAR), calendar.get(Calendar.MONTH) + 1,
-                calendar.get(Calendar.DAY_OF_MONTH));
+        this(
+                calendar.get(Calendar.YEAR),
+                calendar.get(Calendar.MONTH) + 1,
+                calendar.get(Calendar.DAY_OF_MONTH)
+        );
     }
 
     /**
@@ -72,6 +93,10 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
     public ServiceDate() {
         this(new Date());
+    }
+
+    public ServiceDate(LocalDate date) {
+        this(date.getYear(), date.getMonthValue(), date.getDayOfMonth());
     }
 
     /**
@@ -203,14 +228,33 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
                 / (24 * 60 * 60 * 1000);
     }
 
+    public boolean isBefore(ServiceDate other) {
+        return sequenceNumber < other.sequenceNumber;
+    }
+
+    public boolean isBeforeOrEq(ServiceDate other) {
+        return sequenceNumber <= other.sequenceNumber;
+    }
+
+    public boolean isAfter(ServiceDate other) {
+        return sequenceNumber > other.sequenceNumber;
+    }
+
+    public boolean isAfterOrEq(ServiceDate other) {
+        return sequenceNumber >= other.sequenceNumber;
+    }
+
+    public ServiceDate min(ServiceDate other) {
+        return isBefore(other) ? this : other;
+    }
+
+    public ServiceDate max(ServiceDate other) {
+        return isAfter(other) ? this : other;
+    }
+
     @Override
     public int compareTo(ServiceDate o) {
-        int c = this.year - o.year;
-        if (c == 0)
-            c = this.month - o.month;
-        if (c == 0)
-            c = this.day - o.day;
-        return c;
+        return sequenceNumber - o.sequenceNumber;
     }
 
     @Override
@@ -220,30 +264,16 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + day;
-        result = prime * result + month;
-        result = prime * result + year;
-        return result;
+        return sequenceNumber;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (getClass() != obj.getClass())
-            return false;
+        if (this == obj) { return true; }
+        if (obj == null) { return false; }
+        if (getClass() != obj.getClass()) { return false; }
         ServiceDate other = (ServiceDate) obj;
-        if (day != other.day)
-            return false;
-        if (month != other.month)
-            return false;
-        if (year != other.year)
-            return false;
-        return true;
+        return sequenceNumber == other.sequenceNumber;
     }
 
     /**
@@ -271,14 +301,21 @@ public class ServiceDate implements Serializable, Comparable<ServiceDate> {
         c.add(Calendar.HOUR_OF_DAY, -12);
     }
 
-    /****
-     * Private Methods
-     ****/
 
-    private static final Calendar getCalendarForDate(Date date) {
+    /* Private Methods */
+
+    private static Calendar getCalendarForDate(Date date) {
         Calendar c = Calendar.getInstance();
         c.setTime(date);
         return c;
     }
 
+    private static void verifyIsInRange(int v, int min, int max, String name) {
+        if(v < min || v > max) {
+            throw new IllegalArgumentException(
+                    "The ServiceDate " + name + " is not valid. The value " + v
+                            + " is not in range [" + min + ", " + max + "]."
+            );
+        }
+    }
 }

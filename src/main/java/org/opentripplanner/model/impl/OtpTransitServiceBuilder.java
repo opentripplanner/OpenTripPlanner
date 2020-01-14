@@ -15,8 +15,6 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.calendar.ServiceCalendar;
-import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -27,11 +25,17 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExistentIds;
@@ -42,6 +46,8 @@ import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExis
  * a {@link OtpTransitService} instance.
  */
 public class OtpTransitServiceBuilder {
+    private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
+
     private final EntityById<String, Agency> agenciesById = new EntityById<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
@@ -211,5 +217,102 @@ public class OtpTransitServiceBuilder {
         this.stopsById.reindex();
         this.routesById.reindex();
         this.stopTimesByTrip.reindex();
+    }
+
+    /**
+     * Limit the transit service to a time period removing calendar dates and services
+     * outside the period. If a service is start before and/or ends after the period
+     * then the service is modified to match the period.
+     */
+    public void limitServiceDays(ServiceDateInterval periodLimit) {
+        if(periodLimit.isUnbounded()) {
+            LOG.warn("Limiting transit service is skipped, the period is unbounded.");
+            return;
+        }
+
+        LOG.warn("Limiting transit service days to time period: {}", periodLimit);
+
+        int orgSize = calendarDates.size();
+        calendarDates.removeIf(c -> !periodLimit.include(c.getDate()));
+        logRemove("ServiceCalendarDate", orgSize, calendarDates.size(), "Outside time period.");
+
+        List<ServiceCalendar> keepCal = new ArrayList<>();
+        for (ServiceCalendar calendar : calendars) {
+            if(calendar.getPeriod().overlap(periodLimit)) {
+                calendar.setPeriod(calendar.getPeriod().union(periodLimit));
+                keepCal.add(calendar);
+            }
+        }
+
+        orgSize = calendars.size();
+        if(orgSize != keepCal.size()) {
+            calendars.clear();
+            calendars.addAll(keepCal);
+            logRemove("ServiceCalendar", orgSize, calendars.size(), "Outside time period.");
+        }
+        removeEntitiesWithInvalidReferences();
+        LOG.info("Limiting transit service days to time period complete.");
+    }
+
+    /**
+     * Check all relations and remove entities witch reference none existing entries. This
+     * may happen as a result of inconsistent data or by deliberate removal of elements in the
+     * builder.
+     */
+    private void removeEntitiesWithInvalidReferences() {
+        removeTripsWithNoneExistingServiceIds();
+        removeStopTimesForNoneExistingTrips();
+        fixOrRemovePatternsWhichReferenceNoneExistingTrips();
+        removeTransfersForNoneExistingTrips();
+    }
+
+    /** Remove all trips witch reference none existing service ids */
+    private void removeTripsWithNoneExistingServiceIds() {
+        Set<FeedScopedId> serviceIds = findAllServiceIds();
+        int orgSize = tripsById.size();
+        tripsById.removeIf(t -> !serviceIds.contains(t.getServiceId()));
+        logRemove("Trip", orgSize, tripsById.size(), "Trip service id does not exist.");
+    }
+
+    /** Remove all stopTimes witch reference none existing trips */
+    private void removeStopTimesForNoneExistingTrips() {
+        int orgSize = stopTimesByTrip.size();
+        stopTimesByTrip.removeIf(t -> !tripsById.containsKey(t.getId()));
+        logRemove("StopTime", orgSize, stopTimesByTrip.size(), "StopTime trip does not exist.");
+    }
+
+    /** Remove none existing trips from patterns and then remove empty patterns */
+    private void fixOrRemovePatternsWhichReferenceNoneExistingTrips() {
+        int orgSize = tripPatterns.size();
+        List<Map.Entry<StopPattern, TripPattern>> removePatterns = new ArrayList<>();
+
+        for (Map.Entry<StopPattern, TripPattern> e : tripPatterns.entries()) {
+            TripPattern ptn = e.getValue();
+            ptn.removeTrips(t -> !tripsById.containsKey(t.getId()));
+            if(ptn.getTrips().isEmpty()) {
+                removePatterns.add(e);
+            }
+        }
+        for (Map.Entry<StopPattern, TripPattern> it : removePatterns) {
+            tripPatterns.remove(it.getKey(), it.getValue());
+        }
+        logRemove("TripPattern", orgSize, tripPatterns.size(), "No trips for pattern exist.");
+    }
+
+    /** Remove all transfers witch reference none existing trips */
+    private void removeTransfersForNoneExistingTrips() {
+        int orgSize = transfers.size();
+        transfers.removeIf(it -> noTripExist(it.getFromTrip()) || noTripExist(it.getToTrip()));
+        logRemove("Trip", orgSize, transfers.size(), "Transfer to/from trip does not exist.");
+    }
+
+    /** Return true if the trip is a valid reference; {@code null} or exist. */
+    private boolean noTripExist(Trip t) {
+        return t != null && !tripsById.containsKey(t.getId());
+    }
+
+    private static void logRemove(String type, int orgSize, int newSize, String reason) {
+        if(orgSize == newSize) { return; }
+        LOG.info("{} of {} {}(s) removed. Reason: {}", orgSize - newSize, orgSize, type, reason);
     }
 }

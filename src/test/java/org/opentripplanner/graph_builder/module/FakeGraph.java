@@ -6,6 +6,7 @@ import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -44,7 +45,10 @@ public class FakeGraph {
      * Add many transit lines to a lot of stops. This is only used by InitialStopsTest.
      */
     public static void addTransitMultipleLines (Graph g) {
-        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))));
+        GtfsModule gtfs = new GtfsModule(
+                Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))),
+                ServiceDateInterval.unbounded()
+        );
         gtfs.buildGraph(g, new HashMap<>());
     }
 
@@ -52,7 +56,10 @@ public class FakeGraph {
      * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
      */
     public static void addPerpendicularRoutes (Graph graph) {
-        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip"))));
+        GtfsModule gtfs = new GtfsModule(Arrays.asList(
+                new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip"))),
+                ServiceDateInterval.unbounded()
+        );
         gtfs.buildGraph(graph, new HashMap<>());
     }
 

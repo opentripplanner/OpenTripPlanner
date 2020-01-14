@@ -161,11 +161,11 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static ServiceCalendarDate removeMondayFromAlldays() {
-        ServiceCalendarDate date = new ServiceCalendarDate();
-        date.setServiceId(SERVICE_ALLDAYS_ID);
-        date.setDate(new ServiceDate(2009, 1, 5));
-        date.setExceptionType(EXCEPTION_TYPE_REMOVE);
-        return date;
+        return new ServiceCalendarDate(
+                SERVICE_ALLDAYS_ID,
+                new ServiceDate(2009, 1, 5),
+                EXCEPTION_TYPE_REMOVE
+        );
     }
 
     private static <T> List<T> sort(Collection<? extends T> c) {

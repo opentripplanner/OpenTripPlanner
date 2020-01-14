@@ -83,11 +83,10 @@ class CalendarMapper {
     private ServiceCalendarDate newServiceCalendarDate(
             LocalDateTime date, String serviceId, Integer exceptionType
     ) {
-        ServiceCalendarDate serviceCalendarDate = new ServiceCalendarDate();
-        serviceCalendarDate.setServiceId(idFactory.createId(serviceId));
-        serviceCalendarDate.setDate(
-                new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()));
-        serviceCalendarDate.setExceptionType(exceptionType);
-        return serviceCalendarDate;
+        return new ServiceCalendarDate(
+                idFactory.createId(serviceId),
+                new ServiceDate(date.getYear(), date.getMonthValue(), date.getDayOfMonth()),
+                exceptionType
+        );
     }
 }

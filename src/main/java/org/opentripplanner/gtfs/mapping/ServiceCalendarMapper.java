@@ -34,9 +34,12 @@ class ServiceCalendarMapper {
         lhs.setFriday(rhs.getFriday());
         lhs.setSaturday(rhs.getSaturday());
         lhs.setSunday(rhs.getSunday());
-        lhs.setStartDate(ServiceDateMapper.mapServiceDate(rhs.getStartDate()));
-        lhs.setEndDate(ServiceDateMapper.mapServiceDate(rhs.getEndDate()));
-
+        lhs.setPeriod(
+                ServiceDateMapper.mapServiceDateInterval(
+                        rhs.getStartDate(),
+                        rhs.getEndDate()
+                )
+        );
         return lhs;
     }
 }

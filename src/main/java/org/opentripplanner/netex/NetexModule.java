@@ -7,6 +7,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.routing.graph.Graph;
@@ -34,6 +35,11 @@ public class NetexModule implements GraphBuilderModule {
     private final int maxInterlineDistance;
     private final String netexFeedId;
 
+    /**
+     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceStart
+     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceEnd
+     */
+    private final ServiceDateInterval transitPeriodLimit;
 
     private List<NetexBundle> netexBundles;
 
@@ -45,6 +51,7 @@ public class NetexModule implements GraphBuilderModule {
             boolean parentStationTransfers,
             int subwayAccessTime,
             int maxInterlineDistance,
+            ServiceDateInterval transitPeriodLimit,
             List<NetexBundle> netexBundles
     ) {
         this.netexFeedId = netexFeedId;
@@ -52,6 +59,7 @@ public class NetexModule implements GraphBuilderModule {
         this.parentStationTransfers = parentStationTransfers;
         this.subwayAccessTime = subwayAccessTime;
         this.maxInterlineDistance = maxInterlineDistance;
+        this.transitPeriodLimit = transitPeriodLimit;
         this.netexBundles = netexBundles;
     }
 
@@ -69,8 +77,12 @@ public class NetexModule implements GraphBuilderModule {
             for (NetexBundle netexBundle : netexBundles) {
                 netexBundle.checkInputs();
 
-                OtpTransitServiceBuilder transitBuilder =
-                        netexBundle.loadBundle(graph.deduplicator, issueStore);
+                OtpTransitServiceBuilder transitBuilder = netexBundle.loadBundle(
+                        graph.deduplicator,
+                        issueStore
+                );
+                transitBuilder.limitServiceDays(transitPeriodLimit);
+
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
 
                 OtpTransitService otpService = transitBuilder.build();

@@ -155,11 +155,11 @@ public class OtpTransitServiceBuilderTest {
     }
 
     private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
-        ServiceCalendarDate date = new ServiceCalendarDate();
-        date.setServiceId(serviceId);
-        date.setDate(new ServiceDate(2017, 8, 31));
-        date.setExceptionType(2);
-        return date;
+        return new ServiceCalendarDate(
+                serviceId,
+                new ServiceDate(2017, 8, 31),
+                2
+        );
     }
 
     private static <T> T first(Collection<? extends T> c) {

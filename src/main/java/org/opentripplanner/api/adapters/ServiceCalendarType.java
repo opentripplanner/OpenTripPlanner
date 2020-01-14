@@ -34,8 +34,8 @@ public class ServiceCalendarType {
         this.friday = arg.getFriday();
         this.saturday = arg.getSaturday();
         this.sunday = arg.getSunday();
-        this.startDate = arg.getStartDate().getAsDate().getTime();
-        this.endDate = arg.getEndDate().getAsDate().getTime();
+        this.startDate = arg.getPeriod().getStart().getAsDate().getTime();
+        this.endDate = arg.getPeriod().getEnd().getAsDate().getTime();
     }
 
     public ServiceCalendarType() {

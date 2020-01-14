@@ -1,16 +1,16 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.CalendarService;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.graph.Graph;
+
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.TimeZone;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.calendar.CalendarService;
-import org.opentripplanner.routing.graph.Graph;
 
 /**
  * Represents a day of transit services. 
@@ -41,7 +41,7 @@ public class ServiceDay implements Serializable {
 
     public ServiceDay(Graph graph, ServiceDate serviceDate, CalendarService cs, String agencyId) {
         TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
-        this.serviceDate = new ServiceDate(serviceDate);
+        this.serviceDate = serviceDate;
 
         init(graph, cs, timeZone);
     }
