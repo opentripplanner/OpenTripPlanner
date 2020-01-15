@@ -226,7 +226,7 @@ public class OtpTransitServiceBuilder {
      */
     public void limitServiceDays(ServiceDateInterval periodLimit) {
         if(periodLimit.isUnbounded()) {
-            LOG.warn("Limiting transit service is skipped, the period is unbounded.");
+            LOG.info("Limiting transit service is skipped, the period is unbounded.");
             return;
         }
 
@@ -239,7 +239,7 @@ public class OtpTransitServiceBuilder {
         List<ServiceCalendar> keepCal = new ArrayList<>();
         for (ServiceCalendar calendar : calendars) {
             if(calendar.getPeriod().overlap(periodLimit)) {
-                calendar.setPeriod(calendar.getPeriod().union(periodLimit));
+                calendar.setPeriod(calendar.getPeriod().intersection(periodLimit));
                 keepCal.add(calendar);
             }
         }

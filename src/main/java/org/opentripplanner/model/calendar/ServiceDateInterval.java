@@ -61,7 +61,7 @@ public final class ServiceDateInterval {
 
     /**
      * The intervals have at least one day in common.
-     * @see #union(ServiceDateInterval)
+     * @see #intersection(ServiceDateInterval)
      */
     public boolean overlap(ServiceDateInterval other) {
         if(start.isBeforeOrEq(other.end)) {
@@ -71,20 +71,23 @@ public final class ServiceDateInterval {
     }
 
     /**
-     * Return a new service interval that contains the period witch is common for both periods
-     * (common set of service days).
+     * Return a new service interval that contains the period with all dates that exist in both
+     * periods (intersection of {@code this} and {@code other}).
      *
-     * @see #overlap(ServiceDateInterval) for checking an union exist.
+     * @see #overlap(ServiceDateInterval) for checking an intersection exist.
      *
      * @throws IllegalArgumentException it the to periods do not overlap.
      */
-    public ServiceDateInterval union(ServiceDateInterval other) {
+    public ServiceDateInterval intersection(ServiceDateInterval other) {
         return new ServiceDateInterval(
                 start.max(other.start),
                 end.min(other.end)
         );
     }
 
+    /**
+     * Return {@code true} is the given {@code date} exist in this period.
+     */
     public boolean include(ServiceDate date) {
         return start.isBeforeOrEq(date) && end.isAfterOrEq(date);
     }

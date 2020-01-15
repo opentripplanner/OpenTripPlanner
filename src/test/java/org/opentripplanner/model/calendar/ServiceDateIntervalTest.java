@@ -83,25 +83,25 @@ public class ServiceDateIntervalTest {
     }
 
     @Test
-    public void union() {
+    public void intersection() {
         ServiceDateInterval subject = new ServiceDateInterval(d1, d2);
 
-        // Union self -> self
-        assertEquals(subject, subject.union(subject));
+        // Intersection of subject and subject -> subject
+        assertEquals(subject, subject.intersection(subject));
 
         // First day in common
-        assertEquals(new ServiceDateInterval(d1, d1), subject.union(new ServiceDateInterval(d0, d1)));
+        assertEquals(new ServiceDateInterval(d1, d1), subject.intersection(new ServiceDateInterval(d0, d1)));
 
         // Last day in common
-        assertEquals(new ServiceDateInterval(d2, d2), subject.union(new ServiceDateInterval(d2, d3)));
+        assertEquals(new ServiceDateInterval(d2, d2), subject.intersection(new ServiceDateInterval(d2, d3)));
 
-        // self union Unlimited -> self
-        assertEquals(subject, subject.union(ServiceDateInterval.unbounded()));
+        // The intersection of subject and unlimited -> subject
+        assertEquals(subject, subject.intersection(ServiceDateInterval.unbounded()));
     }
 
     @Test(expected = IllegalArgumentException.class)
-    public void unionFailsIfAUnionDoNotExist() {
-        new ServiceDateInterval(d0, d1).union(new ServiceDateInterval(d1.shift(1), d2));
+    public void intersectionFailsIfAUnionDoNotExist() {
+        new ServiceDateInterval(d0, d1).intersection(new ServiceDateInterval(d1.shift(1), d2));
     }
 
     @Test
