@@ -103,7 +103,8 @@ public class SearchContext<T extends TripScheduleInfo> {
                 f.boardCost(),
                 request.searchParams().boardSlackInSeconds(),
                 f.walkReluctanceFactor(),
-                f.waitReluctanceFactor()
+                f.waitReluctanceFactor(),
+                lifeCycle()
         );
     }
 

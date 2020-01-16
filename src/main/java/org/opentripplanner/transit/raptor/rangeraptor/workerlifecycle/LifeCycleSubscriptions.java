@@ -16,7 +16,7 @@ import java.util.function.IntConsumer;
  */
 public final class LifeCycleSubscriptions implements WorkerLifeCycle {
     final List<IntConsumer> setupIterationListeners = new ArrayList<>();
-    final List<Runnable> prepareForNextRoundListeners = new ArrayList<>();
+    final List<IntConsumer> prepareForNextRoundListeners = new ArrayList<>();
     final List<Runnable> transitsForRoundCompleteListeners = new ArrayList<>();
     final List<Runnable> transfersForRoundCompleteListeners = new ArrayList<>();
     final List<Consumer<Boolean>> roundCompleteListeners = new ArrayList<>();
@@ -31,7 +31,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
     }
 
     @Override
-    public void onPrepareForNextRound(Runnable prepareForNextRound) {
+    public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
         if(prepareForNextRound != null) {
             this.prepareForNextRoundListeners.add(prepareForNextRound);
         }

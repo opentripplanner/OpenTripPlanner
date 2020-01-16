@@ -55,7 +55,7 @@ public final class BestTimes {
 
         // Attach to Worker life cycle
         lifeCycle.onSetupIteration((ignore) -> setupIteration());
-        lifeCycle.onPrepareForNextRound(this::prepareForNextRound);
+        lifeCycle.onPrepareForNextRound(round -> prepareForNextRound());
     }
 
     public int time(int stop) {

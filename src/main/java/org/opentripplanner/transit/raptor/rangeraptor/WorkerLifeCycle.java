@@ -36,13 +36,12 @@ public interface WorkerLifeCycle {
     /**
      * Subscribe to 'prepare for next round' events by register listener.
      * Every time a new round start the listener(the input parameter) is
-     * notified/invoked.
+     * notified/invoked with the current round as a argument.
      *
      * @param prepareForNextRound if {@code null} nothing is added to the publisher.
+     *                            The round number(0..n) is passed to the subscriber.
      */
-    void onPrepareForNextRound(Runnable prepareForNextRound);
-
-
+    void onPrepareForNextRound(IntConsumer prepareForNextRound);
 
     /**
      * Subscribe to 'transits for round complete' events by register listener.
@@ -52,7 +51,6 @@ public interface WorkerLifeCycle {
      * @param transitsForRoundComplete if {@code null} nothing is added to the publisher.
      */
     void onTransitsForRoundComplete(Runnable transitsForRoundComplete);
-
 
     /**
      * Subscribe to 'transfers for round complete' events by register listener.
