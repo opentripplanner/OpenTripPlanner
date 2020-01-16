@@ -14,7 +14,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleBuilder;
+import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 
 import java.util.Collection;
@@ -41,11 +41,10 @@ public class SearchContext<T extends TripScheduleInfo> {
     private final TuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final WorkerPerformanceTimers timers;
-    private final DebugRequest<T> debugRequest;
     private final DebugHandlerFactory<T> debugFactory;
     private final StopFilter stopFilter;
 
-    private LifeCycleBuilder lifeCycleBuilder = new LifeCycleBuilder();
+    private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
     public SearchContext(
             RangeRaptorRequest<T> request,
@@ -60,8 +59,7 @@ public class SearchContext<T extends TripScheduleInfo> {
         this.calculator = createCalculator(this.request, tuningParameters);
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
         this.timers = timers;
-        this.debugRequest = debugRequest(request);
-        this.debugFactory = new DebugHandlerFactory<>(this.debugRequest, lifeCycle());
+        this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
         this.stopFilter = request.searchParams().stopFilter() != null
                 ? new StopFilterBitSet(request.searchParams().stopFilter())
                 : (s -> true);
@@ -153,14 +151,14 @@ public class SearchContext<T extends TripScheduleInfo> {
     }
 
     public WorkerLifeCycle lifeCycle() {
-        return lifeCycleBuilder;
+        return lifeCycleSubscriptions;
     }
 
     public LifeCycleEventPublisher createLifeCyclePublisher() {
-        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleBuilder);
+        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleSubscriptions);
         // We want the code to fail (NPE) if someone try to attach to the worker workerlifecycle
         // after it is iniziated; Hence set the builder to null:
-        lifeCycleBuilder = null;
+        lifeCycleSubscriptions = null;
         return publisher;
     }
 }
