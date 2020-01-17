@@ -43,7 +43,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.stopFilter = defaults.stopFilter();
         this.accessLegs.addAll(defaults.accessLegs());
         this.egressLegs.addAll(defaults.egressLegs());
-
     }
 
     public int earliestDepartureTime() {
@@ -164,12 +163,11 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    SearchParams buildSearchParam() {
-        return new SearchParams(this);
-    }
-
     public RaptorRequest<T> build() {
         return parent.build();
     }
 
+    SearchParams buildSearchParam() {
+        return new SearchParams(this);
+    }
 }

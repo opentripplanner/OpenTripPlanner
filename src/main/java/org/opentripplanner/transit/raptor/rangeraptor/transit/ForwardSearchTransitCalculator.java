@@ -16,7 +16,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     private final int tripSearchBinarySearchThreshold;
     private final int boardSlackInSeconds;
     private final int earliestDepartureTime;
-    private final int searchWindowSizeInSeconds;
+    private final int searchWindowInSeconds;
     private final int latestAcceptableArrivalTime;
     private final int iterationStep;
 
@@ -35,14 +35,14 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
             int tripSearchBinarySearchThreshold,
             int boardSlackInSeconds,
             int earliestDepartureTime,
-            int searchWindowSizeInSeconds,
+            int searchWindowInSeconds,
             int latestAcceptableArrivalTime,
             int iterationStep
     ) {
         this.tripSearchBinarySearchThreshold = tripSearchBinarySearchThreshold;
         this.boardSlackInSeconds = boardSlackInSeconds;
         this.earliestDepartureTime = earliestDepartureTime;
-        this.searchWindowSizeInSeconds = searchWindowSizeInSeconds;
+        this.searchWindowInSeconds = searchWindowInSeconds;
         this.latestAcceptableArrivalTime = latestAcceptableArrivalTime < 0
                 ? unreachedTime()
                 : latestAcceptableArrivalTime;
@@ -116,7 +116,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
         return oneIterationOnly()
                 ? IntIterators.singleValueIterator(earliestDepartureTime)
                 : IntIterators.intDecIterator(
-                        earliestDepartureTime + searchWindowSizeInSeconds,
+                        earliestDepartureTime + searchWindowInSeconds,
                         earliestDepartureTime,
                         iterationStep
                 );
@@ -124,7 +124,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
 
     @Override
     public boolean oneIterationOnly() {
-        return searchWindowSizeInSeconds <= iterationStep;
+        return searchWindowInSeconds <= iterationStep;
     }
 
     @Override

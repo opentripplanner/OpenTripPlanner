@@ -66,8 +66,14 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
             RaptorRequest<T> request,
             boolean forward
     ) {
-        RaptorRequest<T> req = heuristicReq(request, profile, forward);
-        return createHeuristicSearch(transitData, req);
+        RaptorRequest<T> heuristicReq = request
+                .mutate()
+                .profile(profile)
+                .searchDirection(forward)
+                .searchParams().searchOneIterationOnly()
+                .build();
+
+        return createHeuristicSearch(transitData, heuristicReq);
     }
 
     public boolean isMultiThreaded() {
@@ -102,13 +108,6 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 ctx.timers(),
                 ctx.searchParams().waitAtBeginningEnabled()
         );
-    }
-
-    private RaptorRequest<T> heuristicReq(RaptorRequest<T> request, RaptorProfile profile, boolean forward) {
-        return request.mutate()
-                .profile(profile).searchDirection(forward)
-                .searchParams().searchOneIterationOnly()
-                .build();
     }
 
     private ExecutorService createNewThreadPool(int size) {
