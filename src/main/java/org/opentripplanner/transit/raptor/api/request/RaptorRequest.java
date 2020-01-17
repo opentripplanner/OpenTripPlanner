@@ -38,7 +38,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     }
 
     RaptorRequest(RaptorRequestBuilder<T> builder) {
-        this.searchParams = builder.searchParams().build();
+        this.searchParams = builder.searchParams().buildSearchParam();
         this.profile = builder.profile();
         this.searchForward = builder.searchForward();
         this.optimizations = Set.copyOf(builder.optimizations());

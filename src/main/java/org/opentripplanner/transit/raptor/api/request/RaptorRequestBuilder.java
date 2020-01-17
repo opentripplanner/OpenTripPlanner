@@ -20,7 +20,7 @@ import java.util.Set;
  */
 public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     // Search
-    private final SearchParamsBuilder searchParams;
+    private final SearchParamsBuilder<T> searchParams;
     private boolean searchForward;
 
     // Algorithm
@@ -37,7 +37,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     }
 
     RaptorRequestBuilder(RaptorRequest<T> defaults) {
-        this.searchParams = new SearchParamsBuilder(defaults.searchParams());
+        this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
         this.searchForward = defaults.searchForward();
 
         // Algorithm
@@ -49,7 +49,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         this.debug = new DebugRequestBuilder<>(defaults.debug());
     }
 
-    public SearchParamsBuilder searchParams() {
+    public SearchParamsBuilder<T> searchParams() {
         return searchParams;
     }
 

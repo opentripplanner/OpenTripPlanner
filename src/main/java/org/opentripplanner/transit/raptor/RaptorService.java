@@ -3,10 +3,9 @@ package org.opentripplanner.transit.raptor;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
@@ -76,7 +75,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
             runInParallel(request, revHeur, fwdHeur);
 
-            mcRequest = addStopFilterToRequest(mcRequest, fwdHeur.stopFilter(revHeur, nAdditionalTransfers));
+            BitSet stopFilter = fwdHeur.stopFilter(revHeur, nAdditionalTransfers);
+            mcRequest = mcRequest.mutate().searchParams().stopFilter(stopFilter).build();
 
             if (request.optimizationEnabled(PARETO_CHECK_AGAINST_DESTINATION)) {
                 destinationArrivalHeuristicsCheck = revHeur.heuristics();
@@ -89,12 +89,6 @@ public class RaptorService<T extends RaptorTripSchedule> {
             destinationArrivalHeuristicsCheck = revHeur.heuristics();
         }
         return config.createMcWorker(transitData, mcRequest, destinationArrivalHeuristicsCheck).route();
-    }
-
-    private RaptorRequest<T> addStopFilterToRequest(RaptorRequest<T> request, BitSet stopFilter) {
-        RaptorRequestBuilder<T> reqBuilder = request.mutate();
-        reqBuilder.searchParams().stopFilter(stopFilter);
-        return reqBuilder.build();
     }
 
     private void debugHeuristicResut(RaptorRequest<?> req, HeuristicSearch<T> fwdHeur, HeuristicSearch<T> revHeur) {

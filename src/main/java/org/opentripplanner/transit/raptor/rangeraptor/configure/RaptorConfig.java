@@ -2,10 +2,9 @@ package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
@@ -106,10 +105,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     }
 
     private RaptorRequest<T> heuristicReq(RaptorRequest<T> request, RaptorProfile profile, boolean forward) {
-        RaptorRequestBuilder<T> copy = request.mutate();
-        copy.profile(profile).searchDirection(forward);
-        copy.searchParams().searchOneIterationOnly();
-        return copy.build();
+        return request.mutate()
+                .profile(profile).searchDirection(forward)
+                .searchParams().searchOneIterationOnly()
+                .build();
     }
 
     private ExecutorService createNewThreadPool(int size) {
