@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
@@ -35,6 +36,7 @@ import java.util.stream.Collectors;
  * Also demonstrates how to run basic searches without using the graphQL profile routing API.
  */
 public class SpeedTest {
+
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
@@ -61,9 +63,9 @@ public class SpeedTest {
     private RangeRaptorService<TripSchedule> service;
 
 
-    private SpeedTest(Graph graph, SpeedTestCmdLineOpts opts) {
-        this.graph = graph;
+    private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
+        this.graph = loadGraph(opts.rootDir());
         this.transitLayer = TransitLayerMapper.map(graph);
         this.streetRouter = new EgressAccessRouter(graph, transitLayer);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
@@ -76,13 +78,18 @@ public class SpeedTest {
         // Given the following setup
         AvgTimer.enableTimers(true);
         SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
-        Graph graph = Graph.load(new File(opts.rootDir(), "Graph.obj"));
 
         // create a new test
-        SpeedTest speedTest = new SpeedTest(graph, opts);
+        SpeedTest speedTest = new SpeedTest(opts);
 
         // and run it
         speedTest.runTest();
+    }
+
+    private static Graph loadGraph(File rootDir) {
+        Graph graph = Graph.load(OtpDataStore.graphFile(rootDir));
+        graph.index();
+        return graph;
     }
 
     private void runTest() throws Exception {
