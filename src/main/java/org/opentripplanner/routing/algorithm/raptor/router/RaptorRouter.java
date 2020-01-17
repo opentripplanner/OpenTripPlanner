@@ -17,7 +17,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -39,7 +39,7 @@ public class RaptorRouter {
     private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
     private static final RaptorService<TripSchedule> raptorService = new RaptorService<>(
             // TODO OTP2 - Load turning parameters from config file
-            new TuningParameters() {}
+            new RaptorTuningParameters() {}
     );
 
     private final RaptorRoutingRequestTransitData requestTransitDataProvider;

@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
@@ -33,7 +33,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
     private final RaptorConfig<T> config;
 
-    public RaptorService(TuningParameters tuningParameters) {
+    public RaptorService(RaptorTuningParameters tuningParameters) {
         this.config = new RaptorConfig<>(tuningParameters);
     }
 

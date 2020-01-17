@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
@@ -31,11 +31,11 @@ import java.util.concurrent.Executors;
  */
 public class RaptorConfig<T extends RaptorTripSchedule> {
     private final ExecutorService threadPool;
-    private final TuningParameters tuningParameters;
+    private final RaptorTuningParameters tuningParameters;
     private final WorkerPerformanceTimersCache timers;
 
 
-    public RaptorConfig(TuningParameters tuningParameters) {
+    public RaptorConfig(RaptorTuningParameters tuningParameters) {
         this.tuningParameters = tuningParameters;
         this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
         this.timers = new WorkerPerformanceTimersCache(isMultiThreaded());

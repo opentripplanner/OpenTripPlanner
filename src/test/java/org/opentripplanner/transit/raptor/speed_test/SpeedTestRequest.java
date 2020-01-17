@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
@@ -33,7 +33,7 @@ public class SpeedTestRequest {
      */
     private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
 
-    static final TuningParameters TUNING_PARAMETERS = new TuningParameters() {
+    static final RaptorTuningParameters TUNING_PARAMETERS = new RaptorTuningParameters() {
         @Override
         public int maxNumberOfTransfers() {
             return 12;

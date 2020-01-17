@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -24,7 +24,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     private final int earliestAcceptableDepartureTime;
     private final int iterationStep;
 
-    ReverseSearchTransitCalculator(SearchParams s, TuningParameters t) {
+    ReverseSearchTransitCalculator(SearchParams s, RaptorTuningParameters t) {
         // The request is already modified to search backwards, so 'earliestDepartureTime()'
         // goes with destination and 'latestArrivalTime()' match origin.
         this(

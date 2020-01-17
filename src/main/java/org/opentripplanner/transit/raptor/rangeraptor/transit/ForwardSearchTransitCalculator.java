@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -20,7 +20,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     private final int latestAcceptableArrivalTime;
     private final int iterationStep;
 
-    ForwardSearchTransitCalculator(SearchParams s, TuningParameters t) {
+    ForwardSearchTransitCalculator(SearchParams s, RaptorTuningParameters t) {
         this(
                 t.scheduledTripBinarySearchThreshold(),
                 s.boardSlackInSeconds(),

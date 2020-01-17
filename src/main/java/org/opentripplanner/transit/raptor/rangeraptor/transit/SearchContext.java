@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -38,7 +38,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     protected final TransitDataProvider<T> transit;
 
     private final TransitCalculator calculator;
-    private final TuningParameters tuningParameters;
+    private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
@@ -48,7 +48,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     public SearchContext(
             RaptorRequest<T> request,
-            TuningParameters tuningParameters,
+            RaptorTuningParameters tuningParameters,
             TransitDataProvider<T> transit,
             WorkerPerformanceTimers timers
     ) {
@@ -85,7 +85,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return request.profile();
     }
 
-    public TuningParameters tuningParameters() {
+    public RaptorTuningParameters tuningParameters() {
         return tuningParameters;
     }
 
@@ -138,7 +138,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RaptorRequest<?> r, TuningParameters t) {
+    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
     }
