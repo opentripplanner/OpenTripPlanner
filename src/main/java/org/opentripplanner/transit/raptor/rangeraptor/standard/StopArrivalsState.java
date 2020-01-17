@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 
 import java.util.Collection;
@@ -19,9 +19,9 @@ import java.util.Collection;
  *     <li>Compute heuristics
  * </ul>
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
 */
-public interface StopArrivalsState<T extends TripScheduleInfo> {
+public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
     void setInitialTime(final int stop, final int arrivalTime, int durationInSeconds);
 

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * A leg in a path. The legs are linked together from the first leg {@link AccessPathLeg}, to the last leg
@@ -14,9 +14,9 @@ import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
  * }
  * </pre>
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface PathLeg<T extends TripScheduleInfo> {
+public interface PathLeg<T extends RaptorTripSchedule> {
 
     /**
      * The time when the leg start/depart from the leg origin.

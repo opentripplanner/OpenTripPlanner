@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
@@ -26,9 +26,9 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WA
 /**
  * A service for performing Range Raptor routing request.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class RaptorService<T extends TripScheduleInfo> {
+public class RaptorService<T extends RaptorTripSchedule> {
     private static final boolean FORWARD = true;
     private static final boolean REVERSE = false;
 

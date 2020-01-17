@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -29,9 +29,9 @@ import java.util.List;
  * want the Algorithm to be as clean as possible and to be able to swap the state implementation - try out and
  * experiment with different state implementations.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-final public class McRangeRaptorWorkerState<T extends TripScheduleInfo> implements WorkerState<T> {
+final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implements WorkerState<T> {
 
     private final Stops<T> stops;
     private final DestinationArrivalPaths<T> paths;

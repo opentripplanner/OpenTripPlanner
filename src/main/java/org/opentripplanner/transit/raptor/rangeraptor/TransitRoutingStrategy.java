@@ -1,16 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
 
 /**
  * Provides alternative implementations of some transit-specific logic within the {@link RangeRaptorWorker}.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TransitRoutingStrategy<T extends TripScheduleInfo> {
+public interface TransitRoutingStrategy<T extends RaptorTripSchedule> {
 
     /**
      * Prepare the {@link TransitRoutingStrategy} to route using the given pattern and tripSearch.

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor._shared;
 
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -11,7 +11,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.opentripplanner.transit.raptor.api.TestTripSchedule.createTripScheduleUseingArrivalTimes;
+import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes;
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
 
@@ -54,9 +54,9 @@ public class StopArrivalsTestData {
 
     public static final int BOARD_SLACK = 120;
 
-    private static final TestTripSchedule TRIP_1 = createTripScheduleUseingArrivalTimes(T1000, T1035);
-    private static final TestTripSchedule TRIP_2 = createTripScheduleUseingArrivalTimes(T1100, T1123);
-    private static final TestTripSchedule TRIP_3 = createTripScheduleUseingArrivalTimes(T1140, T1153);
+    private static final TestRaptorTripSchedule TRIP_1 = createTripScheduleUseingArrivalTimes(T1000, T1035);
+    private static final TestRaptorTripSchedule TRIP_2 = createTripScheduleUseingArrivalTimes(T1100, T1123);
+    private static final TestRaptorTripSchedule TRIP_3 = createTripScheduleUseingArrivalTimes(T1140, T1153);
 
     /**
      * Create a list of stop arrivals with a destination arrival at the end like this:
@@ -126,13 +126,13 @@ public class StopArrivalsTestData {
      * Both {@link #basicTripByForwardSearch()} and {@link #basicTripByReverseSearch()} should return the same trip,
      * here returned as a path.
      */
-    public static Path<TestTripSchedule> basicTripAsPath() {
-        PathLeg<TestTripSchedule> leg6 = new EgressPathLeg<>(STOP_5, T1153, T1200);
-        PathLeg<TestTripSchedule> leg5 = new TransitPathLeg<>(STOP_4, T1140, STOP_5, T1153, TRIP_3, leg6);
-        PathLeg<TestTripSchedule> leg4 = new TransitPathLeg<>(STOP_3, T1100, STOP_4, T1123, TRIP_2, leg5);
-        PathLeg<TestTripSchedule> leg3 = new TransferPathLeg<>(STOP_2, T1035, STOP_3, T1038, leg4.asTransitLeg());
-        PathLeg<TestTripSchedule> leg2 = new TransitPathLeg<>(STOP_1, T1000, STOP_2, T1035, TRIP_1, leg3);
-        AccessPathLeg<TestTripSchedule> leg1 = new AccessPathLeg<>(T0953, STOP_1, T0958, leg2.asTransitLeg());
+    public static Path<TestRaptorTripSchedule> basicTripAsPath() {
+        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(STOP_5, T1153, T1200);
+        PathLeg<TestRaptorTripSchedule> leg5 = new TransitPathLeg<>(STOP_4, T1140, STOP_5, T1153, TRIP_3, leg6);
+        PathLeg<TestRaptorTripSchedule> leg4 = new TransitPathLeg<>(STOP_3, T1100, STOP_4, T1123, TRIP_2, leg5);
+        PathLeg<TestRaptorTripSchedule> leg3 = new TransferPathLeg<>(STOP_2, T1035, STOP_3, T1038, leg4.asTransitLeg());
+        PathLeg<TestRaptorTripSchedule> leg2 = new TransitPathLeg<>(STOP_1, T1000, STOP_2, T1035, TRIP_1, leg3);
+        AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(T0953, STOP_1, T0958, leg2.asTransitLeg());
 
         return new Path<>(leg1, T1200, 2, 600);
     }

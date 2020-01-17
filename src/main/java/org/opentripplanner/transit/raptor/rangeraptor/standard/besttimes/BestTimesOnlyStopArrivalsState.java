@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 
 import java.util.Collection;
@@ -20,9 +20,9 @@ import java.util.Collections;
  * and the minimum number for transfers. The results are an optimistic "guess", since we uses
  * the overall best time instead of best time previous round we might skip hops.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class BestTimesOnlyStopArrivalsState<T extends TripScheduleInfo> implements StopArrivalsState<T> {
+public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implements StopArrivalsState<T> {
 
     private final BestTimes bestTimes;
     private final SimpleBestNumberOfTransfers bestNumberOfTransfers;

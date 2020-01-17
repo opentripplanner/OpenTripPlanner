@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Objects;
 
@@ -8,9 +8,9 @@ import java.util.Objects;
  * Represent an access leg in a path. The access leg is the first leg from origin to the
  * first transit leg. The next leg must be a transit leg - no other legs are allowed.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class AccessPathLeg<T extends TripScheduleInfo> implements PathLeg<T> {
+public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
     private final int fromTime;
     private final int toStop;
     private final int toTime;

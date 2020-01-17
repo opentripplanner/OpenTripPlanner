@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.debug;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
@@ -14,9 +14,9 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
  * {@code null} is returned. Use the {@link #isDebugStopArrival(int)} like methods before
  * retrieving a handler.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugHandlerFactory<T extends TripScheduleInfo> {
+public class DebugHandlerFactory<T extends RaptorTripSchedule> {
     private DebugHandler<ArrivalView<T>> stopHandler;
     private DebugHandler<Path<T>> pathHandler;
 

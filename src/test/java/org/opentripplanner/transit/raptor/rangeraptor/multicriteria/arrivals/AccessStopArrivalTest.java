@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -18,7 +18,7 @@ public class AccessStopArrivalTest {
     private static final int COST = 500;
 
     private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(BOARD_SLACK, true);
-    private AccessStopArrival<TripScheduleInfo> subject = new AccessStopArrival<>(ALIGHT_STOP, DEPATURE_TIME, LEG_DURATION, COST, TRANSIT_CALCULATOR);
+    private AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(ALIGHT_STOP, DEPATURE_TIME, LEG_DURATION, COST, TRANSIT_CALCULATOR);
 
 
 

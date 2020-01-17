@@ -10,9 +10,9 @@ import java.util.Iterator;
  * and the Raptor algorithm. This also simplify the use of the Worker with other data sources,
  * importing and adapting this code into other software like OTP.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TransitDataProvider<T extends TripScheduleInfo> {
+public interface TransitDataProvider<T extends RaptorTripSchedule> {
 
     /**
      * This method is called once, right after the constructor, before the routing start.

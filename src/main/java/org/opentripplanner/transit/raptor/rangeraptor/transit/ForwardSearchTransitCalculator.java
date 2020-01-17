@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
@@ -81,7 +81,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public <T extends TripScheduleInfo> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
+    public <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
         return onTrip.arrival(stopPositionInPattern);
     }
 
@@ -139,7 +139,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -147,7 +147,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createExactTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -159,7 +159,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> PathMapper<T> createPathMapper() {
+    public final <T extends RaptorTripSchedule> PathMapper<T> createPathMapper() {
         return new ForwardPathMapper<>(this);
     }
 }

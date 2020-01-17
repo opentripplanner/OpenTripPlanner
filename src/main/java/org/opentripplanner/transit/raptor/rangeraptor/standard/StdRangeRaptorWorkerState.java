@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.BitSetIterator;
@@ -25,10 +25,10 @@ import java.util.Iterator;
  * Note that this represents the entire state of the Range Raptor search for all rounds. The {@code stopArrivalsState}
  * implementation can be swapped to achieve different results.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class StdRangeRaptorWorkerState<T
-        extends TripScheduleInfo>
+        extends RaptorTripSchedule>
         implements StdWorkerState<T>
 {
 

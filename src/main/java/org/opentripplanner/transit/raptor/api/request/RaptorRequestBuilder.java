@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
 import java.util.EnumSet;
@@ -16,9 +16,9 @@ import java.util.Set;
  *     <li>{@link DebugRequest}
  * </ul>
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class RaptorRequestBuilder<T extends TripScheduleInfo> {
+public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     // Search
     private final SearchParamsBuilder searchParams;
     private boolean searchForward;

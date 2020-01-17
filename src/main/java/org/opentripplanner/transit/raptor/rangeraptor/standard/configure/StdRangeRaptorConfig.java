@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
@@ -35,9 +35,9 @@ import java.util.function.BiFunction;
  * worker configurations together based on the context passed into the class.
  * There is a factory (create) method for each legal configuration.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class StdRangeRaptorConfig<T extends TripScheduleInfo> {
+public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private final SearchContext<T> ctx;
     private final PathConfig<T> pathConfig;

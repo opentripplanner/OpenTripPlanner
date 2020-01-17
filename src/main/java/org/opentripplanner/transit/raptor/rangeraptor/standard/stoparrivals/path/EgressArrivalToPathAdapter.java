@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -23,9 +23,9 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
  * this class optimize this by only adding new destination arrivals at the end of each round.
  * <p/>
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class EgressArrivalToPathAdapter<T extends TripScheduleInfo> implements ArrivedAtDestinationCheck {
+public class EgressArrivalToPathAdapter<T extends RaptorTripSchedule> implements ArrivedAtDestinationCheck {
     private final DestinationArrivalPaths<T> paths;
     private final TransitCalculator calculator;
     private final StopsCursor<T> cursor;

@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
 
@@ -10,9 +10,9 @@ import java.util.function.Consumer;
 
 /**
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Stops<T extends TripScheduleInfo> implements BestNumberOfTransfers {
+public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTransfers {
 
     private final StopArrivalState<T>[][] stops;
     private final RoundProvider roundProvider;

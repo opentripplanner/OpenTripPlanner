@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 
@@ -8,9 +8,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stop
 /**
  * Implement the {@link ArrivalView}.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements ArrivalView<T> {
+abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements ArrivalView<T> {
     private final int round;
     private final int stop;
 
@@ -30,7 +30,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
     }
 
 
-    static final class Access<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
+    static final class Access<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
         private final int departureTime;
         private final int arrivalTime;
 
@@ -61,7 +61,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
         }
     }
 
-    static final class Transit<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
+    static final class Transit<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
         private final StopArrivalState<T> arrival;
         private final StopsCursor<T> cursor;
 
@@ -104,7 +104,7 @@ abstract class StopArrivalViewAdapter<T extends TripScheduleInfo> implements Arr
         }
     }
 
-    static final class Transfer<T extends TripScheduleInfo> extends StopArrivalViewAdapter<T> {
+    static final class Transfer<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
         private final StopArrivalState<T> arrival;
         private final StopsCursor<T> cursor;
 

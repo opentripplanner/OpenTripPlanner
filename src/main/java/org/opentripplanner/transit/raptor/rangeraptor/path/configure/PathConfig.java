@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path.configure;
 
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
@@ -21,9 +21,9 @@ import static org.opentripplanner.transit.raptor.rangeraptor.path.PathParetoSetC
  * This class have REQUEST scope, so a new instance should be created
  * for each new request/travel search.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class PathConfig<T extends TripScheduleInfo> {
+public class PathConfig<T extends RaptorTripSchedule> {
     private final SearchContext<T> ctx;
 
     public PathConfig(SearchContext<T> context) {

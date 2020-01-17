@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -24,9 +24,9 @@ import static java.util.Collections.emptyList;
  * <p>
  *
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Stops<T extends TripScheduleInfo> {
+public final class Stops<T extends RaptorTripSchedule> {
     private final StopArrivalParetoSet<T>[] stops;
     private final BitSet touchedStops;
     private final DebugHandlerFactory<T> debugHandlerFactory;

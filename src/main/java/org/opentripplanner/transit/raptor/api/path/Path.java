@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
@@ -12,9 +12,9 @@ import java.util.Objects;
 /**
  * The result path of a Raptor search describing the one possible journey.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class Path<T extends TripScheduleInfo> {
+public final class Path<T extends RaptorTripSchedule> {
     private final int startTime;
     private final int endTime;
     private final int numberOfTransfers;
@@ -27,7 +27,7 @@ public final class Path<T extends TripScheduleInfo> {
      * Create a "dummy" path without legs. Can be used to test if a path is pareto optimal without
      * creating the hole path.
      */
-    public static <T extends TripScheduleInfo> Path<T> dummyPath(
+    public static <T extends RaptorTripSchedule> Path<T> dummyPath(
             int startTime, int endTime, int numberOfTransfers, int cost
     ) {
         return new Path<>(startTime, endTime, numberOfTransfers, cost);

@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -23,9 +23,9 @@ import java.util.Collection;
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class SearchContext<T extends TripScheduleInfo> {
+public class SearchContext<T extends RaptorTripSchedule> {
     private static final DebugLogger NOOP_DEBUG_LOGGER = (topic, message) -> { };
     /**
      * The request input used to customize the worker to the clients needs.

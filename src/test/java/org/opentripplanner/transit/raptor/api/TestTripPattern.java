@@ -5,16 +5,16 @@ import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 import java.util.Collection;
 
-public class TestTripPattern implements TripPatternInfo<TestTripSchedule> {
+public class TestTripPattern implements TripPatternInfo<TestRaptorTripSchedule> {
 
-    private final TestTripSchedule[] schedules;
+    private final TestRaptorTripSchedule[] schedules;
 
-    public TestTripPattern(TestTripSchedule... schedules) {
+    public TestTripPattern(TestRaptorTripSchedule... schedules) {
         this.schedules = schedules;
     }
 
-    public TestTripPattern(Collection<TestTripSchedule> schedules) {
-        this.schedules = schedules.toArray(new TestTripSchedule[0]);
+    public TestTripPattern(Collection<TestRaptorTripSchedule> schedules) {
+        this.schedules = schedules.toArray(new TestRaptorTripSchedule[0]);
     }
 
     @Override
@@ -28,7 +28,7 @@ public class TestTripPattern implements TripPatternInfo<TestTripSchedule> {
     }
 
     @Override
-    public TestTripSchedule getTripSchedule(int index) {
+    public TestRaptorTripSchedule getTripSchedule(int index) {
         return schedules[index];
     }
 

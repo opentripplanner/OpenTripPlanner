@@ -10,7 +10,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  * allow the implementation to chose the most efficient underlying
  * implementation that suits its needs.
  */
-public interface TripScheduleInfo {
+public interface RaptorTripSchedule {
 
     /**
      * The arrival time at the given stop position in pattern.

@@ -2,14 +2,14 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.TestTripPattern;
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opentripplanner.transit.raptor.api.TestTripSchedule.createTripScheduleUseingDepartureTimes;
+import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUseingDepartureTimes;
 
 public class TripScheduleBoardSearchTest {
 
@@ -62,18 +62,18 @@ public class TripScheduleBoardSearchTest {
     private static final int TRIP_B_INDEX = 2;
 
     // Trips in service
-    private TestTripSchedule tripA = createTripScheduleUseingDepartureTimes(TIME_A0, TIME_A1);
-    private TestTripSchedule tripB = createTripScheduleUseingDepartureTimes(TIME_B0, TIME_B1);
+    private TestRaptorTripSchedule tripA = createTripScheduleUseingDepartureTimes(TIME_A0, TIME_A1);
+    private TestRaptorTripSchedule tripB = createTripScheduleUseingDepartureTimes(TIME_B0, TIME_B1);
 
     // Trips not in service
-    private TestTripSchedule tripS = createTripScheduleUseingDepartureTimes(TIME_S0, TIME_S1);
-    private TestTripSchedule tripT = createTripScheduleUseingDepartureTimes(TIME_T0, TIME_T1);
+    private TestRaptorTripSchedule tripS = createTripScheduleUseingDepartureTimes(TIME_S0, TIME_S1);
+    private TestRaptorTripSchedule tripT = createTripScheduleUseingDepartureTimes(TIME_T0, TIME_T1);
 
     // Trip pattern with trip A, S, B, T.
-    private TripPatternInfo<TestTripSchedule> pattern = new TestTripPattern(tripA, tripS, tripB, tripT);
+    private TripPatternInfo<TestRaptorTripSchedule> pattern = new TestTripPattern(tripA, tripS, tripB, tripT);
 
     // The service under test - the subject
-    private TripScheduleBoardSearch<TestTripSchedule> subject = new TripScheduleBoardSearch<>(
+    private TripScheduleBoardSearch<TestRaptorTripSchedule> subject = new TripScheduleBoardSearch<>(
             TRIPS_BINARY_SEARCH_THRESHOLD, pattern, this::skip
     );
 
@@ -197,7 +197,7 @@ public class TripScheduleBoardSearchTest {
         final int N = 7 * n + 3;
         final int dT = 1000;
 
-        List<TestTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
         int departureTime = 1000;
         int latestDepartureTime = -1;
 
@@ -243,7 +243,7 @@ public class TripScheduleBoardSearchTest {
         final int N = TRIPS_BINARY_SEARCH_THRESHOLD;
 
         // Given a pattern with n + 1 trip schedules
-        List<TestTripSchedule> tripSchedules = new ArrayList<>();
+        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
 
         // Where the N first trips are NOT in service, but with acceptable boarding times
         addNTimes(tripSchedules, tripS, N);
@@ -272,11 +272,11 @@ public class TripScheduleBoardSearchTest {
         return trip == tripS || trip == tripT;
     }
 
-    private void withTrips(TestTripSchedule... schedules) {
+    private void withTrips(TestRaptorTripSchedule... schedules) {
         useTripPattern(new TestTripPattern(schedules));
     }
 
-    private void withTrips(List<TestTripSchedule> schedules) {
+    private void withTrips(List<TestRaptorTripSchedule> schedules) {
         useTripPattern(new TestTripPattern(schedules));
     }
 
@@ -298,7 +298,7 @@ public class TripScheduleBoardSearchTest {
     }
 
 
-    private static void addNTimes(List<TestTripSchedule> trips, TestTripSchedule tripS, int n) {
+    private static void addNTimes(List<TestRaptorTripSchedule> trips, TestRaptorTripSchedule tripS, int n) {
         for (int i = 0; i < n; i++) {
             trips.add(tripS);
         }

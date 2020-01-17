@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Objects;
 
 /**
  * Represent a transit leg in a path.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TransitPathLeg<T extends TripScheduleInfo> extends IntermediatePathLeg<T> {
+public final class TransitPathLeg<T extends RaptorTripSchedule> extends IntermediatePathLeg<T> {
 
     private final PathLeg<T> next;
     private final T trip;

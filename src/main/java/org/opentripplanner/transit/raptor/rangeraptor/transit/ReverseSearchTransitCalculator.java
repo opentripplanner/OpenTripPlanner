@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
@@ -96,7 +96,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
+    public final <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
         return plusDuration(onTrip.departure(stopPositionInPattern), boardSlackInSeconds);
     }
 
@@ -154,7 +154,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -162,7 +162,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createExactTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -174,7 +174,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> PathMapper<T> createPathMapper() {
+    public final <T extends RaptorTripSchedule> PathMapper<T> createPathMapper() {
         return new ReversePathMapper<>(this);
     }
 }

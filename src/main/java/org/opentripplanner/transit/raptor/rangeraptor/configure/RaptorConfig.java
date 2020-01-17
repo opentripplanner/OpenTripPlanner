@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
@@ -28,9 +28,9 @@ import java.util.concurrent.Executors;
  * This class should have APPLICATION scope. It manage a threadPool,
  * and hold a reference to the application tuning parameters.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class RaptorConfig<T extends TripScheduleInfo> {
+public class RaptorConfig<T extends RaptorTripSchedule> {
     private final ExecutorService threadPool;
     private final TuningParameters tuningParameters;
     private final WorkerPerformanceTimersCache timers;

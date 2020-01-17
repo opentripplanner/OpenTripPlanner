@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -13,9 +13,9 @@ import java.util.Set;
  * All input parameters to RangeRaptor that is spesific to a routing request.
  * See {@link TransitDataProvider} for transit data.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class RaptorRequest<T extends TripScheduleInfo> {
+public class RaptorRequest<T extends RaptorTripSchedule> {
     private final SearchParams searchParams;
     private final RaptorProfile profile;
     private final boolean searchForward;
@@ -24,7 +24,7 @@ public class RaptorRequest<T extends TripScheduleInfo> {
     private final DebugRequest<T> debug;
 
 
-    static <T extends TripScheduleInfo> RaptorRequest<T> defaults() {
+    static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
         return new RaptorRequest<>();
     }
 
