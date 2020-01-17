@@ -464,10 +464,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Invariant: boardSlack + alightSlack ≤ transferSlack.
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public int boardSlack = 0;
 
     /**
