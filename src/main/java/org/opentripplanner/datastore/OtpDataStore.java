@@ -8,6 +8,7 @@ import org.opentripplanner.datastore.base.LocalDataSourceRepository;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 
 import javax.validation.constraints.NotNull;
+import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -91,6 +92,22 @@ public class OtpDataStore {
         // Also read in unknown sources in case the data input source is miss-spelled,
         // We look for files on the local-file-system, other repositories ignore this call.
         addAll(findMultipleSources(Collections.emptyList(), UNKNOWN));
+    }
+
+    /**
+     * Static method used to get direct access to graph file without creating the
+     * {@link OtpDataStore} - this is used by other application and tests that want to load the
+     * graph from a directory on the local file system.
+     *
+     * Never use this method in OTP main application to access the graph, use the data store.
+     *
+     * @param path the location where the graph file must exist.
+     *
+     * @return The graph file - the graph is not loaded, you can use the
+     * {@link org.opentripplanner.routing.graph.Graph#load(File)} to load the graph.
+     */
+    public static File graphFile(File path) {
+        return new File(path, GRAPH_FILENAME);
     }
 
     /**
