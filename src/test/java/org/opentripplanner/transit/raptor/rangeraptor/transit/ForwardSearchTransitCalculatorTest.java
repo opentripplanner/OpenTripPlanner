@@ -55,7 +55,7 @@ public class ForwardSearchTransitCalculatorTest {
                 create().exceedsTimeLimitReason()
         );
 
-        latestAcceptableArrivalTime = -1;
+        latestAcceptableArrivalTime = TransitCalculator.TIME_NOT_SET;
         subject = create();
         assertFalse(subject.exceedsTimeLimit(0));
         assertFalse(subject.exceedsTimeLimit(2_000_000_000));

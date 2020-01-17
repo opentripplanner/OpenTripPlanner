@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
-import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -13,6 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.service.WorkerPerformanceTimersCache;
 
@@ -55,25 +55,13 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
         return new McRangeRaptorConfig<>(context).createWorker(heuristics, (s, w) -> createWorker(context, s, w));
     }
 
-    public HeuristicSearch<T> createHeuristicSearch(TransitDataProvider<T> transitData, RaptorRequest<T> request) {
-        SearchContext<T> context = context(transitData, request);
-        return new StdRangeRaptorConfig<>(context).createHeuristicSearch((s, w) -> createWorker(context, s, w));
-    }
-
     public HeuristicSearch<T> createHeuristicSearch(
             TransitDataProvider<T> transitData,
-            RaptorProfile profile,
-            RaptorRequest<T> request,
-            boolean forward
+            RaptorRequest<T> request
     ) {
-        RaptorRequest<T> heuristicReq = request
-                .mutate()
-                .profile(profile)
-                .searchDirection(forward)
-                .searchParams().searchOneIterationOnly()
-                .build();
-
-        return createHeuristicSearch(transitData, heuristicReq);
+        SearchContext<T> context = context(transitData, request);
+        return new StdRangeRaptorConfig<>(context)
+                .createHeuristicSearch((s, w) -> createWorker(context, s, w));
     }
 
     public boolean isMultiThreaded() {
@@ -88,6 +76,10 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
         if (threadPool != null) {
             threadPool.shutdown();
         }
+    }
+
+    public RaptorSearchWindowCalculator searchWindowCalculator() {
+        return new RaptorSearchWindowCalculator(tuningParameters.dynamicSearchWindowCoefficients());
     }
 
     /* private factory methods */
@@ -106,7 +98,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
                 ctx.timers(),
-                ctx.searchParams().waitAtBeginningEnabled()
+                ctx.searchParams().allowWaitingBetweenAccessAndTransit()
         );
     }
 

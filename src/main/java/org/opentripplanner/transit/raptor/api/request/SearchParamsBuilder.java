@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
@@ -25,7 +26,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private boolean timetableEnabled;
     // TODO OTP2 - Rename, this allow the search window to be extended bejond the
     //           - "latest departure time".
-    private boolean waitAtBeginningEnabled;
+    private boolean allowWaitingBetweenAccessAndTransit;
     private BitSet stopFilter;
     private final Collection<TransferLeg> accessLegs = new ArrayList<>();
     private final Collection<TransferLeg> egressLegs = new ArrayList<>();
@@ -39,7 +40,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
-        this.waitAtBeginningEnabled = defaults.waitAtBeginningEnabled();
+        this.allowWaitingBetweenAccessAndTransit = defaults.allowWaitingBetweenAccessAndTransit();
         this.stopFilter = defaults.stopFilter();
         this.accessLegs.addAll(defaults.accessLegs());
         this.egressLegs.addAll(defaults.egressLegs());
@@ -73,6 +74,13 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
     public SearchParamsBuilder<T> searchWindowInSeconds(int searchWindowInSeconds) {
         this.searchWindowInSeconds = searchWindowInSeconds;
+        return this;
+    }
+
+    public SearchParamsBuilder<T> searchWindow(Duration searchWindow) {
+        this.searchWindowInSeconds = searchWindow == null
+                ? SearchParams.NOT_SET
+                : (int)searchWindow.toSeconds();
         return this;
     }
 
@@ -113,12 +121,12 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public boolean waitAtBeginningEnabled() {
-        return waitAtBeginningEnabled;
+    public boolean allowWaitingBetweenAccessAndTransit() {
+        return allowWaitingBetweenAccessAndTransit;
     }
 
-    public SearchParamsBuilder<T> waitAtBeginningEnabled(boolean enable) {
-        this.waitAtBeginningEnabled = enable;
+    public SearchParamsBuilder<T> allowWaitingBetweenAccessAndTransit(boolean enable) {
+        this.allowWaitingBetweenAccessAndTransit = enable;
         return this;
     }
 
@@ -167,7 +175,8 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return parent.build();
     }
 
-    SearchParams buildSearchParam() {
+    /** This is public to allow tests to build just search params */
+    public SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
 }

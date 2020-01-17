@@ -43,7 +43,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
         this.boardSlackInSeconds = boardSlackInSeconds;
         this.earliestDepartureTime = earliestDepartureTime;
         this.searchWindowInSeconds = searchWindowInSeconds;
-        this.latestAcceptableArrivalTime = latestAcceptableArrivalTime < 0
+        this.latestAcceptableArrivalTime = latestAcceptableArrivalTime == TIME_NOT_SET
                 ? unreachedTime()
                 : latestAcceptableArrivalTime;
         this.iterationStep = iterationStep;

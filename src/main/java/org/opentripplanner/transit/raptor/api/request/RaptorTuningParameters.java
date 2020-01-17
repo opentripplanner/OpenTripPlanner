@@ -58,4 +58,12 @@ public interface RaptorTuningParameters {
     default int searchThreadPoolSize() {
         return 0;
     }
+
+
+    /**
+     * Coefficients used to calculate raptor-search-window parameters dynamically  from heuristics.
+     */
+    default DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients() {
+        return new DynamicSearchWindowCoefficients() {};
+    }
 }

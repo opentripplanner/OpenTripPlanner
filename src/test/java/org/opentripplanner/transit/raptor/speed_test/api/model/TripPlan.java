@@ -1,10 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.api.model;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
@@ -25,13 +23,30 @@ public class TripPlan {
     /** The destination */
     public Place to = null;
 
+    /** The raptor response (for reference use) */
+    public RaptorResponse<?> response = null;
+
     /** A list of possible itineraries */
-    @XmlElementWrapper(name="itineraries")
-    @XmlElement(name = "itinerary")
-    @JsonProperty(value="itineraries")
     private List<Itinerary> itineraries = new ArrayList<Itinerary>();
 
     public TripPlan() { }
+
+    public TripPlan(
+            Date date,
+            Place from,
+            Place to,
+            RaptorResponse<?> response,
+            Iterable<? extends Itinerary> itineraries
+    ) {
+        this.date = date;
+        this.from = from;
+        this.to = to;
+        this.response = response;
+        for (Itinerary it : itineraries) {
+            addItinerary(it);
+        }
+        sort();
+    }
 
     public Collection<Itinerary> getItineraries() {
         return itineraries;
