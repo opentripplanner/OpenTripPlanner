@@ -6,9 +6,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.transit.raptor.RangeRaptorService;
+import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
@@ -63,7 +63,7 @@ public class SpeedTest {
     /**
      * Init profile used by the HttpServer
      */
-    private RangeRaptorService<TripSchedule> service;
+    private RaptorService<TripSchedule> service;
 
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
@@ -74,7 +74,7 @@ public class SpeedTest {
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
 
         // Init Raptor Service
-        this.service = new RangeRaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
+        this.service = new RaptorService<>(SpeedTestRequest.TUNING_PARAMETERS);
     }
 
     public static void main(String[] args) throws Exception {
@@ -211,7 +211,7 @@ public class SpeedTest {
 
             TIMER_WORKER.start();
 
-            RangeRaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, streetRouter);
+            RaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, streetRouter);
 
             paths = service.route(req, transitData);
 
@@ -243,10 +243,10 @@ public class SpeedTest {
         streetRouter.route(heurReq);
         TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
 
-        RangeRaptorRequest<TripSchedule> req1 = heuristicRequest(
+        RaptorRequest<TripSchedule> req1 = heuristicRequest(
                 heuristicProfile, heurReq, streetRouter
         );
-        RangeRaptorRequest<TripSchedule> req2 = heuristicRequest(
+        RaptorRequest<TripSchedule> req2 = heuristicRequest(
                 routeProfile, routeReq, streetRouter
         );
 
@@ -281,7 +281,7 @@ public class SpeedTest {
         return graph.getTimeZone().toZoneId();
     }
 
-    private RangeRaptorRequest<TripSchedule> heuristicRequest(
+    private RaptorRequest<TripSchedule> heuristicRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
             EgressAccessRouter streetRouter
@@ -295,7 +295,7 @@ public class SpeedTest {
     }
 
 
-    private RangeRaptorRequest<TripSchedule> rangeRaptorRequest(
+    private RaptorRequest<TripSchedule> rangeRaptorRequest(
             SpeedTestProfile profile,
             SpeedTestRequest request,
             EgressAccessRouter streetRouter

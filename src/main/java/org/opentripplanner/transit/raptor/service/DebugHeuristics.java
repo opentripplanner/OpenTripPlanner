@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.service;
 
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.util.CompareIntArrays;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -34,7 +34,7 @@ public class DebugHeuristics {
             Heuristics h1,
             String bName,
             Heuristics h2,
-            RangeRaptorRequest<?> request
+            RaptorRequest<?> request
     ) {
         DebugRequest<?> debug = request.debug();
         if (debug.logger().isEnabled(HEURISTICS)) {

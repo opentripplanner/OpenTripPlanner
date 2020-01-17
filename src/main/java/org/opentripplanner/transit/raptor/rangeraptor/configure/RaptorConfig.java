@@ -1,8 +1,8 @@
 package org.opentripplanner.transit.raptor.rangeraptor.configure;
 
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
@@ -23,51 +23,51 @@ import java.util.concurrent.Executors;
 
 /**
  * This class is responsible for creating a new search and holding
- * application scoped Range Raptor state.
+ * application scoped Raptor state.
  * <p/>
  * This class should have APPLICATION scope. It manage a threadPool,
  * and hold a reference to the application tuning parameters.
  *
  * @param <T> The TripSchedule type defined by the user of the range raptor API.
  */
-public class RangeRaptorConfig<T extends TripScheduleInfo> {
+public class RaptorConfig<T extends TripScheduleInfo> {
     private final ExecutorService threadPool;
     private final TuningParameters tuningParameters;
     private final WorkerPerformanceTimersCache timers;
 
 
-    public RangeRaptorConfig(TuningParameters tuningParameters) {
+    public RaptorConfig(TuningParameters tuningParameters) {
         this.tuningParameters = tuningParameters;
         this.threadPool = createNewThreadPool(tuningParameters.searchThreadPoolSize());
         this.timers = new WorkerPerformanceTimersCache(isMultiThreaded());
     }
 
-    public SearchContext<T> context(TransitDataProvider<T> transit, RangeRaptorRequest<T> request) {
+    public SearchContext<T> context(TransitDataProvider<T> transit, RaptorRequest<T> request) {
         return new SearchContext<>(request, tuningParameters, transit, timers.get(request));
     }
 
-    public Worker<T> createStdWorker(TransitDataProvider<T> transitData, RangeRaptorRequest<T> request) {
+    public Worker<T> createStdWorker(TransitDataProvider<T> transitData, RaptorRequest<T> request) {
         SearchContext<T> context = context(transitData, request);
         return new StdRangeRaptorConfig<>(context).createSearch((s, w) -> createWorker(context, s, w));
     }
 
-    public Worker<T> createMcWorker(TransitDataProvider<T> transitData, RangeRaptorRequest<T> request, Heuristics heuristics) {
+    public Worker<T> createMcWorker(TransitDataProvider<T> transitData, RaptorRequest<T> request, Heuristics heuristics) {
         final SearchContext<T> context = context(transitData, request);
         return new McRangeRaptorConfig<>(context).createWorker(heuristics, (s, w) -> createWorker(context, s, w));
     }
 
-    public HeuristicSearch<T> createHeuristicSearch(TransitDataProvider<T> transitData, RangeRaptorRequest<T> request) {
+    public HeuristicSearch<T> createHeuristicSearch(TransitDataProvider<T> transitData, RaptorRequest<T> request) {
         SearchContext<T> context = context(transitData, request);
         return new StdRangeRaptorConfig<>(context).createHeuristicSearch((s, w) -> createWorker(context, s, w));
     }
 
     public HeuristicSearch<T> createHeuristicSearch(
             TransitDataProvider<T> transitData,
-            RangeRaptorProfile profile,
-            RangeRaptorRequest<T> request,
+            RaptorProfile profile,
+            RaptorRequest<T> request,
             boolean forward
     ) {
-        RangeRaptorRequest<T> req = heuristicReq(request, profile, forward);
+        RaptorRequest<T> req = heuristicReq(request, profile, forward);
         return createHeuristicSearch(transitData, req);
     }
 
@@ -105,8 +105,8 @@ public class RangeRaptorConfig<T extends TripScheduleInfo> {
         );
     }
 
-    private RangeRaptorRequest<T> heuristicReq(RangeRaptorRequest<T> request, RangeRaptorProfile profile, boolean forward) {
-        RequestBuilder<T> copy = request.mutate();
+    private RaptorRequest<T> heuristicReq(RaptorRequest<T> request, RaptorProfile profile, boolean forward) {
+        RaptorRequestBuilder<T> copy = request.mutate();
         copy.profile(profile).searchDirection(forward);
         copy.searchParams().searchOneIterationOnly();
         return copy.build();

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.service;
 
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
 
 import java.util.HashMap;
@@ -14,7 +14,7 @@ public class WorkerPerformanceTimersCache {
         this.multithreaded = multithreaded;
     }
 
-    public WorkerPerformanceTimers get(RangeRaptorRequest<?> request) {
+    public WorkerPerformanceTimers get(RaptorRequest<?> request) {
         return timers.computeIfAbsent(RequestAlias.alias(request, multithreaded), WorkerPerformanceTimers::new);
     }
 }

@@ -6,9 +6,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
@@ -85,7 +85,7 @@ public class SpeedTestRequest {
     }
 
 
-    RangeRaptorRequest<TripSchedule> createRangeRaptorRequest(
+    RaptorRequest<TripSchedule> createRangeRaptorRequest(
             SpeedTestProfile profile,
             int numOfExtraTransfers,
             boolean oneIterationOnly,
@@ -95,7 +95,7 @@ public class SpeedTestRequest {
         int expandSearchSec = EXPAND_SEARCH_WINDOW_HOURS * 3600/2;
 
 
-        RequestBuilder<TripSchedule> builder = new RequestBuilder<>();
+        RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
         builder.searchParams()
                 .boardSlackInSeconds(120)
                 .timetableEnabled(true)
@@ -123,7 +123,7 @@ public class SpeedTestRequest {
         for (Optimization it : profile.optimizations) {
             builder.enableOptimization(it);
         }
-        if(profile.raptorProfile.isOneOf(RangeRaptorProfile.NO_WAIT_STD, RangeRaptorProfile.NO_WAIT_BEST_TIME)) {
+        if(profile.raptorProfile.isOneOf(RaptorProfile.NO_WAIT_STD, RaptorProfile.NO_WAIT_BEST_TIME)) {
             builder.searchParams().searchOneIterationOnly();
         }
 
@@ -134,7 +134,7 @@ public class SpeedTestRequest {
 
         addDebugOptions(builder, opts);
 
-        RangeRaptorRequest<TripSchedule> req = builder.build();
+        RaptorRequest<TripSchedule> req = builder.build();
 
         if (opts.debugRequest()) {
             System.err.println("-> Request: " + req);
@@ -150,7 +150,7 @@ public class SpeedTestRequest {
         }
     }
 
-    private static void addDebugOptions(RequestBuilder<TripSchedule> builder, SpeedTestCmdLineOpts opts) {
+    private static void addDebugOptions(RaptorRequestBuilder<TripSchedule> builder, SpeedTestCmdLineOpts opts) {
         List<Integer> stops = opts.debugStops();
         List<Integer> path = opts.debugPath();
 

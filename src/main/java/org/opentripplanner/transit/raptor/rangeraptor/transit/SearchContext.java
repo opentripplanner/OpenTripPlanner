@@ -3,8 +3,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
@@ -30,7 +30,7 @@ public class SearchContext<T extends TripScheduleInfo> {
     /**
      * The request input used to customize the worker to the clients needs.
      */
-    private final RangeRaptorRequest<T> request;
+    private final RaptorRequest<T> request;
 
     /**
      * the transit data role needed for routing
@@ -47,7 +47,7 @@ public class SearchContext<T extends TripScheduleInfo> {
     private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
     public SearchContext(
-            RangeRaptorRequest<T> request,
+            RaptorRequest<T> request,
             TuningParameters tuningParameters,
             TransitDataProvider<T> transit,
             WorkerPerformanceTimers timers
@@ -81,7 +81,7 @@ public class SearchContext<T extends TripScheduleInfo> {
         return request.searchParams();
     }
 
-    public RangeRaptorProfile profile() {
+    public RaptorProfile profile() {
         return request.profile();
     }
 
@@ -138,12 +138,12 @@ public class SearchContext<T extends TripScheduleInfo> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RangeRaptorRequest<?> r, TuningParameters t) {
+    private static TransitCalculator createCalculator(RaptorRequest<?> r, TuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
     }
 
-    private DebugRequest<T> debugRequest(RangeRaptorRequest<T> request) {
+    private DebugRequest<T> debugRequest(RaptorRequest<T> request) {
         return request.searchForward() ? request.debug() : request.mutate().debug().reverseDebugRequest().build();
     }
 

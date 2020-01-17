@@ -11,20 +11,20 @@ import java.util.Set;
  * request classes for documentation on each parameter.
  * <p/>
  * <ul>
- *     <li>{@link RangeRaptorRequest}
+ *     <li>{@link RaptorRequest}
  *     <li>{@link McCostParams}
  *     <li>{@link DebugRequest}
  * </ul>
  *
  * @param <T> The TripSchedule type defined by the user of the range raptor API.
  */
-public class RequestBuilder<T extends TripScheduleInfo> {
+public class RaptorRequestBuilder<T extends TripScheduleInfo> {
     // Search
     private final SearchParamsBuilder searchParams;
     private boolean searchForward;
 
     // Algorithm
-    private RangeRaptorProfile profile;
+    private RaptorProfile profile;
     private final McCostParamsBuilder mcCost;
     private final Set<Optimization> optimizations = EnumSet.noneOf(Optimization.class);
 
@@ -32,11 +32,11 @@ public class RequestBuilder<T extends TripScheduleInfo> {
     // Debug
     private final DebugRequestBuilder<T> debug;
 
-    public RequestBuilder() {
-        this(RangeRaptorRequest.defaults());
+    public RaptorRequestBuilder() {
+        this(RaptorRequest.defaults());
     }
 
-    RequestBuilder(RangeRaptorRequest<T> defaults) {
+    RaptorRequestBuilder(RaptorRequest<T> defaults) {
         this.searchParams = new SearchParamsBuilder(defaults.searchParams());
         this.searchForward = defaults.searchForward();
 
@@ -53,11 +53,11 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return searchParams;
     }
 
-    public RangeRaptorProfile profile() {
+    public RaptorProfile profile() {
         return profile;
     }
 
-    public RequestBuilder<T> profile(RangeRaptorProfile profile) {
+    public RaptorRequestBuilder<T> profile(RaptorProfile profile) {
         this.profile = profile;
         return this;
     }
@@ -66,7 +66,7 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return searchForward;
     }
 
-    public RequestBuilder<T> searchDirection(boolean searchForward) {
+    public RaptorRequestBuilder<T> searchDirection(boolean searchForward) {
         this.searchForward = searchForward;
         return this;
     }
@@ -75,12 +75,12 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return optimizations;
     }
 
-    public RequestBuilder<T> enableOptimization(Optimization optimization) {
+    public RaptorRequestBuilder<T> enableOptimization(Optimization optimization) {
         this.optimizations.add(optimization);
         return this;
     }
 
-    public RequestBuilder<T> disableOptimization(Optimization optimization) {
+    public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
         this.optimizations.remove(optimization);
         return this;
     }
@@ -93,7 +93,7 @@ public class RequestBuilder<T extends TripScheduleInfo> {
         return this.debug;
     }
 
-    public RangeRaptorRequest<T> build() {
-        return new RangeRaptorRequest<>(this);
+    public RaptorRequest<T> build() {
+        return new RaptorRequest<>(this);
     }
 }

@@ -275,7 +275,7 @@ public class SearchParams {
 
     private void assertProperty(boolean predicate, String errorMessage) {
         if(!predicate) {
-            throw new IllegalArgumentException(RangeRaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
+            throw new IllegalArgumentException(RaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
         }
     }
 }

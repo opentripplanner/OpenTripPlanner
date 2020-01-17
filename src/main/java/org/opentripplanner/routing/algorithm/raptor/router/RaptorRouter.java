@@ -12,11 +12,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.transit.raptor.RangeRaptorService;
+import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RequestBuilder;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.TuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
@@ -37,7 +37,7 @@ public class RaptorRouter {
 
   private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
   private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
-  private static final RangeRaptorService<TripSchedule> rangeRaptorService = new RangeRaptorService<>(
+  private static final RaptorService<TripSchedule> raptorService = new RaptorService<>(
       // TODO OTP2 - Load turning parameters from config file
       new TuningParameters() {}
   );
@@ -98,9 +98,9 @@ public class RaptorRouter {
 
     // TODO Expose parameters
     // TODO Remove parameters from API
-    RequestBuilder builder = new RequestBuilder();
+    RaptorRequestBuilder builder = new RaptorRequestBuilder();
     builder
-        .profile(RangeRaptorProfile.STANDARD)
+        .profile(RaptorProfile.STANDARD)
         .searchParams()
         .earliestDepartureTime(departureTime)
         .searchWindowInSeconds(request.raptorSearchWindow)
@@ -112,13 +112,13 @@ public class RaptorRouter {
     //TODO Check in combination with timetableEnabled
     //builder.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
 
-    RangeRaptorRequest rangeRaptorRequest = builder.build();
+    RaptorRequest raptorRequest = builder.build();
 
     /* Route transit */
 
     // We know this cast is correct because we have instantiated rangeRaptorService as RangeRaptorService<TripSchedule>
-    @SuppressWarnings("unchecked") Collection<Path<TripSchedule>> paths = rangeRaptorService.route(
-        rangeRaptorRequest,
+    @SuppressWarnings("unchecked") Collection<Path<TripSchedule>> paths = raptorService.route(
+            raptorRequest,
         this.requestTransitDataProvider
     );
 
