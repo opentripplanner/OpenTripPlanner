@@ -437,9 +437,17 @@ public abstract class RoutingResource {
     @QueryParam("invalidDateStrategy")
     protected String invalidDateStrategy;
 
+    /**
+     * The minimum distance that should be covered using transit legs. For now, this will only have an effect if
+     * expressed as a percent. ie "50%"
+     */
     @QueryParam("minTransitDistance")
     private String minTransitDistance;
 
+    /**
+     * Override the default shortest path search timeouts to this value in milliseconds. This value will apply to all
+     * attempts to find an individual itinerary.
+     */
     @QueryParam("searchTimeout")
     protected Long searchTimeout;
 
@@ -450,6 +458,10 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    /**
+     * When set to true, this will require transit to be present in all itineraries returned. This will prevent results
+     * that have only a non-transit mode as the entire itinerary even if that option is more optimal.
+     */
     @QueryParam("onlyTransitTrips")
     private Boolean onlyTransitTrips;
 
