@@ -274,8 +274,8 @@ public class ItineraryMapper {
             State s = se.makeState();
             ArrayList<State> transferStates = new ArrayList<>();
             transferStates.add(s);
-            for (int index =1;index<edges.size();index++) {
-                s = edges.get(index).traverse(s);
+            for (Edge e: edges) {
+                s = e.traverse(s);
                 transferStates.add(s);
             }
 
