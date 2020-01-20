@@ -1,15 +1,11 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
@@ -28,6 +24,8 @@ import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
+
+import static org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService.setEarliestTransportationNetworkCompanyEta;
 
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
@@ -729,79 +727,7 @@ public abstract class RoutingResource {
         if (searchTimeout != null)
             request.searchTimeout = searchTimeout;
 
-        // If using Transportation Network Companies, make sure service exists at origin.
-        // This is not a future-proof solution as TNC coverage areas could be different in the future.  For example, a
-        // trip planned months in advance may not take into account a TNC company deciding to no longer provide service
-        // on that particular date in the future.  The current ETA estimate is only valid for perhaps 30 minutes into
-        // the future.
-        //
-        // Also, if "depart at" and leaving soonish, save earliest departure time for use later use when boarding the
-        // first TNC before transit.  (See StateEditor.boardHailedCar)
-        if (this.modes != null && this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
-            if (companies == null) {
-                companies = "NOAPI";    
-            }
-
-            request.setTransportationNetworkCompanies(companies);
-
-            TransportationNetworkCompanyService service =
-                router.graph.getService(TransportationNetworkCompanyService.class);
-            if (service == null) {
-                LOG.error("Unconfigured Transportation Network Company service for router with id: " + routerId);
-                throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
-            }
-
-            List<ArrivalTime> arrivalEstimates;
-
-            try {
-                arrivalEstimates = service.getArrivalTimes(
-                    companies,
-                    new Place(
-                        request.from.lng,
-                        request.from.lat,
-                        request.from.name
-                    )
-                );
-            } catch (Exception e) {
-                e.printStackTrace();
-                throw new UnsupportedOperationException(
-                    "Unable to verify availability of Transportation Network Company service due to error: " +
-                        e.getMessage()
-                );
-            }
-
-            /**
-             * iterate through results and find earliest ETA of an acceptable ride type
-             * this also checks if any of the ride types are wheelchair accessible or not
-             * if the request requires a wheelchair accessible ride and no arrival estimates are
-             * found, then the TransportationNetworkCompanyAvailabilityException will be thrown.
-             */
-            int earliestEta = Integer.MAX_VALUE;
-            for (ArrivalTime arrivalEstimate : arrivalEstimates) {
-                if (
-                    arrivalEstimate.estimatedSeconds < earliestEta &&
-                        request.wheelchairAccessible == arrivalEstimate.wheelchairAccessible
-                ) {
-                    earliestEta = arrivalEstimate.estimatedSeconds;
-                }
-            }
-
-            if (earliestEta == Integer.MAX_VALUE) {
-                // no acceptable ride types found
-                throw new TransportationNetworkCompanyAvailabilityException();
-            }
-
-            // store the earliest ETA if planning a "depart at" trip that begins soonish (within + or - 30 minutes)
-            long now = (new Date()).getTime() / 1000;
-            long departureTimeWindow = 1800;
-            if (
-                this.arriveBy == false &&
-                    request.dateTime < now + departureTimeWindow &&
-                    request.dateTime > now - departureTimeWindow
-            ) {
-                request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
-            }
-        }
+        setEarliestTransportationNetworkCompanyEta(request, router, companies);
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;
