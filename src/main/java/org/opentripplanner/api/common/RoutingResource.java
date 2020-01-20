@@ -606,6 +606,10 @@ public abstract class RoutingResource {
     @QueryParam("pathComparator")
     private String pathComparator;
 
+    /**
+     * When set to true, this will require transit to be present in all itineraries returned. This will prevent results
+     * that have only a non-transit mode as the entire itinerary even if that option is more optimal.
+     */
     @QueryParam("onlyTransitTrips")
     private Boolean onlyTransitTrips;
 

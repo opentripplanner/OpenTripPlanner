@@ -241,12 +241,14 @@ public class ApiLeg {
     @JsonSerialize
     public Boolean rentedBike;
 
-    @XmlAttribute
-    @JsonSerialize
+     /**
+      * Whether this leg involves traveling in a hailed car (Uber or Lyft for example).
+      */
     public Boolean hailedCar;
 
-    @XmlAttribute
-    @JsonSerialize
+     /**
+      * On legs with hailed car travel, this includes more details specific to TNC travel.
+      */
     public TransportationNetworkCompanySummary tncData;
 
     /**
