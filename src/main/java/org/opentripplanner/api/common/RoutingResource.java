@@ -430,12 +430,6 @@ public abstract class RoutingResource {
     protected String companies;
 
     /**
-     * If request date is invalid, apply the provided strategy to come up with a valid date.
-     */
-    @QueryParam("invalidDateStrategy")
-    protected String invalidDateStrategy;
-
-    /**
      * The minimum distance that should be covered using transit legs. For now, this will only have an effect if
      * expressed as a percent. ie "50%"
      */
@@ -490,11 +484,6 @@ public abstract class RoutingResource {
 
         if (toPlace != null)
             request.setToString(toPlace);
-
-        // NOTE: This query parameter dictates how OTP handles a bad date/time value. It must be set on the request
-        // before setDateTime is called, otherwise the strategy will not be applied.
-        if (invalidDateStrategy != null)
-            request.invalidDateStrategy = invalidDateStrategy;
 
         {
             //FIXME: move into setter method on routing request

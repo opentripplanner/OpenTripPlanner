@@ -627,9 +627,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     // A common separated list of the allowable TNC companies to query
     public String companies;
 
-    // If request date is invalid, apply the provided strategy to come up with a valid date.
-    public String invalidDateStrategy;
-
     // The minimum transit distance required during filtering itineraries
     // Format is a number with a percent, ie: 50%
     public String minTransitDistance;
@@ -944,38 +941,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime.getTime() / 1000;
+        if (dateTime == null) throw new IllegalArgumentException("Date or time parameter is invalid.");
+        else this.dateTime = dateTime.getTime() / 1000;
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
-        if (dateObject == null) {
-            // Handle bad date time.
-            if (invalidDateStrategy == null) {
-                throw new IllegalArgumentException("Date or time parameter is invalid.");
-            } else {
-                // Fix the date with the provided strategy.
-                LOG.warn("Could not parse date/time. Attempting invalid date strategy: {}", invalidDateStrategy);
-                switch (invalidDateStrategy.toUpperCase()) {
-                case "USE_CURRENT":
-                    // Attempt to use provided time.
-                    Date now = new Date();
-                    date = new SimpleDateFormat("yyyy-MM-dd").format(now);
-                    dateObject = DateUtils.toDate(date, time, tz);
-                    if (dateObject == null) {
-                        // Time didn't parse. Use current time instead.
-                        LOG.warn("Couldn't parse time. Using current time instead.");
-                        dateObject = now;
-                    }
-                    break;
-                // TODO: Add other strategies? For example, guess the nearest date to the one provided.
-                default:
-                    // If invalidDateStrategy is not one of the above
-                    throw new IllegalArgumentException("Date or time parameter is invalid.");
-                }
-            }
-        }
-        LOG.debug("Setting date to {}", date);
         setDateTime(dateObject);
     }
 
@@ -1229,7 +1200,6 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && Objects.equal(startingTransitTripId, other.startingTransitTripId)
                 && disableAlertFiltering == other.disableAlertFiltering
                 && geoidElevation == other.geoidElevation
-                && invalidDateStrategy.equals(other.invalidDateStrategy)
                 && minTransitDistance == other.minTransitDistance
                 && searchTimeout == other.searchTimeout
                 && flexFlagStopExtraPenalty == other.flexFlagStopExtraPenalty
