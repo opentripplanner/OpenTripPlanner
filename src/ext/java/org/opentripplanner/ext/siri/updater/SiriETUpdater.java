@@ -2,6 +2,8 @@ package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -29,6 +31,7 @@ import java.util.concurrent.ExecutionException;
  * </pre>
  *
  */
+@Component(key = "siri-et-updater",type = ServiceType.GraphUpdater)
 public class SiriETUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriETUpdater.class);
 

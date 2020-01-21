@@ -2,6 +2,8 @@ package org.opentripplanner.updater.stoptime;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -26,6 +28,7 @@ import java.util.List;
  * </pre>
  *
  */
+@Component(key = "stop-time-updater",type = ServiceType.GraphUpdater)
 public class PollingStoptimeUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(PollingStoptimeUpdater.class);
 

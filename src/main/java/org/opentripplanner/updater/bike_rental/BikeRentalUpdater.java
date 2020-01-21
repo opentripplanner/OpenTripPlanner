@@ -10,6 +10,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -28,6 +30,7 @@ import org.slf4j.LoggerFactory;
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
  */
+@Component(key = "bike-rental",type = ServiceType.GraphUpdater)
 public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(BikeRentalUpdater.class);

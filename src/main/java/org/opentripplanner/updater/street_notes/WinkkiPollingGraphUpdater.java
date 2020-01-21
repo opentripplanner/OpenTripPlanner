@@ -1,6 +1,8 @@
 package org.opentripplanner.updater.street_notes;
 
 import org.opengis.feature.simple.SimpleFeature;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.util.NonLocalizedString;
 
@@ -20,7 +22,7 @@ import java.util.Date;
  * </pre>
  */
 
-
+@Component(key = "winkki-polling-updater",type = ServiceType.GraphUpdater)
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
     protected Alert getNote(SimpleFeature feature) {
         Alert alert = Alert.createSimpleAlerts("winkki:" + feature.getAttribute("licence_type"));

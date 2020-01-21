@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.examples.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -31,6 +33,7 @@ import org.slf4j.LoggerFactory;
  *
  * @see ExampleGraphUpdater
  */
+@Component(key = "example-polling-updater",type = ServiceType.GraphUpdater)
 public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(ExamplePollingGraphUpdater.class);
@@ -74,7 +77,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     public void teardown() {
         LOG.info("Teardown example polling updater");
     }
-    
+
     // This is a private GraphWriterRunnable that can be executed to modify the graph
     private class ExampleGraphWriter implements GraphWriterRunnable {
         @Override

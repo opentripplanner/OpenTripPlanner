@@ -1,26 +1,16 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
-import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
-import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorTransitLayerGraphUpdater;
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.bike_park.BikeParkUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
  * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
+ *
  * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
  * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
  * called "updaters". Each child element represents one updater.
@@ -66,53 +56,12 @@ public abstract class GraphUpdaterConfigurator {
 
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
         for (JsonNode configItem : config.path("updaters")) {
-
             // For each sub-node, determine which kind of updater is being created.
             String type = configItem.path("type").asText();
-            GraphUpdater updater = null;
             if (type != null) {
-                if (type.equals("bike-rental")) {
-                    updater = new BikeRentalUpdater();
-                }
-                else if (type.equals("bike-park")) {
-                    updater = new BikeParkUpdater();
-                }
-                else if (type.equals("stop-time-updater")) {
-                    updater = new PollingStoptimeUpdater();
-                }
-                else if (type.equals("websocket-gtfs-rt-updater")) {
-                    updater = new WebsocketGtfsRealtimeUpdater();
-                }
-                else if (type.equals("real-time-alerts")) {
-                    updater = new GtfsRealtimeAlertsUpdater();
-                }
-                else if (type.equals("example-updater")) {
-                    updater = new ExampleGraphUpdater();
-                }
-                else if (type.equals("example-polling-updater")) {
-                    updater = new ExamplePollingGraphUpdater();
-                }
-                else if (type.equals("winkki-polling-updater")) {
-                    updater = new WinkkiPollingGraphUpdater();
-                }
-                else if (type.equals("raptor-transit-layer")) {
-                    updater = new RaptorTransitLayerGraphUpdater();
-                }
-                else if (type.equals("siri-et-updater")) {
-                    updater = new SiriETUpdater();
-                }
-                else if (type.equals("siri-vm-updater")) {
-                    updater = new SiriVMUpdater();
-                }
-                else if (type.equals("siri-sx-updater")) {
-                    updater = new SiriSXUpdater();
-                }
-            }
-
-            if (updater == null) {
-                LOG.error("Unknown updater type: " + type);
-            } else {
                 try {
+                    GraphUpdater updater = ComponentAnnotationConfigurator.getInstance()
+                        .getComponentInstance(type, ServiceType.GraphUpdater);
                     // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
                     // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
                     updater.setGraphUpdaterManager(updaterManager);

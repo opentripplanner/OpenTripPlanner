@@ -3,6 +3,8 @@ package org.opentripplanner.updater.alerts;
 import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -29,6 +31,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
  * myalert.feedId = TA
  * </pre>
  */
+@Component(key = "real-time-alerts",type = ServiceType.GraphUpdater)
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 

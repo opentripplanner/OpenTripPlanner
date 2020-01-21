@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.graph.Graph;
@@ -18,6 +20,7 @@ import org.slf4j.LoggerFactory;
  * see whether graph.timetableSnapshotSource is non-null (which means we have a source of incoming updates to copy).
  * But by creating it explicitly, we can set the polling interval and avoid treating this as a special case.
  */
+@Component(key = "raptor-transit-layer",type = ServiceType.GraphUpdater)
 public class RaptorTransitLayerGraphUpdater implements GraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(RaptorTransitLayerGraphUpdater.class);

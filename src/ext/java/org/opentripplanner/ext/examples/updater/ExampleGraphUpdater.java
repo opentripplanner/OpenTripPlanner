@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.examples.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -26,10 +28,11 @@ import org.slf4j.LoggerFactory;
  *    "url": "https://api.updater.com/example-updater"
  * }
  * </pre>
- * 
+ *
  * @see ExamplePollingGraphUpdater
  * @see org.opentripplanner.updater.GraphUpdaterConfigurator
  */
+@Component(key = "example-updater",type = ServiceType.GraphUpdater)
 public class ExampleGraphUpdater implements GraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(ExampleGraphUpdater.class);

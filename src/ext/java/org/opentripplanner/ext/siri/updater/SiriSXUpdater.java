@@ -2,6 +2,8 @@ package org.opentripplanner.ext.siri.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
+import org.opentripplanner.annotation.Component;
+import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
@@ -19,6 +21,7 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.UUID;
 
+@Component(key = "siri-sx-updater",type = ServiceType.GraphUpdater)
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
 
