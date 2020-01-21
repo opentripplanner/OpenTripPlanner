@@ -2,6 +2,7 @@ package org.opentripplanner.updater.alerts;
 
 import java.util.*;
 
+import java.util.function.Function;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -54,7 +55,7 @@ public class AlertsUpdateHandler {
         }
     }
 
-    private void handleAlert(String id, GtfsRealtime.Alert alert) {
+    protected void handleAlert(String id, GtfsRealtime.Alert alert) {
         Alert alertText = new Alert();
         alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
@@ -94,7 +95,7 @@ public class AlertsUpdateHandler {
 
             String routeId = null;
             if (informed.hasRouteId()) {
-                routeId = informed.getRouteId();
+                routeId = getId(informed,EntitySelector::getRouteId);
             }
 
             int direction;
@@ -107,16 +108,16 @@ public class AlertsUpdateHandler {
             // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
-                tripId = informed.getTrip().getTripId();
+                tripId = getId(informed,entitySelector -> entitySelector.getTrip().getTripId());
             }
             String stopId = null;
             if (informed.hasStopId()) {
-                stopId = informed.getStopId();
+                stopId =getId(informed,EntitySelector::getStopId);
             }
 
             String agencyId = informed.getAgencyId();
             if (informed.hasAgencyId()) {
-                agencyId = informed.getAgencyId().intern();
+                agencyId = getId(informed,entitySelector -> entitySelector.getAgencyId().intern());
             }
 
             AlertPatch patch = new AlertPatch();
@@ -193,5 +194,9 @@ public class AlertsUpdateHandler {
 
     public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
         this.fuzzyTripMatcher = fuzzyTripMatcher;
+    }
+
+    protected String getId(EntitySelector entity,Function<EntitySelector,String> func){
+        return func.apply(entity);
     }
 }
