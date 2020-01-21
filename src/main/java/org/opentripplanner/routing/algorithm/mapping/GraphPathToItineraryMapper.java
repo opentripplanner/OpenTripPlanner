@@ -330,8 +330,11 @@ public abstract class GraphPathToItineraryMapper {
         GraphPath path,
         Itinerary itinerary
     ) {
-        Graph graph = path.getRoutingContext().graph;
         RoutingRequest request = path.states.getFirst().getOptions();
+        // Don't do anything further if the request doesn't involve TNC routing
+        if (!request.useTransportationNetworkCompany) return true;
+
+        Graph graph = path.getRoutingContext().graph;
         String companies = request.companies;
         if (companies == null) {
             // no companies, therefore this request doesn't have any TNC data to add. Return true
