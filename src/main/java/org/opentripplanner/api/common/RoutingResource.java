@@ -595,7 +595,21 @@ public abstract class RoutingResource {
      * A comma separated list of TNC companies to use in the routing request
      */
     @QueryParam("companies")
-    public String companies;
+    protected String companies;
+
+    /**
+     * The minimum distance that should be covered using transit legs. For now, this will only have an effect if
+     * expressed as a percent. ie "50%"
+     */
+    @QueryParam("minTransitDistance")
+    private String minTransitDistance;
+
+    /**
+     * Override the default shortest path search timeouts to this value in milliseconds. This value will apply to all
+     * attempts to find an individual itinerary.
+     */
+    @QueryParam("searchTimeout")
+    protected Long searchTimeout;
 
     /**
      * Set the method of sorting itineraries in the response. Right now, the only supported value is "duration";

@@ -666,6 +666,27 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public String companies;
 
+    // The minimum transit distance required during filtering itineraries
+    // Format is a number with a percent, ie: 50%
+    public String minTransitDistance;
+
+    // allow custom shortest path search timeouts
+    // set to -1 by default which means don't use a custom timeout
+    // units are in milliseconds
+    public long searchTimeout = -1;
+
+    /**
+     * Keep track of epoch time the request was created by OTP. This is currently only used by the
+     * GTFS-Flex implementation.
+     *
+     * In GTFS-Flex, deviated-route and call-and-ride service can define a trip-level parameter
+     * `drt_advance_book_min`, which determines how far in advance the flexible segment must be
+     * scheduled. If `flexIgnoreDrtAdvanceBookMin = false`, OTP will only provide itineraries which
+     * are feasible based on that constraint. For example, if the current time is 1:00pm and a
+     * particular service must be scheduled one hour in advance, the earliest time the service
+     * is usable is 2:00pm.
+     */
+    public long clockTimeSec;
 
     /* CONSTRUCTORS */
 
@@ -923,7 +944,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setDateTime(Date dateTime) {
-        this.dateTime = dateTime.getTime() / 1000;
+        if (dateTime == null) throw new IllegalArgumentException("Date or time parameter is invalid.");
+        else this.dateTime = dateTime.getTime() / 1000;
     }
 
     public void setDateTime(String date, String time, TimeZone tz) {
