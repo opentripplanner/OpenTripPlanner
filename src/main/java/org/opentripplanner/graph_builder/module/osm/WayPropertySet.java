@@ -394,7 +394,10 @@ public class WayPropertySet {
         }
         return null;
     }
-    // Determining whether this edge is suitable for TNC stops
+
+    /**
+     * Determining whether this edge is suitable for TNC stops
+     */
     public boolean isSuitableForTNCStop(OSMWay way) {
         String parkingLaneProperty = getFirstParkingLaneProperty(way);
         // assume this is a suitable place if no property exists

@@ -208,6 +208,7 @@ public class TransportationNetworkCompanyService implements Serializable {
                     )
                 );
             } catch (Exception e) {
+                LOG.error("Unable to query TNC API for arrival estimates!");
                 e.printStackTrace();
                 throw new UnsupportedOperationException(
                     "Unable to verify availability of Transportation Network Company service due to error: " +
