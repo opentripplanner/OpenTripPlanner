@@ -87,6 +87,11 @@ public class NetexModule implements GraphBuilderModule {
 
                 OtpTransitService otpService = transitBuilder.build();
 
+
+
+                // TODO OTP2 - Move this into the AddTransitModelEntitiesToGraph
+                //           - and make sure thay also work with GTFS feeds - GTFS do no
+                //           - have operators and notice assignments.
                 graph.getOperators().addAll(otpService.getAllOperators());
                 graph.addNoticeAssignments(otpService.getNoticeAssignments());
 

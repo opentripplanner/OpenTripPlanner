@@ -1,6 +1,10 @@
 package org.opentripplanner.model.calendar;
 
+import javax.validation.constraints.NotNull;
 import java.util.Objects;
+
+import static org.opentripplanner.model.calendar.ServiceDate.MAX_DATE;
+import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
 
 
 /**
@@ -15,22 +19,16 @@ import java.util.Objects;
  */
 public final class ServiceDateInterval {
 
-    /**
-     * The unbounded values will represent an unbounded value internally in this class.
-     * They are converted to {@code null} when exported outside the class. This little
-     * trick make internal logic a bit simpler, since there is no need for {@code null} checks.
-     */
-    private static final ServiceDate UNBOUNDED_START = new ServiceDate(0, 1, 1);
-    private static final ServiceDate UNBOUNDED_END = new ServiceDate(9999, 12, 31);
-    private static final ServiceDateInterval UNBOUNDED = new ServiceDateInterval(null, null);
+    private static final ServiceDateInterval UNBOUNDED = new ServiceDateInterval(
+            MIN_DATE, MAX_DATE
+    );
 
     private final ServiceDate start;
     private final ServiceDate end;
 
-
     public ServiceDateInterval(ServiceDate start, ServiceDate end) {
-        this.start = start == null ? UNBOUNDED_START : start;
-        this.end = end == null ? UNBOUNDED_END : end;
+        this.start = start == null ? MIN_DATE : start;
+        this.end = end == null ? MAX_DATE : end;
 
         // Guarantee that the start is before or equal the end.
         if(this.end.isBefore(this.start)) {
@@ -48,15 +46,25 @@ public final class ServiceDateInterval {
     }
 
     public boolean isUnbounded() {
-        return start.equals(UNBOUNDED_START) && end.equals(UNBOUNDED_END);
+        return start.equals(MIN_DATE) && end.equals(MAX_DATE);
     }
 
+    /**
+     * Return the interval start, inclusive. If the period start is unbounded the
+     * {@link ServiceDate#MIN_DATE} is returned.
+     */
+    @NotNull
     public ServiceDate getStart() {
-        return start == UNBOUNDED_START ? null : start;
+        return start;
     }
 
+    /**
+     * Return the interval end, inclusive. If the period start is unbounded the
+     * {@link ServiceDate#MAX_DATE} is returned.
+     */
+    @NotNull
     public ServiceDate getEnd() {
-        return end == UNBOUNDED_END ? null : end;
+        return end;
     }
 
     /**
@@ -107,10 +115,6 @@ public final class ServiceDateInterval {
 
     @Override
     public String toString() {
-        return isUnbounded() ? "UNBOUNDED" : "[" + str(getStart()) + ", " + str(getEnd()) + "]";
-    }
-
-    private String str(ServiceDate it) {
-        return it == null ? "" : it.toString();
+        return "[" + start + ", " + end + "]";
     }
 }

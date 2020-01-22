@@ -45,9 +45,6 @@ import java.util.function.Predicate;
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
- *
- *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *            - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
 
