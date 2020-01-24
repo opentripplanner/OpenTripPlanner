@@ -7,7 +7,6 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GTFSModeNotSupported;
 import org.opentripplanner.graph_builder.issues.TripDegenerate;
 import org.opentripplanner.graph_builder.issues.TripUndefinedService;
-import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Route;
@@ -27,10 +26,7 @@ import java.util.List;
 import java.util.Set;
 
 /**
- * This class is responsible for generating trip patterns when loading GTFS data. This was
- * previously done in the {@link GeometryAndBlockProcessor},
- * and the code is extracted out of it to make the PatternHopFactory reusable
- * for NETEX and GTFS file import.
+ * This class is responsible for generating trip patterns when loading GTFS data.
  */
 public class GenerateTripPatternsOperation {
     private static final Logger LOG = LoggerFactory.getLogger(GenerateTripPatternsOperation.class);

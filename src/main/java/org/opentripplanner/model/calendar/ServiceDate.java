@@ -13,12 +13,13 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 /**
- * A general representation of a year-month-day tuple not tied to any locale and
+ * A general representation of a year-month-day triple not tied to any locale and
  * used by the GTFS entities {@link ServiceCalendar} and
  * {@link ServiceCalendarDate} to represent service date ranges.
+ * <p/>
  * A service date is a particular date when a particular GTFS service id is active.
- *
- * This class is immutable.
+ * <p/>
+ * This class is immutable. It is a ValueObject(DesignPattern).
  */
 public final class ServiceDate implements Serializable, Comparable<ServiceDate> {
 
@@ -32,6 +33,17 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     private static final TimeZone UTC_TIME_ZONE = TimeZone.getTimeZone("UTC");
 
+    /**
+     * The smallest possible ServiceDate allowed. Dates before 1 . JAN year 0 is not allowed.
+     */
+    public static final ServiceDate MIN_DATE = new ServiceDate(0, 1, 1);
+
+    /**
+     * The greatest possible ServiceDate allowed. Dates ater 31 . DEC year 9999 is not allowed.
+     */
+    public static final ServiceDate MAX_DATE = new ServiceDate(9999, 12, 31);
+
+
     private final int year;
 
     private final int month;
@@ -40,7 +52,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     /**
      * A uniq increasing number for any valid day between 0000-01-01 and 9999-12-31.
-     * Holes in the sequence is allowed to simplify the calculation.
+     * Holes in the sequence is allowed to simplify the calculation. This is used for
+     * easy and fast caparison and as a hash for this instant.
      *
      * The value can safely be used for comparison, equals and hashCode.
      */
@@ -66,11 +79,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
         this.month = month;
         this.day = day;
 
-        // The coefficient used are primes equals/larger then the maximum sum of the
-        // following terms.
-        // Month: max 31 days per month => 31 is a prime.
-        // Year: 31 days + 11 months * 31 days/month = max 372 days/year => 373 is a prime
-        this.sequenceNumber = 373 * year + 31 * (month-1) + day;
+        // The sequence number is constructed to be 'yyyymmdd' (a valid integer)
+        this.sequenceNumber = 10_000 * year + 100 * month + day;
     }
 
     public ServiceDate(Calendar calendar) {
@@ -84,8 +94,6 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     /**
      * Construct a ServiceDate from the specified {@link Date} object, using the
      * default {@link TimeZone} object for the current VM to localize the date
-     *
-     * @param date
      */
     public ServiceDate(Date date) {
         this(getCalendarForDate(date));
@@ -259,6 +267,8 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     @Override
     public String toString() {
+        if(MAX_DATE.equals(this)) { return "MAX"; }
+        if(MIN_DATE.equals(this)) { return "MIN"; }
         return String.format("%d-%02d-%02d", year, month, day);
     }
 
