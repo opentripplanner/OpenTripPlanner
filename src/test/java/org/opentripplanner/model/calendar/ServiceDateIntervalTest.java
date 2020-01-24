@@ -20,9 +20,8 @@ public class ServiceDateIntervalTest {
     @Test
     public void unlimited() {
         ServiceDateInterval u = ServiceDateInterval.unbounded();
-        assertTrue(u.include(new ServiceDate(0, 1, 1)));
-        assertTrue(u.include(new ServiceDate(9999, 12, 31)));
-        assertEquals("UNBOUNDED", u.toString());
+        assertTrue(u.include(ServiceDate.MIN_DATE));
+        assertTrue(u.include(ServiceDate.MAX_DATE));
     }
 
     @Test
@@ -35,13 +34,13 @@ public class ServiceDateIntervalTest {
     @Test
     public void getStart() {
         assertEquals(d1, new ServiceDateInterval(d1, d2).getStart());
-        assertNull(ServiceDateInterval.unbounded().getStart());
+        assertEquals(ServiceDate.MIN_DATE, ServiceDateInterval.unbounded().getStart());
     }
 
     @Test
     public void getEnd() {
         assertEquals(d2, new ServiceDateInterval(d1, d2).getEnd());
-        assertNull(ServiceDateInterval.unbounded().getEnd());
+        assertEquals(ServiceDate.MAX_DATE, ServiceDateInterval.unbounded().getEnd());
     }
 
     @Test
@@ -139,8 +138,9 @@ public class ServiceDateIntervalTest {
     @Test
     public void testToString() {
         assertEquals("[2020-01-07, 2020-01-15]", new ServiceDateInterval(d1, d2).toString());
-        assertEquals("[, 2020-01-15]", new ServiceDateInterval(null, d2).toString());
-        assertEquals("[2020-01-07, ]", new ServiceDateInterval(d1, null).toString());
-        assertEquals("UNBOUNDED", new ServiceDateInterval(null, null).toString());
+        assertEquals("[MIN, 2020-01-15]", new ServiceDateInterval(null, d2).toString());
+        assertEquals("[2020-01-07, MAX]", new ServiceDateInterval(d1, null).toString());
+        assertEquals("[MIN, MAX]", new ServiceDateInterval(null, null).toString());
+        assertEquals("[MIN, MAX]", ServiceDateInterval.unbounded().toString());
     }
 }

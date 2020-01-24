@@ -133,6 +133,7 @@ public class GtfsModule implements GraphBuilderModule {
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
                 // NB! The calls below have side effects - the builder state is updated!
+
                 repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
 
                 // NB! The calls below have side effects - the builder state is updated!
