@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -23,7 +23,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * <p/>
  * This mapper uses recursion to reverse the results.
  */
-public final class ReversePathMapper<T extends TripScheduleInfo> implements PathMapper<T> {
+public final class ReversePathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 
     private final TransitCalculator calculator;
 

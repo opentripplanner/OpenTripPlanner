@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 
@@ -22,9 +22,9 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
  *
  * </ul>
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-class DestinationArrival<T extends TripScheduleInfo> implements ArrivalView<T> {
+class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
     private final ArrivalView<T> previous;
     private final int departureTime;

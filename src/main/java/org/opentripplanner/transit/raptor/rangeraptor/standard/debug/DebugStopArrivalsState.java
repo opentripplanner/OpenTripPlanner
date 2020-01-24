@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
@@ -16,9 +16,9 @@ import java.util.Collection;
  * The responsibility of this class is to wrap a {@link StopArrivalsState} and notify the
  * {@link org.opentripplanner.transit.raptor.rangeraptor.standard.debug.StateDebugger} about all stop arrival events.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class DebugStopArrivalsState<T extends TripScheduleInfo> implements StopArrivalsState<T> {
+public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implements StopArrivalsState<T> {
 
     private final StopArrivalsState<T> delegate;
     private final StateDebugger<T> debug;

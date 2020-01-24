@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
@@ -13,9 +13,9 @@ import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
  * <p/>
  * This class do not perform the trip search, but delegates this.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleExactMatchSearch<T extends TripScheduleInfo> implements TripScheduleSearch<T> {
+public class TripScheduleExactMatchSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
 
     private final int slack;
     private final TripScheduleSearch<T> delegate;

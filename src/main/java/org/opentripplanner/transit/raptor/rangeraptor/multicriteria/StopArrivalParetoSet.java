@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -14,9 +14,9 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetWithMarker;
 /**
  * A pareto optimal set of stop arrivals for a given stop.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMarker<AbstractStopArrival<T>> {
+class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMarker<AbstractStopArrival<T>> {
 
     /**
      * Use the factory methods in this class to create a new instance.
@@ -28,7 +28,7 @@ class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMark
     /**
      * Create a stop arrivals pareto set and attach a debugger is handler exist.
      */
-    static <T extends TripScheduleInfo> StopArrivalParetoSet<T> createStopArrivalSet(
+    static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createStopArrivalSet(
             int stop,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
@@ -40,7 +40,7 @@ class StopArrivalParetoSet<T extends TripScheduleInfo> extends ParetoSetWithMark
      * attach a {@link CalculateTransferToDestination} listener witch will create
      * new destination arrivals for each accepted egress stop arrival.
      */
-    static <T extends TripScheduleInfo> StopArrivalParetoSet<T> createEgressStopArrivalSet(
+    static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
             TransferLeg egressLeg,
             CostCalculator costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,

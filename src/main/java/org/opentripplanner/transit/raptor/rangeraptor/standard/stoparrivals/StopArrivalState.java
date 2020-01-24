@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntUtils;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
@@ -18,9 +18,9 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
  * arrival is better then the transit arrival it might be tempting to remove the transit arrival, but this
  * transit might be the best way (or only way) to get to another stop by transfer.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class StopArrivalState<T extends TripScheduleInfo> {
+public class StopArrivalState<T extends RaptorTripSchedule> {
 
     /**
      * Used to initialize all none time based attributes.

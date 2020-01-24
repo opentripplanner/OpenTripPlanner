@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -20,7 +20,7 @@ public class DestinationArrivalTest {
     private static final int TRANSIT_STOP = 101;
     private static final int TRANSIT_BOARD_TIME = ACCESS_DEPARTURE_TIME + 10 * 60;
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + 4 * 60;
-    private static final TripScheduleInfo A_TRIP = null;
+    private static final RaptorTripSchedule A_TRIP = null;
     private static final int TRANSIT_COST = 200;
 
     private static final int DESTINATION_DURATION_TIME = 50;
@@ -34,7 +34,7 @@ public class DestinationArrivalTest {
     /**
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
-    private static final AccessStopArrival<TripScheduleInfo> ACCESS_ARRIVAL = new AccessStopArrival<>(
+    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
             ACCESS_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION_TIME,
@@ -42,7 +42,7 @@ public class DestinationArrivalTest {
             TRANSIT_CALCULATOR
     );
 
-    private static final TransitStopArrival<TripScheduleInfo> TRANSIT_ARRIVAL = new TransitStopArrival<>(
+    private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
             ACCESS_ARRIVAL,
             TRANSIT_STOP,
             TRANSIT_ALIGHT_TIME,
@@ -52,7 +52,7 @@ public class DestinationArrivalTest {
             TRANSIT_COST
     );
 
-    private DestinationArrival<TripScheduleInfo> subject = new DestinationArrival<>(
+    private DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
             TRANSIT_ARRIVAL,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST

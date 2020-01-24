@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 
@@ -15,9 +15,9 @@ import java.util.Collection;
  * <p/>
  * This class find the pareto optimal paths with respect to: rounds, arrival time and total travel time.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdStopArrivalsState<T extends TripScheduleInfo> implements StopArrivalsState<T> {
+public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements StopArrivalsState<T> {
 
     private final Stops<T> stops;
     private final DestinationArrivalPaths<T> results;

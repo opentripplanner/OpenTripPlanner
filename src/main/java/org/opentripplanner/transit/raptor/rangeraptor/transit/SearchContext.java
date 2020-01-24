@@ -3,13 +3,13 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -23,14 +23,14 @@ import java.util.Collection;
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class SearchContext<T extends TripScheduleInfo> {
+public class SearchContext<T extends RaptorTripSchedule> {
     private static final DebugLogger NOOP_DEBUG_LOGGER = (topic, message) -> { };
     /**
      * The request input used to customize the worker to the clients needs.
      */
-    private final RangeRaptorRequest<T> request;
+    private final RaptorRequest<T> request;
 
     /**
      * the transit data role needed for routing
@@ -38,7 +38,7 @@ public class SearchContext<T extends TripScheduleInfo> {
     protected final TransitDataProvider<T> transit;
 
     private final TransitCalculator calculator;
-    private final TuningParameters tuningParameters;
+    private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
@@ -47,8 +47,8 @@ public class SearchContext<T extends TripScheduleInfo> {
     private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
     public SearchContext(
-            RangeRaptorRequest<T> request,
-            TuningParameters tuningParameters,
+            RaptorRequest<T> request,
+            RaptorTuningParameters tuningParameters,
             TransitDataProvider<T> transit,
             WorkerPerformanceTimers timers
     ) {
@@ -81,11 +81,11 @@ public class SearchContext<T extends TripScheduleInfo> {
         return request.searchParams();
     }
 
-    public RangeRaptorProfile profile() {
+    public RaptorProfile profile() {
         return request.profile();
     }
 
-    public TuningParameters tuningParameters() {
+    public RaptorTuningParameters tuningParameters() {
         return tuningParameters;
     }
 
@@ -138,12 +138,12 @@ public class SearchContext<T extends TripScheduleInfo> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RangeRaptorRequest<?> r, TuningParameters t) {
+    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
     }
 
-    private DebugRequest<T> debugRequest(RangeRaptorRequest<T> request) {
+    private DebugRequest<T> debugRequest(RaptorRequest<T> request) {
         return request.searchForward() ? request.debug() : request.mutate().debug().reverseDebugRequest().build();
     }
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -11,9 +11,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.view.DebugHandler;
 /**
  * Send debug events to the {@link DebugHandler} using the {@link StopsCursor}.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-class StateDebugger<T extends TripScheduleInfo> {
+class StateDebugger<T extends RaptorTripSchedule> {
     private final StopsCursor<T> cursor;
     private final RoundProvider roundProvider;
     private final DebugHandler<ArrivalView<T>> debugHandlerStopArrivals;

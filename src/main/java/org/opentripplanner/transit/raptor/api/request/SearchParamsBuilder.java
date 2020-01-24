@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 
 import java.util.ArrayList;
@@ -8,8 +9,12 @@ import java.util.Collection;
 
 /**
  * Mutable version of {@link SearchParams}.
+ *
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class SearchParamsBuilder {
+public class SearchParamsBuilder<T extends RaptorTripSchedule> {
+
+    private final RaptorRequestBuilder<T> parent;
     // Search
     private int earliestDepartureTime;
     private int latestArrivalTime;
@@ -18,18 +23,15 @@ public class SearchParamsBuilder {
     private int numberOfAdditionalTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
+    // TODO OTP2 - Rename, this allow the search window to be extended bejond the
+    //           - "latest departure time".
     private boolean waitAtBeginningEnabled;
     private BitSet stopFilter;
     private final Collection<TransferLeg> accessLegs = new ArrayList<>();
     private final Collection<TransferLeg> egressLegs = new ArrayList<>();
 
-
-
-    public SearchParamsBuilder() {
-        this(SearchParams.defaults());
-    }
-
-    public SearchParamsBuilder(SearchParams defaults) {
+    public SearchParamsBuilder(RaptorRequestBuilder<T> parent, SearchParams defaults) {
+        this.parent = parent;
         this.earliestDepartureTime = defaults.earliestDepartureTime();
         this.latestArrivalTime = defaults.latestArrivalTime();
         this.searchWindowInSeconds = defaults.searchWindowInSeconds();
@@ -41,14 +43,13 @@ public class SearchParamsBuilder {
         this.stopFilter = defaults.stopFilter();
         this.accessLegs.addAll(defaults.accessLegs());
         this.egressLegs.addAll(defaults.egressLegs());
-
     }
 
     public int earliestDepartureTime() {
         return earliestDepartureTime;
     }
 
-    public SearchParamsBuilder earliestDepartureTime(int earliestDepartureTime) {
+    public SearchParamsBuilder<T> earliestDepartureTime(int earliestDepartureTime) {
         this.earliestDepartureTime = earliestDepartureTime;
         return this;
     }
@@ -57,7 +58,7 @@ public class SearchParamsBuilder {
         return latestArrivalTime;
     }
 
-    public SearchParamsBuilder latestArrivalTime(int latestArrivalTime) {
+    public SearchParamsBuilder<T> latestArrivalTime(int latestArrivalTime) {
         this.latestArrivalTime = latestArrivalTime;
         return this;
     }
@@ -66,11 +67,11 @@ public class SearchParamsBuilder {
         return searchWindowInSeconds;
     }
 
-    public SearchParamsBuilder searchOneIterationOnly() {
+    public SearchParamsBuilder<T> searchOneIterationOnly() {
         return searchWindowInSeconds(0);
     }
 
-    public SearchParamsBuilder searchWindowInSeconds(int searchWindowInSeconds) {
+    public SearchParamsBuilder<T> searchWindowInSeconds(int searchWindowInSeconds) {
         this.searchWindowInSeconds = searchWindowInSeconds;
         return this;
     }
@@ -79,7 +80,7 @@ public class SearchParamsBuilder {
         return boardSlackInSeconds;
     }
 
-    public SearchParamsBuilder boardSlackInSeconds(int boardSlackInSeconds) {
+    public SearchParamsBuilder<T> boardSlackInSeconds(int boardSlackInSeconds) {
         this.boardSlackInSeconds = boardSlackInSeconds;
         return this;
     }
@@ -89,7 +90,7 @@ public class SearchParamsBuilder {
         return numberOfAdditionalTransfers;
     }
 
-    public SearchParamsBuilder numberOfAdditionalTransfers(int numberOfAdditionalTransfers) {
+    public SearchParamsBuilder<T> numberOfAdditionalTransfers(int numberOfAdditionalTransfers) {
         this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;
         return this;
     }
@@ -98,7 +99,7 @@ public class SearchParamsBuilder {
         return relaxCostAtDestination;
     }
 
-    public SearchParamsBuilder relaxCostAtDestination(double relaxCostAtDestination) {
+    public SearchParamsBuilder<T> relaxCostAtDestination(double relaxCostAtDestination) {
         this.relaxCostAtDestination = relaxCostAtDestination;
         return this;
     }
@@ -107,7 +108,7 @@ public class SearchParamsBuilder {
         return timetableEnabled;
     }
 
-    public SearchParamsBuilder timetableEnabled(boolean enable) {
+    public SearchParamsBuilder<T> timetableEnabled(boolean enable) {
         this.timetableEnabled = enable;
         return this;
     }
@@ -116,7 +117,7 @@ public class SearchParamsBuilder {
         return waitAtBeginningEnabled;
     }
 
-    public SearchParamsBuilder waitAtBeginningEnabled(boolean enable) {
+    public SearchParamsBuilder<T> waitAtBeginningEnabled(boolean enable) {
         this.waitAtBeginningEnabled = enable;
         return this;
     }
@@ -125,7 +126,7 @@ public class SearchParamsBuilder {
         return stopFilter;
     }
 
-    public SearchParamsBuilder stopFilter(BitSet stopFilter) {
+    public SearchParamsBuilder<T> stopFilter(BitSet stopFilter) {
         this.stopFilter = stopFilter;
         return this;
     }
@@ -134,12 +135,12 @@ public class SearchParamsBuilder {
         return accessLegs;
     }
 
-    public SearchParamsBuilder addAccessStop(TransferLeg accessLeg) {
+    public SearchParamsBuilder<T> addAccessStop(TransferLeg accessLeg) {
         this.accessLegs.add(accessLeg);
         return this;
     }
 
-    public SearchParamsBuilder addAccessStops(Iterable<TransferLeg> accessLegs) {
+    public SearchParamsBuilder<T> addAccessStops(Iterable<TransferLeg> accessLegs) {
         for (TransferLeg it : accessLegs) {
             addAccessStop(it);
         }
@@ -150,20 +151,23 @@ public class SearchParamsBuilder {
         return egressLegs;
     }
 
-    public SearchParamsBuilder addEgressStop(TransferLeg egressLeg) {
+    public SearchParamsBuilder<T> addEgressStop(TransferLeg egressLeg) {
         this.egressLegs.add(egressLeg);
         return this;
     }
 
-    public SearchParamsBuilder addEgressStops(Iterable<TransferLeg> egressLegs) {
+    public SearchParamsBuilder<T> addEgressStops(Iterable<TransferLeg> egressLegs) {
         for (TransferLeg it : egressLegs) {
             addEgressStop(it);
         }
         return this;
     }
 
+    public RaptorRequest<T> build() {
+        return parent.build();
+    }
 
-    public SearchParams build() {
+    SearchParams buildSearchParam() {
         return new SearchParams(this);
     }
 }

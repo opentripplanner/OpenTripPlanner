@@ -1,16 +1,16 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
 /**
  * Represent a access stop arrival.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class AccessStopArrival<T extends TripScheduleInfo> extends AbstractStopArrival<T> {
+public final class AccessStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
     private final int accessDurationInSeconds;
     private final TransitCalculator calculator;
 

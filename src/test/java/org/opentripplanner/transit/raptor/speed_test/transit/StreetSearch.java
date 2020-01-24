@@ -79,6 +79,6 @@ class StreetSearch {
             pathsByStopIndex.put(stopIndex, stopAtDistance);
         }
 
-        LOG.info("Found {} {} stops", resultTimesSecByStopIndex.size(), fromOrigin ?  "access" : "egress");
+        LOG.debug("Found {} {} stops", resultTimesSecByStopIndex.size(), fromOrigin ?  "access" : "egress");
     }
 }

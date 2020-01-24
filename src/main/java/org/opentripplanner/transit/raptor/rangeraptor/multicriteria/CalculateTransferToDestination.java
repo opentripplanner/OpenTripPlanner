@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
@@ -12,9 +12,9 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
  * This class listen to pareto set egress stop arrivals and on accepted
  * transit arrivals make the transfer to the destination.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class CalculateTransferToDestination<T extends TripScheduleInfo>
+public class CalculateTransferToDestination<T extends RaptorTripSchedule>
         implements ParetoSetEventListener<ArrivalView<T>> {
 
     private final TransferLeg egressLeg;

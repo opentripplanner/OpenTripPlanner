@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 /**
@@ -29,9 +29,9 @@ import org.opentripplanner.transit.raptor.util.TimeUtils;
  * </ul>
  * Use the "arrivedByX" methods before calling arrival type specific method. For example the {@link #trip()} method throws an exception if invoked on a Egress
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface ArrivalView<T extends TripScheduleInfo> {
+public interface ArrivalView<T extends RaptorTripSchedule> {
 
     /**
      * Stop index where the arrival takes place.

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.function.Function;
 
@@ -17,9 +17,9 @@ import java.util.function.Function;
  * given threshold. A linear search is slow when the number of schedules is very
  * large, let say more than 300 trip schedules.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class TripScheduleBoardSearch<T extends TripScheduleInfo> implements TripScheduleSearch<T> {
+public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
     private static final int NOT_SET = -1;
 
     private final int nTripsBinarySearchThreshold;
@@ -192,7 +192,7 @@ public class TripScheduleBoardSearch<T extends TripScheduleInfo> implements Trip
         while (upper - lower > nTripsBinarySearchThreshold) {
             int m = (lower + upper) / 2;
 
-            TripScheduleInfo trip = pattern.getTripSchedule(m);
+            RaptorTripSchedule trip = pattern.getTripSchedule(m);
 
             int departure = trip.departure(stopPositionInPattern);
 

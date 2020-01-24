@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.Egress;
 import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -20,17 +20,17 @@ public class ReversePathMapperTest {
     public void mapToPathReverseSearch() {
         // Given:
         Egress egress = basicTripByReverseSearch();
-        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
+        DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
-        Path<TestTripSchedule> expected = StopArrivalsTestData.basicTripAsPath();
-        PathMapper<TestTripSchedule> mapper = CALCULATOR.createPathMapper();
+        Path<TestRaptorTripSchedule> expected = StopArrivalsTestData.basicTripAsPath();
+        PathMapper<TestRaptorTripSchedule> mapper = CALCULATOR.createPathMapper();
 
 
         //When:
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+        Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
 
         // Then:
         assertTime("startTime", expected.startTime(), path.startTime());

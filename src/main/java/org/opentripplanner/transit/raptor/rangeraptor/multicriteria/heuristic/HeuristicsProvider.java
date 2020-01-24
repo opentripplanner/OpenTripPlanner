@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -12,9 +12,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
  * A wrapper around {@link Heuristics} to cash elements to avoid recalculation
  * of heuristic properties.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class HeuristicsProvider<T extends TripScheduleInfo> {
+public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     private final Heuristics heuristics;
     private final RoundProvider roundProvider;
     private final DestinationArrivalPaths<T> paths;

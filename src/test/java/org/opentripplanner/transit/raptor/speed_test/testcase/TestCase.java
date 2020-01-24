@@ -12,6 +12,8 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrShort;
  * Hold all information about a test case and its results.
  */
 public class TestCase {
+    public static final int NOT_SET = -1;
+
     private static final String FEED_ID = "RB";
     public final String id;
     public final String description;

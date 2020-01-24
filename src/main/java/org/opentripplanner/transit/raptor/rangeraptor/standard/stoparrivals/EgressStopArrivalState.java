@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.function.Consumer;
 
@@ -9,9 +9,9 @@ import java.util.function.Consumer;
  * The egress stop arrival state is responsible for sending arrival notifications.
  * This is used to update the destination arrivals.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class EgressStopArrivalState<T extends TripScheduleInfo> extends StopArrivalState<T> {
+public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
     private final int round;
     private final TransferLeg egressLeg;
     private final Consumer<EgressStopArrivalState<T>> transitCallback;

@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class TransferStopArrival<T extends TripScheduleInfo> extends AbstractStopArrival<T> {
+public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
     public TransferStopArrival(AbstractStopArrival<T> previousState, TransferLeg transferLeg, int arrivalTime, int additionalCost) {
         super(

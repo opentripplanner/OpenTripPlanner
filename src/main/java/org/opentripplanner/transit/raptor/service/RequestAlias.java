@@ -1,13 +1,13 @@
 package org.opentripplanner.transit.raptor.service;
 
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 
 import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
 import static org.opentripplanner.transit.raptor.api.request.Optimization.PARETO_CHECK_AGAINST_DESTINATION;
 import static org.opentripplanner.transit.raptor.api.request.Optimization.TRANSFERS_STOP_FILTER;
 
 public class RequestAlias {
-    public static String alias(RangeRaptorRequest<?> request, boolean serviceMultithreaded) {
+    public static String alias(RaptorRequest<?> request, boolean serviceMultithreaded) {
         boolean multithreaded = serviceMultithreaded && request.optimizationEnabled(PARALLEL);
         String alias = request.profile().abbreviation();
 

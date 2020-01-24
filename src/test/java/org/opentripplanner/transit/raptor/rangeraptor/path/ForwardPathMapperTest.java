@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.Egress;
 import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
@@ -18,17 +18,17 @@ public class ForwardPathMapperTest {
     @Test
     public void mapToPathForwardSearch() {
         Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
-        DestinationArrival<TestTripSchedule> destArrival = new DestinationArrival<>(
+        DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
                 egress.previous(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
 
-        PathMapper<TestTripSchedule> mapper = CALCULATOR.createPathMapper();
+        PathMapper<TestRaptorTripSchedule> mapper = CALCULATOR.createPathMapper();
 
-        Path<TestTripSchedule> path = mapper.mapToPath(destArrival);
+        Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
 
-        Path<TestTripSchedule> expected = StopArrivalsTestData.basicTripAsPath();
+        Path<TestRaptorTripSchedule> expected = StopArrivalsTestData.basicTripAsPath();
 
         assertEquals(expected.toString(), path.toString());
         assertEquals(expected.numberOfTransfers(), path.numberOfTransfers());

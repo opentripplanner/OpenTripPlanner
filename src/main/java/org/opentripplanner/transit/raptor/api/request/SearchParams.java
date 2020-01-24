@@ -65,6 +65,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The beginning of the departure window, in seconds since midnight. Inclusive.
      * The earliest a journey may start in seconds since midnight. In the case of a 'depart after'
      * search this is a required. In the case of a 'arrive by' search this is optional.
@@ -81,6 +82,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The end of the departure window, in seconds since midnight. Exclusive.
      * The latest a journey may arrive in seconds since midnight. In the case of a 'arrive by'
      * search this is a required. In the case of a 'depart after' search this is optional.
@@ -96,6 +98,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The time window used to search. The unit is seconds. For a *depart by search*, this is
      * added to the 'earliestDepartureTime' to find the 'latestDepartureTime'. For a *arrive
      * by search* this is used to calculate the 'earliestArrivalTime'. The algorithm will find
@@ -272,7 +275,7 @@ public class SearchParams {
 
     private void assertProperty(boolean predicate, String errorMessage) {
         if(!predicate) {
-            throw new IllegalArgumentException(RangeRaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
+            throw new IllegalArgumentException(RaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
         }
     }
 }

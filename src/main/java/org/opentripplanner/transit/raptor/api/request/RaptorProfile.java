@@ -7,7 +7,7 @@ import java.util.stream.Stream;
  * Several implementation are implemented - with different behaviour. Use the one
  * that suites your need best.
  */
-public enum RangeRaptorProfile {
+public enum RaptorProfile {
     /**
      * Multi criteria pareto search.
      */
@@ -46,7 +46,7 @@ public enum RangeRaptorProfile {
 
     private final String abbreviation;
 
-    RangeRaptorProfile(String abbreviation) {
+    RaptorProfile(String abbreviation) {
         this.abbreviation = abbreviation;
     }
 
@@ -54,11 +54,11 @@ public enum RangeRaptorProfile {
         return abbreviation;
     }
 
-    public boolean is(RangeRaptorProfile candidate) {
+    public boolean is(RaptorProfile candidate) {
         return this == candidate;
     }
 
-    public boolean isOneOf(RangeRaptorProfile... candidates) {
+    public boolean isOneOf(RaptorProfile... candidates) {
         return Stream.of(candidates).anyMatch(this::is);
     }
 }

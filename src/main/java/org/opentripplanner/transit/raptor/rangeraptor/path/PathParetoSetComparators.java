@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 
@@ -26,14 +26,14 @@ public class PathParetoSetComparators {
     private PathParetoSetComparators() { }
 
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorStandard() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorStandard() {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
                 l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds();
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorWithTimetable() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetable() {
         return (l, r) ->
                 l.startTime() > r.startTime() ||
                 l.endTime() < r.endTime() ||
@@ -41,7 +41,7 @@ public class PathParetoSetComparators {
                 l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds();
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorWithTimetableAndCost() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetableAndCost() {
         return (l, r) ->
                 l.startTime() > r.startTime() ||
                 l.endTime() < r.endTime() ||
@@ -50,7 +50,7 @@ public class PathParetoSetComparators {
                 l.cost() < r.cost();
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorWithTimetableAndRelaxedCost(
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetableAndRelaxedCost(
             double relaxCostAtDestinationArrival
     ) {
         return (l, r) ->
@@ -61,7 +61,7 @@ public class PathParetoSetComparators {
                 l.cost() < Math.round(r.cost() * relaxCostAtDestinationArrival);
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorWithCost() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithCost() {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
@@ -69,7 +69,7 @@ public class PathParetoSetComparators {
                 l.cost() < r.cost();
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<Path<T>> comparatorWithRelaxedCost(
+    public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithRelaxedCost(
             double relaxCostAtDestinationArrival
     ) {
         return (l, r) ->
