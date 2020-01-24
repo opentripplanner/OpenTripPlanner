@@ -117,8 +117,17 @@ config key | description | value type | value default | notes
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | Date or Period (ISO 8601) | `-P1Y` | `2020-01-01`, `-P1M3D`, `-P3W`
+`transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | Date or Period (ISO 8601) | `P3Y` | `2022-12-31`, `P1Y6M10D`, `P12W`
 
 This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
+
+## Limit the transit service period
+
+The `transitServiceStart` and `transitServiceEnd` can be used to limit the service dates. This affect both GTFS service calendars and dates. The service calendar is reduced and dates outside the period is dropped. OTP2 compute a transit schedule for every day it can find at least one trip running. OTP will waist resources if a service end date is *unbounded* or very large (`9999-12-31`). To avoid this, limit the OTP service period. Also, if you provide a service with multiple feeds they may have different service end dates. Ta avoid inconsistent results, the period can be limited, so all feeds have data for the whole period. The default is to use a period of 1 year before, and 3 years after the day the graph is build. Limiting the period will *not* improve the search performance, but OTP will build faster and load faster in most cases.
+
+The `transitServiceStart` and `transitServiceEnd` parameters are set using an absolute date like `2020-12-31` or a period like `P1Y6M5D` relative to the graph build date. Negative periods is used to specify dates in the past. The period is computed using the system time-zone, not the feed time-zone. Also, remember that the service day might be more than 24 hours. So be sure to include enough slack to account for the this. Setting the limits too wide have very little impact and is in general better than trying to be exact. The period and date format follow the ISO 8601 standard.
+
 
 ## Reaching a subway platform
 

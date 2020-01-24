@@ -1,6 +1,7 @@
-package org.opentripplanner.model;
+package org.opentripplanner.model.calendar;
 
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.util.Set;
 import java.util.TimeZone;

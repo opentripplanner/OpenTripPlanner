@@ -79,7 +79,11 @@ public class GeometryAndBlockProcessor {
     }
 
     public GeometryAndBlockProcessor (
+            // TODO OTP2 - Operate on the builder, not the transit service and move the executon of
+            //           - this to where the builder is in context.
             OtpTransitService transitService,
+            // TODO OTP2 - This does not belong here - Do geometry and blocks have anything with
+            //           - a FareService.
             FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance,
             int maxInterlineDistance
@@ -90,6 +94,8 @@ public class GeometryAndBlockProcessor {
         this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     }
 
+    // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
+    //           - Create a datastructure and return it, then that should be injected into the graph.
     public void run(Graph graph) {
         run(graph, new DataImportIssueStore(false));
     }
@@ -131,7 +137,7 @@ public class GeometryAndBlockProcessor {
                         && trip.getShapeId().getId() != null && !trip.getShapeId().getId().equals("")) {
                     // save the geometry to later be applied to the hops
                     geometriesByTripPattern.put(tripPattern,
-                            createGeometry(graph, trip, transitService.getStopTimesForTrip(trip)));
+                            createGeometry(trip, transitService.getStopTimesForTrip(trip)));
                 }
             }
         }
@@ -249,7 +255,7 @@ public class GeometryAndBlockProcessor {
      * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically one of the trips
      * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
      */
-    private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
+    private LineString[] createGeometry(Trip trip, List<StopTime> stopTimes) {
         FeedScopedId shapeId = trip.getShapeId();
 
         // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
@@ -263,7 +269,7 @@ public class GeometryAndBlockProcessor {
             for (int i = 0; i < stopTimes.size() - 1; ++i) {
                 st0 = stopTimes.get(i);
                 StopTime st1 = stopTimes.get(i + 1);
-                geoms[i] = getHopGeometryViaShapeDistTraveled(graph, shapeId, st0, st1);
+                geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
             }
             return geoms;
         }
@@ -412,7 +418,7 @@ public class GeometryAndBlockProcessor {
             List<StopTime> stopTimes, int index, int prevSegmentIndex) {
 
         if (index == stopTimes.size()) {
-            return new LinkedList<LinearLocation>();
+            return new LinkedList<>();
         }
 
         StopTime st = stopTimes.get(index);
@@ -435,7 +441,7 @@ public class GeometryAndBlockProcessor {
         return null;
     }
 
-    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
+    private LineString getHopGeometryViaShapeDistTraveled(FeedScopedId shapeId, StopTime st0, StopTime st1) {
 
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
@@ -462,8 +468,9 @@ public class GeometryAndBlockProcessor {
             LineString line = getLineStringForShapeId(shapeId);
             LocationIndexedLine lol = new LocationIndexedLine(line);
 
-            geometry = getSegmentGeometry(graph, shapeId, lol, startIndex, endIndex, startDistance,
-                    endDistance, st0, st1);
+            geometry = getSegmentGeometry(
+                    shapeId, lol, startIndex, endIndex, startDistance, endDistance, st0, st1
+            );
 
             return geometry;
         }
@@ -513,7 +520,7 @@ public class GeometryAndBlockProcessor {
         return true;
     }
 
-    private LineString getSegmentGeometry(Graph graph, FeedScopedId shapeId,
+    private LineString getSegmentGeometry(FeedScopedId shapeId,
             LocationIndexedLine locationIndexedLine, LinearLocation startIndex,
             LinearLocation endIndex, double startDistance, double endDistance,
             StopTime st0, StopTime st1) {

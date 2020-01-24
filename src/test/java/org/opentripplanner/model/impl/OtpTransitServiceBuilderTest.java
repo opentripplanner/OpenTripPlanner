@@ -11,8 +11,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -155,11 +155,11 @@ public class OtpTransitServiceBuilderTest {
     }
 
     private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
-        ServiceCalendarDate date = new ServiceCalendarDate();
-        date.setServiceId(serviceId);
-        date.setDate(new ServiceDate(2017, 8, 31));
-        date.setExceptionType(2);
-        return date;
+        return new ServiceCalendarDate(
+                serviceId,
+                new ServiceDate(2017, 8, 31),
+                2
+        );
     }
 
     private static <T> T first(Collection<? extends T> c) {

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDate;
 

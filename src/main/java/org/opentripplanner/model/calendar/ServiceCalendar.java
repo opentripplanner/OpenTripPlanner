@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
-package org.opentripplanner.model;
+package org.opentripplanner.model.calendar;
 
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.FeedScopedId;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -33,9 +33,7 @@ public final class ServiceCalendar implements Serializable {
 
     private int sunday;
 
-    private ServiceDate startDate;
-
-    private ServiceDate endDate;
+    private ServiceDateInterval period;
 
     public FeedScopedId getServiceId() {
         return serviceId;
@@ -117,20 +115,12 @@ public final class ServiceCalendar implements Serializable {
         setWeekend(value);
     }
 
-    public ServiceDate getStartDate() {
-        return startDate;
+    public ServiceDateInterval getPeriod() {
+        return period;
     }
 
-    public void setStartDate(ServiceDate startDate) {
-        this.startDate = startDate;
-    }
-
-    public ServiceDate getEndDate() {
-        return endDate;
-    }
-
-    public void setEndDate(ServiceDate endDate) {
-        this.endDate = endDate;
+    public void setPeriod(ServiceDateInterval period) {
+        this.period = period;
     }
 
     @Override
@@ -143,14 +133,14 @@ public final class ServiceCalendar implements Serializable {
         return monday == that.monday && tuesday == that.tuesday && wednesday == that.wednesday
                 && thursday == that.thursday && friday == that.friday && saturday == that.saturday
                 && sunday == that.sunday && Objects.equals(serviceId, that.serviceId) && Objects
-                .equals(startDate, that.startDate) && Objects.equals(endDate, that.endDate);
+                .equals(period, that.period);
     }
 
     @Override
     public int hashCode() {
-        return Objects
-                .hash(serviceId, monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        startDate, endDate);
+        return Objects.hash(
+                serviceId, monday, tuesday, wednesday, thursday, friday, saturday, sunday, period
+        );
     }
 
     public String toString() {

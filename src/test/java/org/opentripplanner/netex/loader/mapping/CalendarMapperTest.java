@@ -5,7 +5,7 @@ import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.netex.loader.util.HierarchicalMultimap;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
@@ -15,7 +15,7 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
+import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 
 
 // TODO OTP2 - This needs to be fixed
