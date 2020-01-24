@@ -72,7 +72,7 @@ public class RoundTrackerTest {
             @Override public void onRoundComplete(Consumer<Boolean> roundCompleteWithDestinationReached) {
                 RoundTrackerTest.this.roundComplete = roundCompleteWithDestinationReached;
             }
-            @Override public void onPrepareForNextRound(Runnable prepareForNextRound) {
+            @Override public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
                 throw new IllegalStateException("Not expected");
             }
             @Override public void onTransitsForRoundComplete(Runnable transitsForRoundComplete) {

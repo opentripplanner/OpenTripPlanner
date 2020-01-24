@@ -44,7 +44,7 @@ public class DestinationArrivalPaths<T extends TripScheduleInfo> {
         this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.calculator = calculator;
         this.pathMapper = calculator.createPathMapper();
-        lifeCycle.onPrepareForNextRound(this::clearReachedCurrentRoundFlag);
+        lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
     public void add(ArrivalView<T> egressStopArrival, TransferLeg egressLeg, int additionalCost) {

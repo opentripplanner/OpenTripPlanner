@@ -14,7 +14,6 @@ public class SearchParamsBuilder {
     private int earliestDepartureTime;
     private int latestArrivalTime;
     private int searchWindowInSeconds;
-    private boolean arrivedBy;
     private int boardSlackInSeconds;
     private int numberOfAdditionalTransfers;
     private double relaxCostAtDestination;
@@ -34,7 +33,6 @@ public class SearchParamsBuilder {
         this.earliestDepartureTime = defaults.earliestDepartureTime();
         this.latestArrivalTime = defaults.latestArrivalTime();
         this.searchWindowInSeconds = defaults.searchWindowInSeconds();
-        this.arrivedBy = defaults.arrivedBy();
         this.boardSlackInSeconds = defaults.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
@@ -74,15 +72,6 @@ public class SearchParamsBuilder {
 
     public SearchParamsBuilder searchWindowInSeconds(int searchWindowInSeconds) {
         this.searchWindowInSeconds = searchWindowInSeconds;
-        return this;
-    }
-
-    public boolean arrivedBy() {
-        return arrivedBy;
-    }
-
-    public SearchParamsBuilder arrivedBy(boolean arrivedBy) {
-        this.arrivedBy = arrivedBy;
         return this;
     }
 

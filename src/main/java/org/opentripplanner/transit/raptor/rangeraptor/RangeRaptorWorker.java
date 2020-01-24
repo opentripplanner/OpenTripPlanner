@@ -149,7 +149,7 @@ public final class RangeRaptorWorker<T extends TripScheduleInfo, S extends Worke
         doTransfersForAccessLegs(iterationDepartureTime);
 
         while (hasMoreRounds()) {
-            lifeCycle.prepareForNextRound();
+            lifeCycle.prepareForNextRound(roundTracker.round());
 
             // NB since we have transfer limiting not bothering to cut off search when there are no more transfers
             // as that will be rare and complicates the code
