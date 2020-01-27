@@ -1,4 +1,4 @@
-package org.opentripplanner.api.resource;
+package org.opentripplanner.routing.algorithm.mapping;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
@@ -10,6 +10,7 @@ import org.opentripplanner.api.model.RelativeDirection;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -20,7 +21,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.algorithm.mapping.ItineraryMapper;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;

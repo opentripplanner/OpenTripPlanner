@@ -8,6 +8,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToTripPlanConverter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;

@@ -12,7 +12,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
