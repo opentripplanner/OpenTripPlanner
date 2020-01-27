@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.api.view;
 
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
 
@@ -10,9 +10,9 @@ import java.util.Collection;
  * The worker perform the travel search. There are multiple implementation,
  * even some who do not return paths.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface Worker<T extends TripScheduleInfo> {
+public interface Worker<T extends RaptorTripSchedule> {
 
     /**
      * Perform the reouting request.

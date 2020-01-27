@@ -18,7 +18,6 @@ import java.util.Map;
  * This class is responsible for reading and writing test cases and test case results to CSV files.
  */
 public class CsvFileIO {
-    private static final int NOT_SET = -1;
     private static final Charset CHARSET_UTF_8 = Charset.forName("UTF-8");
     private static final char CSV_DELIMITER = ',';
     private static boolean printResultsForFirstStrategyRun = true;
@@ -53,9 +52,9 @@ public class CsvFileIO {
             String id = csvReader.get("testCaseId");
             TestCase tc = new TestCase(
                     id,
-                    TimeUtils.parseHHMM(csvReader.get("departure"), NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("arrival"), NOT_SET),
-                    TimeUtils.parseHHMM(csvReader.get("window"), NOT_SET),
+                    TimeUtils.parseHHMM(csvReader.get("departure"), TestCase.NOT_SET),
+                    TimeUtils.parseHHMM(csvReader.get("arrival"), TestCase.NOT_SET),
+                    TimeUtils.parseHHMM(csvReader.get("window"), TestCase.NOT_SET),
                     csvReader.get("description"),
                     csvReader.get("origin"),
                     csvReader.get("fromPlace"),

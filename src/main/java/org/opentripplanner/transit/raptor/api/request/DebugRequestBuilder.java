@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 import java.util.ArrayList;
@@ -15,9 +15,9 @@ import java.util.function.Consumer;
 /**
  * Mutable version of {@link DebugRequest}.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugRequestBuilder<T extends TripScheduleInfo> {
+public class DebugRequestBuilder<T extends RaptorTripSchedule> {
     private final List<Integer> stops = new ArrayList<>();
     private final List<Integer> path = new ArrayList<>();
     private int debugPathFromStopIndex;

@@ -13,6 +13,7 @@ import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -56,7 +57,10 @@ public abstract class GtfsTest extends TestCase {
         feedId = new GtfsFeedId.Builder().id("FEED").build();
         gtfsBundle.setFeedId(feedId);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-        GtfsModule gtfsGraphBuilderImpl = new GtfsModule(gtfsBundleList);
+        GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+                gtfsBundleList,
+                ServiceDateInterval.unbounded()
+        );
 
 
         alertsUpdateHandler = new AlertsUpdateHandler();

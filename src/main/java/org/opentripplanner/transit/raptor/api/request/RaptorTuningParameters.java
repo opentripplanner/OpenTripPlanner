@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.api.request;
 /**
  * Tuning parameters - changing these parameters change the performance (speed and/or memory consumption).
  */
-public interface TuningParameters {
+public interface RaptorTuningParameters {
 
     /**
      * This parameter is used to allocate enough memory space for Raptor.

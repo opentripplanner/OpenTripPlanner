@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.configure;
 
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 
-import static org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile.NO_WAIT_BEST_TIME;
-import static org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile.NO_WAIT_STD;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_BEST_TIME;
+import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WAIT_STD;
 
 
 /**
@@ -35,7 +35,7 @@ class VerifyRequestIsValid  {
         }
     }
 
-    private RangeRaptorProfile profile() {
+    private RaptorProfile profile() {
         return context.profile();
     }
 

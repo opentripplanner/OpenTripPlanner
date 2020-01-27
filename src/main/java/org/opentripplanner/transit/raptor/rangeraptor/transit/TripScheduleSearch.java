@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 
 /**
@@ -19,9 +19,9 @@ import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
  * backward in time) the trip found departure/arrival times are swapped. This is one of
  * the things that allows for the algorithm to be generic, used in both cases.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TripScheduleSearch<T extends TripScheduleInfo> {
+public interface TripScheduleSearch<T extends RaptorTripSchedule> {
     /**
      * Find the best trip matching the given {@code timeLimit}.
      * This is the same as calling {@link #search(int, int, int)} with {@code tripIndexLimit: -1}.

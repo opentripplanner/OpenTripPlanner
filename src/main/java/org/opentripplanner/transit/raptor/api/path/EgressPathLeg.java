@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.path;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Objects;
 
@@ -8,9 +8,9 @@ import java.util.Objects;
  * Represent a egress leg in a path. The egress leg is the last leg arriving at the destination. The previous leg
  * must be a transit leg - no other legs are allowed.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class EgressPathLeg<T extends TripScheduleInfo> implements PathLeg<T> {
+public final class EgressPathLeg<T extends RaptorTripSchedule> implements PathLeg<T> {
     private final int fromStop;
     private final int fromTime;
     private final int toTime;

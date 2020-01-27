@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -15,7 +15,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * Build a path from a destination arrival - this maps between the domain of routing
  * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
  */
-public final class ForwardPathMapper<T extends TripScheduleInfo> implements PathMapper<T> {
+public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
     private final TransitCalculator calculator;
 
     public ForwardPathMapper(TransitCalculator calculator) {

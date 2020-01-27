@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 
 import java.util.function.Function;
@@ -72,9 +72,9 @@ public interface TransitCalculator {
      *
      * @param onTrip the current boarded trip
      * @param stopPositionInPattern the stop position/index
-     * @param <T> The TripSchedule type defined by the user of the range raptor API.
+     * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends TripScheduleInfo> int latestArrivalTime(T onTrip, int stopPositionInPattern);
+    <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern);
 
 
     /**
@@ -154,10 +154,10 @@ public interface TransitCalculator {
      * search into the worker (strategy design pattern).
      *
      * @param pattern the pattern to search
-     * @param <T> The TripSchedule type defined by the user of the range raptor API.
+     * @param <T> The TripSchedule type defined by the user of the raptor API.
      * @return The trip search strategy implementation.
      */
-    <T extends TripScheduleInfo> TripScheduleSearch<T> createTripSearch(
+    <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     );
@@ -166,7 +166,7 @@ public interface TransitCalculator {
      * Same as {@link #createTripSearch(TripPatternInfo, Function)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
-    <T extends TripScheduleInfo> TripScheduleSearch<T> createExactTripSearch(
+    <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     );
@@ -174,9 +174,9 @@ public interface TransitCalculator {
     /**
      * Create a new path mapper depending on the search direction.
      *
-     * @param <T> The TripSchedule type defined by the user of the range raptor API.
+     * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends TripScheduleInfo> PathMapper<T> createPathMapper();
+    <T extends RaptorTripSchedule> PathMapper<T> createPathMapper();
 
     /**
      * Return a calculator for test purpose. The following parameters are fixed:

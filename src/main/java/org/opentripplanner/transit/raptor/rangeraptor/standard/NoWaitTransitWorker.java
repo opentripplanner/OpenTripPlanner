@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
@@ -11,9 +11,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
  * The purpose of this class is to implement the "Standard" specific functionality of the worker with
  * NO WAIT TIME between transfer and transit, except the boardSlack.
  * <p/>
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class NoWaitTransitWorker<T extends TripScheduleInfo> implements TransitRoutingStrategy<T> {
+public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements TransitRoutingStrategy<T> {
 
     private static final int NOT_SET = -1;
 

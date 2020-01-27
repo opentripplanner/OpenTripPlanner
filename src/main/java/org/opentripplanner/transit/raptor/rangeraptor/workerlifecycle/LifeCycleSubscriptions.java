@@ -9,12 +9,14 @@ import java.util.function.IntConsumer;
 
 
 /**
- * The responsibility of this class is to provide an interface for Range Raptor
- * workerlifecycle event listeners to subscribe for such events.
+ * The responsibility of this class is to collect all life-cycle subscriptions, and
+ * implement the {@link WorkerLifeCycle} interface for subscribers to add their
+ * subscription. This collection is passed on to the publisher after all subscriptions is
+ * collected. This make it possible to decouple the publisher and subscriptions during setup.
  */
-public final class LifeCycleBuilder implements WorkerLifeCycle {
+public final class LifeCycleSubscriptions implements WorkerLifeCycle {
     final List<IntConsumer> setupIterationListeners = new ArrayList<>();
-    final List<Runnable> prepareForNextRoundListeners = new ArrayList<>();
+    final List<IntConsumer> prepareForNextRoundListeners = new ArrayList<>();
     final List<Runnable> transitsForRoundCompleteListeners = new ArrayList<>();
     final List<Runnable> transfersForRoundCompleteListeners = new ArrayList<>();
     final List<Consumer<Boolean>> roundCompleteListeners = new ArrayList<>();
@@ -29,7 +31,7 @@ public final class LifeCycleBuilder implements WorkerLifeCycle {
     }
 
     @Override
-    public void onPrepareForNextRound(Runnable prepareForNextRound) {
+    public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
         if(prepareForNextRound != null) {
             this.prepareForNextRoundListeners.add(prepareForNextRound);
         }

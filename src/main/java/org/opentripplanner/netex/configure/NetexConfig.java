@@ -60,6 +60,7 @@ public class NetexConfig {
                 buildParams.stationTransfers,
                 buildParams.getSubwayAccessTimeSeconds(),
                 buildParams.maxInterlineDistance,
+                buildParams.getTransitServicePeriod(),
                 netexBundles
         );
     }

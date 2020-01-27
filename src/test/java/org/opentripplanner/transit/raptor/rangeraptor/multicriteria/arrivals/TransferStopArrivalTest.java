@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.TestLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -25,7 +25,7 @@ public class TransferStopArrivalTest {
     private static final int TRANSIT_LEG_DURATION = 1200;
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
     private static final int TRANSIT_COST = 200;
-    private static final TripScheduleInfo TRANSIT_TRIP = null;
+    private static final RaptorTripSchedule TRANSIT_TRIP = null;
     private static final int ROUND = 1;
 
 
@@ -36,7 +36,7 @@ public class TransferStopArrivalTest {
 
 
     private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(BOARD_SLACK, true);
-    private static final AccessStopArrival<TripScheduleInfo> ACCESS_ARRIVAL = new AccessStopArrival<>(
+    private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
             ACCESS_TO_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION,
@@ -44,7 +44,7 @@ public class TransferStopArrivalTest {
             TRANSIT_CALCULATOR
     );
 
-    private static final TransitStopArrival<TripScheduleInfo> TRANSIT_ARRIVAL = new TransitStopArrival<>(
+    private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
             ACCESS_ARRIVAL,
             TRANSIT_TO_STOP,
             TRANSIT_ALIGHT_TIME,
@@ -54,7 +54,7 @@ public class TransferStopArrivalTest {
             TRANSIT_COST
     );
 
-    private TransferStopArrival<TripScheduleInfo> subject = new TransferStopArrival<>(
+    private TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
             new TestLeg(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
             TRANSFER_ALIGHT_TIME,

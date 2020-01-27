@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 import static org.junit.Assert.assertEquals;
@@ -108,7 +108,7 @@ public class ForwardSearchTransitCalculatorTest {
 
     @Test
     public void latestArrivalTime() {
-        TestTripSchedule s = TestTripSchedule.createTripScheduleUseingArrivalTimes(500);
+        TestRaptorTripSchedule s = TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes(500);
         assertEquals(500, create().latestArrivalTime(s, 0));
     }
 

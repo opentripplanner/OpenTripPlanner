@@ -33,7 +33,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -465,10 +464,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Invariant: boardSlack + alightSlack ≤ transferSlack.
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public int boardSlack = 0;
 
     /**

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
@@ -18,9 +18,9 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * <p/>
  * The design was originally done to support the FLyweight design pattern.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class StopsCursor<T extends TripScheduleInfo> {
+public class StopsCursor<T extends RaptorTripSchedule> {
     private Stops<T> stops;
     private final TransitCalculator transitCalculator;
 

@@ -3,18 +3,18 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorProfile;
-import org.opentripplanner.transit.raptor.api.request.RangeRaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleBuilder;
+import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 
 import java.util.Collection;
@@ -23,14 +23,14 @@ import java.util.Collection;
  * The search context is used to hold search scoped instances and to pass these
  * to who ever need them.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class SearchContext<T extends TripScheduleInfo> {
+public class SearchContext<T extends RaptorTripSchedule> {
     private static final DebugLogger NOOP_DEBUG_LOGGER = (topic, message) -> { };
     /**
      * The request input used to customize the worker to the clients needs.
      */
-    private final RangeRaptorRequest<T> request;
+    private final RaptorRequest<T> request;
 
     /**
      * the transit data role needed for routing
@@ -38,18 +38,17 @@ public class SearchContext<T extends TripScheduleInfo> {
     protected final TransitDataProvider<T> transit;
 
     private final TransitCalculator calculator;
-    private final TuningParameters tuningParameters;
+    private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final WorkerPerformanceTimers timers;
-    private final DebugRequest<T> debugRequest;
     private final DebugHandlerFactory<T> debugFactory;
     private final StopFilter stopFilter;
 
-    private LifeCycleBuilder lifeCycleBuilder = new LifeCycleBuilder();
+    private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
     public SearchContext(
-            RangeRaptorRequest<T> request,
-            TuningParameters tuningParameters,
+            RaptorRequest<T> request,
+            RaptorTuningParameters tuningParameters,
             TransitDataProvider<T> transit,
             WorkerPerformanceTimers timers
     ) {
@@ -60,8 +59,7 @@ public class SearchContext<T extends TripScheduleInfo> {
         this.calculator = createCalculator(this.request, tuningParameters);
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
         this.timers = timers;
-        this.debugRequest = debugRequest(request);
-        this.debugFactory = new DebugHandlerFactory<>(this.debugRequest, lifeCycle());
+        this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
         this.stopFilter = request.searchParams().stopFilter() != null
                 ? new StopFilterBitSet(request.searchParams().stopFilter())
                 : (s -> true);
@@ -83,11 +81,11 @@ public class SearchContext<T extends TripScheduleInfo> {
         return request.searchParams();
     }
 
-    public RangeRaptorProfile profile() {
+    public RaptorProfile profile() {
         return request.profile();
     }
 
-    public TuningParameters tuningParameters() {
+    public RaptorTuningParameters tuningParameters() {
         return tuningParameters;
     }
 
@@ -105,7 +103,8 @@ public class SearchContext<T extends TripScheduleInfo> {
                 f.boardCost(),
                 request.searchParams().boardSlackInSeconds(),
                 f.walkReluctanceFactor(),
-                f.waitReluctanceFactor()
+                f.waitReluctanceFactor(),
+                lifeCycle()
         );
     }
 
@@ -139,12 +138,12 @@ public class SearchContext<T extends TripScheduleInfo> {
     /**
      * Create a new calculator depending on the desired search direction.
      */
-    private static TransitCalculator createCalculator(RangeRaptorRequest<?> r, TuningParameters t) {
+    private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
         return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
     }
 
-    private DebugRequest<T> debugRequest(RangeRaptorRequest<T> request) {
+    private DebugRequest<T> debugRequest(RaptorRequest<T> request) {
         return request.searchForward() ? request.debug() : request.mutate().debug().reverseDebugRequest().build();
     }
 
@@ -153,14 +152,14 @@ public class SearchContext<T extends TripScheduleInfo> {
     }
 
     public WorkerLifeCycle lifeCycle() {
-        return lifeCycleBuilder;
+        return lifeCycleSubscriptions;
     }
 
     public LifeCycleEventPublisher createLifeCyclePublisher() {
-        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleBuilder);
+        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleSubscriptions);
         // We want the code to fail (NPE) if someone try to attach to the worker workerlifecycle
         // after it is iniziated; Hence set the builder to null:
-        lifeCycleBuilder = null;
+        lifeCycleSubscriptions = null;
         return publisher;
     }
 }

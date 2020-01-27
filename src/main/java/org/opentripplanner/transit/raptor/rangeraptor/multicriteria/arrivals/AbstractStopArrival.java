@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
@@ -8,16 +8,16 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 /**
  * Abstract super class for multi-criteria stop arrival.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public abstract class AbstractStopArrival<T extends TripScheduleInfo> implements ArrivalView<T> {
+public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
-    public static <T extends TripScheduleInfo> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
         // This is important with respect to performance. Using logical OR(||) is faster than boolean OR(|)
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
     }
 
-    public static <T extends TripScheduleInfo> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
+    public static <T extends RaptorTripSchedule> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
     }
 

@@ -2,16 +2,16 @@ package org.opentripplanner.transit.raptor._shared;
 
 
 
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
-abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
+abstract class AbstractStopArrival implements ArrivalView<TestRaptorTripSchedule> {
     private final int round;
     private final int stop;
     private final int departureTime;
     private final int arrivalTime;
     private final int cost;
-    private final ArrivalView<TestTripSchedule> previous;
+    private final ArrivalView<TestRaptorTripSchedule> previous;
 
     AbstractStopArrival(
             int round,
@@ -19,7 +19,7 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
             int departureTime,
             int arrivalTime,
             int extraCost,
-            ArrivalView<TestTripSchedule> previous
+            ArrivalView<TestRaptorTripSchedule> previous
     ) {
         this.round = round;
         this.stop = stop;
@@ -34,6 +34,6 @@ abstract class AbstractStopArrival implements ArrivalView<TestTripSchedule> {
     @Override public int departureTime() { return departureTime; }
     @Override public int arrivalTime() { return arrivalTime; }
     @Override public int cost() { return cost; }
-    @Override public ArrivalView<TestTripSchedule> previous() { return previous; }
+    @Override public ArrivalView<TestRaptorTripSchedule> previous() { return previous; }
     @Override public String toString() { return asString(); }
 }

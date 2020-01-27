@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.debug.DebugEvent;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 import java.util.Collections;
@@ -41,14 +41,14 @@ import java.util.function.Consumer;
  * REJECT or DROP event for your trip in return. You will also get a list of tips dominating
  * the particular trip.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DebugRequest<T extends TripScheduleInfo> {
+public class DebugRequest<T extends RaptorTripSchedule> {
 
     /**
      * Return a debug request with defaults values.
      */
-    static <T extends TripScheduleInfo> DebugRequest<T> defaults() {
+    static <T extends RaptorTripSchedule> DebugRequest<T> defaults() {
         return new DebugRequest<>();
     }
 

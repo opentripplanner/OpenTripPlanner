@@ -3,9 +3,9 @@ package org.opentripplanner.model.calendar.impl;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -142,8 +142,8 @@ public class CalendarServiceDataFactoryImpl {
 
         // We calculate service dates relative to noon so as to avoid any weirdness
         // relative to DST.
-        Date startDate = getServiceDateAsNoon(calendar.getStartDate(), timeZone);
-        Date endDate = getServiceDateAsNoon(calendar.getEndDate(), timeZone);
+        Date startDate = getServiceDateAsNoon(calendar.getPeriod().getStart(), timeZone);
+        Date endDate = getServiceDateAsNoon(calendar.getPeriod().getEnd(), timeZone);
 
         java.util.Calendar c = java.util.Calendar.getInstance(timeZone);
         c.setTime(startDate);
@@ -209,7 +209,7 @@ public class CalendarServiceDataFactoryImpl {
     }
 
     private void addServiceDate(Set<ServiceDate> activeDates, ServiceDate serviceDate) {
-        activeDates.add(new ServiceDate(serviceDate));
+        activeDates.add(serviceDate);
     }
 
     private static Date getServiceDateAsNoon(ServiceDate serviceDate, TimeZone timeZone) {

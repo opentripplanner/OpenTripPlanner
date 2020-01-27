@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -25,9 +25,9 @@ import java.util.Collection;
  * This class is a thin wrapper around a ParetoSet of {@link Path}s. Before paths are added the
  * arrival time is checked against the arrival time limit.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class DestinationArrivalPaths<T extends TripScheduleInfo> {
+public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator calculator;
     private final PathMapper<T> pathMapper;
@@ -44,7 +44,7 @@ public class DestinationArrivalPaths<T extends TripScheduleInfo> {
         this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.calculator = calculator;
         this.pathMapper = calculator.createPathMapper();
-        lifeCycle.onPrepareForNextRound(this::clearReachedCurrentRoundFlag);
+        lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
     public void add(ArrivalView<T> egressStopArrival, TransferLeg egressLeg, int additionalCost) {

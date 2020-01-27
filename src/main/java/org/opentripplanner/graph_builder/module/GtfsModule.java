@@ -27,6 +27,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
@@ -67,9 +68,18 @@ public class GtfsModule implements GraphBuilderModule {
 
     private int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
+    /**
+     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceStart
+     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceEnd
+     */
+    private final ServiceDateInterval transitPeriodLimit;
+
     private List<GtfsBundle> gtfsBundles;
 
-    public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; }
+    public GtfsModule(List<GtfsBundle> bundles, ServiceDateInterval transitPeriodLimit) {
+        this.gtfsBundles = bundles;
+        this.transitPeriodLimit = transitPeriodLimit;
+    }
 
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
@@ -118,9 +128,12 @@ public class GtfsModule implements GraphBuilderModule {
                         issueStore
                 );
 
+                builder.limitServiceDays(transitPeriodLimit);
+
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
                 // NB! The calls below have side effects - the builder state is updated!
+
                 repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
 
                 // NB! The calls below have side effects - the builder state is updated!

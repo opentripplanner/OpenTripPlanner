@@ -3,16 +3,16 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 /**
  * TODO TGR
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface WorkerState<T extends TripScheduleInfo> {
+public interface WorkerState<T extends RaptorTripSchedule> {
 
     void setInitialTimeForIteration(TransferLeg accessEgressLeg, int iterationDepartureTime);
 

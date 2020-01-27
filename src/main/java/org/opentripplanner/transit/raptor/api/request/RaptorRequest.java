@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
 import java.util.Collections;
-import java.util.EnumSet;
 import java.util.Objects;
 import java.util.Set;
 
@@ -14,43 +13,42 @@ import java.util.Set;
  * All input parameters to RangeRaptor that is spesific to a routing request.
  * See {@link TransitDataProvider} for transit data.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class RangeRaptorRequest<T extends TripScheduleInfo> {
+public class RaptorRequest<T extends RaptorTripSchedule> {
     private final SearchParams searchParams;
-    private final RangeRaptorProfile profile;
+    private final RaptorProfile profile;
     private final boolean searchForward;
     private final Set<Optimization> optimizations;
     private final McCostParams mcCostParams;
     private final DebugRequest<T> debug;
 
 
-    static <T extends TripScheduleInfo> RangeRaptorRequest<T> defaults() {
-        return new RangeRaptorRequest<>();
+    static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
+        return new RaptorRequest<>();
     }
 
-    private RangeRaptorRequest() {
+    private RaptorRequest() {
         searchParams = SearchParams.defaults();
-        profile = RangeRaptorProfile.MULTI_CRITERIA;
+        profile = RaptorProfile.MULTI_CRITERIA;
         searchForward = true;
         optimizations = Collections.emptySet();
         mcCostParams = McCostParams.DEFAULTS;
         debug = DebugRequest.defaults();
     }
 
-    RangeRaptorRequest(RequestBuilder<T> builder) {
-        this.searchParams = builder.searchParams().build();
+    RaptorRequest(RaptorRequestBuilder<T> builder) {
+        this.searchParams = builder.searchParams().buildSearchParam();
         this.profile = builder.profile();
         this.searchForward = builder.searchForward();
-        // TODO JAVA_9 - Cleanup next 3 lines: Set.of(...) and List.of(...)
-        this.optimizations = Collections.unmodifiableSet(EnumSet.copyOf(builder.optimizations()));
+        this.optimizations = Set.copyOf(builder.optimizations());
         this.mcCostParams = new McCostParams(builder.mcCostFactors());
         this.debug = builder.debug().build();
         verify();
     }
 
-    public RequestBuilder<T> mutate() {
-        return new RequestBuilder<T>(this);
+    public RaptorRequestBuilder<T> mutate() {
+        return new RaptorRequestBuilder<T>(this);
     }
 
 
@@ -64,9 +62,9 @@ public class RangeRaptorRequest<T extends TripScheduleInfo> {
     /**
      * The profile/algorithm to use for this request.
      * <p/>
-     * The default value is {@link RangeRaptorProfile#MULTI_CRITERIA}
+     * The default value is {@link RaptorProfile#MULTI_CRITERIA}
      */
-    public RangeRaptorProfile profile() {
+    public RaptorProfile profile() {
         return profile;
     }
 
@@ -141,7 +139,7 @@ public class RangeRaptorRequest<T extends TripScheduleInfo> {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        RangeRaptorRequest<?> that = (RangeRaptorRequest<?>) o;
+        RaptorRequest<?> that = (RaptorRequest<?>) o;
         return profile == that.profile &&
                 Objects.equals(searchParams, that.searchParams) &&
                 Objects.equals(mcCostParams, that.mcCostParams) &&

@@ -1,10 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
-import org.opentripplanner.transit.raptor.api.request.TuningParameters;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
@@ -16,11 +16,11 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     private final int tripSearchBinarySearchThreshold;
     private final int boardSlackInSeconds;
     private final int earliestDepartureTime;
-    private final int searchWindowSizeInSeconds;
+    private final int searchWindowInSeconds;
     private final int latestAcceptableArrivalTime;
     private final int iterationStep;
 
-    ForwardSearchTransitCalculator(SearchParams s, TuningParameters t) {
+    ForwardSearchTransitCalculator(SearchParams s, RaptorTuningParameters t) {
         this(
                 t.scheduledTripBinarySearchThreshold(),
                 s.boardSlackInSeconds(),
@@ -35,14 +35,14 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
             int tripSearchBinarySearchThreshold,
             int boardSlackInSeconds,
             int earliestDepartureTime,
-            int searchWindowSizeInSeconds,
+            int searchWindowInSeconds,
             int latestAcceptableArrivalTime,
             int iterationStep
     ) {
         this.tripSearchBinarySearchThreshold = tripSearchBinarySearchThreshold;
         this.boardSlackInSeconds = boardSlackInSeconds;
         this.earliestDepartureTime = earliestDepartureTime;
-        this.searchWindowSizeInSeconds = searchWindowSizeInSeconds;
+        this.searchWindowInSeconds = searchWindowInSeconds;
         this.latestAcceptableArrivalTime = latestAcceptableArrivalTime < 0
                 ? unreachedTime()
                 : latestAcceptableArrivalTime;
@@ -81,7 +81,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public <T extends TripScheduleInfo> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
+    public <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
         return onTrip.arrival(stopPositionInPattern);
     }
 
@@ -116,7 +116,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
         return oneIterationOnly()
                 ? IntIterators.singleValueIterator(earliestDepartureTime)
                 : IntIterators.intDecIterator(
-                        earliestDepartureTime + searchWindowSizeInSeconds,
+                        earliestDepartureTime + searchWindowInSeconds,
                         earliestDepartureTime,
                         iterationStep
                 );
@@ -124,7 +124,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
 
     @Override
     public boolean oneIterationOnly() {
-        return searchWindowSizeInSeconds <= iterationStep;
+        return searchWindowInSeconds <= iterationStep;
     }
 
     @Override
@@ -139,7 +139,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -147,7 +147,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> TripScheduleSearch<T> createExactTripSearch(
+    public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
             TripPatternInfo<T> pattern,
             Function<T, Boolean> skipTripScheduleCallback
     ) {
@@ -159,7 +159,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends TripScheduleInfo> PathMapper<T> createPathMapper() {
+    public final <T extends RaptorTripSchedule> PathMapper<T> createPathMapper() {
         return new ForwardPathMapper<>(this);
     }
 }

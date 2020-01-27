@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TransitEntity;

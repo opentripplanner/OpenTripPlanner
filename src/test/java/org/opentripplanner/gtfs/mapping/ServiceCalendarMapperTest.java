@@ -10,7 +10,10 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
+import static org.opentripplanner.model.calendar.ServiceDate.MAX_DATE;
+import static org.opentripplanner.model.calendar.ServiceDate.MIN_DATE;
 
 public class ServiceCalendarMapperTest {
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
@@ -62,7 +65,7 @@ public class ServiceCalendarMapperTest {
 
     @Test
     public void testMap() throws Exception {
-        org.opentripplanner.model.ServiceCalendar result = subject.map(CALENDAR);
+        org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(CALENDAR);
 
         assertEquals("A:1", result.getServiceId().toString());
         assertEquals(MONDAY, result.getMonday());
@@ -72,14 +75,14 @@ public class ServiceCalendarMapperTest {
         assertEquals(FRIDAY, result.getFriday());
         assertEquals(SATURDAY, result.getSaturday());
         assertEquals(SUNDAY, result.getSunday());
-        assertEquals(START_DATE.getAsString(), result.getStartDate().getAsString());
-        assertEquals(END_DATE.getAsString(), result.getEndDate().getAsString());
+        assertEquals(START_DATE.getAsString(), result.getPeriod().getStart().getAsString());
+        assertEquals(END_DATE.getAsString(), result.getPeriod().getEnd().getAsString());
     }
 
     @Test
     public void testMapWithNulls() throws Exception {
         ServiceCalendar input = new ServiceCalendar();
-        org.opentripplanner.model.ServiceCalendar result = subject.map(input);
+        org.opentripplanner.model.calendar.ServiceCalendar result = subject.map(input);
 
         assertEquals(0, result.getMonday());
         assertEquals(0, result.getTuesday());
@@ -88,17 +91,17 @@ public class ServiceCalendarMapperTest {
         assertEquals(0, result.getFriday());
         assertEquals(0, result.getSaturday());
         assertEquals(0, result.getSunday());
-        assertNull(result.getStartDate());
-        assertNull(result.getEndDate());
+        assertEquals(MIN_DATE, result.getPeriod().getStart());
+        assertEquals(MAX_DATE, result.getPeriod().getEnd());
     }
 
     /** Mapping the same object twice, should return the the same instance. */
     @Test
     public void testMapCache() throws Exception {
-        org.opentripplanner.model.ServiceCalendar result1 = subject.map(CALENDAR);
-        org.opentripplanner.model.ServiceCalendar result2 = subject.map(CALENDAR);
+        org.opentripplanner.model.calendar.ServiceCalendar result1 = subject.map(CALENDAR);
+        org.opentripplanner.model.calendar.ServiceCalendar result2 = subject.map(CALENDAR);
 
-        assertTrue(result1 == result2);
+        assertSame(result1, result2);
     }
 
 }

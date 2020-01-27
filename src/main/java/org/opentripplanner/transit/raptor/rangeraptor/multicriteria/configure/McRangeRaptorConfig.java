@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
@@ -19,9 +19,9 @@ import java.util.function.BiFunction;
 /**
  * Configure and create multicriteria worker, state and child classes.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public class McRangeRaptorConfig<T extends TripScheduleInfo> {
+public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     private final SearchContext<T> context;
     private final PathConfig<T> pathConfig;
 

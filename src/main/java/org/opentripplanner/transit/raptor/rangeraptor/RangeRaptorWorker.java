@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
-import org.opentripplanner.transit.raptor.api.transit.TripScheduleInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.RoundTracker;
@@ -43,10 +43,10 @@ import java.util.Iterator;
  * <p>
  * This class originated as a rewrite of Conveyals RAPTOR code: https://github.com/conveyal/r5.
  *
- * @param <T> The TripSchedule type defined by the user of the range raptor API.
+ * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 @SuppressWarnings("Duplicates")
-public final class RangeRaptorWorker<T extends TripScheduleInfo, S extends WorkerState<T>> implements Worker<T> {
+public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends WorkerState<T>> implements Worker<T> {
 
 
     private final TransitRoutingStrategy<T> transitWorker;
@@ -149,7 +149,7 @@ public final class RangeRaptorWorker<T extends TripScheduleInfo, S extends Worke
         doTransfersForAccessLegs(iterationDepartureTime);
 
         while (hasMoreRounds()) {
-            lifeCycle.prepareForNextRound();
+            lifeCycle.prepareForNextRound(roundTracker.round());
 
             // NB since we have transfer limiting not bothering to cut off search when there are no more transfers
             // as that will be rare and complicates the code

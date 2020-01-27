@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model.calendar.impl;
 
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;

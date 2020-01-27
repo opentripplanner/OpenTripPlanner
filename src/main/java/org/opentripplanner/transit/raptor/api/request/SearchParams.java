@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
@@ -21,7 +20,6 @@ public class SearchParams {
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
-    private final boolean arrivedBy;
     private final int boardSlackInSeconds;
     private final int numberOfAdditionalTransfers;
     private final double relaxCostAtDestination;
@@ -38,7 +36,6 @@ public class SearchParams {
         earliestDepartureTime = NOT_SET;
         latestArrivalTime = NOT_SET;
         searchWindowInSeconds = DEFAULT_SEARCH_WINDOW_IN_SECONDS;
-        arrivedBy = false;
         boardSlackInSeconds = 60;
         numberOfAdditionalTransfers = 5;
         relaxCostAtDestination = NOT_SET;
@@ -53,16 +50,14 @@ public class SearchParams {
         this.earliestDepartureTime = builder.earliestDepartureTime();
         this.latestArrivalTime = builder.latestArrivalTime();
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
-        this.arrivedBy = builder.arrivedBy();
-        // TODO JAVA_9 - Cleanup next 3 lines: Set.of(...) and List.of(...)
         this.boardSlackInSeconds = builder.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
         this.waitAtBeginningEnabled = builder.waitAtBeginningEnabled();
         this.stopFilter = builder.stopFilter();
-        this.accessLegs = Collections.unmodifiableList(new ArrayList<>(builder.accessLegs()));
-        this.egressLegs = Collections.unmodifiableList(new ArrayList<>(builder.egressLegs()));
+        this.accessLegs = java.util.List.copyOf(builder.accessLegs());
+        this.egressLegs = java.util.List.copyOf(builder.egressLegs());
     }
 
     static SearchParams defaults() {
@@ -70,6 +65,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The beginning of the departure window, in seconds since midnight. Inclusive.
      * The earliest a journey may start in seconds since midnight. In the case of a 'depart after'
      * search this is a required. In the case of a 'arrive by' search this is optional.
@@ -86,6 +82,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The end of the departure window, in seconds since midnight. Exclusive.
      * The latest a journey may arrive in seconds since midnight. In the case of a 'arrive by'
      * search this is a required. In the case of a 'depart after' search this is optional.
@@ -101,6 +98,7 @@ public class SearchParams {
     }
 
     /**
+     * TODO OTP2 Cleanup doc:
      * The time window used to search. The unit is seconds. For a *depart by search*, this is
      * added to the 'earliestDepartureTime' to find the 'latestDepartureTime'. For a *arrive
      * by search* this is used to calculate the 'earliestArrivalTime'. The algorithm will find
@@ -116,14 +114,12 @@ public class SearchParams {
 
 
     /**
-     * This parameter decide if a search is a 'depart after' or 'arrive by' search.
+     * TODO OTP2 - Describe this
      * <p/>
-     * Optional. Default value is 'false'.
-     *
-     * @return true is the search is a 'arrive by' search.
+     * Optional. Default value is 'TIME_TABLE'.
      */
-    public boolean arrivedBy() {
-        return arrivedBy;
+    public ArrivalAndDeparturePreference arrivalAndDeparturePreference() {
+        return ArrivalAndDeparturePreference.TIME_TABLE;
     }
 
     /**
@@ -136,7 +132,6 @@ public class SearchParams {
         return boardSlackInSeconds;
     }
 
-
     /**
      * RangeRaptor is designed to search until the destination is reached and then
      * {@code numberOfAdditionalTransfers} more rounds.
@@ -146,8 +141,6 @@ public class SearchParams {
     public int numberOfAdditionalTransfers() {
         return numberOfAdditionalTransfers;
     }
-
-
 
     /**
      * This accept none optimal trips if they are close enough - if and only if they represent an optimal path
@@ -243,7 +236,6 @@ public class SearchParams {
                 "earliestDepartureTime=" + TimeUtils.timeToStrCompact(earliestDepartureTime, NOT_SET) +
                 ", latestArrivalTime=" + TimeUtils.timeToStrCompact(latestArrivalTime, NOT_SET) +
                 ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds) +
-                ", arrivedBy=" + arrivedBy +
                 ", accessLegs=" + accessLegs +
                 ", egressLegs=" + egressLegs +
                 ", boardSlackInSeconds=" + boardSlackInSeconds +
@@ -259,7 +251,6 @@ public class SearchParams {
         return earliestDepartureTime == that.earliestDepartureTime &&
                 latestArrivalTime == that.latestArrivalTime &&
                 searchWindowInSeconds == that.searchWindowInSeconds &&
-                arrivedBy == that.arrivedBy &&
                 boardSlackInSeconds == that.boardSlackInSeconds &&
                 numberOfAdditionalTransfers == that.numberOfAdditionalTransfers &&
                 accessLegs.equals(that.accessLegs) &&
@@ -269,7 +260,7 @@ public class SearchParams {
     @Override
     public int hashCode() {
         return Objects.hash(
-                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds, arrivedBy, accessLegs,
+                earliestDepartureTime, latestArrivalTime, searchWindowInSeconds, accessLegs,
                 egressLegs, boardSlackInSeconds, numberOfAdditionalTransfers
         );
     }
@@ -284,7 +275,7 @@ public class SearchParams {
 
     private void assertProperty(boolean predicate, String errorMessage) {
         if(!predicate) {
-            throw new IllegalArgumentException(RangeRaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
+            throw new IllegalArgumentException(RaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
         }
     }
 }

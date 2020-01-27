@@ -2,12 +2,12 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.TestTripPattern;
-import org.opentripplanner.transit.raptor.api.TestTripSchedule;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.transit.raptor.api.TestTripSchedule.createTripSchedule;
+import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripSchedule;
 
 public class TripScheduleExactMatchSearchTest {
 
@@ -18,10 +18,10 @@ public class TripScheduleExactMatchSearchTest {
     private static final int TRIP_TIME = 500;
     private static final boolean FORWARD = true;
     private static final boolean REVERSE = false;
-    private static final TestTripSchedule TRIP_SCHEDULE = createTripSchedule(0, TRIP_TIME);
+    private static final TestRaptorTripSchedule TRIP_SCHEDULE = createTripSchedule(0, TRIP_TIME);
     private static final TestTripPattern TRIP_PATTERN = new TestTripPattern(TRIP_SCHEDULE);
 
-    private TripScheduleSearch<TestTripSchedule> subject;
+    private TripScheduleSearch<TestRaptorTripSchedule> subject;
 
     public void setup(boolean forward) {
         TransitCalculator calculator = TransitCalculator.testDummyCalculator(200, forward);
