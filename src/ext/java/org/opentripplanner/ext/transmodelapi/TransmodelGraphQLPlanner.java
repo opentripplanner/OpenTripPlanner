@@ -17,7 +17,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.algorithm.raptor.router.RaptorRouter;
+import org.opentripplanner.routing.algorithm.RaptorRouter;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;

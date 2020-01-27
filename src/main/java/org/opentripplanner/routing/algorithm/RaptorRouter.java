@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.algorithm.raptor.router;
+package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;

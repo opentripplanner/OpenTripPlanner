@@ -7,7 +7,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.raptor.router.RaptorRouter;
+import org.opentripplanner.routing.algorithm.RaptorRouter;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
