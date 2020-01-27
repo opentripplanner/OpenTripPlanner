@@ -31,14 +31,11 @@ import java.util.Map;
 
 /**
  * Does a complete transit search, including access and egress legs.
- * <p>
- * TODO OTP2 - Rename to better reflect scope, does more than Raptor routing. This is - THE
- * router...
  */
-public class RaptorRouter {
+public class RoutingWorker {
 
     private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
-    private static final Logger LOG = LoggerFactory.getLogger(RaptorRouter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
     private static final RaptorService<TripSchedule> raptorService = new RaptorService<>(
             // TODO OTP2 - Load turning parameters from config file
             new RaptorTuningParameters() {}
@@ -49,7 +46,7 @@ public class RaptorRouter {
     private final RoutingRequest request;
 
     //TODO Naming
-    public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
+    public RoutingWorker(RoutingRequest request, TransitLayer transitLayer) {
         double startTime = System.currentTimeMillis();
 
     this.requestTransitDataProvider = new RaptorRoutingRequestTransitData(

@@ -17,7 +17,7 @@ import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.algorithm.RaptorRouter;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -88,8 +88,8 @@ public class TransmodelGraphQLPlanner {
 
 
             if (request.modes.isTransit()) {
-                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.getRealtimeTransitLayer());
-                itineraries.addAll(raptorRouter.route());
+                RoutingWorker worker = new RoutingWorker(request, router.graph.getRealtimeTransitLayer());
+                itineraries.addAll(worker.route());
             }
 
             if (itineraries.isEmpty()) {

@@ -7,7 +7,7 @@ import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.algorithm.RaptorRouter;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -91,8 +91,8 @@ public class PlannerResource extends RoutingResource {
 
             if (request.modes.isTransit()) {
                 // Route on realtime data, and compare with scheduled data while converting to an Itinerary.
-                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.getRealtimeTransitLayer());
-                itineraries.addAll(raptorRouter.route());
+                RoutingWorker worker = new RoutingWorker(request, router.graph.getRealtimeTransitLayer());
+                itineraries.addAll(worker.route());
             }
 
             if (itineraries.isEmpty()) {
