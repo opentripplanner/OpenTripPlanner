@@ -8,7 +8,7 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -139,7 +139,7 @@ public class TestIntermediatePlaces {
         assertNotNull(pathList);
         assertFalse(pathList.isEmpty());
 
-        TripPlan plan = GraphPathToTripPlanConverter.generatePlan(pathList, request);
+        TripPlan plan = GraphPathToItineraryMapper.generatePlan(pathList, request);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
         assertTrue(1 <= plan.itinerary.size());

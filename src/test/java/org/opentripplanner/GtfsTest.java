@@ -8,7 +8,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
@@ -139,7 +139,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
+        TripPlan tripPlan = GraphPathToItineraryMapper.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);
 

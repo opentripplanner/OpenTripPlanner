@@ -69,11 +69,11 @@ import java.util.TimeZone;
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
  * are also bundled together here. This only produces itineraries for non-transit searches, as well as
  * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
- * by {@link ItineraryMapper}.
+ * by {@link RaptorPathToItineraryMapper}.
  */
-public abstract class GraphPathToTripPlanConverter {
+public abstract class GraphPathToItineraryMapper {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphPathToTripPlanConverter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(GraphPathToItineraryMapper.class);
     private static final double MAX_ZAG_DISTANCE = 30; // TODO add documentation, what is a "zag"?
 
     /**

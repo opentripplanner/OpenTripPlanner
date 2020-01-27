@@ -12,7 +12,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToTripPlanConverter;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
@@ -384,7 +384,7 @@ public class TransmodelGraphQLPlanner {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
-            TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
+            TripPlan plan = GraphPathToItineraryMapper.generatePlan(paths, request);
             return plan.itinerary;
         } catch (PathNotFoundException e) {
             return Collections.emptyList();

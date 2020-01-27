@@ -8,7 +8,7 @@ import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToTripPlanConverter;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -165,7 +165,7 @@ public class PlannerResource extends RoutingResource {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
 
             /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
-            TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
+            TripPlan plan = GraphPathToItineraryMapper.generatePlan(paths, request);
             return plan.itinerary;
         } catch (PathNotFoundException e) {
             return Collections.emptyList();
