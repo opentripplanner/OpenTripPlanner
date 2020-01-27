@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.ItineraryMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;

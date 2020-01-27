@@ -20,6 +20,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.algorithm.mapping.ItineraryMapper;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -68,7 +69,7 @@ import java.util.TimeZone;
  * returned by the OTP "planner" web service. TripPlans are made up of Itineraries, so the functions to produce them
  * are also bundled together here. This only produces itineraries for non-transit searches, as well as
  * the non-transit parts of itineraries containing transit, while the whole transit itinerary is produced
- * by {@link org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper}.
+ * by {@link ItineraryMapper}.
  */
 public abstract class GraphPathToTripPlanConverter {
 
