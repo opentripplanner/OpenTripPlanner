@@ -100,4 +100,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         return primed;
     }
 
+    public String getName() {
+        return type;
+    }
 }

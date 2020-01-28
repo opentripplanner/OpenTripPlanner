@@ -17,6 +17,7 @@
 - Add command line parameter for building partial graphs (#2583)
 - Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices (#2887) 
 - New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- Update only the relevant parts of the TransitLayer each time an update is applied (#2918)
 - Ability to switch off the fare service(#2912).
 - Limit the transit service period(#2925).
 - Removed unwanted cost added for wait time between access and transit with RangeRaptor (#2927)

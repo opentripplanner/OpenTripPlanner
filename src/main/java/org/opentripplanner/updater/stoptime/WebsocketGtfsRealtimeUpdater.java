@@ -181,4 +181,9 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
             }
         }
     }
+
+    @Override
+    public String getName() {
+        return "WebsocketGtfsRealtimeUpdater";
+    }
 }

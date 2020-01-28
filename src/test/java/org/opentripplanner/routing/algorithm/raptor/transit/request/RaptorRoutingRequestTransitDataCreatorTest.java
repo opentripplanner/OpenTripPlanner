@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -31,27 +33,27 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         ZonedDateTime startOfTime = DateMapper.asStartOfService(second, ZoneId.of("Europe/London"));
 
         // Total available trip patterns
-        TripPattern tripPattern1 = new TripPattern(1, tripSchedules, null, null);
-        TripPattern tripPattern2 = new TripPattern(2, tripSchedules, null, null);
-        TripPattern tripPattern3 = new TripPattern(3, tripSchedules, null, null);
+        TripPattern tripPattern1 = new TripPatternWithId(new FeedScopedId("", "1"), tripSchedules, null, null, null);
+        TripPattern tripPattern2 = new TripPatternWithId(new FeedScopedId("", "2"),tripSchedules, null, null, null);
+        TripPattern tripPattern3 = new TripPatternWithId(new FeedScopedId("", "3"),tripSchedules, null, null, null);
 
-        List<Map<Integer, TripPatternForDate>> tripPatternsForDates = new ArrayList<>();
+        List<Map<FeedScopedId, TripPatternForDate>> tripPatternsForDates = new ArrayList<>();
 
         // TripPatterns valid for 1st day in search range
-        Map<Integer, TripPatternForDate> tripPatternForDatesById = new HashMap<>();
+        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById = new HashMap<>();
         tripPatternForDatesById.put(tripPattern1.getId(), new TripPatternForDate(tripPattern1, tripPattern1.getTripSchedules(), first));
         tripPatternForDatesById.put(tripPattern2.getId(), new TripPatternForDate(tripPattern2, tripPattern2.getTripSchedules(), first));
         tripPatternForDatesById.put(tripPattern3.getId(), new TripPatternForDate(tripPattern1, tripPattern3.getTripSchedules(), first));
         tripPatternsForDates.add(tripPatternForDatesById);
 
         // TripPatterns valid for 2nd day in search range
-        Map<Integer, TripPatternForDate> tripPatternForDatesById2 = new HashMap<>();
+        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById2 = new HashMap<>();
         tripPatternForDatesById2.put(tripPattern2.getId(), new TripPatternForDate(tripPattern2, tripPattern1.getTripSchedules(), second));
         tripPatternForDatesById2.put(tripPattern3.getId(), new TripPatternForDate(tripPattern3, tripPattern2.getTripSchedules(), second));
         tripPatternsForDates.add(tripPatternForDatesById2);
 
         // TripPatterns valid for 3rd day in search range
-        Map<Integer, TripPatternForDate> tripPatternForDatesById3 = new HashMap<>();
+        Map<FeedScopedId, TripPatternForDate> tripPatternForDatesById3 = new HashMap<>();
         tripPatternForDatesById3.put(tripPattern1.getId(), new TripPatternForDate(tripPattern1, tripPattern1.getTripSchedules(), third));
         tripPatternForDatesById3.put(tripPattern3.getId(), new TripPatternForDate(tripPattern3, tripPattern3.getTripSchedules(), third));
         tripPatternsForDates.add(tripPatternForDatesById3);

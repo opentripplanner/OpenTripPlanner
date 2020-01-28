@@ -157,7 +157,7 @@ public class SiriTripPatternCache {
             counter++;
         }
         // OBA library uses underscore as separator, we're moving toward colon.
-        String code = String.format("%s:%s:%s:rt#%d", routeId.getFeedId(), routeId.getId(), direction, counter);
+        String code = String.format("%s:%s:rt#%d", routeId.getId(), direction, counter);
         return code;
     }
 

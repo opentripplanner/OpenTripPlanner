@@ -4,8 +4,10 @@ import org.opentripplanner.model.Stop;
 
 import java.time.LocalDate;
 import java.time.ZoneId;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -14,7 +16,7 @@ public class TransitLayer {
   /**
    * Transit data required for routing
    */
-  private final Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
+  private final HashMap<LocalDate, List<TripPatternForDate>> tripPatternsForDate;
 
   /**
    * Index of outer list is from stop index, inner list index has no specific meaning. To stop index
@@ -25,36 +27,47 @@ public class TransitLayer {
   /**
    * Maps to original graph to retrieve additional data
    */
-  private final List<Stop> stopsByIndex;
-
-
-  private final Map<Stop, Integer> indexByStop;
+  private final StopIndexForRaptor stopIndex;
 
   private final ZoneId transitDataZoneId;
 
+  /**
+   * Makes a shallow copy of the TransitLayer, except for the tripPatternsForDate, where a shallow
+   * copy of the HashMap is made. This is sufficient, as the TransitLayerUpdater will replace
+   * entire keys and their values in the map.
+   */
+  public TransitLayer(TransitLayer transitLayer) {
+    this(
+        transitLayer.tripPatternsForDate,
+        transitLayer.transferByStopIndex,
+        transitLayer.stopIndex,
+        transitLayer.transitDataZoneId
+    );
+  }
 
   public TransitLayer(
       Map<LocalDate,
       List<TripPatternForDate>> tripPatternsForDate,
       List<List<Transfer>> transferByStopIndex,
-      List<Stop> stopsByIndex,
-      Map<Stop,
-      Integer> indexByStop,
+      StopIndexForRaptor stopIndex,
       ZoneId transitDataZoneId
   ) {
-    this.tripPatternsForDate = tripPatternsForDate;
+    this.tripPatternsForDate = new HashMap<>(tripPatternsForDate);
     this.transferByStopIndex = transferByStopIndex;
-    this.stopsByIndex = stopsByIndex;
-    this.indexByStop = indexByStop;
+    this.stopIndex = stopIndex;
     this.transitDataZoneId = transitDataZoneId;
   }
 
   public int getIndexByStop(Stop stop) {
-    return indexByStop.get(stop);
+    return stopIndex.indexByStop.get(stop);
   }
 
-  public Stop getStopByIndex(int stopIndex) {
-    return stopIndex != -1 ? stopsByIndex.get(stopIndex) : null;
+  public Stop getStopByIndex(int stop) {
+    return stop != -1 ? this.stopIndex.stopsByIndex.get(stop) : null;
+  }
+
+  public StopIndexForRaptor getStopIndex() {
+    return this.stopIndex;
   }
 
   public Collection<TripPatternForDate> getTripPatternsForDate(LocalDate date) {
@@ -73,10 +86,26 @@ public class TransitLayer {
   }
 
   public int getStopCount() {
-    return stopsByIndex.size();
+    return stopIndex.stopsByIndex.size();
+  }
+
+  public List<TripPatternForDate> getTripPatternsForDateCopy(LocalDate date) {
+    List<TripPatternForDate> tripPatternForDate = tripPatternsForDate.get(date);
+    return tripPatternForDate != null ? new ArrayList<>(tripPatternsForDate.get(date)) : null;
   }
 
   public List<List<Transfer>> getTransferByStopIndex() {
     return this.transferByStopIndex;
+  }
+
+  /**
+   * Replaces all the TripPatternForDates for a single date. This is an atomic operation according
+   * to the HashMap implementation.
+   */
+  public void replaceTripPatternsForDate(
+      LocalDate date,
+      List<TripPatternForDate> tripPatternForDates
+  ) {
+    this.tripPatternsForDate.replace(date, tripPatternForDates);
   }
 }
