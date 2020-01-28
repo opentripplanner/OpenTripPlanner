@@ -557,7 +557,7 @@ public abstract class GraphPathToTripPlanConverter {
         }
     }
 
-    private static void addAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg, Locale requestedLocale) {
+    public static void addAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg, Locale requestedLocale) {
         Set<StopCondition> departingStopConditions = isFirstLeg
                 ? StopCondition.DEPARTURE
                 : StopCondition.FIRST_DEPARTURE;

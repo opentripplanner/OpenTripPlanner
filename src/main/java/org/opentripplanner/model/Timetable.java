@@ -18,6 +18,7 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.TimeZone;
 
 
@@ -433,5 +434,4 @@ public class Timetable implements Serializable {
             tt.serviceCode = serviceCodes.get(tt.trip.getServiceId());
         }
     }
-
-} 
+}

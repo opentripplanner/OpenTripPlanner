@@ -76,4 +76,8 @@ public class ExampleGraphUpdater implements GraphUpdater {
         LOG.info("Teardown example updater");
     }
 
+    @Override
+    public String getName() {
+        return "ExampleGraphUpdater";
+    }
 }

@@ -420,7 +420,7 @@ public class TimetableSnapshotSourceTest {
 
         // New trip pattern
         {
-            final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(feedId, modifiedTripId, serviceDate);
+            final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(new FeedScopedId(feedId, modifiedTripId), serviceDate);
             assertNotNull("New trip pattern should be found", newTripPattern);
 
             final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);

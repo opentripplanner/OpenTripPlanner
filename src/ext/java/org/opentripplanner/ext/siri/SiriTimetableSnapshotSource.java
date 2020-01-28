@@ -13,6 +13,8 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -116,9 +118,15 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     public SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
+    private TransitLayer realtimeTransitLayer;
+
+    private TransitLayerUpdater transitLayerUpdater;
+
     public SiriTimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();
         graphIndex = graph.index;
+        realtimeTransitLayer = graph.getRealtimeTransitLayer();
+        transitLayerUpdater = graph.transitLayerUpdater;
 
         // Create dummy agency for added trips
         Agency dummy = new Agency();
@@ -160,7 +168,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
             if (force || buffer.isDirty()) {
                 LOG.debug("Committing {}", buffer.toString());
-                snapshot = buffer.commit(force);
+                snapshot = buffer.commit(transitLayerUpdater, force);
             } else {
                 LOG.debug("Buffer was unchanged, keeping old snapshot.");
             }
@@ -394,7 +402,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
         boolean success = false;
         for (TripPattern pattern : patterns) {
-            if (handleTripPatternUpdate(graph, feedId, pattern, activity, trip, serviceDate)) {
+            if (handleTripPatternUpdate(graph, pattern, activity, trip, serviceDate)) {
                 success = true;
             }
         }
@@ -405,7 +413,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         return success;
     }
 
-    private boolean handleTripPatternUpdate(Graph graph, String feedId,  TripPattern pattern, VehicleActivityStructure activity, Trip trip, ServiceDate serviceDate) {
+    private boolean handleTripPatternUpdate(Graph graph, TripPattern pattern, VehicleActivityStructure activity, Trip trip, ServiceDate serviceDate) {
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
         Timetable currentTimetable = getCurrentTimetable(pattern, serviceDate);
@@ -414,7 +422,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             return false;
         }
 
-        final boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
+        final boolean success = buffer.update(pattern, updatedTripTimes, serviceDate);
 
         return success;
     }
@@ -803,7 +811,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                             result = result | addTripToGraphAndBuffer(feedId, graph, trip, modifiedStopTimes, modifiedStops, tripTimes, serviceDate);
                         }
                     } else {
-                        result = result | buffer.update(feedId, pattern, tripTimes, serviceDate);
+                        result = result | buffer.update(pattern, tripTimes, serviceDate);
                     }
 
                     LOG.debug("Applied realtime data for trip {}", trip.getId().getId());
@@ -879,12 +887,12 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         pattern.scheduledTimetable.tripTimes.clear();
 
         // Add to buffer as-is to include it in the 'lastAddedTripPattern'
-        buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
+        buffer.update(pattern, updatedTripTimes, serviceDate);
 
         //TODO - SIRI: Add pattern to index?
 
         // Add new trip times to the buffer
-        final boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
+        final boolean success = buffer.update(pattern, updatedTripTimes, serviceDate);
         return success;
     }
 
@@ -909,7 +917,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(feedId, pattern, newTripTimes, serviceDate);
+                buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -929,7 +937,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     private boolean cancelPreviouslyAddedTrip(final String feedId, final String tripId, final ServiceDate serviceDate) {
         boolean success = false;
 
-        final TripPattern pattern = buffer.getLastAddedTripPattern(feedId, tripId, serviceDate);
+        final TripPattern pattern = buffer.getLastAddedTripPattern(new FeedScopedId(feedId, tripId), serviceDate);
         if (pattern != null) {
             // Cancel trip times for this trip in this pattern
             final Timetable timetable = buffer.resolve(pattern, serviceDate);
@@ -939,7 +947,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(feedId, pattern, newTripTimes, serviceDate);
+                buffer.update(pattern, newTripTimes, serviceDate);
 //                buffer.removeLastAddedTripPattern(feedId, tripId, serviceDate);
                 success = true;
             }
@@ -1022,7 +1030,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                 if (firstStopIsMatch & lastStopIsMatch) {
                     // Origin and destination matches
-                    TripPattern lastAddedTripPattern = buffer.getLastAddedTripPattern(tripPattern.getFeedId(), currentTrip.getId().getId(), realTimeReportedServiceDate);
+                    TripPattern lastAddedTripPattern = buffer.getLastAddedTripPattern(currentTrip.getId(), realTimeReportedServiceDate);
                     if (lastAddedTripPattern != null) {
                         patterns.add(lastAddedTripPattern);
                     } else {
@@ -1078,7 +1086,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
             TripPattern lastAddedTripPattern = null;
             if (getTimetableSnapshot() != null) {
-                lastAddedTripPattern  = getTimetableSnapshot().getLastAddedTripPattern(trip.getId().getFeedId(), trip.getId().getId(), journeyDate);
+                lastAddedTripPattern  = getTimetableSnapshot().getLastAddedTripPattern(trip.getId(), journeyDate);
             }
 
             TripPattern tripPattern;

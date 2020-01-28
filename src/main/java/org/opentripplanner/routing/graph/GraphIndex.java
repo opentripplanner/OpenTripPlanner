@@ -1,11 +1,14 @@
 package org.opentripplanner.routing.graph;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
+import gnu.trove.set.TIntSet;
+import gnu.trove.set.hash.TIntHashSet;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
@@ -87,6 +90,7 @@ public class GraphIndex {
     public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     public final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
     final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
+    public final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -157,11 +161,48 @@ public class GraphIndex {
         serviceCodes = graph.serviceCodes;
         this.graph = graph;
         graphQL = new GraphQL(
-                new IndexGraphQLSchema(this).indexSchema,
-                new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
-                        new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
-                )));
+            new IndexGraphQLSchema(this).indexSchema,
+            new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
+                new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
+            )));
+        initalizeServiceCodesForDate(graph);
+
         LOG.info("Done indexing graph.");
+    }
+
+    private void initalizeServiceCodesForDate(Graph graph) {
+
+        if (calendarService == null) { return; }
+
+        // CalendarService has one main implementation (CalendarServiceImpl) which contains a
+        // CalendarServiceData which can easily supply all of the dates. But it's impossible to
+        // actually see those dates without modifying the interfaces and inheritance. So we have
+        // to work around this abstraction and reconstruct the CalendarData.
+        // Note the "multiCalendarServiceImpl" which has docs saying it expects one single
+        // CalendarData. It seems to merge the calendar services from multiple GTFS feeds, but
+        // its only documentation says it's a hack.
+        // TODO OTP2 - This cleanup is added to the 'Final cleanup OTP2' issue #2757
+
+        // Reconstruct set of all dates where service is defined, keeping track of which services
+        // run on which days.
+        Multimap<ServiceDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
+
+        for (FeedScopedId serviceId : calendarService.getServiceIds()) {
+            Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(serviceId);
+            for (ServiceDate serviceDate : serviceDatesForService) {
+                serviceIdsForServiceDate.put(serviceDate, serviceId);
+            }
+        }
+        for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
+            TIntSet serviceCodesRunning = new TIntHashSet();
+            for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
+                serviceCodesRunning.add(graph.serviceCodes.get(serviceId));
+            }
+            serviceCodesRunningForDate.put(
+                serviceDate,
+                serviceCodesRunning
+            );
+        }
     }
 
     /* TODO: an almost similar function exists in ProfileRouter, combine these.
@@ -513,5 +554,9 @@ public class GraphIndex {
         }
 
         return null;
+    }
+
+    public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
+        return this.serviceCodesRunningForDate;
     }
 }

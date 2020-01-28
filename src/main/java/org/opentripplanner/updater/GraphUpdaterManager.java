@@ -7,12 +7,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.ExecutionException;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
-import java.util.concurrent.Future;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.ThreadFactory;
 import java.util.concurrent.TimeUnit;
@@ -193,5 +192,15 @@ public class GraphUpdaterManager {
 
     public List<GraphUpdater> getUpdaterList() {
         return updaterList;
+    }
+
+    public Collection<String> waitingUpdaters() {
+        Collection<String> waitingUpdaters = new ArrayList<>();
+        for (GraphUpdater updater : graph.updaterManager.getUpdaterList()) {
+            if (!(updater).isPrimed()) {
+                waitingUpdaters.add(updater.getName());
+            }
+        }
+        return waitingUpdaters;
     }
 }

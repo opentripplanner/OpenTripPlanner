@@ -46,6 +46,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -55,6 +56,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -258,10 +260,13 @@ public class Graph implements Serializable {
     private double distanceBetweenElevationSamples;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer transitLayer;
+    private transient TransitLayer transitLayer;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer realtimeTransitLayer;
+    private transient ConcurrentPublished<TransitLayer> realtimeTransitLayer =
+        new ConcurrentPublished<>();
+
+    public transient TransitLayerUpdater transitLayerUpdater;
 
     private transient AlertPatchService alertPatchService;
 
@@ -507,8 +512,32 @@ public class Graph implements Serializable {
     public Collection<StreetEdge> getStreetEdges() {
         Collection<Edge> allEdges = this.getEdges();
         return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
-    }    
-    
+    }
+
+    public TransitLayer getTransitLayer() {
+        return transitLayer;
+    }
+
+    public void setTransitLayer(
+        TransitLayer transitLayer
+    ) {
+        this.transitLayer = transitLayer;
+    }
+
+    public TransitLayer getRealtimeTransitLayer() {
+        return realtimeTransitLayer.get();
+    }
+
+    public boolean hasRealtimeTransitLayer() {
+        return realtimeTransitLayer != null;
+    }
+
+    public void setRealtimeTransitLayer(
+        TransitLayer realtimeTransitLayer
+    ) {
+        this.realtimeTransitLayer.publish(realtimeTransitLayer);
+    }
+
     public boolean containsVertex(Vertex v) {
         return (v != null) && vertices.get(v.getLabel()) == v;
     }

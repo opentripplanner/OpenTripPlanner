@@ -16,6 +16,8 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -101,9 +103,15 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
+    private TransitLayer realtimeTransitLayer;
+
+    private TransitLayerUpdater transitLayerUpdater;
+
     public TimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();
         graphIndex = graph.index;
+        realtimeTransitLayer = graph.getRealtimeTransitLayer();
+        transitLayerUpdater = graph.transitLayerUpdater;
 
         // Create dummy agency for added trips
         dummyAgency = new Agency();
@@ -142,7 +150,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         if (force || now - lastSnapshotTime > maxSnapshotFrequency) {
             if (force || buffer.isDirty()) {
                 LOG.debug("Committing {}", buffer.toString());
-                snapshot = buffer.commit(force);
+                snapshot = buffer.commit(transitLayerUpdater, force);
             } else {
                 LOG.debug("Buffer was unchanged, keeping old snapshot.");
             }
@@ -323,7 +331,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // If this trip_id has been used for previously ADDED/MODIFIED trip message (e.g. when the sequence of stops has
         // changed, and is now changing back to the originally scheduled one) cancel that previously created trip.
-        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
+        cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
         // Apply update on the *scheduled* time table and set the updated trip times in the buffer
         final TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
@@ -336,7 +344,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Make sure that updated trip times have the correct real time state
         updatedTripTimes.setRealTimeState(RealTimeState.UPDATED);
 
-        final boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
+        final boolean success = buffer.update(pattern, updatedTripTimes, serviceDate);
         return success;
     }
 
@@ -547,7 +555,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         // Check whether trip id has been used for previously ADDED trip message and cancel
         // previously created trip
         final String tripId = tripUpdate.getTrip().getTripId();
-        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
+        cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
         //
         // Create added trip
@@ -713,7 +721,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         newTripTimes.setRealTimeState(realTimeState);
 
         // Add new trip times to the buffer
-        final boolean success = buffer.update(feedId, pattern, newTripTimes, serviceDate);
+        final boolean success = buffer.update(pattern, newTripTimes, serviceDate);
         return success;
     }
 
@@ -738,7 +746,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(feedId, pattern, newTripTimes, serviceDate);
+                buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -753,15 +761,14 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * TripPattern that was created for the added/modified trip continues to exist, and will be reused if a similar
      * added/modified trip message is received with the same route and stop sequence.
      *
-     * @param feedId feed id the trip id belongs to
      * @param tripId trip id without agency id
      * @param serviceDate service date
      * @return true if a previously added trip was cancelled
      */
-    private boolean cancelPreviouslyAddedTrip(final String feedId, final String tripId, final ServiceDate serviceDate) {
+    private boolean cancelPreviouslyAddedTrip(FeedScopedId tripId, final ServiceDate serviceDate) {
         boolean success = false;
 
-        final TripPattern pattern = buffer.getLastAddedTripPattern(feedId, tripId, serviceDate);
+        final TripPattern pattern = buffer.getLastAddedTripPattern(tripId, serviceDate);
         if (pattern != null) {
             // Cancel trip times for this trip in this pattern
             final Timetable timetable = buffer.resolve(pattern, serviceDate);
@@ -771,7 +778,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
                 final TripTimes newTripTimes = new TripTimes(timetable.getTripTimes(tripIndex));
                 newTripTimes.cancel();
-                buffer.update(feedId, pattern, newTripTimes, serviceDate);
+                buffer.update(pattern, newTripTimes, serviceDate);
                 success = true;
             }
         }
@@ -881,7 +888,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
         // Check whether trip id has been used for previously ADDED/MODIFIED trip message and cancel
         // previously created trip
-        cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
+        cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
         // Add new trip
         final boolean success =
@@ -897,7 +904,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             final boolean cancelScheduledSuccess = cancelScheduledTrip(feedId, tripId, serviceDate);
 
             // Try to cancel previously added trip
-            final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(feedId, tripId, serviceDate);
+            final boolean cancelPreviouslyAddedSuccess = cancelPreviouslyAddedTrip(new FeedScopedId(feedId, tripId), serviceDate);
 
             if (cancelScheduledSuccess || cancelPreviouslyAddedSuccess) {
                 success = true;
