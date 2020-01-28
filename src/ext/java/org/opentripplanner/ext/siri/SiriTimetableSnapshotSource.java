@@ -125,7 +125,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     public SiriTimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();
         graphIndex = graph.index;
-        realtimeTransitLayer = graph.realtimeTransitLayer;
+        realtimeTransitLayer = graph.getRealtimeTransitLayer();
         transitLayerUpdater = graph.transitLayerUpdater;
 
         // Create dummy agency for added trips

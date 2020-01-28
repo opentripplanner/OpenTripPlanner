@@ -56,6 +56,7 @@ import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -259,10 +260,11 @@ public class Graph implements Serializable {
     private double distanceBetweenElevationSamples;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer transitLayer;
+    private transient TransitLayer transitLayer;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer realtimeTransitLayer;
+    private transient ConcurrentPublished<TransitLayer> realtimeTransitLayer =
+        new ConcurrentPublished<>();
 
     public transient TransitLayerUpdater transitLayerUpdater;
 
@@ -510,8 +512,32 @@ public class Graph implements Serializable {
     public Collection<StreetEdge> getStreetEdges() {
         Collection<Edge> allEdges = this.getEdges();
         return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
-    }    
-    
+    }
+
+    public TransitLayer getTransitLayer() {
+        return transitLayer;
+    }
+
+    public void setTransitLayer(
+        TransitLayer transitLayer
+    ) {
+        this.transitLayer = transitLayer;
+    }
+
+    public TransitLayer getRealtimeTransitLayer() {
+        return realtimeTransitLayer.get();
+    }
+
+    public boolean hasRealtimeTransitLayer() {
+        return realtimeTransitLayer != null;
+    }
+
+    public void setRealtimeTransitLayer(
+        TransitLayer realtimeTransitLayer
+    ) {
+        this.realtimeTransitLayer.publish(realtimeTransitLayer);
+    }
+
     public boolean containsVertex(Vertex v) {
         return (v != null) && vertices.get(v.getLabel()) == v;
     }

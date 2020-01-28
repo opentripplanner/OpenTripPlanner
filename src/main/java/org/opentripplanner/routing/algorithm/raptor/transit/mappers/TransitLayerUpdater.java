@@ -54,10 +54,11 @@ public class TransitLayerUpdater {
   }
 
   public void update(Set<Timetable> updatedTimetables) {
-    // Make a shallow copy of the realtime transit layer
-    TransitLayer realtimeTransitLayer = new TransitLayer(graph.realtimeTransitLayer);
+    if (!graph.hasRealtimeTransitLayer()) { return; }
 
-    if (graph.realtimeTransitLayer == null) { return; }
+    // Make a shallow copy of the realtime transit layer. Only the objects that are copied will be
+    // changed during this update process.
+    TransitLayer realtimeTransitLayer = new TransitLayer(graph.getRealtimeTransitLayer());
 
     double startTime = System.currentTimeMillis();
 
@@ -111,8 +112,9 @@ public class TransitLayerUpdater {
           new ArrayList<>(patternsForDateMap.values())
       );
 
-      // Switch out the reference with the updated transit layer. This is an atomic operation.
-      graph.realtimeTransitLayer = realtimeTransitLayer;
+      // Switch out the reference with the updated realtimeTransitLayer. This is synchronized to
+      // guarantee that the reference is set after all the fields have been updated.
+      graph.setRealtimeTransitLayer(realtimeTransitLayer);
 
       LOG.debug(
           "UPDATING {} tripPatterns took {} ms",

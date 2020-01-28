@@ -137,8 +137,8 @@ public class Router {
         /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
         LOG.info("Creating transit layer for Raptor routing.");
         if (graph.hasTransit && graph.index != null) {
-            graph.transitLayer = TransitLayerMapper.map(graph);
-            graph.realtimeTransitLayer = new TransitLayer(graph.transitLayer);
+            graph.setTransitLayer(TransitLayerMapper.map(graph));
+            graph.setRealtimeTransitLayer(new TransitLayer(graph.getTransitLayer()));
             graph.transitLayerUpdater = new TransitLayerUpdater(
                 graph,
                 graph.index.getServiceCodesRunningForDate()
