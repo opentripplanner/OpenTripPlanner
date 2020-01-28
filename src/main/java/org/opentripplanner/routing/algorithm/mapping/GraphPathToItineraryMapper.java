@@ -7,7 +7,6 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
@@ -79,68 +78,24 @@ public abstract class GraphPathToItineraryMapper {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public static TripPlan generatePlan(List<GraphPath> paths, RoutingRequest request) {
+    public static List<Itinerary> mapItineraries(List<GraphPath> paths, RoutingRequest request) {
 
-        Locale requestedLocale = request.locale;
-
-        GraphPath exemplar = paths.get(0);
-        Vertex tripStartVertex = exemplar.getStartVertex();
-        Vertex tripEndVertex = exemplar.getEndVertex();
-        String startName = tripStartVertex.getName(requestedLocale);
-        String endName = tripEndVertex.getName(requestedLocale);
-
-        // Use vertex labels if they don't have names
-        if (startName == null) {
-            startName = tripStartVertex.getLabel();
-        }
-        if (endName == null) {
-            endName = tripEndVertex.getLabel();
-        }
-        Place from = new Place(tripStartVertex.getX(), tripStartVertex.getY(), startName);
-        Place to = new Place(tripEndVertex.getX(), tripEndVertex.getY(), endName);
-
-        from.orig = request.from.label;
-        to.orig = request.to.label;
-
-        TripPlan plan = new TripPlan(from, to, request.getDateTime());
-
-        // Convert GraphPaths to Itineraries, keeping track of the best non-transit (e.g. walk/bike-only) option time
-        long bestNonTransitTime = Long.MAX_VALUE;
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(path, request.showIntermediateStops, request.disableAlertFiltering, requestedLocale);
+            Itinerary itinerary = generateItinerary(
+                    path,
+                    request.showIntermediateStops,
+                    request.disableAlertFiltering,
+                    request.locale
+            );
             itinerary = adjustItinerary(request, itinerary);
-            if(itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
-                bestNonTransitTime = itinerary.walkTime;
-            }
             itineraries.add(itinerary);
         }
 
-        // Filter and add itineraries to plan
-        for (Itinerary itinerary : itineraries) {
-            // If this is a transit option whose walk/bike time is greater than that of the walk/bike-only option,
-            // do not include in plan
-            if(itinerary.transitTime > 0 && itinerary.walkTime > bestNonTransitTime) continue;
-
-            plan.addItinerary(itinerary);
-        }
-
-        for (Itinerary i : plan.itinerary) {
-            /* Communicate the fact that the only way we were able to get a response was by removing a slope limit. */
-            i.tooSloped = request.rctx.slopeRestrictionRemoved;
-            /* fix up from/to on first/last legs */
-            if (i.legs.size() == 0) {
-                LOG.warn("itinerary has no legs");
-                continue;
-            }
-            Leg firstLeg = i.legs.get(0);
-            firstLeg.from.orig = plan.from.orig;
-            Leg lastLeg = i.legs.get(i.legs.size() - 1);
-            lastLeg.to.orig = plan.to.orig;
-        }
-
+        // TODO OTP2 - Move this to a more apropriate place ...
         request.rctx.debugOutput.finishedRendering();
-        return plan;
+
+        return itineraries;
     }
 
     /**

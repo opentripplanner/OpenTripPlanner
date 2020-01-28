@@ -7,13 +7,12 @@ import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -139,9 +138,11 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        TripPlan tripPlan = GraphPathToItineraryMapper.generatePlan(paths, routingRequest);
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
+                paths, routingRequest
+        );
         // Stored in instance field for use in individual tests
-        itinerary = tripPlan.itinerary.get(0);
+        itinerary = itineraries.get(0);
 
         assertEquals(legCount, itinerary.legs.size());
 

@@ -224,7 +224,7 @@ public class RaptorPathToItineraryMapper {
         // leg.alightRule = <Assign here>;
         // leg.boardRule =  <Assign here>;
 
-        GraphPathToTripPlanConverter.addAlertPatchesToLeg(
+        GraphPathToItineraryMapper.addAlertPatchesToLeg(
             request.getRoutingContext().graph,
             leg,
             firstLeg,

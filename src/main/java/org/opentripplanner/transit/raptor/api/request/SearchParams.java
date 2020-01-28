@@ -33,9 +33,6 @@ public class SearchParams {
 
     public static final int NOT_SET = -1;
 
-    // Use this as default if we can not determin a search window in another way
-    private static final int DEFAULT_SEARCH_WINDOW_IN_SECONDS = 60 * 60; // 1 hour
-
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
@@ -262,8 +259,8 @@ public class SearchParams {
                 ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds, NOT_SET) +
                 ", boardSlackInSeconds=" + boardSlackInSeconds +
                 ", numberOfAdditionalTransfers=" + numberOfAdditionalTransfers +
-                ", accessLegs=" + accessLegs.stream().limit(5).collect(Collectors.toList()) +
-                ", egressLegs=" + egressLegs.stream().limit(5).collect(Collectors.toList()) +
+                ", accessLegs(max 5)=" + accessLegs.stream().limit(5).collect(Collectors.toList()) +
+                ", egressLegs(max 5)=" + egressLegs.stream().limit(5).collect(Collectors.toList()) +
                 '}';
     }
 

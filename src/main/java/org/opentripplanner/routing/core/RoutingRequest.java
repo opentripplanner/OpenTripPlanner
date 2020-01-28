@@ -546,10 +546,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * When true, realtime updates are ignored during this search.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public boolean ignoreRealtimeUpdates = false;
 
     /**

@@ -8,9 +8,10 @@ import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
@@ -134,12 +135,13 @@ public class TestIntermediatePlaces {
         for (GenericLocation intermediateLocation : via) {
             request.addIntermediatePlace(intermediateLocation);
         }
-        List<GraphPath> pathList = graphPathFinder.graphPathFinderEntryPoint(request);
+        List<GraphPath> paths = graphPathFinder.graphPathFinderEntryPoint(request);
 
-        assertNotNull(pathList);
-        assertFalse(pathList.isEmpty());
+        assertNotNull(paths);
+        assertFalse(paths.isEmpty());
 
-        TripPlan plan = GraphPathToItineraryMapper.generatePlan(pathList, request);
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
         assertTrue(1 <= plan.itinerary.size());
