@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
@@ -104,6 +105,7 @@ public class OTPMain {
         /* Load graph from disk if one is not present from build. */
         if (params.load) {
             GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.getGraphDirectory());
+            ComponentAnnotationConfigurator.getInstance().fromConfig(graphConfig.builderConfig());
             router = GraphLoader.loadGraph(graphConfig);
         }
 
