@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.model.routing.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -28,11 +29,13 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -54,44 +57,49 @@ public class RoutingWorker {
      * To avoid long searches witch might degrade the performance we use an upper limit
      * to the distance for none transit what we would allow.
      */
-    public static final double MAX_NON_TRANSIT_DISTANCE = 100_000;
+    public static final double MAX_WALK_DISTANCE = 50_000;
+    public static final double MAX_BIKE_DISTANCE = 150_000;
+    public static final double MAX_CAR_DISTANCE = 500_000;
 
     private final RoutingRequest request;
+    private TripSearchMetadata responseMetadata = null;
 
     public RoutingWorker(RoutingRequest request) {
         this.request = request;
     }
 
-    public TripPlan route(Router router) {
+    public RoutingResponse route(Router router) {
         try {
-            RoutingWorker worker = new RoutingWorker(request);
             List<Itinerary> itineraries;
 
-            // Non transit routing
-            itineraries = new ArrayList<>(worker.routeNonTransit(router));
+            // Street routing
+            itineraries = new ArrayList<>(routeOnStreetGraph(router));
 
             // Transit routing
-            itineraries.addAll(worker.routeTransit(router));
+            itineraries.addAll(routeTransit(router));
 
             // Filter itineraries
             if(request.modes.isTransit()) {
                 itineraries = ItinerariesHelper.filterAwayLongWalkingTransit(itineraries);
             }
 
-            LOG.info("Return TripPlan with {} itineraries", itineraries.size());
-            return TripPlanMapper.mapTripPlan(request, itineraries);
+            LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
+            return new RoutingResponse(
+                    TripPlanMapper.mapTripPlan(request, itineraries),
+                    responseMetadata
+            );
         }
         finally {
             request.cleanup();
         }
     }
 
-    private List<Itinerary> routeNonTransit(Router router) {
+    private List<Itinerary> routeOnStreetGraph(Router router) {
         try {
             if (!request.modes.getNonTransitSet().isValid()) {
                 return Collections.emptyList();
             }
-            if(!nonTransitDistanceIsReasonable()) { return Collections.emptyList(); }
+            if(!streetDistanceIsReasonable()) { return Collections.emptyList(); }
 
             RoutingRequest nonTransitRequest = request.clone();
             nonTransitRequest.modes.setTransit(false);
@@ -120,13 +128,14 @@ public class RoutingWorker {
             : router.graph.getRealtimeTransitLayer();
 
         RaptorRoutingRequestTransitData requestTransitDataProvider;
-        requestTransitDataProvider = new RaptorRoutingRequestTransitData(transitLayer,
+        requestTransitDataProvider = new RaptorRoutingRequestTransitData(
+                transitLayer,
                 request.getDateTime().toInstant(),
                 TRANSIT_SEARCH_RANGE_IN_DAYS,
                 request.modes,
                 request.walkSpeed
         );
-        LOG.info("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
+        LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
 
         /* Prepare access/egress transfers */
 
@@ -182,19 +191,21 @@ public class RoutingWorker {
         RaptorRequest<TripSchedule> raptorRequest = builder.build();
 
         // Route transit
-        RaptorResponse<TripSchedule> response = raptorService.route(raptorRequest,
+        RaptorResponse<TripSchedule> response = raptorService.route(
+                raptorRequest,
                 requestTransitDataProvider
         );
 
-        LOG.info("Found {} itineraries", response.paths().size());
+        LOG.debug("Found {} itineraries", response.paths().size());
 
-        LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
+        LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
         /* Create itineraries */
 
         double startItineraries = System.currentTimeMillis();
 
-        RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(transitLayer,
+        RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
+                transitLayer,
                 requestTransitDataProvider.getStartOfTime(),
                 request,
                 accessTransfers,
@@ -215,7 +226,9 @@ public class RoutingWorker {
             itineraries.add(itinerary);
         }
 
-        LOG.info("Creating {} itineraries took {} ms",
+        setResponseMetadata(requestTransitDataProvider, response);
+
+        LOG.debug("Creating {} itineraries took {} ms",
                 itineraries.size(),
                 System.currentTimeMillis() - startItineraries
         );
@@ -223,7 +236,7 @@ public class RoutingWorker {
         return itineraries;
     }
 
-    private boolean nonTransitDistanceIsReasonable() {
+    private boolean streetDistanceIsReasonable() {
         // TODO This currently only calculates the distances between the first fromVertex
         //      and the first toVertex
         double distance = SphericalDistanceLibrary.distance(
@@ -233,23 +246,43 @@ public class RoutingWorker {
                         .getCoordinate(),
                 request.rctx.toVertices.iterator().next().getCoordinate()
         );
+        return distance < calculateDistanceMaxLimit();
+    }
 
+    private void setResponseMetadata(
+            RaptorRoutingRequestTransitData transitData,
+            RaptorResponse<TripSchedule> response
+    ) {
+        if(response == null) { return; }
+
+        SearchParams sp = response.requestUsed().searchParams();
+        ZonedDateTime time0 = transitData.getStartOfTime();
+        int timeOffset = request.arriveBy ? sp.latestArrivalTime() : sp.earliestDepartureTime();
+        int searchWindow = sp.searchWindowInSeconds();
+
+        responseMetadata = new TripSearchMetadata(
+                sp.searchWindowInSeconds(),
+                time0.plusSeconds(timeOffset - searchWindow).toInstant(),
+                time0.plusSeconds(timeOffset + searchWindow).toInstant()
+        );
+    }
+
+    private double calculateDistanceMaxLimit() {
         double limit = request.maxWalkDistance * 2;
-
         // Handle overflow and default setting is set to Double MAX_VALUE
-        if(limit < 0) {
-            limit = MAX_NON_TRANSIT_DISTANCE;
-        }
-        // Reduce the limit to a "sensible" size, we should clean up the parameters here
-        // so there is one parameter for each "thing" - not just 'maxWalkDistance' used for
-        // many things.
-        else if(limit > MAX_NON_TRANSIT_DISTANCE) {
-            LOG.warn(
-                    "The max NONE transit distance is reduced to {} from {}.",
-                    (long)MAX_NON_TRANSIT_DISTANCE, limit
-            );
-            limit = MAX_NON_TRANSIT_DISTANCE;
-        }
-        return distance < limit;
+        if(limit< 0) { limit = Double.MAX_VALUE; }
+
+        double maxLimit = request.modes.getCar()
+                ? MAX_CAR_DISTANCE
+                : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE : MAX_WALK_DISTANCE);
+
+        if(limit <= maxLimit) { return limit; }
+
+        LOG.warn(
+                "The max NONE transit distance is reduced to {} km from {} m.",
+                maxLimit/1000, limit
+        );
+
+        return maxLimit;
     }
 }

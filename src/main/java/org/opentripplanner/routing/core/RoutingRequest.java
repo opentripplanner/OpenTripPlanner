@@ -219,7 +219,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Whether the trip must be wheelchair accessible.
      * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
- *                      a walk-only search.
+     *                 a walk-only search.
      */
     @Deprecated
     public boolean wheelchairAccessible = false;
@@ -898,6 +898,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
+    }
+
+    public void setSearchWindowSeconds(int searchWindowInSeconds) {
+        this.searchWindow = Duration.ofSeconds(searchWindowInSeconds);
     }
 
     public int getNumItineraries() {

@@ -50,7 +50,7 @@ public class AccessEgressRouter {
                             stopAtDistance.edges));
         }
 
-        LOG.info("Found {} {} stops", result.size(), fromTarget ? "egress" : "access");
+        LOG.debug("Found {} {} stops", result.size(), fromTarget ? "egress" : "access");
 
         return result;
     }

@@ -1,12 +1,11 @@
 package org.opentripplanner.api.model;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
+import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-
-import javax.xml.bind.annotation.XmlElementWrapper;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
 
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.
@@ -22,20 +21,18 @@ public class TripPlan {
     /** The destination */
     public Place to = null;
 
-    /** A list of possible itineraries */
-    @XmlElementWrapper(name="itineraries") //TODO: why don't we just change the variable name?
+    /**
+     * A list of possible itineraries. The wrapper is named 'itineraries' while the
+     * elements them self is named 'itinerary'.
+     */
+    @XmlElementWrapper(name="itineraries")
     @JsonProperty(value="itineraries")
     public List<Itinerary> itinerary = new ArrayList<Itinerary>();
 
-    public TripPlan() { }
-
-    public TripPlan(Place from, Place to, Date date) {
+    public TripPlan(Place from, Place to, Date date, List<Itinerary> itineraries) {
         this.from = from;
         this.to = to;
         this.date = date;
-    }
-
-    public void addItinerary(Itinerary itinerary) {
-        this.itinerary.add(itinerary);
+        this.itinerary.addAll(itineraries);
     }
 }
