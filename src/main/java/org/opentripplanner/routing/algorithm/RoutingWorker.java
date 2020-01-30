@@ -269,20 +269,28 @@ public class RoutingWorker {
 
     private double calculateDistanceMaxLimit() {
         double limit = request.maxWalkDistance * 2;
-        // Handle overflow and default setting is set to Double MAX_VALUE
-        if(limit< 0) { limit = Double.MAX_VALUE; }
-
         double maxLimit = request.modes.getCar()
                 ? MAX_CAR_DISTANCE
                 : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE : MAX_WALK_DISTANCE);
 
-        if(limit <= maxLimit) { return limit; }
+        // Handle overflow and default setting is set to Double MAX_VALUE
+        // Everything above Long.MAX_VALUE is treated as Infinite
+        if(limit< 0 || limit > Long.MAX_VALUE) {
+            LOG.warn(
+                "The max walk/bike/car distance is reduced to {} km from Infinite",
+                (long)maxLimit/1000
+            );
+            return maxLimit;
+        }
 
-        LOG.warn(
-                "The max NONE transit distance is reduced to {} km from {} m.",
-                maxLimit/1000, limit
-        );
+        if (limit > maxLimit) {
+            LOG.warn(
+                    "The max walk/bike/car distance is reduced to {} km from {} km",
+                    (long)maxLimit/1000, (long)limit/1000
+            );
+            return maxLimit;
+        }
 
-        return maxLimit;
+        return limit;
     }
 }
