@@ -13,10 +13,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.xml.bind.JAXBElement;
+import java.util.Set;
 
 /**
- * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP Route) in two ways.
- * Either directly from the ServiceJourney or through JourneyPattern → Route. The former has precedent over the latter.
+ * This maps a NeTEx ServiceJourney to an OTP Trip. A ServiceJourney can be connected to a Line (OTP
+ * Route) in two ways. Either directly from the ServiceJourney or through JourneyPattern → Route.
+ * The former has precedent over the latter.
  */
 class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
@@ -25,23 +27,26 @@ class TripMapper {
     private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
     private ReadOnlyHierarchicalMap<String, Route> routeById;
     private ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
+  private final Set<FeedScopedId> shapePointIds;
 
     TripMapper(
             FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
-            ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById
+      ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
+      Set<FeedScopedId> shapePointIds
     ) {
         this.idFactory = idFactory;
         this.otpRouteById = otpRouteById;
         this.routeById = routeById;
         this.journeyPatternsById = journeyPatternsById;
+    this.shapePointIds = shapePointIds;
     }
-
 
     /**
      * Map a service journey to a trip.
      * <p>
+   *
      * @return valid trip or {@code null} if unable to map to a valid trip.
      */
     Trip mapServiceJourney(ServiceJourney serviceJourney){
@@ -56,8 +61,17 @@ class TripMapper {
         trip.setId(idFactory.createId(serviceJourney.getId()));
         trip.setRoute(route);
         trip.setServiceId(idFactory.createId(serviceId));
+        trip.setShapeId(getShapeId(serviceJourney));
 
         return trip;
+    }
+
+    private FeedScopedId getShapeId(ServiceJourney serviceJourney) {
+        JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney.getJourneyPatternRef().getValue().getRef());
+    FeedScopedId serviceLinkId = journeyPattern != null ? idFactory.createId(journeyPattern
+        .getId().replace("JourneyPattern", "ServiceLink")) : null;
+
+    return shapePointIds.contains(serviceLinkId) ? serviceLinkId : null;
     }
 
     private String resolveServiceId(ServiceJourney serviceJourney) {
@@ -81,9 +95,10 @@ class TripMapper {
             lineRef = lineRefStruct.getValue().getRef();
         } else if(serviceJourney.getJourneyPatternRef() != null){
             // Connect to Line referenced through JourneyPattern->Route
-            JourneyPattern journeyPattern = journeyPatternsById.lookup(
-                    serviceJourney.getJourneyPatternRef().getValue().getRef()
-            );
+      JourneyPattern journeyPattern = journeyPatternsById.lookup(serviceJourney
+          .getJourneyPatternRef()
+          .getValue()
+          .getRef());
             String routeRef = journeyPattern.getRouteRef().getRef();
             lineRef = routeById.lookup(routeRef).getLineRef().getValue().getRef();
         }

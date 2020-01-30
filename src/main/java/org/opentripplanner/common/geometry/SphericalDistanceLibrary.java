@@ -156,6 +156,10 @@ public abstract class SphericalDistanceLibrary {
         return 360 * distanceMeters / (2 * Math.PI * RADIUS_OF_EARTH_IN_M);
     }
 
+    public static double degreesToMeters(double distanceDegrees) {
+        return (2 * Math.PI * RADIUS_OF_EARTH_IN_M) * distanceDegrees / 360;
+    }
+
     /**
      * @return the approximate number of meters for the given number of degrees latitude. If degrees longitude are
      *         supplied, this is an overestimate anywhere off the equator because meridians converge toward the poles.

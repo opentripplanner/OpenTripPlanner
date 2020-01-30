@@ -13,8 +13,11 @@ import org.rutebanken.netex.model.ServiceJourney;
 
 import javax.xml.bind.JAXBElement;
 
+import java.util.Collections;
+
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.netex.loader.mapping.MappingSupport.ID_FACTORY;
+import static org.opentripplanner.netex.loader.mapping.MappingSupport.createWrappedRef;
 
 public class TripMapperTest {
 
@@ -35,7 +38,7 @@ public class TripMapperTest {
 
         TripMapper tripMapper = new TripMapper(ID_FACTORY, transitBuilder.getRoutes(),
                 new HierarchicalMapById<>(),
-                new HierarchicalMapById<>()
+                new HierarchicalMapById<>(), Collections.emptySet()
         );
 
         ServiceJourney serviceJourney = createExampleServiceJourney();
@@ -75,7 +78,8 @@ public class TripMapperTest {
                 ID_FACTORY,
                 transitBuilder.getRoutes(),
                 routeById,
-                journeyPatternById
+                journeyPatternById,
+                Collections.emptySet()
         );
 
         Trip trip = tripMapper.mapServiceJourney(serviceJourney);
@@ -87,6 +91,10 @@ public class TripMapperTest {
         ServiceJourney serviceJourney = new ServiceJourney();
         serviceJourney.setId("RUT:ServiceJourney:1");
         serviceJourney.setDayTypes(NetexTestDataSample.createEveryDayRefs());
+        serviceJourney.setJourneyPatternRef(createWrappedRef(
+            "RUT:JourneyPattern:1",
+            JourneyPatternRefStructure.class
+        ));
         return serviceJourney;
     }
 }
