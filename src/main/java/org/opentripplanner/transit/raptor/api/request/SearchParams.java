@@ -38,6 +38,7 @@ public class SearchParams {
     private final int searchWindowInSeconds;
     private final int boardSlackInSeconds;
     private final int numberOfAdditionalTransfers;
+    private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
     private final boolean allowWaitingBetweenAccessAndTransit;
@@ -54,6 +55,7 @@ public class SearchParams {
         searchWindowInSeconds = NOT_SET;
         boardSlackInSeconds = 60;
         numberOfAdditionalTransfers = 5;
+        maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
         allowWaitingBetweenAccessAndTransit = true;
@@ -68,6 +70,7 @@ public class SearchParams {
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
         this.boardSlackInSeconds = builder.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
+        this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
         this.allowWaitingBetweenAccessAndTransit = builder.allowWaitingBetweenAccessAndTransit();
@@ -161,6 +164,21 @@ public class SearchParams {
      */
     public int numberOfAdditionalTransfers() {
         return numberOfAdditionalTransfers;
+    }
+
+    /**
+     * This is an absolute limit to the number of transfers. The preferred way to limit the transfers
+     * is to use the {@link #numberOfAdditionalTransfers()}.
+     * <p/>
+     * The default is to use the limit in the tuning parameters
+     * {@link RaptorTuningParameters#maxNumberOfTransfers()}.
+     */
+    public int maxNumberOfTransfers() {
+        return maxNumberOfTransfers;
+    }
+
+    public boolean isMaxNumberOfTransfersSet() {
+        return maxNumberOfTransfers != NOT_SET;
     }
 
     /**

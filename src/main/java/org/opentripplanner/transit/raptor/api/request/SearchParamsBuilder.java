@@ -22,6 +22,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int searchWindowInSeconds;
     private int boardSlackInSeconds;
     private int numberOfAdditionalTransfers;
+    private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
     // TODO OTP2 - Rename, this allow the search window to be extended bejond the
@@ -38,6 +39,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.searchWindowInSeconds = defaults.searchWindowInSeconds();
         this.boardSlackInSeconds = defaults.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = defaults.numberOfAdditionalTransfers();
+        this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
         this.allowWaitingBetweenAccessAndTransit = defaults.allowWaitingBetweenAccessAndTransit();
@@ -93,13 +95,21 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-
     public int numberOfAdditionalTransfers() {
         return numberOfAdditionalTransfers;
     }
 
     public SearchParamsBuilder<T> numberOfAdditionalTransfers(int numberOfAdditionalTransfers) {
         this.numberOfAdditionalTransfers = numberOfAdditionalTransfers;
+        return this;
+    }
+
+    public int maxNumberOfTransfers() {
+        return maxNumberOfTransfers;
+    }
+
+    public SearchParamsBuilder<T> maxNumberOfTransfers(int maxNumberOfTransfers) {
+        this.maxNumberOfTransfers = maxNumberOfTransfers;
         return this;
     }
 

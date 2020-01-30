@@ -4435,7 +4435,7 @@ public class TransmodelIndexGraphQLSchema {
                 .description("Trips search metadata.")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("searchWindowUsed")
-                        .description("The search-window used in the current trip request. Unit: minutes.")
+                        .description("The search-window used in the current trip request. Unit: seconds.")
                         .type(Scalars.GraphQLInt)
                         .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).searchWindowUsed)
                         .build())
