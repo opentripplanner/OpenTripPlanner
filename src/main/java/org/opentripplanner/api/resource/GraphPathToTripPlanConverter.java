@@ -802,9 +802,9 @@ public abstract class GraphPathToTripPlanConverter {
         Stop lastStop = lastVertex instanceof TransitStopVertex ?
                 ((TransitStopVertex) lastVertex).getStop(): null;
 
-        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, null, requestedLocale);
+        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, requestedLocale);
         leg.from.arrival = null;
-        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, null, requestedLocale);
+        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, requestedLocale);
         leg.to.departure = null;
 
         if (showIntermediateStops) {
@@ -829,7 +829,7 @@ public abstract class GraphPathToTripPlanConverter {
                 previousStop = currentStop;
                 if (currentStop == lastStop) break;
 
-                leg.intermediateStops.add(makePlace(states[i], vertex, edges[i], currentStop, null, requestedLocale));
+                leg.intermediateStops.add(makePlace(states[i], vertex, edges[i], currentStop, requestedLocale));
             }
         }
     }
@@ -844,7 +844,7 @@ public abstract class GraphPathToTripPlanConverter {
      * @param tripTimes The {@link TripTimes} associated with the {@link Leg}.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes, Locale requestedLocale) {
+    private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, Locale requestedLocale) {
         // If no edge was given, it means we're at the end of this leg and need to work around that.
         boolean endOfLeg = (edge == null);
         String name = vertex.getName(requestedLocale);
@@ -863,10 +863,6 @@ public abstract class GraphPathToTripPlanConverter {
             place.stopCode = stop.getCode();
             place.platformCode = stop.getCode();
             place.zoneId = stop.getZone();
-            if (endOfLeg) place.stopIndex++;
-            if (tripTimes != null) {
-                place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
-            }
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
