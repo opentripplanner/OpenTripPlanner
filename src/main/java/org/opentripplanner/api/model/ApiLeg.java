@@ -215,7 +215,7 @@ public class ApiLeg {
      */
     @XmlElementWrapper(name = "steps")
     @JsonProperty(value="steps")
-    public List<WalkStep> walkSteps;
+    public List<ApiWalkStep> walkSteps;
 
     @XmlElement
     @JsonSerialize

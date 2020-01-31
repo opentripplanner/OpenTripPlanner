@@ -2,14 +2,14 @@ package org.opentripplanner.api.resource;
 
 import org.opentripplanner.api.model.AbsoluteDirection;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.WalkStep;
+import org.opentripplanner.api.model.ApiWalkStep;
 
 import junit.framework.TestCase;
 
-public class TestWalkStep extends TestCase {
+public class TestApiWalkStep extends TestCase {
 
     public void testRelativeDirection() {
-        WalkStep step = new WalkStep();
+        ApiWalkStep step = new ApiWalkStep();
 
         double angle1 = degreesToRadians(0);
         double angle2 = degreesToRadians(90);

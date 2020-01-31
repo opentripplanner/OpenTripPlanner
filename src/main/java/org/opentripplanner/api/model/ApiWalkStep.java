@@ -43,7 +43,7 @@ import java.util.Locale;
  * everything else false <br>
  * </p>
  * */
-public class WalkStep {
+public class ApiWalkStep {
 
     /**
      * The distance in meters that this step takes.
