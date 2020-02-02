@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -18,7 +18,7 @@ import java.util.Set;
 
 public class AlertToLegMapper {
 
-    public static void addAlertPatchesToLeg(Graph graph, Leg leg, boolean isFirstLeg, Locale requestedLocale) {
+    public static void addAlertPatchesToLeg(Graph graph, ApiLeg leg, boolean isFirstLeg, Locale requestedLocale) {
         Set<StopCondition> departingStopConditions = isFirstLeg
                 ? StopCondition.DEPARTURE
                 : StopCondition.FIRST_DEPARTURE;
@@ -49,7 +49,7 @@ public class AlertToLegMapper {
                 addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
             }
             if (leg.intermediateStops != null) {
-                for (Place place : leg.intermediateStops) {
+                for (ApiPlace place : leg.intermediateStops) {
                     if (place.stopId != null) {
                         Collection<AlertPatch> alerts = getAlertsForStopAndTrip(graph, place.stopId, leg.tripId);
                         Date stopArrival = place.arrival.getTime();
@@ -61,7 +61,7 @@ public class AlertToLegMapper {
         }
 
         if (leg.intermediateStops != null) {
-            for (Place place : leg.intermediateStops) {
+            for (ApiPlace place : leg.intermediateStops) {
                 if (place.stopId != null) {
                     Collection<AlertPatch> alerts = getAlertsForStop(graph, place.stopId);
                     Date stopArrival = place.arrival.getTime();
@@ -218,7 +218,7 @@ public class AlertToLegMapper {
     }
 
 
-    private static void addAlertPatchesToLeg(Leg leg, Collection<StopCondition> stopConditions, Collection<AlertPatch> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
+    private static void addAlertPatchesToLeg(ApiLeg leg, Collection<StopCondition> stopConditions, Collection<AlertPatch> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
         if (alertPatches != null) {
             for (AlertPatch alert : alertPatches) {
                 if (alert.getAlert().effectiveStartDate.before(toTime) &&
@@ -240,7 +240,7 @@ public class AlertToLegMapper {
         }
     }
 
-    private static void addAlertPatchesToLeg(Leg leg, Collection<AlertPatch> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
+    private static void addAlertPatchesToLeg(ApiLeg leg, Collection<AlertPatch> alertPatches, Locale requestedLocale, Date fromTime, Date toTime) {
         addAlertPatchesToLeg(leg, null, alertPatches, requestedLocale, fromTime, toTime);
     }
 }

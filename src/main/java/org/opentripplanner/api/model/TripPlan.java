@@ -16,10 +16,10 @@ public class TripPlan {
     public Date date = null;
     
     /** The origin */
-    public Place from = null;
+    public ApiPlace from = null;
     
     /** The destination */
-    public Place to = null;
+    public ApiPlace to = null;
 
     /**
      * A list of possible itineraries. The wrapper is named 'itineraries' while the
@@ -27,9 +27,9 @@ public class TripPlan {
      */
     @XmlElementWrapper(name="itineraries")
     @JsonProperty(value="itineraries")
-    public List<Itinerary> itinerary = new ArrayList<Itinerary>();
+    public List<ApiItinerary> itinerary = new ArrayList<ApiItinerary>();
 
-    public TripPlan(Place from, Place to, Date date, List<Itinerary> itineraries) {
+    public TripPlan(ApiPlace from, ApiPlace to, Date date, List<ApiItinerary> itineraries) {
         this.from = from;
         this.to = to;
         this.date = date;

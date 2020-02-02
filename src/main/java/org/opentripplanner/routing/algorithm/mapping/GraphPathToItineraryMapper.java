@@ -3,11 +3,11 @@ package org.opentripplanner.routing.algorithm.mapping;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.ApiVertexType;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.DirectionUtils;
@@ -72,11 +72,11 @@ public abstract class GraphPathToItineraryMapper {
     /**
      * Generates a TripPlan from a set of paths
      */
-    public static List<Itinerary> mapItineraries(List<GraphPath> paths, RoutingRequest request) {
+    public static List<ApiItinerary> mapItineraries(List<GraphPath> paths, RoutingRequest request) {
 
-        List<Itinerary> itineraries = new LinkedList<>();
+        List<ApiItinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(
+            ApiItinerary itinerary = generateItinerary(
                     path,
                     request.showIntermediateStops,
                     request.disableAlertFiltering,
@@ -98,7 +98,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param request is the request containing the original trip planning options
      * @return the (adjusted) itinerary
      */
-    private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
+    private static ApiItinerary adjustItinerary(RoutingRequest request, ApiItinerary itinerary) {
         // Check walk limit distance
         if (itinerary.walkDistance > request.maxWalkDistance) {
             itinerary.walkLimitExceeded = true;
@@ -116,8 +116,8 @@ public abstract class GraphPathToItineraryMapper {
      * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
-        Itinerary itinerary = new Itinerary();
+    public static ApiItinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+        ApiItinerary itinerary = new ApiItinerary();
 
         State[] states = new State[path.states.size()];
         State lastState = path.states.getLast();
@@ -138,7 +138,7 @@ public abstract class GraphPathToItineraryMapper {
 
 
         for (int i = 0; i < itinerary.legs.size(); i++) {
-            Leg leg = itinerary.legs.get(i);
+            ApiLeg leg = itinerary.legs.get(i);
             boolean isFirstLeg = i == 0;
 
             AlertToLegMapper.addAlertPatchesToLeg(graph, leg, isFirstLeg, requestedLocale);
@@ -269,8 +269,8 @@ public abstract class GraphPathToItineraryMapper {
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
-        Leg leg = new Leg();
+    private static ApiLeg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+        ApiLeg leg = new ApiLeg();
 
         Edge[] edges = new Edge[states.length - 1];
 
@@ -307,7 +307,7 @@ public abstract class GraphPathToItineraryMapper {
         return leg;
     }
 
-    private static void addFrequencyFields(State[] states, Leg leg) {
+    private static void addFrequencyFields(State[] states, ApiLeg leg) {
         /* TODO adapt to new frequency handling.
         if (states[0].getBackEdge() instanceof FrequencyBoard) {
             State preBoardState = states[0].getBackState();
@@ -330,13 +330,13 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Add a {@link WalkStep} {@link List} to a {@link Leg} {@link List}.
+     * Add a {@link WalkStep} {@link List} to a {@link ApiLeg} {@link List}.
      * It's more convenient to process all legs in one go because the previous step should be kept.
      *
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
+    private static void addWalkSteps(Graph graph, List<ApiLeg> legs, State[][] legsStates, Locale requestedLocale) {
         WalkStep previousStep = null;
 
         String lastMode = null;
@@ -379,15 +379,15 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Fix up a {@link Leg} {@link List} using the information available at the leg boundaries.
+     * Fix up a {@link ApiLeg} {@link List} using the information available at the leg boundaries.
      * This method will fill holes in the arrival and departure times associated with a
-     * {@link Place} within a leg and add board and alight rules. It will also ensure that stop
+     * {@link ApiPlace} within a leg and add board and alight rules. It will also ensure that stop
      * names propagate correctly to the non-transit legs that connect to them.
      *
      * @param legs The legs of the itinerary
      * @param legsStates The states that go with the legs
      */
-    private static void fixupLegs(List<Leg> legs, State[][] legsStates) {
+    private static void fixupLegs(List<ApiLeg> legs, State[][] legsStates) {
         for (int i = 0; i < legsStates.length; i++) {
 
             for (int j = 1; j < legsStates[i].length; j++) {
@@ -411,12 +411,12 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Calculate the walkTime, transitTime and waitingTime of an {@link Itinerary}.
+     * Calculate the walkTime, transitTime and waitingTime of an {@link ApiItinerary}.
      *
      * @param itinerary The itinerary to calculate the times for
      * @param states The states that go with the itinerary
      */
-    private static void calculateTimes(Itinerary itinerary, State[] states) {
+    private static void calculateTimes(ApiItinerary itinerary, State[] states) {
         for (State state : states) {
             if (state.getBackMode() == null) continue;
 
@@ -438,12 +438,12 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
+     * Calculate the elevationGained and elevationLost fields of an {@link ApiItinerary}.
      *
      * @param itinerary The itinerary to calculate the elevation changes for
      * @param edges The edges that go with the itinerary
      */
-    private static void calculateElevations(Itinerary itinerary, Edge[] edges) {
+    private static void calculateElevations(ApiItinerary itinerary, Edge[] edges) {
         for (Edge edge : edges) {
             if (!(edge instanceof StreetEdge)) continue;
 
@@ -467,12 +467,12 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Add mode and alerts fields to a {@link Leg}.
+     * Add mode and alerts fields to a {@link ApiLeg}.
      *
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering, Locale requestedLocale) {
+    private static void addModeAndAlerts(Graph graph, ApiLeg leg, State[] states, boolean disableAlertFiltering, Locale requestedLocale) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -508,7 +508,7 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Add {@link Place} fields to a {@link Leg}.
+     * Add {@link ApiPlace} fields to a {@link ApiLeg}.
      * There is some code duplication because of subtle differences between departure, arrival and
      * intermediate stops.
      *
@@ -517,7 +517,8 @@ public abstract class GraphPathToItineraryMapper {
      * @param edges The edges that go with the leg
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      */
-    private static void addPlaces(Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops,
+    private static void addPlaces(
+            ApiLeg leg, State[] states, Edge[] edges, boolean showIntermediateStops,
         Locale requestedLocale) {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
@@ -533,7 +534,7 @@ public abstract class GraphPathToItineraryMapper {
         leg.to.departure = null;
 
         if (showIntermediateStops) {
-            leg.intermediateStops = new ArrayList<Place>();
+            leg.intermediateStops = new ArrayList<ApiPlace>();
 
             Stop previousStop = null;
             Stop currentStop;
@@ -560,16 +561,16 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Make a {@link Place} to add to a {@link Leg}.
+     * Make a {@link ApiPlace} to add to a {@link ApiLeg}.
      *
-     * @param state The {@link State} that the {@link Place} pertains to.
+     * @param state The {@link State} that the {@link ApiPlace} pertains to.
      * @param vertex The {@link Vertex} at the {@link State}.
      * @param edge The {@link Edge} leading out of the {@link Vertex}.
      * @param stop The {@link Stop} associated with the {@link Vertex}.
-     * @param tripTimes The {@link TripTimes} associated with the {@link Leg}.
-     * @return The resulting {@link Place} object.
+     * @param tripTimes The {@link TripTimes} associated with the {@link ApiLeg}.
+     * @return The resulting {@link ApiPlace} object.
      */
-    private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes, Locale requestedLocale) {
+    private static ApiPlace makePlace(State state, Vertex vertex, Edge edge, Stop stop, TripTimes tripTimes, Locale requestedLocale) {
         // If no edge was given, it means we're at the end of this leg and need to work around that.
         boolean endOfLeg = (edge == null);
         String name = vertex.getName(requestedLocale);
@@ -580,7 +581,7 @@ public abstract class GraphPathToItineraryMapper {
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
-        Place place = new Place(
+        ApiPlace place = new ApiPlace(
                 vertex.getX(),
                 vertex.getY(),
                 name,
@@ -596,15 +597,15 @@ public abstract class GraphPathToItineraryMapper {
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
-            place.vertexType = VertexType.TRANSIT;
+            place.vertexType = ApiVertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
-            place.vertexType = VertexType.BIKESHARE;
+            place.vertexType = ApiVertexType.BIKESHARE;
         } else if (vertex instanceof BikeParkVertex) {
-            place.vertexType = VertexType.BIKEPARK;
+            place.vertexType = ApiVertexType.BIKEPARK;
         } else {
-            place.vertexType = VertexType.NORMAL;
+            place.vertexType = ApiVertexType.NORMAL;
         }
 
         return place;

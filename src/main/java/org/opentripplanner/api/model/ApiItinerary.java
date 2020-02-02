@@ -1,21 +1,17 @@
 package org.opentripplanner.api.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
+import org.opentripplanner.routing.core.Fare;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.routing.core.Fare;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
-public class Itinerary {
+public class ApiItinerary {
 
     /**
      * Duration of the trip on this itinerary, in seconds.
@@ -83,7 +79,7 @@ public class Itinerary {
      */
     @XmlElementWrapper(name = "legs")
     @XmlElement(name = "leg")
-    public List<Leg> legs = new ArrayList<Leg>();
+    public List<ApiLeg> legs = new ArrayList<>();
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible 
@@ -95,55 +91,8 @@ public class Itinerary {
      * adds leg to array list
      * @param leg
      */
-    public void addLeg(Leg leg) {
+    public void addLeg(ApiLeg leg) {
         if(leg != null)
             legs.add(leg);
-    }
-
-    /** 
-     * remove the leg from the list of legs 
-     * @param leg object to be removed
-     */
-    public void removeLeg(Leg leg) {
-        if(leg != null) {
-            legs.remove(leg);
-        }
-    }
-    
-    public void fixupDates(CalendarServiceData service) {
-        TimeZone startTimeZone = null;
-        TimeZone timeZone = null;
-        Iterator<Leg> it = legs.iterator();
-        while (it.hasNext()) {
-            Leg leg = it.next();
-            if (leg.agencyId == null) {
-                if (timeZone != null) {
-                    leg.setTimeZone(timeZone);
-                }
-            } else {
-                timeZone = service.getTimeZoneForAgencyId(leg.agencyId);
-                if (startTimeZone == null) {
-                    startTimeZone = timeZone; 
-                 }
-            }
-        }
-        if (timeZone != null) {
-            Calendar calendar = Calendar.getInstance(startTimeZone);
-            calendar.setTime(startTime.getTime());
-            startTime = calendar;
-            // go back and set timezone for legs prior to first transit
-            it = legs.iterator();
-            while (it.hasNext()) {
-                Leg leg = it.next();
-                if (leg.agencyId == null) {
-                    leg.setTimeZone(startTimeZone);
-                } else {
-                    break;
-                }
-            }
-            calendar = Calendar.getInstance(timeZone);
-            calendar.setTime(endTime.getTime());
-            endTime = calendar;
-        }
     }
 }

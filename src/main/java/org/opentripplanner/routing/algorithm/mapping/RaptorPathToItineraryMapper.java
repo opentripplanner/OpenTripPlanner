@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.VertexType;
+import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.api.model.ApiPlace;
+import org.opentripplanner.api.model.ApiVertexType;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -87,8 +87,8 @@ public class RaptorPathToItineraryMapper {
         this.egressTransfers = egressTransfers;
     }
 
-    public Itinerary createItinerary(Path<TripSchedule> path) {
-        Itinerary itinerary = new Itinerary();
+    public ApiItinerary createItinerary(Path<TripSchedule> path) {
+        ApiItinerary itinerary = new ApiItinerary();
 
         // Map access leg
         mapAccessLeg(itinerary, path.accessLeg(), accessTransfers);
@@ -102,7 +102,7 @@ public class RaptorPathToItineraryMapper {
         while (!pathLeg.isEgressLeg()) {
             // Map transit leg
             if (pathLeg.isTransitLeg()) {
-                Leg transitLeg = mapTransitLeg(request, pathLeg.asTransitLeg(), firstLeg);
+                ApiLeg transitLeg = mapTransitLeg(request, pathLeg.asTransitLeg(), firstLeg);
                 firstLeg = false;
                 itinerary.addLeg(transitLeg);
                 // Increment counters
@@ -133,7 +133,7 @@ public class RaptorPathToItineraryMapper {
     }
 
     private void mapAccessLeg(
-            Itinerary itinerary,
+            ApiItinerary itinerary,
             AccessPathLeg<TripSchedule> accessPathLeg,
             Map<Stop, Transfer> accessPaths
     ) {
@@ -141,17 +141,17 @@ public class RaptorPathToItineraryMapper {
         Transfer accessPath = accessPaths.get(accessToStop);
 
         // TODO Need to account for multiple fromVertices
-        Place from = mapOriginTargetToPlace(request.rctx.fromVertices.iterator().next(), request.from);
-        Place to = mapStopToPlace(accessToStop);
+        ApiPlace from = mapOriginTargetToPlace(request.rctx.fromVertices.iterator().next(), request.from);
+        ApiPlace to = mapStopToPlace(accessToStop);
         mapNonTransitLeg(itinerary, accessPathLeg, accessPath, from, to, true);
     }
 
-    private Leg mapTransitLeg(
+    private ApiLeg mapTransitLeg(
             RoutingRequest request,
             TransitPathLeg<TripSchedule> pathLeg,
             boolean firstLeg
     ) {
-        Leg leg = new Leg();
+        ApiLeg leg = new ApiLeg();
 
         Stop boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
@@ -234,34 +234,34 @@ public class RaptorPathToItineraryMapper {
         return leg;
     }
 
-    private void mapTransferLeg(Itinerary itinerary, TransferPathLeg<TripSchedule> pathLeg) {
+    private void mapTransferLeg(ApiItinerary itinerary, TransferPathLeg<TripSchedule> pathLeg) {
         Stop transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = transitLayer.getTransferByStopIndex().get(pathLeg.fromStop()).stream().filter(t -> t.getToStop() == pathLeg.toStop()).findFirst().get();
 
-        Place from = mapStopToPlace(transferFromStop);
-        Place to = mapStopToPlace(transferToStop);
+        ApiPlace from = mapStopToPlace(transferFromStop);
+        ApiPlace to = mapStopToPlace(transferToStop);
         mapNonTransitLeg(itinerary, pathLeg, transfer, from, to, false);
     }
 
     private void mapEgressLeg(
-            Itinerary itinerary,
+            ApiItinerary itinerary,
             EgressPathLeg<TripSchedule> egressPathLeg,
             Map<Stop, Transfer> egressPaths
     ) {
         Stop egressStop = transitLayer.getStopByIndex(egressPathLeg.fromStop());
         Transfer egressPath = egressPaths.get(egressStop);
 
-        Place from = mapStopToPlace(egressStop);
+        ApiPlace from = mapStopToPlace(egressStop);
         // TODO Need to account for multiple toVertices
-        Place to = mapOriginTargetToPlace(request.rctx.toVertices.iterator().next(), request.to);
+        ApiPlace to = mapOriginTargetToPlace(request.rctx.toVertices.iterator().next(), request.to);
         mapNonTransitLeg(itinerary, egressPathLeg, egressPath, from, to, true);
     }
 
-    private void mapNonTransitLeg(Itinerary itinerary, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
+    private void mapNonTransitLeg(ApiItinerary itinerary, PathLeg<TripSchedule> pathLeg, Transfer transfer, ApiPlace from, ApiPlace to, boolean onlyIfNonZeroDistance) {
         List<Edge> edges = transfer.getEdges();
         if (edges.isEmpty()) {
-            Leg leg = new Leg();
+            ApiLeg leg = new ApiLeg();
             leg.from = from;
             leg.to = to;
             leg.startTime = createCalendar(pathLeg.fromTime());
@@ -291,7 +291,7 @@ public class RaptorPathToItineraryMapper {
             try {
                 State[] states = transferStates.toArray(new State[0]);
                 GraphPath graphPath = new GraphPath(states[states.length - 1], false);
-                Itinerary subItinerary = GraphPathToItineraryMapper
+                ApiItinerary subItinerary = GraphPathToItineraryMapper
                         .generateItinerary(graphPath, false, true, request.locale);
 
                 if (!onlyIfNonZeroDistance || subItinerary.walkDistance > 0) {
@@ -307,31 +307,31 @@ public class RaptorPathToItineraryMapper {
         }
     }
 
-    private Place mapOriginTargetToPlace(Vertex vertex, GenericLocation location) {
+    private ApiPlace mapOriginTargetToPlace(Vertex vertex, GenericLocation location) {
         return vertex instanceof TransitStopVertex ?
                 mapTransitVertexToPlace((TransitStopVertex) vertex) :
                 mapLocationToPlace(location);
     }
 
-    private Place mapLocationToPlace(GenericLocation location) {
+    private ApiPlace mapLocationToPlace(GenericLocation location) {
         if (location.label == null || location.label.isEmpty()) {
-            return new Place(location.lng, location.lat, String.format("%.6f, %.6f", location.lat, location.lng));
+            return new ApiPlace(location.lng, location.lat, String.format("%.6f, %.6f", location.lat, location.lng));
         } else {
-            return new Place(location.lng, location.lat, location.label);
+            return new ApiPlace(location.lng, location.lat, location.label);
         }
     }
 
-    private Place mapTransitVertexToPlace(TransitStopVertex vertex) {
+    private ApiPlace mapTransitVertexToPlace(TransitStopVertex vertex) {
         return mapStopToPlace(vertex.getStop());
     }
 
-    private Place mapStopToPlace(Stop stop) {
-        Place place = new Place(stop.getLon(), stop.getLat(), stop.getName());
+    private ApiPlace mapStopToPlace(Stop stop) {
+        ApiPlace place = new ApiPlace(stop.getLon(), stop.getLat(), stop.getName());
         place.stopId = stop.getId();
         place.stopCode = stop.getCode();
         place.platformCode = stop.getCode();
         place.zoneId = stop.getZone();
-        place.vertexType = VertexType.TRANSIT;
+        place.vertexType = ApiVertexType.TRANSIT;
         return place;
     }
 
@@ -342,8 +342,8 @@ public class RaptorPathToItineraryMapper {
         return c;
     }
 
-    private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
-        List<Place> places = new ArrayList<>();
+    private List<ApiPlace> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
+        List<ApiPlace> places = new ArrayList<>();
         TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
@@ -353,7 +353,7 @@ public class RaptorPathToItineraryMapper {
             }
             if (boarded) {
                 Stop stop = tripPattern.stopPattern.stops[j];
-                Place place = mapStopToPlace(stop);
+                ApiPlace place = mapStopToPlace(stop);
                 place.stopIndex = j;
                 // TODO: fill out stopSequence
                 place.arrival = createCalendar(tripSchedule.arrival(j));

@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
@@ -58,7 +58,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForFromPlace(Leg leg) {
+    public TripTimeShort getTripTimeShortForFromPlace(ApiLeg leg) {
         Trip trip = index.tripForId.get(leg.tripId);
         if (trip == null) {
             return null;
@@ -86,7 +86,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time short for the to place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForToPlace(Leg leg) {
+    public TripTimeShort getTripTimeShortForToPlace(ApiLeg leg) {
         Trip trip = index.tripForId.get(leg.tripId);
         if (trip == null) {
             return null;
@@ -115,7 +115,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all stops for the full trip of a leg.
      */
-    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg) {
+    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(ApiLeg leg) {
         if (leg.tripId == null || leg.serviceDate == null) {
             return new ArrayList<>();
         }
@@ -127,7 +127,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
-    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg) {
+    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(ApiLeg leg) {
         Trip trip = index.tripForId.get(leg.tripId);
 
         if (trip == null) {

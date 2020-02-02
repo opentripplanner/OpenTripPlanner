@@ -1,18 +1,17 @@
 package org.opentripplanner.api.model;
 
-import java.util.Calendar;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement; 
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlElement;
+import java.util.Calendar;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
 */ 
-public class Place {
+public class ApiPlace {
 
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
@@ -84,7 +83,7 @@ public class Place {
      */
     @XmlAttribute
     @JsonSerialize
-    public VertexType vertexType;
+    public ApiVertexType vertexType;
 
     /**
      * In case the vertex is of type Bike sharing station.
@@ -100,17 +99,17 @@ public class Place {
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 
-    public Place() {
+    public ApiPlace() {
     }
 
-    public Place(Double lon, Double lat, String name) {
+    public ApiPlace(Double lon, Double lat, String name) {
         this.lon = lon;
         this.lat = lat;
         this.name = name;
-	    this.vertexType = VertexType.NORMAL;
+	    this.vertexType = ApiVertexType.NORMAL;
     }
 
-    public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
+    public ApiPlace(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
         this(lon, lat, name);
         this.arrival = arrival;
         this.departure = departure;

@@ -4,9 +4,9 @@ import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.opentripplanner.ConstantsForTests;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
@@ -140,12 +140,12 @@ public class TestIntermediatePlaces {
         assertNotNull(paths);
         assertFalse(paths.isEmpty());
 
-        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
+        List<ApiItinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
         TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
         assertTrue(1 <= plan.itinerary.size());
-        for (Itinerary itinerary : plan.itinerary) {
+        for (ApiItinerary itinerary : plan.itinerary) {
             validateIntermediatePlacesVisited(itinerary, via);
             assertTrue(via.length < itinerary.legs.size());
             validateLegsTemporally(request, itinerary);
@@ -157,11 +157,11 @@ public class TestIntermediatePlaces {
     }
 
     // Check that every via location is visited in the right order
-    private void validateIntermediatePlacesVisited(Itinerary itinerary, GenericLocation[] via) {
+    private void validateIntermediatePlacesVisited(ApiItinerary itinerary, GenericLocation[] via) {
         int legIndex = 0;
 
         for (GenericLocation location : via) {
-            Leg leg;
+            ApiLeg leg;
             do {
                 assertTrue("Intermediate location was not an endpoint of any leg",
                     legIndex < itinerary.legs.size());
@@ -173,9 +173,9 @@ public class TestIntermediatePlaces {
     }
 
     // Check that the end point of a leg is also the start point of the next leg
-    private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
-        Place place = plan.from;
-        for (Leg leg : itinerary.legs) {
+    private void validateLegsSpatially(TripPlan plan, ApiItinerary itinerary) {
+        ApiPlace place = plan.from;
+        for (ApiLeg leg : itinerary.legs) {
             assertPlacesAreVeryClose(place, leg.from);
             place = leg.to;
         }
@@ -183,7 +183,7 @@ public class TestIntermediatePlaces {
     }
 
     // Check that the start time and end time of each leg are consistent
-    private void validateLegsTemporally(RoutingRequest request, Itinerary itinerary) {
+    private void validateLegsTemporally(RoutingRequest request, ApiItinerary itinerary) {
         Calendar departTime = Calendar.getInstance(timeZone);
         Calendar arriveTime = Calendar.getInstance(timeZone);
         if (request.arriveBy) {
@@ -194,7 +194,7 @@ public class TestIntermediatePlaces {
             arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).to.arrival;
         }
         long sumOfDuration = 0;
-        for (Leg leg : itinerary.legs) {
+        for (ApiLeg leg : itinerary.legs) {
             assertFalse(departTime.after(leg.startTime));
             assertEquals(leg.startTime, leg.from.departure);
             assertEquals(leg.endTime, leg.to.arrival);
@@ -212,12 +212,12 @@ public class TestIntermediatePlaces {
         assertEquals(sumOfDuration, itinerary.duration.doubleValue(), accuracy);
     }
 
-    private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {
+    private void assertLocationIsVeryCloseToPlace(GenericLocation location, ApiPlace place) {
         assertEquals(location.lat, place.lat, DELTA);
         assertEquals(location.lng, place.lon, DELTA);
     }
 
-    private void assertPlacesAreVeryClose(Place a, Place b) {
+    private void assertPlacesAreVeryClose(ApiPlace a, ApiPlace b) {
         assertEquals(a.lat, b.lat, DELTA);
         assertEquals(a.lon, b.lon, DELTA);
     }

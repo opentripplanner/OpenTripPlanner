@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.model.ApiItinerary;
+import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -16,17 +16,17 @@ public class TripPlanMapper {
 
     public static TripPlan mapTripPlan(
             RoutingRequest request,
-            List<Itinerary> itineraries
+            List<ApiItinerary> itineraries
     ) {
-        Place from;
-        Place to;
+        ApiPlace from;
+        ApiPlace to;
 
         if(itineraries.isEmpty()) {
             from = placeFromGeoLocation(request.from);
             to = placeFromGeoLocation(request.to);
         }
         else {
-            List<Leg> legs = itineraries.get(0).legs;
+            List<ApiLeg> legs = itineraries.get(0).legs;
             from = legs.get(0).from;
             to = legs.get(legs.size() - 1).to;
         }
@@ -38,7 +38,7 @@ public class TripPlanMapper {
         return tripPlan;
     }
 
-    private static Place placeFromGeoLocation(GenericLocation location) {
-        return new Place(location.lng, location.lat, location.label);
+    private static ApiPlace placeFromGeoLocation(GenericLocation location) {
+        return new ApiPlace(location.lng, location.lat, location.label);
     }
 }

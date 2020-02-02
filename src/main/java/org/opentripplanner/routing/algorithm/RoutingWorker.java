@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.api.model.Itinerary;
+import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.routing.RoutingResponse;
@@ -70,7 +70,7 @@ public class RoutingWorker {
 
     public RoutingResponse route(Router router) {
         try {
-            List<Itinerary> itineraries;
+            List<ApiItinerary> itineraries;
 
             // Street routing
             itineraries = new ArrayList<>(routeOnStreetGraph(router));
@@ -94,7 +94,7 @@ public class RoutingWorker {
         }
     }
 
-    private List<Itinerary> routeOnStreetGraph(Router router) {
+    private List<ApiItinerary> routeOnStreetGraph(Router router) {
         try {
             if (!request.modes.getNonTransitSet().isValid()) {
                 return Collections.emptyList();
@@ -109,7 +109,7 @@ public class RoutingWorker {
             List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
 
             // Convert the internal GraphPaths to itineraries
-            List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, request);
+            List<ApiItinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, request);
             ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
             return response;
         }
@@ -118,7 +118,7 @@ public class RoutingWorker {
         }
     }
 
-    private Collection<Itinerary> routeTransit(Router router) {
+    private Collection<ApiItinerary> routeTransit(Router router) {
         if (!request.modes.isTransit()) { return Collections.emptyList(); }
 
         long startTime = System.currentTimeMillis();
@@ -216,10 +216,10 @@ public class RoutingWorker {
         );
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
-        List<Itinerary> itineraries = new ArrayList<>();
+        List<ApiItinerary> itineraries = new ArrayList<>();
         for (Path<TripSchedule> path : response.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
-            Itinerary itinerary = itineraryMapper.createItinerary(path);
+            ApiItinerary itinerary = itineraryMapper.createItinerary(path);
             // Decorate the Itineraries with fare information.
             // Itinerary and Leg are API model classes, lacking internal object references needed for effective
             // fare calculation. We derive the fares from the internal Path objects and add them to the itinerary.

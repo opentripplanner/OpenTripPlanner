@@ -25,7 +25,7 @@ import java.util.TimeZone;
  * particular vehicle (or on foot).
  */
 
-public class Leg {
+public class ApiLeg {
 
     /**
      * The date and time this leg begins.
@@ -197,19 +197,19 @@ public class Leg {
      /**
      * The Place where the leg originates.
      */
-    public Place from = null;
+    public ApiPlace from = null;
     
     /**
      * The Place where the leg begins.
      */
-    public Place to = null;
+    public ApiPlace to = null;
 
     /**
      * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
      * For non-transit legs, null.
      * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
      */
-    public List<Place> intermediateStops;
+    public List<ApiPlace> intermediateStops;
 
     /**
      * The leg's geometry.
