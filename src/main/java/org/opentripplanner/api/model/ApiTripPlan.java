@@ -10,7 +10,7 @@ import java.util.List;
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.
  */
-public class TripPlan {
+public class ApiTripPlan {
 
     /**  The time and date of travel */
     public Date date = null;
@@ -27,9 +27,9 @@ public class TripPlan {
      */
     @XmlElementWrapper(name="itineraries")
     @JsonProperty(value="itineraries")
-    public List<ApiItinerary> itinerary = new ArrayList<ApiItinerary>();
+    public List<ApiItinerary> itinerary = new ArrayList<>();
 
-    public TripPlan(ApiPlace from, ApiPlace to, Date date, List<ApiItinerary> itineraries) {
+    public ApiTripPlan(ApiPlace from, ApiPlace to, Date date, List<ApiItinerary> itineraries) {
         this.from = from;
         this.to = to;
         this.date = date;

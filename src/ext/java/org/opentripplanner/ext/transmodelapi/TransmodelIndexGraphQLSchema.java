@@ -30,7 +30,7 @@ import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.api.model.ApiVertexType;
 import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;

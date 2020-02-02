@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.api.model.ApiPlace;
-import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 
@@ -14,7 +14,7 @@ public class TripPlanMapper {
     /** This is a utility class with static method only. */
     private TripPlanMapper() { }
 
-    public static TripPlan mapTripPlan(
+    public static ApiTripPlan mapTripPlan(
             RoutingRequest request,
             List<ApiItinerary> itineraries
     ) {
@@ -31,11 +31,7 @@ public class TripPlanMapper {
             to = legs.get(legs.size() - 1).to;
         }
 
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime(), itineraries);
-
-        tripPlan.itinerary = itineraries;
-
-        return tripPlan;
+        return new ApiTripPlan(from, to, request.getDateTime(), itineraries);
     }
 
     private static ApiPlace placeFromGeoLocation(GenericLocation location) {

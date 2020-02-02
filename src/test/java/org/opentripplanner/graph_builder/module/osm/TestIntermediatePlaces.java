@@ -7,7 +7,7 @@ import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.api.model.ApiItinerary;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.api.model.ApiPlace;
-import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.ApiTripPlan;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -141,7 +141,7 @@ public class TestIntermediatePlaces {
         assertFalse(paths.isEmpty());
 
         List<ApiItinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(paths, request);
-        TripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
+        ApiTripPlan plan = TripPlanMapper.mapTripPlan(request, itineraries);
         assertLocationIsVeryCloseToPlace(from, plan.from);
         assertLocationIsVeryCloseToPlace(to, plan.to);
         assertTrue(1 <= plan.itinerary.size());
@@ -173,7 +173,7 @@ public class TestIntermediatePlaces {
     }
 
     // Check that the end point of a leg is also the start point of the next leg
-    private void validateLegsSpatially(TripPlan plan, ApiItinerary itinerary) {
+    private void validateLegsSpatially(ApiTripPlan plan, ApiItinerary itinerary) {
         ApiPlace place = plan.from;
         for (ApiLeg leg : itinerary.legs) {
             assertPlacesAreVeryClose(place, leg.from);
