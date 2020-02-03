@@ -87,12 +87,4 @@ public class ApiItinerary {
      */
     public boolean tooSloped = false;
 
-    /** 
-     * adds leg to array list
-     * @param leg
-     */
-    public void addLeg(ApiLeg leg) {
-        if(leg != null)
-            legs.add(leg);
-    }
 }

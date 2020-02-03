@@ -1,23 +1,17 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
  /**
@@ -227,10 +221,6 @@ public class ApiLeg {
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
-    @XmlTransient
-    @JsonIgnore
-    public List<AlertPatch> alertPatches = new ArrayList<>();
-
     @XmlAttribute
     @JsonSerialize
     public String routeShortName;
@@ -272,18 +262,6 @@ public class ApiLeg {
         return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
     }
 
-    public void addAlert(Alert alert, Locale locale) {
-        if (alerts == null) {
-            alerts = new ArrayList<>();
-        }
-        for (LocalizedAlert a : alerts) {
-            if (a.alert.equals(alert)) {
-                return;
-            }
-        }
-        alerts.add(new LocalizedAlert(alert, locale));
-    }
-
     public void setTimeZone(TimeZone timeZone) {
         Calendar calendar = Calendar.getInstance(timeZone);
         calendar.setTime(startTime.getTime());
@@ -293,10 +271,4 @@ public class ApiLeg {
         endTime = calendar;
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
-
-     public void addAlertPatch(AlertPatch alertPatch) {
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
-     }
  }

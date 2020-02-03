@@ -50,7 +50,6 @@ public class LegMapper {
         api.legGeometry = domain.legGeometry;
         api.walkSteps = domain.walkSteps;
         api.alerts = domain.alerts;
-        api.alertPatches = domain.alertPatches;
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;
