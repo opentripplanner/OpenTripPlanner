@@ -53,7 +53,7 @@ public class ApiWalkStep {
     /**
      * The relative direction of this step.
      */
-    public RelativeDirection relativeDirection;
+    public ApiRelativeDirection relativeDirection;
 
     /**
      * The name of the street.
@@ -140,7 +140,7 @@ public class ApiWalkStep {
         return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 
-    public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
+    public static ApiRelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
             boolean roundabout) {
 
         double angleDiff = thisAngle - lastAngle;
@@ -152,27 +152,27 @@ public class ApiWalkStep {
         if (roundabout) {
             // roundabout: the direction we turn onto it implies the circling direction
             if (angleDiff > ccwAngleDiff) {
-                return RelativeDirection.CIRCLE_CLOCKWISE;
+                return ApiRelativeDirection.CIRCLE_CLOCKWISE;
             } else {
-                return RelativeDirection.CIRCLE_COUNTERCLOCKWISE;
+                return ApiRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
             }
         }
 
         // less than 0.3 rad counts as straight, to simplify walking instructions
         if (angleDiff < 0.3 || ccwAngleDiff < 0.3) {
-            return RelativeDirection.CONTINUE;
+            return ApiRelativeDirection.CONTINUE;
         } else if (angleDiff < 0.7) {
-            return RelativeDirection.SLIGHTLY_RIGHT;
+            return ApiRelativeDirection.SLIGHTLY_RIGHT;
         } else if (ccwAngleDiff < 0.7) {
-            return RelativeDirection.SLIGHTLY_LEFT;
+            return ApiRelativeDirection.SLIGHTLY_LEFT;
         } else if (angleDiff < 2) {
-            return RelativeDirection.RIGHT;
+            return ApiRelativeDirection.RIGHT;
         } else if (ccwAngleDiff < 2) {
-            return RelativeDirection.LEFT;
+            return ApiRelativeDirection.LEFT;
         } else if (angleDiff < Math.PI) {
-            return RelativeDirection.HARD_RIGHT;
+            return ApiRelativeDirection.HARD_RIGHT;
         } else {
-            return RelativeDirection.HARD_LEFT;
+            return ApiRelativeDirection.HARD_LEFT;
         }
     }
 
