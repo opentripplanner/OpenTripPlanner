@@ -83,6 +83,9 @@ public class TransmodelGraphQLPlanner {
                 // Handle int overflow, in which case the multiplication will be less than zero
                 if (limit < 0 || distance < limit) {
                     itineraries.addAll(findNonTransitItineraries(request, router));
+                    if(!itineraries.isEmpty()){
+                        request.setMaxWalkDistance(distance);
+                    }
                 }
             }
 
@@ -282,7 +285,7 @@ public class TransmodelGraphQLPlanner {
                 request.clearModes();
             }
 
-            // Apply cable car setting 
+            // Apply cable car setting
             request.modes.setCableCar(cableCar);
         }
 

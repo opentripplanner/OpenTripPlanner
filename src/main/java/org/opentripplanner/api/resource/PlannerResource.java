@@ -86,6 +86,9 @@ public class PlannerResource extends RoutingResource {
                 // Handle int overflow, in which case the multiplication will be less than zero
                 if (limit < 0 || distance < limit) {
                     itineraries.addAll(findNonTransitItineraries(request, router));
+                    if(!itineraries.isEmpty()){
+                        request.setMaxWalkDistance(distance);
+                    }
                 }
             }
 

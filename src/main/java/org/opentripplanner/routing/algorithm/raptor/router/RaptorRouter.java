@@ -69,9 +69,11 @@ public class RaptorRouter {
     double startTimeAccessEgress = System.currentTimeMillis();
 
     Map<Stop, Transfer> accessTransfers =
-        AccessEgressRouter.streetSearch(request, false, 2000);
+        AccessEgressRouter
+            .streetSearch(request, false, maxTransferDistance(request.maxTransferWalkDistance));
     Map<Stop, Transfer> egressTransfers =
-        AccessEgressRouter.streetSearch(request, true, 2000);
+        AccessEgressRouter
+            .streetSearch(request, true, maxTransferDistance(request.maxWalkDistance));
 
     TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
         transitLayer);
@@ -156,5 +158,9 @@ public class RaptorRouter {
     ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
     ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
     return DateMapper.asStartOfService(zdt);
+  }
+
+  private int maxTransferDistance(Number maxWalkDistance) {
+    return 2000 > maxWalkDistance.intValue() ? maxWalkDistance.intValue() : 2000;
   }
 }
