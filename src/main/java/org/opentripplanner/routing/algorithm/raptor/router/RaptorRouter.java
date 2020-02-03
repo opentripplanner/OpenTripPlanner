@@ -7,6 +7,7 @@ import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
+import java.util.Collections;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
@@ -69,9 +70,11 @@ public class RaptorRouter {
     double startTimeAccessEgress = System.currentTimeMillis();
 
     Map<Stop, Transfer> accessTransfers =
-        AccessEgressRouter.streetSearch(request, false, 2000);
+        AccessEgressRouter
+            .streetSearch(request, false, maxTransferDistance(request.maxTransferWalkDistance));
     Map<Stop, Transfer> egressTransfers =
-        AccessEgressRouter.streetSearch(request, true, 2000);
+        AccessEgressRouter
+            .streetSearch(request, true, maxTransferDistance(request.maxWalkDistance));
 
     TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
         transitLayer);
@@ -90,6 +93,12 @@ public class RaptorRouter {
 
     int departureTime = secondsSinceStartOfTime(otpRRDataProvider.getStartOfTime(),
         request.getDateTime().toInstant());
+
+    if (accessTimes.isEmpty() || egressTimes.isEmpty()) {
+      LOG.warn("{} is empty. No itinerary returns",
+          accessTimes.isEmpty() ? "AccessTimes" : "EgressTimes");
+      return Collections.emptyList();
+    }
 
     // TODO Expose parameters
     // TODO Remove parameters from API
@@ -156,5 +165,9 @@ public class RaptorRouter {
     ZoneId zoneId = request.getRoutingContext().graph.getTimeZone().toZoneId();
     ZonedDateTime zdt = request.getDateTime().toInstant().atZone(zoneId);
     return DateMapper.asStartOfService(zdt);
+  }
+
+  private int maxTransferDistance(Number maxWalkDistance) {
+    return 2000 > maxWalkDistance.intValue() ? maxWalkDistance.intValue() : 2000;
   }
 }
