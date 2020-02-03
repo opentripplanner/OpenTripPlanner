@@ -63,7 +63,7 @@ public class ApiWalkStep {
     /**
      * The absolute direction of this step.
      */
-    public AbsoluteDirection absoluteDirection;
+    public ApiAbsoluteDirection absoluteDirection;
 
     /**
      * When exiting a highway or traffic circle, the exit name/number.
@@ -178,7 +178,7 @@ public class ApiWalkStep {
 
     public void setAbsoluteDirection(double thisAngle) {
         int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
-        absoluteDirection = AbsoluteDirection.values()[octant];
+        absoluteDirection = ApiAbsoluteDirection.values()[octant];
     }
 
     public void addAlerts(Collection<Alert> newAlerts, Locale locale) {
