@@ -5,16 +5,22 @@ import org.opentripplanner.model.plan.Itinerary;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class ItineraryMapper {
+    private final LegMapper legMapper;
 
-    public static List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
-        if(domain == null) { return null; }
-        return domain.stream().map(ItineraryMapper::mapItinerary).collect(Collectors.toList());
+    public ItineraryMapper(Locale locale) {
+        this.legMapper = new LegMapper(locale);
     }
 
-    public static ApiItinerary mapItinerary(Itinerary domain) {
+    public List<ApiItinerary> mapItineraries(Collection<Itinerary> domain) {
+        if(domain == null) { return null; }
+        return domain.stream().map(this::mapItinerary).collect(Collectors.toList());
+    }
+
+    public ApiItinerary mapItinerary(Itinerary domain) {
         if(domain == null) { return null; }
         ApiItinerary api = new ApiItinerary();
         api.duration = domain.duration;
@@ -29,7 +35,7 @@ public class ItineraryMapper {
         api.elevationGained = domain.elevationGained;
         api.transfers = domain.transfers;
         api.fare = domain.fare;
-        api.legs = LegMapper.mapLegs(domain.legs);
+        api.legs = legMapper.mapLegs(domain.legs);
         api.tooSloped = domain.tooSloped;
         return api;
     }

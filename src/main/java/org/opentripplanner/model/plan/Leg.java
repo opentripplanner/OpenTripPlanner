@@ -1,9 +1,5 @@
 package org.opentripplanner.model.plan;
 
-// TODO OTP2 - This dependency is not allowed
-import org.opentripplanner.api.model.WalkStep;
-// TODO OTP2 - This dependency is not allowed
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -12,8 +8,9 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Locale;
+import java.util.Set;
 import java.util.TimeZone;
 
 /**
@@ -185,7 +182,7 @@ public class Leg {
     */
    public List<WalkStep> walkSteps;
 
-   public List<LocalizedAlert> alerts;
+   public Set<Alert> alerts = new HashSet<>();
 
    public List<AlertPatch> alertPatches = new ArrayList<>();
 
@@ -218,16 +215,8 @@ public class Leg {
        return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
    }
 
-   public void addAlert(Alert alert, Locale locale) {
-       if (alerts == null) {
-           alerts = new ArrayList<>();
-       }
-       for (LocalizedAlert a : alerts) {
-           if (a.alert.equals(alert)) {
-               return;
-           }
-       }
-       alerts.add(new LocalizedAlert(alert, locale));
+   public void addAlert(Alert alert) {
+       alerts.add(alert);
    }
 
    public void setTimeZone(TimeZone timeZone) {

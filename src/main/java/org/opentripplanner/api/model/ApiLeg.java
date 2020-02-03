@@ -2,7 +2,7 @@ package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.api.model.alertpatch.ApiAlert;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -219,7 +219,7 @@ public class ApiLeg {
 
     @XmlElement
     @JsonSerialize
-    public List<LocalizedAlert> alerts;
+    public List<ApiAlert> alerts;
 
     @XmlAttribute
     @JsonSerialize

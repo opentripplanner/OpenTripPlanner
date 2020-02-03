@@ -1,20 +1,10 @@
 package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.collect.Lists;
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.BikeRentalStationInfo;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.api.model.alertpatch.ApiAlert;
 
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
-import java.util.Locale;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -100,37 +90,11 @@ public class ApiWalkStep {
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
      * distance.
      */
-    @XmlTransient
-    public List<P2<Double>> elevation;
+    public String elevation;
 
     @XmlElement
     @JsonSerialize
-    public List<LocalizedAlert> alerts;
-
-    public transient double angle;
-
-    /**
-     * The walkStep's mode; only populated if this is the first step of that mode in the leg.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
-     */
-    public transient String newMode;
-
-    /**
-     * The street edges that make up this walkStep.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
-     */
-    public transient List<Edge> edges = Lists.newArrayList();
-
-    /**
-     * The bike rental on/off station info.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
-     */
-    public transient BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
-
-    public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
-        relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
-        setAbsoluteDirection(thisAngle);
-    }
+    public List<ApiAlert> alerts;
 
     public String toString() {
         String direction = absoluteDirection.toString();
@@ -140,64 +104,6 @@ public class ApiWalkStep {
         return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 
-    public static ApiRelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
-            boolean roundabout) {
-
-        double angleDiff = thisAngle - lastAngle;
-        if (angleDiff < 0) {
-            angleDiff += Math.PI * 2;
-        }
-        double ccwAngleDiff = Math.PI * 2 - angleDiff;
-
-        if (roundabout) {
-            // roundabout: the direction we turn onto it implies the circling direction
-            if (angleDiff > ccwAngleDiff) {
-                return ApiRelativeDirection.CIRCLE_CLOCKWISE;
-            } else {
-                return ApiRelativeDirection.CIRCLE_COUNTERCLOCKWISE;
-            }
-        }
-
-        // less than 0.3 rad counts as straight, to simplify walking instructions
-        if (angleDiff < 0.3 || ccwAngleDiff < 0.3) {
-            return ApiRelativeDirection.CONTINUE;
-        } else if (angleDiff < 0.7) {
-            return ApiRelativeDirection.SLIGHTLY_RIGHT;
-        } else if (ccwAngleDiff < 0.7) {
-            return ApiRelativeDirection.SLIGHTLY_LEFT;
-        } else if (angleDiff < 2) {
-            return ApiRelativeDirection.RIGHT;
-        } else if (ccwAngleDiff < 2) {
-            return ApiRelativeDirection.LEFT;
-        } else if (angleDiff < Math.PI) {
-            return ApiRelativeDirection.HARD_RIGHT;
-        } else {
-            return ApiRelativeDirection.HARD_LEFT;
-        }
-    }
-
-    public void setAbsoluteDirection(double thisAngle) {
-        int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
-        absoluteDirection = ApiAbsoluteDirection.values()[octant];
-    }
-
-    public void addAlerts(Collection<Alert> newAlerts, Locale locale) {
-        if (newAlerts == null) {
-            return;
-        }
-        if (alerts == null) {
-            alerts = new ArrayList<>();
-        }
-        ALERT: for (Alert newAlert : newAlerts) {
-            for (LocalizedAlert alert : alerts) {
-                if (alert.alert.equals(newAlert)) {
-                    break ALERT;
-                }
-            }
-            alerts.add(new LocalizedAlert(newAlert, locale));
-        }
-    }
-
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
         if (idx <= 0) {
@@ -205,11 +111,4 @@ public class ApiWalkStep {
         }
         return streetName.substring(0, idx - 1);
     }
-
-    @XmlJavaTypeAdapter(ElevationAdapter.class)
-    @JsonSerialize
-    public List<P2<Double>> getElevation() {
-        return elevation;
-    }
-
 }

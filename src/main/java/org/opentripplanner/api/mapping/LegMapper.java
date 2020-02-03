@@ -5,16 +5,24 @@ import org.opentripplanner.model.plan.Leg;
 
 import java.util.Collection;
 import java.util.List;
+import java.util.Locale;
 import java.util.stream.Collectors;
 
 public class LegMapper {
+    private final WalkStepMapper walkStepMapper;
+    private final AlertMapper alertMapper;
 
-    public static List<ApiLeg> mapLegs(Collection<Leg> domain) {
-        if(domain == null) { return null; }
-        return domain.stream().map(LegMapper::mapLeg).collect(Collectors.toList());
+    public LegMapper(Locale locale) {
+        this.walkStepMapper = new WalkStepMapper(locale);
+        this.alertMapper = new AlertMapper(locale);
     }
 
-    public static ApiLeg mapLeg(Leg domain) {
+    public List<ApiLeg> mapLegs(Collection<Leg> domain) {
+        if(domain == null) { return null; }
+        return domain.stream().map(this::mapLeg).collect(Collectors.toList());
+    }
+
+    public ApiLeg mapLeg(Leg domain) {
         if(domain == null) { return null; }
         ApiLeg api = new ApiLeg();
         api.startTime = domain.startTime;
@@ -48,8 +56,8 @@ public class LegMapper {
         api.to = PlaceMapper.mapPlace(domain.to);
         api.intermediateStops = PlaceMapper.mapPlaces(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;
-        api.walkSteps = domain.walkSteps;
-        api.alerts = domain.alerts;
+        api.walkSteps = walkStepMapper.mapWalkSteps(domain.walkSteps);
+        api.alerts = alertMapper.mapAlerts(domain.alerts);
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;

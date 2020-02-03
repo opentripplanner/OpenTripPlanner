@@ -3,7 +3,7 @@ package org.opentripplanner.api.resource;
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.mapping.TripPlanMapper;
-import org.opentripplanner.api.model.ApiTripSearchMetadata;
+import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
@@ -71,8 +71,9 @@ public class PlannerResource extends RoutingResource {
             res = worker.route(router);
 
             // Map to API
-            response.setPlan(TripPlanMapper.mapTripPlan(res.getTripPlan()));
-            response.setMetadata(new ApiTripSearchMetadata(res.getMetadata()));
+            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
+            response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
+            response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
 
             /* Populate up the elevation metadata */
             response.elevationMetadata = new ElevationMetadata();
