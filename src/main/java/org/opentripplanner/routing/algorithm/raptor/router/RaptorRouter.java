@@ -7,6 +7,7 @@ import com.conveyal.r5.otp2.api.request.RangeRaptorRequest;
 import com.conveyal.r5.otp2.api.request.RequestBuilder;
 import com.conveyal.r5.otp2.api.request.TuningParameters;
 import com.conveyal.r5.otp2.api.transit.TransferLeg;
+import java.util.Collections;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.itinerary.ItineraryMapper;
@@ -92,6 +93,12 @@ public class RaptorRouter {
 
     int departureTime = secondsSinceStartOfTime(otpRRDataProvider.getStartOfTime(),
         request.getDateTime().toInstant());
+
+    if (accessTimes.isEmpty() || egressTimes.isEmpty()) {
+      LOG.warn("{} is empty. No itinerary returns",
+          accessTimes.isEmpty() ? "AccessTimes" : "EgressTimes");
+      return Collections.emptyList();
+    }
 
     // TODO Expose parameters
     // TODO Remove parameters from API
