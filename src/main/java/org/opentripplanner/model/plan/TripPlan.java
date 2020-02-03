@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Date;
 import java.util.List;
 
@@ -10,21 +10,26 @@ import java.util.List;
 public class TripPlan {
 
     /**  The time and date of travel */
-    public Date date = null;
+    public final Date date;
 
     /** The origin */
-    public Place from = null;
+    public final Place from;
 
     /** The destination */
-    public Place to = null;
+    public final Place to;
 
-    public List<Itinerary> itineraries = new ArrayList<>();
+    public final List<Itinerary> itineraries;
 
-    public TripPlan() { }
-
-    public TripPlan(Place from, Place to, Date date) {
+    public TripPlan(Place from, Place to, Date date, Collection<Itinerary> itineraries) {
         this.from = from;
         this.to = to;
         this.date = date;
+        this.itineraries = List.copyOf(itineraries);
+    }
+
+    @Override
+    public String toString() {
+        return "TripPlan{" + "date=" + date + ", from=" + from + ", to=" + to
+                + ", itineraries=" + itineraries + '}';
     }
 }

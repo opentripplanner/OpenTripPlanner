@@ -13,13 +13,13 @@ import java.util.List;
 public class ApiTripPlan {
 
     /**  The time and date of travel */
-    public Date date = null;
+    public Date date;
     
     /** The origin */
-    public ApiPlace from = null;
+    public ApiPlace from;
     
     /** The destination */
-    public ApiPlace to = null;
+    public ApiPlace to;
 
     /**
      * A list of possible itineraries. The wrapper is named 'itineraries' while the
@@ -28,11 +28,4 @@ public class ApiTripPlan {
     @XmlElementWrapper(name="itineraries")
     @JsonProperty(value="itineraries")
     public List<ApiItinerary> itinerary = new ArrayList<>();
-
-    public ApiTripPlan(ApiPlace from, ApiPlace to, Date date, List<ApiItinerary> itineraries) {
-        this.from = from;
-        this.to = to;
-        this.date = date;
-        this.itinerary.addAll(itineraries);
-    }
 }

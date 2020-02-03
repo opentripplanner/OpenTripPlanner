@@ -1,21 +1,19 @@
 package org.opentripplanner.model.routing;
 
-import org.opentripplanner.api.model.ApiTripPlan;
+import org.opentripplanner.model.plan.TripPlan;
 
 import java.util.StringJoiner;
 
 public class RoutingResponse {
-    private final ApiTripPlan tripPlan;
+    private final TripPlan tripPlan;
     private final TripSearchMetadata metadata;
 
-    public RoutingResponse(
-            ApiTripPlan tripPlan, TripSearchMetadata metadata
-    ) {
+    public RoutingResponse(TripPlan tripPlan, TripSearchMetadata metadata) {
         this.tripPlan = tripPlan;
         this.metadata = metadata;
     }
 
-    public ApiTripPlan getTripPlan() {
+    public TripPlan getTripPlan() {
         return tripPlan;
     }
 

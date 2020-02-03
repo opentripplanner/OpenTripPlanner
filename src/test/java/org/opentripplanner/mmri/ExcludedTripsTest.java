@@ -1,7 +1,7 @@
 package org.opentripplanner.mmri;
 
 import org.junit.Ignore;
-import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.plan.Leg;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.
@@ -14,7 +14,7 @@ public class ExcludedTripsTest extends MmriTest {
     }
 
     public void test3e1() {
-        ApiLeg leg = plan(+1388530860L, "3e1", "3e2", null, false, false, null, "", "");
+        Leg leg = plan(+1388530860L, "3e1", "3e2", null, false, false, null, "", "");
 
         validateLeg(leg, 1388530980000L, 1388531040000L, "3e2", "3e1", null);
     }

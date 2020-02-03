@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.junit.Ignore;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.model.plan.Leg;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -30,7 +30,7 @@ public class PatternInterlineDwellTest extends GtfsTest {
         long time = calendar.getTime().getTime() / 1000;
         // We should arrive at the destination using two legs, both of which are on
         // the same route and with zero transfers.
-        ApiLeg[] legs = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
+        Leg[] legs = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
         assertEquals(legs[0].routeId.getId(), "route1");
         assertEquals(legs[1].routeId.getId(), "route1");
         assertTrue(itinerary.transfers == 0);

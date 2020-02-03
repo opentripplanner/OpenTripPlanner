@@ -5,13 +5,13 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.api.model.ApiItinerary;
-import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -47,7 +47,7 @@ public abstract class GtfsTest extends TestCase {
 
     private String agencyId;
 
-    public ApiItinerary itinerary = null;
+    public Itinerary itinerary = null;
 
     protected void setUp() {
         File gtfs = new File("src/test/resources/" + getFeedName());
@@ -60,7 +60,6 @@ public abstract class GtfsTest extends TestCase {
                 gtfsBundleList,
                 ServiceDateInterval.unbounded()
         );
-
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
@@ -93,14 +92,14 @@ public abstract class GtfsTest extends TestCase {
         } catch (Exception exception) {}
     }
 
-    public ApiLeg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
+    public Leg plan(long dateTime, String fromVertex, String toVertex, String onTripId,
              boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
              String excludedRoute, String excludedStop) {
         return plan(dateTime, fromVertex, toVertex, onTripId, wheelchairAccessible,
                 preferLeastTransfers, preferredMode, excludedRoute, excludedStop, 1)[0];
     }
 
-    public ApiLeg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
+    public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
                boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
                String excludedRoute, String excludedStop, int legCount) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
@@ -138,7 +137,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        List<ApiItinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
                 paths, routingRequest
         );
         // Stored in instance field for use in individual tests
@@ -146,12 +145,17 @@ public abstract class GtfsTest extends TestCase {
 
         assertEquals(legCount, itinerary.legs.size());
 
-        return itinerary.legs.toArray(new ApiLeg[legCount]);
+        return itinerary.legs.toArray(new Leg[legCount]);
     }
 
     public void validateLeg(
-            ApiLeg leg, long startTime, long endTime, String toStopId, String fromStopId,
-                     String alert) {
+            Leg leg,
+            long startTime,
+            long endTime,
+            String toStopId,
+            String fromStopId,
+            String alert
+    ) {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());

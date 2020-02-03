@@ -98,20 +98,4 @@ public class ApiPlace {
     String getGeometry() {
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
-
-    public ApiPlace() {
-    }
-
-    public ApiPlace(Double lon, Double lat, String name) {
-        this.lon = lon;
-        this.lat = lat;
-        this.name = name;
-	    this.vertexType = ApiVertexType.NORMAL;
-    }
-
-    public ApiPlace(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
-        this(lon, lat, name);
-        this.arrival = arrival;
-        this.departure = departure;
-    }
 }

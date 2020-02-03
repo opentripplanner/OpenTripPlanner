@@ -56,7 +56,9 @@ public class TransmodelGraphQLPlanner {
 
         try {
             RoutingWorker worker = new RoutingWorker(request);
+
             RoutingResponse res = worker.route(router);
+
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
         }
