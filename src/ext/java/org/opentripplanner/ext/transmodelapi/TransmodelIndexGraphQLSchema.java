@@ -1703,6 +1703,12 @@ public class TransmodelIndexGraphQLSchema {
                                 .description("Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for")
                                 .type(whiteListedInputType)
                                 .build())
+                        .argument(GraphQLArgument.newArgument()
+                            .name("includeCancelledTrips")
+                            .description("Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED")
+                            .type(Scalars.GraphQLBoolean)
+                            .defaultValue(false)
+                            .build())
                         .dataFetcher(environment -> {
                             boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
                             int numberOfDepartures = environment.getArgument("numberOfDepartures");
