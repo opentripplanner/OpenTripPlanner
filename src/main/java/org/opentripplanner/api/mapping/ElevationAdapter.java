@@ -1,11 +1,10 @@
-package org.opentripplanner.api.model;
-
-import java.util.ArrayList;
-import java.util.List;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.common.model.P2;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
+import java.util.ArrayList;
+import java.util.List;
 
 public class ElevationAdapter extends XmlAdapter<String, List<P2<Double>>> {
     @Override
