@@ -6,7 +6,7 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ElevationAdapter extends XmlAdapter<String, List<P2<Double>>> {
+public class ElevationMapper extends XmlAdapter<String, List<P2<Double>>> {
     @Override
     public String marshal(List<P2<Double>> pairs) throws Exception {
         if (pairs == null)
