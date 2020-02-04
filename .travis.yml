@@ -20,6 +20,8 @@ after_success:
       mkdir ~/.aws && printf '%s\n' '[default]' 'aws_access_key_id=${AWS_ACCESS_KEY_ID}' 'aws_secret_access_key=${AWS_SECRET_ACCESS_KEY}' 'region=us-east-1' > ~/.aws/config;
       # build markdown docs using mkdocs
       mkdocs build
+      # build enunciate and JavaDoc
+      mvn -DskipTests site
       # copy enunciate API docs into mkdocs folder
       cp -R target/site/enunciate/apidocs target/mkdocs/api
       # copy JavaDoc into mkdocs folder
@@ -45,6 +47,8 @@ cache:
 before_install:
   # install mkdocs
   - pip install --user mkdocs
+  # install awscli
+  - pip install --user awscli
 
 notifications:
   email: false

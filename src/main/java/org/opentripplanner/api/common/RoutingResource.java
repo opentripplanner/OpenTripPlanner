@@ -187,7 +187,7 @@ public abstract class RoutingResource {
      * </ul>
      *
      * <p>
-     *   For a more complete discussion of this parameter see <a href="http://docs.opentripplanner.org/en/latest/Configuration/#routing-modes">Routing modes</a>.
+     *   For a more complete discussion of this parameter see <a href="http://otp-docs.ibi-transit.com/Configuration/#routing-modes">Routing modes</a>.
      * </p>
      */
     @QueryParam("mode")
