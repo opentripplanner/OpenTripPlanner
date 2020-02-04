@@ -42,9 +42,9 @@ public class NoApiTransportationNetworkCompanyDataSource extends TransportationN
     /**
      * For testing purposes only.
      */
-    public NoApiTransportationNetworkCompanyDataSource() {
-        defaultArrivalTimeSeconds = 123;
-        isWheelChairAccessible = true;
+    public NoApiTransportationNetworkCompanyDataSource(int defaultArrivalTimeSeconds, boolean isWheelChairAccessible) {
+        this.defaultArrivalTimeSeconds = defaultArrivalTimeSeconds;
+        this.isWheelChairAccessible = isWheelChairAccessible;
     }
 
     @Override public TransportationNetworkCompany getTransportationNetworkCompanyType() {
@@ -53,8 +53,8 @@ public class NoApiTransportationNetworkCompanyDataSource extends TransportationN
 
     /**
      * In lieu of making an API request, this will merely return a single arrival estimate with the default arrive time.
-     * An idea for improvement of this could be to add the ability to parse GeoJSON representing the service area of
-     * the TNC provider in order to be able to determine if TNC service is unavailable at the given position.
+     * TODO: add the ability to parse GeoJSON representing the service area of the TNC provider in order to be able to
+     *  determine if TNC service is unavailable at the given position.
      */
     @Override protected List<ArrivalTime> queryArrivalTimes(Position position) throws IOException {
         List arrivalEstimates = new ArrayList();

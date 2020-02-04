@@ -26,7 +26,10 @@ import static org.junit.Assert.assertNotNull;
 
 public class NoApiTransportationNetworkCompanyDataSourceTest {
 
-    private static NoApiTransportationNetworkCompanyDataSource source = new NoApiTransportationNetworkCompanyDataSource();
+    private static NoApiTransportationNetworkCompanyDataSource source = new NoApiTransportationNetworkCompanyDataSource(
+        123,
+        true
+    );
 
     @Test
     public void testGetArrivalTimes () throws IOException, ExecutionException {
