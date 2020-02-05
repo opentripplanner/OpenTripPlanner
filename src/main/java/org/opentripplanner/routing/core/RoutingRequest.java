@@ -492,19 +492,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int alightSlack = 0;
 
     /**
-     * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
-     *                        here. Instead the client should be able to pass in a parameter for
-     *                        the max number of additional/extra transfers relative to the best
-     *                        trip (with the fewest possible transfers) within constraint of the
-     *                        other search parameters.
-     *                        This might be to complicated to explain to the customer, so we
-     *                        might stick to the old limit, but that have side-effects that you
-     *                        might not find any trips on a day where a critical part of the
-     *                        trip is not available, because of some real-time disruption.
+     * Ideally maxTransfers should be set in the router config, not here. Instead the client should
+     * be able to pass in a parameter for the max number of additional/extra transfers relative to
+     * the best trip (with the fewest possible transfers) within constraint of the other search
+     * parameters(TODO OTP2 Expose {@link org.opentripplanner.transit.raptor.api.request.SearchParams#numberOfAdditionalTransfers()}
+     * in APIs). This might be to complicated to explain to the customer, so we might stick to the
+     * old limit, but that have side-effects that you might not find any trips on a day where a
+     * critical part of the trip is not available, because of some real-time disruption.
+     *
      * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
-    @Deprecated
-    public int maxTransfers = 2;
+    public Integer maxTransfers = null;
 
     /**
      * For the bike triangle, how important time is.

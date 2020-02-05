@@ -174,6 +174,9 @@ public class RoutingWorker {
         else {
             builder.searchParams().earliestDepartureTime(time);
         }
+        if(request.maxTransfers != null) {
+            builder.searchParams().maxNumberOfTransfers(request.maxTransfers);
+        }
 
         // TODO Expose parameters
         // TODO Remove parameters from API
