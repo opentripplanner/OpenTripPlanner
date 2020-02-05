@@ -40,7 +40,6 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -802,9 +801,9 @@ public abstract class GraphPathToTripPlanConverter {
         Stop lastStop = lastVertex instanceof TransitStopVertex ?
                 ((TransitStopVertex) lastVertex).getStop(): null;
 
-        leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, requestedLocale);
+        leg.from = makePlace(states[0], firstVertex, firstStop, requestedLocale);
         leg.from.arrival = null;
-        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, requestedLocale);
+        leg.to = makePlace(states[states.length - 1], lastVertex, lastStop, requestedLocale);
         leg.to.departure = null;
 
         if (showIntermediateStops) {
@@ -829,7 +828,7 @@ public abstract class GraphPathToTripPlanConverter {
                 previousStop = currentStop;
                 if (currentStop == lastStop) break;
 
-                leg.intermediateStops.add(makePlace(states[i], vertex, edges[i], currentStop, requestedLocale));
+                leg.intermediateStops.add(makePlace(states[i], vertex, currentStop, requestedLocale));
             }
         }
     }
@@ -839,14 +838,11 @@ public abstract class GraphPathToTripPlanConverter {
      *
      * @param state The {@link State} that the {@link Place} pertains to.
      * @param vertex The {@link Vertex} at the {@link State}.
-     * @param edge The {@link Edge} leading out of the {@link Vertex}.
      * @param stop The {@link Stop} associated with the {@link Vertex}.
-     * @param tripTimes The {@link TripTimes} associated with the {@link Leg}.
+     * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(State state, Vertex vertex, Edge edge, Stop stop, Locale requestedLocale) {
-        // If no edge was given, it means we're at the end of this leg and need to work around that.
-        boolean endOfLeg = (edge == null);
+    private static Place makePlace(State state, Vertex vertex, Stop stop, Locale requestedLocale) {
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
@@ -855,8 +851,13 @@ public abstract class GraphPathToTripPlanConverter {
         if (vertex instanceof StreetVertex && !(vertex instanceof TemporaryStreetLocation)) {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
-        Place place = new Place(vertex.getX(), vertex.getY(), name,
-                makeCalendar(state), makeCalendar(state));
+        Place place = new Place(
+                vertex.getX(),
+                vertex.getY(),
+                name,
+                makeCalendar(state),
+                makeCalendar(state)
+        );
 
         if (vertex instanceof TransitStopVertex) {
             place.stopId = stop.getId();
@@ -881,8 +882,6 @@ public abstract class GraphPathToTripPlanConverter {
      * Converts a list of street edges to a list of turn-by-turn directions.
      * 
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
-     * 
-     * @return
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
         List<WalkStep> steps = new ArrayList<WalkStep>();
@@ -908,7 +907,7 @@ public abstract class GraphPathToTripPlanConverter {
                     s = e.traverse(s);
                     transferStates.add(s);
                 }
-                states = transferStates.toArray(new State[transferStates.size()]);
+                states = transferStates.toArray(new State[0]);
             }
         }
 
