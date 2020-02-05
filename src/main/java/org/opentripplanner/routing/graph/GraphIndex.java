@@ -410,8 +410,8 @@ public class GraphIndex {
         List<StopTimesInPattern> ret = new ArrayList<>();
         TimetableSnapshot snapshot = graph.getTimetableSnapshot();
 
-        Collection<TripPattern> patterns = getPatternsForStop(stop, true);
-        for (TripPattern pattern : patterns) {
+        Collection<TripPattern> patternsForStop = getPatternsForStop(stop, true);
+        for (TripPattern pattern : patternsForStop) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
             Timetable tt;
             if (snapshot != null){
