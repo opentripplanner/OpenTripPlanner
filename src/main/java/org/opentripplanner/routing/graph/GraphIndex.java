@@ -317,7 +317,9 @@ public class GraphIndex {
         Date date = new Date(startTime * 1000);
         ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
-        for (TripPattern pattern : patternsForStop.get(stop)) {
+        Collection<TripPattern> patternsForStop = getPatternsForStop(stop, true);
+
+        for (TripPattern pattern : patternsForStop) {
 
             // The bounded priority Q is used to keep a sorted short list of trip times. We can not
             // relay on the trip times to be in order because of real-time updates. This code can
@@ -408,7 +410,7 @@ public class GraphIndex {
         List<StopTimesInPattern> ret = new ArrayList<>();
         TimetableSnapshot snapshot = graph.getTimetableSnapshot();
 
-        Collection<TripPattern> patterns = patternsForStop.get(stop);
+        Collection<TripPattern> patterns = getPatternsForStop(stop, true);
         for (TripPattern pattern : patterns) {
             StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
             Timetable tt;
@@ -434,14 +436,15 @@ public class GraphIndex {
         return ret;
     }
 
-    // TODO OTP2 - Add support for includeRealtimeUpdates
     public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
         List<TripPattern> tripPatterns = new ArrayList<>(patternsForStop.get(stop));
-        /*
-        if (includeRealtimeUpdates && graph.timetableSnapshotSource != null) {
-            tripPatterns.addAll(graph.timetableSnapshotSource.getAddedTripPatternsForStop(stop));
+
+        TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
+
+        if (includeRealtimeUpdates && timetableSnapshot != null) {
+            tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
         }
-         */
+
         return tripPatterns;
     }
 
