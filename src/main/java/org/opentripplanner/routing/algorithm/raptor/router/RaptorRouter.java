@@ -14,10 +14,12 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +42,7 @@ public class RaptorRouter {
     private static final RaptorService<TripSchedule> raptorService = new RaptorService<>(
             // TODO OTP2 - Load turning parameters from config file
             new RaptorTuningParameters() {}
-    );
+  );
 
     private final RaptorRoutingRequestTransitData requestTransitDataProvider;
     private final TransitLayer transitLayer;
@@ -50,8 +52,8 @@ public class RaptorRouter {
     public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
         double startTime = System.currentTimeMillis();
 
-        this.requestTransitDataProvider = new RaptorRoutingRequestTransitData(
-                transitLayer,
+    this.requestTransitDataProvider = new RaptorRoutingRequestTransitData(
+        transitLayer,
                 request.getDateTime().toInstant(),
                 TRANSIT_SEARCH_RANGE_IN_DAYS,
                 request.modes,
@@ -93,34 +95,41 @@ public class RaptorRouter {
 
         double startTimeRouting = System.currentTimeMillis();
 
-        int departureTime = DateMapper.secondsSinceStartOfTime(
+        RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
+
+        int time = DateMapper.secondsSinceStartOfTime(
                 requestTransitDataProvider.getStartOfTime(),
                 request.getDateTime().toInstant()
         );
 
+        if(request.arriveBy) {
+            builder.searchParams().latestArrivalTime(time);
+        }
+        else {
+            builder.searchParams().earliestDepartureTime(time);
+        }
+
         // TODO Expose parameters
         // TODO Remove parameters from API
-        RaptorRequest<TripSchedule> raptorRequest = new RaptorRequestBuilder<TripSchedule>()
-                .profile(RaptorProfile.STANDARD)
-                //TODO Check in combination with timetableEnabled
-                //.enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
+        builder.profile(RaptorProfile.MULTI_CRITERIA)
+                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
                 .searchParams()
-                .earliestDepartureTime(departureTime)
-                .searchWindowInSeconds(request.raptorSearchWindow)
+                .searchWindow(request.searchWindow)
                 .addAccessStops(accessTimes)
                 .addEgressStops(egressTimes)
                 .boardSlackInSeconds(request.boardSlack)
-                .timetableEnabled(true)
-                .build();
+                .allowWaitingBetweenAccessAndTransit(false)
+                .timetableEnabled(true);
 
-        /* Route transit */
+        RaptorRequest<TripSchedule> raptorRequest = builder.build();
 
-        Collection<Path<TripSchedule>> paths = raptorService.route(
+        // Route transit
+        RaptorResponse<TripSchedule> response = raptorService.route(
                 raptorRequest,
                 this.requestTransitDataProvider
         );
 
-        LOG.info("Found {} itineraries", paths.size());
+        LOG.info("Found {} itineraries", response.paths().size());
 
         LOG.info("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
@@ -138,7 +147,7 @@ public class RaptorRouter {
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
         List<Itinerary> itineraries = new ArrayList<>();
-        for (Path<TripSchedule> path : paths) {
+        for (Path<TripSchedule> path : response.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
             // Decorate the Itineraries with fare information.

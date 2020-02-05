@@ -42,13 +42,25 @@ public class TestCase {
 
     @Override
     public String toString() {
+        return toString(NOT_SET, NOT_SET, NOT_SET);
+    }
+
+    public String toString(int departureTime, int arrivalTime, int window) {
         return String.format(
                 "#%s %s - %s, (%.3f, %.3f) - (%.3f, %.3f), %s-%s(%s)",
                 id, fromPlace.getDescription(), toPlace.getDescription(),
                 fromPlace.getLat(), fromPlace.getLon(),
                 toPlace.getLat(), toPlace.getLon(),
-                timeToStrShort(departureTime), timeToStrShort(arrivalTime), timeToStrShort(window)
+                timeToString(this.departureTime, departureTime),
+                timeToString(this.arrivalTime, arrivalTime),
+                timeToString(this.window, window)
         );
+    }
+
+    private String timeToString(int orgTime, int calcTime) {
+        return orgTime == NOT_SET && calcTime > 0
+                ? timeToStrShort(calcTime) + "*"
+                : timeToStrShort(orgTime);
     }
 
     /**

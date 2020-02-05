@@ -23,8 +23,9 @@ public class HeuristicsAdapter implements Heuristics {
     private int originDepartureTime = -1;
     private final BestTimes times;
     private final BestNumberOfTransfers transfers;
-    private final Collection<TransferLeg> transferLegs;
+    private final Collection<TransferLeg> egressLegs;
     private final TransitCalculator calculator;
+    private boolean aggregatedResultsCalculated = false;
 
     private int minJourneyTravelDuration = NOT_SET;
     private int minJourneyNumOfTransfers = NOT_SET;
@@ -32,13 +33,13 @@ public class HeuristicsAdapter implements Heuristics {
     public HeuristicsAdapter(
             BestTimes times,
             BestNumberOfTransfers transfers,
-            Collection<TransferLeg> transferLegs,
+            Collection<TransferLeg> egressLegs,
             TransitCalculator calculator,
             WorkerLifeCycle lifeCycle
     ) {
         this.times = times;
         this.transfers = transfers;
-        this.transferLegs = transferLegs;
+        this.egressLegs = egressLegs;
         this.calculator = calculator;
         lifeCycle.onSetupIteration(this::setUpIteration);
     }
@@ -46,9 +47,9 @@ public class HeuristicsAdapter implements Heuristics {
     private void setUpIteration(int departureTime) {
         if (this.originDepartureTime > 0) {
             throw new IllegalStateException(
-                    "You should only run one iteration to calculate heuristics, this is because we use " +
-                    "the origin departure time to calculate the travel duration at the end of the search."
-            );
+                    "You should only run one iteration to calculate heuristics, this is because "
+                    + "we use the origin departure time to calculate the travel duration at the "
+                    + "end of the search.");
         }
         this.originDepartureTime = departureTime;
     }
@@ -60,7 +61,10 @@ public class HeuristicsAdapter implements Heuristics {
 
     @Override
     public int bestTravelDuration(int stop) {
-        return calculator.duration(originDepartureTime, times.time(stop));
+        if(reached(stop)) {
+            return calculator.duration(originDepartureTime, times.time(stop));
+        }
+        return NOT_SET;
     }
 
     @Override
@@ -85,24 +89,38 @@ public class HeuristicsAdapter implements Heuristics {
 
     @Override
     public int bestOverallJourneyTravelDuration() {
-        if(minJourneyTravelDuration == NOT_SET) {
-            for (TransferLeg it : transferLegs) {
-                int v = bestTravelDuration(it.stop()) + it.durationInSeconds();
-                minJourneyTravelDuration = Math.min(minJourneyTravelDuration, v);
-            }
-        }
+        calculateAggregatedResults();
         return minJourneyTravelDuration;
     }
 
     @Override
     public int bestOverallJourneyNumOfTransfers() {
-        if(minJourneyNumOfTransfers == NOT_SET) {
-            for (TransferLeg it : transferLegs) {
-                int v = bestNumOfTransfers(it.stop());
-                minJourneyNumOfTransfers = Math.min(minJourneyNumOfTransfers, v);
+        calculateAggregatedResults();
+        return minJourneyNumOfTransfers;
+    }
+
+    @Override
+    public boolean destinationReached() {
+        calculateAggregatedResults();
+        return minJourneyNumOfTransfers != NOT_SET;
+    }
+
+    /**
+     * Lazy calculate some of the result values.
+     */
+    private void calculateAggregatedResults() {
+        if(aggregatedResultsCalculated) { return; }
+
+        for (TransferLeg it : egressLegs) {
+            if(reached(it.stop())) {
+                int t = bestTravelDuration(it.stop()) + it.durationInSeconds();
+                minJourneyTravelDuration = Math.min(minJourneyTravelDuration, t);
+
+                int n = bestNumOfTransfers(it.stop());
+                minJourneyNumOfTransfers = Math.min(minJourneyNumOfTransfers, n);
             }
         }
-        return minJourneyNumOfTransfers;
+        aggregatedResultsCalculated = true;
     }
 
     /**

@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -19,6 +20,11 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
  * request parameters ensure that this calculator is used.
  */
 public interface TransitCalculator {
+
+    /**
+     * Use this constant to represent an uninitialized time value.
+     */
+    int TIME_NOT_SET = SearchParams.TIME_NOT_SET;
 
     /**
      * Add duration to time and return the result. In the case of a normal
@@ -195,7 +201,7 @@ public interface TransitCalculator {
                         boardSlackInSeconds,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours
-                        -1,
+                        TIME_NOT_SET,
                         60
                 )
                 : new ReverseSearchTransitCalculator(
@@ -203,7 +209,7 @@ public interface TransitCalculator {
                         boardSlackInSeconds,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours
-                        -1,
+                        TIME_NOT_SET,
                         60
                 );
     }

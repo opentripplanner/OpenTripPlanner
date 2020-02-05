@@ -75,8 +75,15 @@ class Result implements Comparable<Result> {
         Result result = (Result) o;
         return Objects.equals(startTime, result.startTime) &&
                 Objects.equals(endTime, result.endTime) &&
-                Objects.equals(cost, result.cost) &&
+                compareCost(cost, result.cost) &&
                 Objects.equals(details, result.details);
+    }
+
+    private boolean compareCost(Integer c1, Integer c2) {
+        // Ignore cost from comparison if not computed
+        if(c1 == null || c1 == 0) return true;
+        if(c2 == null || c2 == 0) return true;
+        return c1.equals(c2);
     }
 
     @Override

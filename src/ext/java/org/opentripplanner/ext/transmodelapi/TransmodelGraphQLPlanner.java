@@ -199,8 +199,8 @@ public class TransmodelGraphQLPlanner {
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
 //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
-        callWith.argument("walkReluctance", (Double v) ->  request.setWalkReluctance(v));
-        callWith.argument("waitReluctance", (Double v) ->  request.setWaitReluctance(v));
+        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
 //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
@@ -230,23 +230,23 @@ public class TransmodelGraphQLPlanner {
 //        callWith.argument("preferred.lines", lines -> request.setPreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
         callWith.argument("preferred.otherThanPreferredLinesPenalty", request::setOtherThanPreferredRoutesPenalty);
         // Deprecated organisations -> authorities
-        callWith.argument("preferred.organisations", organisations -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("preferred.authorities", authorities -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("preferred.organisations", (Collection<String> organisations) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("preferred.authorities", (Collection<String> authorities) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 //        callWith.argument("unpreferred.lines", lines -> request.setUnpreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("unpreferred.organisations", organisations -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("unpreferred.authorities", authorities -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("unpreferred.organisations", (Collection<String> organisations) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
 //        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("banned.organisations", organisations -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("banned.authorities", authorities -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
-        callWith.argument("banned.serviceJourneys", serviceJourneys -> request.bannedTrips = toBannedTrips((Collection<String>) serviceJourneys));
+        callWith.argument("banned.organisations", (Collection<String> organisations) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
 
 //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
 //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
 
-        callWith.argument("whiteListed.lines", lines -> request.setWhiteListedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("whiteListed.organisations", organisations -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("whiteListed.authorities", authorities -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
+        callWith.argument("whiteListed.organisations", (Collection<String> organisations) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("whiteListed.authorities", (Collection<String> authorities) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
