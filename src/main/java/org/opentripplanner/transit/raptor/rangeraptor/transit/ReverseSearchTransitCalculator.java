@@ -49,7 +49,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
         this.boardSlackInSeconds = boardSlackInSeconds;
         this.latestArrivalTime = latestArrivalTime;
         this.searchWindowInSeconds = searchWindowInSeconds;
-        this.earliestAcceptableDepartureTime = earliestAcceptableDepartureTime < 0
+        this.earliestAcceptableDepartureTime = earliestAcceptableDepartureTime == TIME_NOT_SET
                 ? unreachedTime()
                 : earliestAcceptableDepartureTime;
         this.iterationStep = iterationStep;

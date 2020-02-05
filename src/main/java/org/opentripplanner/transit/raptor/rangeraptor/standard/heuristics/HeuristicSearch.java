@@ -54,4 +54,8 @@ public class HeuristicSearch<T extends RaptorTripSchedule> implements Worker<T> 
         }
         return stopFilter;
     }
+
+    public boolean destinationReached() {
+        return heuristics.destinationReached();
+    }
 }

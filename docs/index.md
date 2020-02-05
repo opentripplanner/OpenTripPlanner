@@ -1,11 +1,20 @@
 ![OTP Logo](otp-logo.svg)
 # OpenTripPlanner
 
+## *OTP2* IS WORK IN PROGRESS. 
+THE DOCUMENTATION MAY NOT BE UPDATED. WE TRY TO DOCUMENT THINGS ALONG THE WAY, BUT KEEPING ALL OF IT UP TO DATE IS TIME CONSUMING. WE PLAN TO GO OVER THE DOCUMENTATION BEFORE THE RC(RELEASE CANDIDATE) IS MADE.
+
 _This documentation is targeted primarily at the OTP development community and more technical users. For high-level information about the project, please visit [**www.opentripplanner.org**](http://www.opentripplanner.org)_
 
 **OpenTripPlanner** (OTP) is an open source multi-modal trip planner, which runs on Linux, Mac, Windows, or potentially any platform with a Java virtual machine. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). The code is under active development with a variety of [deployments](Deployments) around the world.
 
 If you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
+
+## Versions of this documentation
+ - [OTP Master](http://docs.opentripplanner.org/en/latest) - Latest release
+ - [OTP dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 development branch 
+ - [OTP dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 development branch
+
 
 ## External Technical Documentation
 

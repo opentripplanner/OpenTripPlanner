@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCaseFailedException;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
@@ -15,15 +17,15 @@ import java.util.Map;
 class ResultPrinter {
     private ResultPrinter() { }
 
-    static void printResultOk(TestCase testCase, long lapTime, boolean printItineraries) {
-        printResult("SUCCESS", testCase, lapTime, printItineraries, "");
+    static void printResultOk(TestCase testCase, RaptorRequest<?> request, long lapTime, boolean printItineraries) {
+        printResult("SUCCESS", request, testCase, lapTime, printItineraries, "");
     }
 
-    static void printResultFailed(TestCase testCase, long lapTime, Exception e) {
+    static void printResultFailed(TestCase testCase, RaptorRequest<?> request, long lapTime, Exception e) {
         boolean testError = e instanceof TestCaseFailedException;
         String errorDetails = " - " + e.getMessage() + (testError ? "" : "  (" + e.getClass().getSimpleName() + ")");
 
-        printResult("FAILED", testCase, lapTime,true, errorDetails);
+        printResult("FAILED", request, testCase, lapTime,true, errorDetails);
 
         if(!testError) {
             e.printStackTrace();
@@ -32,6 +34,7 @@ class ResultPrinter {
 
     private static void printResult(
             String status,
+            RaptorRequest<?> request,
             TestCase tc,
             long lapTime,
             boolean printItineraries,
@@ -42,11 +45,17 @@ class ResultPrinter {
                     "SpeedTest %-7s  %4d ms  %-66s %s %n",
                     status,
                     lapTime,
-                    tc.toString(),
+                    toString(tc, request),
                     errorDetails
             );
             tc.printResults();
         }
+    }
+
+    private static String toString(TestCase tc, RaptorRequest<?> request) {
+        if(request == null) { return tc.toString(); }
+        SearchParams r = request.searchParams();
+        return tc.toString(r.earliestDepartureTime(), r.latestArrivalTime(), r.searchWindowInSeconds());
     }
 
     static void logSingleTestResult(

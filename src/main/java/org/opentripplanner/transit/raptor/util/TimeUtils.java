@@ -8,6 +8,12 @@ import java.util.Calendar;
  * Time utility methods. See the unit test for examples on how to use this class.
  */
 public class TimeUtils {
+    /**
+     * This constant is used to represent a service time, which is not set.
+     * This typically is used in the requestWhen an integer is used to represent a service time in seconds
+     */
+    public static final int NOT_SET = -1_000_000;
+
     private enum FormatType { COMPACT, LONG, SHORT }
     private static final boolean USE_RAW_TIME = false;
 
@@ -45,6 +51,15 @@ public class TimeUtils {
 
     public static String timeToStrCompact(Calendar time) {
         return timeStr(time, FormatType.COMPACT);
+    }
+
+    public static String timeMsToStrInSec(long timeMs) {
+        if(timeMs == 0) { return "0 seconds"; }
+        if(timeMs == 1000) { return "1 second"; }
+        if(timeMs < 100) { return String.format ("%.3f seconds",  timeMs/1000.0); }
+        if(timeMs < 995) { return String.format ("%.2f seconds",  timeMs/1000.0); }
+        if(timeMs < 9950) { return String.format ("%.1f seconds",  timeMs/1000.0); }
+        else { return String.format ("%.0f seconds",  timeMs/1000.0); }
     }
 
     public static String timeToStrLong(int time) {

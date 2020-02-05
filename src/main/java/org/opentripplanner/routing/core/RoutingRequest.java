@@ -25,6 +25,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -37,11 +38,13 @@ import java.util.Set;
 import java.util.TimeZone;
 
 /**
- * A trip planning request. Some parameters may not be honored by the trip planner for some or all itineraries.
- * For example, maxWalkDistance may be relaxed if the alternative is to not provide a route.
+ * A trip planning request. Some parameters may not be honored by the trip planner for some or all
+ * itineraries. For example, maxWalkDistance may be relaxed if the alternative is to not provide a
+ * route.
  *
- * All defaults should be specified here in the RoutingRequest, NOT as annotations on query parameters in web services
- * that create RoutingRequests. This establishes a priority chain for default values:
+ * All defaults should be specified here in the RoutingRequest, NOT as annotations on query
+ * parameters in web services that create RoutingRequests. This establishes a priority chain for
+ * default values:
  * RoutingRequest field initializers, then JSON router config, then query parameters.
  *
  * @Deprecated tag is added to all parameters that are not currently functional in either the Raptor router or other
@@ -190,18 +193,33 @@ public class RoutingRequest implements Cloneable, Serializable {
     public long dateTime = new Date().getTime() / 1000;
 
     /**
-     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
-     *
-     * @deprecated TODO OTP2 Regression. Needs to be implemented in Raptor.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2885
+     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
+     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
+     * to latest arrival time (LAT - EAT).
+     * <p>
+     * All optimal travels that depart within the search window is guarantied to be found.
+     * <p>
+     * This is sometimes referred to as the Range Raptor Search Window - but could be used in a none
+     * Transit search as well; Hence this is named search-window and not raptor-search-window. Do
+     * not confuse this with the travel-window, which is the time between EDT to LAT.
+     * <p>
+     * Use {@code null} to unset, and {@link Duration#ZERO} to do one Raptor iteration. The value is
+     * dynamically  assigned a suitable value, if not set. In a small to medium size operation
+     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
+     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
+     * auto assignment.
      */
-     @Deprecated
+    public Duration searchWindow;
+
+    /**
+     * Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.
+     */
     public boolean arriveBy = false;
 
     /**
      * Whether the trip must be wheelchair accessible.
      * @deprecated TODO OTP2 Regression. This is not implemented in Raptor yet, but will work with
- *                      a walk-only search.
+     *                 a walk-only search.
      */
     @Deprecated
     public boolean wheelchairAccessible = false;
@@ -474,28 +492,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int alightSlack = 0;
 
     /**
-     * @deprecated  TODO OTP2 Regression. A maxTransfers should be set in the router config, not
-     *                        here. Instead the client should be able to pass in a parameter for
-     *                        the max number of additional/extra transfers relative to the best
-     *                        trip (with the fewest possible transfers) within constraint of the
-     *                        other search parameters.
-     *                        This might be to complicated to explain to the customer, so we
-     *                        might stick to the old limit, but that have side-effects that you
-     *                        might not find any trips on a day where a critical part of the
-     *                        trip is not available, because of some real-time disruption.
+     * Ideally maxTransfers should be set in the router config, not here. Instead the client should
+     * be able to pass in a parameter for the max number of additional/extra transfers relative to
+     * the best trip (with the fewest possible transfers) within constraint of the other search
+     * parameters(TODO OTP2 Expose {@link org.opentripplanner.transit.raptor.api.request.SearchParams#numberOfAdditionalTransfers()}
+     * in APIs). This might be to complicated to explain to the customer, so we might stick to the
+     * old limit, but that have side-effects that you might not find any trips on a day where a
+     * critical part of the trip is not available, because of some real-time disruption.
+     *
      * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
-    @Deprecated
-    public int maxTransfers = 2;
-
-    /**
-     * Raptor search window in seconds.
-     *
-     * TODO OTP2 This needs to be exposed on the API, maybe not as is. There are
-     *           a few possibilities. Other alternatives are:
-     *           {@code earliest/latest departure/arrival time}
-     */
-    public int raptorSearchWindow = 40 * 60;
+    public Integer maxTransfers = null;
 
     /**
      * For the bike triangle, how important time is.
@@ -537,10 +544,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * When true, realtime updates are ignored during this search.
-     *
-     * @deprecated TODO OTP2 Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public boolean ignoreRealtimeUpdates = false;
 
     /**
@@ -892,6 +896,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
+    }
+
+    public void setSearchWindowSeconds(int searchWindowInSeconds) {
+        this.searchWindow = Duration.ofSeconds(searchWindowInSeconds);
     }
 
     public int getNumItineraries() {
@@ -1340,5 +1348,4 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
         return new PathComparator(compareStartTimes);
     }
-
 }

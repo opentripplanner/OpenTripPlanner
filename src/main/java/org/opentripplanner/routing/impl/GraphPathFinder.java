@@ -142,7 +142,11 @@ public class GraphPathFinder {
         return paths;
     }
 
-    /* Try to find N paths through the Graph */
+    /**
+     *  Try to find N paths through the Graph
+     * @throws VertexNotFoundException
+     * @throws PathNotFoundException
+     */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
 
         // We used to perform a protective clone of the RoutingRequest here.

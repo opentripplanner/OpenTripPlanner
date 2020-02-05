@@ -7,8 +7,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayer
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.transit.raptor.RaptorService;
-import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
@@ -18,7 +18,6 @@ import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
-import org.opentripplanner.transit.raptor.speed_test.transit.TripPlanSupport;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -27,7 +26,6 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -135,8 +133,13 @@ public class SpeedTest {
             testCasesToRun = testCases.stream().filter(it -> testCaseIds.contains(it.id)).collect(Collectors.toList());
         }
 
-        // Warm up JIT compiler
-        runSingleTestCase(tripPlans, testCases.get(1), true);
+        // We assume we we are debugging and not measuring performance if we only run 1 test-case
+        // one time; Hence skip JIT compiler warm-up.
+        int samplesPrProfile = opts.numberOfTestsSamplesToRun() / opts.profiles().length;
+        if(testCasesToRun.size() > 1 || samplesPrProfile > 1) {
+            // Warm-up JIT compiler
+            runSingleTestCase(tripPlans, testCases.get(1), true);
+        }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
         AvgTimer.resetAll();
@@ -169,7 +172,10 @@ public class SpeedTest {
     }
 
     private boolean runSingleTestCase(List<TripPlan> tripPlans, TestCase testCase, boolean ignoreResults) {
+        RaptorRequest<?> rReqUsed = null;
+        int nPathsFound = 0;
         try {
+
             final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, getTimeZoneId());
 
             if (opts.compareHeuristics()) {
@@ -181,19 +187,28 @@ public class SpeedTest {
                 // Perform routing
                 TOT_TIMER.start();
                 TripPlan route = route(request);
+                rReqUsed = route.response.requestUsed();
+                nPathsFound = route.response.paths().size();
                 TOT_TIMER.stop();
 
                 if (!ignoreResults) {
                     tripPlans.add(route);
+
+                    // assert throws Exception on failure
                     testCase.assertResult(route.getItineraries());
-                    ResultPrinter.printResultOk(testCase, TOT_TIMER.lapTime(), opts.verbose());
+
+                    // Report success
+                    ResultPrinter.printResultOk(testCase, route.response.requestUsed(), TOT_TIMER.lapTime(), opts.verbose());
+                    numOfPathsFound.add(nPathsFound);
                 }
             }
             return true;
         } catch (Exception e) {
             TOT_TIMER.failIfStarted();
             if (!ignoreResults) {
-                ResultPrinter.printResultFailed(testCase, TOT_TIMER.lapTime(), e);
+                // Report failure
+                ResultPrinter.printResultFailed(testCase, rReqUsed, TOT_TIMER.lapTime(), e);
+                numOfPathsFound.add(nPathsFound);
             }
             return false;
         }
@@ -201,19 +216,22 @@ public class SpeedTest {
 
 
     public TripPlan route(SpeedTestRequest request) {
+        TransitDataProvider<TripSchedule> transitData;
+        RaptorRequest<TripSchedule> rRequest;
+        RaptorResponse<TripSchedule> response;
+
         try {
-            Collection<Path<TripSchedule>> paths;
             streetRouter.route(request);
 
             // -------------------------------------------------------- [ WORKER ROUTE ]
 
-            TransitDataProvider<TripSchedule> transitData = transitData(request);
+            transitData = transitData(request);
 
             TIMER_WORKER.start();
 
-            RaptorRequest<TripSchedule> req = rangeRaptorRequest(routeProfile, request, streetRouter);
+            rRequest = rangeRaptorRequest(routeProfile, request, streetRouter);
 
-            paths = service.route(req, transitData);
+            response = service.route(rRequest, transitData);
 
 
             TIMER_WORKER.stop();
@@ -222,13 +240,12 @@ public class SpeedTest {
 
             TIMER_COLLECT_RESULTS.start();
 
-            if (paths.isEmpty()) {
+            if (response.paths().isEmpty()) {
                 numOfPathsFound.add(0);
                 throw new NoResultFound();
             }
-            numOfPathsFound.add(paths.size());
 
-            TripPlan tripPlan = mapToTripPlan(request, paths, streetRouter);
+            TripPlan tripPlan = mapToTripPlan(request, response, streetRouter);
 
             TIMER_COLLECT_RESULTS.stop();
 
@@ -305,13 +322,25 @@ public class SpeedTest {
         );
     }
 
-    private TripPlan mapToTripPlan(SpeedTestRequest request, Collection<Path<TripSchedule>> paths, EgressAccessRouter streetRouter) {
-        ItinerarySet itineraries = ItineraryMapper.mapItineraries(request, paths, streetRouter, transitLayer);
+    private TripPlan mapToTripPlan(
+            SpeedTestRequest request,
+            RaptorResponse<TripSchedule> response,
+            EgressAccessRouter streetRouter
+    ) {
+        ItinerarySet itineraries = ItineraryMapper.mapItineraries(
+                request, response.paths(), streetRouter, transitLayer
+        );
 
         // Filter away similar itineraries for easier reading
         // itineraries.filter();
 
-        return TripPlanSupport.createTripPlanForRequest(request, itineraries);
+        return new TripPlan(
+                request.getDepartureTimestamp(),
+                request.tc().fromPlace,
+                request.tc().toPlace,
+                response,
+                itineraries
+        );
     }
 
     private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {

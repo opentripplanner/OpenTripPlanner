@@ -54,6 +54,14 @@ If you have extracted a smaller PBF file from a larger region, be sure to put on
 
 ## Start up OTP
 
+**TODO OTP2**
+ 
+THIS SECTION NEEDS CLEANUP - THERE IS STILL A FEW PR HANGING AND WE WILL NOT 
+UPDATE THIS SECTION BEFORE ALL OF THEM ARE MERGED - THIS SHOULD BE FIXED AT 
+LATEST AT THE TIME OF THE OTP 2 BETA/RELEASE CANDIDATE. 
+
+INCLUDE IMAGE FROM [ISSUE #2904](https://github.com/opentripplanner/OpenTripPlanner/issues/2904) HERE. THIS IMAGE IS THE BEST DOC ON PARAMETERS TOGETER WITH THE `--help` OPTION RIGHT NOW.
+
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). Run `java -version` to check that you have version 11 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
 GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <options>`. The `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. If you have sufficient memory in your computer,

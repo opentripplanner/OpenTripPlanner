@@ -1,7 +1,8 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import com.esotericsoftware.minlog.Log;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -59,6 +60,29 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return searchParams;
     }
 
+
+    /**
+     * A dynamic search is a search witch uses heuristics to resolve search parameters
+     * as earliest-departure-time, latest-arrival-time and search-window. This is an aggregated
+     * value:
+     * <ul>
+     *     <li>A multi-criteria search is a dynamic search.</li>
+     *     <li>A standard range-raptor search with more than one iteration.</li>
+     * </ul>
+     * In principle any search could be run using dynamic resolving of EDT, LAT and search-window,
+     * but for other "simpler" searches we would rather have it fail than magically run, if
+     * configured wrong.
+     */
+    public boolean isDynamicSearch() {
+        if(profile().is(RaptorProfile.MULTI_CRITERIA)) {
+            return true;
+        }
+        if(profile.is(RaptorProfile.STANDARD)) {
+            return !searchParams().searchOneIterationOnly();
+        }
+        return false;
+    }
+
     /**
      * The profile/algorithm to use for this request.
      * <p/>
@@ -107,6 +131,18 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return optimization.isOneOf(optimizations);
     }
 
+    public boolean useTransfersStopFilter() {
+        return optimizationEnabled(Optimization.TRANSFERS_STOP_FILTER);
+    }
+
+    public boolean useDestinationPruning() {
+        return optimizationEnabled(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+    }
+
+    public boolean runInParallel() {
+        return optimizationEnabled(Optimization.PARALLEL);
+    }
+
     /**
      * The multi-criteria cost criteria factors.
      */
@@ -152,9 +188,24 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     }
 
 
+
+    static void assertProperty(boolean predicate, String message) {
+        if(!predicate) {
+            throw new IllegalArgumentException(message);
+        }
+    }
+
     /* private methods */
 
     private void verify() {
         searchParams.verify();
+        if(!profile.is(RaptorProfile.MULTI_CRITERIA)) {
+            if(useTransfersStopFilter()) {
+                Log.warn("Stop filtering is only supported using McRangeRaptor");
+            }
+            if(useDestinationPruning()) {
+                Log.warn("Destination pruning is only supported using McRangeRaptor");
+            }
+        }
     }
 }

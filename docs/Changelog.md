@@ -21,6 +21,8 @@
 - Ability to switch off the fare service(#2912).
 - Limit the transit service period(#2925).
 - Removed unwanted cost added for wait time between access and transit with RangeRaptor (#2927)
+- Dynamic search parameters, calculate raptor search-window when needed. (#2931)
+- Support for next/previous paging trip search results (#2941)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

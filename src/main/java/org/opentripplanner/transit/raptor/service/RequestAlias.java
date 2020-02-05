@@ -2,29 +2,25 @@ package org.opentripplanner.transit.raptor.service;
 
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 
-import static org.opentripplanner.transit.raptor.api.request.Optimization.PARALLEL;
-import static org.opentripplanner.transit.raptor.api.request.Optimization.PARETO_CHECK_AGAINST_DESTINATION;
-import static org.opentripplanner.transit.raptor.api.request.Optimization.TRANSFERS_STOP_FILTER;
-
 public class RequestAlias {
     public static String alias(RaptorRequest<?> request, boolean serviceMultithreaded) {
-        boolean multithreaded = serviceMultithreaded && request.optimizationEnabled(PARALLEL);
+        boolean multithreaded = serviceMultithreaded && request.runInParallel();
         String alias = request.profile().abbreviation();
 
         if (request.searchInReverse()) {
             alias += "-Rev";
         }
-        if (request.optimizationEnabled(PARALLEL) && multithreaded) {
+        if (multithreaded) {
             // Run search in parallel
-            alias += "-Pll";
+            alias += "-LL";
         }
-        if (request.optimizationEnabled(PARETO_CHECK_AGAINST_DESTINATION)) {
+        if (request.useDestinationPruning()) {
             // Heuristic to prune on pareto optimal Destination arrivals
-            alias += "-?Dst";
+            alias += "-DP";
         }
-        if (request.optimizationEnabled(TRANSFERS_STOP_FILTER)) {
+        if (request.useTransfersStopFilter()) {
             // Heuristic used to generate stop filter based on number of transfers
-            alias += "-?Stp";
+            alias += "-SF";
         }
         return alias;
     }

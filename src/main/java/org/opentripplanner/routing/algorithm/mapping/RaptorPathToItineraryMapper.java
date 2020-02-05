@@ -1,11 +1,10 @@
-package org.opentripplanner.routing.algorithm.raptor.itinerary;
+package org.opentripplanner.routing.algorithm.mapping;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
 import org.opentripplanner.api.model.VertexType;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -23,7 +22,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -52,7 +50,7 @@ import java.util.TimeZone;
  * information has to be fetched from the graph index to create complete itineraries that can be shown in a trip
  * planner.
  */
-public class ItineraryMapper {
+public class RaptorPathToItineraryMapper {
 
     private final TransitLayer transitLayer;
 
@@ -64,7 +62,7 @@ public class ItineraryMapper {
 
     private final Map<Stop, Transfer> egressTransfers;
 
-    private static Logger LOG = LoggerFactory.getLogger(ItineraryMapper.class);
+    private static Logger LOG = LoggerFactory.getLogger(RaptorPathToItineraryMapper.class);
 
     /**
      * Constructs an itinerary mapper for a request and a set of results
@@ -75,7 +73,7 @@ public class ItineraryMapper {
      * @param accessTransfers the access paths calculated for this request by access stop
      * @param egressTransfers the egress paths calculated for this request by egress stop
      */
-    public ItineraryMapper(
+    public RaptorPathToItineraryMapper(
             TransitLayer transitLayer,
             ZonedDateTime startOfTime,
             RoutingRequest request,
@@ -226,7 +224,7 @@ public class ItineraryMapper {
         // leg.alightRule = <Assign here>;
         // leg.boardRule =  <Assign here>;
 
-        GraphPathToTripPlanConverter.addAlertPatchesToLeg(
+        AlertToLegMapper.addAlertPatchesToLeg(
             request.getRoutingContext().graph,
             leg,
             firstLeg,
@@ -293,7 +291,7 @@ public class ItineraryMapper {
             try {
                 State[] states = transferStates.toArray(new State[0]);
                 GraphPath graphPath = new GraphPath(states[states.length - 1], false);
-                Itinerary subItinerary = GraphPathToTripPlanConverter
+                Itinerary subItinerary = GraphPathToItineraryMapper
                         .generateItinerary(graphPath, false, true, request.locale);
 
                 if (!onlyIfNonZeroDistance || subItinerary.walkDistance > 0) {

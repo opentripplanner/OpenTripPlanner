@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.util;
 import org.junit.Test;
 
 import java.util.Calendar;
+import java.util.Locale;
 import java.util.TimeZone;
 
 import static org.junit.Assert.assertEquals;
@@ -54,6 +55,28 @@ public class TimeUtilsTest {
         assertEquals("13:33", TimeUtils.timeToStrShort(T_13_33_57));
         assertEquals("00:00", TimeUtils.timeToStrShort(T_00_00_09));
         assertEquals("09:36", TimeUtils.timeToStrShort(CAL));
+    }
+
+    @Test
+    public void timeMsToStrInSec() {
+        Locale defaultLocale = Locale.getDefault();
+        try {
+            Locale.setDefault(Locale.FRANCE);
+            assertEquals("0 seconds", TimeUtils.timeMsToStrInSec(0));
+            assertEquals("0,001 seconds", TimeUtils.timeMsToStrInSec(1));
+            assertEquals("0,099 seconds", TimeUtils.timeMsToStrInSec(99));
+            assertEquals("0,10 seconds", TimeUtils.timeMsToStrInSec(100));
+            assertEquals("0,99 seconds", TimeUtils.timeMsToStrInSec(994));
+            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(995));
+            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(999));
+            assertEquals("1 second", TimeUtils.timeMsToStrInSec(1000));
+            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(1001));
+            assertEquals("9,9 seconds", TimeUtils.timeMsToStrInSec(9_949));
+            assertEquals("10 seconds", TimeUtils.timeMsToStrInSec(9_950));
+        }
+        finally {
+            Locale.setDefault(defaultLocale);
+        }
     }
 
     @Test
