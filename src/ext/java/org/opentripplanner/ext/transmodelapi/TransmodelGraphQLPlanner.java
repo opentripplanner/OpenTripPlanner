@@ -1,18 +1,16 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetchingEnvironment;
 import org.apache.commons.lang3.StringUtils;
-import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
+import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
@@ -26,7 +24,6 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -51,34 +48,30 @@ public class TransmodelGraphQLPlanner {
         this.mappingUtil = mappingUtil;
     }
 
-    public Map<String, Object> plan(DataFetchingEnvironment environment) {
+    public PlanResponse plan(DataFetchingEnvironment environment) {
         Router router = environment.getContext();
         RoutingRequest request = createRequest(environment);
 
-        TripPlan plan;
-        List<Message> messages = new ArrayList<>();
-        DebugOutput debugOutput = new DebugOutput();
+        PlanResponse response = new PlanResponse();
 
         try {
             RoutingWorker worker = new RoutingWorker(request);
-            plan = worker.route(router);
+            RoutingResponse res = worker.route(router);
+            response.plan = res.getTripPlan();
+            response.metadata = res.getMetadata();
         }
         catch (Exception e) {
-            plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
+            response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
             PlannerError error = new PlannerError(e);
             if (!PlannerError.isPlanningError(e.getClass()))
                 LOG.warn("Error while planning path: ", e);
-            messages.add(error.message);
+            response.messages.add(error.message);
         } finally {
             if (request.rctx != null) {
-                debugOutput = request.rctx.debugOutput;
+                response.debugOutput = request.rctx.debugOutput;
             }
         }
-        return ImmutableMap.<String, Object>builder()
-                       .put("plan", plan)
-                       .put("messages", messages)
-                       .put("debugOutput", debugOutput)
-                       .build();
+        return response;
     }
 
     private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
@@ -131,11 +124,12 @@ public class TransmodelGraphQLPlanner {
             lon = (Double) coordinates.get("longitude");
         }
 
-        String placeRef = (String) m.get("place"); // TODO OTP2 mappingUtil.preparePlaceRef((String) m.get("place"));
+        String placeRef = (String) m.get("place");
+        FeedScopedId stopId = placeRef == null ? null : mappingUtil.fromIdString(placeRef);
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
-        return new GenericLocation(name, mappingUtil.fromIdString(placeRef), lat, lon);
+        return new GenericLocation(name, stopId, lat, lon);
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
@@ -154,6 +148,7 @@ public class TransmodelGraphQLPlanner {
         } else {
             request.setDateTime(new Date());
         }
+        callWith.argument("searchWindow", request::setSearchWindowSeconds);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);

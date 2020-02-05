@@ -29,13 +29,13 @@ public interface DynamicSearchWindowCoefficients {
      * {@code 0.0} to {@code 3.0}. Using {@code 0.0} will give you a raptor-search-window ≈
      * {@code C}.
      */
-    default float t() { return 0.75f; }
+    default float t() { return 0.4f; }
 
     /**
      * {@code C} - The constant minimum number of minutes for a raptor search window. Use a value
      * between 30-180 minutes in a normal deployment.
      */
-    default int c() { return 60; }
+    default int c() { return 30; }
 
     /**
      * {@code N} - The search window is rounded of to the closest multiplication of N minutes.

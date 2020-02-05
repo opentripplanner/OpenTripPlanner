@@ -14,7 +14,10 @@ public class TripPlanMapper {
     /** This is a utility class with static method only. */
     private TripPlanMapper() { }
 
-    public static TripPlan mapTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
+    public static TripPlan mapTripPlan(
+            RoutingRequest request,
+            List<Itinerary> itineraries
+    ) {
         Place from;
         Place to;
 
@@ -28,10 +31,7 @@ public class TripPlanMapper {
             to = legs.get(legs.size() - 1).to;
         }
 
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-
-        // TODO OTP2 - This does not make sense
-        //tripPlan.itinerary = limitNumberOfItineraries(itineraries, request.numItineraries);
+        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime(), itineraries);
 
         tripPlan.itinerary = itineraries;
 
