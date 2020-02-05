@@ -116,6 +116,12 @@ public class TimetableSnapshot {
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
 
+    /**
+     * This maps contains all of the new TripPatterns added by realtime data indexed on stop. This
+     * has to be kept in order for them to be included in the stop times api call on a specific stop.
+     *
+     * TODO Find a generic way to keep all realtime indexes.
+     */
     private Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     
     /**

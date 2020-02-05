@@ -436,6 +436,10 @@ public class GraphIndex {
         return ret;
     }
 
+    /**
+     * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+     * added by realtime updates are added to the collection.
+     */
     public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
         List<TripPattern> tripPatterns = new ArrayList<>(patternsForStop.get(stop));
 
