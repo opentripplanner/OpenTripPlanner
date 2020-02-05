@@ -10,7 +10,7 @@ If you want to get started right away running your own OTP instance, the best pl
 ## Versions of this documentation
  - [OTP Master](http://docs.opentripplanner.org/en/latest) - Latest release
  - [OTP dev-1.x](http://docs.opentripplanner.org/en/dev-1.x) - OTP 1 development branch 
- - [OTP dev-2.x[(http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 development branch
+ - [OTP dev-2.x](http://docs.opentripplanner.org/en/dev-2.x) - OTP 2 development branch
 
 
 ## External Technical Documentation
