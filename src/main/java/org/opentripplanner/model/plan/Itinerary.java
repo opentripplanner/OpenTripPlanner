@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -91,4 +92,11 @@ public class Itinerary {
         if(leg != null)
             legs.add(leg);
     }
+
+    public boolean isWalkingAllTheWay() {
+        // We should have only one leg, but it is NOT the job of the itinerary to enforce that;
+        // Hence, we iterate over all legs.
+        return legs.stream().allMatch(it -> TraverseMode.WALK.toString().equals(it.mode));
+    }
+
 }

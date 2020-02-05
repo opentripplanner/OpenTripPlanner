@@ -5,6 +5,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.algorithm.itineraryfilters.ItineraryFilterChain;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -63,9 +64,11 @@ public class RoutingWorker {
 
     private final RoutingRequest request;
     private TripSearchMetadata responseMetadata = null;
+    private final List<ItineraryFilter> filters = new ArrayList<>();
 
     public RoutingWorker(RoutingRequest request) {
         this.request = request;
+        this.filters.addAll(ItineraryFilterChain.FILTERS);
     }
 
     public RoutingResponse route(Router router) {
@@ -79,8 +82,8 @@ public class RoutingWorker {
             itineraries.addAll(routeTransit(router));
 
             // Filter itineraries
-            if(request.modes.isTransit()) {
-                itineraries = ItinerariesHelper.filterAwayLongWalkingTransit(itineraries);
+            for (ItineraryFilter filter : filters) {
+                itineraries = filter.filter(request, itineraries);
             }
 
             LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
