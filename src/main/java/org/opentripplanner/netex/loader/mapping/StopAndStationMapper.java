@@ -7,6 +7,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
+import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.StopPlace;
@@ -76,7 +77,7 @@ class StopAndStationMapper {
         // never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station);
+                addNewStopToParentIfNotPresent(quay, station, stopPlace.getWeighting());
             }
         }
     }
@@ -105,7 +106,11 @@ class StopAndStationMapper {
                 .collect(toList());
     }
 
-    private void addNewStopToParentIfNotPresent(Quay quay, Station station) {
+    private void addNewStopToParentIfNotPresent(
+        Quay quay,
+        Station station,
+        InterchangeWeightingEnumeration interchangeWeight
+    ) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
         //           - for version resolution.
@@ -117,7 +122,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, interchangeWeight);
         if (stop == null) return;
 
         station.addChildStop(stop);
