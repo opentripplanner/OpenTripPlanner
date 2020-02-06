@@ -16,6 +16,8 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Maps a Timetable and a date to a TripPatternForDate. TripSchedules are then filtered according
@@ -28,11 +30,13 @@ public class TripPatternForDateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDateMapper.class);
 
-  private final Map<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new HashMap<>();
+  private final ConcurrentMap<Timetable, List<TripTimes>> sortedTripTimesForTimetable =
+      new ConcurrentHashMap<>();
 
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
 
-  private final Map<TripTimes, TripSchedule> tripScheduleForTripTimes = new HashMap<>();
+  private final ConcurrentMap<TripTimes, TripSchedule> tripScheduleForTripTimes =
+      new ConcurrentHashMap<>();
 
   private final Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
 
@@ -64,7 +68,6 @@ public class TripPatternForDateMapper {
     );
     for (TripTimes tripTimes : sortedTripTimes) {
       if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
-
         continue;
       }
       if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {
