@@ -50,8 +50,6 @@ public class TripPatternCache {
             // Finish scheduled time table
             tripPattern.scheduledTimetable.finish();
             
-            // TODO: Add pattern to graph index?
-            
             // Add pattern to cache
             cache.put(stopPattern, tripPattern);
         }
