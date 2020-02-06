@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
@@ -32,8 +33,6 @@ public class TriangleInequalityTest {
 
     @BeforeClass
     public static void onlyOnce() throws Exception {
-
-        extra = new HashMap<Class<?>, Object>();
         graph = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
@@ -44,7 +43,7 @@ public class TriangleInequalityTest {
 
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(graph, extra);
+        loader.buildGraph(graph, new GraphBuilderModuleSummary(loader));
 
         // Need to set up the index because buildGraph doesn't do it.
         graph.rebuildVertexAndEdgeIndices();

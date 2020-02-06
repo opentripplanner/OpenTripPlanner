@@ -7,6 +7,7 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import junit.framework.TestCase;
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.error.GraphNotFoundException;
@@ -239,7 +240,7 @@ public class GraphServiceTest extends TestCase {
         ObjectNode routerConfig = mapper.createObjectNode();
         routerConfig.put("timeout", 8);
         EmbedConfig embedConfig = new EmbedConfig(buildConfig, routerConfig);
-        embedConfig.buildGraph(emptyGraph, null);
+        embedConfig.buildGraph(emptyGraph, new GraphBuilderModuleSummary(embedConfig));
 
         GraphService graphService = new GraphService();
         graphService.registerGraph("A", new MemoryGraphSource("A", emptyGraph));

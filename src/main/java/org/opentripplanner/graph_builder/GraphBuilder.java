@@ -6,6 +6,7 @@ import org.opentripplanner.common.walk.WalkComfortCalculator;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -134,10 +135,14 @@ public class GraphBuilder implements Runnable {
         for (GraphBuilderModule builder : _graphBuilderModules) {
             builder.checkInputs();
         }
-        
-        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-        for (GraphBuilderModule load : _graphBuilderModules)
-            load.buildGraph(graph, extra);
+
+        for (GraphBuilderModule module : _graphBuilderModules) {
+            GraphBuilderModuleSummary moduleSummary = new GraphBuilderModuleSummary(module);
+            LOG.info(moduleSummary.start());
+            module.buildGraph(graph, moduleSummary);
+            LOG.info(moduleSummary.finish());
+            graph.addGraphBuilderSummary(moduleSummary);
+        }
 
         graph.summarizeBuilderAnnotations();
         if (serializeGraph) {

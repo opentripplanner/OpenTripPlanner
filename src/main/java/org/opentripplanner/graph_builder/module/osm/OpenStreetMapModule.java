@@ -17,6 +17,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.walk.WalkComfortCalculator;
 import org.opentripplanner.graph_builder.annotation.*;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -178,7 +179,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         walkLTSGenerator = new WalkComfortCalculator(walkConfig);
         OSMDatabase osmdb = new OSMDatabase();
         Handler handler = new Handler(graph, osmdb);
@@ -191,7 +192,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             graph.addBuilderAnnotation(annotation);
         }
         LOG.info("Building street graph from OSM");
-        handler.buildGraph(extra);
+        handler.buildGraph();
         graph.hasStreets = true;
         //Calculates envelope for OSM
         graph.calculateEnvelope();
@@ -279,7 +280,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             this.osmdb = osmdb;
         }
 
-        public void buildGraph(HashMap<Class<?>, Object> extra) {
+        public void buildGraph() {
 
             if (staticBikeRental) {
                 processBikeRentalNodes();
@@ -318,8 +319,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 customNamer.postprocess(graph);
             }
 
-            // generate elevation profiles
-            extra.put(ElevationPoint.class, elevationData);
+            // save elevation data to graph for use in a later graph builder
+            graph.setKnownElevations(elevationData);
 
             applyBikeSafetyFactor(graph);
 

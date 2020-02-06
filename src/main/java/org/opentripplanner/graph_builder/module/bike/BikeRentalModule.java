@@ -1,8 +1,8 @@
 package org.opentripplanner.graph_builder.module.bike;
 
 import java.util.Collection;
-import java.util.HashMap;
 
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -30,7 +30,7 @@ public class BikeRentalModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
 
         LOG.info("Building bike rental stations from static source...");
         BikeRentalStationService service = graph.getService(BikeRentalStationService.class, true);

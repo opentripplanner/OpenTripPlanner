@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import org.junit.Test;
 import org.opentripplanner.graph_builder.module.FakeGraph;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -77,7 +78,7 @@ public class PlatformLinkerTest {
 
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<>());
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
 
         Vertex stairsEndpoint = gg.getVertex(stairsEndpointLabel);
 

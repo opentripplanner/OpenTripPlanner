@@ -12,6 +12,7 @@ import com.google.common.collect.Iterables;
 import com.google.common.collect.Lists;
 import junit.framework.TestCase;
 
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
@@ -92,7 +93,7 @@ public class TestPatternHopFactory extends TestCase {
         //Linkers aren't run otherwise
         graph.hasStreets = true;
         graph.hasTransit = true;
-        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(graph, new GraphBuilderModuleSummary(ttsnm));
     }
 
     public void testAnnotation() {

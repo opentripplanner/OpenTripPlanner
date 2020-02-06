@@ -20,8 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 
 public class GtfsGraphBuilderModuleTest {
 
-    private static final HashMap<Class<?>, Object> _extra = new HashMap<>();
-
     private GtfsModule builder;
 
     @Test
@@ -37,7 +35,7 @@ public class GtfsGraphBuilderModuleTest {
         builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
-        builder.buildGraph(graph, _extra);
+        builder.buildGraph(graph, new GraphBuilderModuleSummary(builder));
         graph.index(true);
 
         // Feed id is used instead of the agency id for OBA entities.
@@ -66,7 +64,7 @@ public class GtfsGraphBuilderModuleTest {
         builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
-        builder.buildGraph(graph, _extra);
+        builder.buildGraph(graph, new GraphBuilderModuleSummary(builder));
         graph.index(true);
 
         // Feed id is used instead of the agency id for OBA entities.

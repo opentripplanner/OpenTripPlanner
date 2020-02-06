@@ -83,7 +83,7 @@ public class GtfsModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         // we're about to add another agency to the graph, so clear the cached timezone
         // in case it should change
         // OTP doesn't currently support multiple time zones in a single graph;

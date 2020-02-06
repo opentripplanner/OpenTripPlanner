@@ -14,6 +14,7 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -59,7 +60,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
 
         if (outPath == null) {
             LOG.error("Saving folder is empty!");

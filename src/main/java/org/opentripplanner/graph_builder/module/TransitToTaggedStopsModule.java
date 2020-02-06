@@ -17,7 +17,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -49,7 +48,7 @@ public class TransitToTaggedStopsModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         LOG.info("Linking transit stops to tagged bus stops...");
 
         // Make sure the graph index has been initialized. Don't recalculate the street index because it should

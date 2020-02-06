@@ -8,6 +8,7 @@ import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
 import org.junit.rules.ExpectedException;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -455,7 +456,7 @@ public class TestHalfEdges {
     public void testNetworkLinker() {
         int numVerticesBefore = graph.getVertices().size();
         StreetLinkerModule ttsnm = new StreetLinkerModule();
-        ttsnm.buildGraph(graph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(graph, new GraphBuilderModuleSummary(ttsnm));
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();

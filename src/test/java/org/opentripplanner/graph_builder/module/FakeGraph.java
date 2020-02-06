@@ -53,7 +53,7 @@ public class FakeGraph {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
         return gg;
     }
 
@@ -119,7 +119,7 @@ public class FakeGraph {
 
         // phew. load it into the graph.
         GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
-        gtfs.buildGraph(gg, new HashMap<>());
+        gtfs.buildGraph(gg, new GraphBuilderModuleSummary(gtfs));
     }
 
     /** Add many transit lines to a lot of stops */
@@ -187,7 +187,7 @@ public class FakeGraph {
 
         // phew. load it into the graph.
         GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
-        gtfs.buildGraph(g, new HashMap<>());
+        gtfs.buildGraph(g, new GraphBuilderModuleSummary(gtfs));
     }
 
     public static void addPerpendicularRoutes(Graph graph) throws Exception {
@@ -278,7 +278,7 @@ public class FakeGraph {
 
         // phew. load it into the graph.
         GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
-        gtfs.buildGraph(graph, new HashMap<>());
+        gtfs.buildGraph(graph, new GraphBuilderModuleSummary(gtfs));
     }
 
     private static Service createDummyService() {
@@ -387,7 +387,7 @@ public class FakeGraph {
 
         // phew. load it into the graph.
         GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
-        gtfs.buildGraph(gg, new HashMap<>());
+        gtfs.buildGraph(gg, new GraphBuilderModuleSummary(gtfs));
     }
 
     /** Add a regular grid of stops to the graph */
@@ -550,7 +550,7 @@ public class FakeGraph {
 
         // phew. load it into the graph.
         GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(tempFile)));
-        gtfs.buildGraph(gg, new HashMap<>());
+        gtfs.buildGraph(gg, new GraphBuilderModuleSummary(gtfs));
     }
 
     /**

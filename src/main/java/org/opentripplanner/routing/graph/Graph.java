@@ -11,6 +11,7 @@ import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -114,6 +115,8 @@ public class Graph implements Serializable {
 
     private transient List<GraphBuilderAnnotation> graphBuilderAnnotations = new LinkedList<GraphBuilderAnnotation>(); // initialize for tests
 
+    private transient List<GraphBuilderModuleSummary> graphBuildModuleSummaries = new ArrayList<>();
+
     private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
 
     private Collection<String> feedIds = new HashSet<>();
@@ -196,6 +199,9 @@ public class Graph implements Serializable {
 
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
+
+    /** used during graph build to store known elevations */
+    private transient HashMap<Vertex, Double> knownElevations;
 
     public Graph(Graph basedOn) {
         this();
@@ -623,12 +629,13 @@ public class Graph implements Serializable {
     }
 
     /**
-     * Add a graph builder annotation to this graph's list of graph builder annotations. The return value of this method is the annotation's message,
-     * which allows for a single-line idiom that creates, registers, and logs a new graph builder annotation:
-     * log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
+     * Add a graph builder annotation to this graph's list of graph builder annotations. The return value of this method
+     * is the annotation's message, which allows for a single-line idiom that creates, registers, and logs a new graph
+     * builder annotation: log.warning(graph.addBuilderAnnotation(new SomeKindOfAnnotation(param1, param2)));
      * 
-     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message is still returned. This
-     * allows annotation registration to be turned off, saving memory and disk space when the user is not interested in annotations.
+     * If the graphBuilderAnnotations field of this graph is null, the annotation is not actually saved, but the message
+     * is still returned. This allows annotation registration to be turned off, saving memory and disk space when the
+     * user is not interested in annotations.
      */
     public String addBuilderAnnotation(GraphBuilderAnnotation gba) {
         String ret = gba.getMessage();
@@ -641,6 +648,14 @@ public class Graph implements Serializable {
         return this.graphBuilderAnnotations;
     }
 
+    public void addGraphBuilderSummary(GraphBuilderModuleSummary gbms) {
+        this.graphBuildModuleSummaries.add(gbms);
+    }
+
+    public List<GraphBuilderModuleSummary> getBuilderSummaries() {
+        return this.graphBuildModuleSummaries;
+    }
+
     /**
      * Adds mode of transport to transit modes in graph
      * @param mode
@@ -651,6 +666,14 @@ public class Graph implements Serializable {
 
     public HashSet<TraverseMode> getTransitModes() {
         return transitModes;
+    }
+
+    public HashMap<Vertex, Double> getKnownElevations() {
+        return knownElevations;
+    }
+
+    public void setKnownElevations(HashMap<Vertex, Double> knownElevations) {
+        this.knownElevations = knownElevations;
     }
 
     /* (de) serialization */
