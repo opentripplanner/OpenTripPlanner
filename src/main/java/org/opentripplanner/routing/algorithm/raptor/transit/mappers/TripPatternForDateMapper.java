@@ -13,7 +13,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -40,6 +39,10 @@ public class TripPatternForDateMapper {
 
   private final Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
 
+  /**
+   * @param serviceCodesRunningForDate - READ ONLY
+   * @param newTripPatternForOld - READ ONLY
+   */
   TripPatternForDateMapper(
       Map<ServiceDate, TIntSet> serviceCodesRunningForDate,
       Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld
@@ -48,6 +51,13 @@ public class TripPatternForDateMapper {
     this.newTripPatternForOld = newTripPatternForOld;
   }
 
+  /**
+   * This method is THREAD SAFE.
+   *
+   * @param timetable The timetable to be mapped to TripPatternForDate - READ ONLY
+   * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
+   * @return TripPatternForDate for this timetable and serviceDate
+   */
   public TripPatternForDate map(Timetable timetable, ServiceDate serviceDate) {
 
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
@@ -98,5 +108,4 @@ public class TripPatternForDateMapper {
     );
     return tripPatternForDate;
   }
-
 }
