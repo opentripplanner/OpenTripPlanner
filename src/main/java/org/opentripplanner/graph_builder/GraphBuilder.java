@@ -10,7 +10,6 @@ import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
-import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
@@ -258,9 +257,6 @@ public class GraphBuilder implements Runnable {
             gtfsModule.setFareServiceFactory(builderParams.fareServiceFactory);
             graphBuilder.addModule(gtfsModule);
             if ( hasOSM ) {
-                if (builderParams.matchBusRoutesToStreets) {
-                    graphBuilder.addModule(new BusRouteStreetMatcher());
-                }
                 graphBuilder.addModule(new TransitToTaggedStopsModule());
             }
         }
