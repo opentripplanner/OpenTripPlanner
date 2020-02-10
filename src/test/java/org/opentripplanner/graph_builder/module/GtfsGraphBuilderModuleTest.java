@@ -20,8 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 
 public class GtfsGraphBuilderModuleTest {
 
-    private GtfsModule builder;
-
     @Test
     public void testNoBikesByDefault() throws IOException {
         // We configure two trip: one with unknown bikes_allowed and the second with bikes
@@ -32,7 +30,7 @@ public class GtfsGraphBuilderModuleTest {
 
         List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
         bundleList.get(0).setDefaultBikesAllowed(false);
-        builder = new GtfsModule(bundleList);
+        GtfsModule builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
         builder.buildGraph(graph, new GraphBuilderModuleSummary(builder));
@@ -61,7 +59,7 @@ public class GtfsGraphBuilderModuleTest {
 
         List<GtfsBundle> bundleList = getGtfsAsBundleList(gtfs);
         bundleList.get(0).setDefaultBikesAllowed(true);
-        builder = new GtfsModule(bundleList);
+        GtfsModule builder = new GtfsModule(bundleList);
 
         Graph graph = new Graph();
         builder.buildGraph(graph, new GraphBuilderModuleSummary(builder));
