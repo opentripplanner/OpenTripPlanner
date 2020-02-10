@@ -261,8 +261,18 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "\t\t\t\tborder: 1px solid black;\n"
                 + "\t\t\t\tpadding: 5px;\n"
                 + "\t\t\t}\n"
+                + "\n"
                 + "\t\t\ttable {\n"
                 + "\t\t\t\tmargin: 5px;\n"
+                + "\t\t\t}\n"
+                + "\n"
+                + "\t\t\t.subtasks table {\n"
+                + "\t\t\t\tmargin: 0;\n"
+                + "\t\t\t}\n"
+                + "\n"
+                + "\t\t\t.subtasks td {\n"
+                + "\t\t\t\tborder: none;\n"
+                + "\t\t\t\tmin-width: 145px;\n"
                 + "\t\t\t}\n"
                 + "\n"
                 + "\t\t</style>\n"
@@ -330,7 +340,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 StringBuilder summaryLine = new StringBuilder();
                 summaryLine.append(
                     String.format(
-                        "<tr><td>%s</td><td>%.1fs (%.0f%%)</td><td>",
+                        "<tr><td>%s</td><td>%.1fs (%.0f%%)</td><td class=\"subtasks\">",
                         summary.getName(),
                         summary.getDuration() / 1000.0,
                         summary.getDuration() * 1.0 / totalDuration * 100
