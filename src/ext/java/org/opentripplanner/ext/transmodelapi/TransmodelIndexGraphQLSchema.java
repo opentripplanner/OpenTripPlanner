@@ -3831,7 +3831,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("mode")
                         .description("The mode of transport or access (e.g., foot) used when traversing this leg.")
                         .type(modeEnum)
-                        .dataFetcher(environment -> Enum.valueOf(TraverseMode.class, ((Leg) environment.getSource()).mode))
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).mode)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")

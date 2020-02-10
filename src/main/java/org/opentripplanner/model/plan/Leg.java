@@ -72,7 +72,7 @@ public class Leg {
    /**
     * The mode (e.g., <code>Walk</code>) used when traversing this leg.
     */
-   public String mode = TraverseMode.WALK.toString();
+   public TraverseMode mode = TraverseMode.WALK;
 
    /**
     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of

@@ -13,9 +13,7 @@ import java.util.List;
  */
 public class Itinerary {
 
-    /**
-     *  Total duration of the itinerary in seconds.
-     */
+    /** Total duration of the itinerary in seconds */
     public Long durationSeconds = 0L;
 
     /**
@@ -100,7 +98,7 @@ public class Itinerary {
     public boolean isWalkingAllTheWay() {
         // We should have only one leg, but it is NOT the job of the itinerary to enforce that;
         // Hence, we iterate over all legs.
-        return legs.stream().allMatch(it -> TraverseMode.WALK.toString().equals(it.mode));
+        return legs.stream().allMatch(it -> it.mode == TraverseMode.WALK);
     }
 
     public Leg firstLeg() {

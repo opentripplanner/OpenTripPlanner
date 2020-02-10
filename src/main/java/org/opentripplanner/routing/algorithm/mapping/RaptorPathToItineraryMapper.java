@@ -186,7 +186,7 @@ public class RaptorPathToItineraryMapper {
         leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
-        leg.mode = tripPattern.mode.toString();
+        leg.mode = tripPattern.mode;
         leg.tripId = trip.getId();
         leg.from = mapStopToPlace(boardStop);
         leg.to = mapStopToPlace(alightStop);
@@ -264,7 +264,7 @@ public class RaptorPathToItineraryMapper {
             leg.to = to;
             leg.startTime = createCalendar(pathLeg.fromTime());
             leg.endTime = createCalendar(pathLeg.toTime());
-            leg.mode = TraverseMode.WALK.name();
+            leg.mode = TraverseMode.WALK;
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();

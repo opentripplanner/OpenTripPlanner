@@ -34,7 +34,7 @@ public class LegMapper {
         api.headway = domain.headway;
         api.distance = domain.distanceMeters;
         api.pathway = domain.pathway;
-        api.mode = domain.mode;
+        api.mode = domain.mode.toString();
         api.route = domain.route;
         api.agencyName = domain.agencyName;
         api.agencyUrl = domain.agencyUrl;

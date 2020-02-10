@@ -336,13 +336,13 @@ public abstract class GraphPathToItineraryMapper {
     private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
         WalkStep previousStep = null;
 
-        String lastMode = null;
+        TraverseMode lastMode = null;
 
         BikeRentalStationVertex onVertex = null, offVertex = null;
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
-            String legMode = legs.get(i).mode;
+            TraverseMode legMode = legs.get(i).mode;
             if(legMode != lastMode && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
@@ -476,7 +476,7 @@ public abstract class GraphPathToItineraryMapper {
             Edge edge = state.getBackEdge();
 
             if (mode != null) {
-                leg.mode = mode.toString();
+                leg.mode = mode;
             }
 
             if (alerts != null) {

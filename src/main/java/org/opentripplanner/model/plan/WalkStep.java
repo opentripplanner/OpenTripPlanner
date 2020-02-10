@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Collection;
@@ -107,7 +108,7 @@ public class WalkStep {
      *
      * TODO OTP2 - This is not used ?
      */
-    public String newMode;
+    public TraverseMode newMode;
 
     /**
      * The street edges that make up this walkStep.
