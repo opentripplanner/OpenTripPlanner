@@ -2,9 +2,7 @@ package org.opentripplanner.model.plan;
 
 
 import org.opentripplanner.routing.core.Fare;
-import org.opentripplanner.routing.core.TraverseMode;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
@@ -14,22 +12,22 @@ import java.util.List;
 public class Itinerary {
 
     /** Total duration of the itinerary in seconds */
-    public Long durationSeconds = 0L;
+    public final long durationSeconds;
 
     /**
      * How much time is spent on transit, in seconds.
      */
-    public long transitTimeSeconds = 0;
+    public final long transitTimeSeconds;
 
     /**
      * The number of transfers this trip has.
      */
-    public Integer nTransfers = 0;
+    public final int nTransfers;
 
     /**
      * How much time is spent waiting for transit to arrive, in seconds.
      */
-    public long waitingTimeSeconds = 0;
+    public final long waitingTimeSeconds;
 
     /**
      * How much time is spent walking/biking/driving, in seconds.
@@ -37,12 +35,12 @@ public class Itinerary {
     public long nonTransitTimeSeconds = 0;
 
     /**
-     * How far the user has to walk, in meters.
+     * How far the user has to walk, bike and/or drive, in meters.
      */
-    public Double nonTransitDistanceMeters = 0.0;
+    public final double nonTransitDistanceMeters;
 
     /**
-     * Indicates that the walk limit distance has been exceeded for this itinerary when true.
+     * Indicates that the walk/bike/drive limit distance has been exceeded for this itinerary.
      */
     public boolean nonTransitLimitExceeded = false;
 
@@ -61,10 +59,20 @@ public class Itinerary {
     public Double elevationGained = 0.0;
 
     /**
+     * If a generalized cost is used in the routing algorithm, this should be the total
+     * cost computed by the algorithm. This is relevant for anyone who want to debug an search
+     * and tuning the system. The unit should be equivalent to the cost of "one second of transit".
+     */
+    public int generalizedCost = 0;
+
+    /**
      * This itinerary has a greater slope than the user requested (but there are no possible
      * itineraries with a good slope).
      */
     public boolean tooSloped = false;
+
+     /** TRUE if mode is WALK from start ot end (all legs are walking). */
+    public final boolean walkOnly;
 
     /**
      * The cost of this trip
@@ -76,7 +84,24 @@ public class Itinerary {
      * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
      * 6, then walks to their destination, has four legs.
      */
-    public List<Leg> legs = new ArrayList<>();
+    public final List<Leg> legs;
+
+
+    public Itinerary(List<Leg> legs) {
+        if(legs.isEmpty()) { throw new IllegalArgumentException("At least one leg is required."); }
+
+        this.legs = List.copyOf(legs);
+
+        // Set aggregated data
+        ItinerariesCalculateLegTotals totals = new ItinerariesCalculateLegTotals(legs);
+        this.durationSeconds = totals.totalDurationSeconds;
+        this.nTransfers = totals.transfers();
+        this.transitTimeSeconds = totals.transitTimeSeconds;
+        this.nonTransitTimeSeconds = totals.nonTransitTimeSeconds;
+        this.nonTransitDistanceMeters = totals.nonTransitDistanceMeters;
+        this.waitingTimeSeconds = totals.waitingTimeSeconds;
+        this.walkOnly = totals.walkOnly;
+    }
 
     /**
      * Time that the trip departs.
@@ -96,9 +121,12 @@ public class Itinerary {
      * Return {@code true} if all legs are WALKING.
      */
     public boolean isWalkingAllTheWay() {
-        // We should have only one leg, but it is NOT the job of the itinerary to enforce that;
-        // Hence, we iterate over all legs.
-        return legs.stream().allMatch(it -> it.mode == TraverseMode.WALK);
+        return walkOnly;
+    }
+
+    /** TRUE if alt least one leg is a transit leg. */
+    public boolean hasTransit() {
+        return transitTimeSeconds > 0;
     }
 
     public Leg firstLeg() {
@@ -109,19 +137,12 @@ public class Itinerary {
         return legs.get(legs.size()-1);
     }
 
-    /**
-     * adds leg to array list
-     */
-    public void addLeg(Leg leg) {
-        if(leg != null)
-            legs.add(leg);
-    }
-
     @Override
     public String toString() {
         return "Itinerary{"
                 + "nTransfers=" + nTransfers
                 + ", durationSeconds=" + durationSeconds
+                + ", generalizedCost=" + generalizedCost
                 + ", nonTransitTimeSeconds=" + nonTransitTimeSeconds
                 + ", transitTimeSeconds=" + transitTimeSeconds
                 + ", waitingTimeSeconds=" + waitingTimeSeconds

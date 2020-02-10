@@ -209,7 +209,7 @@ public class TestIntermediatePlaces {
 
         // Check the total duration of the legs,
         int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
-        assertEquals(sumOfDuration, itinerary.durationSeconds.doubleValue(), accuracy);
+        assertEquals(sumOfDuration, itinerary.durationSeconds, accuracy);
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

@@ -32,8 +32,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.util.PolylineEncoder;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -62,7 +60,6 @@ public class RaptorPathToItineraryMapper {
 
     private final Map<Stop, Transfer> egressTransfers;
 
-    private static Logger LOG = LoggerFactory.getLogger(RaptorPathToItineraryMapper.class);
 
     /**
      * Constructs an itinerary mapper for a request and a set of results
@@ -88,10 +85,10 @@ public class RaptorPathToItineraryMapper {
     }
 
     public Itinerary createItinerary(Path<TripSchedule> path) {
-        Itinerary itinerary = new Itinerary();
+        List<Leg> legs = new ArrayList<>();
 
         // Map access leg
-        mapAccessLeg(itinerary, path.accessLeg(), accessTransfers);
+        mapAccessLeg(legs, path.accessLeg(), accessTransfers);
 
         // TODO: Add back this code when PathLeg interface contains object references
 
@@ -104,14 +101,12 @@ public class RaptorPathToItineraryMapper {
             if (pathLeg.isTransitLeg()) {
                 Leg transitLeg = mapTransitLeg(request, pathLeg.asTransitLeg(), firstLeg);
                 firstLeg = false;
-                itinerary.addLeg(transitLeg);
-                // Increment counters
-                itinerary.transitTimeSeconds += pathLeg.duration();
+                legs.add(transitLeg);
             }
 
             // Map transfer leg
             if (pathLeg.isTransferLeg()) {
-                mapTransferLeg(itinerary, pathLeg.asTransferLeg());
+                mapTransferLeg(legs, pathLeg.asTransferLeg());
             }
 
             pathLeg = pathLeg.nextLeg();
@@ -119,19 +114,19 @@ public class RaptorPathToItineraryMapper {
 
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
-        mapEgressLeg(itinerary, egressPathLeg, egressTransfers);
+        mapEgressLeg(legs, egressPathLeg, egressTransfers);
+
+        Itinerary itinerary = new Itinerary(legs);
 
         // Map general itinerary fields
-        itinerary.nTransfers = path.numberOfTransfers();
-        itinerary.durationSeconds = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
-        itinerary.waitingTimeSeconds = itinerary.durationSeconds - itinerary.nonTransitTimeSeconds - itinerary.transitTimeSeconds;
+        itinerary.generalizedCost = path.cost();
         itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
 
         return itinerary;
     }
 
     private void mapAccessLeg(
-            Itinerary itinerary,
+            List<Leg> legs,
             AccessPathLeg<TripSchedule> accessPathLeg,
             Map<Stop, Transfer> accessPaths
     ) {
@@ -141,7 +136,7 @@ public class RaptorPathToItineraryMapper {
         // TODO Need to account for multiple fromVertices
         Place from = mapOriginTargetToPlace(request.rctx.fromVertices.iterator().next(), request.from);
         Place to = mapStopToPlace(accessToStop);
-        mapNonTransitLeg(itinerary, accessPathLeg, accessPath, from, to, true);
+        mapNonTransitLeg(legs, accessPathLeg, accessPath, from, to, true);
     }
 
     private Leg mapTransitLeg(
@@ -232,18 +227,18 @@ public class RaptorPathToItineraryMapper {
         return leg;
     }
 
-    private void mapTransferLeg(Itinerary itinerary, TransferPathLeg<TripSchedule> pathLeg) {
+    private void mapTransferLeg(List<Leg> legs, TransferPathLeg<TripSchedule> pathLeg) {
         Stop transferFromStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = transitLayer.getTransferByStopIndex().get(pathLeg.fromStop()).stream().filter(t -> t.getToStop() == pathLeg.toStop()).findFirst().get();
 
         Place from = mapStopToPlace(transferFromStop);
         Place to = mapStopToPlace(transferToStop);
-        mapNonTransitLeg(itinerary, pathLeg, transfer, from, to, false);
+        mapNonTransitLeg(legs, pathLeg, transfer, from, to, false);
     }
 
     private void mapEgressLeg(
-            Itinerary itinerary,
+            List<Leg> legs,
             EgressPathLeg<TripSchedule> egressPathLeg,
             Map<Stop, Transfer> egressPaths
     ) {
@@ -253,10 +248,10 @@ public class RaptorPathToItineraryMapper {
         Place from = mapStopToPlace(egressStop);
         // TODO Need to account for multiple toVertices
         Place to = mapOriginTargetToPlace(request.rctx.toVertices.iterator().next(), request.to);
-        mapNonTransitLeg(itinerary, egressPathLeg, egressPath, from, to, true);
+        mapNonTransitLeg(legs, egressPathLeg, egressPath, from, to, true);
     }
 
-    private void mapNonTransitLeg(Itinerary itinerary, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
+    private void mapNonTransitLeg(List<Leg> legs, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
         List<Edge> edges = transfer.getEdges();
         if (edges.isEmpty()) {
             Leg leg = new Leg();
@@ -270,9 +265,7 @@ public class RaptorPathToItineraryMapper {
             leg.walkSteps = Collections.emptyList();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
-                itinerary.nonTransitTimeSeconds += pathLeg.fromTime() - pathLeg.fromTime();
-                itinerary.nonTransitDistanceMeters += transfer.getDistanceMeters();
-                itinerary.addLeg(leg);
+                legs.add(leg);
             }
         } else {
             StateEditor se = new StateEditor(request, edges.get(0).getFromVertex());
@@ -293,11 +286,7 @@ public class RaptorPathToItineraryMapper {
                         .generateItinerary(graphPath, false, true, request.locale);
 
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
-                    subItinerary.legs.forEach(leg -> {
-                        itinerary.nonTransitDistanceMeters += subItinerary.nonTransitDistanceMeters;
-                        itinerary.nonTransitTimeSeconds += subItinerary.nonTransitTimeSeconds;
-                        itinerary.addLeg(leg);
-                    });
+                    legs.addAll(subItinerary.legs);
                 }
             } catch (TrivialPathException e) {
                 // Ignore, no legs need be copied

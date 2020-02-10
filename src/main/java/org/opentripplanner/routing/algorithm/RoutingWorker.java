@@ -157,7 +157,7 @@ public class RoutingWorker {
                 request.walkSpeed
         );
 
-        LOG.info("Access/egress routing took {} ms",
+        LOG.debug("Access/egress routing took {} ms",
                 System.currentTimeMillis() - startTimeAccessEgress
         );
 
@@ -185,7 +185,9 @@ public class RoutingWorker {
         // TODO Remove parameters from API
         builder
                 .profile(RaptorProfile.MULTI_CRITERIA)
-                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
+                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+
+        builder
                 .searchParams()
                 .searchWindow(request.searchWindow)
                 .addAccessStops(accessTimes)

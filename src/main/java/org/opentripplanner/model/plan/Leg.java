@@ -202,18 +202,23 @@ public class Leg {
     * @return Boolean true if the leg is a transit leg
     */
    public Boolean isTransitLeg() {
-       if (mode == null) return null;
-       else if (mode.equals(TraverseMode.WALK.toString())) return false;
-       else if (mode.equals(TraverseMode.CAR.toString())) return false;
-       else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-       else return true;
+       return mode.isTransit();
    }
 
-   /**
+    public boolean isWalkingLeg() {
+        return mode.isWalking();
+    }
+
+    public boolean isOnStreetNonTransit() {
+        return mode.isOnStreetNonTransit();
+    }
+
+    /**
     * The leg's duration in seconds
     */
-   public double getDuration() {
-       return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
+   public long getDuration() {
+       // Round to closest second; Hence subtract 500 ms before dividing by 1000
+       return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
    }
 
    public void addAlert(Alert alert) {
