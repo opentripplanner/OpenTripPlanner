@@ -18,6 +18,7 @@ import org.opentripplanner.common.model.T2;
 import org.opentripplanner.common.walk.WalkComfortCalculator;
 import org.opentripplanner.graph_builder.annotation.*;
 import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
+import org.opentripplanner.graph_builder.module.GraphBuilderTaskSummary;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -184,18 +185,33 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         OSMDatabase osmdb = new OSMDatabase();
         Handler handler = new Handler(graph, osmdb);
         for (OpenStreetMapProvider provider : _providers) {
-            LOG.info("Gathering OSM from provider: " + provider);
+            GraphBuilderTaskSummary providerGatherTask = graphBuilderModuleSummary.addSubTask(
+                "Gathering OSM from provider: " + provider
+            );
+            LOG.info(providerGatherTask.start());
             provider.readOSM(osmdb);
+            LOG.info(providerGatherTask.finish());
         }
+
+        GraphBuilderTaskSummary providerGatherTask = graphBuilderModuleSummary.addSubTask(
+            "OSM db post-load tasks"
+        );
+        LOG.info(providerGatherTask.start());
         osmdb.postLoad();
         for (GraphBuilderAnnotation annotation : osmdb.getAnnotations()) {
             graph.addBuilderAnnotation(annotation);
         }
-        LOG.info("Building street graph from OSM");
+        LOG.info(providerGatherTask.finish());
+
+        GraphBuilderTaskSummary streetGraphBuildTask = graphBuilderModuleSummary.addSubTask(
+            "Building street graph from OSM"
+        );
+        LOG.info(streetGraphBuildTask.start());
         handler.buildGraph();
         graph.hasStreets = true;
         //Calculates envelope for OSM
         graph.calculateEnvelope();
+        LOG.info(streetGraphBuildTask.finish());
     }
 
     /*

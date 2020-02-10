@@ -85,8 +85,10 @@ public class ElevationModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
-        GraphBuilderTaskSummary demTask = graphBuilderModuleSummary.addSubTask("set elevation profiles with DEM");
-        log.info(demTask.start());
+        GraphBuilderTaskSummary demPrepareTask = graphBuilderModuleSummary.addSubTask(
+            "fetch and prepare elevation data"
+        );
+        log.info(demPrepareTask.start());
 
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
@@ -96,6 +98,12 @@ public class ElevationModule implements GraphBuilderModule {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
+        log.info(demPrepareTask.finish());
+
+        GraphBuilderTaskSummary setElevationsFromDEMTask = graphBuilderModuleSummary.addSubTask(
+            "set elevation profiles with DEM"
+        );
+        log.info(setElevationsFromDEMTask.start());
 
         List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
         int nProcessed = 0;
@@ -127,7 +135,7 @@ public class ElevationModule implements GraphBuilderModule {
             }
         }
 
-        log.info(demTask.finish());
+        log.info(setElevationsFromDEMTask.finish());
 
         GraphBuilderTaskSummary missingElevationsTask = graphBuilderModuleSummary.addSubTask(
             "calculate missing elevations"
