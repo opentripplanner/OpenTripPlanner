@@ -194,7 +194,7 @@ public class RaptorPathToItineraryMapper {
         leg.to = mapStopToPlace(alightStop);
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
-        leg.distance = getDistanceFromCoordinates(transitLegCoordinates);
+        leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
 
         if (request.showIntermediateStops) {
             leg.intermediateStops = extractIntermediateStops(pathLeg);
@@ -268,10 +268,10 @@ public class RaptorPathToItineraryMapper {
             leg.endTime = createCalendar(pathLeg.toTime());
             leg.mode = TraverseMode.WALK.name();
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
-            leg.distance = (double) transfer.getDistanceMeters();
+            leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();
 
-            if (!onlyIfNonZeroDistance || leg.distance > 0) {
+            if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
                 itinerary.walkTime += pathLeg.fromTime() - pathLeg.fromTime();
                 itinerary.walkDistance += transfer.getDistanceMeters();
                 itinerary.addLeg(leg);

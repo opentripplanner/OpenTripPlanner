@@ -277,10 +277,10 @@ public abstract class GraphPathToItineraryMapper {
         leg.endTime = makeCalendar(states[states.length - 1]);
 
         // Calculate leg distance and fill array of edges
-        leg.distance = 0.0;
+        leg.distanceMeters = 0.0;
         for (int i = 0; i < edges.length; i++) {
             edges[i] = states[i + 1].getBackEdge();
-            leg.distance += edges[i].getDistanceMeters();
+            leg.distanceMeters += edges[i].getDistanceMeters();
         }
 
         TimeZone timeZone = leg.startTime.getTimeZone();

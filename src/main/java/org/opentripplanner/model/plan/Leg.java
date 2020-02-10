@@ -61,7 +61,7 @@ public class Leg {
    /**
     * The distance traveled while traversing the leg in meters.
     */
-   public Double distance = null;
+   public Double distanceMeters = null;
 
    /**
     * Is this leg a traversing pathways?

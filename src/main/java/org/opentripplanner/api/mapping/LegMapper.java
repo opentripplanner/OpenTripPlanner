@@ -32,7 +32,7 @@ public class LegMapper {
         api.realTime = domain.realTime;
         api.isNonExactFrequency = domain.isNonExactFrequency;
         api.headway = domain.headway;
-        api.distance = domain.distance;
+        api.distance = domain.distanceMeters;
         api.pathway = domain.pathway;
         api.mode = domain.mode;
         api.route = domain.route;

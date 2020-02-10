@@ -3898,7 +3898,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("distance")
                         .description("The distance traveled while traversing the leg in meters.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).distance)
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).distanceMeters)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("ride")
