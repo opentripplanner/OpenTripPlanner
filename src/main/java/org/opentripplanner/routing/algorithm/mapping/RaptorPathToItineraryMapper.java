@@ -123,8 +123,6 @@ public class RaptorPathToItineraryMapper {
 
         // Map general itinerary fields
         itinerary.nTransfers = path.numberOfTransfers();
-        itinerary.startTime = createCalendar(path.accessLeg().fromTime());
-        itinerary.endTime = createCalendar(egressPathLeg.toTime());
         itinerary.durationSeconds = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
         itinerary.waitingTimeSeconds = itinerary.durationSeconds - itinerary.nonTransitTimeSeconds - itinerary.transitTimeSeconds;
         itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;

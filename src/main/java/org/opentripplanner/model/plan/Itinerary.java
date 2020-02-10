@@ -19,29 +19,24 @@ public class Itinerary {
     public Long durationSeconds = 0L;
 
     /**
-     * Time that the trip departs.
-     */
-    public Calendar startTime = null;
-
-    /**
-     * Time that the trip arrives.
-     */
-    public Calendar endTime = null;
-
-    /**
-     * How much time is spent walking/biking/driving, in seconds.
-     */
-    public long nonTransitTimeSeconds = 0;
-
-    /**
      * How much time is spent on transit, in seconds.
      */
     public long transitTimeSeconds = 0;
 
     /**
+     * The number of transfers this trip has.
+     */
+    public Integer nTransfers = 0;
+
+    /**
      * How much time is spent waiting for transit to arrive, in seconds.
      */
     public long waitingTimeSeconds = 0;
+
+    /**
+     * How much time is spent walking/biking/driving, in seconds.
+     */
+    public long nonTransitTimeSeconds = 0;
 
     /**
      * How far the user has to walk, in meters.
@@ -68,11 +63,6 @@ public class Itinerary {
     public Double elevationGained = 0.0;
 
     /**
-     * The number of transfers this trip has.
-     */
-    public Integer nTransfers = 0;
-
-    /**
      * This itinerary has a greater slope than the user requested (but there are no possible
      * itineraries with a good slope).
      */
@@ -91,6 +81,20 @@ public class Itinerary {
     public List<Leg> legs = new ArrayList<>();
 
     /**
+     * Time that the trip departs.
+     */
+    public Calendar startTime() {
+        return firstLeg().startTime;
+    }
+
+    /**
+     * Time that the trip arrives.
+     */
+    public Calendar endTime() {
+        return lastLeg().endTime;
+    }
+
+    /**
      * Return {@code true} if all legs are WALKING.
      */
     public boolean isWalkingAllTheWay() {
@@ -99,11 +103,37 @@ public class Itinerary {
         return legs.stream().allMatch(it -> TraverseMode.WALK.toString().equals(it.mode));
     }
 
+    public Leg firstLeg() {
+        return legs.get(0);
+    }
+
+    public Leg lastLeg() {
+        return legs.get(legs.size()-1);
+    }
+
     /**
      * adds leg to array list
      */
     public void addLeg(Leg leg) {
         if(leg != null)
             legs.add(leg);
+    }
+
+    @Override
+    public String toString() {
+        return "Itinerary{"
+                + "nTransfers=" + nTransfers
+                + ", durationSeconds=" + durationSeconds
+                + ", nonTransitTimeSeconds=" + nonTransitTimeSeconds
+                + ", transitTimeSeconds=" + transitTimeSeconds
+                + ", waitingTimeSeconds=" + waitingTimeSeconds
+                + ", nonTransitDistanceMeters=" + nonTransitDistanceMeters
+                + ", nonTransitLimitExceeded=" + nonTransitLimitExceeded
+                + ", tooSloped=" + tooSloped
+                + ", elevationLost=" + elevationLost
+                + ", elevationGained=" + elevationGained
+                + ", legs=" + legs
+                + ", fare=" + fare
+                + '}';
     }
 }

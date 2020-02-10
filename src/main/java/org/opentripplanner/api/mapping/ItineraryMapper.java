@@ -23,9 +23,10 @@ public class ItineraryMapper {
     public ApiItinerary mapItinerary(Itinerary domain) {
         if(domain == null) { return null; }
         ApiItinerary api = new ApiItinerary();
+
         api.duration = domain.durationSeconds;
-        api.startTime = domain.startTime;
-        api.endTime = domain.endTime;
+        api.startTime = domain.startTime();
+        api.endTime = domain.endTime();
         api.walkTime = domain.nonTransitTimeSeconds;
         api.transitTime = domain.transitTimeSeconds;
         api.waitingTime = domain.waitingTimeSeconds;
@@ -37,6 +38,7 @@ public class ItineraryMapper {
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
         api.tooSloped = domain.tooSloped;
+
         return api;
     }
 

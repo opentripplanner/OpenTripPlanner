@@ -18,7 +18,7 @@ public class ItinerariesHelper {
     //           - DELETE AFTER 2020-05-05
     public static List<Itinerary> limitNumberOfItineraries(List<Itinerary> itineraries, int max) {
         return itineraries.stream()
-                .sorted(Comparator.comparing(i -> i.endTime))
+                .sorted(Comparator.comparing(Itinerary::endTime))
                 .limit(max)
                 .collect(Collectors.toList());
     }

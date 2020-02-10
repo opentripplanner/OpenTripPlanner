@@ -146,8 +146,6 @@ public abstract class GraphPathToItineraryMapper {
         fixupLegs(itinerary.legs, legsStates);
 
         itinerary.durationSeconds = lastState.getElapsedTimeSeconds();
-        itinerary.startTime = makeCalendar(states[0]);
-        itinerary.endTime = makeCalendar(lastState);
 
         calculateTimes(itinerary, states);
 
