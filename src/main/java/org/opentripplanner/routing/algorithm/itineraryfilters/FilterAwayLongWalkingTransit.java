@@ -24,7 +24,7 @@ public class FilterAwayLongWalkingTransit implements ItineraryFilter {
         long bestWalkingTime = itineraries
                 .stream()
                 .filter(Itinerary::isWalkingAllTheWay)
-                .mapToLong(it -> it.walkTime)
+                .mapToLong(it -> it.nonTransitTimeSeconds)
                 .min()
                 .orElse(Long.MAX_VALUE);
 
@@ -32,7 +32,7 @@ public class FilterAwayLongWalkingTransit implements ItineraryFilter {
         // If this is a transit option whose walk/bike time is greater than
         // that of the walk/bike-only option, do not include in plan
         for (Itinerary it : itineraries) {
-            if (it.transitTime <= 0 || it.walkTime < bestWalkingTime) {
+            if (it.transitTimeSeconds <= 0 || it.nonTransitTimeSeconds < bestWalkingTime) {
                 result.add(it);
             }
         }

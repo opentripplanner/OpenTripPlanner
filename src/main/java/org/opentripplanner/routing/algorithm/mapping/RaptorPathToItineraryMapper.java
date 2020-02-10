@@ -106,7 +106,7 @@ public class RaptorPathToItineraryMapper {
                 firstLeg = false;
                 itinerary.addLeg(transitLeg);
                 // Increment counters
-                itinerary.transitTime += pathLeg.duration();
+                itinerary.transitTimeSeconds += pathLeg.duration();
             }
 
             // Map transfer leg
@@ -122,12 +122,12 @@ public class RaptorPathToItineraryMapper {
         mapEgressLeg(itinerary, egressPathLeg, egressTransfers);
 
         // Map general itinerary fields
-        itinerary.transfers = path.numberOfTransfers();
+        itinerary.nTransfers = path.numberOfTransfers();
         itinerary.startTime = createCalendar(path.accessLeg().fromTime());
         itinerary.endTime = createCalendar(egressPathLeg.toTime());
-        itinerary.duration = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
-        itinerary.waitingTime = itinerary.duration - itinerary.walkTime - itinerary.transitTime;
-        itinerary.walkLimitExceeded = itinerary.walkDistance > request.maxWalkDistance;
+        itinerary.durationSeconds = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
+        itinerary.waitingTimeSeconds = itinerary.durationSeconds - itinerary.nonTransitTimeSeconds - itinerary.transitTimeSeconds;
+        itinerary.nonTransitLimitExceeded = itinerary.nonTransitDistanceMeters > request.maxWalkDistance;
 
         return itinerary;
     }
@@ -272,8 +272,8 @@ public class RaptorPathToItineraryMapper {
             leg.walkSteps = Collections.emptyList();
 
             if (!onlyIfNonZeroDistance || leg.distanceMeters > 0) {
-                itinerary.walkTime += pathLeg.fromTime() - pathLeg.fromTime();
-                itinerary.walkDistance += transfer.getDistanceMeters();
+                itinerary.nonTransitTimeSeconds += pathLeg.fromTime() - pathLeg.fromTime();
+                itinerary.nonTransitDistanceMeters += transfer.getDistanceMeters();
                 itinerary.addLeg(leg);
             }
         } else {
@@ -294,10 +294,10 @@ public class RaptorPathToItineraryMapper {
                 Itinerary subItinerary = GraphPathToItineraryMapper
                         .generateItinerary(graphPath, false, true, request.locale);
 
-                if (!onlyIfNonZeroDistance || subItinerary.walkDistance > 0) {
+                if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
                     subItinerary.legs.forEach(leg -> {
-                        itinerary.walkDistance += subItinerary.walkDistance;
-                        itinerary.walkTime += subItinerary.walkTime;
+                        itinerary.nonTransitDistanceMeters += subItinerary.nonTransitDistanceMeters;
+                        itinerary.nonTransitTimeSeconds += subItinerary.nonTransitTimeSeconds;
                         itinerary.addLeg(leg);
                     });
                 }

@@ -99,8 +99,8 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
         // Check walk limit distance
-        if (itinerary.walkDistance > request.maxWalkDistance) {
-            itinerary.walkLimitExceeded = true;
+        if (itinerary.nonTransitDistanceMeters > request.maxWalkDistance) {
+            itinerary.nonTransitLimitExceeded = true;
         }
         // Return itinerary
         return itinerary;
@@ -145,7 +145,7 @@ public abstract class GraphPathToItineraryMapper {
 
         fixupLegs(itinerary.legs, legsStates);
 
-        itinerary.duration = lastState.getElapsedTimeSeconds();
+        itinerary.durationSeconds = lastState.getElapsedTimeSeconds();
         itinerary.startTime = makeCalendar(states[0]);
         itinerary.endTime = makeCalendar(lastState);
 
@@ -153,9 +153,9 @@ public abstract class GraphPathToItineraryMapper {
 
         calculateElevations(itinerary, edges);
 
-        itinerary.walkDistance = lastState.getWalkDistance();
+        itinerary.nonTransitDistanceMeters = lastState.getWalkDistance();
 
-        itinerary.transfers = 0;
+        itinerary.nTransfers = 0;
 
         return itinerary;
     }
@@ -421,17 +421,17 @@ public abstract class GraphPathToItineraryMapper {
 
             switch (state.getBackMode()) {
                 default:
-                    itinerary.transitTime += state.getTimeDeltaSeconds();
+                    itinerary.transitTimeSeconds += state.getTimeDeltaSeconds();
                     break;
 
                 case LEG_SWITCH:
-                    itinerary.waitingTime += state.getTimeDeltaSeconds();
+                    itinerary.waitingTimeSeconds += state.getTimeDeltaSeconds();
                     break;
 
                 case WALK:
                 case BICYCLE:
                 case CAR:
-                    itinerary.walkTime += state.getTimeDeltaSeconds();
+                    itinerary.nonTransitTimeSeconds += state.getTimeDeltaSeconds();
             }
         }
     }
