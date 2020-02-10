@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
+import java.util.Iterator;
 import java.util.stream.Stream;
 
 
@@ -34,6 +35,10 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
         return stream(marker);
     }
 
+    public Iterable<T> tailAfterMarker() {
+        return iterableArray(copyArray(marker));
+    }
+
     /**
      * Move the marker after the last element in the set.
      */
@@ -46,5 +51,23 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
         if(fromIndex == marker) {
             marker = toIndex;
         }
+    }
+
+    public static<T> Iterable<T> iterableArray(T[] array) {
+        return () -> new Iterator<>() {
+            private int pos=0;
+
+            public boolean hasNext() {
+                return array.length>pos;
+            }
+
+            public T next() {
+                return array[pos++];
+            }
+
+            public void remove() {
+                throw new UnsupportedOperationException("Cannot remove an element of an array.");
+            }
+        };
     }
 }

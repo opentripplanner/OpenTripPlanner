@@ -13,7 +13,6 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 import java.util.BitSet;
 import java.util.Collection;
-import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -79,7 +78,7 @@ public final class Stops<T extends RaptorTripSchedule> {
         if(it==null) {
             return emptyList();
         }
-        return it.streamAfterMarker().collect(Collectors.toList());
+        return it.tailAfterMarker();
     }
 
     void clearTouchedStopsAndSetStopMarkers() {

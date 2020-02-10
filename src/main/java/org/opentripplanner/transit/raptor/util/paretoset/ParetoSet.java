@@ -70,6 +70,10 @@ public class ParetoSet<T> extends AbstractCollection<T> {
         return Arrays.stream(elements, startInclusive, size);
     }
 
+    final T[] copyArray(int startInclusive) {
+        return Arrays.copyOfRange(elements, startInclusive, size);
+    }
+
     @Override
     public boolean add(T  newValue) {
         if (size == 0) {
