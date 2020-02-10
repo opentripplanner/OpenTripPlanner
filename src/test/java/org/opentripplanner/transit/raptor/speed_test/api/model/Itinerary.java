@@ -43,33 +43,12 @@ public class Itinerary {
      * How far the user has to walk, in meters.
      */
     public Double walkDistance = 0.0;
-    
-    /**
-     * Indicates that the walk limit distance has been exceeded for this itinerary when true.
-     */
-    public boolean walkLimitExceeded = false;
-
-    /**
-     * How much elevation is lost, in total, over the course of the trip, in meters. As an example,
-     * a trip that went from the top of Mount Everest straight down to sea level, then back up K2,
-     * then back down again would have an elevationLost of Everest + K2.
-     */
-    public Double elevationLost = 0.0;
-    /**
-     * How much elevation is gained, in total, over the course of the trip, in meters. See
-     * elevationLost.
-     */
-    public Double elevationGained = 0.0;
 
     /**
      * The number of transfers this trip has.
      */
     public Integer transfers = 0;
 
-    /**
-     * The cost of this trip
-     */
-    // public Fare fare = new Fare();
 
     /**
      * Weight of the itinerary, used for debugging
@@ -104,53 +83,4 @@ public class Itinerary {
             legs.add(leg);
         }
     }
-
-    /** 
-     * remove the leg from the list of legs 
-     * @param leg object to be removed
-     */
-    public void removeLeg(Leg leg) {
-        if(leg != null) {
-            legs.remove(leg);
-        }
-    }
-
-    /*
-    public void fixupDates(CalendarServiceData service) {
-        TimeZone startTimeZone = null;
-        TimeZone timeZone = null;
-        Iterator<Leg> it = legs.iterator();
-        while (it.hasNext()) {
-            Leg leg = it.next();
-            if (leg.agencyId == null) {
-                if (timeZone != null) {
-                    leg.setTimeZone(timeZone);
-                }
-            } else {
-                timeZone = service.getTimeZoneForAgencyId(leg.agencyId);
-                if (startTimeZone == null) {
-                    startTimeZone = timeZone; 
-                 }
-            }
-        }
-        if (timeZone != null) {
-            Calendar calendar = Calendar.getInstance(startTimeZone);
-            calendar.setTime(startTime.getTime());
-            startTime = calendar;
-            // go back and set timezone for legs prior to first transit
-            it = legs.iterator();
-            while (it.hasNext()) {
-                Leg leg = it.next();
-                if (leg.agencyId == null) {
-                    leg.setTimeZone(startTimeZone);
-                } else {
-                    break;
-                }
-            }
-            calendar = Calendar.getInstance(timeZone);
-            calendar.setTime(endTime.getTime());
-            endTime = calendar;
-        }
-    }
-    */
 }

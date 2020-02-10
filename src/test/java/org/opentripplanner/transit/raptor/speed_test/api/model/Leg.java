@@ -1,9 +1,8 @@
 package org.opentripplanner.transit.raptor.speed_test.api.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.TraverseMode;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.util.Calendar;
 import java.util.List;
 
@@ -32,7 +31,7 @@ public class Leg {
    /**
     * The mode (e.g., <code>Walk</code>) used when traversing this leg.
     */
-   public String mode = TraverseMode.WALK.toString();
+   public TraverseMode mode = TraverseMode.WALK;
 
    /**
     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
@@ -114,11 +113,7 @@ public class Leg {
     * @return Boolean true if the leg is a transit leg
     */
    public Boolean isTransitLeg() {
-       if (mode == null) return null;
-       else if (mode.equals(TraverseMode.WALK.toString())) return false;
-       else if (mode.equals(TraverseMode.CAR.toString())) return false;
-       else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-       else return true;
+      return mode.isTransit();
    }
 
    /**
@@ -126,14 +121,12 @@ public class Leg {
     * @return Boolean true if the leg is a transit leg
     */
    public boolean isWalkLeg() {
-      return mode != null && TraverseMode.WALK.name().equals(mode);
+      return mode.isWalking();
    }
    /**
     * The leg's duration in seconds
     */
-   @XmlElement
-   @JsonSerialize
    public double getDuration() {
-       return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
+       return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis())/1000.0;
    }
 }
