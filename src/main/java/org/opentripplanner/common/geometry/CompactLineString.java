@@ -104,6 +104,7 @@ public final class CompactLineString {
      * 0-coordinates are added in order for the delta encoding to work correctly.
      */
     public static byte[] compactLineString(LineString lineString, boolean reverse) {
+        if (lineString == null) return null;
         lineString = GeometryUtils.addStartEndCoordinatesToLineString(
                 new Coordinate(0.0, 0.0),
                 lineString,
