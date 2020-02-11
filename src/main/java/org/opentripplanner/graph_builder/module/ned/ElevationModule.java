@@ -5,7 +5,11 @@ import org.locationtech.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
+import org.geotools.referencing.CRS;
 import org.opengis.coverage.Coverage;
+import org.opengis.referencing.FactoryException;
+import org.opengis.referencing.operation.MathTransform;
+import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -445,8 +449,16 @@ public class ElevationModule implements GraphBuilderModule {
             // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
             // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
             // rasters to also use (long, lat).
-            coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, x, y), values);
-        } catch (org.opengis.coverage.PointOutsideCoverageException e) {
+            DirectPosition2D projectedPosition = new DirectPosition2D(GeometryUtils.WGS84_XY, x, y);
+            MathTransform transformer = CRS.findMathTransform(
+                GeometryUtils.WGS84_XY,
+                coverage.getCoordinateReferenceSystem(),
+                true
+            );
+            DirectPosition2D transformedPosition = new DirectPosition2D();
+            transformer.transform(projectedPosition, transformedPosition);
+            coverage.evaluate(transformedPosition, values);
+        } catch (org.opengis.coverage.PointOutsideCoverageException | FactoryException | TransformException e) {
             nPointsOutsideDEM += 1;
         }
         nPointsEvaluated += 1;
