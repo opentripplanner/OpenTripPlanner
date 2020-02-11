@@ -5,7 +5,8 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.model.routing.TripSearchMetadata;
-import org.opentripplanner.routing.algorithm.itineraryfilters.ItineraryFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
+import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -32,6 +33,7 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -54,17 +56,22 @@ public class RoutingWorker {
      * To avoid long searches witch might degrade the performance we use an upper limit
      * to the distance for none transit what we would allow.
      */
-    public static final double MAX_WALK_DISTANCE = 50_000;
-    public static final double MAX_BIKE_DISTANCE = 150_000;
-    public static final double MAX_CAR_DISTANCE = 500_000;
+    private static final double MAX_WALK_DISTANCE = 50_000;
+    private static final double MAX_BIKE_DISTANCE = 150_000;
+    private static final double MAX_CAR_DISTANCE = 500_000;
+
+    /** Filter itineraries down to this limit, but not below. */
+    private static final int MIN_NUMBER_OF_ITINERARIES = 3;
+
+    /** Never return more that this limit of itineraries. */
+    private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
     private final RoutingRequest request;
     private TripSearchMetadata responseMetadata = null;
-    private final List<ItineraryFilter> filters = new ArrayList<>();
+    private Instant filterOnLatestDepartureTime = null;
 
     public RoutingWorker(RoutingRequest request) {
         this.request = request;
-        this.filters.addAll(ItineraryFilterChain.FILTERS);
     }
 
     public RoutingResponse route(Router router) {
@@ -77,10 +84,10 @@ public class RoutingWorker {
             // Transit routing
             itineraries.addAll(routeTransit(router));
 
+            long startTimeFiltering = System.currentTimeMillis();
             // Filter itineraries
-            for (ItineraryFilter filter : filters) {
-                itineraries = filter.filter(request, itineraries);
-            }
+            itineraries = filterChain().filter(itineraries);
+            LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
 
             LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
             return new RoutingResponse(
@@ -163,13 +170,10 @@ public class RoutingWorker {
         );
 
         // Route transit
-        RaptorResponse<TripSchedule> response = raptorService.route(
-                raptorRequest,
-                requestTransitDataProvider
-        );
+        RaptorResponse<TripSchedule> transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
 
-        LOG.debug("Found {} itineraries", response.paths().size());
-
+        LOG.debug("Found {} transit itineraries", transitResponse.paths().size());
+        LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
         LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
         /* Create itineraries */
@@ -186,7 +190,7 @@ public class RoutingWorker {
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
         List<Itinerary> itineraries = new ArrayList<>();
-        for (Path<TripSchedule> path : response.paths()) {
+        for (Path<TripSchedule> path : transitResponse.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
             // Decorate the Itineraries with fare information.
@@ -198,7 +202,16 @@ public class RoutingWorker {
             itineraries.add(itinerary);
         }
 
-        setResponseMetadata(requestTransitDataProvider, response);
+        setResponseMetadata(requestTransitDataProvider, transitResponse);
+
+        // Filter itineraries away that depart after the latest-departure-time for depart after
+        // search. These itineraries is a result of timeshifting the access leg and is needed for
+        // the raptor to prune the results. These itineraries are often not ideal, but if they
+        // pareto optimal for the "next" window, they will appear when a "next" search is performed.
+        int win = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
+        if(!request.arriveBy && win > 0) {
+            filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + win);
+        }
 
         LOG.debug("Creating {} itineraries took {} ms",
                 itineraries.size(),
@@ -206,6 +219,16 @@ public class RoutingWorker {
         );
 
         return itineraries;
+    }
+
+    private ItineraryFilter filterChain() {
+        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
+        builder.setMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
+        builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
+        builder.setGroupByTransferCost(request.walkBoardCost + request.transferPenalty);
+        builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
+
+        return builder.build();
     }
 
     private boolean streetDistanceIsReasonable() {
@@ -225,15 +248,19 @@ public class RoutingWorker {
             RaptorRoutingRequestTransitData transitData,
             RaptorResponse<TripSchedule> response
     ) {
-        if(response == null) { return; }
 
         SearchParams sp = response.requestUsed().searchParams();
-        ZonedDateTime time0 = transitData.getStartOfTime();
-        int timeOffset = request.arriveBy ? sp.latestArrivalTime() : sp.earliestDepartureTime();
         int searchWindow = sp.searchWindowInSeconds();
 
+        // No results found or standard range-raptor search performed (not multi-criteria)
+        if(searchWindow <= 0) { return; }
+
+
+        ZonedDateTime time0 = transitData.getStartOfTime();
+        int timeOffset = request.arriveBy ? sp.latestArrivalTime() : sp.earliestDepartureTime();
+
         responseMetadata = new TripSearchMetadata(
-                sp.searchWindowInSeconds(),
+                searchWindow,
                 time0.plusSeconds(timeOffset - searchWindow).toInstant(),
                 time0.plusSeconds(timeOffset + searchWindow).toInstant()
         );

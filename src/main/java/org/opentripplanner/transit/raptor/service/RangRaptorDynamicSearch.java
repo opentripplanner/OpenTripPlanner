@@ -79,7 +79,11 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return createAndRunWorker(mcRequest);
         }
         catch (DestinationNotReachedException e) {
-            return emptyResult();
+            return new RaptorResponse<>(
+                    Collections.emptyList(),
+                    originalRequest,
+                    originalRequest
+            );
         }
     }
 
@@ -99,6 +103,8 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     /**
      * Run standard "singe-iteration" raptor search to calculate heuristics - this should be
      * really fast to run compared with a (multi-criteria) range-raptor search.
+     *
+     * @throws DestinationNotReachedException if destination is not reached.
      */
     private void runHeuristics() {
         if (isItPossibleToRunHeuristicsInParallel()) {
@@ -108,10 +114,6 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             runHeuristicsSequentially();
         }
         fwdHeuristics.debugCompareResult(revHeuristics);
-    }
-
-    private RaptorResponse<T> emptyResult() {
-        return new RaptorResponse<>(Collections.emptyList(), originalRequest, originalRequest);
     }
 
     private RaptorResponse<T> createAndRunWorker(RaptorRequest<T> mcRequest) {
@@ -144,6 +146,9 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
                 && revHeuristics.isEnabled();
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     private void runHeuristicsInParallel() {
         try {
             fwdHeuristics.withRequest(originalRequest);
@@ -166,6 +171,9 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         }
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     private void runHeuristicsSequentially() {
         if (originalRequest.searchParams().isEarliestDepartureTimeSet()) {
             fwdHeuristics.withRequest(originalRequest).run();
