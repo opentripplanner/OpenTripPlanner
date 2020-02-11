@@ -18,6 +18,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
+import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -31,10 +32,12 @@ import org.slf4j.LoggerFactory;
 import javax.media.jai.InterpolationBilinear;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street data that has already
@@ -57,8 +60,8 @@ public class ElevationModule implements GraphBuilderModule {
     private Coverage coverage;
 
     // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings.
-    private int nPointsEvaluated = 0;
-    private int nPointsOutsideDEM = 0;
+    private AtomicInteger nPointsEvaluated = new AtomicInteger(0);
+    private AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
 
     private final double distanceBetweenSamplesM;
 
@@ -108,30 +111,37 @@ public class ElevationModule implements GraphBuilderModule {
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
         log.info("Setting street elevation profiles from digital elevation model...");
-        List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
-        int nProcessed = 0;
+
+        List<StreetEdge> edgesWithElevation = Collections.synchronizedList(new ArrayList<>());
+        AtomicInteger nProcessed = new AtomicInteger();
         int nTotal = graph.countEdges();
-        for (Vertex gv : graph.getVertices()) {
-            for (Edge ee : gv.getOutgoing()) {
+
+        graph.getVertices().parallelStream().forEach(gv -> {
+            gv.getOutgoing().parallelStream().forEach(ee -> {
                 if (ee instanceof StreetWithElevationEdge) {
                     StreetWithElevationEdge edgeWithElevation = (StreetWithElevationEdge) ee;
                     processEdge(graph, edgeWithElevation);
                     if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
                         edgesWithElevation.add(edgeWithElevation);
                     }
-                    nProcessed += 1;
-                    if (nProcessed % 50000 == 0) {
-                        log.info("set elevation on {}/{} edges", nProcessed, nTotal);
-                        double failurePercentage = nPointsOutsideDEM / nPointsEvaluated * 100;
-                        if (failurePercentage > 50) {
-                            log.warn("Fetching elevation failed at {}/{} points ({}%)",
-                                    nPointsOutsideDEM, nPointsEvaluated, failurePercentage);
-                            log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
-                                    "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
-                        }
+                    int curNumProcessed = nProcessed.addAndGet(1);
+                    if (curNumProcessed % 50000 == 0) {
+                        log.info("set elevation on {}/{} edges", curNumProcessed, nTotal);
                     }
                 }
-            }
+            });
+        });
+
+        double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
+        if (failurePercentage > 50) {
+            log.warn(graph.addBuilderAnnotation(new Graphwide(
+                String.format(
+                    "Fetching elevation failed at %d/%d points (%d%%)",
+                    nPointsOutsideDEM, nPointsEvaluated, failurePercentage
+                )
+            )));
+            log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
+                "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
 
         @SuppressWarnings("unchecked")
@@ -463,9 +473,9 @@ public class ElevationModule implements GraphBuilderModule {
             transformer.transform(projectedPosition, transformedPosition);
             coverage.evaluate(transformedPosition, values);
         } catch (org.opengis.coverage.PointOutsideCoverageException | FactoryException | TransformException e) {
-            nPointsOutsideDEM += 1;
+            nPointsOutsideDEM.incrementAndGet();
         }
-        nPointsEvaluated += 1;
+        nPointsEvaluated.incrementAndGet();
         return values[0] * elevationUnitMultiplier;
     }
 
