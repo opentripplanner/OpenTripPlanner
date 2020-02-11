@@ -1,9 +1,9 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
@@ -13,10 +13,9 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.standalone.S3BucketConfig;
 
 import java.io.File;
+import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
@@ -95,11 +94,15 @@ public class ElevationModuleTest {
         DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
         NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
         gcf.tileSource = awsTileSource;
-        ElevationModule elevationModule = new ElevationModule(gcf);
+        ElevationModule elevationModule = new ElevationModule(
+            gcf,
+            1,
+            10
+        );
 
         // build to graph to execute the elevation module
         elevationModule.checkInputs();
-        elevationModule.buildGraph(graph, new GraphBuilderModuleSummary(elevationModule));
+        elevationModule.buildGraph(graph, new HashMap<>());
 
         // verify that elevation data has been set on the StreetWithElevationEdge
         assertNotNull(edge.getElevationProfile());
