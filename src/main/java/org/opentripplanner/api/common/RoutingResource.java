@@ -577,6 +577,9 @@ public abstract class RoutingResource {
     @QueryParam("disableAlertFiltering")
     private Boolean disableAlertFiltering;
 
+    @QueryParam("debugItineraryFilter")
+    private Boolean debugItineraryFilter;
+
     /**
      * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.
      */
@@ -816,6 +819,10 @@ public abstract class RoutingResource {
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;
+
+        if(debugItineraryFilter != null ) {
+            request.debugItineraryFilter = debugItineraryFilter;
+        }
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

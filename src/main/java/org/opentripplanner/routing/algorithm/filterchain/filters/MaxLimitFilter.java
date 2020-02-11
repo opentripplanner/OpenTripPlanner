@@ -24,6 +24,14 @@ public class MaxLimitFilter implements ItineraryFilter {
     public List<Itinerary> filter(final List<Itinerary> itineraries) {
         if(itineraries.isEmpty()) { return itineraries; }
 
-        return itineraries.stream().limit(maxLimit).collect(Collectors.toList());
+        // Count elements(i) and elements not marked for deletion(j)
+        int i=0, j=0;
+
+        while (i < itineraries.size() && j < maxLimit) {
+            Itinerary it = itineraries.get(i);
+            if(!it.debugMarkedAsDeleted) { ++j; }
+            ++i;
+        }
+        return itineraries.stream().limit(i).collect(Collectors.toList());
     }
 }

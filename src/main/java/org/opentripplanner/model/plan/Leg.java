@@ -304,22 +304,25 @@ public class Leg {
         if(value == null || !value) { return; }
         sb.append(name);
     }
+
     private static void toStringAdd(StringBuilder sb, String name, String value) {
         if(value == null) { return; }
         sb.append(name).append("='").append(value).append("'");
     }
+
     private static void toStringAddCal(StringBuilder sb, String name, Calendar value) {
         if(value == null) { return; }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd mm:hh:ssZZZ");
         sb.append(name).append("='").append(sdf.format(value.getTime())).append("'");
     }
+
     private static void toStringAdd(StringBuilder sb, String name, Object value) {
         if(value == null) { return; }
         sb.append(name).append("=").append(value);
     }
+
     private static void toStringAddPosInt(StringBuilder sb, String name, int value) {
         if(value == 0) { return; }
         sb.append(name);
     }
-
 }

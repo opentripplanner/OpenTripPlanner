@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
@@ -23,6 +25,7 @@ public class ItineraryFilterChainBuilder {
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
+    private boolean debug;
 
     /** Max departure time in epoch seconds */
     public void setLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
@@ -61,6 +64,15 @@ public class ItineraryFilterChainBuilder {
         groupByTransferCost = cost;
     }
 
+    /**
+     * This will NOT delete itineraries, but mark them as deleted using the
+     * {@link Itinerary#markAsDeleted()} and add an alert to the first leg and
+     * the second leg (if first leg is walking).
+     */
+    public void debug() {
+        this.debug = true;
+    }
+
     public ItineraryFilter build() {
         final List<ItineraryFilter> filters = new ArrayList<>();
 
@@ -86,6 +98,6 @@ public class ItineraryFilterChainBuilder {
             filters.add(new MaxLimitFilter("MAX", maxLimit));
         }
 
-        return new FilterChain(filters);
+        return debug ? new DebugFilterChain(filters) : new FilterChain(filters);
     }
 }

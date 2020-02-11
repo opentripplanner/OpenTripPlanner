@@ -76,7 +76,6 @@ public class Place {
      */
     public String bikeShareId;
 
-
     public Place() { }
 
     public Place(Double lon, Double lat, String name) {

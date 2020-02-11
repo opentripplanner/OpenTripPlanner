@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.Fare;
 
 import java.util.Calendar;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -75,6 +76,12 @@ public class Itinerary {
     public final boolean walkOnly;
 
     /**
+     * The Itinerary filters may mark itineraries as deleted instead of actually deleting them.
+     * This is very handy, when tuning the system or debugging - looking for missing expected trips.
+     */
+    public boolean debugMarkedAsDeleted;
+
+    /**
      * The cost of this trip
      */
     public Fare fare = new Fare();
@@ -135,6 +142,20 @@ public class Itinerary {
 
     public Leg lastLeg() {
         return legs.get(legs.size()-1);
+    }
+
+    /** Get the first transit leg if one exist */
+    public Optional<Leg> firstTransitLeg() {
+        return legs.stream().filter(Leg::isTransitLeg).findFirst();
+    }
+
+    /**
+     * A itinerary can be marked as deleted instead of actually deleting it. This is very handy
+     * when tuning the system or debugging. This can be combined with adding an alert to one of
+     * the first legs to explain why this itinerary is deleted.
+     */
+    public void markAsDeleted() {
+        this.debugMarkedAsDeleted = true;
     }
 
     @Override

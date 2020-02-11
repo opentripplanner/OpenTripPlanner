@@ -212,6 +212,7 @@ public class TransmodelGraphQLPlanner {
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
         callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
+        callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
 

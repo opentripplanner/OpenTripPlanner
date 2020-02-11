@@ -1078,6 +1078,13 @@ public class TransmodelIndexGraphQLSchema {
                         .defaultValue(defaultRoutingRequest.transitDistanceReluctance)
                         .build())
                 */
+                .argument(GraphQLArgument.newArgument()
+                        .name("debugItineraryFilter")
+                        .description("Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but NOT delete them when this is enabled.")
+                        .type(Scalars.GraphQLBoolean)
+                        .defaultValue(defaultRoutingRequest.debugItineraryFilter)
+                        .build())
+
                 .dataFetcher(environment -> new TransmodelGraphQLPlanner(mappingUtil).plan(environment))
                 .build();
 
@@ -4050,7 +4057,6 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLLong)
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).waitingTimeSeconds)
                         .build())
-
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("distance")
                         .description("Total distance for the trip, in meters. NOT IMPLEMENTED")
@@ -4070,6 +4076,12 @@ public class TransmodelIndexGraphQLSchema {
                         .description("How far the user has to walk, in meters.")
                         .type(Scalars.GraphQLFloat)
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).nonTransitDistanceMeters)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("debugMarkedAsDeleted")
+                        .description("This itinerary is marked as deleted by at least one itinerary filter.")
+                        .type(Scalars.GraphQLBoolean)
+                        .dataFetcher(environment -> ((Itinerary) environment.getSource()).debugMarkedAsDeleted)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("legs")
@@ -4366,6 +4378,11 @@ public class TransmodelIndexGraphQLSchema {
                         .name("kissAndRide")
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).kissAndRide)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("debugItineraryFilter")
+                        .type(Scalars.GraphQLBoolean)
+                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).debugItineraryFilter)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()

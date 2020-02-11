@@ -39,6 +39,9 @@ public class ItineraryMapper {
         api.legs = legMapper.mapLegs(domain.legs);
         api.tooSloped = domain.tooSloped;
 
+        // To be backward compatible we set this to {@code null} and not false when not set.
+        api.debugMarkedAsDeleted = domain.debugMarkedAsDeleted ? Boolean.TRUE : null;
+
         return api;
     }
 

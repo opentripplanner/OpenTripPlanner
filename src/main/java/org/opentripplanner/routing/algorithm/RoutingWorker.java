@@ -228,6 +228,10 @@ public class RoutingWorker {
         builder.setGroupByTransferCost(request.walkBoardCost + request.transferPenalty);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
 
+        if(request.debugItineraryFilter) {
+            builder.debug();
+        }
+
         return builder.build();
     }
 
