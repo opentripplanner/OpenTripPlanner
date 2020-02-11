@@ -1,9 +1,5 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import java.util.Iterator;
-import java.util.stream.Stream;
-
-
 /**
  * {@link ParetoSet} with the possibility to set a index marker, which
  * can be used to list all elements added after the marker is set.
@@ -29,14 +25,10 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
     }
 
     /**
-     * Create a stream for all elements added after the marker.
+     * List all elements added after the marker.
      */
-    public Stream<T> streamAfterMarker() {
-        return stream(marker);
-    }
-
-    public Iterable<T> tailAfterMarker() {
-        return iterableArray(copyArray(marker));
+    public Iterable<T> elementsAfterMarker() {
+        return tail(marker);
     }
 
     /**
@@ -51,23 +43,5 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
         if(fromIndex == marker) {
             marker = toIndex;
         }
-    }
-
-    public static<T> Iterable<T> iterableArray(T[] array) {
-        return () -> new Iterator<>() {
-            private int pos=0;
-
-            public boolean hasNext() {
-                return array.length>pos;
-            }
-
-            public T next() {
-                return array[pos++];
-            }
-
-            public void remove() {
-                throw new UnsupportedOperationException("Cannot remove an element of an array.");
-            }
-        };
     }
 }

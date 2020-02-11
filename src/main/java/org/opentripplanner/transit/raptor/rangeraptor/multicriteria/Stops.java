@@ -78,7 +78,7 @@ public final class Stops<T extends RaptorTripSchedule> {
         if(it==null) {
             return emptyList();
         }
-        return it.tailAfterMarker();
+        return it.elementsAfterMarker();
     }
 
     void clearTouchedStopsAndSetStopMarkers() {
