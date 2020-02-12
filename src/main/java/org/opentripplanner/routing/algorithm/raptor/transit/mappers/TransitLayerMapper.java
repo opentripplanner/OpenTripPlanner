@@ -74,7 +74,7 @@ public class TransitLayerMapper {
     /**
      * Map pre-Raptor TripPatterns and Trips to the corresponding Raptor classes.
      * <p>
-     * Part of this method runs in parallel.
+     * Part of this method runs IN PARALLEL.
      * <p>
      */
     private HashMap<LocalDate, List<TripPatternForDate>> mapTripPatterns (
@@ -96,6 +96,8 @@ public class TransitLayerMapper {
         );
 
         Set<ServiceDate> allServiceDates = graph.index.getServiceCodesRunningForDate().keySet();
+
+        // THIS CODE RUNS IN PARALLEL
 
         allServiceDates
             .parallelStream()
@@ -125,6 +127,9 @@ public class TransitLayerMapper {
                     }
                 }
             });
+
+        // END PARALLEL CODE
+
         return tripPatternsForDates;
     }
 
