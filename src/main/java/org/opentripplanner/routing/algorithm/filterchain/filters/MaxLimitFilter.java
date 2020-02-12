@@ -6,6 +6,11 @@ import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import java.util.List;
 import java.util.stream.Collectors;
 
+
+/**
+ * Remove all itineraries after the provided limit. This filter remove the itineraries at the
+ * end of the list, so the list should be sorted on the desired key before this filter is applied.
+ */
 public class MaxLimitFilter implements ItineraryFilter {
     private final String name;
     private final int maxLimit;

@@ -23,8 +23,7 @@ public class FilterChainTestData {
     public static final Place F = place("F", 9.0, 10.5);
 
     public static Itinerary itinerary(Leg ... legs) {
-        Itinerary it = new Itinerary(Arrays.asList(legs));
-        return it;
+        return new Itinerary(Arrays.asList(legs));
     }
 
     public static Leg leg(Place from, Place to, int t0, int t1, double distanceMeters, TraverseMode mode) {
@@ -32,10 +31,14 @@ public class FilterChainTestData {
         leg.mode = mode;
         leg.from = from;
         leg.to = to;
-        leg.startTime = new GregorianCalendar( 2020, FEBRUARY, 2, 12, t0);
-        leg.endTime = new GregorianCalendar( 2020, FEBRUARY, 2, 12, t1);
+        leg.startTime = newTime(t0);
+        leg.endTime = newTime(t1);
         leg.distanceMeters = distanceMeters;
         return leg;
+    }
+
+    public static GregorianCalendar newTime(int minutes) {
+        return new GregorianCalendar(2020, FEBRUARY, 2, 12, minutes);
     }
 
     public static Place place(String name, double lon, double lat) {

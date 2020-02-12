@@ -42,7 +42,7 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
 
     @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
-
+        if(itineraries.size() <= minLimit) { return itineraries; }
 
         List<Entry<T>> groups = new ArrayList<>();
 
@@ -81,9 +81,16 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
         return result;
     }
 
-    // static default visibility to allow unit testing
+
+    /**
+     * Get a approximate max limit for each group so that the total
+     * minLimit is respected. For example, if the min limit is 5 elements
+     * and there is 3 groups, we set the maxLimit for each group to 2,
+     * returning between 4 and 6 elements depending on the distribution.
+     */
     static int groupMaxLimit(int minLimit, int nGroups) {
-        return Math.max(1, minLimit / nGroups);
+
+        return Math.max(1, Math.round((float) minLimit / nGroups));
     }
 
     private static class Entry<T extends GroupId<T>> {

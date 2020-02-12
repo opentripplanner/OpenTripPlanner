@@ -61,7 +61,7 @@ public class LongTransitWalkingFilterTest {
         List<Itinerary> result = new LongTransitWalkingFilter().filter(List.of(walk, i1));
 
         // Then:
-        assertEquals(toStr(result), List.of(walk, i1), result);
+        assertEquals(toStr(List.of(walk, i1)), toStr(result));
     }
 
 }

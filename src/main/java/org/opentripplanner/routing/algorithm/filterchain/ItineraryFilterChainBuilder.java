@@ -27,16 +27,23 @@ public class ItineraryFilterChainBuilder {
     private Instant latestDepartureTimeLimit = null;
     private boolean debug;
 
-    /** Max departure time in epoch seconds */
+    /**
+     * Max departure time. This is a absolute filter on the itinerary departure time from the
+     * origin. This do not respect the {@link #setApproximateMinLimit(int)}.
+     */
     public void setLatestDepartureTimeLimit(Instant latestDepartureTimeLimit) {
         this.latestDepartureTimeLimit = latestDepartureTimeLimit;
     }
 
     /**
-     * Set the minimum filter limit. The filtering is skipped if the number of itineraries
-     * is below or equal to the min limit.
+     * Set a guideline for the minimum number of itineraries to return. Some filters may respect a
+     * minimum number of elements to keep when filtering and stop reducing the number when this
+     * limit is reached. This depend on the filter and the intended use case.
+     * <p>
+     * For example the group-by filter will keep 2 samples in each group if there is 2 groups and
+     * the min-limit is 3 ~ keeping up to 4 itineraries (approximately 3).
      */
-    public void setMinLimit(int minLimit) {
+    public void setApproximateMinLimit(int minLimit) {
         this.minLimit = minLimit;
     }
 
@@ -66,8 +73,8 @@ public class ItineraryFilterChainBuilder {
 
     /**
      * This will NOT delete itineraries, but mark them as deleted using the
-     * {@link Itinerary#markAsDeleted()} and add an alert to the first leg and
-     * the second leg (if first leg is walking).
+     * {@link Itinerary#markAsDeleted()} and add an alert to the first
+     * transit leg.
      */
     public void debug() {
         this.debug = true;
@@ -85,7 +92,6 @@ public class ItineraryFilterChainBuilder {
                 minLimit
         ));
 
-        // A Range Raptor search produces
         if (latestDepartureTimeLimit != null) {
             filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
         }

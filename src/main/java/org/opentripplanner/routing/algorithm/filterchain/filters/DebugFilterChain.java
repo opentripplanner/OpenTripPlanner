@@ -32,6 +32,7 @@ public class DebugFilterChain implements ItineraryFilter {
 
             if(current.size() < last.size()) {
                 for (Itinerary it : last) {
+                    // match by instance ref, see Itinerary#equals
                     if(!current.contains(it)) {
                         markItineraryAsDeleted(filter.name(), it);
                     }
@@ -62,6 +63,8 @@ public class DebugFilterChain implements ItineraryFilter {
         patch.setAlert(alert);
         patch.setId(filterName);
 
+        // Add both an alert and a alert-patch to
+        // make sure the user interfce picks it up.
         legOp.get().addAlert(alert);
         legOp.get().addAlertPatch(patch);
     }

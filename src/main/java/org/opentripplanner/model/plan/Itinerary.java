@@ -13,12 +13,12 @@ import java.util.Optional;
 public class Itinerary {
 
     /** Total duration of the itinerary in seconds */
-    public final long durationSeconds;
+    public final int durationSeconds;
 
     /**
      * How much time is spent on transit, in seconds.
      */
-    public final long transitTimeSeconds;
+    public final int transitTimeSeconds;
 
     /**
      * The number of transfers this trip has.
@@ -28,12 +28,12 @@ public class Itinerary {
     /**
      * How much time is spent waiting for transit to arrive, in seconds.
      */
-    public final long waitingTimeSeconds;
+    public final int waitingTimeSeconds;
 
     /**
      * How much time is spent walking/biking/driving, in seconds.
      */
-    public long nonTransitTimeSeconds = 0;
+    public int nonTransitTimeSeconds;
 
     /**
      * How far the user has to walk, bike and/or drive, in meters.
@@ -124,6 +124,15 @@ public class Itinerary {
         return lastLeg().endTime;
     }
 
+
+    /**
+     * This is the amount of time used to travel. {@code waitingTime} is NOT
+     * included.
+     */
+    public int effectiveDurationSeconds() {
+        return transitTimeSeconds + nonTransitTimeSeconds;
+    }
+
     /**
      * Return {@code true} if all legs are WALKING.
      */
@@ -151,11 +160,27 @@ public class Itinerary {
 
     /**
      * A itinerary can be marked as deleted instead of actually deleting it. This is very handy
-     * when tuning the system or debugging. This can be combined with adding an alert to one of
-     * the first legs to explain why this itinerary is deleted.
+     * when tuning the system or debugging. This is combined with an alert on the first transit
+     * leg to explain why this itinerary is deleted.
      */
     public void markAsDeleted() {
         this.debugMarkedAsDeleted = true;
+    }
+
+    /**
+     * Return {@code true} it the other object is the same object using the {@link
+     * Object#equals(Object)}. An itinerary is a temporary object and the equals method should not
+     * be used for comparision of 2 instances, only to check that to objects are the same instance.
+     */
+    @Override
+    public final boolean equals(Object o) {
+        return super.equals(o);
+    }
+
+    /** @see #equals(Object) */
+    @Override
+    public final int hashCode() {
+        return super.hashCode();
     }
 
     @Override

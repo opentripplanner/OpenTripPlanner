@@ -56,9 +56,9 @@ public class RoutingWorker {
      * To avoid long searches witch might degrade the performance we use an upper limit
      * to the distance for none transit what we would allow.
      */
-    private static final double MAX_WALK_DISTANCE = 50_000;
-    private static final double MAX_BIKE_DISTANCE = 150_000;
-    private static final double MAX_CAR_DISTANCE = 500_000;
+    private static final double MAX_WALK_DISTANCE_METERS = 50_000;
+    private static final double MAX_BIKE_DISTANCE_METERS = 150_000;
+    private static final double MAX_CAR_DISTANCE_METERS = 500_000;
 
     /** Filter itineraries down to this limit, but not below. */
     private static final int MIN_NUMBER_OF_ITINERARIES = 3;
@@ -223,7 +223,7 @@ public class RoutingWorker {
 
     private ItineraryFilter filterChain() {
         ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
-        builder.setMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
+        builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
         builder.setGroupByTransferCost(request.walkBoardCost + request.transferPenalty);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
@@ -273,8 +273,8 @@ public class RoutingWorker {
     private double calculateDistanceMaxLimit() {
         double limit = request.maxWalkDistance * 2;
         double maxLimit = request.modes.getCar()
-                ? MAX_CAR_DISTANCE
-                : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE : MAX_WALK_DISTANCE);
+                ? MAX_CAR_DISTANCE_METERS
+                : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
 
         // Handle overflow and default setting is set to Double MAX_VALUE
         // Everything above Long.MAX_VALUE is treated as Infinite

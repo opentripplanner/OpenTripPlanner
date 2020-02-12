@@ -24,7 +24,7 @@ public class ItineraryMapper {
         if(domain == null) { return null; }
         ApiItinerary api = new ApiItinerary();
 
-        api.duration = domain.durationSeconds;
+        api.duration = (long) domain.durationSeconds;
         api.startTime = domain.startTime();
         api.endTime = domain.endTime();
         api.walkTime = domain.nonTransitTimeSeconds;

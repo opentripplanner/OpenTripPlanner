@@ -33,9 +33,10 @@ public class LongTransitWalkingFilter implements ItineraryFilter {
         final long bestWalkingDuration = bestWalkingTimeOp.getAsLong();
 
         // Filter away itineraries that spend more time on traveling (except waiting) than
-        // walking-all-the-way.
+        // walking-all-the-way. We ned to use '<=' not '<' to include the walk-all-the-way
+        // itinerary as well.
         return itineraries.stream()
-                .filter(it -> it.nonTransitTimeSeconds + it.transitTimeSeconds <= bestWalkingDuration)
+                .filter(it -> it.effectiveDurationSeconds() <= bestWalkingDuration)
                 .collect(Collectors.toList());
     }
 }

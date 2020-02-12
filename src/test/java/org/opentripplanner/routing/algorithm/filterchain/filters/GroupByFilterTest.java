@@ -18,14 +18,14 @@ import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestD
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.itinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.toStr;
+import static org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter.groupMaxLimit;
 import static org.opentripplanner.routing.core.TraverseMode.TRANSIT;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class GroupByFilterTest {
 
     private GroupByFilter<GroupByLongestLegsId> createFilter(int minLimit) {
-        return new GroupByFilter<>(
-                "test",
+        return new GroupByFilter<>("test",
                 i -> new GroupByLongestLegsId(i, .5),
                 new SortOnWalkingArrivalAndDeparture(),
                 minLimit
@@ -37,35 +37,32 @@ public class GroupByFilterTest {
         GroupByFilter<GroupByLongestLegsId> subject;
         List<Itinerary> result;
 
-        List<Itinerary> list = List.of(
-                // Group 1
-                itinerary(leg(A, C, 6, 19, 9.0, WALK)),
-                // Group 2, with 3 itinararies
-                itinerary(
-                        leg(A, B, 6, 12, 8.0, TRANSIT),
-                        leg(B, C, 13, 14, 2.0, TRANSIT)
-                ),
-                itinerary(
-                        leg(A, B, 6, 12, 8.0, TRANSIT),
-                        leg(B, C, 13, 15, 1.0, TRANSIT)
-                )
+        // Group 1
+        Itinerary i1 = itinerary(leg(A, C, 6, 19, 9.0, WALK));
+
+        // Group 2, with 3 itineraries
+        Itinerary i2 = itinerary(
+                leg(A, B, 6, 12, 8.0, TRANSIT),
+                leg(B, C, 13, 14, 2.0, TRANSIT)
         );
+        Itinerary i3 = itinerary(
+                leg(A, B, 6, 12, 8.0, TRANSIT),
+                leg(B, C, 13, 15, 1.0, TRANSIT)
+        );
+
+        List<Itinerary> list = List.of(i1, i2, i3);
 
         // With min Limit = 1, expect the best trips from both groups
         result = createFilter(1).filter(list);
-        assertEquals("{AC(6-19)}, {AB(6-12), BC(13-14)}", toStr(result));
+        assertEquals(toStr(List.of(i1, i2)), toStr(result));
 
         // With min Limit = 2, also one from each group
         result = createFilter(2).filter(list);
-        assertEquals("{AC(6-19)}, {AB(6-12), BC(13-14)}", toStr(result));
+        assertEquals(toStr(List.of(i1, i2)), toStr(result));
 
         // With min Limit = 3, still one from each group
         result = createFilter(3).filter(list);
-        assertEquals("{AC(6-19)}, {AB(6-12), BC(13-14)}", toStr(result));
-
-        // With min Limit = 4, get 1 + 2 results
-        result = createFilter(4).filter(list);
-        assertEquals("{AC(6-19)}, {AB(6-12), BC(13-14)}, {AB(6-12), BC(13-15)}", toStr(result));
+        assertEquals(toStr(List.of(i1, i2, i3)), toStr(result));
     }
 
     @Test
@@ -96,7 +93,7 @@ public class GroupByFilterTest {
         // Expected order:
         String exp1 = toStr(List.of(it1));
         String exp2 = toStr(List.of(it1, it4));
-        String exp4 = toStr(List.of(it1, it4, it2, it3));
+        String exp4 = toStr(List.of(it1, it2, it3, it4));
 
         // Assert all itineraries is put in the same group - expect just one result back
         result = createFilter(1).filter(List.of(it1, it2, it3, it4));
@@ -115,22 +112,32 @@ public class GroupByFilterTest {
     }
 
     @Test
-    public void groupMaxLimit() {
+    public void testGroupMaxLimit() {
         // min limit = 1
-        assertEquals(1, GroupByFilter.groupMaxLimit(1, 1));
-        assertEquals(1, GroupByFilter.groupMaxLimit(1, 100));
+        assertEquals(1, groupMaxLimit(1, 1));
+        assertEquals(1, groupMaxLimit(1, 100));
 
         // min limit = 2
-        assertEquals(2, GroupByFilter.groupMaxLimit(2, 1));
-        assertEquals(1, GroupByFilter.groupMaxLimit(2, 2));
-        assertEquals(1, GroupByFilter.groupMaxLimit(2, 100));
+        assertEquals(2, groupMaxLimit(2, 1));
+        assertEquals(1, groupMaxLimit(2, 2));
+        assertEquals(1, groupMaxLimit(2, 100));
 
-        // min limit = 7
-        assertEquals(7, GroupByFilter.groupMaxLimit(7, 1));
-        assertEquals(3, GroupByFilter.groupMaxLimit(7, 2));
-        assertEquals(2, GroupByFilter.groupMaxLimit(7, 3));
-        assertEquals(1, GroupByFilter.groupMaxLimit(7, 4));
-        assertEquals(1, GroupByFilter.groupMaxLimit(7, 7));
-        assertEquals(1, GroupByFilter.groupMaxLimit(7, 100));
+        // min limit = 3
+        assertEquals(3, groupMaxLimit(3, 1));
+        assertEquals(2, groupMaxLimit(3, 2));
+        assertEquals(1, groupMaxLimit(3, 3));
+
+        // min limit = 4
+        assertEquals(4, groupMaxLimit(4, 1));
+        assertEquals(2, groupMaxLimit(4, 2));
+        assertEquals(1, groupMaxLimit(4, 3));
+        assertEquals(1, groupMaxLimit(4, 100));
+
+        // min limit = 5
+        assertEquals(5, groupMaxLimit(5, 1));
+        assertEquals(3, groupMaxLimit(5, 2));
+        assertEquals(2, groupMaxLimit(5, 3));
+        assertEquals(1, groupMaxLimit(5, 4));
+        assertEquals(1, groupMaxLimit(5, 100));
     }
 }

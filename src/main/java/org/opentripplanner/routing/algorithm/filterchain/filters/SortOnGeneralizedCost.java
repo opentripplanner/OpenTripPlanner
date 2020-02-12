@@ -3,12 +3,20 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This filter sort itineraries based on the generalized cost plus a cost for all transfers. The
+ * cost of transfers are added, because this is not part of the cost function in the raptor search.
+ * <p>
+ * We tried different ways to do this. Later when we have more/cleaner criteria in the raptor search
+ * this filter could be exchanged with another better filter, like using a pareto-set and a spread
+ * function, or sorting on the length of the weighted normalized vector of all criteria.
+ */
 public class SortOnGeneralizedCost implements ItineraryFilter {
+
     private final int transferCost;
 
     public SortOnGeneralizedCost(int transferCost) {
@@ -22,31 +30,17 @@ public class SortOnGeneralizedCost implements ItineraryFilter {
 
     @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
-        if(itineraries.size() < 2) {
+        if (itineraries.size() < 2) {
             return itineraries;
         }
-        // Make a list of itineraries with qualifier
-        List<ItineraryWrapper> list = new ArrayList<>();
-
-        for (Itinerary it : itineraries) {
-            double q = it.generalizedCost + transferCost * it.nTransfers;
-            list.add(new ItineraryWrapper(it, q));
-        }
-
         // Sort acceding by qualifier and map to list of itineraries
-        return list.stream()
-                .sorted(Comparator.comparingDouble(l -> l.q))
-                .map(it -> it.itinerary)
+        return itineraries
+                .stream()
+                .sorted(Comparator.comparingDouble(this::calculateQualifier))
                 .collect(Collectors.toList());
     }
 
-    private static class ItineraryWrapper {
-        final Itinerary itinerary;
-        final double q;
-
-        public ItineraryWrapper(Itinerary itinerary, double q) {
-            this.itinerary = itinerary;
-            this.q = q;
-        }
+    private int calculateQualifier(Itinerary it) {
+        return it.generalizedCost + transferCost * it.nTransfers;
     }
 }

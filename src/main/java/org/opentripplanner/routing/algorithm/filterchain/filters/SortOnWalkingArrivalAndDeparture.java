@@ -37,7 +37,7 @@ public class SortOnWalkingArrivalAndDeparture implements ItineraryFilter {
 
     @Override
     public String name() {
-        return "sort-on:walk-mode;arrival-time;departure-time";
+        return "sort-on:walk-mode,arrival-time,departure-time";
     }
 
     @Override
