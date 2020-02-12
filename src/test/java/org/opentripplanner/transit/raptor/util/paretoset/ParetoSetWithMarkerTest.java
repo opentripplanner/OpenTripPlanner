@@ -2,9 +2,10 @@ package org.opentripplanner.transit.raptor.util.paretoset;
 
 import org.junit.Test;
 
+import java.util.Iterator;
 import java.util.Objects;
-import java.util.function.Function;
-import java.util.stream.Stream;
+import java.util.StringJoiner;
+import java.util.stream.StreamSupport;
 
 import static org.junit.Assert.assertEquals;
 
@@ -78,7 +79,7 @@ public class ParetoSetWithMarkerTest {
         assertEquals(
                 "Empty set have no elements after marker",
                 "{}",
-                toString(subject.streamAfterMarker())
+                toString(subject.elementsAfterMarker())
         );
 
         subject.add(v(5,5));
@@ -86,7 +87,7 @@ public class ParetoSetWithMarkerTest {
         assertEquals(
                 "Still empty - no elements after marker",
                 "{}",
-                toString(subject.streamAfterMarker())
+                toString(subject.elementsAfterMarker())
         );
 
         subject.markAtEndOfSet();
@@ -94,7 +95,7 @@ public class ParetoSetWithMarkerTest {
         assertEquals(
                 "Return one element after marker",
                 "[3, 7]",
-                toString(subject.streamAfterMarker())
+                toString(subject.elementsAfterMarker())
         );
     }
 
@@ -111,27 +112,34 @@ public class ParetoSetWithMarkerTest {
 
         // Then all 3 elements exist AFTER marker
         assertEquals("[9, 1], <M>, [6, 4], [5, 5], [4, 6]", toString(subject));
-        assertEquals("[6, 4], [5, 5], [4, 6]", toString(subject.streamAfterMarker()));
+        assertEquals("[6, 4], [5, 5], [4, 6]", toString(subject.elementsAfterMarker()));
     }
 
-    @SuppressWarnings("OptionalGetWithoutIsPresent")
     private String toString(ParetoSetWithMarker<Vector> set) {
         if(set.isEmpty()) {
             return "{}";
         }
-        Vector firstVectorAfterMarker = set.streamAfterMarker().findFirst().orElse(null);
-        if(firstVectorAfterMarker != null) {
-            return toString(set.stream(), it -> it == firstVectorAfterMarker ? "<M>, " + it : it.toString());
+        Iterator<Vector> afterMarker = set.elementsAfterMarker().iterator();
+        Vector firstVectorAfterMarker = afterMarker.hasNext() ? afterMarker.next() : null;
+
+        StringJoiner buf = new StringJoiner(", ");
+
+        if(firstVectorAfterMarker == null) {
+            set.forEach(it -> buf.add(it.toString()));
+            buf.add("<M>");
         }
-        return toString(set.stream()) + ", <M>";
+        else {
+            set.forEach(it -> {
+                if(it == firstVectorAfterMarker) { buf.add("<M>"); }
+                buf.add(it.toString());
+            });
+        }
+        return buf.toString();
     }
 
-    private String toString(Stream<Vector> stream) {
-        return toString(stream, Objects::toString);
-    }
-
-    private String toString(Stream<Vector> stream, Function<Vector, String> mapper) {
-        return stream.map(mapper)
+    private String toString(Iterable<Vector> elements) {
+        return StreamSupport.stream(elements.spliterator(), false)
+                .map(Objects::toString)
                 .reduce((a,b) -> a + ", " + b)
                 .orElse("{}");
     }
