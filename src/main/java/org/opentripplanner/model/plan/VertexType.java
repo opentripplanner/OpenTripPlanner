@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.model.plan;
 
 /**
  * Represent type of vertex, used in Place aka from, to in API
@@ -8,5 +8,4 @@ package org.opentripplanner.api.model;
  */
 public enum VertexType {
     NORMAL, BIKESHARE, BIKEPARK, TRANSIT
-    
 }

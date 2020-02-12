@@ -1,8 +1,4 @@
-package org.opentripplanner.api.resource;
-
-import org.opentripplanner.api.model.AbsoluteDirection;
-import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.WalkStep;
+package org.opentripplanner.model.plan;
 
 import junit.framework.TestCase;
 

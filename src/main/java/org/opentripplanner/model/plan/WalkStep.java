@@ -1,32 +1,44 @@
-package org.opentripplanner.transit.raptor.speed_test.api.model;
+package org.opentripplanner.model.plan;
+
+import com.google.common.collect.Lists;
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.BikeRentalStationInfo;
+import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graph.Edge;
+
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
  * <p>
- * Turn onto Broadway from W 57th St (coming from 7th Ave): <br/>
- * distance = 100 (say) <br/>
- * walkDirection = RIGHT <br/>
- * streetName = Broadway <br/>
- * everything else null/false <br/>
+ * Turn onto Broadway from W 57th St (coming from 7th Ave): <br>
+ * distance = 100 (say) <br>
+ * walkDirection = RIGHT <br>
+ * streetName = Broadway <br>
+ * everything else null/false <br>
  * </p>
  * <p>
- * Now, turn from Broadway onto Central Park S via Columbus Circle <br/>
- * distance = 200 (say) <br/>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br/>
- * streetName = Central Park S <br/>
- * exit = 1 (first exit) <br/>
- * immediately everything else false <br/>
+ * Now, turn from Broadway onto Central Park S via Columbus Circle <br>
+ * distance = 200 (say) <br>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
+ * streetName = Central Park S <br>
+ * exit = 1 (first exit) <br>
+ * immediately everything else false <br>
  * </p>
  * <p>
- * Instead, go through the circle to continue on Broadway <br/>
- * distance = 100 (say) <br/>
- * walkDirection = CIRCLE_COUNTERCLOCKWISE <br/>
- * streetName = Broadway <br/>
- * exit = 3 <br/>
- * stayOn = true <br/>
- * everything else false <br/>
+ * Instead, go through the circle to continue on Broadway <br>
+ * distance = 100 (say) <br>
+ * walkDirection = CIRCLE_COUNTERCLOCKWISE <br>
+ * streetName = Broadway <br>
+ * exit = 3 <br>
+ * stayOn = true <br>
+ * everything else false <br>
  * </p>
- * */
+ */
 public class WalkStep {
 
     /**
@@ -80,44 +92,59 @@ public class WalkStep {
      */
     public double lat;
 
+    /**
+     * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
+     * distance.
+     */
+    public List<P2<Double>> elevation;
 
-    public transient double angle;
+    public final Set<Alert> alerts = new HashSet<>();
+
+    public double angle;
 
     /**
      * The walkStep's mode; only populated if this is the first step of that mode in the leg.
+     * Used only in generating the streetEdges array in StreetSegment; not serialized.
+     *
+     * TODO OTP2 - This is not used ?
+     */
+    public TraverseMode newMode;
+
+    /**
+     * The street edges that make up this walkStep.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public transient String newMode;
+    public List<Edge> edges = Lists.newArrayList();
+
+    /**
+     * The bike rental on/off station info.
+     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     */
+    public BikeRentalStationInfo bikeRentalOnStation;
+
+    public BikeRentalStationInfo bikeRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
         setAbsoluteDirection(thisAngle);
     }
 
-    public String toString() {
-        String text = "";
-        if(this.relativeDirection == RelativeDirection.CIRCLE_COUNTERCLOCKWISE || this.relativeDirection == RelativeDirection.CIRCLE_CLOCKWISE) {
-            if (this.relativeDirection == RelativeDirection.CIRCLE_COUNTERCLOCKWISE) {
-                text +=  String.format("Take roundabout counterclockwise to %(ordinal_exit_number)s exit on %(street_name)s", this.exit, this.streetName);
-            } else {
-                text +=  String.format("Take roundabout clockwise to %(ordinal_exit_number)s exit on %(street_name)s", this.exit, this.streetName);
-            }
-        }
-        else {
-            if(this.relativeDirection == RelativeDirection.DEPART) {
-                text += "Start on" + " " + this.streetName + "" + " heading " + "" + this .absoluteDirection.toString() + "";
-            }
-            else {
-                text += "" + this.relativeDirection.toString() + "" + ' ' +
-                        (this.stayOn ? "to continue on" : "on to")  + " " +
-                        this.streetName + "";
-            }
-        }
-        return text;
+    public void setAbsoluteDirection(double thisAngle) {
+        int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
+        absoluteDirection = AbsoluteDirection.values()[octant];
+    }
+
+    public List<P2<Double>> getElevation() {
+        return elevation;
+    }
+
+    public void addAlerts(Collection<Alert> alerts) {
+        if(alerts == null) { return; }
+        this.addAlerts(alerts);
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
-                                                         boolean roundabout) {
+            boolean roundabout) {
 
         double angleDiff = thisAngle - lastAngle;
         if (angleDiff < 0) {
@@ -152,11 +179,6 @@ public class WalkStep {
         }
     }
 
-    public void setAbsoluteDirection(double thisAngle) {
-        int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
-        absoluteDirection = AbsoluteDirection.values()[octant];
-    }
-
 
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
@@ -166,10 +188,12 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    private String makeSentence(String text) {
-        if (text.length() > 1) {
-            text = text.substring(0, 1).toUpperCase() + text.substring(1) + ".";
+    @Override
+    public String toString() {
+        String direction = absoluteDirection.toString();
+        if (relativeDirection != null) {
+            direction = relativeDirection.toString();
         }
-        return text;
+        return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 }
