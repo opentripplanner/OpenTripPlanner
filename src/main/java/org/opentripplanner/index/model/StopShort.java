@@ -30,7 +30,8 @@ public class StopShort {
         lat = stop.getLat();
         lon = stop.getLon();
         url = stop.getUrl();
-        cluster = stop.getParentStation().getId().getId(); // TODO harmonize these names, maybe use "station" everywhere
+        // parentStation may be missing on the stop returning null.
+        cluster = stop.getParentStation() != null ? stop.getParentStation().getId().getId() : null; // TODO harmonize these names, maybe use "station" everywhere
     }
 
     /** @param distance in integral meters, to avoid serializing a bunch of decimal places. */
