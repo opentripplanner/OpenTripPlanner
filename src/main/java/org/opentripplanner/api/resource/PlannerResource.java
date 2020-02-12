@@ -2,12 +2,13 @@ package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.RoutingResource;
-import org.opentripplanner.api.model.ApiTripSearchMetadata;
+import org.opentripplanner.api.mapping.TripPlanMapper;
+import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,7 +22,6 @@ import javax.ws.rs.core.UriInfo;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.List;
 
 import static org.opentripplanner.api.resource.ServerInfo.Q;
 
@@ -57,7 +57,7 @@ public class PlannerResource extends RoutingResource {
         Response response = new Response(uriInfo);
         RoutingRequest request = null;
         Router router = null;
-        List<GraphPath> paths = null;
+        RoutingResponse res = null;
         try {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
@@ -65,12 +65,15 @@ public class PlannerResource extends RoutingResource {
             router = otpServer.getRouter(null);
             request.setRoutingContext(router.graph);
 
+            // Route
             RoutingWorker worker = new RoutingWorker(request);
 
-            RoutingResponse res = worker.route(router);
+            res = worker.route(router);
 
-            response.setPlan(res.getTripPlan());
-            response.setMetadata(new ApiTripSearchMetadata(res.getMetadata()));
+            // Map to API
+            TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
+            response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
+            response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
 
             /* Populate up the elevation metadata */
             response.elevationMetadata = new ElevationMetadata();
@@ -111,9 +114,9 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(request.to.lng);
             sb.append(' ');
-            if (paths != null) {
-                for (GraphPath path : paths) {
-                    sb.append(path.getDuration());
+            if (res != null) {
+                for (Itinerary it : res.getTripPlan().itineraries) {
+                    sb.append(it.durationSeconds);
                     sb.append(' ');
                 }
             }

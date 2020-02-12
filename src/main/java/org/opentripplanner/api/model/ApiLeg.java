@@ -1,23 +1,17 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.api.model.alertpatch.ApiAlert;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
-import javax.xml.bind.annotation.XmlTransient;
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Locale;
 import java.util.TimeZone;
 
  /**
@@ -25,18 +19,18 @@ import java.util.TimeZone;
  * particular vehicle (or on foot).
  */
 
-public class Leg {
+public class ApiLeg {
 
     /**
      * The date and time this leg begins.
      */
     public Calendar startTime = null;
-    
+
     /**
      * The date and time this leg ends.
      */
     public Calendar endTime = null;
-    
+
     /**
      * For transit leg, the offset from the scheduled departure-time of the boarding stop in this leg.
      * "scheduled time of departure at boarding stop" = startTime - departureDelay
@@ -52,24 +46,24 @@ public class Leg {
      * Whether there is real-time data about this Leg
      */
     public Boolean realTime = false;
-    
+
     /**
      * Is this a frequency-based trip with non-strict departure times?
      */
     public Boolean isNonExactFrequency = null;
-    
+
     /**
-     * The best estimate of the time between two arriving vehicles. This is particularly important 
-     * for non-strict frequency trips, but could become important for real-time trips, strict 
+     * The best estimate of the time between two arriving vehicles. This is particularly important
+     * for non-strict frequency trips, but could become important for real-time trips, strict
      * frequency trips, and scheduled trips with empirical headways.
      */
     public Integer headway = null;
-    
+
     /**
      * The distance traveled while traversing the leg in meters.
      */
     public Double distance = null;
-    
+
     /**
      * Is this leg a traversing pathways?
      */
@@ -122,7 +116,7 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public Integer routeType = null;
-    
+
     /**
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
@@ -143,7 +137,7 @@ public class Leg {
     @JsonSerialize
     public Boolean interlineWithPreviousLeg;
 
-    
+
     /**
      * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
      */
@@ -157,7 +151,7 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String tripBlockId = null;
-    
+
     /**
      * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
      */
@@ -172,13 +166,13 @@ public class Leg {
     @XmlAttribute
     @JsonSerialize
     public String agencyId = null;
-    
+
     /**
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
     public FeedScopedId tripId = null;
-    
+
     /**
      * For transit legs, the service date of the trip.
      * For non-transit legs, null.
@@ -197,19 +191,19 @@ public class Leg {
      /**
      * The Place where the leg originates.
      */
-    public Place from = null;
-    
+    public ApiPlace from = null;
+
     /**
      * The Place where the leg begins.
      */
-    public Place to = null;
+    public ApiPlace to = null;
 
     /**
      * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
      * For non-transit legs, null.
      * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
      */
-    public List<Place> intermediateStops;
+    public List<ApiPlace> intermediateStops;
 
     /**
      * The leg's geometry.
@@ -217,19 +211,15 @@ public class Leg {
     public EncodedPolylineBean legGeometry;
 
     /**
-     * A series of turn by turn instructions used for walking, biking and driving. 
+     * A series of turn by turn instructions used for walking, biking and driving.
      */
     @XmlElementWrapper(name = "steps")
     @JsonProperty(value="steps")
-    public List<WalkStep> walkSteps;
+    public List<ApiWalkStep> walkSteps;
 
     @XmlElement
     @JsonSerialize
-    public List<LocalizedAlert> alerts;
-
-    @XmlTransient
-    @JsonIgnore
-    public List<AlertPatch> alertPatches = new ArrayList<>();
+    public List<ApiAlert> alerts;
 
     @XmlAttribute
     @JsonSerialize
@@ -262,26 +252,14 @@ public class Leg {
         else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
         else return true;
     }
-    
-    /** 
+
+    /**
      * The leg's duration in seconds
      */
     @XmlElement
     @JsonSerialize
     public double getDuration() {
         return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
-    }
-
-    public void addAlert(Alert alert, Locale locale) {
-        if (alerts == null) {
-            alerts = new ArrayList<>();
-        }
-        for (LocalizedAlert a : alerts) {
-            if (a.alert.equals(alert)) {
-                return;
-            }
-        }
-        alerts.add(new LocalizedAlert(alert, locale));
     }
 
     public void setTimeZone(TimeZone timeZone) {
@@ -293,10 +271,4 @@ public class Leg {
         endTime = calendar;
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
-
-     public void addAlertPatch(AlertPatch alertPatch) {
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
-     }
  }

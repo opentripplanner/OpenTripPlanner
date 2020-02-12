@@ -10,16 +10,16 @@ import java.util.List;
 /**
  * A TripPlan is a set of ways to get from point A to point B at time T.
  */
-public class TripPlan {
+public class ApiTripPlan {
 
     /**  The time and date of travel */
-    public Date date = null;
+    public Date date;
     
     /** The origin */
-    public Place from = null;
+    public ApiPlace from;
     
     /** The destination */
-    public Place to = null;
+    public ApiPlace to;
 
     /**
      * A list of possible itineraries. The wrapper is named 'itineraries' while the
@@ -27,12 +27,5 @@ public class TripPlan {
      */
     @XmlElementWrapper(name="itineraries")
     @JsonProperty(value="itineraries")
-    public List<Itinerary> itinerary = new ArrayList<Itinerary>();
-
-    public TripPlan(Place from, Place to, Date date, List<Itinerary> itineraries) {
-        this.from = from;
-        this.to = to;
-        this.date = date;
-        this.itinerary.addAll(itineraries);
-    }
+    public List<ApiItinerary> itinerary = new ArrayList<>();
 }

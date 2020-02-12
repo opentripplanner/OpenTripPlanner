@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.junit.Ignore;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.model.plan.Leg;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;
@@ -33,7 +33,7 @@ public class PatternInterlineDwellTest extends GtfsTest {
         Leg[] legs = plan(time, "stop0", "stop3", null, false, false, null, null, null, 2);
         assertEquals(legs[0].routeId.getId(), "route1");
         assertEquals(legs[1].routeId.getId(), "route1");
-        assertTrue(itinerary.transfers == 0);
+        assertTrue(itinerary.nTransfers == 0);
     }
 
     // TODO test for trips on the same block with no transfer allowed (Trimet special case)

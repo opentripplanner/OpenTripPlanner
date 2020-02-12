@@ -67,7 +67,11 @@ public class TableTestReport {
         return list.isEmpty() ? "-" : list.stream().map(Object::toString).collect(Collectors.joining(" "));
     }
 
-    private static String toStr(Collection<String> list) {
-        return list.isEmpty() ? "-" : String.join(" ", list);
+    private static String toStr(Collection<?> list) {
+        return list.isEmpty()
+                ? "-"
+                : list.stream()
+                        .map(Object::toString)
+                        .collect(Collectors.joining(" "));
     }
 }
