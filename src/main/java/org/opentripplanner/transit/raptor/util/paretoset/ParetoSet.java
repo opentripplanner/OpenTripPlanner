@@ -4,7 +4,6 @@ import java.util.AbstractCollection;
 import java.util.Arrays;
 import java.util.Iterator;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 
 /**
@@ -61,13 +60,33 @@ public class ParetoSet<T> extends AbstractCollection<T> {
     }
 
 
+    /**
+     * Return an iterator over the contained collection.
+     * <p>
+     * This is NOT thread-safe and the behavior is undefined if the collection is modified during
+     * the iteration.
+     */
     @Override
     public final Iterator<T> iterator() {
-        return stream(0).iterator();
+        return tailIterator(0);
     }
 
-    final Stream<T> stream(int startInclusive) {
-        return Arrays.stream(elements, startInclusive, size);
+    /**
+     * Return an iterable instance. This is made to be as FAST AS POSSIBLE, sacrificing
+     * thread-safety and modifiable protection.
+     * <p>
+     * The iterator created by this iterable is NOT thread-safe.
+     * <p>
+     * Do not modify the collection between the iterator is created, until the iterator complete.
+     * <p>
+     * It is safe to create as many iterators as you like. The iterator created will reflect the
+     * current set of elements in this set at the time of creation.
+     *
+     * @param startIndexInclusive the first element to include in the iterator, unlike the elements
+     *                            in  this set the index is cashed until an iterator is created.
+     */
+    final Iterable<T> tail(final int startIndexInclusive) {
+        return () -> tailIterator(startIndexInclusive);
     }
 
     @Override
@@ -185,6 +204,19 @@ public class ParetoSet<T> extends AbstractCollection<T> {
      */
     protected void notifyElementMoved(int fromIndex, int toIndex) {
         // Noop
+    }
+
+    /**
+     * This tail iterator is made to be FAST, it is NOT thread-safe and it the
+     * underlying collection is changed the returned values of the iterator also
+     * changes. Do not update on this collection while using this iterator.
+     */
+    private Iterator<T> tailIterator(final int startInclusive) {
+        return new Iterator<>() {
+            int i = startInclusive;
+            @Override public boolean hasNext() { return i < size; }
+            @Override public T next() { return elements[i++]; }
+        };
     }
 
     /**
