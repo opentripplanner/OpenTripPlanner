@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.model.routing.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import org.junit.Ignore;
 import org.opentripplanner.GtfsTest;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.model.plan.Leg;
 
 import java.util.Calendar;
 import java.util.GregorianCalendar;

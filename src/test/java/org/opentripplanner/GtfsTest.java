@@ -5,13 +5,13 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -60,7 +60,6 @@ public abstract class GtfsTest extends TestCase {
                 gtfsBundleList,
                 ServiceDateInterval.unbounded()
         );
-
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
@@ -149,8 +148,14 @@ public abstract class GtfsTest extends TestCase {
         return itinerary.legs.toArray(new Leg[legCount]);
     }
 
-    public void validateLeg(Leg leg, long startTime, long endTime, String toStopId, String fromStopId,
-                     String alert) {
+    public void validateLeg(
+            Leg leg,
+            long startTime,
+            long endTime,
+            String toStopId,
+            String fromStopId,
+            String alert
+    ) {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());
@@ -164,7 +169,7 @@ public abstract class GtfsTest extends TestCase {
         if (alert != null) {
             assertNotNull(leg.alerts);
             assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.get(0).getAlertHeaderText());
+            assertEquals(alert, leg.alerts.iterator().next().alertHeaderText.toString());
         } else {
             assertNull(leg.alerts);
         }

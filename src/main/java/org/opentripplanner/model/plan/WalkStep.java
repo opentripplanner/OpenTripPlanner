@@ -1,22 +1,15 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.model.plan;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.graph.Edge;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.google.common.collect.Lists;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Represents one instruction in walking directions. Three examples from New York City:
@@ -102,36 +95,38 @@ public class WalkStep {
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
      * distance.
      */
-    @XmlTransient
     public List<P2<Double>> elevation;
 
-    @XmlElement
-    @JsonSerialize
-    public List<LocalizedAlert> alerts;
+    public final Set<Alert> alerts = new HashSet<>();
 
-    public transient double angle;
+    public double angle;
 
     /**
      * The walkStep's mode; only populated if this is the first step of that mode in the leg.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public transient String newMode;
+    public String newMode;
 
     /**
      * The street edges that make up this walkStep.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public transient List<Edge> edges = Lists.newArrayList();
+    public List<Edge> edges = Lists.newArrayList();
 
     /**
      * The bike rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public transient BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
+    public BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
         setAbsoluteDirection(thisAngle);
+    }
+
+    public void addAlerts(Collection<Alert> alerts) {
+        if(alerts == null) { return; }
+        this.addAlerts(alerts);
     }
 
     public String toString() {
@@ -183,23 +178,6 @@ public class WalkStep {
         absoluteDirection = AbsoluteDirection.values()[octant];
     }
 
-    public void addAlerts(Collection<Alert> newAlerts, Locale locale) {
-        if (newAlerts == null) {
-            return;
-        }
-        if (alerts == null) {
-            alerts = new ArrayList<>();
-        }
-        ALERT: for (Alert newAlert : newAlerts) {
-            for (LocalizedAlert alert : alerts) {
-                if (alert.alert.equals(newAlert)) {
-                    break ALERT;
-                }
-            }
-            alerts.add(new LocalizedAlert(newAlert, locale));
-        }
-    }
-
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
         if (idx <= 0) {
@@ -208,10 +186,7 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    @XmlJavaTypeAdapter(ElevationAdapter.class)
-    @JsonSerialize
     public List<P2<Double>> getElevation() {
         return elevation;
     }
-
 }

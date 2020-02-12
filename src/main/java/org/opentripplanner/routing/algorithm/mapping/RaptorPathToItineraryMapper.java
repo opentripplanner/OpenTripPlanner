@@ -1,10 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.VertexType;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.model.Route;
@@ -12,6 +8,10 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;

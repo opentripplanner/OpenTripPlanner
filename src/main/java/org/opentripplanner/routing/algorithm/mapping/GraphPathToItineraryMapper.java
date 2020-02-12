@@ -3,12 +3,6 @@ package org.opentripplanner.routing.algorithm.mapping;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.VertexType;
-import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -16,6 +10,12 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.RelativeDirection;
+import org.opentripplanner.model.plan.VertexType;
+import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
@@ -301,7 +301,7 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states, disableAlertFiltering, requestedLocale);
+        addModeAndAlerts(graph, leg, states, disableAlertFiltering);
 
         return leg;
     }
@@ -471,7 +471,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering, Locale requestedLocale) {
+    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -483,7 +483,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (alerts != null) {
                 for (Alert alert : alerts) {
-                    leg.addAlert(alert, requestedLocale);
+                    leg.addAlert(alert);
                 }
             }
 
@@ -493,12 +493,12 @@ public abstract class GraphPathToItineraryMapper {
                         // If the alert patch contains a trip and that trip match this leg only add the alert for
                         // this leg.
                         if (alertPatch.getTrip().equals(leg.tripId)) {
-                            leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                            leg.addAlert(alertPatch.getAlert());
                             leg.addAlertPatch(alertPatch);
                         }
                     } else {
                         // If we are not matching a particular trip add all known alerts for this trip pattern.
-                        leg.addAlert(alertPatch.getAlert(), requestedLocale);
+                        leg.addAlert(alertPatch.getAlert());
                         leg.addAlertPatch(alertPatch);
                     }
                 }
@@ -516,7 +516,8 @@ public abstract class GraphPathToItineraryMapper {
      * @param edges The edges that go with the leg
      * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      */
-    private static void addPlaces(Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops,
+    private static void addPlaces(
+            Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops,
         Locale requestedLocale) {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
@@ -609,7 +610,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
-        List<WalkStep> steps = new ArrayList<WalkStep>();
+        List<WalkStep> steps = new ArrayList<>();
         WalkStep step = null;
         double lastAngle = 0, distance = 0; // distance used for appending elevation profiles
         int roundaboutExit = 0; // track whether we are in a roundabout, and if so the exit number
@@ -836,11 +837,11 @@ public abstract class GraphPathToItineraryMapper {
                     if (twoBack.distance < MAX_ZAG_DISTANCE
                             && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
                         
-                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT || 
+                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
                                 (twoBack.relativeDirection == RelativeDirection.RIGHT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
-                                ((lastStep.relativeDirection == RelativeDirection.LEFT || 
+                                ((lastStep.relativeDirection == RelativeDirection.LEFT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
                                 (twoBack.relativeDirection == RelativeDirection.LEFT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
@@ -852,7 +853,7 @@ public abstract class GraphPathToItineraryMapper {
                             lastStep.distance += twoBack.distance;
                             
                             // A U-turn to the left, typical in the US. 
-                            if (lastStep.relativeDirection == RelativeDirection.LEFT || 
+                            if (lastStep.relativeDirection == RelativeDirection.LEFT ||
                                     lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
                                 lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
                             else
@@ -901,7 +902,7 @@ public abstract class GraphPathToItineraryMapper {
 
             // increment the total length for this step
             step.distance += edge.getDistanceMeters();
-            step.addAlerts(graph.streetNotesService.getNotes(forwardState), requestedLocale);
+            step.addAlerts(graph.streetNotesService.getNotes(forwardState));
             lastAngle = DirectionUtils.getLastAngle(geom);
 
             step.edges.add(edge);
@@ -946,7 +947,7 @@ public abstract class GraphPathToItineraryMapper {
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
                 s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
-        step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
+        step.addAlerts(graph.streetNotesService.getNotes(s));
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
         if (s.getBackEdge() instanceof AreaEdge) {
             step.area = true;

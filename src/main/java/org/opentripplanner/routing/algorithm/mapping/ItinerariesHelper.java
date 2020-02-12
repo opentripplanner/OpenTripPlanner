@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
