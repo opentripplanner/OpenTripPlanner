@@ -285,6 +285,11 @@ public class RaptorPathToItineraryMapper {
                 Itinerary subItinerary = GraphPathToItineraryMapper
                         .generateItinerary(graphPath, false, true, request.locale);
 
+                // TODO OTP2 We use the duration initially calculated for use during routing
+                //      because they do not always match up and we risk getting negative wait times
+                //      (#2955)
+                subItinerary.nonTransitTimeSeconds = pathLeg.duration();
+
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
                     legs.addAll(subItinerary.legs);
                 }
