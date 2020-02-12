@@ -215,7 +215,7 @@ public class ServiceLinkMapper {
       else {
         Coordinate fromCoord = new Coordinate(fromShapePoint.getLon(), fromShapePoint.getLat());
         Coordinate toCoord = new Coordinate(toShapePoint.getLon(), toShapePoint.getLat());
-        distance = SphericalDistanceLibrary.degreesToMeters(toCoord.distance(fromCoord));
+        distance = SphericalDistanceLibrary.distance(fromCoord, toCoord);
       }
       distanceCounter.add(distance);
       toShapePoint.setDistTraveled(distanceCounter.doubleValue());
