@@ -13,9 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Maps a Timetable and a date to a TripPatternForDate. TripSchedules are then filtered according
@@ -23,27 +25,44 @@ import java.util.Map;
  *
  * If the Timetable contains a ServiceDate that is not valid for any of its trips, a message is
  * logged.
+ *
+ * This class is THREAD SAFE because the collections initialized as part of the class state are
+ * concurrent and because the collections passed in on the constructor or their elements are not
+ * modified. The objects passed into the map method are also not modified.
  */
 public class TripPatternForDateMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(TripPatternForDateMapper.class);
 
-  private final Map<Timetable, List<TripTimes>> sortedTripTimesForTimetable = new HashMap<>();
+  private final ConcurrentMap<Timetable, List<TripTimes>> sortedTripTimesForTimetable =
+      new ConcurrentHashMap<>();
+
+  private final ConcurrentMap<TripTimes, TripSchedule> tripScheduleForTripTimes =
+      new ConcurrentHashMap<>();
 
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
 
-  private final Map<TripTimes, TripSchedule> tripScheduleForTripTimes = new HashMap<>();
-
   private final Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld;
 
+  /**
+   * @param serviceCodesRunningForDate - READ ONLY
+   * @param newTripPatternForOld - READ ONLY
+   */
   TripPatternForDateMapper(
       Map<ServiceDate, TIntSet> serviceCodesRunningForDate,
       Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld
   ) {
-    this.serviceCodesRunningForDate = serviceCodesRunningForDate;
-    this.newTripPatternForOld = newTripPatternForOld;
+    this.serviceCodesRunningForDate = Collections.unmodifiableMap(serviceCodesRunningForDate);
+    this.newTripPatternForOld = Collections.unmodifiableMap(newTripPatternForOld);
   }
 
+  /**
+   * This method is THREAD SAFE.
+   *
+   * @param timetable The timetable to be mapped to TripPatternForDate - READ ONLY
+   * @param serviceDate The date to map the TripPatternForDate for - READ ONLY
+   * @return TripPatternForDate for this timetable and serviceDate
+   */
   public TripPatternForDate map(Timetable timetable, ServiceDate serviceDate) {
 
     TIntSet serviceCodesRunning = serviceCodesRunningForDate.get(serviceDate);
@@ -64,7 +83,6 @@ public class TripPatternForDateMapper {
     );
     for (TripTimes tripTimes : sortedTripTimes) {
       if (!serviceCodesRunning.contains(tripTimes.serviceCode)) {
-
         continue;
       }
       if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {
@@ -89,11 +107,11 @@ public class TripPatternForDateMapper {
     }
 
     TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
-    TripPatternForDate tripPatternForDate = new TripPatternForDate(newTripPattern,
-        newTripSchedules,
-        ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
-    );
-    return tripPatternForDate;
-  }
 
+    return new TripPatternForDate(
+            newTripPattern,
+            newTripSchedules,
+            ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
+    );
+  }
 }
