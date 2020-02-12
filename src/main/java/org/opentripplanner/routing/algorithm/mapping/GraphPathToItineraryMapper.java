@@ -99,8 +99,8 @@ public abstract class GraphPathToItineraryMapper {
      */
     private static Itinerary adjustItinerary(RoutingRequest request, Itinerary itinerary) {
         // Check walk limit distance
-        if (itinerary.walkDistance > request.maxWalkDistance) {
-            itinerary.walkLimitExceeded = true;
+        if (itinerary.nonTransitDistanceMeters > request.maxWalkDistance) {
+            itinerary.nonTransitLimitExceeded = true;
         }
         // Return itinerary
         return itinerary;
@@ -116,7 +116,6 @@ public abstract class GraphPathToItineraryMapper {
      * @return The generated itinerary
      */
     public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
-        Itinerary itinerary = new Itinerary();
 
         State[] states = new State[path.states.size()];
         State lastState = path.states.getLast();
@@ -129,33 +128,28 @@ public abstract class GraphPathToItineraryMapper {
 
         State[][] legsStates = sliceStates(states);
 
+        List<Leg> legs = new ArrayList<>();
         for (State[] legStates : legsStates) {
-            itinerary.addLeg(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
+            legs.add(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
         }
 
-        addWalkSteps(graph, itinerary.legs, legsStates, requestedLocale);
+        addWalkSteps(graph, legs, legsStates, requestedLocale);
 
 
-        for (int i = 0; i < itinerary.legs.size(); i++) {
-            Leg leg = itinerary.legs.get(i);
+        for (int i = 0; i < legs.size(); i++) {
+            Leg leg = legs.get(i);
             boolean isFirstLeg = i == 0;
 
             AlertToLegMapper.addAlertPatchesToLeg(graph, leg, isFirstLeg, requestedLocale);
         }
 
-        fixupLegs(itinerary.legs, legsStates);
+        fixupLegs(legs, legsStates);
 
-        itinerary.duration = lastState.getElapsedTimeSeconds();
-        itinerary.startTime = makeCalendar(states[0]);
-        itinerary.endTime = makeCalendar(lastState);
-
-        calculateTimes(itinerary, states);
+        Itinerary itinerary = new Itinerary(legs);
 
         calculateElevations(itinerary, edges);
 
-        itinerary.walkDistance = lastState.getWalkDistance();
-
-        itinerary.transfers = 0;
+        itinerary.generalizedCost = (int) lastState.weight;
 
         return itinerary;
     }
@@ -277,10 +271,10 @@ public abstract class GraphPathToItineraryMapper {
         leg.endTime = makeCalendar(states[states.length - 1]);
 
         // Calculate leg distance and fill array of edges
-        leg.distance = 0.0;
+        leg.distanceMeters = 0.0;
         for (int i = 0; i < edges.length; i++) {
             edges[i] = states[i + 1].getBackEdge();
-            leg.distance += edges[i].getDistanceMeters();
+            leg.distanceMeters += edges[i].getDistanceMeters();
         }
 
         TimeZone timeZone = leg.startTime.getTimeZone();
@@ -338,13 +332,13 @@ public abstract class GraphPathToItineraryMapper {
     private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
         WalkStep previousStep = null;
 
-        String lastMode = null;
+        TraverseMode lastMode = null;
 
         BikeRentalStationVertex onVertex = null, offVertex = null;
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
-            String legMode = legs.get(i).mode;
+            TraverseMode legMode = legs.get(i).mode;
             if(legMode != lastMode && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
@@ -410,33 +404,6 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Calculate the walkTime, transitTime and waitingTime of an {@link Itinerary}.
-     *
-     * @param itinerary The itinerary to calculate the times for
-     * @param states The states that go with the itinerary
-     */
-    private static void calculateTimes(Itinerary itinerary, State[] states) {
-        for (State state : states) {
-            if (state.getBackMode() == null) continue;
-
-            switch (state.getBackMode()) {
-                default:
-                    itinerary.transitTime += state.getTimeDeltaSeconds();
-                    break;
-
-                case LEG_SWITCH:
-                    itinerary.waitingTime += state.getTimeDeltaSeconds();
-                    break;
-
-                case WALK:
-                case BICYCLE:
-                case CAR:
-                    itinerary.walkTime += state.getTimeDeltaSeconds();
-            }
-        }
-    }
-
-    /**
      * Calculate the elevationGained and elevationLost fields of an {@link Itinerary}.
      *
      * @param itinerary The itinerary to calculate the elevation changes for
@@ -478,7 +445,7 @@ public abstract class GraphPathToItineraryMapper {
             Edge edge = state.getBackEdge();
 
             if (mode != null) {
-                leg.mode = mode.toString();
+                leg.mode = mode;
             }
 
             if (alerts != null) {

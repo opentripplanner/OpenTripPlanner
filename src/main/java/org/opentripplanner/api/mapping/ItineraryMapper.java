@@ -23,20 +23,22 @@ public class ItineraryMapper {
     public ApiItinerary mapItinerary(Itinerary domain) {
         if(domain == null) { return null; }
         ApiItinerary api = new ApiItinerary();
-        api.duration = domain.duration;
-        api.startTime = domain.startTime;
-        api.endTime = domain.endTime;
-        api.walkTime = domain.walkTime;
-        api.transitTime = domain.transitTime;
-        api.waitingTime = domain.waitingTime;
-        api.walkDistance = domain.walkDistance;
-        api.walkLimitExceeded = domain.walkLimitExceeded;
+
+        api.duration = domain.durationSeconds;
+        api.startTime = domain.startTime();
+        api.endTime = domain.endTime();
+        api.walkTime = domain.nonTransitTimeSeconds;
+        api.transitTime = domain.transitTimeSeconds;
+        api.waitingTime = domain.waitingTimeSeconds;
+        api.walkDistance = domain.nonTransitDistanceMeters;
+        api.walkLimitExceeded = domain.nonTransitLimitExceeded;
         api.elevationLost = domain.elevationLost;
         api.elevationGained = domain.elevationGained;
-        api.transfers = domain.transfers;
+        api.transfers = domain.nTransfers;
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
         api.tooSloped = domain.tooSloped;
+
         return api;
     }
 

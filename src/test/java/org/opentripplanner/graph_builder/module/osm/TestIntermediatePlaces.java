@@ -151,7 +151,7 @@ public class TestIntermediatePlaces {
             validateLegsTemporally(request, itinerary);
             validateLegsSpatially(plan, itinerary);
             if (modes.contains("TRANSIT")) {
-                assert itinerary.transitTime > 0;
+                assert itinerary.transitTimeSeconds > 0;
             }
         }
     }
@@ -203,13 +203,13 @@ public class TestIntermediatePlaces {
             departTime = leg.to.arrival;
             sumOfDuration += leg.getDuration();
         }
-        sumOfDuration += itinerary.waitingTime;
+        sumOfDuration += itinerary.waitingTimeSeconds;
 
         assertFalse(departTime.after(arriveTime));
 
         // Check the total duration of the legs,
         int accuracy = itinerary.legs.size(); // allow 1 second per leg for rounding errors
-        assertEquals(sumOfDuration, itinerary.duration.doubleValue(), accuracy);
+        assertEquals(sumOfDuration, itinerary.durationSeconds, accuracy);
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {

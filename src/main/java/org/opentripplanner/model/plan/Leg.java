@@ -6,6 +6,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -61,7 +62,7 @@ public class Leg {
    /**
     * The distance traveled while traversing the leg in meters.
     */
-   public Double distance = null;
+   public Double distanceMeters = null;
 
    /**
     * Is this leg a traversing pathways?
@@ -71,7 +72,7 @@ public class Leg {
    /**
     * The mode (e.g., <code>Walk</code>) used when traversing this leg.
     */
-   public String mode = TraverseMode.WALK.toString();
+   public TraverseMode mode = TraverseMode.WALK;
 
    /**
     * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
@@ -201,18 +202,23 @@ public class Leg {
     * @return Boolean true if the leg is a transit leg
     */
    public Boolean isTransitLeg() {
-       if (mode == null) return null;
-       else if (mode.equals(TraverseMode.WALK.toString())) return false;
-       else if (mode.equals(TraverseMode.CAR.toString())) return false;
-       else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-       else return true;
+       return mode.isTransit();
    }
 
-   /**
+    public boolean isWalkingLeg() {
+        return mode.isWalking();
+    }
+
+    public boolean isOnStreetNonTransit() {
+        return mode.isOnStreetNonTransit();
+    }
+
+    /**
     * The leg's duration in seconds
     */
-   public double getDuration() {
-       return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
+   public long getDuration() {
+       // Round to closest second; Hence subtract 500 ms before dividing by 1000
+       return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
    }
 
    public void addAlert(Alert alert) {
@@ -234,4 +240,73 @@ public class Leg {
            alertPatches.add(alertPatch);
        }
     }
+
+    /** Should be used for debug logging only */
+    @Override
+    public String toString() {
+        final StringBuilder sb = new StringBuilder();
+        toStringAdd(sb, ", from", from);
+        toStringAdd(sb, ", to", to);
+        toStringAddCal(sb, ", startTime", startTime);
+        toStringAddCal(sb, ", endTime", endTime);
+        toStringAddPosInt(sb, ", departureDelay", departureDelay);
+        toStringAddPosInt(sb, ", arrivalDelay", arrivalDelay);
+        toStringAdd(sb, ", realTime", realTime);
+        toStringAdd(sb, ", isNonExactFrequency", isNonExactFrequency);
+        toStringAdd(sb, ", headway", headway);
+        toStringAdd(sb, ", distance", distanceMeters);
+        toStringAdd(sb, ", pathway", pathway);
+        toStringAdd(sb, ", mode", mode);
+        toStringAdd(sb, ", route", route);
+        toStringAdd(sb, ", agencyName", agencyName);
+        toStringAdd(sb, ", agencyUrl", agencyUrl);
+        toStringAdd(sb, ", agencyBrandingUrl", agencyBrandingUrl);
+        toStringAddPosInt(sb, ", agencyTimeZoneOffset", agencyTimeZoneOffset);
+        toStringAdd(sb, ", routeColor", routeColor);
+        toStringAdd(sb, ", routeType", routeType);
+        toStringAdd(sb, ", routeId", routeId);
+        toStringAdd(sb, ", routeTextColor", routeTextColor);
+        toStringAdd(sb, ", interlineWithPreviousLeg", interlineWithPreviousLeg);
+        toStringAdd(sb, ", tripShortName", tripShortName);
+        toStringAdd(sb, ", tripBlockId", tripBlockId);
+        toStringAdd(sb, ", headsign", headsign);
+        toStringAdd(sb, ", agencyId", agencyId);
+        toStringAdd(sb, ", tripId", tripId);
+        toStringAdd(sb, ", serviceDate", serviceDate);
+        toStringAdd(sb, ", routeBrandingUrl", routeBrandingUrl);
+        toStringAdd(sb, ", intermediateStops", intermediateStops);
+        toStringAdd(sb, ", legGeometry", legGeometry);
+        toStringAdd(sb, ", walkSteps", walkSteps);
+        toStringAdd(sb, ", alerts", alerts);
+        toStringAdd(sb, ", alertPatches", alertPatches);
+        toStringAdd(sb, ", routeShortName", routeShortName);
+        toStringAdd(sb, ", routeLongName", routeLongName);
+        toStringAdd(sb, ", boardRule", boardRule);
+        toStringAdd(sb, ", alightRule", alightRule);
+        toStringAdd(sb, ", rentedBike", rentedBike);
+        return "Leg{" + (sb.length() > 0 ? sb.substring(2) : "") + "}";
+    }
+
+    private static void toStringAdd(StringBuilder sb, String name, Boolean value) {
+        if(value == null || !value) { return; }
+        sb.append(name);
+    }
+    private static void toStringAdd(StringBuilder sb, String name, String value) {
+        if(value == null) { return; }
+        sb.append(name).append("='").append(value).append("'");
+    }
+    private static void toStringAddCal(StringBuilder sb, String name, Calendar value) {
+        if(value == null) { return; }
+        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd mm:hh:ssZZZ");
+        sb.append(name).append("='").append(sdf.format(value.getTime())).append("'");
+    }
+    private static void toStringAdd(StringBuilder sb, String name, Object value) {
+        if(value == null) { return; }
+        sb.append(name).append("=").append(value);
+    }
+    private static void toStringAddPosInt(StringBuilder sb, String name, int value) {
+        if(value == 0) { return; }
+        sb.append(name);
+    }
+
 }

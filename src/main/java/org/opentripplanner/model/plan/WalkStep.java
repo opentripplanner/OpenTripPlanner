@@ -4,6 +4,7 @@ import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Collection;
@@ -37,7 +38,7 @@ import java.util.Set;
  * stayOn = true <br>
  * everything else false <br>
  * </p>
- * */
+ */
 public class WalkStep {
 
     /**
@@ -103,9 +104,11 @@ public class WalkStep {
 
     /**
      * The walkStep's mode; only populated if this is the first step of that mode in the leg.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     * Used only in generating the streetEdges array in StreetSegment; not serialized.
+     *
+     * TODO OTP2 - This is not used ?
      */
-    public String newMode;
+    public TraverseMode newMode;
 
     /**
      * The street edges that make up this walkStep.
@@ -117,24 +120,27 @@ public class WalkStep {
      * The bike rental on/off station info.
      * Used only in generating the streetEdges array in StreetSegment; not serialized. 
      */
-    public BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
+    public BikeRentalStationInfo bikeRentalOnStation;
+
+    public BikeRentalStationInfo bikeRentalOffStation;
 
     public void setDirections(double lastAngle, double thisAngle, boolean roundabout) {
         relativeDirection = getRelativeDirection(lastAngle, thisAngle, roundabout);
         setAbsoluteDirection(thisAngle);
     }
 
+    public void setAbsoluteDirection(double thisAngle) {
+        int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
+        absoluteDirection = AbsoluteDirection.values()[octant];
+    }
+
+    public List<P2<Double>> getElevation() {
+        return elevation;
+    }
+
     public void addAlerts(Collection<Alert> alerts) {
         if(alerts == null) { return; }
         this.addAlerts(alerts);
-    }
-
-    public String toString() {
-        String direction = absoluteDirection.toString();
-        if (relativeDirection != null) {
-            direction = relativeDirection.toString();
-        }
-        return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
@@ -173,10 +179,6 @@ public class WalkStep {
         }
     }
 
-    public void setAbsoluteDirection(double thisAngle) {
-        int octant = (int) (8 + Math.round(thisAngle * 8 / (Math.PI * 2))) % 8;
-        absoluteDirection = AbsoluteDirection.values()[octant];
-    }
 
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
@@ -186,7 +188,12 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    public List<P2<Double>> getElevation() {
-        return elevation;
+    @Override
+    public String toString() {
+        String direction = absoluteDirection.toString();
+        if (relativeDirection != null) {
+            direction = relativeDirection.toString();
+        }
+        return "WalkStep(" + direction + " on " + streetName + " for " + distance + ")";
     }
 }

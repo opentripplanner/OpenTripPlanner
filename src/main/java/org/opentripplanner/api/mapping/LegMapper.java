@@ -32,9 +32,11 @@ public class LegMapper {
         api.realTime = domain.realTime;
         api.isNonExactFrequency = domain.isNonExactFrequency;
         api.headway = domain.headway;
-        api.distance = domain.distance;
+        api.distance = domain.distanceMeters;
         api.pathway = domain.pathway;
-        api.mode = domain.mode;
+
+        // TODO OTP2 - This is fragile - what happen if we rename the domain modes?
+        api.mode = domain.mode.name();
         api.route = domain.route;
         api.agencyName = domain.agencyName;
         api.agencyUrl = domain.agencyUrl;
