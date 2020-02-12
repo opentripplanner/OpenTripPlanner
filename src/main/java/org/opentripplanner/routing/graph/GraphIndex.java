@@ -105,8 +105,7 @@ public class GraphIndex {
     public GraphQL graphQL;
 
     public GraphIndex (Graph graph) {
-        LOG.info("Indexing graph...");
-
+        LOG.info("GraphIndex init...");
         CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
 
         for (String feedId : graph.getFeedIds()) {
@@ -167,7 +166,7 @@ public class GraphIndex {
             )));
         initalizeServiceCodesForDate(graph);
 
-        LOG.info("Done indexing graph.");
+        LOG.info("GraphIndex init complete.");
     }
 
     private void initalizeServiceCodesForDate(Graph graph) {
