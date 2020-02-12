@@ -387,9 +387,7 @@ public class TimetableSnapshot {
 
     private void addPatternToIndex(TripPattern tripPattern) {
         for (Stop stop: tripPattern.getStops()) {
-            if (!patternsForStop.containsEntry(stop, tripPattern)) {
-                patternsForStop.put(stop, tripPattern);
-            }
+            patternsForStop.put(stop, tripPattern);
         }
     }
 
