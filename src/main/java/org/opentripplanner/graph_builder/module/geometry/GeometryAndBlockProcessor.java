@@ -263,9 +263,9 @@ public class GeometryAndBlockProcessor {
         // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
         LineString[] geoms = new LineString[stopTimes.size() - 1];
 
-        // Detect presence or absence of shape_dist_traveled on a per-trip basis
+        // Detect presence or absence of shape_dist_traveled on a per-trip basis both for stop_times and shape itself
         StopTime st0 = stopTimes.get(0);
-        boolean hasShapeDist = st0.isShapeDistTraveledSet();
+        boolean hasShapeDist = st0.isShapeDistTraveledSet() && getDistanceForShapeId(shapeId) != null;
         if (hasShapeDist) {
             // this trip has shape_dist in stop_times
             for (int i = 0; i < stopTimes.size() - 1; ++i) {
