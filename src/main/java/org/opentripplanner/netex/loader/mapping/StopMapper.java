@@ -4,7 +4,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransferPriority;
+import org.opentripplanner.model.StopPriority;
 import org.rutebanken.netex.model.InterchangeWeightingEnumeration;
 import org.rutebanken.netex.model.Quay;
 
@@ -47,25 +47,25 @@ class StopMapper {
         stop.setName(parentStation.getName());
         stop.setCode(quay.getPublicCode());
         stop.setParentStation(parentStation);
-        stop.setTransferPriority(mapTransferPriority(interchangeWeight));
+        stop.setStopPriority(mapTransferPriority(interchangeWeight));
 
         return stop;
     }
 
-    private TransferPriority mapTransferPriority(
+    private StopPriority mapTransferPriority(
         InterchangeWeightingEnumeration interchangeWeight
     ) {
-        if (interchangeWeight == null) return TransferPriority.TRANSFER_ALLOWED;
+        if (interchangeWeight == null) return StopPriority.ALLOWED;
         switch (interchangeWeight) {
             case PREFERRED_INTERCHANGE:
-                return TransferPriority.PREFERRED_TRANSFER;
+                return StopPriority.PREFERRED;
             case RECOMMENDED_INTERCHANGE:
-                return TransferPriority.RECOMMENDED_TRANSFER;
+                return StopPriority.RECOMMENDED;
             case NO_INTERCHANGE:
-                return TransferPriority.NO_TRANSFER;
+                return StopPriority.DISCOURAGED;
             case INTERCHANGE_ALLOWED:
             default:
-                return TransferPriority.TRANSFER_ALLOWED;
+                return StopPriority.ALLOWED;
         }
     }
 }

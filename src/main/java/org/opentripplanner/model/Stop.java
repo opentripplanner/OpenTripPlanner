@@ -42,7 +42,7 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     private Station parentStation;
 
-    private TransferPriority transferPriority;
+    private StopPriority stopPriority;
 
     private WheelChairBoarding wheelchairBoarding;
 
@@ -124,12 +124,12 @@ public final class Stop extends TransitEntity<FeedScopedId> {
         this.parentStation = parentStation;
     }
 
-    public TransferPriority getTransferPriority() {
-        return transferPriority;
+    public StopPriority getStopPriority() {
+        return stopPriority;
     }
 
-    public void setTransferPriority(TransferPriority transferPriority) {
-        this.transferPriority = transferPriority;
+    public void setStopPriority(StopPriority stopPriority) {
+        this.stopPriority = stopPriority;
     }
 
     public WheelChairBoarding getWheelchairBoarding() {
