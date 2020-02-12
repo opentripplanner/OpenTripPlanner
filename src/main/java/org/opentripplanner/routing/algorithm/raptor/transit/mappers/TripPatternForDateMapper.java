@@ -107,10 +107,11 @@ public class TripPatternForDateMapper {
     }
 
     TripPattern newTripPattern = newTripPatternForOld.get(oldTripPattern);
-    TripPatternForDate tripPatternForDate = new TripPatternForDate(newTripPattern,
-        newTripSchedules,
-        ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
+
+    return new TripPatternForDate(
+            newTripPattern,
+            newTripSchedules,
+            ServiceCalendarMapper.localDateFromServiceDate(serviceDate)
     );
-    return tripPatternForDate;
   }
 }

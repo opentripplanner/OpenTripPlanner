@@ -20,6 +20,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
 
 import static org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransfersMapper.mapTransfers;
@@ -83,12 +84,9 @@ public class TransitLayerMapper {
         Collection<org.opentripplanner.model.TripPattern> allTripPatterns =
             graph.tripPatternForId.values();
 
-        final Map<org.opentripplanner.model.TripPattern, TripPattern>
-        newTripPatternForOld =
+        final Map<org.opentripplanner.model.TripPattern, TripPattern> newTripPatternForOld =
             mapOldTripPatternToRaptorTripPattern(stopIndex, allTripPatterns);
 
-        // The return value of this entire process.
-        HashMap<LocalDate, List<TripPatternForDate>> tripPatternsForDates = new HashMap<>();
 
         TripPatternForDateMapper tripPatternForDateMapper = new TripPatternForDateMapper(
             graph.index.getServiceCodesRunningForDate(),
@@ -97,8 +95,11 @@ public class TransitLayerMapper {
 
         Set<ServiceDate> allServiceDates = graph.index.getServiceCodesRunningForDate().keySet();
 
-        // THIS CODE RUNS IN PARALLEL
+        // The return value of this entire process.
+        ConcurrentHashMap<LocalDate, List<TripPatternForDate>> result = new ConcurrentHashMap<>();
 
+
+        // THIS CODE RUNS IN PARALLEL
         allServiceDates
             .parallelStream()
             .forEach(serviceDate -> {
@@ -122,15 +123,12 @@ public class TransitLayerMapper {
                     }
                 }
                 if (!values.isEmpty()) {
-                    synchronized (tripPatternsForDates) {
-                        tripPatternsForDates.put(localDate, values);
-                    }
+                    result.put(localDate, values);
                 }
             });
-
         // END PARALLEL CODE
 
-        return tripPatternsForDates;
+        return new HashMap<>(result);
     }
 
     // TODO We can save time by either pre-sorting these or use a sorting algorithm that is
