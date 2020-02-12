@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.model.plan;
 
 /**
  * Represents a turn direction, relative to the current heading.

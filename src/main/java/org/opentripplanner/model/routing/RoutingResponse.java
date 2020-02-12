@@ -1,17 +1,14 @@
 package org.opentripplanner.model.routing;
 
-import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.model.plan.TripPlan;
 
 import java.util.StringJoiner;
 
 public class RoutingResponse {
-    // TODO TOP2 - The TripPlan need to be split into API and core.
     private final TripPlan tripPlan;
     private final TripSearchMetadata metadata;
 
-    public RoutingResponse(
-            TripPlan tripPlan, TripSearchMetadata metadata
-    ) {
+    public RoutingResponse(TripPlan tripPlan, TripSearchMetadata metadata) {
         this.tripPlan = tripPlan;
         this.metadata = metadata;
     }

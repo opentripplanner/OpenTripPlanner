@@ -1,9 +1,9 @@
 package org.opentripplanner.mmri;
 
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
-
 import org.junit.Ignore;
-import org.opentripplanner.api.model.Leg;
+import org.opentripplanner.model.plan.Leg;
+
+import static org.opentripplanner.routing.core.TraverseMode.BUS;
 
 /**
  * TODO OTP2 - Test is too close to the implementation and will need to be reimplemented.

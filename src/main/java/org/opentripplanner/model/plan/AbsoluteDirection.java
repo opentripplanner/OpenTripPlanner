@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.api.model;
+package org.opentripplanner.model.plan;
 
 /** 
  * An absolute cardinal or intermediate direction.
