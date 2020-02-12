@@ -99,6 +99,7 @@ public class SpeedTestRequest {
         builder.searchParams()
                 .boardSlackInSeconds(120)
                 .timetableEnabled(true)
+                .allowWaitingBetweenAccessAndTransit(true)
                 .numberOfAdditionalTransfers(numOfExtraTransfers);
 
         if(testCase.departureTime != TestCase.NOT_SET) {

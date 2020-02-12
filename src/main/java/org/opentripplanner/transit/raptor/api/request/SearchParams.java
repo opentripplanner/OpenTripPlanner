@@ -7,6 +7,9 @@ import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
+import java.util.stream.Collectors;
+
+import static org.opentripplanner.transit.raptor.api.request.RaptorRequest.assertProperty;
 
 
 /**
@@ -14,17 +17,31 @@ import java.util.Objects;
  * search parameters.
  */
 public class SearchParams {
-    private static final int NOT_SET = -1;
-    private static final int DEFAULT_SEARCH_WINDOW_IN_SECONDS = 60 * 60; // 1 hour
+
+    /**
+     * The TIME_NOT_SET constant is used to mark a parameter as not set, we uses a large negative
+     * value to be sure we are not in conflict with a valid service time.
+     * <p>
+     * This would potentially support negative service times, which is not allowed, but in rear
+     * cases/system happens when DST is adjusted.
+     * <p>
+     * We do not use {@link Integer#MIN_VALUE} because this could potentially lead to overflow
+     * situations witch would be very hard to debug. Add -1 to MIN_VALUE and you get a positive
+     * number - not an exception.
+     */
+    public static final int TIME_NOT_SET = -9_999_999;
+
+    public static final int NOT_SET = -1;
 
     private final int earliestDepartureTime;
     private final int latestArrivalTime;
     private final int searchWindowInSeconds;
     private final int boardSlackInSeconds;
     private final int numberOfAdditionalTransfers;
+    private final int maxNumberOfTransfers;
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
-    private final boolean waitAtBeginningEnabled;
+    private final boolean allowWaitingBetweenAccessAndTransit;
     private final BitSet stopFilter;
     private final Collection<TransferLeg> accessLegs;
     private final Collection<TransferLeg> egressLegs;
@@ -33,28 +50,30 @@ public class SearchParams {
      * Default values is defined in the default constructor.
      */
     private SearchParams() {
-        earliestDepartureTime = NOT_SET;
-        latestArrivalTime = NOT_SET;
-        searchWindowInSeconds = DEFAULT_SEARCH_WINDOW_IN_SECONDS;
+        earliestDepartureTime = TIME_NOT_SET;
+        latestArrivalTime = TIME_NOT_SET;
+        searchWindowInSeconds = NOT_SET;
         boardSlackInSeconds = 60;
         numberOfAdditionalTransfers = 5;
+        maxNumberOfTransfers = NOT_SET;
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
-        waitAtBeginningEnabled = true;
+        allowWaitingBetweenAccessAndTransit = true;
         stopFilter = null;
         accessLegs = Collections.emptyList();
         egressLegs = Collections.emptyList();
     }
 
-    SearchParams(SearchParamsBuilder builder) {
+    SearchParams(SearchParamsBuilder<?> builder) {
         this.earliestDepartureTime = builder.earliestDepartureTime();
         this.latestArrivalTime = builder.latestArrivalTime();
         this.searchWindowInSeconds = builder.searchWindowInSeconds();
         this.boardSlackInSeconds = builder.boardSlackInSeconds();
         this.numberOfAdditionalTransfers = builder.numberOfAdditionalTransfers();
+        this.maxNumberOfTransfers = builder.maxNumberOfTransfers();
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
-        this.waitAtBeginningEnabled = builder.waitAtBeginningEnabled();
+        this.allowWaitingBetweenAccessAndTransit = builder.allowWaitingBetweenAccessAndTransit();
         this.stopFilter = builder.stopFilter();
         this.accessLegs = java.util.List.copyOf(builder.accessLegs());
         this.egressLegs = java.util.List.copyOf(builder.egressLegs());
@@ -81,6 +100,10 @@ public class SearchParams {
         return earliestDepartureTime;
     }
 
+    public boolean isEarliestDepartureTimeSet() {
+        return earliestDepartureTime != TIME_NOT_SET;
+    }
+
     /**
      * TODO OTP2 Cleanup doc:
      * The end of the departure window, in seconds since midnight. Exclusive.
@@ -95,6 +118,10 @@ public class SearchParams {
      */
     public int latestArrivalTime() {
         return latestArrivalTime;
+    }
+
+    public boolean isLatestArrivalTimeSet() {
+        return latestArrivalTime != TIME_NOT_SET;
     }
 
     /**
@@ -112,14 +139,11 @@ public class SearchParams {
         return searchWindowInSeconds;
     }
 
-
-    /**
-     * TODO OTP2 - Describe this
-     * <p/>
-     * Optional. Default value is 'TIME_TABLE'.
-     */
-    public ArrivalAndDeparturePreference arrivalAndDeparturePreference() {
-        return ArrivalAndDeparturePreference.TIME_TABLE;
+    public boolean isSearchWindowSet() {
+        return searchWindowInSeconds != NOT_SET;
+    }
+    public boolean searchOneIterationOnly() {
+        return searchWindowInSeconds == 0;
     }
 
     /**
@@ -140,6 +164,21 @@ public class SearchParams {
      */
     public int numberOfAdditionalTransfers() {
         return numberOfAdditionalTransfers;
+    }
+
+    /**
+     * This is an absolute limit to the number of transfers. The preferred way to limit the transfers
+     * is to use the {@link #numberOfAdditionalTransfers()}.
+     * <p/>
+     * The default is to use the limit in the tuning parameters
+     * {@link RaptorTuningParameters#maxNumberOfTransfers()}.
+     */
+    public int maxNumberOfTransfers() {
+        return maxNumberOfTransfers;
+    }
+
+    public boolean isMaxNumberOfTransfersSet() {
+        return maxNumberOfTransfers != NOT_SET;
     }
 
     /**
@@ -192,8 +231,8 @@ public class SearchParams {
      * <p/>
      * The default value is TRUE.
      */
-    public boolean waitAtBeginningEnabled() {
-        return waitAtBeginningEnabled;
+    public boolean allowWaitingBetweenAccessAndTransit() {
+        return allowWaitingBetweenAccessAndTransit;
     }
 
     /**
@@ -233,13 +272,13 @@ public class SearchParams {
     @Override
     public String toString() {
         return "SearchParams{" +
-                "earliestDepartureTime=" + TimeUtils.timeToStrCompact(earliestDepartureTime, NOT_SET) +
-                ", latestArrivalTime=" + TimeUtils.timeToStrCompact(latestArrivalTime, NOT_SET) +
-                ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds) +
-                ", accessLegs=" + accessLegs +
-                ", egressLegs=" + egressLegs +
+                "earliestDepartureTime=" + TimeUtils.timeToStrCompact(earliestDepartureTime, TIME_NOT_SET) +
+                ", latestArrivalTime=" + TimeUtils.timeToStrCompact(latestArrivalTime, TIME_NOT_SET) +
+                ", searchWindowInSeconds=" + TimeUtils.timeToStrCompact(searchWindowInSeconds, NOT_SET) +
                 ", boardSlackInSeconds=" + boardSlackInSeconds +
                 ", numberOfAdditionalTransfers=" + numberOfAdditionalTransfers +
+                ", accessLegs(max 5)=" + accessLegs.stream().limit(5).collect(Collectors.toList()) +
+                ", egressLegs(max 5)=" + egressLegs.stream().limit(5).collect(Collectors.toList()) +
                 '}';
     }
 
@@ -269,13 +308,11 @@ public class SearchParams {
     /* private methods */
 
     void verify() {
+        assertProperty(
+                earliestDepartureTime != TIME_NOT_SET || latestArrivalTime != TIME_NOT_SET,
+                "'earliestDepartureTime' or 'latestArrivalTime' is required."
+        );
         assertProperty(!accessLegs.isEmpty(), "At least one 'accessLegs' is required.");
         assertProperty(!egressLegs.isEmpty(), "At least one 'egressLegs' is required.");
-    }
-
-    private void assertProperty(boolean predicate, String errorMessage) {
-        if(!predicate) {
-            throw new IllegalArgumentException(RaptorRequest.class.getSimpleName()  + " error: " + errorMessage);
-        }
     }
 }

@@ -1,15 +1,15 @@
 package org.opentripplanner.api.resource;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map.Entry;
+import org.opentripplanner.api.model.ApiTripPlan;
+import org.opentripplanner.api.model.ApiTripSearchMetadata;
+import org.opentripplanner.api.model.error.PlannerError;
 
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.model.error.PlannerError;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map.Entry;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
 @XmlRootElement
@@ -18,7 +18,8 @@ public class Response {
     /** A dictionary of the parameters provided in the request that triggered this response. */
     @XmlElement
     public HashMap<String, String> requestParameters;
-    private TripPlan plan;
+    private ApiTripPlan plan;
+    private ApiTripSearchMetadata metadata;
     private PlannerError error = null;
 
     /** Debugging and profiling information */
@@ -48,12 +49,20 @@ public class Response {
     // is request params, followed by plan, followed by errors.
 
     /** The actual trip plan. */
-    public TripPlan getPlan() {
+    public ApiTripPlan getPlan() {
         return plan;
     }
 
-    public void setPlan(TripPlan plan) {
+    public void setPlan(ApiTripPlan plan) {
         this.plan = plan;
+    }
+
+    public ApiTripSearchMetadata getMetadata() {
+        return metadata;
+    }
+
+    public void setMetadata(ApiTripSearchMetadata metadata) {
+        this.metadata = metadata;
     }
 
     /** The error (if any) that this response raised. */

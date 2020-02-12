@@ -1,8 +1,10 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.ArrayList;
+import java.util.EnumSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
@@ -29,7 +31,7 @@ class Result implements Comparable<Result> {
     final String startTime;
     final String endTime;
     final Set<String> agencies = new TreeSet<>();
-    final Set<String> modes = new TreeSet<>();
+    final Set<TraverseMode> modes = EnumSet.noneOf(TraverseMode.class);
     final List<String> routes = new ArrayList<>();
     final List<Integer> stops = new ArrayList<>();
     final String details;
@@ -75,8 +77,15 @@ class Result implements Comparable<Result> {
         Result result = (Result) o;
         return Objects.equals(startTime, result.startTime) &&
                 Objects.equals(endTime, result.endTime) &&
-                Objects.equals(cost, result.cost) &&
+                compareCost(cost, result.cost) &&
                 Objects.equals(details, result.details);
+    }
+
+    private boolean compareCost(Integer c1, Integer c2) {
+        // Ignore cost from comparison if not computed
+        if(c1 == null || c1 == 0) return true;
+        if(c2 == null || c2 == 0) return true;
+        return c1.equals(c2);
     }
 
     @Override

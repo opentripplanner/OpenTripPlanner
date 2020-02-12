@@ -80,6 +80,11 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
+    public RaptorRequestBuilder<T> clearOptimizations() {
+        this.optimizations.clear();
+        return this;
+    }
+
     public RaptorRequestBuilder<T> disableOptimization(Optimization optimization) {
         this.optimizations.remove(optimization);
         return this;

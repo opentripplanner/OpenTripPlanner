@@ -21,6 +21,8 @@ import java.util.Calendar;
 import java.util.Collection;
 import java.util.TimeZone;
 
+import static org.opentripplanner.routing.core.TraverseMode.WALK;
+
 public class ItineraryMapper {
     private SpeedTestRequest request;
     private TransitLayer transitLayer;
@@ -82,7 +84,7 @@ public class ItineraryMapper {
         leg.endTime = createCalendar(request.getDepartureDate(), accessLeg.toTime());
         leg.from = new PlaceAPI(request.tc().fromPlace);
         leg.to = new PlaceAPI(request.tc().toPlace);
-        leg.mode = "WALK";
+        leg.mode = WALK;
 
         // TODO TGR - This could be nice to visualize for debugging purposes, but...
         //leg.legGeometry = PolylineEncoder.createEncodings(acessCoords);
@@ -114,7 +116,7 @@ public class ItineraryMapper {
                 */
                 leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
                 leg.endTime = createCalendar(request.getDepartureDate(), previousArrivalTime);
-                leg.mode = "WALK";
+                leg.mode = WALK;
                 leg.from = new PlaceAPI(fromStop.locLat(), fromStop.locLon(), fromStop.name());
                 leg.to = new PlaceAPI(toStop.locLat(), toStop.locLon(), toStop.name());
                 //leg.legGeometry = PolylineEncoder.createEncodings(transferCoords);
@@ -155,7 +157,7 @@ public class ItineraryMapper {
                 leg.agencyId = routeInfo.getAgency().getId();
                 leg.routeShortName = routeInfo.getShortName()   ;
                 leg.routeLongName = routeInfo.getLongName();
-                leg.mode = tripSchedule.getOriginalTripPattern().mode.toString();
+                leg.mode = tripSchedule.getOriginalTripPattern().mode;
 
                 leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
                 leg.endTime = createCalendar(request.getDepartureDate(), it.toTime());
@@ -175,7 +177,7 @@ public class ItineraryMapper {
         leg.from.stopIndex = egressLeg.fromStop();
         leg.from.stopId = new FeedScopedId("RB", lastStop.id());
         leg.to = new PlaceAPI(request.tc().toPlace);
-        leg.mode = "WALK";
+        leg.mode = WALK;
 
         // TODO TGR
         // leg.legGeometry = PolylineEncoder.createEncodings(egressCoords);

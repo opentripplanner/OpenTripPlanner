@@ -1,42 +1,32 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.google.common.base.Joiner;
-import com.google.common.collect.ImmutableMap;
 import graphql.schema.DataFetchingEnvironment;
 import org.apache.commons.lang3.StringUtils;
-import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
+import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.algorithm.raptor.router.RaptorRouter;
+import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
+import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -58,64 +48,32 @@ public class TransmodelGraphQLPlanner {
         this.mappingUtil = mappingUtil;
     }
 
-    public Map<String, Object> plan(DataFetchingEnvironment environment) {
+    public PlanResponse plan(DataFetchingEnvironment environment) {
         Router router = environment.getContext();
         RoutingRequest request = createRequest(environment);
 
-        TripPlan plan = new TripPlan(
-                                            new Place(request.from.lng, request.from.lat, request.getFromPlace().name),
-                                            new Place(request.to.lng, request.to.lat, request.getToPlace().name),
-                                            request.getDateTime());
-        List<Message> messages = new ArrayList<>();
-        DebugOutput debugOutput = new DebugOutput();
+        PlanResponse response = new PlanResponse();
 
         try {
-            List<Itinerary> itineraries = new ArrayList<>();
+            RoutingWorker worker = new RoutingWorker(request);
 
-            // TODO This currently only calculates the distances between the first fromVertex
-            //      and the first toVertex
-            if (request.modes.getNonTransitSet().isValid()) {
-                double distance = SphericalDistanceLibrary.distance(
-                        request.rctx.fromVertices.iterator().next().getCoordinate(),
-                        request.rctx.toVertices.iterator().next().getCoordinate()
-                );
-                double limit = request.maxWalkDistance * 2;
-                // Handle int overflow, in which case the multiplication will be less than zero
-                if (limit < 0 || distance < limit) {
-                    itineraries.addAll(findNonTransitItineraries(request, router));
-                }
-            }
+            RoutingResponse res = worker.route(router);
 
-
-            if (request.modes.isTransit()) {
-                RaptorRouter raptorRouter = new RaptorRouter(request, router.graph.getRealtimeTransitLayer());
-                itineraries.addAll(raptorRouter.route());
-            }
-
-            if (itineraries.isEmpty()) {
-                throw new PathNotFoundException();
-            }
-
-            plan = createTripPlan(request, itineraries);
-        } catch (Exception e) {
+            response.plan = res.getTripPlan();
+            response.metadata = res.getMetadata();
+        }
+        catch (Exception e) {
+            response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
             PlannerError error = new PlannerError(e);
             if (!PlannerError.isPlanningError(e.getClass()))
                 LOG.warn("Error while planning path: ", e);
-            messages.add(error.message);
+            response.messages.add(error.message);
         } finally {
-            if (request != null) {
-                if (request.rctx != null) {
-                    debugOutput = request.rctx.debugOutput;
-                }
-                request.cleanup(); // TODO verify that this cleanup step is being done on Analyst web services
+            if (request.rctx != null) {
+                response.debugOutput = request.rctx.debugOutput;
             }
         }
-
-        return ImmutableMap.<String, Object>builder()
-                       .put("plan", plan)
-                       .put("messages", messages)
-                       .put("debugOutput", debugOutput)
-                       .build();
+        return response;
     }
 
     private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
@@ -168,11 +126,12 @@ public class TransmodelGraphQLPlanner {
             lon = (Double) coordinates.get("longitude");
         }
 
-        String placeRef = (String) m.get("place"); // TODO OTP2 mappingUtil.preparePlaceRef((String) m.get("place"));
+        String placeRef = (String) m.get("place");
+        FeedScopedId stopId = placeRef == null ? null : mappingUtil.fromIdString(placeRef);
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
-        return new GenericLocation(name, mappingUtil.fromIdString(placeRef), lat, lon);
+        return new GenericLocation(name, stopId, lat, lon);
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
@@ -191,6 +150,7 @@ public class TransmodelGraphQLPlanner {
         } else {
             request.setDateTime(new Date());
         }
+        callWith.argument("searchWindow", request::setSearchWindowSeconds);
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
         callWith.argument("maximumWalkDistance", request::setMaxWalkDistance);
@@ -199,8 +159,8 @@ public class TransmodelGraphQLPlanner {
 //        callWith.argument("preTransitReluctance", (Double v) ->  request.setPreTransitReluctance(v));
 //        callWith.argument("maxPreTransitWalkDistance", (Double v) ->  request.setMaxPreTransitWalkDistance(v));
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
-        callWith.argument("walkReluctance", (Double v) ->  request.setWalkReluctance(v));
-        callWith.argument("waitReluctance", (Double v) ->  request.setWaitReluctance(v));
+        callWith.argument("walkReluctance", request::setWalkReluctance);
+        callWith.argument("waitReluctance", request::setWaitReluctance);
         callWith.argument("walkBoardCost", request::setWalkBoardCost);
 //        callWith.argument("walkOnStreetReluctance", request::setWalkOnStreetReluctance);
         callWith.argument("waitReluctance", request::setWaitReluctance);
@@ -230,23 +190,23 @@ public class TransmodelGraphQLPlanner {
 //        callWith.argument("preferred.lines", lines -> request.setPreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
         callWith.argument("preferred.otherThanPreferredLinesPenalty", request::setOtherThanPreferredRoutesPenalty);
         // Deprecated organisations -> authorities
-        callWith.argument("preferred.organisations", organisations -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("preferred.authorities", authorities -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("preferred.organisations", (Collection<String> organisations) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("preferred.authorities", (Collection<String> authorities) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 //        callWith.argument("unpreferred.lines", lines -> request.setUnpreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("unpreferred.organisations", organisations -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("unpreferred.authorities", authorities -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("unpreferred.organisations", (Collection<String> organisations) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
 //        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("banned.organisations", organisations -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("banned.authorities", authorities -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
-        callWith.argument("banned.serviceJourneys", serviceJourneys -> request.bannedTrips = toBannedTrips((Collection<String>) serviceJourneys));
+        callWith.argument("banned.organisations", (Collection<String> organisations) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
+        callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
 
 //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
 //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
 
-        callWith.argument("whiteListed.lines", lines -> request.setWhiteListedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("whiteListed.organisations", organisations -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) organisations, in -> in)));
-        callWith.argument("whiteListed.authorities", authorities -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues((Collection<String>) authorities, in -> in)));
+        callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
+        callWith.argument("whiteListed.organisations", (Collection<String> organisations) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
+        callWith.argument("whiteListed.authorities", (Collection<String> authorities) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
@@ -373,37 +333,4 @@ public class TransmodelGraphQLPlanner {
     public static <T> boolean hasArgument(Map<String, T> m, String name) {
         return m.containsKey(name) && m.get(name) != null;
     }
-
-    private List<Itinerary> findNonTransitItineraries(RoutingRequest request, Router router) {
-        RoutingRequest nonTransitRequest = request.clone();
-        nonTransitRequest.modes.setTransit(false);
-
-        try {
-            // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
-            GraphPathFinder gpFinder = new GraphPathFinder(router);
-            List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
-
-            /* Convert the internal GraphPaths to a TripPlan object that is included in an OTP web service Response. */
-            TripPlan plan = GraphPathToTripPlanConverter.generatePlan(paths, request);
-            return plan.itinerary;
-        } catch (PathNotFoundException e) {
-            return Collections.emptyList();
-        }
-    }
-
-    private TripPlan createTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
-        Place from = new Place();
-        Place to = new Place();
-        if (!itineraries.isEmpty()) {
-            from = itineraries.get(0).legs.get(0).from;
-            to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
-        }
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-        itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
-                .limit(request.numItineraries).collect(Collectors.toList());
-        tripPlan.itinerary = itineraries;
-        LOG.info("Returning {} itineraries", itineraries.size());
-        return tripPlan;
-    }
-
 }

@@ -18,6 +18,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.Duration;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -81,7 +82,27 @@ public abstract class RoutingResource {
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time")
     protected String time;
-    
+
+    /**
+     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
+     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
+     * to latest arrival time (LAT minus EAT).
+     * <p>
+     * All optimal travels that depart within the search window is guarantied to be found.
+     * <p>
+     * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
+     * scheduled/time dependent travels.
+     * <p>
+     * Optional - it is NOT recommended to set this value, unless you use the value returned by the
+     * previous search. Then it can be used to get the next/previous "page". The value is
+     * dynamically assigned a suitable value, if not set. In a small to medium size operation
+     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
+     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
+     * auto assignment.
+     */
+    @QueryParam("searchWindow")
+    protected Integer searchWindow;
+
     /**
      * Whether the trip should depart or arrive at the specified date and time.
      *
@@ -622,6 +643,10 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+        }
+
+        if(searchWindow != null) {
+            request.searchWindow = Duration.ofSeconds(searchWindow);
         }
 
         if (wheelchair != null)

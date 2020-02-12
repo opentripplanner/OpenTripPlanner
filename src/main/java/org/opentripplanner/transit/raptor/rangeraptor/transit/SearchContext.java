@@ -128,6 +128,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     /** Calculate the maximum number of rounds to perform. */
     public int nRounds() {
+        if(request.searchParams().isMaxNumberOfTransfersSet()) {
+            return request.searchParams().maxNumberOfTransfers() + 1;
+        }
         return tuningParameters.maxNumberOfTransfers() + 1;
     }
 
