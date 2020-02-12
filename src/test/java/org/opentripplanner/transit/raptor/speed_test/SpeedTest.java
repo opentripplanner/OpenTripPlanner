@@ -175,7 +175,6 @@ public class SpeedTest {
         RaptorRequest<?> rReqUsed = null;
         int nPathsFound = 0;
         try {
-
             final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, getTimeZoneId());
 
             if (opts.compareHeuristics()) {
@@ -241,7 +240,6 @@ public class SpeedTest {
             TIMER_COLLECT_RESULTS.start();
 
             if (response.paths().isEmpty()) {
-                numOfPathsFound.add(0);
                 throw new NoResultFound();
             }
 
@@ -354,7 +352,7 @@ public class SpeedTest {
     }
 
     private void forceGCToAvoidGCLater() {
-        WeakReference ref = new WeakReference<>(new Object());
+        WeakReference<?> ref = new WeakReference<>(new Object());
         while (ref.get() != null) {
             System.gc();
         }

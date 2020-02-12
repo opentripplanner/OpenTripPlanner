@@ -1,20 +1,20 @@
 package org.opentripplanner.api.model;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Test;
 
-public class WalkStepTest {
+import static org.junit.Assert.assertEquals;
+
+public class ApiWalkStepTest {
 	private static final String NO_PARENS_STREET_NAME = "a normal name";
 	private static final String START_WITH_PARENS_STREET_NAME = "(start with paren)";
 	private static final String PARENS_STREET_NAME = "a normal name (paren)";
 	
-	private WalkStep step;
+	private ApiWalkStep step;
 	
 	@Before
 	public void init() {
-		step = new WalkStep();
+		step = new ApiWalkStep();
 	}
 
 	@Test
