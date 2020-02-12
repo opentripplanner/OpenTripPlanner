@@ -17,8 +17,8 @@ import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.ElevationFlattened;
 import org.opentripplanner.graph_builder.issues.ElevationPropagationLimit;
+import org.opentripplanner.graph_builder.issues.Graphwide;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
-import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -134,12 +134,12 @@ public class ElevationModule implements GraphBuilderModule {
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
         if (failurePercentage > 50) {
-            log.warn(graph.addBuilderAnnotation(new Graphwide(
+            issueStore.add(new Graphwide(
                 String.format(
                     "Fetching elevation failed at %d/%d points (%d%%)",
                     nPointsOutsideDEM, nPointsEvaluated, failurePercentage
                 )
-            )));
+            ));
             log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
@@ -389,7 +389,9 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            issueStore.add(new ElevationFlattened(ee));
+            synchronized (graph) {
+                issueStore.add(new ElevationFlattened(ee));
+            }
         }
     }
 
