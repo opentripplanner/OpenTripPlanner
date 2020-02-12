@@ -395,7 +395,9 @@ public class ElevationModule implements GraphBuilderModule {
                 coordList.toArray(coordArr));
 
         if(ee.setElevationProfile(elevPCS, false)) {
-            log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
+            synchronized (graph) {
+                log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
+            }
         }
     }
 
