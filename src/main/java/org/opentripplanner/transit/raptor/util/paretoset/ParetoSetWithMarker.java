@@ -1,8 +1,5 @@
 package org.opentripplanner.transit.raptor.util.paretoset;
 
-import java.util.stream.Stream;
-
-
 /**
  * {@link ParetoSet} with the possibility to set a index marker, which
  * can be used to list all elements added after the marker is set.
@@ -28,10 +25,10 @@ public class ParetoSetWithMarker<T> extends ParetoSet<T> {
     }
 
     /**
-     * Create a stream for all elements added after the marker.
+     * List all elements added after the marker.
      */
-    public Stream<T> streamAfterMarker() {
-        return stream(marker);
+    public Iterable<T> elementsAfterMarker() {
+        return tail(marker);
     }
 
     /**
