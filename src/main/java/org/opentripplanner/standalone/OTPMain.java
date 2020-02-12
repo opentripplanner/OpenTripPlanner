@@ -106,7 +106,8 @@ public class OTPMain {
         if (params.load) {
             GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.getGraphDirectory());
             ComponentAnnotationConfigurator.getInstance().fromConfig(graphConfig.builderConfig());
-            router = GraphLoader.loadGraph(graphConfig);
+            GraphService service = new GraphService(graphConfig,params.autoReload);
+            router = service.load();
         }
 
         /* Bail out if we have no router to work with. */
