@@ -124,7 +124,9 @@ public class TimetableHelper {
                 foundMatch = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
                 if (!foundMatch && stop.getParentStation() != null) {
-                    Stop alternativeStop = graph.index.stopForId.get(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
+                    Stop alternativeStop = graph.index
+                        .getStopForId()
+                        .get(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
                     if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
                         foundMatch = true;
                         stopPatternChanged = true;
@@ -200,7 +202,9 @@ public class TimetableHelper {
                     foundMatch = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!foundMatch && stop.getParentStation() != null) {
-                        Stop alternativeStop = graph.index.stopForId.get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
+                        Stop alternativeStop = graph.index
+                            .getStopForId()
+                            .get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
                             foundMatch = true;
                             stopPatternChanged = true;
@@ -376,7 +380,9 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex.stopForId.get(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
+                        Stop alternativeStop = graphIndex
+                            .getStopForId()
+                            .get(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
                             stopsMatchById = true;
                             stop = alternativeStop;
@@ -396,7 +402,9 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex.stopForId.get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
+                        Stop alternativeStop = graphIndex
+                            .getStopForId()
+                            .get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
                             stopsMatchById = true;
                             stop = alternativeStop;
@@ -482,7 +490,9 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex.stopForId.get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
+                        Stop alternativeStop = graphIndex
+                            .getStopForId()
+                            .get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
                             stopsMatchById = true;
                             stopTime.setStop(alternativeStop);
@@ -617,7 +627,7 @@ public class TimetableHelper {
 
                         if (!matchFound && stop.getParentStation() != null) {
                             FeedScopedId alternativeId = new FeedScopedId(stop.getId().getFeedId(), monitoredCall.getStopPointRef().getValue());
-                            Stop alternativeStop = graph.index.stopForId.get(alternativeId);
+                            Stop alternativeStop = graph.index.getStopForId().get(alternativeId);
                             if (alternativeStop != null && alternativeStop.getParentStation() != null) {
                                 matchFound = stop.getParentStation().equals(alternativeStop.getParentStation());
                             }

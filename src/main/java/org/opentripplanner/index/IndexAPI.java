@@ -92,13 +92,13 @@ public class IndexAPI {
     @GET
     @Path("/feeds")
     public Response getFeeds() {
-        return Response.status(Status.OK).entity(index.agenciesForFeedId.keySet()).build();
+        return Response.status(Status.OK).entity(index.getAgenciesForFeedId().keySet()).build();
     }
 
     @GET
     @Path("/feeds/{feedId}")
     public Response getFeedInfo(@PathParam("feedId") String feedId) {
-        FeedInfo feedInfo = index.feedInfoForId.get(feedId);
+        FeedInfo feedInfo = index.getFeedInfoForId().get(feedId);
         if (feedInfo == null) {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         } else {
@@ -111,14 +111,14 @@ public class IndexAPI {
    @Path("/agencies/{feedId}")
    public Response getAgencies (@PathParam("feedId") String feedId) {
        return Response.status(Status.OK).entity(
-               index.agenciesForFeedId.getOrDefault(feedId, new HashMap<>()).values()).build();
+               index.getAgenciesForFeedId().getOrDefault(feedId, new HashMap<>()).values()).build();
    }
 
    /** Return specific agency in the graph, by ID. */
    @GET
    @Path("/agencies/{feedId}/{agencyId}")
    public Response getAgency (@PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId) {
-       for (Agency agency : index.agenciesForFeedId.get(feedId).values()) {
+       for (Agency agency : index.getAgenciesForFeedId().get(feedId).values()) {
            if (agency.getId().equals(agencyId)) {
                return Response.status(Status.OK).entity(agency).build();
            }
@@ -130,8 +130,8 @@ public class IndexAPI {
     @GET
     @Path("/agencies/{feedId}/{agencyId}/routes")
     public Response getAgencyRoutes (@PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId) {
-        Collection<Route> routes = index.routeForId.values();
-        Agency agency = index.agenciesForFeedId.get(feedId).get(agencyId);
+        Collection<Route> routes = index.getRouteForId().values();
+        Agency agency = index.getAgenciesForFeedId().get(feedId).get(agencyId);
         if (agency == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         Collection<Route> agencyRoutes = new ArrayList<>();
         for (Route route: routes) {
@@ -153,7 +153,7 @@ public class IndexAPI {
    @Path("/stops/{stopId}")
    public Response getStop (@PathParam("stopId") String stopIdString) {
        FeedScopedId stopId = GtfsLibrary.convertIdFromString(stopIdString);
-       Stop stop = index.stopForId.get(stopId);
+       Stop stop = index.getStopForId().get(stopId);
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
        } else { 
@@ -175,7 +175,7 @@ public class IndexAPI {
 
        /* When no parameters are supplied, return all stops. */
        if (uriInfo.getQueryParameters().isEmpty()) {
-           Collection<Stop> stops = index.stopForId.values();
+           Collection<Stop> stops = index.getStopForId().values();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        }
        /* If any of the circle parameters are specified, expect a circle not a box. */
@@ -217,10 +217,10 @@ public class IndexAPI {
    @GET
    @Path("/stops/{stopId}/routes")
    public Response getRoutesForStop (@PathParam("stopId") String stopId) {
-       Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopId));
+       Stop stop = index.getStopForId().get(GtfsLibrary.convertIdFromString(stopId));
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Set<Route> routes = Sets.newHashSet();
-       for (TripPattern pattern : index.patternsForStop.get(stop)) {
+       for (TripPattern pattern : index.getPatternsForStop().get(stop)) {
            routes.add(pattern.route);
        }
        return Response.status(Status.OK).entity(RouteShort.list(routes)).build();
@@ -230,9 +230,9 @@ public class IndexAPI {
    @Path("/stops/{stopId}/patterns")
    public Response getPatternsForStop (@PathParam("stopId") String stopIdString) {
        FeedScopedId id = GtfsLibrary.convertIdFromString(stopIdString);
-       Stop stop = index.stopForId.get(id);
+       Stop stop = index.getStopForId().get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
-       Collection<TripPattern> patterns = index.patternsForStop.get(stop);
+       Collection<TripPattern> patterns = index.getPatternsForStop().get(stop);
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
@@ -250,7 +250,7 @@ public class IndexAPI {
                                          @QueryParam("timeRange") @DefaultValue("86400") int timeRange,
                                          @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
                                          @QueryParam("omitNonPickups") boolean omitNonPickups) {
-        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
+        Stop stop = index.getStopForId().get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
 
         List<org.opentripplanner.api.model.StopTimesInPattern> stopTimesInPatterns =
@@ -270,7 +270,7 @@ public class IndexAPI {
     public Response getStoptimesForStopAndDate (@PathParam("stopId") String stopIdString,
                                                 @PathParam("date") String date,
                                                 @QueryParam("omitNonPickups") boolean omitNonPickups) {
-        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
+        Stop stop = index.getStopForId().get(GtfsLibrary.convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         ServiceDate sd;
         try {
@@ -290,11 +290,11 @@ public class IndexAPI {
     @GET
     @Path("/stops/{stopId}/transfers")
     public Response getTransfers(@PathParam("stopId") String stopIdString) {
-        Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopIdString));
+        Stop stop = index.getStopForId().get(GtfsLibrary.convertIdFromString(stopIdString));
         
         if (stop != null) {
             // get the transfers for the stop
-            TransitStopVertex v = index.stopVertexForStop.get(stop);
+            TransitStopVertex v = index.getStopVertexForStop().get(stop);
             Collection<Edge> transfers = Collections2.filter(v.getOutgoing(), new Predicate<Edge>() {
                 @Override
                 public boolean apply(Edge edge) {
@@ -321,16 +321,16 @@ public class IndexAPI {
    @GET
    @Path("/routes")
    public Response getRoutes (@QueryParam("hasStop") List<String> stopIds) {
-       Collection<Route> routes = index.routeForId.values();
+       Collection<Route> routes = index.getRouteForId().values();
        // Filter routes to include only those that pass through all given stops
        if (stopIds != null) {
            // Protective copy, we are going to calculate the intersection destructively
            routes = Lists.newArrayList(routes);
            for (String stopId : stopIds) {
-               Stop stop = index.stopForId.get(GtfsLibrary.convertIdFromString(stopId));
+               Stop stop = index.getStopForId().get(GtfsLibrary.convertIdFromString(stopId));
                if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
                Set<Route> routesHere = Sets.newHashSet();
-               for (TripPattern pattern : index.patternsForStop.get(stop)) {
+               for (TripPattern pattern : index.getPatternsForStop().get(stop)) {
                    routesHere.add(pattern.route);
                }
                routes.retainAll(routesHere);
@@ -344,7 +344,7 @@ public class IndexAPI {
    @Path("/routes/{routeId}")
    public Response getRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
-       Route route = index.routeForId.get(routeId);
+       Route route = index.getRouteForId().get(routeId);
        if (route != null) {
            return Response.status(Status.OK).entity(route).build();
        } else { 
@@ -357,9 +357,9 @@ public class IndexAPI {
    @Path("/routes/{routeId}/patterns")
    public Response getPatternsForRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
-       Route route = index.routeForId.get(routeId);
+       Route route = index.getRouteForId().get(routeId);
        if (route != null) {
-           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.getPatternsForRoute().get(route);
            return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
@@ -371,10 +371,10 @@ public class IndexAPI {
    @Path("/routes/{routeId}/stops")
    public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
-       Route route = index.routeForId.get(routeId);
+       Route route = index.getRouteForId().get(routeId);
        if (route != null) {
            Set<Stop> stops = Sets.newHashSet();
-           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.getPatternsForRoute().get(route);
            for (TripPattern pattern : patterns) {
                stops.addAll(pattern.getStops());
            }
@@ -389,10 +389,10 @@ public class IndexAPI {
    @Path("/routes/{routeId}/trips")
    public Response getTripsForRoute (@PathParam("routeId") String routeIdString) {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
-       Route route = index.routeForId.get(routeId);
+       Route route = index.getRouteForId().get(routeId);
        if (route != null) {
            List<Trip> trips = Lists.newArrayList();
-           Collection<TripPattern> patterns = index.patternsForRoute.get(route);
+           Collection<TripPattern> patterns = index.getPatternsForRoute().get(route);
            for (TripPattern pattern : patterns) {
                trips.addAll(pattern.getTrips());
            }
@@ -410,7 +410,7 @@ public class IndexAPI {
    @Path("/trips/{tripId}")
    public Response getTrip (@PathParam("tripId") String tripIdString) {
        FeedScopedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
-       Trip trip = index.tripForId.get(tripId);
+       Trip trip = index.getTripForId().get(tripId);
        if (trip != null) {
            return Response.status(Status.OK).entity(trip).build();
        } else { 
@@ -422,9 +422,9 @@ public class IndexAPI {
    @Path("/trips/{tripId}/stops")
    public Response getStopsForTrip (@PathParam("tripId") String tripIdString) {
        FeedScopedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
-       Trip trip = index.tripForId.get(tripId);
+       Trip trip = index.getTripForId().get(tripId);
        if (trip != null) {
-           TripPattern pattern = index.patternForTrip.get(trip);
+           TripPattern pattern = index.getPatternForTrip().get(trip);
            Collection<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        } else { 
@@ -436,9 +436,9 @@ public class IndexAPI {
     @Path("/trips/{tripId}/semanticHash")
     public Response getSemanticHashForTrip (@PathParam("tripId") String tripIdString) {
         FeedScopedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
-        Trip trip = index.tripForId.get(tripId);
+        Trip trip = index.getTripForId().get(tripId);
         if (trip != null) {
-            TripPattern pattern = index.patternForTrip.get(trip);
+            TripPattern pattern = index.getPatternForTrip().get(trip);
             String hashString = pattern.semanticHashString(trip);
             return Response.status(Status.OK).entity(hashString).build();
         } else {
@@ -450,9 +450,9 @@ public class IndexAPI {
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        FeedScopedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
-       Trip trip = index.tripForId.get(tripId);
+       Trip trip = index.getTripForId().get(tripId);
        if (trip != null) {
-           TripPattern pattern = index.patternForTrip.get(trip);
+           TripPattern pattern = index.getPatternForTrip().get(trip);
            // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
            Timetable table = index.currentUpdatedTimetableForTripPattern(pattern);
            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
@@ -466,9 +466,9 @@ public class IndexAPI {
     @Path("/trips/{tripId}/geometry")
     public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
         FeedScopedId tripId = GtfsLibrary.convertIdFromString(tripIdString);
-        Trip trip = index.tripForId.get(tripId);
+        Trip trip = index.getTripForId().get(tripId);
         if (trip != null) {
-            TripPattern tripPattern = index.patternForTrip.get(trip);
+            TripPattern tripPattern = index.getPatternForTrip().get(trip);
             // TODO OTP2 - Refactor to use the pattern ID
             return getGeometryForPattern(tripPattern.getCode());
         } else {

@@ -77,20 +77,20 @@ public class GraphIndex {
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
 
     // TODO: consistently key on model object or id string
-    public final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
-    public final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-    public final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
-    public final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
-    public final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
-    public final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
-    public final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
-    public final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-    public final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
-    public final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-    public final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    public final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
-    final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
-    public final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
+    private final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
+    private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
+    private final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
+    private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
+    private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
+    private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
+    private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
+    private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
+    private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
+    private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
+    private final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
+    private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
+    private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
 
     /* Should eventually be replaced with new serviceId indexes. */
     private final CalendarService calendarService;
@@ -98,9 +98,6 @@ public class GraphIndex {
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
-
-    /** Used for finding first/last trip of the day. This is the time at which service ends for the day. */
-    public final int overnightBreak = 60 * 60 * 2; // FIXME not being set, this was done in transitIndex
 
     public GraphQL graphQL;
 
@@ -111,15 +108,15 @@ public class GraphIndex {
 
         for (String feedId : graph.getFeedIds()) {
             for (Agency agency : graph.getAgencies(feedId)) {
-                Map<String, Agency> agencyForId = agenciesForFeedId.getOrDefault(feedId, new HashMap<>());
+                Map<String, Agency> agencyForId = getAgenciesForFeedId().getOrDefault(feedId, new HashMap<>());
                 agencyForId.put(agency.getId(), agency);
-                this.agenciesForFeedId.put(feedId, agencyForId);
+                this.getAgenciesForFeedId().put(feedId, agencyForId);
             }
-            this.feedInfoForId.put(feedId, graph.getFeedInfo(feedId));
+            this.getFeedInfoForId().put(feedId, graph.getFeedInfo(feedId));
         }
 
         for (Operator operator : graph.getOperators()) {
-            this.operatorForId.put(operator.getId(), operator);
+            this.getOperatorForId().put(operator.getId(), operator);
         }
 
         /* We will keep a separate set of all vertices in case some have the same label.
@@ -128,31 +125,31 @@ public class GraphIndex {
             if (vertex instanceof TransitStopVertex) {
                 TransitStopVertex stopVertex = (TransitStopVertex) vertex;
                 Stop stop = stopVertex.getStop();
-                stopForId.put(stop.getId(), stop);
-                stopVertexForStop.put(stop, stopVertex);
+                getStopForId().put(stop.getId(), stop);
+                getStopVertexForStop().put(stop, stopVertex);
             }
         }
-        for (TransitStopVertex stopVertex : stopVertexForStop.values()) {
+        for (TransitStopVertex stopVertex : getStopVertexForStop().values()) {
             Envelope envelope = new Envelope(stopVertex.getCoordinate());
-            stopSpatialIndex.insert(envelope, stopVertex);
+            getStopSpatialIndex().insert(envelope, stopVertex);
         }
         for (TripPattern pattern : graph.tripPatternForId.values()) {
-            patternsForFeedId.put(pattern.getFeedId(), pattern);
-            patternsForRoute.put(pattern.route, pattern);
+            getPatternsForFeedId().put(pattern.getFeedId(), pattern);
+            getPatternsForRoute().put(pattern.route, pattern);
             for (Trip trip : pattern.getTrips()) {
-                patternForTrip.put(trip, pattern);
-                tripForId.put(trip.getId(), trip);
+                getPatternForTrip().put(trip, pattern);
+                getTripForId().put(trip.getId(), trip);
             }
             for (Stop stop: pattern.getStops()) {
-                patternsForStop.put(stop, pattern);
+                getPatternsForStop().put(stop, pattern);
             }
         }
-        for (Route route : patternsForRoute.asMap().keySet()) {
-            routeForId.put(route.getId(), route);
+        for (Route route : getPatternsForRoute().asMap().keySet()) {
+            getRouteForId().put(route.getId(), route);
         }
         for (MultiModalStation multiModalStation : graph.multiModalStationById.values()) {
             for (Station childStation : multiModalStation.getChildStations()) {
-                multiModalStationForStations.put(childStation, multiModalStation);
+                getMultiModalStationForStations().put(childStation, multiModalStation);
             }
         }
 
@@ -198,7 +195,7 @@ public class GraphIndex {
             for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
                 serviceCodesRunning.add(graph.serviceCodes.get(serviceId));
             }
-            serviceCodesRunningForDate.put(
+            getServiceCodesRunningForDate().put(
                 serviceDate,
                 serviceCodesRunning
             );
@@ -229,6 +226,58 @@ public class GraphIndex {
         // Destroy the routing context, to clean up the temporary edges & vertices
         rr.rctx.destroy();
         return visitor.stopsFound;
+    }
+
+    public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
+        return agenciesForFeedId;
+    }
+
+    public Map<FeedScopedId, Operator> getOperatorForId() {
+        return operatorForId;
+    }
+
+    public Map<String, FeedInfo> getFeedInfoForId() {
+        return feedInfoForId;
+    }
+
+    public Map<FeedScopedId, Stop> getStopForId() {
+        return stopForId;
+    }
+
+    public Map<FeedScopedId, Trip> getTripForId() {
+        return tripForId;
+    }
+
+    public Map<FeedScopedId, Route> getRouteForId() {
+        return routeForId;
+    }
+
+    public Map<Stop, TransitStopVertex> getStopVertexForStop() {
+        return stopVertexForStop;
+    }
+
+    public Map<Trip, TripPattern> getPatternForTrip() {
+        return patternForTrip;
+    }
+
+    public Multimap<String, TripPattern> getPatternsForFeedId() {
+        return patternsForFeedId;
+    }
+
+    public Multimap<Route, TripPattern> getPatternsForRoute() {
+        return patternsForRoute;
+    }
+
+    public Multimap<Stop, TripPattern> getPatternsForStop() {
+        return patternsForStop;
+    }
+
+    public Map<Station, MultiModalStation> getMultiModalStationForStations() {
+        return multiModalStationForStations;
+    }
+
+    public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
+        return stopSpatialIndex;
     }
 
     public static class StopAndDistance {
@@ -278,7 +327,7 @@ public class GraphIndex {
     /** Dynamically generate the set of Routes passing though a Stop on demand. */
     public Set<Route> routesForStop(Stop stop) {
         Set<Route> routes = Sets.newHashSet();
-        for (TripPattern p : patternsForStop.get(stop)) {
+        for (TripPattern p : getPatternsForStop().get(stop)) {
             routes.add(p.route);
         }
         return routes;
@@ -441,7 +490,7 @@ public class GraphIndex {
      * added by realtime updates are added to the collection.
      */
     public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
-        List<TripPattern> tripPatterns = new ArrayList<>(patternsForStop.get(stop));
+        List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop().get(stop));
 
         TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
 
@@ -484,7 +533,7 @@ public class GraphIndex {
      */
     public Agency getAgencyWithoutFeedId(String agencyId) {
         // Iterate over the agency map for each feed.
-        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+        for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
             Agency agency = agencyForId.get(agencyId);
             if (agency != null) {
                 return agency;
@@ -500,7 +549,7 @@ public class GraphIndex {
      */
     public Set<Agency> getAllAgencies() {
         Set<Agency> allAgencies = new HashSet<>();
-        for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
+        for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
             allAgencies.addAll(agencyForId.values());
         }
         return allAgencies;
@@ -517,7 +566,7 @@ public class GraphIndex {
      * Get a list of all operators spanning across all feeds.
      */
     public Collection<Operator> getAllOperators() {
-        return operatorForId.values();
+        return getOperatorForId().values();
     }
 
     /**
@@ -532,7 +581,7 @@ public class GraphIndex {
             return null;
         }
 
-        return stops.stream().map(stopVertexForStop::get).collect(Collectors.toSet());
+        return stops.stream().map(getStopVertexForStop()::get).collect(Collectors.toSet());
     }
 
     private Collection<Stop> getStopsForId(FeedScopedId id) {
@@ -555,7 +604,7 @@ public class GraphIndex {
             return station.getChildStops();
         }
         // Single stop
-        Stop stop = graph.index.stopForId.get(id);
+        Stop stop = graph.index.getStopForId().get(id);
         if (stop != null) {
             return Collections.singleton(stop);
         }

@@ -227,7 +227,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("parentStation")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId.get(new FeedScopedId(
+                .dataFetcher(environment -> index.getStopForId().get(new FeedScopedId(
                     ((Stop) environment.getSource()).getId().getFeedId(),
                     ((Stop) environment.getSource()).getParentStation().getId().getId())))
                 .build())
@@ -254,7 +254,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
                 .type(new GraphQLList(new GraphQLNonNull(routeType)))
-                .dataFetcher(environment -> index.patternsForStop
+                .dataFetcher(environment -> index.getPatternsForStop()
                     .get((Stop) environment.getSource())
                     .stream()
                     .map(pattern -> pattern.route)
@@ -264,13 +264,13 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
                 .type(new GraphQLList(patternType))
-                .dataFetcher(environment -> index.patternsForStop
+                .dataFetcher(environment -> index.getPatternsForStop()
                     .get((Stop) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("transfers")               //TODO: add max distance as parameter?
                 .type(new GraphQLList(stopAtDistanceType))
-                .dataFetcher(environment -> index.stopVertexForStop
+                .dataFetcher(environment -> index.getStopVertexForStop()
                     .get(environment.getSource())
                     .getOutgoing()
                     .stream()
@@ -372,7 +372,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
-                .dataFetcher(environment -> index.stopForId
+                .dataFetcher(environment -> index.getStopForId()
                     .get(((TripTimeShort) environment.getSource()).stopId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -433,7 +433,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trip")
                 .type(tripType)
-                .dataFetcher(environment -> index.tripForId
+                .dataFetcher(environment -> index.getTripForId()
                     .get(((TripTimeShort) environment.getSource()).tripId))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -547,25 +547,25 @@ public class IndexGraphQLSchema {
                 .name("pattern")
                 .type(patternType)
                 .dataFetcher(
-                    environment -> index.patternForTrip.get((Trip) environment.getSource()))
+                    environment -> index.getPatternForTrip().get((Trip) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
-                .dataFetcher(environment -> index.patternForTrip
+                .dataFetcher(environment -> index.getPatternForTrip()
                     .get((Trip) environment.getSource()).getStops())
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("semanticHash")
                 .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
-                .dataFetcher(environment -> index.patternForTrip.get((Trip) environment.getSource())
+                .dataFetcher(environment -> index.getPatternForTrip().get((Trip) environment.getSource())
                     .semanticHashString((Trip) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stoptimes")
                 .type(new GraphQLList(stoptimeType))
                 .dataFetcher(environment -> TripTimeShort.fromTripTimes(
-                    index.patternForTrip.get((Trip) environment.getSource()).scheduledTimetable,
+                    index.getPatternForTrip().get((Trip) environment.getSource()).scheduledTimetable,
                     (Trip) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -583,7 +583,7 @@ public class IndexGraphQLSchema {
                             return null;
                         } else {
                             ServiceDate serviceDay = ServiceDate.parseString(environment.getArgument("serviceDay"));
-                            TripPattern pattern = index.patternForTrip.get(trip);
+                            TripPattern pattern = index.getPatternForTrip().get(trip);
                             return TripTimeShort.fromTripTimes(tts.resolve(pattern, serviceDay), trip);
                         }
                     } catch (ParseException e) {
@@ -605,7 +605,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("geometry")
                 .type(Scalars.GraphQLString) //TODO: Should be geometry
-                .dataFetcher(environment -> index.patternForTrip
+                .dataFetcher(environment -> index.getPatternForTrip()
                     .get((Trip) environment.getSource()).getGeometry())
                 .build())
             .build();
@@ -766,13 +766,13 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("patterns")
                 .type(new GraphQLList(patternType))
-                .dataFetcher(environment -> index.patternsForRoute
+                .dataFetcher(environment -> index.getPatternsForRoute()
                     .get((Route) environment.getSource()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stops")
                 .type(new GraphQLList(stopType))
-                .dataFetcher(environment -> index.patternsForRoute
+                .dataFetcher(environment -> index.getPatternsForRoute()
                     .get((Route) environment.getSource())
                     .stream()
                     .map(TripPattern::getStops)
@@ -783,7 +783,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
                 .type(new GraphQLList(tripType))
-                .dataFetcher(environment -> index.patternsForRoute
+                .dataFetcher(environment -> index.getPatternsForRoute()
                     .get((Route) environment.getSource())
                     .stream()
                     .map(TripPattern::getTrips)
@@ -836,7 +836,7 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("routes")
                 .type(new GraphQLList(routeType))
-                .dataFetcher(environment -> index.routeForId.values()
+                .dataFetcher(environment -> index.getRouteForId().values()
                     .stream()
                     .filter(route -> route.getAgency() == environment.getSource())
                     .collect(Collectors.toList()))
@@ -875,7 +875,7 @@ public class IndexGraphQLSchema {
                     .field(GraphQLFieldDefinition.newFieldDefinition()
                             .name("routes")
                             .type(new GraphQLList(routeType))
-                            .dataFetcher(environment -> index.routeForId.values()
+                            .dataFetcher(environment -> index.getRouteForId().values()
                                     .stream()
                                     .filter(route -> route.getOperator() == environment.getSource())
                                     .collect(Collectors.toList()))
@@ -883,7 +883,7 @@ public class IndexGraphQLSchema {
                     .field(GraphQLFieldDefinition.newFieldDefinition()
                             .name("trips")
                             .type(new GraphQLList(tripType))
-                            .dataFetcher(environment -> index.tripForId.values()
+                            .dataFetcher(environment -> index.getTripForId().values()
                                     .stream()
                                     .filter(trip -> trip.getOperator() == environment.getSource())
                                     .collect(Collectors.toList()))
@@ -895,13 +895,13 @@ public class IndexGraphQLSchema {
             .field(relay.nodeField(nodeInterface, environment -> {
                 Relay.ResolvedGlobalId id = relay.fromGlobalId(environment.getArgument("id"));
                 if (id.getType().equals(stopType.getName())) {
-                    return index.stopForId.get(GtfsLibrary.convertIdFromString(id.getId()));
+                    return index.getStopForId().get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 if (id.getType().equals(tripType.getName())) {
-                    return index.tripForId.get(GtfsLibrary.convertIdFromString(id.getId()));
+                    return index.getTripForId().get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 if (id.getType().equals(routeType.getName())) {
-                    return index.routeForId.get(GtfsLibrary.convertIdFromString(id.getId()));
+                    return index.getRouteForId().get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 if (id.getType().equals(patternType.getName())) {
                     return index.graph.tripPatternForId.get(id.getId());
@@ -910,7 +910,7 @@ public class IndexGraphQLSchema {
                     return index.getAgencyWithoutFeedId(id.getId());
                 }
                 if (id.getType().equals(operatorType.getName())) {
-                    return index.operatorForId.get(GtfsLibrary.convertIdFromString(id.getId()));
+                    return index.getOperatorForId().get(GtfsLibrary.convertIdFromString(id.getId()));
                 }
                 return null;
             }))
@@ -950,7 +950,7 @@ public class IndexGraphQLSchema {
                             .name("id")
                             .type(new GraphQLNonNull(Scalars.GraphQLString))
                             .build())
-                    .dataFetcher(environment -> index.operatorForId.get(
+                    .dataFetcher(environment -> index.getOperatorForId().get(
                             GtfsLibrary.convertIdFromString((String)environment.getArgument("id"))))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -963,11 +963,11 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> {
                     if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.stopForId.values());
+                        return new ArrayList<>(index.getStopForId().values());
                     } else {
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.stopForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.getStopForId().get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
                 })
@@ -1054,7 +1054,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.stopForId
+                .dataFetcher(environment -> index.getStopForId()
                     .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1067,11 +1067,11 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> {
                     if (!(environment.getArgument("ids") instanceof List)) {
-                        return new ArrayList<>(index.routeForId.values());
+                        return new ArrayList<>(index.getRouteForId().values());
                     } else {
                         return ((List<String>) environment.getArgument("ids"))
                             .stream()
-                            .map(id -> index.routeForId.get(GtfsLibrary.convertIdFromString(id)))
+                            .map(id -> index.getRouteForId().get(GtfsLibrary.convertIdFromString(id)))
                             .collect(Collectors.toList());
                     }
                 })
@@ -1084,14 +1084,14 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.routeForId
+                .dataFetcher(environment -> index.getRouteForId()
                     .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trips")
                 .description("Get all trips for the specified graph")
                 .type(new GraphQLList(tripType))
-                .dataFetcher(environment -> new ArrayList<>(index.tripForId.values()))
+                .dataFetcher(environment -> new ArrayList<>(index.getTripForId().values()))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("trip")
@@ -1101,7 +1101,7 @@ public class IndexGraphQLSchema {
                     .name("id")
                     .type(new GraphQLNonNull(Scalars.GraphQLString))
                     .build())
-                .dataFetcher(environment -> index.tripForId
+                .dataFetcher(environment -> index.getTripForId()
                     .get(GtfsLibrary.convertIdFromString(environment.getArgument("id"))))
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1126,7 +1126,7 @@ public class IndexGraphQLSchema {
                 .dataFetcher(environment -> {
                     try {
                         return fuzzyTripMatcher.getTrip(
-                            index.routeForId.get(
+                            index.getRouteForId().get(
                                 GtfsLibrary.convertIdFromString(environment.getArgument("route"))),
                             environment.getArgument("direction"),
                             environment.getArgument("time"),

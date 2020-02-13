@@ -35,7 +35,7 @@ public class GraphIndexTest extends GtfsTest {
         for (Vertex vertex : graph.getVertices()) {
             if (vertex instanceof TransitStopVertex) {
                 Stop stop = ((TransitStopVertex)vertex).getStop();
-                Vertex index_vertex = graph.index.stopVertexForStop.get(stop);
+                Vertex index_vertex = graph.index.getStopVertexForStop().get(stop);
                 assertEquals(index_vertex, vertex);
             }
         }
@@ -43,14 +43,14 @@ public class GraphIndexTest extends GtfsTest {
         /* Agencies */
         String feedId = graph.getFeedIds().iterator().next();
         Agency agency;
-        agency = graph.index.agenciesForFeedId.get(feedId).get("azerty");
+        agency = graph.index.getAgenciesForFeedId().get(feedId).get("azerty");
         assertNull(agency);
-        agency = graph.index.agenciesForFeedId.get(feedId).get("agency");
+        agency = graph.index.getAgenciesForFeedId().get(feedId).get("agency");
         assertEquals(agency.getId(), "agency");
         assertEquals(agency.getName(), "Fake Agency");
 
         /* Stops */
-        graph.index.stopForId.get(new FeedScopedId("X", "Y"));
+        graph.index.getStopForId().get(new FeedScopedId("X", "Y"));
 
         /* Trips */
 //        graph.index.tripForId;
@@ -61,18 +61,18 @@ public class GraphIndexTest extends GtfsTest {
 
     /** Check that bidirectional relationships between TripPatterns and Trips, Routes, and Stops are coherent. */
     public void testPatternsCoherent() {
-        for (Trip trip : graph.index.tripForId.values()) {
-            TripPattern pattern = graph.index.patternForTrip.get(trip);
+        for (Trip trip : graph.index.getTripForId().values()) {
+            TripPattern pattern = graph.index.getPatternForTrip().get(trip);
             assertTrue(pattern.getTrips().contains(trip));
         }
         /* This one depends on a feed where each TripPattern appears on only one route. */
-        for (Route route : graph.index.routeForId.values()) {
-            for (TripPattern pattern : graph.index.patternsForRoute.get(route)) {
+        for (Route route : graph.index.getRouteForId().values()) {
+            for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
                 assertEquals(pattern.route, route);
             }
         }
-        for (Stop stop : graph.index.stopForId.values()) {
-            for (TripPattern pattern : graph.index.patternsForStop.get(stop)) {
+        for (Stop stop : graph.index.getStopForId().values()) {
+            for (TripPattern pattern : graph.index.getPatternsForStop().get(stop)) {
                 assertTrue(pattern.stopPattern.containsStop(stop.getId().toString()));
             }
         }
@@ -80,17 +80,17 @@ public class GraphIndexTest extends GtfsTest {
 
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
-        Stop stopJ = graph.index.stopForId.get(new FeedScopedId(feedId, "J"));
-        Stop stopL = graph.index.stopForId.get(new FeedScopedId(feedId, "L"));
-        Stop stopM = graph.index.stopForId.get(new FeedScopedId(feedId, "M"));
-        TransitStopVertex stopvJ = graph.index.stopVertexForStop.get(stopJ);
-        TransitStopVertex stopvL = graph.index.stopVertexForStop.get(stopL);
-        TransitStopVertex stopvM = graph.index.stopVertexForStop.get(stopM);
+        Stop stopJ = graph.index.getStopForId().get(new FeedScopedId(feedId, "J"));
+        Stop stopL = graph.index.getStopForId().get(new FeedScopedId(feedId, "L"));
+        Stop stopM = graph.index.getStopForId().get(new FeedScopedId(feedId, "M"));
+        TransitStopVertex stopvJ = graph.index.getStopVertexForStop().get(stopJ);
+        TransitStopVertex stopvL = graph.index.getStopVertexForStop().get(stopL);
+        TransitStopVertex stopvM = graph.index.getStopVertexForStop().get(stopM);
         // There are a two other stops within 100 meters of stop J.
         Envelope env = new Envelope(new Coordinate(stopJ.getLon(), stopJ.getLat()));
         env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(100, stopJ.getLat()),
                 SphericalDistanceLibrary.metersToDegrees(100));
-        List<TransitStopVertex> stops = graph.index.stopSpatialIndex.query(env);
+        List<TransitStopVertex> stops = graph.index.getStopSpatialIndex().query(env);
         assertTrue(stops.contains(stopvJ));
         assertTrue(stops.contains(stopvL));
         assertTrue(stops.contains(stopvM));

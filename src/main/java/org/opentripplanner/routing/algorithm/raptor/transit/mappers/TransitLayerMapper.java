@@ -51,9 +51,9 @@ public class TransitLayerMapper {
 
         LOG.info("Mapping transitLayer from Graph...");
 
-        stopIndex =  new StopIndexForRaptor(graph.index.stopForId.values());
+        stopIndex =  new StopIndexForRaptor(graph.index.getStopForId().values());
         tripPatternsByStopByDate = mapTripPatterns(stopIndex);
-        transferByStopIndex = mapTransfers(graph.index.stopVertexForStop, stopIndex);
+        transferByStopIndex = mapTransfers(graph.index.getStopVertexForStop(), stopIndex);
 
         LOG.info("Mapping complete.");
 

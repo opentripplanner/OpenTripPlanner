@@ -37,12 +37,12 @@ public class TripTimeShortHelper {
             TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(
                     trip.getId(), serviceDate);
             if (pattern == null) {
-                pattern = index.patternForTrip.get(trip);
+                pattern = index.getPatternForTrip().get(trip);
             }
             timetable = timetableSnapshot.resolve(pattern, serviceDate);
         }
         if (timetable == null) {
-            timetable = index.patternForTrip.get(trip).scheduledTimetable;
+            timetable = index.getPatternForTrip().get(trip).scheduledTimetable;
         }
 
         // This check is made here to avoid changing TripTimeShort.fromTripTimes
@@ -59,7 +59,7 @@ public class TripTimeShortHelper {
      * Find trip time short for the from place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForFromPlace(Leg leg) {
-        Trip trip = index.tripForId.get(leg.tripId);
+        Trip trip = index.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
         }
@@ -87,7 +87,7 @@ public class TripTimeShortHelper {
      * Find trip time short for the to place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForToPlace(Leg leg) {
-        Trip trip = index.tripForId.get(leg.tripId);
+        Trip trip = index.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
         }
@@ -119,7 +119,7 @@ public class TripTimeShortHelper {
         if (leg.tripId == null || leg.serviceDate == null) {
             return new ArrayList<>();
         }
-        Trip trip = index.tripForId.get(leg.tripId);
+        Trip trip = index.getTripForId().get(leg.tripId);
         ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
         return getTripTimesShort(trip, serviceDate);
     }
@@ -128,7 +128,7 @@ public class TripTimeShortHelper {
      * Find trip time shorts for all intermediate stops for a leg.
      */
     public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg) {
-        Trip trip = index.tripForId.get(leg.tripId);
+        Trip trip = index.getTripForId().get(leg.tripId);
 
         if (trip == null) {
             return new ArrayList<>();
@@ -176,7 +176,7 @@ public class TripTimeShortHelper {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops
-            Stop stop = index.stopForId.get(quayId);
+            Stop stop = index.getStopForId().get(quayId);
             if (stop != null && stop.getParentStation() != null) {
                 Station parentStation = stop.getParentStation();
                 for (Stop childStop : parentStation.getChildStops()) {

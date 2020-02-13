@@ -312,7 +312,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     private String getLocationOfFirstQuay(String vertexId, GraphIndex graphIndex) {
-        Vertex vertex = graphIndex.stopVertexForStop.get(vertexId);
+        Vertex vertex = graphIndex.getStopVertexForStop().get(vertexId);
         if (vertex instanceof TransitStopVertex) {
             TransitStopVertex stopVertex = (TransitStopVertex) vertex;
 

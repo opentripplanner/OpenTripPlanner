@@ -10,7 +10,7 @@ public class GraphStatistics {
 
 
     GraphStatistics(GraphIndex index) {
-        this.stops = index.stopForId.size();
+        this.stops = index.getStopForId().size();
     }
 
     /**

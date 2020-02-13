@@ -941,8 +941,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return trip pattern or null if no trip pattern was found
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
-        TripPattern pattern = graphIndex.patternForTrip.get(trip);
+        Trip trip = graphIndex.getTripForId().get(new FeedScopedId(feedId, tripId));
+        TripPattern pattern = graphIndex.getPatternForTrip().get(trip);
         return pattern;
     }
 
@@ -954,7 +954,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = graphIndex.routeForId.get(new FeedScopedId(feedId, routeId));
+        Route route = graphIndex.getRouteForId().get(new FeedScopedId(feedId, routeId));
         return route;
     }
 
@@ -966,7 +966,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
+        Trip trip = graphIndex.getTripForId().get(new FeedScopedId(feedId, tripId));
         return trip;
     }
 
@@ -978,7 +978,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = graphIndex.stopForId.get(new FeedScopedId(feedId, stopId));
+        Stop stop = graphIndex.getStopForId().get(new FeedScopedId(feedId, stopId));
         return stop;
     }
 }

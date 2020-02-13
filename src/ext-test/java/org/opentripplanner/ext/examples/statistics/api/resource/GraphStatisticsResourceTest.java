@@ -32,7 +32,7 @@ public class GraphStatisticsResourceTest {
         );
         graph.index();
 
-        long expStops = graph.index.stopForId.size();
+        long expStops = graph.index.getStopForId().size();
         expResult = "{data={graphStatistics={stops=" + expStops + "}}}";
 
         subject = new GraphStatisticsResource(graph.index);

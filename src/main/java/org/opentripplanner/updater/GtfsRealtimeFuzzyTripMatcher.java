@@ -48,7 +48,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         } catch (ParseException e) {
             return trip;
         }
-        Route route = index.routeForId.get(routeId);
+        Route route = index.getRouteForId().get(routeId);
         if (route == null) {
             return trip;
         }
@@ -73,7 +73,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
 
     public Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
         BitSet services = index.servicesRunning(date);
-        for (TripPattern pattern : index.patternsForRoute.get(route)) {
+        for (TripPattern pattern : index.getPatternsForRoute().get(route)) {
             if (pattern.directionId != direction) continue;
             for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
                 if (times.getScheduledDepartureTime(0) == startTime &&
