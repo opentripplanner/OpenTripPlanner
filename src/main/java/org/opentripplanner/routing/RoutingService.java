@@ -27,14 +27,10 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.HttpToGraphQLMapper;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
@@ -57,20 +53,25 @@ import java.util.stream.Collectors;
  */
 public class RoutingService {
 
-  private static final Logger LOG = LoggerFactory.getLogger(RoutingService.class);
+  private final Graph graph;
 
-  private Graph graph;
+  private final TimetableSnapshot timetableSnapshot;
 
   // TODO Move this
   private GraphQL graphQL;
 
   public RoutingService(Graph graph) {
-    this.graph = graph;
+    this(graph, graph.getTimetableSnapshot());
+  }
+
+  private RoutingService(Graph graph, TimetableSnapshot timetableSnapshot) {
     graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema,
         new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
             .setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
             .build()))
     );
+    this.timetableSnapshot = timetableSnapshot;
+    this.graph = graph;
   }
 
   public List<FindClosestStopsByWalking.StopAndDistance> findClosestStopsByWalking(
@@ -181,8 +182,6 @@ public class RoutingService {
   public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
     List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop().get(stop));
 
-    TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
-
     if (includeRealtimeUpdates && timetableSnapshot != null) {
       tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
     }
@@ -197,11 +196,11 @@ public class RoutingService {
    */
   public Timetable currentUpdatedTimetableForTripPattern(TripPattern tripPattern) {
     // The timetableSnapshot will be null if there's no real-time data being applied.
-      if (graph.getTimetableSnapshot() == null) { return tripPattern.scheduledTimetable; }
+      if (timetableSnapshot == null) { return tripPattern.scheduledTimetable; }
     // Get the updated times for right now, which is the only reasonable default since no date is supplied.
     Calendar calendar = Calendar.getInstance();
     ServiceDate serviceDate = new ServiceDate(calendar.getTime());
-    return graph.getTimetableSnapshot().resolve(tripPattern, serviceDate);
+    return timetableSnapshot.resolve(tripPattern, serviceDate);
   }
 
   public Response getGraphQLResponse(
@@ -279,13 +278,12 @@ public class RoutingService {
   }
 
   public List<TripTimeShort> getStopTimesForTripAndDate(Trip trip, ServiceDate serviceDate) {
-    TimetableSnapshot tts = graph.getTimetableSnapshot();
-    if (tts == null) {
+    if (timetableSnapshot == null) {
       return null;
     }
     else {
       TripPattern pattern = getPatternForTrip().get(trip);
-      return TripTimeShort.fromTripTimes(tts.resolve(pattern, serviceDate), trip);
+      return TripTimeShort.fromTripTimes(timetableSnapshot.resolve(pattern, serviceDate), trip);
     }
   }
 
@@ -326,34 +324,7 @@ public class RoutingService {
   }
 
   public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-    final ServiceDay serviceDay = new ServiceDay(graph,
-        serviceDate,
-        getCalendarService(),
-        trip.getRoute().getAgency().getId()
-    );
-    TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
-    Timetable timetable = null;
-    if (timetableSnapshot != null) {
-      // Check if realtime-data is available for trip
-
-      TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(trip.getId(), serviceDate);
-      if (pattern == null) {
-        pattern = getPatternForTrip().get(trip);
-      }
-      timetable = timetableSnapshot.resolve(pattern, serviceDate);
-    }
-    if (timetable == null) {
-      timetable = getPatternForTrip().get(trip).scheduledTimetable;
-    }
-
-    // This check is made here to avoid changing TripTimeShort.fromTripTimes
-    TripTimes times = timetable.getTripTimes(timetable.getTripIndex(trip.getId()));
-    if (!serviceDay.serviceRunning(times.serviceCode)) {
-      return new ArrayList<>();
-    }
-    else {
-      return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
-    }
+    return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
   }
 
   public GraphQL getGraphQL() {
@@ -361,7 +332,7 @@ public class RoutingService {
   }
 
   public TimetableSnapshot getTimetableSnapshot() {
-    return graph.getTimetableSnapshot();
+    return timetableSnapshot;
   }
 
   public Graph getGraph() {
