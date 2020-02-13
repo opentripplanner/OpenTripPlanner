@@ -29,9 +29,9 @@ public class GraphService {
       try {
         watchService = graphDirPath.getFileSystem().newWatchService();
         graphDirPath.register(watchService, ENTRY_MODIFY);
-        scanner.schedule(() -> {
+        scanner.scheduleWithFixedDelay(() -> {
           this.scan();
-        }, 30, TimeUnit.SECONDS);
+        }, 60, 30, TimeUnit.SECONDS);
       } catch (IOException e) {
         LOG.info("Failed to register watch ", e);
       }
