@@ -16,7 +16,7 @@ import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -311,8 +311,8 @@ public class TransmodelGraphQLPlanner {
         return new HashMap<>(bannedTrips);
     }
 
-    private String getLocationOfFirstQuay(String vertexId, GraphIndex graphIndex) {
-        Vertex vertex = graphIndex.getStopVertexForStop().get(vertexId);
+    private String getLocationOfFirstQuay(String vertexId, RoutingService routingService) {
+        Vertex vertex = routingService.getStopVertexForStop().get(vertexId);
         if (vertex instanceof TransitStopVertex) {
             TransitStopVertex stopVertex = (TransitStopVertex) vertex;
 

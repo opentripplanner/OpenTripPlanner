@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.examples.statistics.api.model;
 
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 
 /**
  * Simple POJO to define the returned 'key numbers'.
@@ -9,7 +9,7 @@ public class GraphStatistics {
     private int stops;
 
 
-    GraphStatistics(GraphIndex index) {
+    GraphStatistics(RoutingService index) {
         this.stops = index.getStopForId().size();
     }
 

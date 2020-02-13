@@ -27,6 +27,7 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -44,7 +45,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
@@ -66,6 +67,7 @@ import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.awt.*;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -75,6 +77,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -89,6 +92,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -1000,4 +1005,57 @@ public class Graph implements Serializable {
         return alertPatchService;
     }
 
+    private Collection<Stop> getStopsForId(FeedScopedId id) {
+
+        // GroupOfStations
+        GroupOfStations groupOfStations = groupOfStationsById.get(id);
+        if (groupOfStations != null) {
+            return groupOfStations.getChildStops();
+        }
+
+        // Multimodal station
+        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return multiModalStation.getChildStops();
+        }
+
+        // Station
+        Station station = stationById.get(id);
+        if (station != null) {
+            return station.getChildStops();
+        }
+        // Single stop
+        Stop stop = index.getStopForId().get(id);
+        if (stop != null) {
+            return Collections.singleton(stop);
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+     * @return The associated TransitStopVertex or all underlying TransitStopVertices
+     */
+    public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+        Collection<Stop> stops = getStopsForId(id);
+
+        if (stops == null) {
+            return null;
+        }
+
+        return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
+    }
+
+    /** An OBA Service Date is a local date without timezone, only year month and day. */
+    public BitSet servicesRunning (ServiceDate date) {
+        BitSet services = new BitSet(calendarService.getServiceIds().size());
+        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
+            int n = serviceCodes.get(serviceId);
+            if (n < 0) continue;
+            services.set(n);
+        }
+        return services;
+    }
 }

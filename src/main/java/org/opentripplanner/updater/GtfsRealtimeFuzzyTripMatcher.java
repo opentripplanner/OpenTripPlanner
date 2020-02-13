@@ -6,7 +6,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TimeToStringConverter;
 
@@ -22,9 +22,9 @@ import java.util.BitSet;
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
-    private GraphIndex index;
+    private RoutingService index;
 
-    public GtfsRealtimeFuzzyTripMatcher(GraphIndex index) {
+    public GtfsRealtimeFuzzyTripMatcher(RoutingService index) {
         this.index = index;
     }
 
@@ -72,7 +72,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
     }
 
     public Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
-        BitSet services = index.servicesRunning(date);
+        BitSet services = index.graph.servicesRunning(date);
         for (TripPattern pattern : index.getPatternsForRoute().get(route)) {
             if (pattern.directionId != direction) continue;
             for (TripTimes times : pattern.scheduledTimetable.tripTimes) {

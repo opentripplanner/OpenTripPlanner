@@ -7,7 +7,9 @@ import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 
 import javax.ws.rs.core.Response;
 import java.util.HashMap;
@@ -35,7 +37,7 @@ public class GraphStatisticsResourceTest {
         long expStops = graph.index.getStopForId().size();
         expResult = "{data={graphStatistics={stops=" + expStops + "}}}";
 
-        subject = new GraphStatisticsResource(graph.index);
+        subject = new GraphStatisticsResource(new RoutingService(graph));
     }
 
     @Test public void getGraphQLAsJson() {

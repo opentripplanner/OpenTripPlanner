@@ -7,7 +7,7 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -95,7 +95,7 @@ public class TimetableHelper {
 
         Trip trip = getTrip(tripId, timetable);
 
-        List<StopTime> modifiedStopTimes = createModifiedStopTimes(timetable, oldTimes, journey, trip, graph.index);
+        List<StopTime> modifiedStopTimes = createModifiedStopTimes(timetable, oldTimes, journey, trip, new RoutingService(graph));
         if (modifiedStopTimes == null) {
             return null;
         }
@@ -338,12 +338,12 @@ public class TimetableHelper {
      * Calculate new stoppattern based on single stop cancellations
      *
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param graphIndex
+     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
      */
-    public static List<Stop> createModifiedStops(Timetable timetable, EstimatedVehicleJourney journey, GraphIndex graphIndex) {
+    public static List<Stop> createModifiedStops(Timetable timetable, EstimatedVehicleJourney journey, RoutingService routingService) {
         if (journey == null) {
             return null;
         }
@@ -380,7 +380,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex
+                        Stop alternativeStop = routingService
                             .getStopForId()
                             .get(new FeedScopedId(stop.getId().getFeedId(), recordedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
@@ -402,7 +402,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex
+                        Stop alternativeStop = routingService
                             .getStopForId()
                             .get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {
@@ -434,12 +434,12 @@ public class TimetableHelper {
      * @param oldTimes
      * @param journey    SIRI-ET EstimatedVehicleJourney
      * @param trip
-     * @param graphIndex
+     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
      */
-    public static List<StopTime> createModifiedStopTimes(Timetable timetable, TripTimes oldTimes, EstimatedVehicleJourney journey, Trip trip, GraphIndex graphIndex) {
+    public static List<StopTime> createModifiedStopTimes(Timetable timetable, TripTimes oldTimes, EstimatedVehicleJourney journey, Trip trip, RoutingService routingService) {
         if (journey == null) {
             return null;
         }
@@ -452,7 +452,7 @@ public class TimetableHelper {
 
         List<EstimatedCall> estimatedCalls = journeyCalls.getEstimatedCalls();
 
-        List<Stop> stops = createModifiedStops(timetable, journey, graphIndex);
+        List<Stop> stops = createModifiedStops(timetable, journey, routingService);
 
         List<StopTime> modifiedStops = new ArrayList<>();
 
@@ -490,7 +490,7 @@ public class TimetableHelper {
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
                     if (!stopsMatchById && stop.getParentStation() != null) {
-                        Stop alternativeStop = graphIndex
+                        Stop alternativeStop = routingService
                             .getStopForId()
                             .get(new FeedScopedId(stop.getId().getFeedId(), estimatedCall.getStopPointRef().getValue()));
                         if (alternativeStop != null && stop.getParentStation().equals(alternativeStop.getParentStation())) {

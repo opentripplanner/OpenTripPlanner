@@ -9,7 +9,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -43,7 +43,7 @@ import java.util.Set;
 public class SiriFuzzyTripMatcher {
     private static final Logger LOG = LoggerFactory.getLogger(SiriFuzzyTripMatcher.class);
 
-    private GraphIndex index;
+    private RoutingService index;
 
     private static Map<String, Set<Trip>> mappedTripsCache = new HashMap<>();
     private static Map<String, Set<Trip>> mappedVehicleRefCache = new HashMap<>();
@@ -54,7 +54,7 @@ public class SiriFuzzyTripMatcher {
 
     private static Set<String> nonExistingStops = new HashSet<>();
 
-    public SiriFuzzyTripMatcher(GraphIndex index) {
+    public SiriFuzzyTripMatcher(RoutingService index) {
         this.index = index;
         initCache(this.index);
     }
@@ -184,7 +184,7 @@ public class SiriFuzzyTripMatcher {
         return mappedTripsCache.getOrDefault(tripId, new HashSet<>());
     }
 
-    private static void initCache(GraphIndex index) {
+    private static void initCache(RoutingService index) {
         if (mappedTripsCache.isEmpty()) {
 
             Set<Trip> trips = index.getPatternForTrip().keySet();

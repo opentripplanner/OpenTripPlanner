@@ -1,31 +1,19 @@
 package org.opentripplanner.routing;
 
-import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Maps;
 import com.google.common.collect.MinMaxPriorityQueue;
 import com.google.common.collect.Multimap;
 import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import gnu.trove.set.TIntSet;
-import gnu.trove.set.hash.TIntHashSet;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
-import org.joda.time.LocalDate;
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.common.geometry.CompactElevationProfile;
-import org.opentripplanner.common.geometry.HashGridSpatialIndex;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
@@ -37,16 +25,8 @@ import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -56,275 +36,86 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
-import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.Executors;
-import java.util.stream.Collectors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
  * serialized with the graph. Caching these maps is essentially an optimization, but a big one.
  * The index is bootstrapped from the graph's list of edges.
  */
-public class GraphIndex {
+public class RoutingService {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
-
-    // TODO: consistently key on model object or id string
-    private final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
-    private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-    private final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
-    private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
-    private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
-    private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
-    private final Map<Stop, TransitStopVertex> stopVertexForStop = Maps.newHashMap();
-    private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
-    private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
-    private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-    private final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
-    private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
-    private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
-    private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
-
-    /* Should eventually be replaced with new serviceId indexes. */
-    private final CalendarService calendarService;
-    private final Map<FeedScopedId,Integer> serviceCodes;
+    private static final Logger LOG = LoggerFactory.getLogger(RoutingService.class);
 
     /* This is a workaround, and should probably eventually be removed. */
     public Graph graph;
 
     public GraphQL graphQL;
 
-    public GraphIndex (Graph graph) {
-        LOG.info("Indexing graph...");
-
-        CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
-
-        for (String feedId : graph.getFeedIds()) {
-            for (Agency agency : graph.getAgencies(feedId)) {
-                Map<String, Agency> agencyForId = getAgenciesForFeedId().getOrDefault(feedId, new HashMap<>());
-                agencyForId.put(agency.getId(), agency);
-                this.getAgenciesForFeedId().put(feedId, agencyForId);
-            }
-            this.getFeedInfoForId().put(feedId, graph.getFeedInfo(feedId));
-        }
-
-        for (Operator operator : graph.getOperators()) {
-            this.getOperatorForId().put(operator.getId(), operator);
-        }
-
-        /* We will keep a separate set of all vertices in case some have the same label.
-         * Maybe we should just guarantee unique labels. */
-        for (Vertex vertex : graph.getVertices()) {
-            if (vertex instanceof TransitStopVertex) {
-                TransitStopVertex stopVertex = (TransitStopVertex) vertex;
-                Stop stop = stopVertex.getStop();
-                getStopForId().put(stop.getId(), stop);
-                getStopVertexForStop().put(stop, stopVertex);
-            }
-        }
-        for (TransitStopVertex stopVertex : getStopVertexForStop().values()) {
-            Envelope envelope = new Envelope(stopVertex.getCoordinate());
-            getStopSpatialIndex().insert(envelope, stopVertex);
-        }
-        for (TripPattern pattern : graph.tripPatternForId.values()) {
-            getPatternsForFeedId().put(pattern.getFeedId(), pattern);
-            getPatternsForRoute().put(pattern.route, pattern);
-            for (Trip trip : pattern.getTrips()) {
-                getPatternForTrip().put(trip, pattern);
-                getTripForId().put(trip.getId(), trip);
-            }
-            for (Stop stop: pattern.getStops()) {
-                getPatternsForStop().put(stop, pattern);
-            }
-        }
-        for (Route route : getPatternsForRoute().asMap().keySet()) {
-            getRouteForId().put(route.getId(), route);
-        }
-        for (MultiModalStation multiModalStation : graph.multiModalStationById.values()) {
-            for (Station childStation : multiModalStation.getChildStations()) {
-                getMultiModalStationForStations().put(childStation, multiModalStation);
-            }
-        }
-
-        // Copy these two service indexes from the graph until we have better ones.
-        calendarService = graph.getCalendarService();
-        serviceCodes = graph.serviceCodes;
+    public RoutingService(Graph graph) {
         this.graph = graph;
         graphQL = new GraphQL(
             new IndexGraphQLSchema(this).indexSchema,
             new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d").build()
             )));
-        initalizeServiceCodesForDate(graph);
-
-        LOG.info("Done indexing graph.");
     }
 
-    private void initalizeServiceCodesForDate(Graph graph) {
-
-        if (calendarService == null) { return; }
-
-        // CalendarService has one main implementation (CalendarServiceImpl) which contains a
-        // CalendarServiceData which can easily supply all of the dates. But it's impossible to
-        // actually see those dates without modifying the interfaces and inheritance. So we have
-        // to work around this abstraction and reconstruct the CalendarData.
-        // Note the "multiCalendarServiceImpl" which has docs saying it expects one single
-        // CalendarData. It seems to merge the calendar services from multiple GTFS feeds, but
-        // its only documentation says it's a hack.
-        // TODO OTP2 - This cleanup is added to the 'Final cleanup OTP2' issue #2757
-
-        // Reconstruct set of all dates where service is defined, keeping track of which services
-        // run on which days.
-        Multimap<ServiceDate, FeedScopedId> serviceIdsForServiceDate = HashMultimap.create();
-
-        for (FeedScopedId serviceId : calendarService.getServiceIds()) {
-            Set<ServiceDate> serviceDatesForService = calendarService.getServiceDatesForServiceId(serviceId);
-            for (ServiceDate serviceDate : serviceDatesForService) {
-                serviceIdsForServiceDate.put(serviceDate, serviceId);
-            }
-        }
-        for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
-            TIntSet serviceCodesRunning = new TIntHashSet();
-            for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-                serviceCodesRunning.add(graph.serviceCodes.get(serviceId));
-            }
-            getServiceCodesRunningForDate().put(
-                serviceDate,
-                serviceCodesRunning
-            );
-        }
-    }
-
-    /* TODO: an almost similar function exists in ProfileRouter, combine these.
-    *  Should these live in a separate class? */
-    public List<StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
-        // Make a normal OTP routing request so we can traverse edges and use GenericAStar
-        // TODO make a function that builds normal routing requests from profile requests
-        RoutingRequest rr = new RoutingRequest(TraverseMode.WALK);
-        rr.from = new GenericLocation(null, null, lat, lon);
-        // FIXME requires destination to be set, not necessary for analyst
-        rr.to = new GenericLocation(null, null, lat, lon);
-        rr.oneToMany = true;
-        rr.setRoutingContext(graph);
-        rr.walkSpeed = 1;
-        rr.dominanceFunction = new DominanceFunction.LeastWalk();
-        // RR dateTime defaults to currentTime.
-        // If elapsed time is not capped, searches are very slow.
-        rr.worstTime = (rr.dateTime + radius);
-        AStar astar = new AStar();
-        rr.setNumItineraries(1);
-        StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
-        astar.setTraverseVisitor(visitor);
-        astar.getShortestPathTree(rr, 1); // timeout in seconds
-        // Destroy the routing context, to clean up the temporary edges & vertices
-        rr.rctx.destroy();
-        return visitor.stopsFound;
+    public List<FindClosestStopsByWalking.StopAndDistance> findClosestStopsByWalking(double lat, double lon, int radius) {
+        return FindClosestStopsByWalking.findClosestStopsByWalking(graph, lat, lon, radius);
     }
 
     public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
-        return agenciesForFeedId;
+        return graph.index.getAgenciesForFeedId();
     }
 
     public Map<FeedScopedId, Operator> getOperatorForId() {
-        return operatorForId;
+        return graph.index.getOperatorForId();
     }
 
     public Map<String, FeedInfo> getFeedInfoForId() {
-        return feedInfoForId;
+        return graph.index.getFeedInfoForId();
     }
 
     public Map<FeedScopedId, Stop> getStopForId() {
-        return stopForId;
+        return graph.index.getStopForId();
     }
 
     public Map<FeedScopedId, Trip> getTripForId() {
-        return tripForId;
+        return graph.index.getTripForId();
     }
 
     public Map<FeedScopedId, Route> getRouteForId() {
-        return routeForId;
+        return graph.index.getRouteForId();
     }
 
     public Map<Stop, TransitStopVertex> getStopVertexForStop() {
-        return stopVertexForStop;
+        return graph.index.getStopVertexForStop();
     }
 
     public Map<Trip, TripPattern> getPatternForTrip() {
-        return patternForTrip;
-    }
-
-    public Multimap<String, TripPattern> getPatternsForFeedId() {
-        return patternsForFeedId;
+        return graph.index.getPatternForTrip();
     }
 
     public Multimap<Route, TripPattern> getPatternsForRoute() {
-        return patternsForRoute;
+        return graph.index.getPatternsForRoute();
     }
 
     public Multimap<Stop, TripPattern> getPatternsForStop() {
-        return patternsForStop;
+        return graph.index.getPatternsForStop();
     }
 
     public Map<Station, MultiModalStation> getMultiModalStationForStations() {
-        return multiModalStationForStations;
-    }
-
-    public HashGridSpatialIndex<TransitStopVertex> getStopSpatialIndex() {
-        return stopSpatialIndex;
-    }
-
-    public static class StopAndDistance {
-        public Stop stop;
-        public int distance;
-
-        public StopAndDistance(Stop stop, int distance){
-            this.stop = stop;
-            this.distance = distance;
-        }
-    }
-
-    static private class StopFinderTraverseVisitor implements TraverseVisitor {
-        List<StopAndDistance> stopsFound = new ArrayList<>();
-        @Override public void visitEdge(Edge edge, State state) { }
-        @Override public void visitEnqueue(State state) { }
-        // Accumulate stops into ret as the search runs.
-        @Override public void visitVertex(State state) {
-            Vertex vertex = state.getVertex();
-            if (vertex instanceof TransitStopVertex) {
-                stopsFound.add(new StopAndDistance(((TransitStopVertex) vertex).getStop(),
-                    (int) state.getElapsedTimeSeconds()));
-            }
-        }
-    }
-
-
-    /** An OBA Service Date is a local date without timezone, only year month and day. */
-    public BitSet servicesRunning (ServiceDate date) {
-        BitSet services = new BitSet(calendarService.getServiceIds().size());
-        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
-            int n = serviceCodes.get(serviceId);
-            if (n < 0) continue;
-            services.set(n);
-        }
-        return services;
-    }
-
-    /**
-     * Wraps the other servicesRunning whose parameter is an OBA ServiceDate.
-     * Joda LocalDate is a similar class.
-     */
-    public BitSet servicesRunning (LocalDate date) {
-        return servicesRunning(new ServiceDate(date.getYear(), date.getMonthOfYear(), date.getDayOfMonth()));
+        return graph.index.getMultiModalStationForStations();
     }
 
     /** Dynamically generate the set of Routes passing though a Stop on demand. */
@@ -334,14 +125,6 @@ public class GraphIndex {
             routes.add(p.route);
         }
         return routes;
-    }
-
-    /**
-     * Fetch upcoming vehicle departures from a stop.
-     * Fetches two departures for each pattern during the next 24 hours as default
-     */
-    public Collection<StopTimesInPattern> stopTimesForStop(Stop stop, boolean omitNonPickups) {
-        return stopTimesForStop(stop, System.currentTimeMillis()/1000, 24 * 60 * 60, 2, omitNonPickups);
     }
 
     /**
@@ -390,7 +173,7 @@ public class GraphIndex {
 
             // Loop through all possible days
             for (ServiceDate serviceDate : serviceDates) {
-                ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
+                ServiceDay sd = new ServiceDay(graph, serviceDate, graph.getCalendarService(), pattern.route.getAgency().getId());
                 Timetable tt;
                 if (snapshot != null){
                     tt = snapshot.resolve(pattern, serviceDate);
@@ -471,7 +254,7 @@ public class GraphIndex {
             } else {
                 tt = pattern.scheduledTimetable;
             }
-            ServiceDay sd = new ServiceDay(graph, serviceDate, calendarService, pattern.route.getAgency().getId());
+            ServiceDay sd = new ServiceDay(graph, serviceDate, graph.getCalendarService(), pattern.route.getAgency().getId());
             int sidx = 0;
             for (Stop currStop : pattern.stopPattern.stops) {
                 if (currStop == stop) {
@@ -564,58 +347,10 @@ public class GraphIndex {
         return res == null ? Collections.emptyList() : res;
     }
 
-
     /**
      * Get a list of all operators spanning across all feeds.
      */
     public Collection<Operator> getAllOperators() {
         return getOperatorForId().values();
-    }
-
-    /**
-     *
-     * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
-     * @return The associated TransitStopVertex or all underlying TransitStopVertices
-     */
-    public Set<Vertex> getStopVerticesById(FeedScopedId id) {
-        Collection<Stop> stops = getStopsForId(id);
-
-        if (stops == null) {
-            return null;
-        }
-
-        return stops.stream().map(getStopVertexForStop()::get).collect(Collectors.toSet());
-    }
-
-    private Collection<Stop> getStopsForId(FeedScopedId id) {
-
-        // GroupOfStations
-        GroupOfStations groupOfStations = graph.groupOfStationsById.get(id);
-        if (groupOfStations != null) {
-            return groupOfStations.getChildStops();
-        }
-
-        // Multimodal station
-        MultiModalStation multiModalStation = graph.multiModalStationById.get(id);
-        if (multiModalStation != null) {
-            return multiModalStation.getChildStops();
-        }
-
-        // Station
-        Station station = graph.stationById.get(id);
-        if (station != null) {
-            return station.getChildStops();
-        }
-        // Single stop
-        Stop stop = graph.index.getStopForId().get(id);
-        if (stop != null) {
-            return Collections.singleton(stop);
-        }
-
-        return null;
-    }
-
-    public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
-        return this.serviceCodesRunningForDate;
     }
 }

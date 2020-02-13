@@ -32,8 +32,9 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.FindClosestStopsByWalking;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -141,7 +142,7 @@ public class IndexGraphQLSchema {
         return null;
     });
 
-    public IndexGraphQLSchema(GraphIndex index) {
+    public IndexGraphQLSchema(RoutingService index) {
 
         fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(index);
 
@@ -150,12 +151,12 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
-                .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).stop)
+                .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
                 .type(Scalars.GraphQLInt)
-                .dataFetcher(environment -> ((GraphIndex.StopAndDistance) environment.getSource()).distance)
+                .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).distance)
                 .build())
             .build();
 

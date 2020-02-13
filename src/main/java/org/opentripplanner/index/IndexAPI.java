@@ -28,7 +28,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -76,13 +76,13 @@ public class IndexAPI {
     /** Include GTFS entities referenced by ID in the result. */
     @QueryParam("refs") private boolean refs = false;
 
-    private final GraphIndex index;
+    private final RoutingService index;
     private final StreetVertexIndex streetIndex;
     private final ObjectMapper deserializer = new ObjectMapper();
 
     public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         Router router = otpServer.getRouter(routerId);
-        index = router.graph.index;
+        index = new RoutingService(router.graph);
         streetIndex = router.graph.streetIndex;
     }
 

@@ -11,6 +11,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.List;
@@ -22,7 +23,7 @@ import java.util.Map;
  *
  * TODO: The old transit index doesn't exist anymore, and the new one needs more tests.
  */
-public class GraphIndexTest extends GtfsTest {
+public class RoutingServiceTest extends GtfsTest {
 
     @Override
     public String getFeedName() {
@@ -105,7 +106,7 @@ public class GraphIndexTest extends GtfsTest {
                 "    }" +
                 "}";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
         Map<String, Object> data = (Map<String, Object>) result.getData();
         assertEquals("Fake Agency", ((Map) data.get("agency")).get("name"));
@@ -123,7 +124,7 @@ public class GraphIndexTest extends GtfsTest {
                         "    }}\n" +
                         "}\n";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
         Map<String, Object> data = (Map<String, Object>) result.getData();
         assertEquals(18, ((List) ((Map) ((Map) data.get("viewer")).get("agency")).get("routes")).size());
@@ -208,7 +209,7 @@ public class GraphIndexTest extends GtfsTest {
             + "    }\n"
             + "  }";
 
-        ExecutionResult result = graph.index.graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
         assertTrue(result.getErrors().isEmpty());
     }
 
