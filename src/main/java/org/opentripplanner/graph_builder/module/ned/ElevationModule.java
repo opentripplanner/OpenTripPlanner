@@ -72,13 +72,17 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private double elevationUnitMultiplier = 1;
 
-    public ElevationModule(ElevationGridCoverageFactory factory,
-            double elevationUnitMultiplier,
-            double distanceBetweenSamples
-    ) {
+    /** used to transform street coordinates into the projection used by the elevation data */
+    private MathTransform transformer;
+
+    public ElevationModule(
+        ElevationGridCoverageFactory factory,
+        double elevationUnitMultiplier,
+        double distanceBetweenSamplesM
+        ) {
         this.setGridCoverageFactory(factory);
         this.elevationUnitMultiplier = elevationUnitMultiplier;
-        this.distanceBetweenSamplesM = distanceBetweenSamples;
+        this.distanceBetweenSamplesM = distanceBetweenSamplesM;
     }
 
     public List<String> provides() {
@@ -110,26 +114,39 @@ public class ElevationModule implements GraphBuilderModule {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
+        try {
+            transformer = CRS.findMathTransform(
+                GeometryUtils.WGS84_XY,
+                coverage.getCoordinateReferenceSystem(),
+                true
+            );
+        } catch (FactoryException e) {
+            log.error("Could not find an appropriate transformer!");
+            throw new RuntimeException(e);
+        }
         log.info("Setting street elevation profiles from digital elevation model...");
 
         List<StreetEdge> edgesWithElevation = Collections.synchronizedList(new ArrayList<>());
         AtomicInteger nProcessed = new AtomicInteger();
-        int nTotal = graph.countEdges();
 
-        graph.getVertices().parallelStream().forEach(gv -> {
-            gv.getOutgoing().parallelStream().forEach(ee -> {
+        List<StreetWithElevationEdge> edgesToCalculate = new ArrayList<>();
+        for (Vertex gv : graph.getVertices()) {
+            for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
-                    StreetWithElevationEdge edgeWithElevation = (StreetWithElevationEdge) ee;
-                    processEdge(graph, edgeWithElevation);
-                    if (edgeWithElevation.getElevationProfile() != null && !edgeWithElevation.isElevationFlattened()) {
-                        edgesWithElevation.add(edgeWithElevation);
-                    }
-                    int curNumProcessed = nProcessed.addAndGet(1);
-                    if (curNumProcessed % 50000 == 0) {
-                        log.info("set elevation on {}/{} edges", curNumProcessed, nTotal);
-                    }
+                    edgesToCalculate.add((StreetWithElevationEdge) ee);
                 }
-            });
+            }
+        }
+
+        edgesToCalculate.parallelStream().forEach(edgeWithElevation -> {
+            processEdge(graph, edgeWithElevation);
+            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
+                edgesWithElevation.add(edgeWithElevation);
+            }
+            int curNumProcessed = nProcessed.addAndGet(1);
+            if (curNumProcessed % 50000 == 0) {
+                log.info("set elevation on {}/{} edges", curNumProcessed, edgesToCalculate.size());
+            }
         });
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
@@ -351,7 +368,7 @@ public class ElevationModule implements GraphBuilderModule {
      * @param graph the graph (used only for error handling)
      */
     private void processEdge(Graph graph, StreetWithElevationEdge ee) {
-        if (ee.getElevationProfile() != null) {
+        if (ee.hasPackedElevationProfile()) {
             return; /* already set up */
         }
         Geometry g = ee.getGeometry();
@@ -444,15 +461,10 @@ public class ElevationModule implements GraphBuilderModule {
             // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
             // rasters to also use (long, lat).
             DirectPosition2D projectedPosition = new DirectPosition2D(GeometryUtils.WGS84_XY, x, y);
-            MathTransform transformer = CRS.findMathTransform(
-                GeometryUtils.WGS84_XY,
-                coverage.getCoordinateReferenceSystem(),
-                true
-            );
             DirectPosition2D transformedPosition = new DirectPosition2D();
             transformer.transform(projectedPosition, transformedPosition);
             coverage.evaluate(transformedPosition, values);
-        } catch (org.opengis.coverage.PointOutsideCoverageException | FactoryException | TransformException e) {
+        } catch (org.opengis.coverage.PointOutsideCoverageException | TransformException e) {
             nPointsOutsideDEM.incrementAndGet();
         }
         nPointsEvaluated.incrementAndGet();
