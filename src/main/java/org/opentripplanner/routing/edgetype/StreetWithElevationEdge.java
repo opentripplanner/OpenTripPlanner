@@ -90,6 +90,8 @@ public class StreetWithElevationEdge extends StreetEdge {
         return CompactElevationProfile.uncompactElevationProfile(packedElevationProfile);
     }
 
+    public boolean hasPackedElevationProfile () { return packedElevationProfile != null; }
+
     @Override
     public boolean isElevationFlattened() {
         return flattened;
