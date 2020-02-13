@@ -15,7 +15,7 @@ public class Place {
         this.lat = lat;
         this.lon = lon;
         this.description = description;
-        this.stopId = stopId == null ? null : new FeedScopedId(feedId, stopId);
+        this.stopId = isBlank(stopId) ? null : new FeedScopedId(feedId, stopId);
     }
 
     public double getLat() {
@@ -32,6 +32,10 @@ public class Place {
 
     public FeedScopedId getStopId() {
         return stopId;
+    }
+
+    public Coordinate getCoordinate() {
+        return new Coordinate(lon, lat);
     }
 
     public String coordinateAsString() {
@@ -58,7 +62,7 @@ public class Place {
         return Objects.hash(lat, lon, stopId);
     }
 
-    public Coordinate getCoordinate() {
-        return new Coordinate(lon, lat);
+    private static boolean isBlank(String value) {
+        return value == null || value.isBlank();
     }
 }

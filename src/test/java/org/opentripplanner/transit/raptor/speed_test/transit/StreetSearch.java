@@ -68,7 +68,7 @@ class StreetSearch {
         );
 
         if(stopAtDistanceList.isEmpty()) {
-            throw new RuntimeException("Point not near a road: " + place);
+            throw new RuntimeException("No stops found nearby: " + place);
         }
 
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {

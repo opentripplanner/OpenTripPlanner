@@ -11,6 +11,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
@@ -48,11 +49,12 @@ public class SpeedTestRequest {
     private final TestCase testCase;
     private final SpeedTestCmdLineOpts opts;
     private final ZoneId inputZoneId;
-    private final LocalDate date = LocalDate.of(2019, 11, 12);
+    private final LocalDate date;
 
-    SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts, ZoneId inputZoneId) {
+    SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts, SpeedTestConfig config, ZoneId inputZoneId) {
         this.testCase = testCase;
         this.opts = opts;
+        this.date = config.getTestDate();
         this.inputZoneId = inputZoneId;
     }
 
