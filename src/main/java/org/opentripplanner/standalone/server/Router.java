@@ -134,8 +134,6 @@ public class Router {
             }
         }
 
-        RoutingService routingService = new RoutingService(graph);
-
         /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
         /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
         LOG.info("Creating transit layer for Raptor routing.");
