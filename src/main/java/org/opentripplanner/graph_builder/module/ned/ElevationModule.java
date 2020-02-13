@@ -359,25 +359,48 @@ public class ElevationModule implements GraphBuilderModule {
 
         List<Coordinate> coordList = new LinkedList<Coordinate>();
 
-        // calculate the total edge length in meters
-        double edgeLenM = 0;
-        for (int i = 0; i < coords.length - 1; i++) {
-            edgeLenM += SphericalDistanceLibrary.distance(coords[i].y, coords[i].x, coords[i + 1].y,
-                    coords[i + 1].x);
-        }
-
         // initial sample (x = 0)
         coordList.add(new Coordinate(0, getElevation(coords[0])));
 
-        // loop for edge-internal samples
-        for (double x = distanceBetweenSamplesM; x < edgeLenM; x += distanceBetweenSamplesM) {
-            // avoid final-segment samples less than half the distance between samples:
-            if (edgeLenM - x < distanceBetweenSamplesM / 2) {
-                break;
-            }
+        // iterate through coordinates calculating the edge length and creating intermediate elevation coordinates at
+        // the regularly specified interval
+        double edgeLenM = 0;
+        double sampleDistance = distanceBetweenSamplesM;
+        double previousDistance = 0;
+        double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
+        for (int i = 0; i < coords.length - 1; i++) {
+            x2 = coords[i + 1].x;
+            y2 = coords[i + 1].y;
+            double curSegmentDistance = SphericalDistanceLibrary.distance(y1, x1, y2, x2);
+            edgeLenM += curSegmentDistance;
+            while (edgeLenM > sampleDistance) {
+                // if current edge length is longer than the current sample distance, insert new elevation coordinates
+                // as needed until sample distance has caught up
 
-            Coordinate internal = getPointAlongEdge(coords, edgeLenM, x / edgeLenM);
-            coordList.add(new Coordinate(x, getElevation(internal)));
+                // calculate percent of current segment that distance is between
+                double pctAlongSeg = (sampleDistance - previousDistance) / curSegmentDistance;
+                // add an elevation coordinate
+                coordList.add(
+                    new Coordinate(
+                        sampleDistance,
+                        getElevation(
+                            new Coordinate(
+                                x1 + (pctAlongSeg * (x2 - x1)),
+                                y1 + (pctAlongSeg * (y2 - y1))
+                            )
+                        )
+                    )
+                );
+                sampleDistance += distanceBetweenSamplesM;
+            }
+            previousDistance = edgeLenM;
+            x1 = x2;
+            y1 = y2;
+        }
+
+        // remove final-segment sample if it is less than half the distance between samples
+        if (edgeLenM - coordList.get(coordList.size() - 1).x < distanceBetweenSamplesM / 2) {
+            coordList.remove(coordList.size() - 1);
         }
 
         // final sample (x = edge length)
@@ -393,51 +416,6 @@ public class ElevationModule implements GraphBuilderModule {
                 issueStore.add(new ElevationFlattened(ee));
             }
         }
-    }
-
-    /**
-     * Returns a coordinate along a path located at a specific point indicated by the percentage of
-     * distance covered from start to end.
-     * 
-     * @param coords the list of (x,y) coordinates that form the path
-     * @param length the total length of the path
-     * @param t the percentage (ranges from 0 to 1)
-     * @return the (x,y) coordinate at t
-     */
-    public Coordinate getPointAlongEdge(Coordinate[] coords, double length, double t) {
-
-        double pctThrough = 0; // current percentage of the edge length traversed
-
-        // endpoints of current segment within edge:
-        double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
-
-        for (int i = 1; i < coords.length - 1; i++) { // loop through inner points
-            Coordinate innerPt = coords[i];
-            x2 = innerPt.x;
-            y2 = innerPt.y;
-
-            // percentage of total edge length represented by current segment:
-            double pct = SphericalDistanceLibrary.distance(y1, x1, y2, x2) / length;
-
-            if (pctThrough + pct > t) { // if current segment contains 't,' we're done
-                double pctAlongSeg = (t - pctThrough) / pct;
-                return new Coordinate(x1 + (pctAlongSeg * (x2 - x1)), y1
-                        + (pctAlongSeg * (y2 - y1)));
-            }
-
-            pctThrough += pct;
-            x1 = x2;
-            y1 = y2;
-        }
-
-        // handle the final segment separately
-        x2 = coords[coords.length - 1].x;
-        y2 = coords[coords.length - 1].y;
-
-        double pct = SphericalDistanceLibrary.distance(y1, x1, y2, x2) / length;
-        double pctAlongSeg = (t - pctThrough) / pct;
-
-        return new Coordinate(x1 + (pctAlongSeg * (x2 - x1)), y1 + (pctAlongSeg * (y2 - y1)));
     }
 
     /**
