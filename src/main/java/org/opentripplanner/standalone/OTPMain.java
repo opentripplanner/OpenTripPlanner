@@ -103,10 +103,12 @@ public class OTPMain {
         }
 
         /* Load graph from disk if one is not present from build. */
+        GraphService service = null;
         if (params.load) {
             GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.getGraphDirectory());
             ComponentAnnotationConfigurator.getInstance().fromConfig(graphConfig.builderConfig());
-            router = GraphLoader.loadGraph(graphConfig);
+            service= new GraphService(graphConfig,params.autoReload);
+            router = service.load();
         }
 
         /* Bail out if we have no router to work with. */
@@ -127,7 +129,7 @@ public class OTPMain {
         // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
         // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
         if (params.serve) {
-            appConstruction.setRouter(router);
+            appConstruction.setGraphService(service);
             GrizzlyServer grizzlyServer = appConstruction.createGrizzlyServer();
             // Loop to restart server on uncaught fatal exceptions.
             while (true) {

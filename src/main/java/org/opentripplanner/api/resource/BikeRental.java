@@ -38,7 +38,7 @@ public class BikeRental {
             @PathParam("routerId") String routerId,
             @QueryParam("locale") String locale_param) {
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         if (router == null) return null;
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         Locale locale;
@@ -48,7 +48,7 @@ public class BikeRental {
         if (lowerLeft != null) {
             envelope = getEnvelope(lowerLeft, upperRight);
         } else {
-            envelope = new Envelope(-180,180,-90,90); 
+            envelope = new Envelope(-180,180,-90,90);
         }
         Collection<BikeRentalStation> stations = bikeRentalService.getBikeRentalStations();
         List<BikeRentalStation> out = new ArrayList<>();

@@ -13,16 +13,16 @@ import java.util.List;
 /**
  * This is a JCommander-annotated class that holds parameters for OTP stand-alone mode.
  * These parameters can be parsed from the command line, or provided in a file using Jcommander's
- * at-symbol syntax (see http://jcommander.org/#Syntax). When stand-alone OTP is started as a 
+ * at-symbol syntax (see http://jcommander.org/#Syntax). When stand-alone OTP is started as a
  * daemon, parameters are loaded from such a file, located by default in '/etc/opentripplanner.cfg'.
- * 
+ *
  * Note that JCommander-annotated parameters can be any type that can be constructed from a string.
- * This module also contains classes for validating parameters. 
+ * This module also contains classes for validating parameters.
  * See: http://jcommander.org/#Parameter_validation
- * 
- * Some parameter fields are not initialized so when inferring other parameters, we can check for 
+ *
+ * Some parameter fields are not initialized so when inferring other parameters, we can check for
  * null and see whether they were specified on the command line.
- * 
+ *
  * @author abyrd
  */
 public class CommandLineParameters implements Cloneable {
@@ -56,6 +56,9 @@ public class CommandLineParameters implements Cloneable {
 
     @Parameter(names = {"--load"}, description = "Load the Graph.obj in the specified directory.")
     public boolean load;
+
+    @Parameter(names = {"--autoReload"}, description = "Auto reload if Graph.obj updates")
+    public boolean autoReload;
 
     @Parameter(names = {"--loadOSMGraph"}, description = "When building a graph, load the "
             + "osmGraph.obj file and build on top of it. You must have previously built a graph "
@@ -144,7 +147,7 @@ public class CommandLineParameters implements Cloneable {
             }
         }
     }
-    
+
     public static class ReadableDirectory implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
@@ -159,7 +162,7 @@ public class CommandLineParameters implements Cloneable {
             }
         }
     }
-    
+
     public static class ReadWriteDirectory implements IParameterValidator {
         @Override
         public void validate(String name, String value) throws ParameterException {
