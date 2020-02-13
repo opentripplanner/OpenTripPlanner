@@ -1,15 +1,10 @@
 package org.opentripplanner.standalone;
 
-import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
-import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
-
-import java.io.IOException;
-import java.nio.file.Path;
-import java.nio.file.WatchKey;
-import java.nio.file.WatchService;
+import java.io.File;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.atomic.AtomicLong;
 import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.standalone.config.GraphConfig;
 import org.slf4j.Logger;
@@ -21,38 +16,30 @@ public class GraphService {
   private final GraphConfig config;
   private Router currentRouter;
   private ScheduledExecutorService scanner = Executors.newSingleThreadScheduledExecutor();
-  private WatchService watchService;
+  private AtomicLong lastModified = new AtomicLong();
+  private File graphFile;
 
   public GraphService(GraphConfig config, boolean autoReload) {
     this.config = config;
+    graphFile = new File(config.getPath(), "Graph.obj");
     if (autoReload) {
-      Path graphDirPath = config.getPath().toPath();
-      try {
-        watchService = graphDirPath.getFileSystem().newWatchService();
-        graphDirPath.register(watchService, ENTRY_MODIFY, ENTRY_CREATE);
-        scanner.scheduleWithFixedDelay(() -> this.scan(), 60, 10, TimeUnit.SECONDS);
-      } catch (IOException e) {
-        LOG.info("Failed to register watch ", e);
-      }
+      lastModified.set(graphFile.lastModified());
+      scanner.scheduleWithFixedDelay(() -> this.scan(), 60, 10, TimeUnit.SECONDS);
     }
   }
 
   private void scan() {
-    WatchKey key = this.watchService.poll();
-    if (key != null) {
-      key.pollEvents().stream().filter(event -> event.context().toString().endsWith(".obj"))
-          .findFirst().ifPresent(event -> {
-        Router newRouter = this.load();
-        if (newRouter != null) {
-          LOG.info("Shutting down existing router and will switch to new router after done");
-          currentRouter.shutdown();
-          this.currentRouter = newRouter;
-          LOG.info("New Graph loaded");
-        } else {
-          LOG.info("Failed to load new graph will try to reload in next round");
-        }
-      });
-      key.reset();
+    long latestLastModified = graphFile.lastModified();
+    if (lastModified.getAndSet(latestLastModified) != latestLastModified) {
+      Router newRouter = this.load();
+      if (newRouter != null) {
+        LOG.info("Shutting down existing router and will switch to new router after done");
+        currentRouter.shutdown();
+        this.currentRouter = newRouter;
+        LOG.info("New Graph loaded");
+      } else {
+        LOG.info("Failed to load new graph will try to reload in next round");
+      }
     }
   }
 
