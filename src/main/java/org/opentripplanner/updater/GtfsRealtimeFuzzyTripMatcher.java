@@ -6,7 +6,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.TimeToStringConverter;
 

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.vertextype;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
+import org.opentripplanner.routing.GraphIndex;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -37,7 +38,7 @@ public class TransitStopVertex extends Vertex {
 
     /**
      * @param stop The transit model stop reference.
-     *             See {@link org.opentripplanner.routing.graph.GraphIndex#stopVertexForStop} for navigation
+     *             See {@link GraphIndex#stopVertexForStop} for navigation
      *             from a Stop to this class.
      * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
      */

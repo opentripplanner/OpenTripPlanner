@@ -16,7 +16,7 @@ import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.GraphIndex;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;

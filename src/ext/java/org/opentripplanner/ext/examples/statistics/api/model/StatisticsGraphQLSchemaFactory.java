@@ -9,7 +9,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.GraphIndex;
 
 public class StatisticsGraphQLSchemaFactory {
 
