@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
@@ -10,6 +9,7 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.TripTimes;

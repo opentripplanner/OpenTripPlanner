@@ -38,11 +38,4 @@ public class ApiTripSearchMetadata {
      * Unit : epoch milliseconds
      */
     public Long prevDateTime;
-
-
-    public ApiTripSearchMetadata(TripSearchMetadata model) {
-        this.searchWindowUsed = model.searchWindowUsed;
-        this.nextDateTime = model.nextDateTime.toEpochMilli();
-        this.prevDateTime = model.prevDateTime.toEpochMilli();
-    }
 }
