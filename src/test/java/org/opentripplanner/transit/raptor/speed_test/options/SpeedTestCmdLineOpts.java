@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.cli;
+package org.opentripplanner.transit.raptor.speed_test.options;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;

@@ -11,7 +11,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
-import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;

@@ -10,7 +10,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.AccessEgressLeg;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
