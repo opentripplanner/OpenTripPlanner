@@ -7,6 +7,7 @@ import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.execution.ExecutorServiceExecutionStrategy;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
@@ -24,9 +25,12 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -36,6 +40,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Collections;
@@ -45,7 +50,9 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.concurrent.Executors;
+import java.util.stream.Collectors;
 
 /**
  * This class contains all the transient indexes of graph elements -- those that are not
@@ -56,10 +63,10 @@ public class RoutingService {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingService.class);
 
-    /* This is a workaround, and should probably eventually be removed. */
-    public Graph graph;
+    private Graph graph;
 
-    public GraphQL graphQL;
+    // TODO Move this
+    private GraphQL graphQL;
 
     public RoutingService(Graph graph) {
         this.graph = graph;
@@ -352,5 +359,104 @@ public class RoutingService {
      */
     public Collection<Operator> getAllOperators() {
         return getOperatorForId().values();
+    }
+
+    public BitSet getServicesRunningForDate(ServiceDate date) {
+        return graph.servicesRunning(date);
+    }
+
+    public TripPattern getTripPatternForId(String id) {
+        return graph.tripPatternForId.get(id);
+    }
+
+    public Collection<TripPattern> getTripPatterns() {
+        return graph.tripPatternForId.values();
+    }
+
+    public Collection<Notice> getNoticesByElement(TransitEntity<?> transitEntity) {
+        return graph.getNoticesByElement().get(transitEntity);
+    }
+
+    public Collection<Notice> getNotices() {
+        return graph.getNoticesByElement().values();
+    }
+
+    public List<TripTimeShort> getStopTimesForTripAndDate(Trip trip, ServiceDate serviceDate) {
+        TimetableSnapshot tts = graph.getTimetableSnapshot();
+        if (tts == null) {
+            return null;
+        } else {
+            TripPattern pattern = getPatternForTrip().get(trip);
+            return TripTimeShort.fromTripTimes(tts.resolve(pattern, serviceDate), trip);
+        }
+    }
+
+    public Collection<Stop> getStopsByBoundingBox(Envelope envelope) {
+        return graph.streetIndex
+            .getTransitStopForEnvelope(envelope)
+            .stream()
+            .map(TransitStopVertex::getStop)
+            .collect(Collectors.toList());
+    }
+
+    public Station getStationById(FeedScopedId id) {
+        return graph.stationById.get(id);
+    }
+
+    public Collection<Station> getStations() {
+        return graph.stationById.values();
+    }
+
+    public CalendarService getCalendarService() {
+        return graph.getCalendarService();
+    }
+
+    public TimeZone getTimeZone() {
+        return graph.getTimeZone();
+    }
+
+    public BikeRentalStationService getBikerentalStationService() {
+        return graph.getService(BikeRentalStationService.class);
+    }
+
+    public AlertPatchService getSiriAlertPatchService() {
+        return graph.getSiriAlertPatchService();
+    }
+
+    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
+        return graph.multiModalStationById.get(feedScopedId);
+    }
+
+    public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
+        final ServiceDay serviceDay = new ServiceDay(graph, serviceDate,
+            getCalendarService(), trip.getRoute().getAgency().getId());
+        TimetableSnapshot timetableSnapshot = graph.getTimetableSnapshot();
+        Timetable timetable = null;
+        if (timetableSnapshot != null) {
+            // Check if realtime-data is available for trip
+
+            TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(
+                trip.getId(), serviceDate);
+            if (pattern == null) {
+                pattern = getPatternForTrip().get(trip);
+            }
+            timetable = timetableSnapshot.resolve(pattern, serviceDate);
+        }
+        if (timetable == null) {
+            timetable = getPatternForTrip().get(trip).scheduledTimetable;
+        }
+
+        // This check is made here to avoid changing TripTimeShort.fromTripTimes
+        TripTimes times = timetable.getTripTimes(timetable.getTripIndex(trip.getId()));
+        if (!serviceDay.serviceRunning(times.serviceCode)) {
+            return new ArrayList<>();
+        }
+        else {
+            return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
+        }
+    }
+
+    public GraphQL getGraphQL() {
+        return this.graphQL;
     }
 }

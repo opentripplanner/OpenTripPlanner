@@ -5,14 +5,9 @@ import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Timetable;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -20,52 +15,23 @@ import java.util.List;
 
 public class TripTimeShortHelper {
 
-    private RoutingService index;
+    private RoutingService routingService;
 
-    public TripTimeShortHelper(RoutingService index) {
-        this.index = index;
-    }
-
-    public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-        final ServiceDay serviceDay = new ServiceDay(index.graph, serviceDate,
-                                                            index.graph.getCalendarService(), trip.getRoute().getAgency().getId());
-        TimetableSnapshot timetableSnapshot = index.graph.getTimetableSnapshot();
-        Timetable timetable = null;
-        if (timetableSnapshot != null) {
-            // Check if realtime-data is available for trip
-
-            TripPattern pattern = timetableSnapshot.getLastAddedTripPattern(
-                    trip.getId(), serviceDate);
-            if (pattern == null) {
-                pattern = index.getPatternForTrip().get(trip);
-            }
-            timetable = timetableSnapshot.resolve(pattern, serviceDate);
-        }
-        if (timetable == null) {
-            timetable = index.getPatternForTrip().get(trip).scheduledTimetable;
-        }
-
-        // This check is made here to avoid changing TripTimeShort.fromTripTimes
-        TripTimes times = timetable.getTripTimes(timetable.getTripIndex(trip.getId()));
-        if (!serviceDay.serviceRunning(times.serviceCode)) {
-            return new ArrayList<>();
-        }
-        else {
-            return TripTimeShort.fromTripTimes(timetable, trip, serviceDay);
-        }
+    public TripTimeShortHelper(RoutingService routingService) {
+        this.routingService = routingService;
     }
 
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForFromPlace(Leg leg) {
-        Trip trip = index.getTripForId().get(leg.tripId);
+        Trip trip = routingService.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
         }
         ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
 
-        List<TripTimeShort> tripTimes = getTripTimesShort(trip, serviceDate);
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2
@@ -87,13 +53,13 @@ public class TripTimeShortHelper {
      * Find trip time short for the to place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForToPlace(Leg leg) {
-        Trip trip = index.getTripForId().get(leg.tripId);
+        Trip trip = routingService.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
         }
         ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
 
-        List<TripTimeShort> tripTimes = getTripTimesShort(trip, serviceDate);
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2
@@ -119,23 +85,23 @@ public class TripTimeShortHelper {
         if (leg.tripId == null || leg.serviceDate == null) {
             return new ArrayList<>();
         }
-        Trip trip = index.getTripForId().get(leg.tripId);
+        Trip trip = routingService.getTripForId().get(leg.tripId);
         ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
-        return getTripTimesShort(trip, serviceDate);
+        return routingService.getTripTimesShort(trip, serviceDate);
     }
 
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
     public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg) {
-        Trip trip = index.getTripForId().get(leg.tripId);
+        Trip trip = routingService.getTripForId().get(leg.tripId);
 
         if (trip == null) {
             return new ArrayList<>();
         }
         ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
 
-        List<TripTimeShort> tripTimes = getTripTimesShort(trip, serviceDate);
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         List<TripTimeShort> filteredTripTimes = new ArrayList<>();
 
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
@@ -176,7 +142,7 @@ public class TripTimeShortHelper {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops
-            Stop stop = index.getStopForId().get(quayId);
+            Stop stop = routingService.getStopForId().get(quayId);
             if (stop != null && stop.getParentStation() != null) {
                 Station parentStation = stop.getParentStation();
                 for (Stop childStop : parentStation.getChildStops()) {

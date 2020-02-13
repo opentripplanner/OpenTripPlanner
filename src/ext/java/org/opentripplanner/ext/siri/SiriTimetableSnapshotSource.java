@@ -1004,7 +1004,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         for (Iterator<Trip> iterator = matches.iterator(); iterator.hasNext(); ) {
             Trip currentTrip = iterator.next();
             TripPattern tripPattern = routingService.getPatternForTrip().get(currentTrip);
-            Set<ServiceDate> serviceDates = routingService.graph.getCalendarService().getServiceDatesForServiceId(currentTrip.getServiceId());
+            Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(currentTrip.getServiceId());
 
             if (!serviceDates.contains(realTimeReportedServiceDate)) {
                 // Current trip has no service on the date of the 'MonitoredVehicleJourney'
@@ -1070,7 +1070,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
     }
     private TripPattern getPatternForTrip(Trip trip, EstimatedVehicleJourney journey) {
 
-        Set<ServiceDate> serviceDates = routingService.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+        Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
 
         List<RecordedCall> recordedCalls = (journey.getRecordedCalls() != null ? journey.getRecordedCalls().getRecordedCalls():new ArrayList<>());
         List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
@@ -1155,7 +1155,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
 
             Trip trip = iterator.next();
-            Set<ServiceDate> serviceDatesForServiceId = routingService.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+            Set<ServiceDate> serviceDatesForServiceId = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
 
             for (Iterator<ServiceDate> serviceDateIterator = serviceDatesForServiceId.iterator(); serviceDateIterator.hasNext(); ) {
                 ServiceDate next = serviceDateIterator.next();
@@ -1229,7 +1229,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         for (Iterator<Trip> iterator = trips.iterator(); iterator.hasNext(); ) {
 
             Trip trip = iterator.next();
-            Set<ServiceDate> serviceDatesForServiceId = routingService.graph.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
+            Set<ServiceDate> serviceDatesForServiceId = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
             if (serviceDatesForServiceId.contains(serviceDate)) {
 
                 TripPattern pattern = routingService.getPatternForTrip().get(trip);
@@ -1254,7 +1254,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                     if (firstReportedStopIsFound) {
                         for (TripTimes times : getCurrentTimetable(pattern, serviceDate).tripTimes) {
                             if (times.getScheduledDepartureTime(stopNumber - 1) == departureInSecondsSinceMidnight) {
-                                if (routingService.graph.getCalendarService().getServiceDatesForServiceId(times.trip.getServiceId()).contains(serviceDate)) {
+                                if (routingService.getCalendarService().getServiceDatesForServiceId(times.trip.getServiceId()).contains(serviceDate)) {
                                     result.add(times.trip);
                                 }
                             }

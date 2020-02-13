@@ -106,7 +106,7 @@ public class RoutingServiceTest extends GtfsTest {
                 "    }" +
                 "}";
 
-        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).getGraphQL().execute(query);
         assertTrue(result.getErrors().isEmpty());
         Map<String, Object> data = (Map<String, Object>) result.getData();
         assertEquals("Fake Agency", ((Map) data.get("agency")).get("name"));
@@ -124,7 +124,7 @@ public class RoutingServiceTest extends GtfsTest {
                         "    }}\n" +
                         "}\n";
 
-        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).getGraphQL().execute(query);
         assertTrue(result.getErrors().isEmpty());
         Map<String, Object> data = (Map<String, Object>) result.getData();
         assertEquals(18, ((List) ((Map) ((Map) data.get("viewer")).get("agency")).get("routes")).size());
@@ -209,7 +209,7 @@ public class RoutingServiceTest extends GtfsTest {
             + "    }\n"
             + "  }";
 
-        ExecutionResult result = new RoutingService(graph).graphQL.execute(query);
+        ExecutionResult result = new RoutingService(graph).getGraphQL().execute(query);
         assertTrue(result.getErrors().isEmpty());
     }
 

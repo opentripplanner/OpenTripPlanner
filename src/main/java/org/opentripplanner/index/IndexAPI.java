@@ -479,14 +479,14 @@ public class IndexAPI {
    @GET
    @Path("/patterns")
    public Response getPatterns () {
-       Collection<TripPattern> patterns = index.graph.tripPatternForId.values();
+       Collection<TripPattern> patterns = index.getTripPatterns();
        return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
    }
 
    @GET
    @Path("/patterns/{patternId}")
    public Response getPattern (@PathParam("patternId") String patternIdString) {
-       TripPattern pattern = index.graph.tripPatternForId.get(patternIdString);
+       TripPattern pattern = index.getTripPatternForId(patternIdString);
        if (pattern != null) {
            return Response.status(Status.OK).entity(new PatternDetail(pattern)).build();
        } else { 
@@ -497,7 +497,7 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{patternId}/trips")
    public Response getTripsForPattern (@PathParam("patternId") String patternIdString) {
-       TripPattern pattern = index.graph.tripPatternForId.get(patternIdString);
+       TripPattern pattern = index.getTripPatternForId(patternIdString);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(TripShort.list(trips)).build();
@@ -510,7 +510,7 @@ public class IndexAPI {
    @Path("/patterns/{patternId}/stops")
    public Response getStopsForPattern (@PathParam("patternId") String patternIdString) {
        // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
-       TripPattern pattern = index.graph.tripPatternForId.get(patternIdString);
+       TripPattern pattern = index.getTripPatternForId(patternIdString);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
@@ -523,7 +523,7 @@ public class IndexAPI {
     @Path("/patterns/{patternId}/semanticHash")
     public Response getSemanticHashForPattern (@PathParam("patternId") String patternIdString) {
         // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
-        TripPattern pattern = index.graph.tripPatternForId.get(patternIdString);
+        TripPattern pattern = index.getTripPatternForId(patternIdString);
         if (pattern != null) {
             String semanticHash = pattern.semanticHashString(null);
             return Response.status(Status.OK).entity(semanticHash).build();
@@ -536,7 +536,7 @@ public class IndexAPI {
     @GET
     @Path("/patterns/{patternId}/geometry")
     public Response getGeometryForPattern (@PathParam("patternId") String patternIdString) {
-        TripPattern pattern = index.graph.tripPatternForId.get(patternIdString);
+        TripPattern pattern = index.getTripPatternForId(patternIdString);
         if (pattern != null) {
             EncodedPolylineBean geometry = PolylineEncoder.createEncodings(pattern.getGeometry());
             return Response.status(Status.OK).entity(geometry).build();
