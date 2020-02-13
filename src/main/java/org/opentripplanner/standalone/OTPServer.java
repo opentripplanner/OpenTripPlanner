@@ -3,6 +3,7 @@ package org.opentripplanner.standalone;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -20,12 +21,12 @@ public class OTPServer {
 
     public final CommandLineParameters params;
 
-    private final Router router;
+    private final GraphService service;
 
-    public OTPServer (CommandLineParameters params, Router router) {
+    public OTPServer (CommandLineParameters params, GraphService service) {
         LOG.info("Wiring up and configuring server.");
         this.params = params;
-        this.router = router;
+        this.service = service;
     }
 
     /**
@@ -38,9 +39,8 @@ public class OTPServer {
         DeferredAuthorityFactory.exit();
     }
 
-    public Router getRouter(String routerId) {
-        // TODO OTP2 eventually remove the routerId entirely. For now we just always return the same router.
-        return router;
+    public Router getRouter() {
+        return service.getRouter();
     }
 
     /**

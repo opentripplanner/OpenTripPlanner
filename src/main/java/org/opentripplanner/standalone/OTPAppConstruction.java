@@ -29,8 +29,8 @@ public class OTPAppConstruction {
     private final OTPConfiguration configuration;
     private final CommandLineParameters commandLineParameters;
 
-    private Router router = null;
     private OTPServer server = null;
+    private GraphService graphService;
 
     /**
      * Create a new OTP configuration instance for a given directory.
@@ -78,7 +78,7 @@ public class OTPAppConstruction {
      */
     public OTPServer server() {
         if (server == null) {
-            server = new OTPServer(commandLineParameters, router);
+            server = new OTPServer(commandLineParameters, graphService);
         }
         return server;
     }
@@ -87,8 +87,8 @@ public class OTPAppConstruction {
         return new OTPApplication(server(), !commandLineParameters.insecure);
     }
 
-    public void setRouter (Router router) {
-        this.router = router;
+    public void setGraphService (GraphService service) {
+        this.graphService = service;
     }
 
 }
