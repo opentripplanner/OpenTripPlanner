@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import static java.nio.file.StandardWatchEventKinds.ENTRY_CREATE;
 import static java.nio.file.StandardWatchEventKinds.ENTRY_MODIFY;
 
 import java.io.IOException;
@@ -28,7 +29,7 @@ public class GraphService {
       Path graphDirPath = config.getPath().toPath();
       try {
         watchService = graphDirPath.getFileSystem().newWatchService();
-        graphDirPath.register(watchService, ENTRY_MODIFY);
+        graphDirPath.register(watchService, ENTRY_MODIFY, ENTRY_CREATE);
         scanner.scheduleWithFixedDelay(() -> this.scan(), 60, 10, TimeUnit.SECONDS);
       } catch (IOException e) {
         LOG.info("Failed to register watch ", e);
