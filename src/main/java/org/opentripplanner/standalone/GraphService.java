@@ -29,9 +29,7 @@ public class GraphService {
       try {
         watchService = graphDirPath.getFileSystem().newWatchService();
         graphDirPath.register(watchService, ENTRY_MODIFY);
-        scanner.scheduleWithFixedDelay(() -> {
-          this.scan();
-        }, 60, 30, TimeUnit.SECONDS);
+        scanner.scheduleWithFixedDelay(() -> this.scan(), 60, 10, TimeUnit.SECONDS);
       } catch (IOException e) {
         LOG.info("Failed to register watch ", e);
       }
@@ -48,10 +46,12 @@ public class GraphService {
           LOG.info("Shutting down existing router and will switch to new router after done");
           currentRouter.shutdown();
           this.currentRouter = newRouter;
+          LOG.info("New Graph loaded");
         } else {
           LOG.info("Failed to load new graph will try to reload in next round");
         }
       });
+      key.reset();
     }
   }
 
