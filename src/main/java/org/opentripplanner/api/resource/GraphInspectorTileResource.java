@@ -28,9 +28,9 @@ import org.opentripplanner.standalone.Router;
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
  * (bike safety factor, connectivity...).
- * 
+ *
  * One can easily add a new layer by adding the following kind of code to a leaflet map:
- * 
+ *
  * <pre>
  *   var bikesafety = new L.TileLayer(
  *      'http://localhost:8080/otp/routers/default/inspector/tile/bike-safety/{z}/{x}/{y}.png',
@@ -38,15 +38,15 @@ import org.opentripplanner.standalone.Router;
  *   var map = L.map(...);
  *   L.control.layers(null, { "Bike safety": bikesafety }).addTo(map);
  * </pre>
- * 
+ *
  * Tile rendering goes through TileRendererManager which select the appropriate renderer for the
  * given layer.
- * 
+ *
  * @see org.opentripplanner.inspector.TileRendererManager
  * @see TileRenderer
- * 
+ *
  * @author laurent
- * 
+ *
  */
 @Path("/routers/{routerId}/inspector")
 public class GraphInspectorTileResource extends RoutingResource {
@@ -80,7 +80,7 @@ public class GraphInspectorTileResource extends RoutingResource {
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
         TileRequest tileRequest = new TileRequest(env, 256, 256);
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
@@ -94,15 +94,15 @@ public class GraphInspectorTileResource extends RoutingResource {
 
     /**
      * Gets all layer names
-     * 
+     *
      * Used in fronted to create layer chooser
-     * @return 
+     * @return
      */
     @GET @Path("layers")
     @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public InspectorLayersList getLayers() {
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
         return layersList;
     }

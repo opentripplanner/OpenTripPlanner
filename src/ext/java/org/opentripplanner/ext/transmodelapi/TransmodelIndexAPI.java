@@ -40,7 +40,7 @@ public class TransmodelIndexAPI {
     private final ObjectMapper deserializer = new ObjectMapper();
 
     public TransmodelIndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        this.router = otpServer.getRouter(routerId);
+        this.router = otpServer.getRouter();
         index = new TransmodelGraphIndex(router.graph);
     }
 
