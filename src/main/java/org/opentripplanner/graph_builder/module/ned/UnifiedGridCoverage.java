@@ -26,7 +26,9 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     private static final long serialVersionUID = -7798801307087575896L;
 
     private static Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
-    
+
+    private List<GeneralEnvelope> regionEnvelopes;
+
     private ArrayList<Coverage> regions;
 
     private List<VerticalDatum> datums;
@@ -40,6 +42,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         super(name, coverage);
         regions = new ArrayList<Coverage>();
         regions.add(coverage);
+        regionEnvelopes = new ArrayList<>();
+        regionEnvelopes.add((GeneralEnvelope) coverage.getEnvelope());
         this.datums = datums;
     }
 
@@ -52,12 +56,13 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     public double[] evaluate(DirectPosition point, double[] values)
             throws PointOutsideCoverageException, CannotEvaluateException {
 
-        for (Coverage region : regions) {
+        for (int i = 0; i < regions.size(); i++) {
             // GeneralEnvelope has a contains method, OpenGIS Envelope does not
-            GeneralEnvelope env = ((GeneralEnvelope)region.getEnvelope());
+            GeneralEnvelope env = regionEnvelopes.get(i);
             // Check envelope to avoid incurring exception construction overhead (PointOutsideCoverageException),
             // especially important when there are many regions.
             if (env.contains(point)) {
+                Coverage region = regions.get(i);
                 double[] result;
                 double x = point.getOrdinate(0);
                 double y = point.getOrdinate(1);
@@ -96,6 +101,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
 
     public void add(GridCoverage2D regionCoverage) {
         regions.add(regionCoverage);
+        regionEnvelopes.add((GeneralEnvelope) regionCoverage.getEnvelope());
     }
 
 }
