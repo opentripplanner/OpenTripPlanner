@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.service;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
