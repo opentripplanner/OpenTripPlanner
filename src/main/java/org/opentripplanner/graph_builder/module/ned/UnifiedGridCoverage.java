@@ -31,13 +31,8 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     private static final long serialVersionUID = -7798801307087575896L;
 
     private static Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
-    private final SpatialIndex regionsIndex;
-    private final SpatialIndex datumsIndex;
-
-    private List<GeneralEnvelope> regionEnvelopes;
-
+    private final SpatialIndex datumRegionIndex;
     private ArrayList<Coverage> regions;
-
     private List<VerticalDatum> datums;
 
     /**
@@ -45,19 +40,13 @@ public class UnifiedGridCoverage extends AbstractCoverage {
      * in the same way. However, the superclass constructor (AbstractCoverage) needs a coverage to copy properties from.
      * So the first sub-coverage needs to be passed in at construction time.
      */
-    protected UnifiedGridCoverage(CharSequence name, Coverage coverage, List<VerticalDatum> datums) {
+    protected UnifiedGridCoverage(CharSequence name, GridCoverage2D coverage, List<VerticalDatum> datums) {
         super(name, coverage);
-        regions = new ArrayList<Coverage>();
-        regions.add(coverage);
-        regionEnvelopes = new ArrayList<>();
-        regionEnvelopes.add((GeneralEnvelope) coverage.getEnvelope());
+        regions = new ArrayList<>();
         this.datums = datums;
-        regionsIndex = new STRtree();
-        datumsIndex = new STRtree();
-        regionsIndex.insert(new ReferencedEnvelope(coverage.getEnvelope()), coverage);
-        for (VerticalDatum datum : datums) {
-            datumsIndex.insert(new Envelope(datum.lowerLeftLongitude, datum.lowerLeftLongitude + datum.deltaLongitude, datum.lowerLeftLatitude, datum.lowerLeftLatitude + datum.deltaLatitude), datum);
-        }
+        datumRegionIndex = new STRtree();
+        // Add first coverage to list of regions/spatial index.
+        this.add(coverage);
     }
 
     @Override
@@ -71,27 +60,19 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         double y = point.getOrdinate(1);
         Coordinate pointCoordinate = new Coordinate(x, y);
         Envelope envelope = new Envelope(pointCoordinate);
-        List<Coverage> coverageCandidates = regionsIndex.query(envelope);
+        List<DatumRegion> coverageCandidates = datumRegionIndex.query(envelope);
         if (coverageCandidates.size() > 0) {
-            // Found a match for coverage.
-            Coverage region = coverageCandidates.get(0);
-            List<VerticalDatum> datumCandidates = datumsIndex.query(envelope);
-            if (datumCandidates.size() > 0) {
-                // Found datum match.
-                VerticalDatum datum = datumCandidates.get(0);
-                double[] result;
-                try {
-                    result = region.evaluate(point, values);
-                    result[0] += datum.interpolatedHeight(x, y);
-                    return result;
-                } catch (PointOutsideCoverageException e) {
-                    /* not found */
-                    log.warn("Point not found: " + point);
-                    return null;
-                }
-            } else {
-                //if we get here, all vdatums failed.
-                log.error("Failed to convert elevation at " + y + ", " + x + " from NAVD88 to NAD83");
+            // Found a match for coverage/datum.
+            DatumRegion datumRegion = coverageCandidates.get(0);
+            double[] result;
+            try {
+                result = datumRegion.region.evaluate(point, values);
+                result[0] += datumRegion.datum.interpolatedHeight(x, y);
+                return result;
+            } catch (PointOutsideCoverageException e) {
+                /* not found */
+                log.warn("Point not found: " + point);
+                return null;
             }
         }
         /* not found */
@@ -110,8 +91,24 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     }
 
     public void add(GridCoverage2D regionCoverage) {
-        regionsIndex.insert(new ReferencedEnvelope(regionCoverage.getEnvelope()), regionCoverage);
+        // Iterate over datums to find intersection envelope with each region and add to spatial index.
+        for (VerticalDatum datum : datums) {
+            Envelope datumEnvelope = new Envelope(datum.lowerLeftLongitude, datum.lowerLeftLongitude + datum.deltaLongitude, datum.lowerLeftLatitude, datum.lowerLeftLatitude + datum.deltaLatitude);
+            ReferencedEnvelope regionEnvelope = new ReferencedEnvelope(regionCoverage.getEnvelope());
+            Envelope intersection = regionEnvelope.intersection(datumEnvelope);
+            datumRegionIndex.insert(intersection, new DatumRegion(datum, regionCoverage));
+        }
         regions.add(regionCoverage);
+    }
+
+    public class DatumRegion {
+        public final VerticalDatum datum;
+        public final Coverage region;
+
+        public DatumRegion (VerticalDatum datum, Coverage region) {
+            this.datum = datum;
+            this.region = region;
+        }
     }
 
 }
