@@ -58,7 +58,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.routing.TripSearchMetadata;
-import org.opentripplanner.routing.FindClosestStopsByWalking;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
@@ -1368,18 +1368,18 @@ public class TransmodelIndexGraphQLSchema {
                         .name("id")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment -> relay.toGlobalId(quayAtDistance.getName(),
-                                Integer.toString(((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).distance) + ";" +
-                                        mappingUtil.toIdString(((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).stop.getId())))
+                                Integer.toString(((StopFinder.StopAndDistance) environment.getSource()).distance) + ";" +
+                                        mappingUtil.toIdString(((StopFinder.StopAndDistance) environment.getSource()).stop.getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quay")
                         .type(quayType)
-                        .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).stop)
+                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).stop)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("distance")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).distance)
+                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).distance)
                         .build())
                 .build();
 
@@ -2993,7 +2993,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .argument(relay.getConnectionFieldArguments())
                         .dataFetcher(environment -> {
-                            List<FindClosestStopsByWalking.StopAndDistance> stops;
+                            List<StopFinder.StopAndDistance> stops;
                             try {
                                 stops = routingService.findClosestStopsByWalking(
                                         environment.getArgument("latitude"),

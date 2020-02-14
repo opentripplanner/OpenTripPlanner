@@ -28,11 +28,10 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimeKey;
-import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.FindClosestStopsByWalking;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -151,12 +150,12 @@ public class IndexGraphQLSchema {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("stop")
                 .type(stopType)
-                .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).stop)
+                .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).stop)
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("distance")
                 .type(Scalars.GraphQLInt)
-                .dataFetcher(environment -> ((FindClosestStopsByWalking.StopAndDistance) environment.getSource()).distance)
+                .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).distance)
                 .build())
             .build();
 

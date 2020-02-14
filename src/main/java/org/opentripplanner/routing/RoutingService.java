@@ -47,37 +47,32 @@ import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
 /**
- * This class contains all the transient indexes of graph elements -- those that are not serialized
- * with the graph. Caching these maps is essentially an optimization, but a big one. The index is
- * bootstrapped from the graph's list of edges.
+ * This is the entry point of all API requests towards the OTP graph. A new instance of this class
+ * should be created for each request. This ensures that the same TimetableSnapshot is used
+ * for the duration of the request (which may involve several method calls).
  */
 public class RoutingService {
 
   private final Graph graph;
 
-  private final TimetableSnapshot timetableSnapshot;
+  private TimetableSnapshot timetableSnapshot;
 
   // TODO Move this
   private GraphQL graphQL;
 
-  public RoutingService(Graph graph) {
-    this(graph, graph.getTimetableSnapshot());
-  }
-
-  private RoutingService(Graph graph, TimetableSnapshot timetableSnapshot) {
+  private RoutingService(Graph graph) {
     graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema,
         new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
             .setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
             .build()))
     );
-    this.timetableSnapshot = timetableSnapshot;
     this.graph = graph;
   }
 
-  public List<FindClosestStopsByWalking.StopAndDistance> findClosestStopsByWalking(
+  public List<StopFinder.StopAndDistance> findClosestStopsByWalking(
       double lat, double lon, int radius
   ) {
-    return FindClosestStopsByWalking.findClosestStopsByWalking(graph, lat, lon, radius);
+    return StopFinder.findClosestStopsByWalking(graph, lat, lon, radius);
   }
 
   public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
@@ -337,5 +332,16 @@ public class RoutingService {
 
   public Graph getGraph() {
     return graph;
+  }
+
+  /**
+   * Lazy-initialization of TimetableSnapshot
+   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
+   */
+  private TimetableSnapshot getTimeTableSnapshot() {
+    if (this.timetableSnapshot == null) {
+      timetableSnapshot = graph.getTimetableSnapshot();
+    }
+    return this.timetableSnapshot;
   }
 }

@@ -16,7 +16,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FindClosestStopsByWalking {
+public class StopFinder {
 
   /* TODO: an almost similar function exists in ProfileRouter, combine these.
    *  Should these live in a separate class? */
