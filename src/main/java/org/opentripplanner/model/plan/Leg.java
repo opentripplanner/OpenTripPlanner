@@ -216,29 +216,42 @@ public class Leg {
     /**
     * The leg's duration in seconds
     */
-   public long getDuration() {
-       // Round to closest second; Hence subtract 500 ms before dividing by 1000
-       return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
-   }
+    public long getDuration() {
+        // Round to closest second; Hence subtract 500 ms before dividing by 1000
+        return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
+    }
 
-   public void addAlert(Alert alert) {
-       alerts.add(alert);
-   }
+    public void addAlert(Alert alert) {
+        alerts.add(alert);
+    }
 
-   public void setTimeZone(TimeZone timeZone) {
-       Calendar calendar = Calendar.getInstance(timeZone);
-       calendar.setTime(startTime.getTime());
-       startTime = calendar;
-       calendar = Calendar.getInstance(timeZone);
-       calendar.setTime(endTime.getTime());
-       endTime = calendar;
-       agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
-   }
+    public void setTimeZone(TimeZone timeZone) {
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(startTime.getTime());
+        startTime = calendar;
+        calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(endTime.getTime());
+        endTime = calendar;
+        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
+    }
 
     public void addAlertPatch(AlertPatch alertPatch) {
-       if (!alertPatches.contains(alertPatch)) {
-           alertPatches.add(alertPatch);
-       }
+        if (!alertPatches.contains(alertPatch)) {
+            alertPatches.add(alertPatch);
+        }
+    }
+
+    /**
+     * Compare to legs to determine if they start and end at the same place and time.
+     *
+     * Note! Properties like mode and trip is NOT considered.
+     */
+    public boolean sameStartAndEnd(Leg other) {
+        if (this == other) { return true; }
+        return startTime.equals(other.startTime)
+                && endTime.equals(other.endTime)
+                && from.sameLocation(other.from)
+                && to.sameLocation(other.to);
     }
 
     /** Should be used for debug logging only */
@@ -291,22 +304,25 @@ public class Leg {
         if(value == null || !value) { return; }
         sb.append(name);
     }
+
     private static void toStringAdd(StringBuilder sb, String name, String value) {
         if(value == null) { return; }
         sb.append(name).append("='").append(value).append("'");
     }
+
     private static void toStringAddCal(StringBuilder sb, String name, Calendar value) {
         if(value == null) { return; }
         SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd mm:hh:ssZZZ");
         sb.append(name).append("='").append(sdf.format(value.getTime())).append("'");
     }
+
     private static void toStringAdd(StringBuilder sb, String name, Object value) {
         if(value == null) { return; }
         sb.append(name).append("=").append(value);
     }
+
     private static void toStringAddPosInt(StringBuilder sb, String name, int value) {
         if(value == 0) { return; }
         sb.append(name);
     }
-
 }

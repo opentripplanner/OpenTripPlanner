@@ -12,13 +12,15 @@ import java.util.List;
 import java.util.Map;
 
 public class TransferToAccessEgressLegMapper {
-    private TransitLayer transitLayer;
+    private final TransitLayer transitLayer;
+    private final double walkSpeed;
 
-    public TransferToAccessEgressLegMapper(TransitLayer transitLayer) {
+    public TransferToAccessEgressLegMapper(TransitLayer transitLayer, double walkSpeed) {
         this.transitLayer = transitLayer;
+        this.walkSpeed = walkSpeed;
     }
 
-    public Collection<TransferLeg> map(Map<Stop, Transfer> input, double walkSpeed) {
+    public Collection<TransferLeg> map(Map<Stop, Transfer> input) {
         List<TransferLeg> result = new ArrayList<>();
         for (Map.Entry<Stop, Transfer> entry : input.entrySet()) {
             Stop stop = entry.getKey();

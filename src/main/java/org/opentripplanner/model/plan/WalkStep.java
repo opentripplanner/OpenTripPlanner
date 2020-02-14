@@ -179,7 +179,6 @@ public class WalkStep {
         }
     }
 
-
     public String streetNameNoParens() {
         int idx = streetName.indexOf('(');
         if (idx <= 0) {

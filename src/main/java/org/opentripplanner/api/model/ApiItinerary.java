@@ -14,6 +14,14 @@ import java.util.List;
 public class ApiItinerary {
 
     /**
+     * The Itinerary filter may mark itineraries as deleted in stead of actually deleting them. This
+     * is very handy, when tuning the system or debugging - looking for missing expected trips.
+     * <p>
+     * Default is {@code null} - flag is not returned unless set to true.
+     */
+    public Boolean debugMarkedAsDeleted = null;
+
+    /**
      * Duration of the trip on this itinerary, in seconds.
      */
     public Long duration = 0L;

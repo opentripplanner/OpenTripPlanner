@@ -100,6 +100,9 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
         );
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     void run() {
         if (!run) { return; }
 

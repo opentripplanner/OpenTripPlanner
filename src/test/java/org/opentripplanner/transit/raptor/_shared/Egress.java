@@ -14,7 +14,7 @@ public class Egress {
         this.arrivalTime = arrivalTime;
         this.previous = previous;
     }
-    public int additionalCost(){ return 100; }
+    public int additionalCost(){ return 1000; }
     public int departureTime() { return departureTime; }
     public int arrivalTime() { return arrivalTime; }
     public ArrivalView<TestRaptorTripSchedule> previous() { return previous; }

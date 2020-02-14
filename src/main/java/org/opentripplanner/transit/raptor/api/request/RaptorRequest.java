@@ -52,14 +52,12 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return new RaptorRequestBuilder<T>(this);
     }
 
-
     /**
      * Requered travel search parameters.
      */
     public SearchParams searchParams() {
         return searchParams;
     }
-
 
     /**
      * A dynamic search is a search witch uses heuristics to resolve search parameters
