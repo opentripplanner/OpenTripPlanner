@@ -25,10 +25,14 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
 import javax.ws.rs.core.Response;
@@ -80,6 +84,12 @@ public class RoutingService {
       timetableSnapshot = graph.getTimetableSnapshot();
     }
     return this.timetableSnapshot;
+  }
+
+  // TODO We should probably not have the Router as a parameter here
+  public RoutingResponse route(RoutingRequest request, Router router) {
+    RoutingWorker worker = new RoutingWorker(request);
+    return worker.route(router);
   }
 
   public List<StopFinder.StopAndDistance> findClosestStopsByWalking(

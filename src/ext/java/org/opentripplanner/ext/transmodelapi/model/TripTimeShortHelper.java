@@ -15,16 +15,10 @@ import java.util.List;
 
 public class TripTimeShortHelper {
 
-    private RoutingService routingService;
-
-    public TripTimeShortHelper(RoutingService routingService) {
-        this.routingService = routingService;
-    }
-
     /**
      * Find trip time short for the from place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForFromPlace(Leg leg) {
+    public TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
         Trip trip = routingService.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
@@ -44,15 +38,15 @@ public class TripTimeShortHelper {
          */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.realtimeDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.scheduledDeparture == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
     }
 
     /**
      * Find trip time short for the to place in transit leg, or null.
      */
-    public TripTimeShort getTripTimeShortForToPlace(Leg leg) {
+    public TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
         Trip trip = routingService.getTripForId().get(leg.tripId);
         if (trip == null) {
             return null;
@@ -72,16 +66,16 @@ public class TripTimeShortHelper {
         */
 
         if (leg.realTime) {
-            return tripTimes.stream().filter(tripTime -> tripTime.realtimeArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId)).findFirst().orElse(null);
+            return tripTimes.stream().filter(tripTime -> tripTime.realtimeArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
         }
-        return tripTimes.stream().filter(tripTime -> tripTime.scheduledArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId)).findFirst().orElse(null);
+        return tripTimes.stream().filter(tripTime -> tripTime.scheduledArrival == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)).findFirst().orElse(null);
     }
 
 
     /**
      * Find trip time shorts for all stops for the full trip of a leg.
      */
-    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg) {
+    public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
         if (leg.tripId == null || leg.serviceDate == null) {
             return new ArrayList<>();
         }
@@ -93,7 +87,7 @@ public class TripTimeShortHelper {
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
-    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg) {
+    public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
         Trip trip = routingService.getTripForId().get(leg.tripId);
 
         if (trip == null) {
@@ -112,12 +106,12 @@ public class TripTimeShortHelper {
             long boardingTime = leg.realTime ? tripTime.realtimeDeparture : tripTime.scheduledDeparture;
 
             if (!boardingStopFound) {
-                boardingStopFound |= boardingTime == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId);
+                boardingStopFound |= boardingTime == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService);
                 continue;
             }
 
             long arrivalTime = leg.realTime ? tripTime.realtimeArrival : tripTime.scheduledArrival;
-            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId)) {
+            if (arrivalTime == endTimeSeconds && matchesQuayOrSiblingQuay(leg.to.stopId, tripTime.stopId, routingService)) {
                 break;
             }
 
@@ -138,7 +132,7 @@ public class TripTimeShortHelper {
         return serviceDate;
     }
 
-    private boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate) {
+    private boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops
