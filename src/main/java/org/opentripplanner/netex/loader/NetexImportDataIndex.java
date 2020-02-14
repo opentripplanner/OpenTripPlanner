@@ -25,6 +25,7 @@ import org.rutebanken.netex.model.Operator;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
+import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
@@ -86,6 +87,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
     public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
+    public final HierarchicalMapById<ServiceLink> serviceLinkById;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
 
 
@@ -125,6 +127,7 @@ public class NetexImportDataIndex {
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>();
+        this.serviceLinkById = new HierarchicalMapById<>();
         this.stopPlaceById = new HierarchicalVersionMapById<>();
         this.timeZone = new HierarchicalElement<>();
     }
@@ -155,6 +158,7 @@ public class NetexImportDataIndex {
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>(parent.serviceJourneyByPatternId);
+        this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
         this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
@@ -250,6 +254,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId() {
                 return serviceJourneyByPatternId;
+            }
+
+            public ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById() {
+                return serviceLinkById;
             }
 
             public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
