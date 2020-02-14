@@ -25,10 +25,19 @@ import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.media.jai.InterpolationBilinear;
+import java.io.BufferedOutputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
+import java.nio.file.Files;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -53,6 +62,12 @@ public class ElevationModule implements GraphBuilderModule {
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
     private ElevationGridCoverageFactory gridCoverageFactory;
+
+    private boolean cacheElevations = false;
+
+    private File cachedElevationsFile;
+
+    private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
     private Coverage coverage;
 
@@ -91,6 +106,12 @@ public class ElevationModule implements GraphBuilderModule {
         distanceBetweenSamplesM = distance;
     }
 
+    public void setCacheElevations(boolean cacheElevations) { this.cacheElevations = cacheElevations; }
+
+    public void setCachedElevationsFile(File cachedElevationsFile) {
+        this.cachedElevationsFile = cachedElevationsFile;
+    }
+
     @Override
     public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         GraphBuilderTaskSummary demPrepareTask = graphBuilderModuleSummary.addSubTask(
@@ -115,6 +136,22 @@ public class ElevationModule implements GraphBuilderModule {
         } catch (FactoryException e) {
             log.error("Could not find an appropriate transformer!");
             throw new RuntimeException(e);
+        }
+
+        // try to load in the cached elevation data
+        try {
+            ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
+            cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
+            log.info("Cached elevation data loaded into memory!");
+        } catch (IOException | ClassNotFoundException e) {
+            log.warn(graph.addBuilderAnnotation(
+                new Graphwide(
+                    String.format(
+                        "Cached elevations file could not be read in due to error: %s!",
+                        e.getMessage()
+                    )
+                )
+            ));
         }
         log.info(demPrepareTask.finish());
 
@@ -156,6 +193,24 @@ public class ElevationModule implements GraphBuilderModule {
             )));
             log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
+        }
+
+        if (cacheElevations) {
+            // write information from edgesWithElevation to a new cache file for subsequent graph builds
+            HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
+            for (StreetEdge streetEdge : edgesWithElevation) {
+                newCachedElevations.put(PolylineEncoder.createEncodings(streetEdge.getGeometry()).getPoints(),
+                    streetEdge.getElevationProfile());
+            }
+            try {
+                ObjectOutputStream out = new ObjectOutputStream(
+                    new BufferedOutputStream(new FileOutputStream(cachedElevationsFile)));
+                out.writeObject(newCachedElevations);
+                out.close();
+            } catch (IOException e) {
+                log.error(e.getMessage());
+                log.error(graph.addBuilderAnnotation(new Graphwide("Failed to write cached elevation file!")));
+            }
         }
         log.info(setElevationsFromDEMTask.finish());
 
@@ -377,6 +432,21 @@ public class ElevationModule implements GraphBuilderModule {
             return; /* already set up */
         }
         Geometry g = ee.getGeometry();
+
+        // first try to find a cached value if possible
+        if (cachedElevations != null) {
+            PackedCoordinateSequence coordinateSequence = cachedElevations.get(
+                PolylineEncoder.createEncodings(g).getPoints()
+            );
+            // found a cached value!
+            if (coordinateSequence != null) {
+                setEdgeElevationProfile(ee, coordinateSequence, graph);
+                return;
+            }
+        }
+
+        // did not find a cached value, calculate
+
         Coordinate[] coords = g.getCoordinates();
 
         List<Coordinate> coordList = new LinkedList<Coordinate>();
@@ -433,6 +503,10 @@ public class ElevationModule implements GraphBuilderModule {
         PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
                 coordList.toArray(coordArr));
 
+        setEdgeElevationProfile(ee, elevPCS, graph);
+    }
+
+    private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
         if(ee.setElevationProfile(elevPCS, false)) {
             synchronized (graph) {
                 log.trace(graph.addBuilderAnnotation(new ElevationFlattened(ee)));
@@ -479,6 +553,17 @@ public class ElevationModule implements GraphBuilderModule {
     @Override
     public void checkInputs() {
         gridCoverageFactory.checkInputs();
+
+        // check for the existence of cached elevation data.
+        if (cacheElevations) {
+            if (Files.exists(cachedElevationsFile.toPath())) {
+                log.info("Cached elevations file found!");
+            } else {
+                log.warn("No cached elevations file found or read access not allowed! Unable to load in cached elevations. This could take a while...");
+            }
+        } else {
+            log.warn("Not using cached elevations! This could take a while...");
+        }
     }
 
 }

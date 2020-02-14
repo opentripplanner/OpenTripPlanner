@@ -186,6 +186,13 @@ public class GraphBuilderParameters {
     public String micromobilityDropoffRestrictionsUrlOrFile;
 
     /**
+     * When set to true (it is by default), this will create a file after building elevations with information about
+     * all the elevations organized by coordinates. Subsequent graph builds will reuse the data in this file to avoid
+     * recalculating all the elevation data again.
+     */
+    public boolean cacheElevations;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -222,6 +229,7 @@ public class GraphBuilderParameters {
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
         micromobilityTravelRestrictionsUrlOrFile = config.path("micromobilityTravelRestrictionsUrlOrFile").asText();
         micromobilityDropoffRestrictionsUrlOrFile = config.path("micromobilityDropoffRestrictionsUrlOrFile").asText();
+        cacheElevations = config.path("cacheElevations").asBoolean(true);
     }
 
 

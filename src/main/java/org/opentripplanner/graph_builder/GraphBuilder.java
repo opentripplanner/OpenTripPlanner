@@ -35,6 +35,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -179,6 +180,8 @@ public class GraphBuilder implements Runnable {
             LOG.error("'{}' is not a readable directory.", dir);
             return null;
         }
+        File cachedElevationsFile = Paths.get(dir.getAbsolutePath(), "cached_elevations.obj").toFile();
+
         // Find and parse config files first to reveal syntax errors early without waiting for graph build.
         builderConfig = OTPMain.loadJson(new File(dir, BUILDER_CONFIG_FILENAME));
         GraphBuilderParameters builderParams = new GraphBuilderParameters(builderConfig);
@@ -206,6 +209,9 @@ public class GraphBuilder implements Runnable {
                     } else {
                         LOG.info("Skipping DEM file {}", file);
                     }
+                    break;
+                case CACHED_ELEVATIONS:
+                    LOG.info("Found cached elevations file {}", file);
                     break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
@@ -272,6 +278,7 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(streetLinkerModule);
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
+        ElevationModule elevationBuilder = null;
         if (builderParams.elevationBucket != null) {
             // Download the elevation tiles from an Amazon S3 bucket
             S3BucketConfig bucketConfig = builderParams.elevationBucket;
@@ -283,18 +290,21 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsBucketName = bucketConfig.bucketName;
             NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             gcf.tileSource = awsTileSource;
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addModule(elevationBuilder);
+            elevationBuilder = new ElevationModule(gcf);
         } else if (builderParams.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
-            graphBuilder.addModule(elevationBuilder);
+            elevationBuilder = new ElevationModule(gcf);
         } else if (demFile != null) {
             // Load the elevation from a file in the graph inputs directory
             ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demFile);
-            GraphBuilderModule elevationBuilder = new ElevationModule(gcf);
+            elevationBuilder = new ElevationModule(gcf);
+        }
+        if (elevationBuilder != null) {
+            // add in extra settings that can lookup elevation data from previous graph builds
+            elevationBuilder.setCacheElevations(builderParams.cacheElevations);
+            elevationBuilder.setCachedElevationsFile(cachedElevationsFile);
             graphBuilder.addModule(elevationBuilder);
         }
         if ( hasGTFS ) {
@@ -318,7 +328,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
+        GTFS, OSM, DEM, CACHED_ELEVATIONS, CONFIG, GRAPH, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -334,6 +344,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
+            if (name.equals("cached_elevations.obj")) return CACHED_ELEVATIONS;
             if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }
