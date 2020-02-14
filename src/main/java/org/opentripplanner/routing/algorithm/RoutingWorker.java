@@ -33,6 +33,7 @@ import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
@@ -264,7 +265,7 @@ public class RoutingWorker {
         int timeOffset = request.arriveBy ? sp.latestArrivalTime() : sp.earliestDepartureTime();
 
         responseMetadata = new TripSearchMetadata(
-                searchWindow,
+                Duration.ofSeconds(searchWindow),
                 time0.plusSeconds(timeOffset - searchWindow).toInstant(),
                 time0.plusSeconds(timeOffset + searchWindow).toInstant()
         );
