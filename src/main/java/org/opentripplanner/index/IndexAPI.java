@@ -455,7 +455,7 @@ public class IndexAPI {
        if (trip != null) {
            TripPattern pattern = routingService.getPatternForTrip().get(trip);
            // Note, we need the updated timetable not the scheduled one (which contains no real-time updates).
-           Timetable table = routingService.currentUpdatedTimetableForTripPattern(pattern);
+           Timetable table = routingService.getTimetableForTripPattern(pattern);
            return Response.status(Status.OK).entity(TripTimeShort.fromTripTimes(table, trip)).build();
        } else {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();

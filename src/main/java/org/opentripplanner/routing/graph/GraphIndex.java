@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
+import com.google.common.collect.Sets;
 import gnu.trove.set.TIntSet;
 import gnu.trove.set.hash.TIntHashSet;
 import org.locationtech.jts.geom.Envelope;
@@ -17,6 +18,7 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.CalendarService;
@@ -25,7 +27,10 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -160,6 +165,29 @@ public class GraphIndex {
 
   public Map<ServiceDate, TIntSet> getServiceCodesRunningForDate() {
     return serviceCodesRunningForDate;
+  }
+
+  /** Dynamically generate the set of Routes passing though a Stop on demand. */
+  public Set<Route> getRoutesForStop(Stop stop) {
+    Set<Route> routes = Sets.newHashSet();
+    for (TripPattern p : getPatternsForStop().get(stop)) {
+      routes.add(p.route);
+    }
+    return routes;
+  }
+
+  /**
+   * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
+   * added by realtime updates are added to the collection.
+   */
+  public Collection<TripPattern> getPatternsForStop(Stop stop, TimetableSnapshot timetableSnapshot) {
+    List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop().get(stop));
+
+    if (timetableSnapshot != null) {
+      tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
+    }
+
+    return tripPatterns;
   }
 
   /**

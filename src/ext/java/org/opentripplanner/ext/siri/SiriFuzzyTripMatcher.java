@@ -274,7 +274,7 @@ public class SiriFuzzyTripMatcher {
 
     public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
         Stop stop = routingService.getStopForId().get(siriStopId);
-        return routingService.routesForStop(stop);
+        return routingService.getRoutesForStop(stop);
     }
 
     public FeedScopedId getStop(String siriStopId) {

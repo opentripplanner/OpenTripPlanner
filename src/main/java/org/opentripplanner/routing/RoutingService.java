@@ -1,7 +1,6 @@
 package org.opentripplanner.routing;
 
 import com.google.common.collect.Multimap;
-import com.google.common.collect.Sets;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
@@ -33,7 +32,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
 import javax.ws.rs.core.Response;
-import java.util.ArrayList;
 import java.util.BitSet;
 import java.util.Calendar;
 import java.util.Collection;
@@ -55,18 +53,33 @@ public class RoutingService {
 
   private final Graph graph;
 
+  /**
+   * This should only be accessed through the getTimetableSnapshot method.
+   */
   private TimetableSnapshot timetableSnapshot;
 
   // TODO Move this
   private GraphQL graphQL;
 
-  private RoutingService(Graph graph) {
+  public RoutingService(Graph graph) {
+    // TODO This should be moved
     graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema,
         new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
             .setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
             .build()))
     );
     this.graph = graph;
+  }
+
+  /**
+   * Lazy-initialization of TimetableSnapshot
+   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
+   */
+  private TimetableSnapshot getTimetableSnapshot() {
+    if (this.timetableSnapshot == null) {
+      timetableSnapshot = graph.getTimetableSnapshot();
+    }
+    return this.timetableSnapshot;
   }
 
   public List<StopFinder.StopAndDistance> findClosestStopsByWalking(
@@ -119,13 +132,8 @@ public class RoutingService {
     return graph.index.getMultiModalStationForStations();
   }
 
-  /** Dynamically generate the set of Routes passing though a Stop on demand. */
-  public Set<Route> routesForStop(Stop stop) {
-    Set<Route> routes = Sets.newHashSet();
-    for (TripPattern p : getPatternsForStop().get(stop)) {
-      routes.add(p.route);
-    }
-    return routes;
+  public Set<Route> getRoutesForStop(Stop stop) {
+    return graph.index.getRoutesForStop(stop);
   }
 
   /**
@@ -146,7 +154,6 @@ public class RoutingService {
   public List<StopTimesInPattern> stopTimesForStop(
       Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
   ) {
-
     return StopTimesHelper.stopTimesForStop(
         this,
         stop,
@@ -167,7 +174,12 @@ public class RoutingService {
   public List<StopTimesInPattern> getStopTimesForStop(
       Stop stop, ServiceDate serviceDate, boolean omitNonPickups
   ) {
-    return StopTimesHelper.getStopTimesForStop(this, stop, serviceDate, omitNonPickups);
+    return StopTimesHelper.getStopTimesForStop(
+        this,
+        stop,
+        serviceDate,
+        omitNonPickups
+    );
   }
 
   /**
@@ -175,13 +187,9 @@ public class RoutingService {
    * added by realtime updates are added to the collection.
    */
   public Collection<TripPattern> getPatternsForStop(Stop stop, boolean includeRealtimeUpdates) {
-    List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop().get(stop));
-
-    if (includeRealtimeUpdates && timetableSnapshot != null) {
-      tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
-    }
-
-    return tripPatterns;
+    return graph.index.getPatternsForStop(
+        stop,
+        includeRealtimeUpdates ? getTimetableSnapshot() : null);
   }
 
   /**
@@ -189,20 +197,17 @@ public class RoutingService {
    * probably be a less awkward way to do this that just gets the latest entry from the resolver
    * without making a fake routing request.
    */
-  public Timetable currentUpdatedTimetableForTripPattern(TripPattern tripPattern) {
-    // The timetableSnapshot will be null if there's no real-time data being applied.
-      if (timetableSnapshot == null) { return tripPattern.scheduledTimetable; }
-    // Get the updated times for right now, which is the only reasonable default since no date is supplied.
-    Calendar calendar = Calendar.getInstance();
-    ServiceDate serviceDate = new ServiceDate(calendar.getTime());
-    return timetableSnapshot.resolve(tripPattern, serviceDate);
+  public Timetable getTimetableForTripPattern(TripPattern tripPattern) {
+    TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
+    return timetableSnapshot != null ?
+        timetableSnapshot.resolve(tripPattern, new ServiceDate(Calendar.getInstance().getTime()))
+        : tripPattern.scheduledTimetable;
   }
 
   public Response getGraphQLResponse(
       String query, Map<String, Object> variables, String operationName
   ) {
     ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
-
     return HttpToGraphQLMapper.mapExecutionResultToHttpResponse(executionResult);
   }
 
@@ -240,7 +245,6 @@ public class RoutingService {
   }
 
   public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
-    // Delegate to graph
     Collection<Notice> res = graph.getNoticesByElement().get(entity);
     return res == null ? Collections.emptyList() : res;
   }
@@ -264,22 +268,18 @@ public class RoutingService {
     return graph.tripPatternForId.values();
   }
 
-  public Collection<Notice> getNoticesByElement(TransitEntity<?> transitEntity) {
-    return graph.getNoticesByElement().get(transitEntity);
-  }
-
   public Collection<Notice> getNotices() {
     return graph.getNoticesByElement().values();
   }
 
   public List<TripTimeShort> getStopTimesForTripAndDate(Trip trip, ServiceDate serviceDate) {
-    if (timetableSnapshot == null) {
-      return null;
-    }
-    else {
-      TripPattern pattern = getPatternForTrip().get(trip);
-      return TripTimeShort.fromTripTimes(timetableSnapshot.resolve(pattern, serviceDate), trip);
-    }
+    TimetableSnapshot timetableSnapshot = getTimetableSnapshot();
+    return timetableSnapshot != null
+        ? TripTimeShort.fromTripTimes(
+            timetableSnapshot.resolve(getPatternForTrip().get(trip), serviceDate),
+            trip
+          )
+        : null;
   }
 
   public Collection<Stop> getStopsByBoundingBox(Envelope envelope) {
@@ -322,26 +322,13 @@ public class RoutingService {
     return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
   }
 
+  // TODO This should be moved
   public GraphQL getGraphQL() {
     return this.graphQL;
   }
 
-  public TimetableSnapshot getTimetableSnapshot() {
-    return timetableSnapshot;
-  }
-
+  // TODO we want to get rid of this and only delegate to methods on the graph
   public Graph getGraph() {
     return graph;
-  }
-
-  /**
-   * Lazy-initialization of TimetableSnapshot
-   * @return The same TimetableSnapshot is returned throughout the lifecycle of this object.
-   */
-  private TimetableSnapshot getTimeTableSnapshot() {
-    if (this.timetableSnapshot == null) {
-      timetableSnapshot = graph.getTimetableSnapshot();
-    }
-    return this.timetableSnapshot;
   }
 }
