@@ -73,7 +73,10 @@ public class GraphBuilder implements Runnable {
         if (graphOut != null) {
             // Abort building a graph if the file can not be saved
             if (graphOut.exists()) {
-                LOG.info("Graph already exists and will be overwritten at the end of the build process.");
+                LOG.info(
+                        "Graph already exists and will be overwritten at the end of the "
+                        + "build process. Graph: {}", graphOut.path()
+                );
             }
             if (!graphOut.isWritable()) {
                 throw new RuntimeException(
