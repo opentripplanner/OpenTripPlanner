@@ -34,13 +34,12 @@ public class StopTimesHelper {
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
    * @return
    */
-  public static List<StopTimesInPattern> stopTimesForStop(RoutingService routingService, Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
+  public static List<StopTimesInPattern> stopTimesForStop(RoutingService routingService, TimetableSnapshot timetableSnapshot, Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
 
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
     }
     List<StopTimesInPattern> ret = new ArrayList<>();
-    TimetableSnapshot snapshot = routingService.getTimetableSnapshot();
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
 
@@ -67,8 +66,8 @@ public class StopTimesHelper {
       for (ServiceDate serviceDate : serviceDates) {
         ServiceDay sd = new ServiceDay(routingService.getGraph(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
         Timetable tt;
-        if (snapshot != null){
-          tt = snapshot.resolve(pattern, serviceDate);
+        if (timetableSnapshot != null){
+          tt = timetableSnapshot.resolve(pattern, serviceDate);
         } else {
           tt = pattern.scheduledTimetable;
         }
@@ -133,16 +132,15 @@ public class StopTimesHelper {
    * @param serviceDate Return all departures for the specified date
    * @return
    */
-  public static List<StopTimesInPattern> getStopTimesForStop(RoutingService routingService, Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
+  public static List<StopTimesInPattern> getStopTimesForStop(RoutingService routingService, TimetableSnapshot timetableSnapshot, Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
     List<StopTimesInPattern> ret = new ArrayList<>();
-    TimetableSnapshot snapshot = routingService.getTimetableSnapshot();
 
     Collection<TripPattern> patternsForStop = routingService.getPatternsForStop(stop, true);
     for (TripPattern pattern : patternsForStop) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
       Timetable tt;
-      if (snapshot != null){
-        tt = snapshot.resolve(pattern, serviceDate);
+      if (timetableSnapshot != null){
+        tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
         tt = pattern.scheduledTimetable;
       }

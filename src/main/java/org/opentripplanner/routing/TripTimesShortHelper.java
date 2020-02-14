@@ -13,13 +13,12 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class TripTimesShortHelper {
-  public static List<TripTimeShort> getTripTimesShort(RoutingService routingService, Trip trip, ServiceDate serviceDate) {
+  public static List<TripTimeShort> getTripTimesShort(RoutingService routingService, TimetableSnapshot timetableSnapshot, Trip trip, ServiceDate serviceDate) {
     final ServiceDay serviceDay = new ServiceDay(routingService.getGraph(),
         serviceDate,
         routingService.getCalendarService(),
         trip.getRoute().getAgency().getId()
     );
-    TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
     Timetable timetable = null;
     if (timetableSnapshot != null) {
       // Check if realtime-data is available for trip

@@ -156,6 +156,7 @@ public class RoutingService {
   ) {
     return StopTimesHelper.stopTimesForStop(
         this,
+        getTimetableSnapshot(),
         stop,
         startTime,
         timeRange,
@@ -176,6 +177,7 @@ public class RoutingService {
   ) {
     return StopTimesHelper.getStopTimesForStop(
         this,
+        getTimetableSnapshot(),
         stop,
         serviceDate,
         omitNonPickups
@@ -319,7 +321,12 @@ public class RoutingService {
   }
 
   public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
-    return TripTimesShortHelper.getTripTimesShort(this, trip, serviceDate);
+    return TripTimesShortHelper.getTripTimesShort(
+        this,
+        getTimetableSnapshot(),
+        trip,
+        serviceDate
+    );
   }
 
   // TODO This should be moved
