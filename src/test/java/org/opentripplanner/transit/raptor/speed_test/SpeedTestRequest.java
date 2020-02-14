@@ -130,7 +130,7 @@ public class SpeedTestRequest {
             builder.searchParams().searchOneIterationOnly();
         }
 
-        builder.searchDirection(profile.forward);
+        builder.searchDirection(profile.direction);
 
         addAccessEgressStopArrivals(streetRouter.getAccessTimesInSecondsByStopIndex(), builder.searchParams()::addAccessStop);
         addAccessEgressStopArrivals(streetRouter.getEgressTimesInSecondsByStopIndex(), builder.searchParams()::addEgressStop);

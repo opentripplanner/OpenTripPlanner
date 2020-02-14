@@ -21,7 +21,7 @@ import java.util.Set;
 public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     // Search
     private final SearchParamsBuilder<T> searchParams;
-    private boolean searchForward;
+    private SearchDirection searchDirection;
 
     // Algorithm
     private RaptorProfile profile;
@@ -38,7 +38,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
 
     RaptorRequestBuilder(RaptorRequest<T> defaults) {
         this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
-        this.searchForward = defaults.searchForward();
+        this.searchDirection = defaults.searchDirection();
 
         // Algorithm
         this.profile = defaults.profile();
@@ -62,12 +62,12 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public boolean searchForward() {
-        return searchForward;
+    public SearchDirection searchDirection() {
+        return searchDirection;
     }
 
-    public RaptorRequestBuilder<T> searchDirection(boolean searchForward) {
-        this.searchForward = searchForward;
+    public RaptorRequestBuilder<T> searchDirection(SearchDirection searchDirection) {
+        this.searchDirection = searchDirection;
         return this;
     }
 

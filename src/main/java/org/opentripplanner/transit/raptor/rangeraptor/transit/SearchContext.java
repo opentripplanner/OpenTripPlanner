@@ -66,11 +66,15 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     public Collection<TransferLeg> accessLegs() {
-        return request.searchForward() ? request.searchParams().accessLegs() : request.searchParams().egressLegs();
+        return request.searchDirection().isForward()
+                ? request.searchParams().accessLegs()
+                : request.searchParams().egressLegs();
     }
 
     public Collection<TransferLeg> egressLegs() {
-        return request.searchForward() ? request.searchParams().egressLegs() : request.searchParams().accessLegs();
+        return request.searchDirection().isForward()
+                ? request.searchParams().egressLegs()
+                : request.searchParams().accessLegs();
     }
 
     public int[] egressStops() {
@@ -143,11 +147,15 @@ public class SearchContext<T extends RaptorTripSchedule> {
      */
     private static TransitCalculator createCalculator(RaptorRequest<?> r, RaptorTuningParameters t) {
         SearchParams s = r.searchParams();
-        return r.searchForward() ? new ForwardSearchTransitCalculator(s, t) : new ReverseSearchTransitCalculator(s, t);
+        return r.searchDirection().isForward()
+                ? new ForwardSearchTransitCalculator(s, t)
+                : new ReverseSearchTransitCalculator(s, t);
     }
 
     private DebugRequest<T> debugRequest(RaptorRequest<T> request) {
-        return request.searchForward() ? request.debug() : request.mutate().debug().reverseDebugRequest().build();
+        return request.searchDirection().isForward()
+                ? request.debug()
+                : request.mutate().debug().reverseDebugRequest().build();
     }
 
     public RoundProvider roundProvider() {

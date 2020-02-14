@@ -22,6 +22,8 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 
@@ -36,11 +38,7 @@ import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.
  * to configure the "main" multi-iteration RangeRaptor search.
  */
 public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
-
     private static final Logger LOG = LoggerFactory.getLogger(RangRaptorDynamicSearch.class);
-
-    private static final boolean FORWARD = true;
-    private static final boolean REVERSE = false;
 
     private final RaptorConfig<T> config;
     private final TransitDataProvider<T> transitData;
