@@ -5,11 +5,11 @@ import org.opentripplanner.model.plan.Itinerary;
 import java.util.List;
 
 /**
- * Filter or decorate itineraries. A filter can reorder, modify the list or the elements in the
- * list. It is not recommended to change the list passed into the filter, instead make a copy,
- * change it and return the copy. It is allowed to pass on an immutable list.
+ * Filter or decorate itineraries. A filter can modify the elements in the list, but not the List. 
+ * It should treat the list as immutable. Do not change the list passed into the filter, instead make a copy,
+ * change it and return the copy. It is allowed to return the list unchanged.
  * <p>
- * A filter should do one thing! For example do not change the itineraries and delete elements in
+ * A filter should do only one thing! For example do not change the itineraries and delete elements in
  * the same filter. Instead create two filters and insert them after each other in the filter chain.
  * This allows decoration of each filter and make it easier to reuse logic. The
  * {@link org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter} work with
