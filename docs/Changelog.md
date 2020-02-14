@@ -24,6 +24,7 @@
 - Dynamic search parameters, calculate raptor search-window when needed. (#2931)
 - Support for next/previous paging trip search results (#2941)
 - Fix mismatch in duration for walk legs, resulting in negative wait times (#2955)
+- NeTEx import now supports ServiceLinks (#2951)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

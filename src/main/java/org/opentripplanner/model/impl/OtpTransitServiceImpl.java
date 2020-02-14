@@ -25,11 +25,14 @@ import org.opentripplanner.model.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.groupingBy;
 
@@ -207,9 +210,14 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     /*  Private Methods */
 
-    private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(Collection<ShapePoint> shapePoints) {
-        Map<FeedScopedId, List<ShapePoint>> map = shapePoints.stream()
-                .collect(groupingBy(ShapePoint::getShapeId));
+    private Map<FeedScopedId, List<ShapePoint>> mapShapePoints(
+        Multimap<FeedScopedId, ShapePoint> shapePoints
+    ) {
+        Map<FeedScopedId, List<ShapePoint>> map = new HashMap<>();
+        for (Map.Entry<FeedScopedId, Collection<ShapePoint>> entry
+            : shapePoints.asMap().entrySet()) {
+            map.put(entry.getKey(), new ArrayList<>(entry.getValue()));
+        }
         for (List<ShapePoint> list : map.values()) {
             Collections.sort(list);
         }

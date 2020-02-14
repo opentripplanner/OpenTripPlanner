@@ -92,7 +92,7 @@ public class OtpTransitServiceBuilderTest {
 
     @Test
     public void testGetAllShapePoints() {
-        Collection<ShapePoint> shapePoints = subject.getShapePoints();
+        Collection<ShapePoint> shapePoints = subject.getShapePoints().values();
 
         assertEquals(9, shapePoints.size());
         assertEquals("<ShapePoint F:4 #1 (41.0,-75.0)>", first(shapePoints).toString());
