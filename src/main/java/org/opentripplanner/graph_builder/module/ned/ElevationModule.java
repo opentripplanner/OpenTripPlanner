@@ -139,19 +139,15 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         // try to load in the cached elevation data
-        try {
-            ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
-            cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
-            log.info("Cached elevation data loaded into memory!");
-        } catch (IOException | ClassNotFoundException e) {
-            log.warn(graph.addBuilderAnnotation(
-                new Graphwide(
-                    String.format(
-                        "Cached elevations file could not be read in due to error: %s!",
-                        e.getMessage()
-                    )
-                )
-            ));
+        if (cacheElevations) {
+            try {
+                ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
+                cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
+                log.info("Cached elevation data loaded into memory!");
+            } catch (IOException | ClassNotFoundException e) {
+                log.warn(graph.addBuilderAnnotation(new Graphwide(
+                    String.format("Cached elevations file could not be read in due to error: %s!", e.getMessage()))));
+            }
         }
         log.info(demPrepareTask.finish());
 
