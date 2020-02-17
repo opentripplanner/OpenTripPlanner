@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -245,5 +246,25 @@ public class GraphIndex {
           serviceCodesRunning
       );
     }
+  }
+
+  /**
+   * Construct a set of all Agencies in this graph, spanning across all feed IDs. I am creating this
+   * method only to allow merging pull request #2032 which adds GraphQL. This should probably be
+   * done some other way, see javadoc on getAgencyWithoutFeedId.
+   */
+  public Set<Agency> getAllAgencies() {
+    Set<Agency> allAgencies = new HashSet<>();
+    for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
+      allAgencies.addAll(agencyForId.values());
+    }
+    return allAgencies;
+  }
+
+  /**
+   * Get a list of all operators spanning across all feeds.
+   */
+  public Collection<Operator> getAllOperators() {
+    return getOperatorForId().values();
   }
 }

@@ -18,6 +18,7 @@ import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
@@ -38,6 +39,9 @@ public class RoutingService {
   @Delegate(types=Graph.class)
   private final Graph graph;
 
+  @Delegate(types=GraphIndex.class)
+  private final GraphIndex graphIndex;
+
   /**
    * This should only be accessed through the getTimetableSnapshot method.
    */
@@ -54,6 +58,7 @@ public class RoutingService {
             .build()))
     );
     this.graph = graph;
+    this.graphIndex = graph.index;
   }
 
   /**
