@@ -5,6 +5,7 @@ import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.ApiTripSearchMetadata;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -65,9 +66,9 @@ public class PlannerResource extends RoutingResource {
             router = otpServer.getRouter(null);
             request.setRoutingContext(router.graph);
 
-            RoutingWorker worker = new RoutingWorker(request);
+            RoutingService routingService = new RoutingService(router.graph);
 
-            RoutingResponse res = worker.route(router);
+            RoutingResponse res = routingService.route(request, router);
 
             response.setPlan(res.getTripPlan());
             response.setMetadata(new ApiTripSearchMetadata(res.getMetadata()));
