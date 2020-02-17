@@ -127,7 +127,7 @@ public class OTPMain {
         graph.index();
 
         Router router = new Router(graph);
-        router.startup(app.config().routerConfig());
+        router.startup(app.config().routerConfig().rawJson);
 
         /* Start visualizer if requested. */
         if (params.visualize) {

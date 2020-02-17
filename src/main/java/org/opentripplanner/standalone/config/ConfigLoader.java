@@ -102,10 +102,14 @@ public class ConfigLoader {
     public GraphBuildParameters loadBuildConfig() {
         JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
 
+        GraphBuildParameters params = new GraphBuildParameters(
+                new NodeAdapter(node, BUILD_CONFIG_FILENAME)
+        );
+
         if(!node.isMissingNode()) {
-            LOG.info(ReflectionLibrary.dumpFields(new GraphBuildParameters(node), "rawJson"));
+            LOG.info(ReflectionLibrary.dumpFields(params, "rawJson"));
         }
-        return new GraphBuildParameters(node);
+        return params;
     }
 
     /**
@@ -114,8 +118,10 @@ public class ConfigLoader {
      * <p>
      * @see #loadJsonFile for more details.
      */
-    public JsonNode loadRouterConfig() {
-        return loadJsonByFilename(ROUTER_CONFIG_FILENAME);
+    public RouterConfigParams loadRouterConfig() {
+        JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
+        NodeAdapter adapter = new NodeAdapter(node, ROUTER_CONFIG_FILENAME);
+        return new RouterConfigParams(adapter);
     }
 
     /**

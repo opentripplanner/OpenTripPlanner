@@ -65,19 +65,19 @@ public class ConfigLoaderTest {
         FileUtils.write(file, "{key-a : 12}", UTF_8);
 
         // when:
-        JsonNode node = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfigParams params = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then:
-        assertEquals(12, node.path("key-a").asInt());
+        assertEquals(12, params.rawJson.path("key-a").asInt());
     }
 
     @Test
     public void whenFileDoNotExistExpectMissingNode() {
         // when: ruter-config.json do not exist
-        JsonNode res = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfigParams res = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then: expect missing node
-        assertTrue(res.toString(), res.isMissingNode());
+        assertTrue(res.toString(), res.rawJson.isMissingNode());
     }
 
     @Test

@@ -1,10 +1,7 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import javax.validation.constraints.NotNull;
 import java.net.URI;
-import java.net.URISyntaxException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,7 +50,7 @@ public class StorageParameters {
      * <p>
      * This is a path to a file on the local file system, not an URI.
      * <p>
-     * This parameter is optional.
+     * This parameter is optional. Default is {@code null}.
      */
     public final String gsCredentials;
 
@@ -63,7 +60,7 @@ public class StorageParameters {
      * <p>
      * Example: {@code "streetGraph" : "file:///Users/kelvin/otp/streetGraph.obj" }
      * <p>
-     * This parameter is optional.
+     * This parameter is optional. Default is {@code null}.
      */
     public final URI streetGraph;
 
@@ -73,7 +70,7 @@ public class StorageParameters {
      * <p>
      * Example: {@code "graph" : "gs://my-bucket/otp/graph.obj" }
      * <p>
-     * This parameter is optional.
+     * This parameter is optional. Default is {@code null}.
      */
     public final URI graph;
 
@@ -122,57 +119,19 @@ public class StorageParameters {
      * <p>
      * Example: {@code "osm" : "file:///Users/kelvin/otp/buildReport" }
      * <p>
-     * This parameter is optional.
+     * This parameter is optional. Default is {@code null}.
      */
     public final URI buildReportDir;
 
-    StorageParameters(JsonNode node) {
-        this.gsCredentials = node.path("gsCredentials").asText(null);
-        this.graph = uriFromJson("graph", node);
-        this.streetGraph = uriFromJson("streetGraph", node);
-        this.osm.addAll(uris("osm", node));
-        this.dem.addAll(uris("dem", node));
-        this.gtfs.addAll(uris("gtfs", node));
-        this.netex.addAll(uris("netex", node));
-        this.buildReportDir = uriFromJson("buildReportDir", node);
-    }
 
-    static List<URI> uris(String name, JsonNode node) {
-        List<URI> uris = new ArrayList<>();
-        JsonNode array = node.path(name);
-
-        if(array.isMissingNode()) {
-            return uris;
-        }
-        if(!array.isArray()) {
-            throw new IllegalArgumentException(
-                    "Unable to parse 'storage' parameter in 'build-config.json': "
-                    + "\n\tActual: \"" + name + "\" : \"" + array.asText() + "\""
-                    + "\n\tExpected ARRAY of URIs: [ \"<uri>\", .. ]."
-            );
-        }
-        for (JsonNode it : array) {
-            uris.add(uriFromString(name, it.asText()));
-        }
-        return uris;
-    }
-
-    static URI uriFromJson(String name, JsonNode node) {
-        return uriFromString(name, node.path(name).asText());
-    }
-
-    static URI uriFromString(String name, String text) {
-        if (text == null || text.isBlank()) {
-            return null;
-        }
-        try {
-            return new URI(text);
-        }
-        catch (URISyntaxException e) {
-            throw new IllegalArgumentException(
-                    "Unable to parse 'storage' parameter in 'build-config.json': "
-                    + "\n\tActual: \"" + name + "\" : \"" + text + "\""
-                    + "\n\tExpected valid URI, it should be parsable by java.net.URI class.");
-        }
+    StorageParameters(NodeAdapter config) {
+        this.gsCredentials = config.asText("gsCredentials",null);
+        this.graph = config.asUri("graph", null);
+        this.streetGraph = config.asUri("streetGraph", null);
+        this.osm.addAll(config.asUris("osm"));
+        this.dem.addAll(config.asUris("dem"));
+        this.gtfs.addAll(config.asUris("gtfs"));
+        this.netex.addAll(config.asUris("netex"));
+        this.buildReportDir = config.asUri("buildReportDir", null);
     }
 }

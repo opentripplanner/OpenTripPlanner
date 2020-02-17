@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.configure;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
@@ -8,6 +7,7 @@ import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.GraphBuildParameters;
 import org.opentripplanner.standalone.config.OtpConfig;
+import org.opentripplanner.standalone.config.RouterConfigParams;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,7 +48,7 @@ public class OTPConfiguration {
 
     // TODO OTP2 - Make a POJO wrapper around the router config to encapsulate the JSON
     //           - node handling
-    private JsonNode routerConfig;
+    private RouterConfigParams routerConfig;
 
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
         this.cli = cli;
@@ -74,10 +74,9 @@ public class OTPConfiguration {
     }
 
     public void setEmbeddedRouterConfig(String routerConfig) {
-        if(this.routerConfig.isMissingNode()) {
+        if(this.routerConfig.rawJson.isMissingNode()) {
             LOG.info("Using the graph embedded JSON router configuration.");
-            this.routerConfig = ConfigLoader
-                    .fromString(routerConfig,"Graph embedded router config");
+            this.routerConfig = ConfigLoader.fromString(routerConfig).loadRouterConfig();
         }
     }
 
@@ -103,7 +102,7 @@ public class OTPConfiguration {
      * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
      * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
      */
-    public JsonNode routerConfig() {
+    public RouterConfigParams routerConfig() {
         return routerConfig;
     }
 
@@ -112,7 +111,7 @@ public class OTPConfiguration {
      * the graph is serialized.
      */
     public EmbedConfig createEmbedConfig() {
-        return new EmbedConfig(buildConfig.rawJson, routerConfig);
+        return new EmbedConfig(buildConfig.rawJson, routerConfig.rawJson);
     }
 
     /**
