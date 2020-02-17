@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.core.RoutingRequest;
 
 import java.util.List;
@@ -31,11 +31,7 @@ public class TripPlanMapper {
             to = legs.get(legs.size() - 1).to;
         }
 
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime(), itineraries);
-
-        tripPlan.itinerary = itineraries;
-
-        return tripPlan;
+        return new TripPlan(from, to, request.getDateTime(), itineraries);
     }
 
     private static Place placeFromGeoLocation(GenericLocation location) {

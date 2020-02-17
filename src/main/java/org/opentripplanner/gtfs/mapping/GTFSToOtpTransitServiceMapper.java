@@ -3,6 +3,7 @@ package org.opentripplanner.gtfs.mapping;
 import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 /**
@@ -73,7 +74,9 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
-        builder.getShapePoints().addAll(shapePointMapper.map(data.getAllShapePoints()));
+        for (ShapePoint shapePoint : shapePointMapper.map(data.getAllShapePoints())) {
+            builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
+        }
 
         mapGtfsStopsToOtpStopsAndStations(data, builder);
 

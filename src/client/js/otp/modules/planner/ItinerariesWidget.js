@@ -119,7 +119,13 @@ otp.widgets.ItinerariesWidget =
             //$('<h3>'+this.headerContent(itin, i)+'</h3>').appendTo(this.itinsAccord).click(function(evt) {
 
             var headerDivId = divId+'-headerContent-'+i;
-            $('<h3><div id='+headerDivId+'></div></h3>')
+            var itinSyle = "";
+
+            if(itin.itinData.debugMarkedAsDeleted) {
+                itinSyle = "style=\"background: #FFB3DA\"";
+            }
+
+            $('<h3 ' + itinSyle + ' ><div id=' + headerDivId + '></div></h3>')
             .appendTo(this.itinsAccord)
             .data('itin', itin)
             .data('index', i)

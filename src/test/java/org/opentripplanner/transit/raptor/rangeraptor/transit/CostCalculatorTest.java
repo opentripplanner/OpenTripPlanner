@@ -55,4 +55,12 @@ public class CostCalculatorTest {
         // =>  100 * ( 200 + 3 * (5 + 3 * 0.5))
         assertEquals(21_950, subject.calculateMinCost(200, 3));
     }
+
+    @Test
+    public void testConvertBetweenRaptorAndMainOtpDomainModel() {
+        assertEquals(0, CostCalculator.toOtpDomainCost(49));
+        assertEquals(1, CostCalculator.toOtpDomainCost(50));
+        assertEquals(300, CostCalculator.toOtpDomainCost(30_000));
+        assertEquals(5, CostCalculator.toOtpDomainCost(subject.calculateMinCost(5,0)));
+    }
 }

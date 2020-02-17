@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.graph.Graph;

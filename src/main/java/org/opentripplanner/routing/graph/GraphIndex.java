@@ -54,10 +54,9 @@ public class GraphIndex {
   private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
 
-  public GraphIndex(Graph graph) {
-    LOG.info("Indexing graph...");
-
-    CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
+    public GraphIndex (Graph graph) {
+        LOG.info("GraphIndex init...");
+        CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
 
     for (String feedId : graph.getFeedIds()) {
       for (Agency agency : graph.getAgencies(feedId)) {
@@ -108,8 +107,8 @@ public class GraphIndex {
 
     initalizeServiceCodesForDate(graph);
 
-    LOG.info("Done indexing graph.");
-  }
+        LOG.info("GraphIndex init complete.");
+    }
 
   public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
     return agenciesForFeedId;

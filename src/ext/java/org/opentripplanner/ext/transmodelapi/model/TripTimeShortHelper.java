@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
@@ -8,6 +7,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.model.plan.Leg;
 
 import java.text.ParseException;
 import java.util.ArrayList;

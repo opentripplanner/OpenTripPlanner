@@ -8,6 +8,7 @@ import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 
@@ -53,7 +54,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
                 accessLeg,
                 destinationArrivalTime,
                 numberOfTransfers,
-                to.cost()
+                CostCalculator.toOtpDomainCost(to.cost())
         );
     }
 
