@@ -1768,7 +1768,7 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Get all situations active for the quay.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                     .dataFetcher(env -> getRoutingService(env).getSiriAlertPatchService()
-                        .getStopPatches(env.getSource()))
+                        .getStopPatches(((Stop)env.getSource()).getId()))
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
