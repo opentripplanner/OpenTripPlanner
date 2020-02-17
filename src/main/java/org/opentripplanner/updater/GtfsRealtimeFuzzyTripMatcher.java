@@ -22,10 +22,10 @@ import java.util.BitSet;
  */
 public class GtfsRealtimeFuzzyTripMatcher {
 
-    private RoutingService index;
+    private RoutingService routingService;
 
-    public GtfsRealtimeFuzzyTripMatcher(RoutingService index) {
-        this.index = index;
+    public GtfsRealtimeFuzzyTripMatcher(RoutingService routingService) {
+        this.routingService = routingService;
     }
 
     public TripDescriptor match(String feedId, TripDescriptor trip) {
@@ -48,7 +48,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         } catch (ParseException e) {
             return trip;
         }
-        Route route = index.getRouteForId().get(routeId);
+        Route route = routingService.getRouteForId().get(routeId);
         if (route == null) {
             return trip;
         }
@@ -72,8 +72,8 @@ public class GtfsRealtimeFuzzyTripMatcher {
     }
 
     public Trip getTrip (Route route, int direction, int startTime, ServiceDate date) {
-        BitSet services = index.getServicesRunningForDate(date);
-        for (TripPattern pattern : index.getPatternsForRoute().get(route)) {
+        BitSet services = routingService.getServicesRunningForDate(date);
+        for (TripPattern pattern : routingService.getPatternsForRoute().get(route)) {
             if (pattern.directionId != direction) continue;
             for (TripTimes times : pattern.scheduledTimetable.tripTimes) {
                 if (times.getScheduledDepartureTime(0) == startTime &&

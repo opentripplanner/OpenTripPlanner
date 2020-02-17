@@ -13,6 +13,7 @@ import com.google.common.collect.Maps;
 import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
+import lombok.experimental.Delegate;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.locationtech.jts.geom.Coordinate;
@@ -27,6 +28,7 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
@@ -48,6 +50,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -1048,7 +1051,7 @@ public class Graph implements Serializable {
     }
 
     /** An OBA Service Date is a local date without timezone, only year month and day. */
-    public BitSet servicesRunning (ServiceDate date) {
+    public BitSet getServicesRunningForDate(ServiceDate date) {
         BitSet services = new BitSet(calendarService.getServiceIds().size());
         for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
             int n = serviceCodes.get(serviceId);
@@ -1056,5 +1059,134 @@ public class Graph implements Serializable {
             services.set(n);
         }
         return services;
+    }
+
+    public BikeRentalStationService getBikerentalStationService() {
+        return getService(BikeRentalStationService.class);
+    }
+
+    public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
+        return index.getAgenciesForFeedId();
+    }
+
+    public Map<FeedScopedId, Operator> getOperatorForId() {
+        return index.getOperatorForId();
+    }
+
+    public Map<String, FeedInfo> getFeedInfoForId() {
+        return index.getFeedInfoForId();
+    }
+
+    public Map<FeedScopedId, Stop> getStopForId() {
+        return index.getStopForId();
+    }
+
+    public Map<FeedScopedId, Trip> getTripForId() {
+        return index.getTripForId();
+    }
+
+    public Map<FeedScopedId, Route> getRouteForId() {
+        return index.getRouteForId();
+    }
+
+    public Map<Stop, TransitStopVertex> getStopVertexForStop() {
+        return index.getStopVertexForStop();
+    }
+
+    public Map<Trip, TripPattern> getPatternForTrip() {
+        return index.getPatternForTrip();
+    }
+
+    public Multimap<Route, TripPattern> getPatternsForRoute() {
+        return index.getPatternsForRoute();
+    }
+
+    public Multimap<Stop, TripPattern> getPatternsForStop() {
+        return index.getPatternsForStop();
+    }
+
+    public Map<Station, MultiModalStation> getMultiModalStationForStations() {
+        return index.getMultiModalStationForStations();
+    }
+
+    public Set<Route> getRoutesForStop(Stop stop) {
+        return index.getRoutesForStop(stop);
+    }
+
+    /**
+     * Fetch an agency by its string ID, ignoring the fact that this ID should be scoped by a feedId.
+     * This is a stopgap (i.e. hack) method for fetching agencies where no feed scope is available. I
+     * am creating this method only to allow merging pull request #2032 which adds GraphQL. Note that
+     * if the same agency ID is defined in several feeds, this will return one of them at random. That
+     * is obviously not the right behavior. The problem is that agencies are not currently keyed on an
+     * FeedScopedId object, but on separate feedId and id Strings. A real fix will involve replacing
+     * or heavily modifying the OBA GTFS loader, which is now possible since we have forked it.
+     */
+    public Agency getAgencyWithoutFeedId(String agencyId) {
+        // Iterate over the agency map for each feed.
+        for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
+            Agency agency = agencyForId.get(agencyId);
+            if (agency != null) {
+                return agency;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Construct a set of all Agencies in this graph, spanning across all feed IDs. I am creating this
+     * method only to allow merging pull request #2032 which adds GraphQL. This should probably be
+     * done some other way, see javadoc on getAgencyWithoutFeedId.
+     */
+    public Set<Agency> getAllAgencies() {
+        Set<Agency> allAgencies = new HashSet<>();
+        for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
+            allAgencies.addAll(agencyForId.values());
+        }
+        return allAgencies;
+    }
+
+    public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
+        Collection<Notice> res = getNoticesByElement().get(entity);
+        return res == null ? Collections.emptyList() : res;
+    }
+
+    /**
+     * Get a list of all operators spanning across all feeds.
+     */
+    public Collection<Operator> getAllOperators() {
+        return getOperatorForId().values();
+    }
+
+    public TripPattern getTripPatternForId(String id) {
+        return tripPatternForId.get(id);
+    }
+
+    public Collection<TripPattern> getTripPatterns() {
+        return tripPatternForId.values();
+    }
+
+    public Collection<Notice> getNotices() {
+        return getNoticesByElement().values();
+    }
+
+    public Collection<Stop> getStopsByBoundingBox(Envelope envelope) {
+        return streetIndex
+            .getTransitStopForEnvelope(envelope)
+            .stream()
+            .map(TransitStopVertex::getStop)
+            .collect(Collectors.toList());
+    }
+
+    public Station getStationById(FeedScopedId id) {
+        return stationById.get(id);
+    }
+
+    public Collection<Station> getStations() {
+        return stationById.values();
+    }
+
+    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
+        return multiModalStationById.get(feedScopedId);
     }
 }
