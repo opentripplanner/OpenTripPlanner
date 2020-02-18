@@ -20,7 +20,7 @@ package org.opentripplanner.transit.raptor.api.request;
  * </pre>
  * The {@code round_N(...)} method is will round the input to the closest multiplication of N.
  * <p>
- * There are 3 coefficients: {@link #c()}, {@link #t()} and {@link #n()}.
+ * There are 3 coefficients: {@link #minTimeMinutes()}, {@link #minTripTimeCoefficient()} and {@link #stepMinutes()}.
  */
 public interface DynamicSearchWindowCoefficients {
 
@@ -29,13 +29,13 @@ public interface DynamicSearchWindowCoefficients {
      * {@code 0.0} to {@code 3.0}. Using {@code 0.0} will give you a raptor-search-window ≈
      * {@code C}.
      */
-    default float t() { return 0.4f; }
+    default double minTripTimeCoefficient() { return 0.4f; }
 
     /**
      * {@code C} - The constant minimum number of minutes for a raptor search window. Use a value
      * between 30-180 minutes in a normal deployment.
      */
-    default int c() { return 30; }
+    default int minTimeMinutes() { return 30; }
 
     /**
      * {@code N} - The search window is rounded of to the closest multiplication of N minutes.
@@ -45,5 +45,5 @@ public interface DynamicSearchWindowCoefficients {
      * Use a value between {@code 1 and 60}. This should be less than the {@code C}
      * (min-raptor-search-window) coefficient.
      */
-    default int n() { return 10; }
+    default int stepMinutes() { return 10; }
 }

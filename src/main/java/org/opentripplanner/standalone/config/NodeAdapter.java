@@ -14,17 +14,17 @@ import java.util.Arrays;
 import java.util.List;
 import java.util.regex.Pattern;
 
-class NodeAdapter {
+public class NodeAdapter {
 
     private final JsonNode json;
     private final String source;
 
-    NodeAdapter(@NotNull JsonNode node, String source) {
+    public NodeAdapter(@NotNull JsonNode node, String source) {
         json = node;
         this.source = source;
     }
 
-    JsonNode asRawNode() {
+    public JsonNode asRawNode() {
         return json;
     }
 
@@ -32,39 +32,39 @@ class NodeAdapter {
         return json.path(path);
     }
 
-    boolean isEmpty() {
+    public boolean isEmpty() {
         return json.isMissingNode();
     }
 
-    NodeAdapter path(String path) {
+    public NodeAdapter path(String path) {
         return new NodeAdapter(json.path(path), source + "/" + path);
     }
 
-    Boolean asBoolean(String path, boolean defaultValue) {
+    public Boolean asBoolean(String path, boolean defaultValue) {
         return json.path(path).asBoolean(defaultValue);
     }
 
-    double asDouble(String path, double defaultValue) {
+    public double asDouble(String path, double defaultValue) {
         return json.path(path).asDouble(defaultValue);
     }
 
-    int asInt(String path, int defaultValue) {
+    public int asInt(String path, int defaultValue) {
         return json.path(path).asInt(defaultValue);
     }
 
-    String asText(String path, String defaultValue) {
+    public String asText(String path, String defaultValue) {
         return json.path(path).asText(defaultValue);
     }
 
     /**
      * @throws OtpAppException if path doe not exist.
      */
-    String asText(String path) {
+    public String asText(String path) {
         return required(path, asText(path, null));
     }
 
     @SuppressWarnings("unchecked")
-    <T extends Enum<T>> T asEnum(String propertyName, T defaultValue) {
+    public <T extends Enum<T>> T asEnum(String propertyName, T defaultValue) {
         String valueAsString = asText(propertyName, defaultValue.name());
         try {
             return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
@@ -76,7 +76,7 @@ class NodeAdapter {
         }
     }
 
-    LocalDate asDateOrRelativePeriod(String propertyName, String defaultValue) {
+    public LocalDate asDateOrRelativePeriod(String propertyName, String defaultValue) {
         String text = asText(propertyName, defaultValue);
         try {
             if (text == null || text.isBlank()) {
@@ -97,11 +97,11 @@ class NodeAdapter {
         }
     }
 
-    Pattern asPattern(String path, String defaultValue) {
+    public Pattern asPattern(String path, String defaultValue) {
         return Pattern.compile(asText(path, defaultValue));
     }
 
-    List<URI> asUris(String name) {
+    public List<URI> asUris(String name) {
         List<URI> uris = new ArrayList<>();
         JsonNode array = json.path(name);
 
@@ -116,10 +116,9 @@ class NodeAdapter {
         return uris;
     }
 
-    URI asUri(String name, String defaultValue) {
+    public URI asUri(String name, String defaultValue) {
         return uriFromString(name, asText(name, defaultValue));
     }
-
 
 
     /* private methods */

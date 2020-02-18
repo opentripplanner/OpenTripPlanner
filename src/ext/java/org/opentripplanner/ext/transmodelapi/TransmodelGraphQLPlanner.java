@@ -53,7 +53,7 @@ public class TransmodelGraphQLPlanner {
         PlanResponse response = new PlanResponse();
 
         try {
-            RoutingWorker worker = new RoutingWorker(request);
+            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
 
             RoutingResponse res = worker.route(router);
 

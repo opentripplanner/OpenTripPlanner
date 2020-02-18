@@ -7,7 +7,7 @@ import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.standalone.config.NodeAdapterTest.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 public class NetexParametersTest {
 
@@ -26,7 +26,8 @@ public class NetexParametersTest {
 
     @Test
     public void testLoadingConfigAndPatternMatchers() throws IOException {
-        NodeAdapter nodeAdapter = newNodeAdapterForTest("{\n" +
+        NodeAdapter nodeAdapter = newNodeAdapterForTest(
+                "{\n" +
                 "    'moduleFilePattern' : 'netex_.*\\\\.zip',\n" +
                 "    'ignoreFilePattern' : '(__.*|\\\\..*)',\n" +
                 "    'sharedFilePattern' : '_stops.xml',\n" +

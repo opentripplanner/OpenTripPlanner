@@ -1,12 +1,10 @@
 package org.opentripplanner.graph_builder.module;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.databind.ObjectWriter;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.RouterConfigParams;
 
 import java.util.HashMap;
 
@@ -18,11 +16,11 @@ import java.util.HashMap;
 public class EmbedConfig implements GraphBuilderModule {
 
     /* We are storing the JSON as a string because JsonNodes are not serializable. */
-    private final JsonNode buildConfig;
-    private final JsonNode routerConfig;
+    private final GraphBuildParameters buildConfig;
+    private final RouterConfigParams routerConfig;
 
     // maybe save the GraphBuilderParameters instead of the JSON
-    public EmbedConfig(JsonNode buildConfig, JsonNode routerConfig) {
+    public EmbedConfig(GraphBuildParameters buildConfig, RouterConfigParams routerConfig) {
         this.buildConfig = buildConfig;
         this.routerConfig = routerConfig;
     }
@@ -34,21 +32,13 @@ public class EmbedConfig implements GraphBuilderModule {
             DataImportIssueStore issueStore
     ) {
         try {
-            graph.buildConfig = serializedConfiguration(buildConfig);
-            graph.routerConfig = serializedConfiguration(routerConfig);
+            graph.buildConfig = buildConfig;
+            graph.routerConfig = routerConfig;
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
     }
 
     @Override
-    public void checkInputs() {
-
-    }
-
-    private String serializedConfiguration(JsonNode config) throws JsonProcessingException{
-        ObjectMapper mapper = new ObjectMapper();
-        ObjectWriter writer = mapper.writerWithDefaultPrettyPrinter();
-        return config.isMissingNode() ? null : writer.writeValueAsString(config);
-    }
+    public void checkInputs() { }
 }

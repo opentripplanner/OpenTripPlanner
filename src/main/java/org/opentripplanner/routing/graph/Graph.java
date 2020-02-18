@@ -58,6 +58,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.RouterConfigParams;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.OtpAppException;
@@ -165,10 +167,10 @@ public class Graph implements Serializable {
     private Coordinate center = null;
 
     /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public String buildConfig = null;
+    public GraphBuildParameters buildConfig = GraphBuildParameters.DEFAULT;
 
     /** Embed a router configuration inside the graph, for starting up with a single file. */
-    public String routerConfig = null;
+    public RouterConfigParams routerConfig = RouterConfigParams.DEFAULT;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
@@ -219,13 +221,13 @@ public class Graph implements Serializable {
      * Has information how much time boarding a vehicle takes. Can be significant
      * eg in airplanes or ferries.
      */
-    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
+    public Map<TraverseMode, Integer> boardTimes = Collections.emptyMap();
 
     /**
      * Has information how much time alighting a vehicle takes. Can be significant
      * eg in airplanes or ferries.
      */
-    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
+    public Map<TraverseMode, Integer> alightTimes = Collections.emptyMap();
 
     /**
      * The difference in meters between the WGS84 ellipsoid height and geoid height
@@ -286,9 +288,7 @@ public class Graph implements Serializable {
     }
 
     // Constructor for deserialization.
-    public Graph() {
-
-    }
+    public Graph() { }
 
     public TimetableSnapshot getTimetableSnapshot() {
         return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();

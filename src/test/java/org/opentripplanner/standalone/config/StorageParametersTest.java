@@ -6,13 +6,14 @@ import org.junit.Test;
 import java.io.IOException;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.standalone.config.NodeAdapterTest.newNodeAdapterForTest;
+import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 public class StorageParametersTest {
 
     @Test
     public void testCreateGoogleCloudStorageParameters() throws IOException {
-        NodeAdapter nodeAdapter = newNodeAdapterForTest("{"
+        NodeAdapter nodeAdapter = newNodeAdapterForTest(
+                "{"
                 + " gsCredentials : 'file:/cfile',\n"
                 + " graph : 'gs://b/g.obj',\n"
                 + " streetGraph : 'file:/b/bg.obj',\n"
@@ -21,7 +22,8 @@ public class StorageParametersTest {
                 + " netex : [ 'gs://b/netex.zip' ],\n"
                 + " gtfs : [ 'file:/b/gtfs.zip' ],\n"
                 + " buildReportDir : 'gs://b/report'\n"
-                + "}");
+                + "}"
+        );
         StorageParameters c =  new StorageParameters(nodeAdapter);
 
         assertEquals("file:/cfile", c.gsCredentials);

@@ -1,12 +1,8 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.Test;
 import org.opentripplanner.util.OtpAppException;
 
-import java.io.IOException;
 import java.time.LocalDate;
 
 import static org.junit.Assert.assertEquals;
@@ -14,26 +10,10 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
+import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
 public class NodeAdapterTest {
     private enum AnEnum { A, B }
-
-    static NodeAdapter newNodeAdapterForTest(String configText) {
-        ObjectMapper mapper = new ObjectMapper();
-        mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
-        mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-
-        // Replace ' with "
-        configText = configText.replace("'", "\"");
-
-        try {
-            JsonNode config = mapper.readTree(configText);
-            return new NodeAdapter(config, "Test");
-        }
-        catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
-        }
-    }
 
     @Test
     public void asRawNode() {

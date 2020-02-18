@@ -66,7 +66,7 @@ public class PlannerResource extends RoutingResource {
             request.setRoutingContext(router.graph);
 
             // Route
-            RoutingWorker worker = new RoutingWorker(request);
+            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
 
             res = worker.route(router);
 

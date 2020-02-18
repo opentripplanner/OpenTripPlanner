@@ -70,13 +70,16 @@ public class OTPConfiguration {
      * the OTP config, build config and the router config.
      */
     public static OTPConfiguration createForTest(String configJson) {
-        return new OTPConfiguration(new CommandLineParameters(), ConfigLoader.fromString(configJson));
+        return new OTPConfiguration(
+                new CommandLineParameters(),
+                ConfigLoader.fromString(configJson)
+        );
     }
 
-    public void setEmbeddedRouterConfig(String routerConfig) {
-        if(this.routerConfig.rawJson.isMissingNode()) {
+    public void setEmbeddedRouterConfig(RouterConfigParams routerConfig) {
+        if(this.routerConfig.isDefault()) {
             LOG.info("Using the graph embedded JSON router configuration.");
-            this.routerConfig = ConfigLoader.fromString(routerConfig).loadRouterConfig();
+            this.routerConfig = routerConfig;
         }
     }
 
@@ -111,7 +114,7 @@ public class OTPConfiguration {
      * the graph is serialized.
      */
     public EmbedConfig createEmbedConfig() {
-        return new EmbedConfig(buildConfig.rawJson, routerConfig.rawJson);
+        return new EmbedConfig(buildConfig, routerConfig);
     }
 
     /**

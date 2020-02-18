@@ -19,7 +19,6 @@ import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.GraphBuildParameters;
-import org.opentripplanner.standalone.server.Router;
 
 import java.io.File;
 import java.io.IOException;
@@ -192,17 +191,5 @@ public class ConstantsForTests {
 
     private static GraphBuildParameters createNetexBuilderParameters() {
         return new ConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
-    }
-
-    /**
-     * Convenience method for tests: make a router from a graph using embedded config.
-     * This is under src/test to prevent it from being available in non-test code.
-     */
-    public static Router forTestGraph(Graph graph) {
-        Router router = new Router(graph);
-        // GraphConfig contains all the methods for parsing config files, including embedded ones. But it seems to
-        // only be designed for the case where you're loading from a directory, not for in-memory testing graphs.
-        router.startup(ConfigLoader.fromString(graph.routerConfig, "Embedded router config"));
-        return router;
     }
 }

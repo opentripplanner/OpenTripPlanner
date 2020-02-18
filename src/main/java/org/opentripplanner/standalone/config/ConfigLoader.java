@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.reflect.ReflectionLibrary;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +65,8 @@ public class ConfigLoader {
      * Generic method to parse the given json and return a JsonNode tree. The {@code source} is
      * used to generate a proper error message in case the string is not a proper JSON document.
      */
-    public static JsonNode fromString(String json, String source) {
-        return new ConfigLoader(null, json).stringToJsonNode(json, source);
+    public static JsonNode nodeFromString(String json, String source) {
+        return new ConfigLoader(null, null).stringToJsonNode(json, source);
     }
 
     /**
@@ -101,15 +101,11 @@ public class ConfigLoader {
      */
     public GraphBuildParameters loadBuildConfig() {
         JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
-
-        GraphBuildParameters params = new GraphBuildParameters(
-                new NodeAdapter(node, BUILD_CONFIG_FILENAME)
-        );
-
-        if(!node.isMissingNode()) {
-            LOG.info(ReflectionLibrary.dumpFields(params, "rawJson"));
+        if(node.isMissingNode()) {
+            return GraphBuildParameters.DEFAULT;
         }
-        return params;
+        LOG.info("Summarizing GraphBuildParameters: {}", node.toPrettyString());
+        return new GraphBuildParameters(node, BUILD_CONFIG_FILENAME);
     }
 
     /**
@@ -120,8 +116,11 @@ public class ConfigLoader {
      */
     public RouterConfigParams loadRouterConfig() {
         JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
-        NodeAdapter adapter = new NodeAdapter(node, ROUTER_CONFIG_FILENAME);
-        return new RouterConfigParams(adapter);
+        if(node.isMissingNode()) {
+            return RouterConfigParams.DEFAULT;
+        }
+        LOG.info("Summarizing RouterConfigParams: {}", node.toPrettyString());
+        return new RouterConfigParams(node, ROUTER_CONFIG_FILENAME);
     }
 
     /**
@@ -185,16 +184,16 @@ public class ConfigLoader {
      */
     private JsonNode stringToJsonNode(String jsonAsString, String source) {
         try {
-            if(jsonAsString == null) {
+            if(jsonAsString == null || jsonAsString.isBlank()) {
                 return MissingNode.getInstance();
             }
             jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
             return mapper.readTree(jsonAsString);
         }
-        catch (IOException e) {
-            LOG.error("Error while parsing JSON config '{}': {}", source, e.getMessage());
-            throw new RuntimeException(e.getLocalizedMessage(), e);
+        catch (IOException ie) {
+            LOG.error("Error while parsing JSON config '{}': {}", source, ie.getMessage());
+            throw new OtpAppException("Failed to load config: " + source);
         }
     }
 

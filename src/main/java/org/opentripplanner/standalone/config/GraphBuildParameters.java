@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -26,15 +27,14 @@ import java.time.Period;
  * is the build configuration and the other is the router configuration.
  */
 public class GraphBuildParameters {
-
+    public static final GraphBuildParameters DEFAULT = new GraphBuildParameters(MissingNode.getInstance(), "DEFAULT");
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
      */
-    public final JsonNode rawJson;
-
+    private final JsonNode rawJson;
 
     /**
      * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
@@ -253,16 +253,15 @@ public class GraphBuildParameters {
      */
     public final StorageParameters storage;
 
-
-
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-    public GraphBuildParameters(NodeAdapter c) {
-        rawJson = c.asRawNode();
+    public GraphBuildParameters(JsonNode node, String source) {
+        NodeAdapter c = new NodeAdapter(node, source);
+        rawJson = node;
         dataImportReport = c.asBoolean("dataImportReport", false);
         transit = c.asBoolean("transit", true);
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
@@ -300,6 +299,17 @@ public class GraphBuildParameters {
 
         netex = new NetexParameters(c.path("netex"));
         storage = new StorageParameters(c.path("storage"));
+    }
+
+    /**
+     * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
+     */
+    public boolean isDefault() {
+        return rawJson.isMissingNode();
+    }
+
+    public String toJson() {
+        return rawJson.isMissingNode() ? "" : rawJson.toString();
     }
 
     public ServiceDateInterval getTransitServicePeriod() {

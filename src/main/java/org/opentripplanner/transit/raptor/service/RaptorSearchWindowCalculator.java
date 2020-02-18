@@ -20,7 +20,7 @@ public class RaptorSearchWindowCalculator {
     private final int c;
 
     /** Min trip time coefficient */
-    private final float t;
+    private final double t;
     private final int stepInSeconds;
 
     private int minTravelTime = NOT_SET;
@@ -30,11 +30,11 @@ public class RaptorSearchWindowCalculator {
     private SearchParams params;
 
     public RaptorSearchWindowCalculator(DynamicSearchWindowCoefficients c) {
-        this(c.c(), c.t(), c.n());
+        this(c.minTimeMinutes(), c.minTripTimeCoefficient(), c.stepMinutes());
     }
 
     public RaptorSearchWindowCalculator(
-            int minSearchWindowInMinutes, float minTripTimeCoefficient, int roundOffInMinutes
+            int minSearchWindowInMinutes, double minTripTimeCoefficient, int roundOffInMinutes
     ) {
         this.t = minTripTimeCoefficient;
         // Convert minutes to seconds
@@ -122,7 +122,7 @@ public class RaptorSearchWindowCalculator {
      * Round values to closest increment of given {@code stepInSeconds}. This is used to round of a
      * time or duration to the closest "step" of like 10 minutes.
      */
-    int roundStep(float value) {
-        return Math.round(value / stepInSeconds) * stepInSeconds;
+    int roundStep(double value) {
+        return (int) Math.round(value / stepInSeconds) * stepInSeconds;
     }
 }
