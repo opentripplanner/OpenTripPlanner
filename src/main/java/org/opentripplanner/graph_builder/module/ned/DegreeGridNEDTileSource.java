@@ -67,7 +67,10 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         for (P2<Integer> tile : tiles) {
             int x = tile.first - 1;
             int y = tile.second + 1;
-            paths.add(getPathToTile(x, y));
+            File tilePath = getPathToTile(x, y);
+            if (tilePath != null) {
+                paths.add(tilePath);
+            }
         }
         return paths;
     }
@@ -97,14 +100,16 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             path.getParentFile().mkdirs();
 
             if (awsAccessKey == null || awsSecretKey == null) {
-                throw new RuntimeException("Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
+                throw new RuntimeException(
+                    "Cannot download NED tiles from S3: awsAccessKey or awsSecretKey properties are not set");
             }
             log.info("Downloading NED degree tile " + path);
             // download the file from S3.
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
+            String key = null;
             try {
                 S3Service s3Service = new RestS3Service(awsCredentials);
-                String key = formatLatLon(x, y) + ".tiff";
+                key = formatLatLon(x, y) + ".tiff";
                 S3Object object = s3Service.getObject(awsBucketName, key);
 
                 InputStream istream = object.getDataInputStream();
@@ -120,18 +125,10 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
                 }
                 ostream.close();
                 istream.close();
-            } catch (S3ServiceException e) {
+            } catch (ServiceException | IOException e) {
+                log.error("Error downloading tile {}! Error: {}.", key, e.getMessage());
                 path.deleteOnExit();
-                throw new RuntimeException(e);
-            } catch (ServiceException e) {
-                path.deleteOnExit();
-                throw new RuntimeException(e);
-            } catch (FileNotFoundException e) {
-                path.deleteOnExit();
-                throw new RuntimeException(e);
-            } catch (IOException e) {
-                path.deleteOnExit();
-                throw new RuntimeException(e);
+                return null;
             }
             return path;
         }
