@@ -100,6 +100,10 @@ class TripPatternMapper {
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime()
             );
+
+            // Unable to map StopTimes, problem logged by the mapper above
+            if (stopTimes == null) continue;
+
             result.tripStopTimes.put(trip, stopTimes.stopTimes);
             result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 
