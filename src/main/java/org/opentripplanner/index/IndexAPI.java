@@ -8,6 +8,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.mapping.StopMapper;
+import org.opentripplanner.api.model.ApiStop;
+import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
@@ -153,14 +156,14 @@ public class IndexAPI {
    @Path("/stops/{stopId}")
    public Response getStop (@PathParam("stopId") String stopIdString) {
        FeedScopedId stopId = GtfsLibrary.convertIdFromString(stopIdString);
-       Stop stop = index.stopForId.get(stopId);
+       ApiStop stop = StopMapper.mapStop(index.stopForId.get(stopId));
        if (stop != null) {
            return Response.status(Status.OK).entity(stop).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
+
    /** Return a list of all stops within a circle around the given coordinate. */
    @GET
    @Path("/stops")
@@ -175,8 +178,8 @@ public class IndexAPI {
 
        /* When no parameters are supplied, return all stops. */
        if (uriInfo.getQueryParameters().isEmpty()) {
-           Collection<Stop> stops = index.stopForId.values();
-           return Response.status(Status.OK).entity(StopShort.list(stops)).build();
+           Collection<ApiStop> stops = StopMapper.mapStops(index.stopForId.values());
+           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
        }
        /* If any of the circle parameters are specified, expect a circle not a box. */
        boolean expectCircle = (lat != null || lon != null || radius != null);
@@ -187,13 +190,13 @@ public class IndexAPI {
            if (radius > MAX_STOP_SEARCH_RADIUS){
                radius = MAX_STOP_SEARCH_RADIUS;
            }
-           List<StopShort> stops = Lists.newArrayList(); 
+           List<ApiStopShort> stops = Lists.newArrayList();
            Coordinate coord = new Coordinate(lon, lat);
            for (TransitStopVertex stopVertex : streetIndex.getNearbyTransitStops(
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
-                   stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+                   stops.add(new ApiStopShort(StopMapper.mapStop(stopVertex.getStop()), (int) distance));
                }
            }
            return Response.status(Status.OK).entity(stops).build();
@@ -205,10 +208,10 @@ public class IndexAPI {
            if (maxLat <= minLat || maxLon <= minLon) {
                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
            }
-           List<StopShort> stops = Lists.newArrayList();
+           List<ApiStopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
            for (TransitStopVertex stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
-               stops.add(new StopShort(stopVertex.getStop()));
+               stops.add(new ApiStopShort(StopMapper.mapStop(stopVertex.getStop())));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
@@ -373,12 +376,12 @@ public class IndexAPI {
        FeedScopedId routeId = GtfsLibrary.convertIdFromString(routeIdString);
        Route route = index.routeForId.get(routeId);
        if (route != null) {
-           Set<Stop> stops = Sets.newHashSet();
+           Set<ApiStop> stops = Sets.newHashSet();
            Collection<TripPattern> patterns = index.patternsForRoute.get(route);
            for (TripPattern pattern : patterns) {
-               stops.addAll(pattern.getStops());
+               stops.addAll(StopMapper.mapStops(pattern.getStops()));
            }
-           return Response.status(Status.OK).entity(StopShort.list(stops)).build();
+           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
