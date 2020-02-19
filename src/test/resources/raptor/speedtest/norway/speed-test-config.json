@@ -2,7 +2,6 @@
   // Run all test-cases on the given date
   testDate: "2020-01-15",
 
-
   accessEgressMaxWalkDistanceMeters: 1000,
 
   // Default is 1.4 m/s = ~ 5.0 km/t
@@ -26,7 +25,10 @@
       minTripTimeCoefficient: 0.3,
 
       // Default is 30 minutes
-      minTimeMinutes: 40,
+      minWinTimeMinutes: 40,
+
+      // Default is 180 minutes (3 hours)
+      maxWinTimeMinutes : 360,
 
       // Default is 10 minutes
       stepMinutes: 10

@@ -12,9 +12,7 @@ public final class TransitTuningParameters implements RaptorTuningParameters {
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
     private final int searchThreadPoolSize;
-    private final double dsWinMinTripTimeCoefficient;
-    private final int dsWinMinTimeMinutes;
-    private final int dsWinStepMinutes;
+    private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
     public TransitTuningParameters(NodeAdapter c) {
         RaptorTuningParameters dft = new RaptorTuningParameters() {};
@@ -29,18 +27,9 @@ public final class TransitTuningParameters implements RaptorTuningParameters {
         this.searchThreadPoolSize = c.asInt(
                 "searchThreadPoolSize", dft.searchThreadPoolSize()
         );
-
         // Dynamic Search Window
-        NodeAdapter dsWin = c.path("dynamicSearchWindow");
-        DynamicSearchWindowCoefficients dsWinDft = dft.dynamicSearchWindowCoefficients();
-        this.dsWinMinTripTimeCoefficient = dsWin.asDouble(
-                "minTripTimeCoefficient", dsWinDft.minTripTimeCoefficient()
-        );
-        this.dsWinMinTimeMinutes = dsWin.asInt(
-                "minTimeMinutes",  dsWinDft.minTimeMinutes()
-        );
-        this.dsWinStepMinutes = dsWin.asInt(
-                "stepMinutes",  dsWinDft.stepMinutes()
+        dynamicSearchWindowCoefficients = new DynamicSearchWindowCoefficientsImpl(
+                c.path("dynamicSearchWindow")
         );
     }
 
@@ -66,10 +55,30 @@ public final class TransitTuningParameters implements RaptorTuningParameters {
 
     @Override
     public DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients() {
-        return new DynamicSearchWindowCoefficients() {
-            @Override public double minTripTimeCoefficient() { return dsWinMinTripTimeCoefficient; }
-            @Override public int minTimeMinutes() { return dsWinMinTimeMinutes; }
-            @Override public int stepMinutes() { return dsWinStepMinutes; }
-        };
+        return dynamicSearchWindowCoefficients;
+    }
+
+    private static class DynamicSearchWindowCoefficientsImpl
+            implements DynamicSearchWindowCoefficients
+    {
+        private final double minTripTimeCoefficient;
+        private final int minWinTimeMinutes;
+        private final int maxWinTimeMinutes;
+        private final int stepMinutes;
+
+        public DynamicSearchWindowCoefficientsImpl(NodeAdapter dsWin) {
+            DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
+            this.minTripTimeCoefficient = dsWin.asDouble(
+                    "minTripTimeCoefficient", dsWinDft.minTripTimeCoefficient()
+            );
+            this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes",  dsWinDft.minWinTimeMinutes());
+            this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes",  dsWinDft.maxWinTimeMinutes());
+            this.stepMinutes = dsWin.asInt("stepMinutes",  dsWinDft.stepMinutes());
+        }
+
+        @Override public double minTripTimeCoefficient() { return minTripTimeCoefficient; }
+        @Override public int minWinTimeMinutes() { return minWinTimeMinutes; }
+        @Override public int maxWinTimeMinutes() { return maxWinTimeMinutes; }
+        @Override public int stepMinutes() { return stepMinutes; }
     }
 }
