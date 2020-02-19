@@ -6,7 +6,6 @@ import com.vividsolutions.jts.index.SpatialIndex;
 import com.vividsolutions.jts.index.strtree.STRtree;
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.geometry.GeneralEnvelope;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.opengis.coverage.CannotEvaluateException;
 import org.opengis.coverage.Coverage;
@@ -31,6 +30,13 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     private static final long serialVersionUID = -7798801307087575896L;
 
     private static Logger log = LoggerFactory.getLogger(UnifiedGridCoverage.class);
+
+    /**
+     * A spatial index of the intersection of all regions and datums. For smaller-scale deployments, this spatial index
+     * might perform more slowly than manually iterating over each region and datum. However, in larger regions, this
+     * can result in 20+% more calculations being done. In smaller-scale deployments since the overall time is not as
+     * long, we leave this in here for the benefit of larger regions where this will result in much better performance.
+     */
     private final SpatialIndex datumRegionIndex;
     private ArrayList<Coverage> regions;
     private List<VerticalDatum> datums;
@@ -55,6 +61,9 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         return null;
     }
 
+    /**
+     * Calculate the elevation at a given point
+     */
     public double[] evaluate(DirectPosition point, double[] values) throws CannotEvaluateException {
         double x = point.getOrdinate(0);
         double y = point.getOrdinate(1);
@@ -71,12 +80,12 @@ public class UnifiedGridCoverage extends AbstractCoverage {
                 return result;
             } catch (PointOutsideCoverageException e) {
                 /* not found */
-                log.warn("Point not found: " + point);
+                log.debug("Point not found: " + point);
                 return null;
             }
         }
         /* not found */
-        log.warn("Point not found: " + point);
+        log.debug("Point not found: " + point);
         return null;
     }
     
