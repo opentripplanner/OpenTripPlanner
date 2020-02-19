@@ -58,6 +58,7 @@ public class DebugFilterChain implements ItineraryFilter {
                 "This itinerary is marked as deleted by " + filterName + " filter. "
         );
         alert.alertDescriptionText = alert.alertDetailText;
+        alert.alertType = "incident";
 
         AlertPatch patch = new AlertPatch();
         patch.setAlert(alert);

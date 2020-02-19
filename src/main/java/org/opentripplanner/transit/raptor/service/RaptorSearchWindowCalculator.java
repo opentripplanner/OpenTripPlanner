@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.service;
 
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -108,6 +108,13 @@ public class RaptorSearchWindowCalculator {
      * by the time between the EDT and LAT. The unit is seconds.
      */
     private int calculateSearchWindow() {
+        // If both EDT and LAT is set the search window is the time between these, minus the
+        // min-travel-time.
+        if(params.isEarliestDepartureTimeSet() && params.isLatestArrivalTimeSet()) {
+            int travelWindow = params.latestArrivalTime() - params.earliestDepartureTime();
+            return roundStep(travelWindow - minTravelTime);
+        }
+        // Set the search window using the min-travel-time.
         return roundStep(c + t * minTravelTime);
     }
 
