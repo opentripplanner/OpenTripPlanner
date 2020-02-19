@@ -7,12 +7,12 @@ import java.util.List;
  * Calculate derived itinerary fields
  */
 class ItinerariesCalculateLegTotals {
-    long totalDurationSeconds = 0;
-    long transitTimeSeconds = 0;
+    int totalDurationSeconds = 0;
+    int transitTimeSeconds = 0;
     int nTransitLegs = 0;
-    long nonTransitTimeSeconds = 0;
+    int nonTransitTimeSeconds = 0;
     double nonTransitDistanceMeters = 0.0;
-    long waitingTimeSeconds;
+    int waitingTimeSeconds;
     boolean walkOnly = true;
 
     public ItinerariesCalculateLegTotals(List<Leg> legs) {
@@ -23,7 +23,7 @@ class ItinerariesCalculateLegTotals {
         long startTimeMs = legs.get(0).startTime.getTimeInMillis();
         long endTimeMs = legs.get(legs.size()-1).endTime.getTimeInMillis();
 
-        totalDurationSeconds = Math.round((endTimeMs - startTimeMs) / 1000.0);
+        totalDurationSeconds = (int) Math.round((endTimeMs - startTimeMs) / 1000.0);
 
         for (Leg leg : legs) {
             long dt = leg.getDuration();

@@ -2,6 +2,7 @@ package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
+import org.opentripplanner.util.CoordinateUtils;
 
 import java.util.Calendar;
 
@@ -75,7 +76,6 @@ public class Place {
      */
     public String bikeShareId;
 
-
     public Place() { }
 
     public Place(Double lon, Double lat, String name) {
@@ -96,6 +96,18 @@ public class Place {
      */
     String getGeometry() {
         return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
+    }
+
+    /**
+     * Test if the place is likely to be at the same location. First check the coordinates
+     * then check the stopId [if it exist].
+     */
+    public boolean sameLocation(Place other) {
+        if(this == other) { return true; }
+        if(lat != null && lon != null && other.lat != null && other.lon != null) {
+            return CoordinateUtils.compare(lat, lon, other.lat, other.lon);
+        }
+        return stopId != null && stopId.equals(other.stopId);
     }
 
     @Override

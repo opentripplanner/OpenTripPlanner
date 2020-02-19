@@ -6,6 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StopTime;
@@ -91,6 +92,7 @@ public class NetexMapper {
         // before Route - if both entities are defined in the same file.
         mapAuthorities(netexIndex);
         mapOperators(netexIndex);
+        mapShapePoints(netexIndex);
         mapStopPlaceAndQuays(netexIndex);
         mapMultiModalStopPlaces(netexIndex);
         mapGroupsOfStopPlaces(netexIndex);
@@ -112,6 +114,22 @@ public class NetexMapper {
         for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);
             transitBuilder.getAgenciesById().add(agency);
+        }
+    }
+
+    private void mapShapePoints(NetexImportDataIndexReadOnlyView netexIndex) {
+        ServiceLinkMapper serviceLinkMapper = new ServiceLinkMapper(idFactory, issueStore);
+        for (JourneyPattern journeyPattern : netexIndex.getJourneyPatternsById().localValues()) {
+
+            Collection<ShapePoint> shapePoints = serviceLinkMapper.getShapePointsByJourneyPattern(
+                journeyPattern,
+                netexIndex.getServiceLinkById(),
+                netexIndex.getQuayIdByStopPointRef(),
+                netexIndex.getQuayById());
+
+            for (ShapePoint shapePoint : shapePoints) {
+                transitBuilder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
+            }
         }
     }
 
@@ -170,6 +188,7 @@ public class NetexMapper {
                 idFactory,
                 transitBuilder.getStops(),
                 transitBuilder.getRoutes(),
+                transitBuilder.getShapePoints().keySet(),
                 netexIndex.getRouteById(),
                 netexIndex.getJourneyPatternsById(),
                 netexIndex.getQuayIdByStopPointRef(),

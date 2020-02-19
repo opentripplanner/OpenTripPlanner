@@ -139,7 +139,7 @@ public class GeometryAndBlockProcessor {
                         && trip.getShapeId().getId() != null && !trip.getShapeId().getId().equals("")) {
                     // save the geometry to later be applied to the hops
                     geometriesByTripPattern.put(tripPattern,
-                            createGeometry(trip, transitService.getStopTimesForTrip(trip)));
+                            createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip)));
                 }
             }
         }
@@ -257,111 +257,41 @@ public class GeometryAndBlockProcessor {
      * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically one of the trips
      * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
      */
-    private LineString[] createGeometry(Trip trip, List<StopTime> stopTimes) {
-        FeedScopedId shapeId = trip.getShapeId();
+    private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
 
-        // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
-        LineString[] geoms = new LineString[stopTimes.size() - 1];
-
-        // Detect presence or absence of shape_dist_traveled on a per-trip basis both for stop_times and shape itself
-        StopTime st0 = stopTimes.get(0);
-        boolean hasShapeDist = st0.isShapeDistTraveledSet() && getDistanceForShapeId(shapeId) != null;
-        if (hasShapeDist) {
+        if (hasShapeDist(shapeId, stopTimes)) {
             // this trip has shape_dist in stop_times
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
-            }
-            return geoms;
+            return getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
         }
-        LineString shape = getLineStringForShapeId(shapeId);
-        if (shape == null) {
+
+        LineString shapeLineString = getLineStringForShapeId(shapeId);
+        if (shapeLineString == null) {
             // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
             // create straight line segments between stops for each hop
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                geoms[i] = geometry;
-            }
-            return geoms;
-        }
-        // This trip does not have shape_dist in stop_times, but does have an associated shape.
-        ArrayList<IndexedLineSegment> segments = new ArrayList<IndexedLineSegment>();
-        for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
-            segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
-        }
-        // Find possible segment matches for each stop.
-        List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<List<IndexedLineSegment>>();
-        int minSegmentIndex = 0;
-        for (int i = 0; i < stopTimes.size() ; ++i) {
-            Stop stop = stopTimes.get(i).getStop();
-            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
-            List<IndexedLineSegment> stopSegments = new ArrayList<IndexedLineSegment>();
-            double bestDistance = Double.MAX_VALUE;
-            IndexedLineSegment bestSegment = null;
-            int maxSegmentIndex = -1;
-            int index = -1;
-            int minSegmentIndexForThisStop = -1;
-            for (IndexedLineSegment segment : segments) {
-                index++;
-                if (segment.index < minSegmentIndex) {
-                    continue;
-                }
-                double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
-                    stopSegments.add(segment);
-                    maxSegmentIndex = index;
-                    if (minSegmentIndexForThisStop == -1)
-                        minSegmentIndexForThisStop = index;
-                } else if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestSegment = segment;
-                    if (maxSegmentIndex != -1) {
-                        maxSegmentIndex = index;
-                    }
-                }
-            }
-            if (stopSegments.size() == 0) {
-                //no segments within 150m
-                //fall back to nearest segment
-                stopSegments.add(bestSegment);
-                minSegmentIndex = bestSegment.index;
-            } else {
-                minSegmentIndex = minSegmentIndexForThisStop;
-                Collections.sort(stopSegments, new IndexedLineSegmentComparator(coord));
-            }
-
-            for (int j = i - 1; j >= 0; j --) {
-                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
-                    IndexedLineSegment segment = it.next();
-                    if (segment.index > maxSegmentIndex) {
-                        it.remove();
-                    }
-                }
-            }
-            possibleSegmentsForStop.add(stopSegments);
+            return createStraightLineHopeGeometries(stopTimes, shapeId);
         }
 
-        List<LinearLocation> locations = getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
-
+        List<LinearLocation> locations = getLinearLocations(stopTimes, shapeLineString);
         if (locations == null) {
             // this only happens on shape which have points very far from
             // their stop sequence. So we'll fall back to trivial stop-to-stop
             // linking, even though theoretically we could do better.
-
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                geoms[i] = geometry;
-                //this warning is not strictly correct, but will do
-                issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
-            }
-            return geoms;
+            return createStraightLineHopeGeometries(stopTimes, shapeId);
         }
 
+        return getGeometriesByShape(stopTimes, shapeId, shapeLineString, locations);
+    }
+
+    private boolean hasShapeDist(FeedScopedId shapeId, List<StopTime> stopTimes) {
+        StopTime st0 = stopTimes.get(0);
+        return st0.isShapeDistTraveledSet() && getDistanceForShapeId(shapeId) != null;
+    }
+
+    private LineString[] getGeometriesByShape(
+        List<StopTime> stopTimes, FeedScopedId shapeId, LineString shape,
+        List<LinearLocation> locations
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
         Iterator<LinearLocation> locationIt = locations.iterator();
         LinearLocation endLocation = locationIt.next();
         double distanceSoFar = 0;
@@ -408,7 +338,96 @@ public class GeometryAndBlockProcessor {
             }
             geoms[i] = geometry;
         }
+        return geoms;
+    }
 
+    private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        // This trip does not have shape_dist in stop_times, but does have an associated shape.
+        ArrayList<IndexedLineSegment> segments = new ArrayList<>();
+        for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
+            segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
+        }
+        // Find possible segment matches for each stop.
+        List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<>();
+        int minSegmentIndex = 0;
+        for (int i = 0; i < stopTimes.size() ; ++i) {
+            Stop stop = stopTimes.get(i).getStop();
+            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
+            List<IndexedLineSegment> stopSegments = new ArrayList<>();
+            double bestDistance = Double.MAX_VALUE;
+            IndexedLineSegment bestSegment = null;
+            int maxSegmentIndex = -1;
+            int index = -1;
+            int minSegmentIndexForThisStop = -1;
+            for (IndexedLineSegment segment : segments) {
+                index++;
+                if (segment.index < minSegmentIndex) {
+                    continue;
+                }
+                double distance = segment.distance(coord);
+                if (distance < maxStopToShapeSnapDistance) {
+                    stopSegments.add(segment);
+                    maxSegmentIndex = index;
+                    if (minSegmentIndexForThisStop == -1)
+                        minSegmentIndexForThisStop = index;
+                } else if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSegment = segment;
+                    if (maxSegmentIndex != -1) {
+                        maxSegmentIndex = index;
+                    }
+                }
+            }
+            if (stopSegments.size() == 0 && bestSegment != null) {
+                //no segments within 150m
+                //fall back to nearest segment
+                stopSegments.add(bestSegment);
+                minSegmentIndex = bestSegment.index;
+            } else {
+                minSegmentIndex = minSegmentIndexForThisStop;
+                stopSegments.sort(new IndexedLineSegmentComparator(coord));
+            }
+
+            for (int j = i - 1; j >= 0; j --) {
+                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
+                    IndexedLineSegment segment = it.next();
+                    if (segment.index > maxSegmentIndex) {
+                        it.remove();
+                    }
+                }
+            }
+            possibleSegmentsForStop.add(stopSegments);
+        }
+
+        return getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
+    }
+
+    private LineString[] createStraightLineHopeGeometries(
+        List<StopTime> stopTimes, FeedScopedId shapeId
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
+        StopTime st0;
+        for (int i = 0; i < stopTimes.size() - 1; ++i) {
+            st0 = stopTimes.get(i);
+            StopTime st1 = stopTimes.get(i + 1);
+            LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+            geoms[i] = geometry;
+            //this warning is not strictly correct, but will do
+            issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
+        }
+        return geoms;
+    }
+
+    private LineString[] getHopGeometriesViaShapeDistTravelled(
+        List<StopTime> stopTimes, FeedScopedId shapeId
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
+        StopTime st0;
+        for (int i = 0; i < stopTimes.size() - 1; ++i) {
+            st0 = stopTimes.get(i);
+            StopTime st1 = stopTimes.get(i + 1);
+            geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+        }
         return geoms;
     }
 
@@ -544,7 +563,7 @@ public class GeometryAndBlockProcessor {
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }
-            geometriesByShapeSegmentKey.put(key, (LineString) geometry);
+            geometriesByShapeSegmentKey.put(key, geometry);
         }
 
         return geometry;
@@ -559,7 +578,7 @@ public class GeometryAndBlockProcessor {
      */
     private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
         List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
-        ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
+        ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
         ShapePoint last = null;
         for (ShapePoint sp : points) {
             if (last == null || last.getSequence() != sp.getSequence()) {

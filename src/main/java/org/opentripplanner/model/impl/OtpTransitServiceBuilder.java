@@ -1,6 +1,7 @@
 package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
@@ -74,7 +75,7 @@ public class OtpTransitServiceBuilder {
 
     private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
 
-    private final List<ShapePoint> shapePoints = new ArrayList<>();
+    private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
 
     private final EntityById<FeedScopedId, Station> stationsById = new EntityById<>();
 
@@ -151,7 +152,7 @@ public class OtpTransitServiceBuilder {
         return routesById;
     }
 
-    public List<ShapePoint> getShapePoints() {
+    public Multimap<FeedScopedId, ShapePoint> getShapePoints() {
         return shapePoints;
     }
 
