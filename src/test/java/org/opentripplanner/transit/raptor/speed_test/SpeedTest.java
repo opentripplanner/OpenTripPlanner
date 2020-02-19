@@ -48,6 +48,8 @@ public class SpeedTest {
 
 
     private final AvgTimer TOT_TIMER = AvgTimer.timerMilliSec("SpeedTest:route");
+    private final AvgTimer TIMER_STREET = AvgTimer.timerMilliSec("SpeedTest:street route");
+    private final AvgTimer TIMER_TRANSIT_DATA = AvgTimer.timerMilliSec("SpeedTest:transit data");
     private final AvgTimer TIMER_WORKER = AvgTimer.timerMilliSec("SpeedTest:route Worker");
     private final AvgTimer TIMER_COLLECT_RESULTS = AvgTimer.timerMilliSec("SpeedTest: Collect Results");
 
@@ -225,35 +227,30 @@ public class SpeedTest {
         RaptorResponse<TripSchedule> response;
 
         try {
+            TIMER_STREET.start();
             streetRouter.route(request);
+            TIMER_STREET.stop();
 
-            // -------------------------------------------------------- [ WORKER ROUTE ]
-
+            TIMER_TRANSIT_DATA.start();
             transitData = transitData(request);
+            TIMER_TRANSIT_DATA.stop();
 
             TIMER_WORKER.start();
-
             rRequest = rangeRaptorRequest(routeProfile, request, streetRouter);
-
             response = service.route(rRequest, transitData);
-
-
             TIMER_WORKER.stop();
 
-            // -------------------------------------------------------- [ COLLECT RESULTS ]
-
             TIMER_COLLECT_RESULTS.start();
-
             if (response.paths().isEmpty()) {
                 throw new NoResultFound();
             }
-
             TripPlan tripPlan = mapToTripPlan(request, response, streetRouter);
-
             TIMER_COLLECT_RESULTS.stop();
 
             return tripPlan;
         } finally {
+            TIMER_STREET.failIfStarted();
+            TIMER_TRANSIT_DATA.failIfStarted();
             TIMER_WORKER.failIfStarted();
             TIMER_COLLECT_RESULTS.failIfStarted();
         }
