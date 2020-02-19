@@ -11,8 +11,6 @@ public class TripSearchMetadata {
     /**
      * This is the time window used by the raptor search. The window is an optional parameter and
      * OTP might override it/dynamically assign a new value.
-     * <p>
-     * Unit : seconds
      */
     public Duration searchWindowUsed;
 
