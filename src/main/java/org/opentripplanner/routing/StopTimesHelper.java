@@ -4,6 +4,7 @@ import com.google.common.collect.MinMaxPriorityQueue;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TripPattern;
@@ -132,13 +133,14 @@ public class StopTimesHelper {
    * @param serviceDate Return all departures for the specified date
    * @return
    */
-  public static List<StopTimesInPattern> getStopTimesForStop(RoutingService routingService, TimetableSnapshot timetableSnapshot, Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
+  public static List<StopTimesInPattern> getStopTimesForStop(RoutingService routingService, Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
     Collection<TripPattern> patternsForStop = routingService.getPatternsForStop(stop, true);
     for (TripPattern pattern : patternsForStop) {
       StopTimesInPattern stopTimes = new StopTimesInPattern(pattern);
       Timetable tt;
+      TimetableSnapshot timetableSnapshot = routingService.getTimetableSnapshot();
       if (timetableSnapshot != null){
         tt = timetableSnapshot.resolve(pattern, serviceDate);
       } else {
@@ -148,7 +150,7 @@ public class StopTimesHelper {
       int sidx = 0;
       for (Stop currStop : pattern.stopPattern.stops) {
         if (currStop == stop) {
-          if(omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
+          if(omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) continue;
             stopTimes.times.add(new TripTimeShort(t, sidx, stop, sd));

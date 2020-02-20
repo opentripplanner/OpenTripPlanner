@@ -107,7 +107,6 @@ public class RoutingService {
   ) {
     return StopTimesHelper.getStopTimesForStop(
         this,
-        lazyGetTimeTableSnapShot(),
         stop,
         serviceDate,
         omitNonPickups
@@ -139,7 +138,6 @@ public class RoutingService {
   public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
     return TripTimesShortHelper.getTripTimesShort(
         this,
-        lazyGetTimeTableSnapShot(),
         trip,
         serviceDate
     );
