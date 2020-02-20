@@ -14,7 +14,7 @@ import java.util.List;
 
 public class TripTimesShortHelper {
   public static List<TripTimeShort> getTripTimesShort(RoutingService routingService, TimetableSnapshot timetableSnapshot, Trip trip, ServiceDate serviceDate) {
-    final ServiceDay serviceDay = new ServiceDay(routingService.getGraph(),
+    final ServiceDay serviceDay = new ServiceDay(routingService.getServiceCodes(),
         serviceDate,
         routingService.getCalendarService(),
         trip.getRoute().getAgency().getId()

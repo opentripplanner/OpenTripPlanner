@@ -146,7 +146,7 @@ public class Graph implements Serializable {
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
+    private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
@@ -1098,5 +1098,9 @@ public class Graph implements Serializable {
 
     public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
         return multiModalStationById.get(feedScopedId);
+    }
+
+    public Map<FeedScopedId, Integer> getServiceCodes() {
+        return serviceCodes;
     }
 }

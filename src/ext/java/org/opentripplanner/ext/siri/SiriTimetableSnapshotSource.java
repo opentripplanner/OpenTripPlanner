@@ -649,10 +649,10 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
 
-        if (!graph.serviceCodes.containsKey(serviceId)) {
-            graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
+        if (!graph.getServiceCodes().containsKey(serviceId)) {
+            graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
         }
-        tripTimes.serviceCode = graph.serviceCodes.get(serviceId);
+        tripTimes.serviceCode = graph.getServiceCodes().get(serviceId);
 
         pattern.add(tripTimes);
 
@@ -871,7 +871,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip, graph, serviceDate);
 
         // Add service code to bitset of pattern if needed (using copy on write)
-        final int serviceCode = graph.serviceCodes.get(trip.getServiceId());
+        final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
         if (!pattern.getServices().get(serviceCode)) {
             final BitSet services = (BitSet) pattern.getServices().clone();
             services.set(serviceCode);

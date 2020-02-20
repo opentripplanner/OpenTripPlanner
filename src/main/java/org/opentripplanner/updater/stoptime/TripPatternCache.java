@@ -45,7 +45,7 @@ public class TripPatternCache {
             tripPattern.setId(new FeedScopedId(tripPattern.getFeedId(), generateUniqueTripPatternCode(tripPattern)));
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-            tripPattern.setServiceCodes(graph.serviceCodes);
+            tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
             tripPattern.scheduledTimetable.finish();

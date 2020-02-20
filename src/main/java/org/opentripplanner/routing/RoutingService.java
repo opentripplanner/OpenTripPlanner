@@ -184,9 +184,4 @@ public class RoutingService {
   public GraphQL getGraphQL() {
     return this.graphQL;
   }
-
-  // TODO we want to get rid of this and only delegate to methods on the graph
-  public Graph getGraph() {
-    return graph;
-  }
 }

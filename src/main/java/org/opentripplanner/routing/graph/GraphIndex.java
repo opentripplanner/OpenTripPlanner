@@ -239,7 +239,7 @@ public class GraphIndex {
     for (ServiceDate serviceDate : serviceIdsForServiceDate.keySet()) {
       TIntSet serviceCodesRunning = new TIntHashSet();
       for (FeedScopedId serviceId : serviceIdsForServiceDate.get(serviceDate)) {
-        serviceCodesRunning.add(graph.serviceCodes.get(serviceId));
+        serviceCodesRunning.add(graph.getServiceCodes().get(serviceId));
       }
       serviceCodesRunningForDate.put(
           serviceDate,

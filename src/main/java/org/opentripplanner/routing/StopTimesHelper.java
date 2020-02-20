@@ -64,7 +64,7 @@ public class StopTimesHelper {
 
       // Loop through all possible days
       for (ServiceDate serviceDate : serviceDates) {
-        ServiceDay sd = new ServiceDay(routingService.getGraph(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+        ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
         Timetable tt;
         if (timetableSnapshot != null){
           tt = timetableSnapshot.resolve(pattern, serviceDate);
@@ -144,7 +144,7 @@ public class StopTimesHelper {
       } else {
         tt = pattern.scheduledTimetable;
       }
-      ServiceDay sd = new ServiceDay(routingService.getGraph(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
+      ServiceDay sd = new ServiceDay(routingService.getServiceCodes(), serviceDate, routingService.getCalendarService(), pattern.route.getAgency().getId());
       int sidx = 0;
       for (Stop currStop : pattern.stopPattern.stops) {
         if (currStop == stop) {
