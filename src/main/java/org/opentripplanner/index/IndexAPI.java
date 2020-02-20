@@ -593,24 +593,6 @@ public class IndexAPI {
         return Response.status(Status.OK).entity("NONE").build();
     }
 
-    @POST
-    @Path("/graphql")
-    @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL (HashMap<String, Object> queryParameters) {
-        HttpToGraphQLMapper.QlRequestParams qlReq = mapHttpQuerryParamsToQLParams(queryParameters, deserializer);
-        if(qlReq.isFailed()) {
-            return qlReq.getFailedResponse();
-        }
-        return getRoutingService().getGraphQLResponse(qlReq.query, qlReq.variables, qlReq.operationName);
-    }
-
-    @POST
-    @Path("/graphql")
-    @Consumes("application/graphql")
-    public Response getGraphQL (String query) {
-        return getRoutingService().getGraphQLResponse(query, new HashMap<>(), null);
-    }
-
     /** Represents a transfer from a stop */
     private static class Transfer {
         /** The stop we are connecting to */

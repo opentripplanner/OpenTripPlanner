@@ -1,11 +1,6 @@
 package org.opentripplanner.routing;
 
-import com.google.common.util.concurrent.ThreadFactoryBuilder;
-import graphql.ExecutionResult;
-import graphql.GraphQL;
-import graphql.execution.ExecutorServiceExecutionStrategy;
 import lombok.experimental.Delegate;
-import org.opentripplanner.index.IndexGraphQLSchema;
 import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.model.Stop;
@@ -20,14 +15,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.util.HttpToGraphQLMapper;
 
-import javax.ws.rs.core.Response;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
-import java.util.concurrent.Executors;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -47,16 +38,7 @@ public class RoutingService {
    */
   private TimetableSnapshot timetableSnapshot;
 
-  // TODO Move this
-  private GraphQL graphQL;
-
   public RoutingService(Graph graph) {
-    // TODO This should be moved
-    graphQL = new GraphQL(new IndexGraphQLSchema(this).indexSchema,
-        new ExecutorServiceExecutionStrategy(Executors.newCachedThreadPool(new ThreadFactoryBuilder()
-            .setNameFormat("GraphQLExecutor-" + graph.routerId + "-%d")
-            .build()))
-    );
     this.graph = graph;
     this.graphIndex = graph.index;
   }
@@ -154,13 +136,6 @@ public class RoutingService {
         : tripPattern.scheduledTimetable;
   }
 
-  public Response getGraphQLResponse(
-      String query, Map<String, Object> variables, String operationName
-  ) {
-    ExecutionResult executionResult = graphQL.execute(query, operationName, null, variables);
-    return HttpToGraphQLMapper.mapExecutionResultToHttpResponse(executionResult);
-  }
-
   public List<TripTimeShort> getStopTimesForTripAndDate(Trip trip, ServiceDate serviceDate) {
     TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
     return timetableSnapshot != null
@@ -178,10 +153,5 @@ public class RoutingService {
         trip,
         serviceDate
     );
-  }
-
-  // TODO This should be moved
-  public GraphQL getGraphQL() {
-    return this.graphQL;
   }
 }
