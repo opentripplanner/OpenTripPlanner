@@ -136,16 +136,6 @@ public class RoutingService {
         : tripPattern.scheduledTimetable;
   }
 
-  public List<TripTimeShort> getStopTimesForTripAndDate(Trip trip, ServiceDate serviceDate) {
-    TimetableSnapshot timetableSnapshot = lazyGetTimeTableSnapShot();
-    return timetableSnapshot != null
-        ? TripTimeShort.fromTripTimes(
-            timetableSnapshot.resolve(getPatternForTrip().get(trip), serviceDate),
-            trip
-          )
-        : null;
-  }
-
   public List<TripTimeShort> getTripTimesShort(Trip trip, ServiceDate serviceDate) {
     return TripTimesShortHelper.getTripTimesShort(
         this,
