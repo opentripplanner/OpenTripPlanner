@@ -24,7 +24,7 @@ public class ItineraryMapper {
         if(domain == null) { return null; }
         ApiItinerary api = new ApiItinerary();
 
-        api.duration = domain.durationSeconds;
+        api.duration = (long) domain.durationSeconds;
         api.startTime = domain.startTime();
         api.endTime = domain.endTime();
         api.walkTime = domain.nonTransitTimeSeconds;
@@ -38,6 +38,9 @@ public class ItineraryMapper {
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
         api.tooSloped = domain.tooSloped;
+
+        // To be backward compatible we set this to {@code null} and not false when not set.
+        api.debugMarkedAsDeleted = domain.debugMarkedAsDeleted ? Boolean.TRUE : null;
 
         return api;
     }

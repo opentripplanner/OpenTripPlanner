@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.service;
 
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
@@ -23,7 +24,7 @@ import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.NO_WA
 public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     private static final Logger LOG = LoggerFactory.getLogger(HeuristicSearchTask.class);
 
-    private final boolean direction;
+    private final SearchDirection direction;
     private final String name;
     private final RaptorConfig<T> config;
     private final TransitDataProvider<T> transitData;
@@ -38,7 +39,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
             TransitDataProvider<T> transitData
     ) {
         this(
-                request.searchForward(),
+                request.searchDirection(),
                 RequestAlias.alias(request, config.isMultiThreaded()),
                 config,
                 transitData
@@ -47,7 +48,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     }
 
     public HeuristicSearchTask(
-            boolean direction,
+            SearchDirection direction,
             String name,
             RaptorConfig<T> config,
             TransitDataProvider<T> transitData
@@ -68,6 +69,10 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
 
     public boolean isEnabled() {
         return run;
+    }
+
+    public SearchDirection getDirection() {
+        return direction;
     }
 
     public HeuristicSearch<T> search() {
@@ -100,6 +105,9 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
         );
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     void run() {
         if (!run) { return; }
 

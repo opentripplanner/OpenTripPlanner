@@ -278,12 +278,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
      *  of not wanting to walk too much without asking for totally ridiculous itineraries, but this
      *  observation should in no way be taken as scientific or definitive. Your mileage may vary.
-     *
-     *  @deprecated TODO OTP2 Regression. This is currently used in A Star search, but has no meaning if it
- *                            is not implemented in Raptor. It should be part of a weight-based
- *                            Raptor-search.
      */
-    @Deprecated
     public double walkReluctance = 2.0;
 
     /** Used instead of walk reluctance for stairs */
@@ -628,6 +623,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public String pathComparator = null;
 
+
+    /**
+     * Switch on to return all itineraries and mark filtered itineraried as deleted.
+     */
+    public boolean debugItineraryFilter = false;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
@@ -896,10 +897,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setDateTime(String date, String time, TimeZone tz) {
         Date dateObject = DateUtils.toDate(date, time, tz);
         setDateTime(dateObject);
-    }
-
-    public void setSearchWindowSeconds(int searchWindowInSeconds) {
-        this.searchWindow = Duration.ofSeconds(searchWindowInSeconds);
     }
 
     public int getNumItineraries() {

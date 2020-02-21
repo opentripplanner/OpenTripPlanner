@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 
 import java.util.Arrays;
 import java.util.List;
@@ -13,75 +14,75 @@ public enum SpeedTestProfile {
             "rr",
             "Standard Range Raptor, super fast [ transfers, arrival time, travel time ].",
             RaptorProfile.STANDARD,
-            true
+            SearchDirection.FORWARD
     ),
     std_range_raptor_reverse(
             "rrr",
             "Reverse Standard Range Raptor",
             RaptorProfile.STANDARD,
-            false
+            SearchDirection.REVERSE
     ),
     std_best_time(
             "bt",
             "Best Time Range Raptor, super fast. Arrival time only, no path.",
             RaptorProfile.BEST_TIME,
-            true
+            SearchDirection.FORWARD
     ),
     std_best_time_reverse(
             "btr",
             "Reverse Best Time Range Raptor",
             RaptorProfile.BEST_TIME,
-            false
+            SearchDirection.REVERSE
     ),
     no_wait_std(
             "ws",
             "Standard Range Raptor without waiting time.",
             RaptorProfile.NO_WAIT_STD,
-            true
+            SearchDirection.FORWARD
     ),
     no_wait_std_reverse(
             "wsr",
             "Reverse Standard Range Raptor without waiting time.",
             RaptorProfile.NO_WAIT_STD,
-            false
+            SearchDirection.REVERSE
     ),
     no_wait_best_time(
             "wt",
             "Best Time Range Raptor without waiting time.",
             RaptorProfile.NO_WAIT_BEST_TIME,
-            true
+            SearchDirection.FORWARD
     ),
     no_wait_best_time_reverse(
             "wtr",
             "Reverse Best Time Range Raptor without waiting time.",
             RaptorProfile.NO_WAIT_BEST_TIME,
-            false
+            SearchDirection.REVERSE
     ),
     mc_range_raptor(
             "mc",
             "Multi-Criteria Range Raptor [ transfers, arrival time, travel time, cost ].",
             RaptorProfile.MULTI_CRITERIA,
-            true
+            SearchDirection.FORWARD
     ),
     mc_destination(
             "md",
             "Multi-Criteria Range Raptor with check on destination arrival.",
             RaptorProfile.MULTI_CRITERIA,
-            true,
+            SearchDirection.FORWARD,
             Optimization.PARETO_CHECK_AGAINST_DESTINATION
     ),
     mc_filter_stops(
             "ms",
             "Multi-Criteria Range Raptor with check on stop filter.",
             RaptorProfile.MULTI_CRITERIA,
-            true,
+            SearchDirection.FORWARD,
             Optimization.TRANSFERS_STOP_FILTER
     ),
     mc_stop_destination(
             "mds",
             "Multi-Criteria Range Raptor with check on stop filter and destination arrival.",
             RaptorProfile.MULTI_CRITERIA,
-            true,
+            SearchDirection.FORWARD,
             Optimization.PARETO_CHECK_AGAINST_DESTINATION,
             Optimization.TRANSFERS_STOP_FILTER
     ),
@@ -90,14 +91,14 @@ public enum SpeedTestProfile {
     final String shortName;
     final String description;
     final RaptorProfile raptorProfile;
-    final boolean forward;
+    final SearchDirection direction;
     final List<Optimization> optimizations;
 
-    SpeedTestProfile(String shortName, String description, RaptorProfile profile, boolean forward, Optimization... optimizations) {
+    SpeedTestProfile(String shortName, String description, RaptorProfile profile, SearchDirection direction, Optimization... optimizations) {
         this.shortName = shortName;
         this.description = description;
         this.raptorProfile = profile;
-        this.forward = forward;
+        this.direction = direction;
         this.optimizations = Arrays.asList(optimizations);
     }
 
@@ -132,21 +133,21 @@ public enum SpeedTestProfile {
     }
 
     private String description() {
-        String text = description;
+        StringBuilder text;
 
         if (name().equals(shortName)) {
-            text = String.format("%s : %s", name(), text);
+            text = new StringBuilder(String.format("%s : %s", name(), description));
         } else {
-            text = String.format("%s, %s : %s", shortName, name(), text);
+            text = new StringBuilder(String.format("%s, %s : %s", shortName, name(), description));
         }
 
         if (raptorProfile != null) {
-            text += String.format("\n·%22s%s", "", raptorProfile);
-            text += forward ? ", FORWARD" : ", REVERSE";
+            text.append(String.format("\n·%22s%s", "", raptorProfile));
+            text.append(", ").append(direction.name());
             for (Optimization it : optimizations) {
-                text += ", " + it.name();
+                text.append(", ").append(it.name());
             }
         }
-        return text;
+        return text.toString();
     }
 }

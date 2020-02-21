@@ -1,5 +1,6 @@
 package org.opentripplanner.model.routing;
 
+import java.time.Duration;
 import java.time.Instant;
 
 /**
@@ -10,10 +11,8 @@ public class TripSearchMetadata {
     /**
      * This is the time window used by the raptor search. The window is an optional parameter and
      * OTP might override it/dynamically assign a new value.
-     * <p>
-     * Unit : seconds
      */
-    public int searchWindowUsed;
+    public Duration searchWindowUsed;
 
     /**
      * This is the suggested search time for the "next page" or time window. Insert it together
@@ -32,7 +31,7 @@ public class TripSearchMetadata {
     public Instant prevDateTime;
 
 
-    public TripSearchMetadata(int searchWindowUsed, Instant prevDateTime, Instant nextDateTime) {
+    public TripSearchMetadata(Duration searchWindowUsed, Instant prevDateTime, Instant nextDateTime) {
         this.searchWindowUsed = searchWindowUsed;
         this.nextDateTime = nextDateTime;
         this.prevDateTime = prevDateTime;

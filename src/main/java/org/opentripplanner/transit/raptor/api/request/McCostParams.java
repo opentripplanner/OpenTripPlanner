@@ -17,7 +17,7 @@ public class McCostParams {
      * Default constructor defines default values.
      */
     private McCostParams() {
-        this.boardCost = 300;
+        this.boardCost = 600;
         this.walkReluctanceFactor = 4.0;
         this.waitReluctanceFactor = 1.0;
     }

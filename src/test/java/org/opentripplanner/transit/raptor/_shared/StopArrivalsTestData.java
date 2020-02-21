@@ -7,6 +7,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
 
 import java.util.Arrays;
 import java.util.List;
@@ -134,7 +135,7 @@ public class StopArrivalsTestData {
         PathLeg<TestRaptorTripSchedule> leg2 = new TransitPathLeg<>(STOP_1, T1000, STOP_2, T1035, TRIP_1, leg3);
         AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(T0953, STOP_1, T0958, leg2.asTransitLeg());
 
-        return new Path<>(leg1, T1200, 2, 600);
+        return new Path<>(leg1, T1200, 2, CostCalculator.toOtpDomainCost(6_000));
     }
 
     public static List<Integer> basicTripStops() {

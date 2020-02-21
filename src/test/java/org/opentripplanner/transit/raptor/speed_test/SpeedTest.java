@@ -11,7 +11,8 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
-import org.opentripplanner.transit.raptor.speed_test.cli.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
+import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
 import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
@@ -50,6 +51,7 @@ public class SpeedTest {
     private final AvgTimer TIMER_COLLECT_RESULTS = AvgTimer.timerMilliSec("SpeedTest: Collect Results");
 
     private final SpeedTestCmdLineOpts opts;
+    private final SpeedTestConfig config;
     private int nAdditionalTransfers;
     private SpeedTestProfile routeProfile;
     private SpeedTestProfile heuristicProfile;
@@ -66,6 +68,7 @@ public class SpeedTest {
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
         this.opts = opts;
+        this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir());
         this.transitLayer = TransitLayerMapper.map(graph);
         this.streetRouter = new EgressAccessRouter(graph, transitLayer);
@@ -175,11 +178,11 @@ public class SpeedTest {
         RaptorRequest<?> rReqUsed = null;
         int nPathsFound = 0;
         try {
-            final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, getTimeZoneId());
+            final SpeedTestRequest request = new SpeedTestRequest(testCase, opts, config, getTimeZoneId());
 
             if (opts.compareHeuristics()) {
                 TOT_TIMER.start();
-                SpeedTestRequest heurReq = new SpeedTestRequest(testCase, opts, getTimeZoneId());
+                SpeedTestRequest heurReq = new SpeedTestRequest(testCase, opts, config, getTimeZoneId());
                 compareHeuristics(heurReq, request);
                 TOT_TIMER.stop();
             } else {

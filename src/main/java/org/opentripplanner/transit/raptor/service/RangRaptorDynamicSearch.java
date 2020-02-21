@@ -10,7 +10,6 @@ import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,10 +17,14 @@ import org.slf4j.LoggerFactory;
 import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
+import java.util.stream.Collectors;
 
 import static org.opentripplanner.transit.raptor.api.request.RaptorProfile.MULTI_CRITERIA;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.FORWARD;
+import static org.opentripplanner.transit.raptor.api.request.SearchDirection.REVERSE;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 
@@ -36,11 +39,7 @@ import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.
  * to configure the "main" multi-iteration RangeRaptor search.
  */
 public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
-
     private static final Logger LOG = LoggerFactory.getLogger(RangRaptorDynamicSearch.class);
-
-    private static final boolean FORWARD = true;
-    private static final boolean REVERSE = false;
 
     private final RaptorConfig<T> config;
     private final TransitDataProvider<T> transitData;
@@ -79,7 +78,11 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             return createAndRunWorker(mcRequest);
         }
         catch (DestinationNotReachedException e) {
-            return emptyResult();
+            return new RaptorResponse<>(
+                    Collections.emptyList(),
+                    originalRequest,
+                    originalRequest
+            );
         }
     }
 
@@ -99,6 +102,8 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     /**
      * Run standard "singe-iteration" raptor search to calculate heuristics - this should be
      * really fast to run compared with a (multi-criteria) range-raptor search.
+     *
+     * @throws DestinationNotReachedException if destination is not reached.
      */
     private void runHeuristics() {
         if (isItPossibleToRunHeuristicsInParallel()) {
@@ -108,10 +113,6 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             runHeuristicsSequentially();
         }
         fwdHeuristics.debugCompareResult(revHeuristics);
-    }
-
-    private RaptorResponse<T> emptyResult() {
-        return new RaptorResponse<>(Collections.emptyList(), originalRequest, originalRequest);
     }
 
     private RaptorResponse<T> createAndRunWorker(RaptorRequest<T> mcRequest) {
@@ -144,6 +145,9 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
                 && revHeuristics.isEnabled();
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     private void runHeuristicsInParallel() {
         try {
             fwdHeuristics.withRequest(originalRequest);
@@ -166,25 +170,48 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         }
     }
 
+    /**
+     * @throws DestinationNotReachedException if destination is not reached
+     */
     private void runHeuristicsSequentially() {
-        if (originalRequest.searchParams().isEarliestDepartureTimeSet()) {
-            fwdHeuristics.withRequest(originalRequest).run();
-            calculateDynamicParametersFromHeuristics(fwdHeuristics.result());
+        List<HeuristicSearchTask<T>> tasks = listTasksInOrder();
 
-            // The request need to be injected here to allow the reverse heuristics
-            // to use a calculated LAT
-            RaptorRequest<T> request = requestForReverseHeurSearchWithDynamicSearchParams();
-            revHeuristics.withRequest(request).run();
-        }
-        else {
-            revHeuristics.withRequest(originalRequest).run();
-            calculateDynamicParametersFromHeuristics(fwdHeuristics.result());
+        if(tasks.isEmpty()) { return; }
 
-            // The request need to be injected here to allow the forward heuristics
-            // to use EDT calculated above
-            RaptorRequest<T> request = requestForForwardHeurSearchWithDynamicSearchParams();
-            fwdHeuristics.withRequest(request).run();
-        }
+        // Run the first heuristic search
+        HeuristicSearchTask<T> task;
+        task = tasks.get(0);
+        task.withRequest(originalRequest).run();
+        calculateDynamicSearchParametersFromHeuristics(task.result());
+
+        if(tasks.size() == 1) { return; }
+
+        // Run the second heuristic search
+        task = tasks.get(1);
+        RaptorRequest<T> request = task.getDirection().isForward()
+                ? requestForForwardHeurSearchWithDynamicSearchParams()
+                : requestForReverseHeurSearchWithDynamicSearchParams();
+
+        task.withRequest(request).run();
+    }
+
+    /**
+     * If the earliest-departure-time(EDT) is set, the task order should be:
+     * <ol>
+     *     <li>{@code FORWARD}</li>
+     *     <li>{@code REVERSE}</li>
+     * </ol>
+     * If not EDT is set, the latest-arrival-time is set, and the order should be the opposite,
+     * with {@code REVERSE} first
+     */
+    private List<HeuristicSearchTask<T>> listTasksInOrder() {
+        boolean performForwardFirst = originalRequest.searchParams().isEarliestDepartureTimeSet();
+
+        List<HeuristicSearchTask<T>> list = performForwardFirst
+                ? List.of(fwdHeuristics, revHeuristics)
+                : List.of(revHeuristics, fwdHeuristics);
+
+        return list.stream().filter(HeuristicSearchTask::isEnabled).collect(Collectors.toList());
     }
 
     private RaptorRequest<T> requestForForwardHeurSearchWithDynamicSearchParams() {
@@ -240,7 +267,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         return request.mutate().searchParams().stopFilter(stopFilter).build();
     }
 
-    private void calculateDynamicParametersFromHeuristics(Heuristics heuristics) {
+    private void calculateDynamicSearchParametersFromHeuristics(Heuristics heuristics) {
         if(heuristics != null) {
             dynamicSearchParamsCalculator
                     .withMinTripTime(heuristics.bestOverallJourneyTravelDuration())

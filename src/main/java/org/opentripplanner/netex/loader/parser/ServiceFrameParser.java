@@ -15,6 +15,8 @@ import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.RoutesInFrame_RelStructure;
+import org.rutebanken.netex.model.ServiceLink;
+import org.rutebanken.netex.model.ServiceLinksInFrame_RelStructure;
 import org.rutebanken.netex.model.Service_VersionFrameStructure;
 import org.rutebanken.netex.model.StopAssignmentsInFrame_RelStructure;
 import org.slf4j.Logger;
@@ -48,6 +50,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private final Map<String, String> quayIdByStopPointRef = new HashMap<>();
 
+    private final Collection<ServiceLink> serviceLinks = new ArrayList<>();
+
     private final NoticeParser noticeParser = new NoticeParser();
 
     ServiceFrameParser(ReadOnlyHierarchicalVersionMapById<Quay> quayById) {
@@ -64,6 +68,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         parseLines(frame.getLines());
         parseJourneyPatterns(frame.getJourneyPatterns());
         parseDestinationDisplays(frame.getDestinationDisplays());
+        parseServiceLinks(frame.getServiceLinks());
 
         // Keep list sorted alphabetically
         warnOnMissingMapping(LOG, frame.getAdditionalNetworks());
@@ -85,7 +90,6 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         warnOnMissingMapping(LOG, frame.getRoutingConstraintZones());
         warnOnMissingMapping(LOG, frame.getScheduledStopPoints());
         warnOnMissingMapping(LOG, frame.getServiceExclusions());
-        warnOnMissingMapping(LOG, frame.getServiceLinks());
         warnOnMissingMapping(LOG, frame.getServicePatterns());
         warnOnMissingMapping(LOG, frame.getStopAreas());
         warnOnMissingMapping(LOG, frame.getTariffZones());
@@ -111,6 +115,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         noticeParser.setResultOnIndex(index);
         index.quayIdByStopPointRef.addAll((quayIdByStopPointRef));
         index.routeById.addAll(routes);
+        index.serviceLinkById.addAll(serviceLinks);
 
         // update references
         index.networkIdByGroupOfLineId.addAll(networkIdByGroupOfLineId);
@@ -201,5 +206,11 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         if (destDisplays == null) return;
 
         this.destinationDisplays.addAll(destDisplays.getDestinationDisplay());
+    }
+
+    private void parseServiceLinks(ServiceLinksInFrame_RelStructure serviceLinks) {
+        if (serviceLinks == null) return;
+
+        this.serviceLinks.addAll(serviceLinks.getServiceLink());
     }
 }

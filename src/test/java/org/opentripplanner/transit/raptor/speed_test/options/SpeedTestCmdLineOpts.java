@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.speed_test.cli;
+package org.opentripplanner.transit.raptor.speed_test.options;
 
 import org.apache.commons.cli.CommandLine;
 import org.apache.commons.cli.CommandLineParser;
@@ -95,35 +95,7 @@ public class SpeedTestCmdLineOpts {
         return 0;
     }
 
-    private Options options() {
-        Options options = new Options();
-
-        // General options
-        options.addOption(HELP, "help", false, "Print all command line options, then exit. (Optional)");
-        options.addOption(VERBOSE, "verbose", false, "Verbose output, print itineraries.");
-        options.addOption(ROOT_DIR, "dir", true, "The directory where network and input files are located. (Optional)");
-
-        // Search options
-        options.addOption(PROFILES, "profiles", true, "A coma separated list of configuration profiles:\n" + String.join("\n", SpeedTestProfile.options()));
-        options.addOption(TEST_CASES, "testCases", true, "A coma separated list of test case ids to run.");
-        options.addOption(SAMPLE_TEST_N_TIMES, "sampleTestNTimes", true, "Repeat the test N times. Profiles are altered in a round robin fashion.");
-        options.addOption(NUM_OF_ADD_TRANSFERS, "nExtraTransfers", true, "The maximum number of extra transfers allowed relative to the path with the fewest transfers.");
-
-        // Result options
-        options.addOption(NUM_OF_ITINERARIES, "numOfItineraries", true, "Number of itineraries to return.");
-        options.addOption(COMPARE_HEURISTICS, "compare", false, "Compare heuristics for the listed profiles. The 1st profile is compared with 2..n listed profiles.");
-
-        // Debug options
-        options.addOption(DEBUG, "debug", false, "Enable debug info.");
-        options.addOption(DEBUG_STOPS, "debugStops", true, "A coma separated list of stops to debug.");
-        options.addOption(DEBUG_PATH, "debugPath", true, "A coma separated list of stops representing a trip/path to debug. " +
-                "Use a '*' to indicate where to start debugging. For example '1,*2,3' will print event at stop 2 and 3, " +
-                "but not stop 1 for all trips starting with the given stop sequence.");
-        options.addOption(DEBUG_REQUEST, "debugRequest", false, "Debug request.");
-        return options;
-    }
-
-   public boolean verbose() {
+    public boolean verbose() {
         return cmd.hasOption(VERBOSE);
     }
 
@@ -152,6 +124,34 @@ public class SpeedTestCmdLineOpts {
     public List<String> testCaseIds() {
         return parseCSVList(TEST_CASES);
     }
+
+    private Options options() {
+        Options options = new Options();
+
+        // General options
+        options.addOption(HELP, "help", false, "Print all command line options, then exit. (Optional)");
+        options.addOption(VERBOSE, "verbose", false, "Verbose output, print itineraries.");
+        options.addOption(ROOT_DIR, "dir", true, "The directory where network and input files are located. (Optional)");
+
+        // Search options
+        options.addOption(PROFILES, "profiles", true, "A coma separated list of configuration profiles:\n" + String.join("\n", SpeedTestProfile.options()));
+        options.addOption(TEST_CASES, "testCases", true, "A coma separated list of test case ids to run.");
+        options.addOption(SAMPLE_TEST_N_TIMES, "sampleTestNTimes", true, "Repeat the test N times. Profiles are altered in a round robin fashion.");
+        options.addOption(NUM_OF_ADD_TRANSFERS, "nExtraTransfers", true, "The maximum number of extra transfers allowed relative to the path with the fewest transfers.");
+
+        // Result options
+        options.addOption(NUM_OF_ITINERARIES, "numOfItineraries", true, "Number of itineraries to return.");
+        options.addOption(COMPARE_HEURISTICS, "compare", false, "Compare heuristics for the listed profiles. The 1st profile is compared with 2..n listed profiles.");
+
+        // Debug options
+        options.addOption(DEBUG, "debug", false, "Enable debug info.");
+        options.addOption(DEBUG_STOPS, "debugStops", true, "A coma separated list of stops to debug.");
+        options.addOption(DEBUG_PATH, "debugPath", true, "A coma separated list of stops representing a trip/path to debug. " +
+                "Use a '*' to indicate where to start debugging. For example '1,*2,3' will print event at stop 2 and 3, " +
+                "but not stop 1 for all trips starting with the given stop sequence.");
+        options.addOption(DEBUG_REQUEST, "debugRequest", false, "Debug request.");
+        return options;
+   }
 
     List<String> parseCSVList(String opt) {
         return cmd.hasOption(opt)
