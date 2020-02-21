@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.RaptorSearchWindowCalculator;
+import org.opentripplanner.transit.raptor.service.RaptorSearchWindowCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.SearchContext;
 import org.opentripplanner.transit.raptor.service.WorkerPerformanceTimersCache;
 

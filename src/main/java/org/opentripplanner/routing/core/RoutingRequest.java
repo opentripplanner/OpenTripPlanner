@@ -899,10 +899,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
-    public void setSearchWindowSeconds(int searchWindowInSeconds) {
-        this.searchWindow = Duration.ofSeconds(searchWindowInSeconds);
-    }
-
     public int getNumItineraries() {
         if (modes.isTransit()) {
             return numItineraries;

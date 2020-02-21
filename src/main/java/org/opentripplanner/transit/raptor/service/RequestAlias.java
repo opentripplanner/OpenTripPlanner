@@ -7,7 +7,7 @@ public class RequestAlias {
         boolean multithreaded = serviceMultithreaded && request.runInParallel();
         String alias = request.profile().abbreviation();
 
-        if (request.searchInReverse()) {
+        if (request.searchDirection().isInReverse()) {
             alias += "-Rev";
         }
         if (multithreaded) {
