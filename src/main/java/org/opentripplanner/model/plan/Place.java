@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.util.Constants;
 import org.opentripplanner.util.CoordinateUtils;
 
@@ -52,7 +53,9 @@ public class Place {
      * The time the rider will depart the place.
      */
     public Calendar departure = null;
+
     public String orig;
+
     public String zoneId;
 
     /**
@@ -112,31 +115,19 @@ public class Place {
 
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        toStringAdd(sb, "name", name);
-        toStringAdd(sb, "stopId", stopId);
-        toStringAdd(sb, "stopCode", stopCode);
-        toStringAdd(sb, "platformCode", platformCode);
-        toStringAdd(sb, "lon", lon);
-        toStringAdd(sb, "lat", lat);
-        toStringAdd(sb, "arrival", arrival);
-        toStringAdd(sb, "departure", departure);
-        toStringAdd(sb, "orig", orig);
-        toStringAdd(sb, "zoneId", zoneId);
-        toStringAdd(sb, "stopIndex", stopIndex);
-        toStringAdd(sb, "stopSequence", stopSequence);
-        toStringAdd(sb, "vertexType", vertexType);
-        toStringAdd(sb, "bikeShareId", bikeShareId);
-
-        return "Place{" + (sb.length() > 0 ? sb.substring(2) : "") + "}";
+        return new ToStringBuilder(Place.class)
+                .addStr("name", name)
+                .addObj("stopId", stopId)
+                .addStr("stopCode", stopCode)
+                .addStr("platformCode", platformCode)
+                .addCoordinate("lon", lon)
+                .addCoordinate("lat", lat)
+                .addStr("orig", orig)
+                .addStr("zoneId", zoneId)
+                .addNum("stopIndex", stopIndex)
+                .addNum("stopSequence", stopSequence)
+                .addEnum("vertexType", vertexType)
+                .addStr("bikeShareId", bikeShareId)
+                .toString();
     }
-    private static void toStringAdd(StringBuilder sb, String name, String value) {
-        if(value == null) { return; }
-        sb.append(", ").append(name).append("='").append(value).append("'");
-    }
-    private static void toStringAdd(StringBuilder sb, String name, Object value) {
-        if(value == null) { return; }
-        sb.append(", ").append(name).append("=").append(value);
-    }
-
 }
