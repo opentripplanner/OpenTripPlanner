@@ -5,8 +5,6 @@ import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.util.Constants;
 import org.opentripplanner.util.CoordinateUtils;
 
-import java.util.Calendar;
-
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
 */ 
@@ -44,16 +42,6 @@ public class Place {
      */
     public Double lat = null;
 
-    /**
-     * The time the rider will arrive at the place.
-     */
-    public Calendar arrival = null;
-
-    /**
-     * The time the rider will depart the place.
-     */
-    public Calendar departure = null;
-
     public String orig;
 
     public String zoneId;
@@ -86,12 +74,6 @@ public class Place {
         this.lat = lat;
         this.name = name;
         this.vertexType = VertexType.NORMAL;
-    }
-
-    public Place(Double lon, Double lat, String name, Calendar arrival, Calendar departure) {
-        this(lon, lat, name);
-        this.arrival = arrival;
-        this.departure = departure;
     }
 
     /**

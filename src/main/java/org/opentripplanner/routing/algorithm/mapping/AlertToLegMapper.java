@@ -4,6 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.graph.Graph;
@@ -49,11 +50,12 @@ public class AlertToLegMapper {
                 addAlertPatchesToLeg(leg, StopCondition.ARRIVING, alerts, requestedLocale, legStartTime, legEndTime);
             }
             if (leg.intermediateStops != null) {
-                for (Place place : leg.intermediateStops) {
+                for (StopArrival visit : leg.intermediateStops) {
+                    Place place = visit.place;
                     if (place.stopId != null) {
                         Collection<AlertPatch> alerts = getAlertsForStopAndTrip(graph, place.stopId, leg.tripId);
-                        Date stopArrival = place.arrival.getTime();
-                        Date stopDepature = place.departure.getTime();
+                        Date stopArrival = visit.arrival.getTime();
+                        Date stopDepature = visit.departure.getTime();
                         addAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
                     }
                 }
@@ -61,11 +63,12 @@ public class AlertToLegMapper {
         }
 
         if (leg.intermediateStops != null) {
-            for (Place place : leg.intermediateStops) {
+            for (StopArrival visit : leg.intermediateStops) {
+                Place place = visit.place;
                 if (place.stopId != null) {
                     Collection<AlertPatch> alerts = getAlertsForStop(graph, place.stopId);
-                    Date stopArrival = place.arrival.getTime();
-                    Date stopDepature = place.departure.getTime();
+                    Date stopArrival = visit.arrival.getTime();
+                    Date stopDepature = visit.departure.getTime();
                     addAlertPatchesToLeg(leg, StopCondition.PASSING, alerts, requestedLocale, stopArrival, stopDepature);
                 }
             }

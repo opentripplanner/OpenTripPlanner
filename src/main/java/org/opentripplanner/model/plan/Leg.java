@@ -172,7 +172,7 @@ public class Leg {
      * always {@code null} unless {@code showIntermediateStops} parameter is set to "true" in the
      * planner request.
      */
-    public List<Place> intermediateStops;
+    public List<StopArrival> intermediateStops;
 
    /**
     * The leg's geometry.

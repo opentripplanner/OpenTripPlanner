@@ -56,6 +56,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
+import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.routing.TripSearchMetadata;
@@ -3977,14 +3978,14 @@ public class TransmodelIndexGraphQLSchema {
                         .description("For ride legs, intermediate quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list.")
                         .type(new GraphQLNonNull(new GraphQLList(quayType)))
                         .dataFetcher(environment -> {
-                                List<Place> stops = ((Leg) environment.getSource()).intermediateStops;
+                                List<StopArrival> stops = ((Leg) environment.getSource()).intermediateStops;
                                 if (stops == null) {
                                     return new ArrayList<>();
                                 }
                                 else {
                                     return (stops.stream()
-                                            .filter(place -> place.stopId != null)
-                                            .map(placeWithStop -> index.stopForId.get(placeWithStop.stopId))
+                                            .filter(v -> v.place.stopId != null)
+                                            .map(s -> index.stopForId.get(s.place.stopId))
                                             .filter(Objects::nonNull)
                                             .collect(Collectors.toList()));
                                 }
