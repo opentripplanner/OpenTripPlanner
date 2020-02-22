@@ -74,19 +74,11 @@ public class UnifiedGridCoverage extends AbstractCoverage {
             // Found a match for coverage/datum.
             DatumRegion datumRegion = coverageCandidates.get(0);
             double[] result;
-            try {
-                result = datumRegion.region.evaluate(point, values);
-                result[0] += datumRegion.datum.interpolatedHeight(x, y);
-                return result;
-            } catch (PointOutsideCoverageException e) {
-                /* not found */
-                log.debug("Point not found: " + point);
-                return null;
-            }
+            result = datumRegion.region.evaluate(point, values);
+            result[0] += datumRegion.datum.interpolatedHeight(x, y);
+            return result;
         }
-        /* not found */
-        log.debug("Point not found: " + point);
-        return null;
+        throw new PointOutsideCoverageException("Point not found: " + point);
     }
     
     @Override

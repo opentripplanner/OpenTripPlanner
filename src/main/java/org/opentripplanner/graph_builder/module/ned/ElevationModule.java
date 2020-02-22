@@ -7,6 +7,7 @@ import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.geotools.referencing.CRS;
 import org.opengis.coverage.Coverage;
+import org.opengis.coverage.PointOutsideCoverageException;
 import org.opengis.referencing.FactoryException;
 import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
@@ -431,64 +432,69 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         // did not find a cached value, calculate
+        // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
+        // process the elevation on the edge
+        try {
+            Coordinate[] coords = g.getCoordinates();
 
-        Coordinate[] coords = g.getCoordinates();
+            List<Coordinate> coordList = new LinkedList<Coordinate>();
 
-        List<Coordinate> coordList = new LinkedList<Coordinate>();
+            // initial sample (x = 0)
+            coordList.add(new Coordinate(0, getElevation(coords[0])));
 
-        // initial sample (x = 0)
-        coordList.add(new Coordinate(0, getElevation(coords[0])));
+            // iterate through coordinates calculating the edge length and creating intermediate elevation coordinates at
+            // the regularly specified interval
+            double edgeLenM = 0;
+            double sampleDistance = distanceBetweenSamplesM;
+            double previousDistance = 0;
+            double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
+            for (int i = 0; i < coords.length - 1; i++) {
+                x2 = coords[i + 1].x;
+                y2 = coords[i + 1].y;
+                double curSegmentDistance = SphericalDistanceLibrary.distance(y1, x1, y2, x2);
+                edgeLenM += curSegmentDistance;
+                while (edgeLenM > sampleDistance) {
+                    // if current edge length is longer than the current sample distance, insert new elevation coordinates
+                    // as needed until sample distance has caught up
 
-        // iterate through coordinates calculating the edge length and creating intermediate elevation coordinates at
-        // the regularly specified interval
-        double edgeLenM = 0;
-        double sampleDistance = distanceBetweenSamplesM;
-        double previousDistance = 0;
-        double x1 = coords[0].x, y1 = coords[0].y, x2, y2;
-        for (int i = 0; i < coords.length - 1; i++) {
-            x2 = coords[i + 1].x;
-            y2 = coords[i + 1].y;
-            double curSegmentDistance = SphericalDistanceLibrary.distance(y1, x1, y2, x2);
-            edgeLenM += curSegmentDistance;
-            while (edgeLenM > sampleDistance) {
-                // if current edge length is longer than the current sample distance, insert new elevation coordinates
-                // as needed until sample distance has caught up
-
-                // calculate percent of current segment that distance is between
-                double pctAlongSeg = (sampleDistance - previousDistance) / curSegmentDistance;
-                // add an elevation coordinate
-                coordList.add(
-                    new Coordinate(
-                        sampleDistance,
-                        getElevation(
-                            new Coordinate(
-                                x1 + (pctAlongSeg * (x2 - x1)),
-                                y1 + (pctAlongSeg * (y2 - y1))
+                    // calculate percent of current segment that distance is between
+                    double pctAlongSeg = (sampleDistance - previousDistance) / curSegmentDistance;
+                    // add an elevation coordinate
+                    coordList.add(
+                        new Coordinate(
+                            sampleDistance,
+                            getElevation(
+                                new Coordinate(
+                                    x1 + (pctAlongSeg * (x2 - x1)),
+                                    y1 + (pctAlongSeg * (y2 - y1))
+                                )
                             )
                         )
-                    )
-                );
-                sampleDistance += distanceBetweenSamplesM;
+                    );
+                    sampleDistance += distanceBetweenSamplesM;
+                }
+                previousDistance = edgeLenM;
+                x1 = x2;
+                y1 = y2;
             }
-            previousDistance = edgeLenM;
-            x1 = x2;
-            y1 = y2;
+
+            // remove final-segment sample if it is less than half the distance between samples
+            if (edgeLenM - coordList.get(coordList.size() - 1).x < distanceBetweenSamplesM / 2) {
+                coordList.remove(coordList.size() - 1);
+            }
+
+            // final sample (x = edge length)
+            coordList.add(new Coordinate(edgeLenM, getElevation(coords[coords.length - 1])));
+
+            // construct the PCS
+            Coordinate coordArr[] = new Coordinate[coordList.size()];
+            PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
+                    coordList.toArray(coordArr));
+
+            setEdgeElevationProfile(ee, elevPCS, graph);
+        } catch (PointOutsideCoverageException | TransformException e) {
+            log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
-
-        // remove final-segment sample if it is less than half the distance between samples
-        if (edgeLenM - coordList.get(coordList.size() - 1).x < distanceBetweenSamplesM / 2) {
-            coordList.remove(coordList.size() - 1);
-        }
-
-        // final sample (x = edge length)
-        coordList.add(new Coordinate(edgeLenM, getElevation(coords[coords.length - 1])));
-
-        // construct the PCS
-        Coordinate coordArr[] = new Coordinate[coordList.size()];
-        PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
-                coordList.toArray(coordArr));
-
-        setEdgeElevationProfile(ee, elevPCS, graph);
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
@@ -505,7 +511,7 @@ public class ElevationModule implements GraphBuilderModule {
      * @param c the coordinate (NAD83)
      * @return elevation in meters
      */
-    private double getElevation(Coordinate c) {
+    private double getElevation(Coordinate c) throws PointOutsideCoverageException, TransformException {
         return getElevation(c.x, c.y);
     }
 
@@ -516,7 +522,7 @@ public class ElevationModule implements GraphBuilderModule {
      * @param y the query latitude (NAD83)
      * @return elevation in meters
      */
-    private double getElevation(double x, double y) {
+    private double getElevation(double x, double y) throws PointOutsideCoverageException, TransformException {
         double values[] = new double[1];
         try {
             // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
@@ -528,8 +534,9 @@ public class ElevationModule implements GraphBuilderModule {
             DirectPosition2D transformedPosition = new DirectPosition2D();
             transformer.transform(projectedPosition, transformedPosition);
             coverage.evaluate(transformedPosition, values);
-        } catch (org.opengis.coverage.PointOutsideCoverageException | TransformException e) {
+        } catch (PointOutsideCoverageException | TransformException e) {
             nPointsOutsideDEM.incrementAndGet();
+            throw e;
         }
         nPointsEvaluated.incrementAndGet();
         return values[0] * elevationUnitMultiplier;
