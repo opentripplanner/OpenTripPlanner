@@ -88,7 +88,7 @@ public class ConfigLoader {
      * @see #loadJsonFile for more details.
      */
     public OtpConfig loadOtpConfig() {
-        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME));
+        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME);
     }
 
     /**
@@ -104,7 +104,6 @@ public class ConfigLoader {
         if(node.isMissingNode()) {
             return GraphBuildParameters.DEFAULT;
         }
-        LOG.info("Summarizing GraphBuildParameters: {}", node.toPrettyString());
         return new GraphBuildParameters(node, BUILD_CONFIG_FILENAME);
     }
 
@@ -119,7 +118,6 @@ public class ConfigLoader {
         if(node.isMissingNode()) {
             return RouterConfigParams.DEFAULT;
         }
-        LOG.info("Summarizing RouterConfigParams: {}", node.toPrettyString());
         return new RouterConfigParams(node, ROUTER_CONFIG_FILENAME);
     }
 
@@ -162,7 +160,8 @@ public class ConfigLoader {
             );
             JsonNode node = stringToJsonNode(configString, file.toString());
 
-            LOG.info("Found and loaded JSON configuration file '{}'", file.getPath());
+            LOG.info("Load JSON configuration file '{}'", file.getPath());
+            LOG.info("Summarizing '{}': {}", file.getPath(), node.toPrettyString());
             return node;
         }
         catch (FileNotFoundException ex) {
@@ -192,7 +191,7 @@ public class ConfigLoader {
             return mapper.readTree(jsonAsString);
         }
         catch (IOException ie) {
-            LOG.error("Error while parsing JSON config '{}': {}", source, ie.getMessage());
+            LOG.error("Error while parsing config '{}'.", source, ie);
             throw new OtpAppException("Failed to load config: " + source);
         }
     }

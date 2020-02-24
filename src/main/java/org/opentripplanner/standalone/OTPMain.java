@@ -133,7 +133,6 @@ public class OTPMain {
         if (params.visualize) {
             router.graphVisualizer = new GraphVisualizer(router);
             router.graphVisualizer.run();
-            router.timeouts = new double[] {60}; // avoid timeouts due to search animation
         }
 
         /* Start web server if requested. */

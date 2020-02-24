@@ -21,7 +21,7 @@ import java.util.List;
  * Example {@code build-config.json}:
  * <pre>
  * {
- *     htmlAnnotations: true,
+ *     osmWayPropertySet: "norway",
  *     storage: {
  *         gsCredentials: "${OTP_GOOGLE_SERVICE_ACCOUNT}",
  *         osm: [ "gs://otp-test-bucket/a/b/osm-oslo-mini.pbf" ],
@@ -119,7 +119,7 @@ public class StorageParameters {
      * <p>
      * Example: {@code "osm" : "file:///Users/kelvin/otp/buildReport" }
      * <p>
-     * This parameter is optional. Default is {@code null}.
+     * This parameter is optional. Default is {@code null} in witch case the report is skipped.
      */
     public final URI buildReportDir;
 

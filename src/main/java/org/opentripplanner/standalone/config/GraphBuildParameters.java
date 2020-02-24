@@ -9,6 +9,8 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.Period;
@@ -27,6 +29,8 @@ import java.time.Period;
  * is the build configuration and the other is the router configuration.
  */
 public class GraphBuildParameters {
+    private static final Logger LOG = LoggerFactory.getLogger(GraphBuildParameters.class);
+
     public static final GraphBuildParameters DEFAULT = new GraphBuildParameters(MissingNode.getInstance(), "DEFAULT");
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
@@ -43,7 +47,7 @@ public class GraphBuildParameters {
     public final boolean dataImportReport;
 
     /**
-     * If the number of issues is larger then {@link #maxDataImportIssuesPerFile}, then the files
+     * If the number of issues is larger then {@code #maxDataImportIssuesPerFile}, then the files
      * will be split in multiple files. Since browsers have problems opening large HTML files.
      */
     public final int maxDataImportIssuesPerFile;
@@ -299,6 +303,8 @@ public class GraphBuildParameters {
 
         netex = new NetexParameters(c.path("netex"));
         storage = new StorageParameters(c.path("storage"));
+
+        c.logUnusedParameters(LOG);
     }
 
     /**

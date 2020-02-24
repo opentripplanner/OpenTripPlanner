@@ -218,18 +218,6 @@ public class Graph implements Serializable {
     public boolean hasScheduledService = false;
 
     /**
-     * Has information how much time boarding a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> boardTimes = Collections.emptyMap();
-
-    /**
-     * Has information how much time alighting a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> alightTimes = Collections.emptyMap();
-
-    /**
      * The difference in meters between the WGS84 ellipsoid height and geoid height
      * at the graph's center
      */

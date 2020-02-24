@@ -31,7 +31,6 @@ public class Router {
     public final Graph graph;
     private final RouterConfigParams config;
     public final RaptorConfig<TripSchedule> raptorConfig;
-    public double[] timeouts = {5, 4, 2};
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger
@@ -69,9 +68,7 @@ public class Router {
     public void startup() {
 
         this.tileRendererManager = new TileRendererManager(this.graph);
-        this.defaultRoutingRequest = config.routingDefaults();
-        this.timeouts = config.timeouts(this.timeouts);
-        LOG.info("Timeouts: {}", this.timeouts);
+        this.defaultRoutingRequest = config.routingRequestDefaults;
 
         if (config.requestLogFile != null) {
             this.requestLogger = createLogger(config.requestLogFile);
@@ -79,9 +76,6 @@ public class Router {
         } else {
             LOG.info("Incoming requests will not be logged.");
         }
-
-        graph.boardTimes = config.boardTimes();
-        graph.alightTimes = config.alightTimes();
 
         /* Create transit layer for Raptor routing. Here we map the scheduled timetables. */
         /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
@@ -139,4 +133,7 @@ public class Router {
         return logger;
     }
 
+    public double streetRoutingTimeoutSeconds() {
+        return config.streetRoutingTimeoutSeconds;
+    }
 }

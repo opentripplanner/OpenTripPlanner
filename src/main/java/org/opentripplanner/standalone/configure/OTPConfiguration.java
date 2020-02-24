@@ -8,7 +8,6 @@ import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.GraphBuildParameters;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfigParams;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,9 +44,6 @@ public class OTPConfiguration {
     private final CommandLineParameters cli;
     private final OtpConfig otpConfig;
     private final GraphBuildParameters buildConfig;
-
-    // TODO OTP2 - Make a POJO wrapper around the router config to encapsulate the JSON
-    //           - node handling
     private RouterConfigParams routerConfig;
 
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
@@ -93,6 +89,13 @@ public class OTPConfiguration {
     }
 
     /**
+     * Get the otp config as a type safe java bean.
+     */
+    public OtpConfig otpConfig() {
+        return otpConfig;
+    }
+
+    /**
      * Get the graph build config as a java bean - type safe.
      */
     public GraphBuildParameters buildConfig() {
@@ -122,15 +125,5 @@ public class OTPConfiguration {
      */
     public OtpDataStoreConfig createDataStoreConfig() {
         return new OtpDataStoreConfigAdapter(cli.getBaseDirectory(), buildConfig().storage);
-    }
-
-    /**
-     * When the OTP server start, this method check the settings in the 'otp-config.json'
-     * to determine if a {@link OTPFeature} is on/off/[not set]. If [no set] {@code null}
-     * is returned.
-     */
-    public Boolean isFeatureEnabled(OTPFeature feature) {
-        // delegate to OTP config
-        return otpConfig.isFeatureEnabled(feature);
     }
 }

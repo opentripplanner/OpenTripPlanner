@@ -8,7 +8,7 @@ import org.opentripplanner.standalone.config.ConfigLoader;
 import org.opentripplanner.standalone.config.GraphBuildParameters;
 
 public class GraphBuildParametersSerializer extends Serializer<GraphBuildParameters> {
-    public static final String SOURCE = "Serialized Graph";
+    public static final String SOURCE = "SerializedGraph";
 
     @Override
     public void write(Kryo kryo, Output output, GraphBuildParameters object) {
