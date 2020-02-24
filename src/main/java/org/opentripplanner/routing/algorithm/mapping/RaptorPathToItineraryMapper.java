@@ -291,7 +291,9 @@ public class RaptorPathToItineraryMapper {
                 // TODO OTP2 We use the duration initially calculated for use during routing
                 //      because they do not always match up and we risk getting negative wait times
                 //      (#2955)
-                subItinerary.nonTransitTimeSeconds = pathLeg.duration();
+                assert(subItinerary.legs.size() == 1);
+                subItinerary.legs.get(0).startTime = createCalendar(pathLeg.fromTime());
+                subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
 
                 if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
                     legs.addAll(subItinerary.legs);
