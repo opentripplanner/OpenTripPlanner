@@ -1,7 +1,6 @@
-package org.opentripplanner.common.model;
+package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.model.FeedScopedId;
 
 /**
  * Represents a location that is to be used in a routing request. It can be either a from, to, or

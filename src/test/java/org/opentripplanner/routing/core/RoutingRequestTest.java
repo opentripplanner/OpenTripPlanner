@@ -3,9 +3,9 @@ package org.opentripplanner.routing.core;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.model.GenericLocation;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
