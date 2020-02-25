@@ -7,6 +7,7 @@ import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.server.Router;
@@ -66,9 +67,8 @@ public class PlannerResource extends RoutingResource {
             request.setRoutingContext(router.graph);
 
             // Route
-            RoutingWorker worker = new RoutingWorker(request);
-
-            res = worker.route(router);
+            RoutingService routingService = new RoutingService(router.graph);
+            res = routingService.route(request, router);
 
             // Map to API
             TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
@@ -82,8 +82,9 @@ public class PlannerResource extends RoutingResource {
         }
         catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass()))
+            if(!PlannerError.isPlanningError(e.getClass())) {
                 LOG.warn("Error while planning path: ", e);
+            }
             response.setError(error);
         } finally {
             if (request != null) {

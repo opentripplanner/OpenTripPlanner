@@ -26,7 +26,6 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.DoubleStream;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
 @Path("/routers/{routerId}/transmodel/index")    // It would be nice to get rid of the final /index.
@@ -56,8 +55,7 @@ public class TransmodelIndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
+    public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
         if (queryParameters==null || !queryParameters.containsKey("query")) {
             LOG.debug("No query found in body");
             return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("No query found in body").build();
@@ -78,22 +76,20 @@ public class TransmodelIndexAPI {
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse(query, router, variables, operationName, finalTimeout, maxResolves);
+        return index.getGraphQLResponse(query, router, variables, operationName, maxResolves);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL(String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
-        return index.getGraphQLResponse(query, router, null, null, finalTimeout, maxResolves);
+    public Response getGraphQL(String query, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
+        return index.getGraphQLResponse(query, router, null, null, maxResolves);
     }
 
     @POST
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphQLBatch(List<HashMap<String, Object>> queries, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
         List<Map<String, Object>> responses = new ArrayList<>();
         List<Callable<Map>> futures = new ArrayList();
 
@@ -113,7 +109,7 @@ public class TransmodelIndexAPI {
             String operationName = (String) query.getOrDefault("operationName", null);
 
             futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,
-                    variables, operationName, finalTimeout, maxResolves));
+                    variables, operationName, maxResolves));
         }
 
         try {
@@ -130,16 +126,4 @@ public class TransmodelIndexAPI {
         }
         return Response.status(Response.Status.OK).entity(responses).build();
     }
-
-    private int checkTimeout(int timeout) {
-        if (router.timeouts.length > 0) {
-            int newTimeout = (int) Math.floor(DoubleStream.of(router.timeouts).sum() + 5) * 1000;
-            if (newTimeout > timeout) {
-                LOG.debug("Timeout set to sum of router config timeouts. Sum: {}. Old timeout: {}", newTimeout, timeout);
-                timeout = newTimeout;
-            }
-        }
-        return timeout;
-    }
-
 }

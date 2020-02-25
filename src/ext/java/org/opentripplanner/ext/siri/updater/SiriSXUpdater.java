@@ -5,6 +5,7 @@ import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -90,7 +91,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
         blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
 
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
 
         requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 

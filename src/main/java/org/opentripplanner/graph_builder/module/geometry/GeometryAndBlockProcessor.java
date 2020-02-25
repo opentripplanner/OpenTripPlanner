@@ -109,7 +109,7 @@ public class GeometryAndBlockProcessor {
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
-            graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
+            graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
         }
 
         LOG.info("Processing geometries and blocks on graph...");
@@ -151,7 +151,7 @@ public class GeometryAndBlockProcessor {
                 // Make a single unified geometry, and also store the per-hop split geometries.
                 tripPattern.setHopGeometries(hopGeometries);
             }
-            tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+            tripPattern.setServiceCodes(graph.getServiceCodes()); // TODO this could be more elegant
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
             graph.tripPatternForId.put(tripPattern.getCode(), tripPattern);

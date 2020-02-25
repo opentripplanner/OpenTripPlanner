@@ -27,6 +27,7 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -47,6 +48,7 @@ import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
@@ -58,6 +60,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.OtpAppException;
@@ -74,6 +78,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -88,6 +93,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -141,7 +148,7 @@ public class Graph implements Serializable {
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
+    private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
@@ -165,10 +172,10 @@ public class Graph implements Serializable {
     private Coordinate center = null;
 
     /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public String buildConfig = null;
+    public BuildConfig buildConfig = BuildConfig.DEFAULT;
 
     /** Embed a router configuration inside the graph, for starting up with a single file. */
-    public String routerConfig = null;
+    public RouterConfig routerConfig = RouterConfig.DEFAULT;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
@@ -214,18 +221,6 @@ public class Graph implements Serializable {
      * exact_times = 1).
      */
     public boolean hasScheduledService = false;
-
-    /**
-     * Has information how much time boarding a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
-
-    /**
-     * Has information how much time alighting a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
 
     /**
      * The difference in meters between the WGS84 ellipsoid height and geoid height
@@ -286,9 +281,7 @@ public class Graph implements Serializable {
     }
 
     // Constructor for deserialization.
-    public Graph() {
-
-    }
+    public Graph() { }
 
     public TimetableSnapshot getTimetableSnapshot() {
         return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();
@@ -1000,4 +993,102 @@ public class Graph implements Serializable {
         return alertPatchService;
     }
 
+    private Collection<Stop> getStopsForId(FeedScopedId id) {
+
+        // GroupOfStations
+        GroupOfStations groupOfStations = groupOfStationsById.get(id);
+        if (groupOfStations != null) {
+            return groupOfStations.getChildStops();
+        }
+
+        // Multimodal station
+        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return multiModalStation.getChildStops();
+        }
+
+        // Station
+        Station station = stationById.get(id);
+        if (station != null) {
+            return station.getChildStops();
+        }
+        // Single stop
+        Stop stop = index.getStopForId().get(id);
+        if (stop != null) {
+            return Collections.singleton(stop);
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+     * @return The associated TransitStopVertex or all underlying TransitStopVertices
+     */
+    public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+        Collection<Stop> stops = getStopsForId(id);
+
+        if (stops == null) {
+            return null;
+        }
+
+        return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
+    }
+
+    /** An OBA Service Date is a local date without timezone, only year month and day. */
+    public BitSet getServicesRunningForDate(ServiceDate date) {
+        BitSet services = new BitSet(calendarService.getServiceIds().size());
+        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
+            int n = serviceCodes.get(serviceId);
+            if (n < 0) continue;
+            services.set(n);
+        }
+        return services;
+    }
+
+    public BikeRentalStationService getBikerentalStationService() {
+        return getService(BikeRentalStationService.class);
+    }
+
+    public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
+        Collection<Notice> res = getNoticesByElement().get(entity);
+        return res == null ? Collections.emptyList() : res;
+    }
+
+    public TripPattern getTripPatternForId(String id) {
+        return tripPatternForId.get(id);
+    }
+
+    public Collection<TripPattern> getTripPatterns() {
+        return tripPatternForId.values();
+    }
+
+    public Collection<Notice> getNotices() {
+        return getNoticesByElement().values();
+    }
+
+    public Collection<Stop> getStopsByBoundingBox(Envelope envelope) {
+        return streetIndex
+            .getTransitStopForEnvelope(envelope)
+            .stream()
+            .map(TransitStopVertex::getStop)
+            .collect(Collectors.toList());
+    }
+
+    public Station getStationById(FeedScopedId id) {
+        return stationById.get(id);
+    }
+
+    public Collection<Station> getStations() {
+        return stationById.values();
+    }
+
+    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
+        return multiModalStationById.get(feedScopedId);
+    }
+
+    public Map<FeedScopedId, Integer> getServiceCodes() {
+        return serviceCodes;
+    }
 }

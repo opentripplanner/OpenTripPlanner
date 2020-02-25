@@ -13,7 +13,8 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
     public static <T extends RaptorTripSchedule> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeRoundAndCost() {
-        // This is important with respect to performance. Using logical OR(||) is faster than boolean OR(|)
+        // This is important with respect to performance. Using the short-circuit logical OR(||) is
+        // faster than bitwise inclusive OR(|) (even between boolean expressions)
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound || l.cost < r.cost;
     }
 

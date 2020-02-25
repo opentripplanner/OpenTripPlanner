@@ -899,10 +899,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         setDateTime(dateObject);
     }
 
-    public void setSearchWindowSeconds(int searchWindowInSeconds) {
-        this.searchWindow = Duration.ofSeconds(searchWindowInSeconds);
-    }
-
     public int getNumItineraries() {
         if (modes.isTransit()) {
             return numItineraries;
@@ -1138,22 +1134,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (modes.getWalk())
             return walkBoardCost;
         return bikeBoardCost;
-    }
-
-    /**
-     * @return The time it actually takes to board a vehicle. Could be significant eg. on airplanes and ferries
-     */
-    public int getBoardTime(TraverseMode transitMode) {
-        Integer i = this.rctx.graph.boardTimes.get(transitMode);
-        return i == null ? 0 : i;
-    }
-
-    /**
-     * @return The time it actually takes to alight a vehicle. Could be significant eg. on airplanes and ferries
-     */
-    public int getAlightTime(TraverseMode transitMode) {
-        Integer i = this.rctx.graph.alightTimes.get(transitMode);
-        return i == null ? 0 : i;
     }
 
     private String getRouteOrAgencyStr(HashSet<String> strings) {

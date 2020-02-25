@@ -3,7 +3,6 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
 import org.opentripplanner.model.plan.Itinerary;
@@ -49,7 +48,8 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index();
-            Router router = ConstantsForTests.forTestGraph(graph);
+            Router router = new Router(graph);
+            router.startup();
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();
         } catch (Exception e) {
@@ -187,20 +187,18 @@ public class TestIntermediatePlaces {
         Calendar departTime = Calendar.getInstance(timeZone);
         Calendar arriveTime = Calendar.getInstance(timeZone);
         if (request.arriveBy) {
-            departTime = itinerary.legs.get(0).from.departure;
+            departTime = itinerary.legs.get(0).startTime;
             arriveTime.setTimeInMillis(request.dateTime * 1000);
         } else {
             departTime.setTimeInMillis(request.dateTime * 1000);
-            arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).to.arrival;
+            arriveTime = itinerary.legs.get(itinerary.legs.size() - 1).endTime;
         }
         long sumOfDuration = 0;
         for (Leg leg : itinerary.legs) {
             assertFalse(departTime.after(leg.startTime));
-            assertEquals(leg.startTime, leg.from.departure);
-            assertEquals(leg.endTime, leg.to.arrival);
             assertFalse(leg.startTime.after(leg.endTime));
 
-            departTime = leg.to.arrival;
+            departTime = leg.endTime;
             sumOfDuration += leg.getDuration();
         }
         sumOfDuration += itinerary.waitingTimeSeconds;

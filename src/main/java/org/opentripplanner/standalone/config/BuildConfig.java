@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -8,15 +9,15 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
-import org.opentripplanner.util.OtpAppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.time.Period;
-import java.time.format.DateTimeParseException;
-import java.util.Arrays;
-import java.util.List;
 
 /**
+ * This class is an object representation of the 'build-config.json'.
+ * <p>
  * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from the
  * RouterParameters which can be applied to a pre-built graph or on the fly at runtime. Eventually
  * both classes may be initialized from the same config file so make sure there is no overlap in the
@@ -29,16 +30,17 @@ import java.util.List;
  * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
  * is the build configuration and the other is the router configuration.
  */
-public class GraphBuildParameters {
+public class BuildConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(BuildConfig.class);
 
+    public static final BuildConfig DEFAULT = new BuildConfig(MissingNode.getInstance(), "DEFAULT");
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
      */
-    public final JsonNode rawJson;
-
+    private final JsonNode rawJson;
 
     /**
      * Generates nice HTML report of Graph errors/warnings. They are stored in the same location
@@ -47,7 +49,7 @@ public class GraphBuildParameters {
     public final boolean dataImportReport;
 
     /**
-     * If the number of issues is larger then {@link #maxDataImportIssuesPerFile}, then the files
+     * If the number of issues is larger then {@code #maxDataImportIssuesPerFile}, then the files
      * will be split in multiple files. Since browsers have problems opening large HTML files.
      */
     public final int maxDataImportIssuesPerFile;
@@ -247,7 +249,7 @@ public class GraphBuildParameters {
     /**
      * Netex specific build parameters.
      */
-    public final NetexParameters netex;
+    public final NetexConfig netex;
 
     /**
      * Otp auto detect input and output files using the command line supplied paths. This parameter
@@ -255,9 +257,7 @@ public class GraphBuildParameters {
      * storage section is optional, and the fallback is to use the auto detection. It is OK to
      * autodetect some file and specify the path to others.
      */
-    public final StorageParameters storage;
-
-
+    public final StorageConfig storage;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -265,45 +265,59 @@ public class GraphBuildParameters {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-    public GraphBuildParameters(JsonNode config) {
-        rawJson = config;
-        dataImportReport = config.path("dataImportReport").asBoolean(false);
-        transit = config.path("transit").asBoolean(true);
-        useTransfersTxt = config.path("useTransfersTxt").asBoolean(false);
-        parentStopLinking = config.path("parentStopLinking").asBoolean(false);
-        stationTransfers = config.path("stationTransfers").asBoolean(false);
-        subwayAccessTime = config.path("subwayAccessTime").asDouble(DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-        streets = config.path("streets").asBoolean(true);
-        embedRouterConfig = config.path("embedRouterConfig").asBoolean(true);
-        areaVisibility = config.path("areaVisibility").asBoolean(false);
-        platformEntriesLinking = config.path("platformEntriesLinking").asBoolean(false);
-        matchBusRoutesToStreets = config.path("matchBusRoutesToStreets").asBoolean(false);
-        fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
-        elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
-        elevationUnitMultiplier = config.path("elevationUnitMultiplier").asDouble(1);
-        fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
-        customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
-        wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));
-        osmCacheDataInMem = config.path("osmCacheDataInMem").asBoolean(false);
-        staticBikeRental = config.path("staticBikeRental").asBoolean(false);
-        staticParkAndRide = config.path("staticParkAndRide").asBoolean(true);
-        staticBikeParkAndRide = config.path("staticBikeParkAndRide").asBoolean(false);
-        maxDataImportIssuesPerFile = config.path("maxDataImportIssuesPerFile").asInt(1000);
-        maxInterlineDistance = config.path("maxInterlineDistance").asInt(200);
-        pruningThresholdIslandWithoutStops = config.path("islandWithoutStopsMaxSize").asInt(40);
-        pruningThresholdIslandWithStops = config.path("islandWithStopsMaxSize").asInt(5);
-        banDiscouragedWalking = config.path("banDiscouragedWalking").asBoolean(false);
-        banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
-        maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
-        extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
-        distanceBetweenElevationSamples = config.path("distanceBetweenElevationSamples").asDouble(
+    public BuildConfig(JsonNode node, String source) {
+        NodeAdapter c = new NodeAdapter(node, source);
+        rawJson = node;
+        dataImportReport = c.asBoolean("dataImportReport", false);
+        transit = c.asBoolean("transit", true);
+        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
+        parentStopLinking = c.asBoolean("parentStopLinking", false);
+        stationTransfers = c.asBoolean("stationTransfers", false);
+        subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+        streets = c.asBoolean("streets", true);
+        embedRouterConfig = c.asBoolean("embedRouterConfig", true);
+        areaVisibility = c.asBoolean("areaVisibility", false);
+        platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
+        matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
+        fetchElevationUS = c.asBoolean("fetchElevationUS", false);
+        elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
+        elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
+        fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
+        customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
+        wayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
+        osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
+        staticBikeRental = c.asBoolean("staticBikeRental", false);
+        staticParkAndRide = c.asBoolean("staticParkAndRide", true);
+        staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
+        maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
+        maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
+        pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);
+        pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
+        banDiscouragedWalking = c.asBoolean("banDiscouragedWalking", false);
+        banDiscouragedBiking = c.asBoolean("banDiscouragedBiking", false);
+        maxTransferDistance = c.asDouble("maxTransferDistance", 2000d);
+        extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
+        distanceBetweenElevationSamples = c.asDouble("distanceBetweenElevationSamples",
                 CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
         );
-        transitServiceStart = parseDateOrRelativePeriod(config, "transitServiceStart", "-P1Y");
-        transitServiceEnd = parseDateOrRelativePeriod(config, "transitServiceEnd", "P3Y");
+        transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
+        transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
 
-        netex = new NetexParameters(config.path("netex"));
-        storage = new StorageParameters(config.path("storage"));
+        netex = new NetexConfig(c.path("netex"));
+        storage = new StorageConfig(c.path("storage"));
+
+        c.logUnusedParameters(LOG);
+    }
+
+    /**
+     * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
+     */
+    public boolean isDefault() {
+        return rawJson.isMissingNode();
+    }
+
+    public String toJson() {
+        return rawJson.isMissingNode() ? "" : rawJson.toString();
     }
 
     public ServiceDateInterval getTransitServicePeriod() {
@@ -316,39 +330,5 @@ public class GraphBuildParameters {
     public int getSubwayAccessTimeSeconds() {
         // Convert access time in minutes to seconds
         return (int)(subwayAccessTime * 60.0);
-    }
-
-    @SuppressWarnings("unchecked")
-    static <T extends Enum<T>> T enumValueOf(JsonNode config, String propertyName, T defaultValue) {
-        String valueAsString = config.path(propertyName).asText(defaultValue.name());
-        try {
-            return Enum.valueOf((Class<T>) defaultValue.getClass(), valueAsString);
-        }
-        catch (IllegalArgumentException ignore) {
-            List<? extends Enum> legalValues = Arrays.asList(defaultValue.getClass().getEnumConstants());
-            throw new OtpAppException("The graph build parameter '" + propertyName
-                    + "' : '" + valueAsString + "' is not in legal. Expected one of " + legalValues + ".");
-        }
-    }
-
-    static LocalDate parseDateOrRelativePeriod(JsonNode config, String propertyName, String defaultValue) {
-        String text = config.path(propertyName).asText(defaultValue);
-        try {
-            if (text == null || text.isBlank()) {
-                return null;
-            }
-            if (text.startsWith("-") || text.startsWith("P")) {
-                return LocalDate.now().plus(Period.parse(text));
-            }
-            else {
-                return LocalDate.parse(text);
-            }
-        }
-        catch (DateTimeParseException e) {
-            throw new OtpAppException("The graph build parameter: '" + propertyName
-                    + "' : '" + text + "' is not a Period or LocalDate: " +
-                    e.getLocalizedMessage()
-            );
-        }
     }
 }

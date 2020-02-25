@@ -1,7 +1,5 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.model.routing.TripSearchMetadata;
-
 /**
  * Meta-data about the trip search performed.
  */

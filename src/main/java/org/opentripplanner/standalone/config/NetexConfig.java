@@ -1,10 +1,8 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
 import java.util.regex.Pattern;
 
-public class NetexParameters {
+public class NetexConfig {
 
     private static final String EMPTY_STRING_PATTERN = "$^";
 
@@ -84,19 +82,11 @@ public class NetexParameters {
      */
     public final Pattern groupFilePattern;
 
-    NetexParameters(JsonNode config) {
-        ignoreFilePattern = pattern("ignoreFilePattern", IGNORE_FILE_PATTERN, config);
-        sharedFilePattern = pattern("sharedFilePattern", SHARED_FILE_PATTERN, config);
-        sharedGroupFilePattern = pattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN, config);
-        groupFilePattern = pattern("groupFilePattern", GROUP_FILE_PATTERN, config);
-        netexFeedId = text("netexFeedId", NETEX_FEED_ID, config);
-    }
-
-    private static Pattern pattern(String path, String defaultValue, JsonNode config) {
-        return Pattern.compile(text(path, defaultValue, config));
-    }
-
-    private static String text(String path, String defaultValue, JsonNode config) {
-        return config == null ? defaultValue : config.path(path).asText(defaultValue);
+    NetexConfig(NodeAdapter config) {
+        ignoreFilePattern = config.asPattern("ignoreFilePattern", IGNORE_FILE_PATTERN);
+        sharedFilePattern = config.asPattern("sharedFilePattern", SHARED_FILE_PATTERN);
+        sharedGroupFilePattern = config.asPattern("sharedGroupFilePattern", SHARED_GROUP_FILE_PATTERN);
+        groupFilePattern = config.asPattern("groupFilePattern", GROUP_FILE_PATTERN);
+        netexFeedId = config.asText("netexFeedId", NETEX_FEED_ID);
     }
 }

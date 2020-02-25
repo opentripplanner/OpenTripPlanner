@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -22,18 +22,21 @@ public class S3BucketConfig {
     public String bucketName;
 
     /** Create a BucketConfig from a JSON configuration node. */
-    public static S3BucketConfig fromConfig(JsonNode config) {
-        if (config == null || config.isMissingNode()) {
+    public static S3BucketConfig fromConfig(NodeAdapter config) {
+        if (config.isEmpty()) {
             /* No configuration was specified, nothing should be downloaded from S3. */
             return null;
         }
         S3BucketConfig bucketConfig = new S3BucketConfig();
         try {
-            bucketConfig.accessKey = config.get("accessKey").asText();
-            bucketConfig.secretKey = config.get("secretKey").asText();
-            bucketConfig.bucketName = config.get("bucketName").asText();
-        } catch (NullPointerException ex) {
-            LOG.error("You must specify an accessKey, a secretKey, and a bucketName when configuring S3 download.");
+            bucketConfig.accessKey = config.asText("accessKey");
+            bucketConfig.secretKey = config.asText("secretKey");
+            bucketConfig.bucketName = config.asText("bucketName");
+        } catch (OtpAppException ex) {
+            LOG.error(
+                    "You must specify an accessKey, a secretKey, and a bucketName when " +
+                    "configuring S3 download. " + ex.getMessage()
+            );
             throw ex;
         }
         return bucketConfig;

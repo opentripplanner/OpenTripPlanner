@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.rangeraptor.transit;
+package org.opentripplanner.transit.raptor.service;
 
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
@@ -16,30 +16,27 @@ public class RaptorSearchWindowCalculator {
 
     private final int NOT_SET = -9_999_999;
 
-    /** Min search window in seconds */
-    private final int c;
 
     /** Min trip time coefficient */
-    private final float t;
-    private final int stepInSeconds;
+    private final double minTripTimeCoefficient;
+
+    /** Min search window in seconds */
+    private final int minSearchWinSeconds;
+
+    private final int maxSearchWinSeconds;
+    private final int stepSeconds;
 
     private int minTravelTime = NOT_SET;
     private int earliestDepartureTime = NOT_SET;
     private int latestArrivalTime = NOT_SET;
-    private int searchWindow = NOT_SET;
+    private int searchWindowSeconds = NOT_SET;
     private SearchParams params;
 
     public RaptorSearchWindowCalculator(DynamicSearchWindowCoefficients c) {
-        this(c.c(), c.t(), c.n());
-    }
-
-    public RaptorSearchWindowCalculator(
-            int minSearchWindowInMinutes, float minTripTimeCoefficient, int roundOffInMinutes
-    ) {
-        this.t = minTripTimeCoefficient;
-        // Convert minutes to seconds
-        this.c = minSearchWindowInMinutes * 60;
-        this.stepInSeconds = roundOffInMinutes * 60;
+        this.minTripTimeCoefficient = c.minTripTimeCoefficient();
+        this.minSearchWinSeconds = c.minWinTimeMinutes() * 60;
+        this.maxSearchWinSeconds = c.maxWinTimeMinutes() * 60;
+        this.stepSeconds = c.stepMinutes() * 60;
     }
 
     /**
@@ -53,8 +50,8 @@ public class RaptorSearchWindowCalculator {
         return latestArrivalTime;
     }
 
-    public int getSearchWindowInSeconds() {
-        return searchWindow;
+    public int getSearchWindowSeconds() {
+        return searchWindowSeconds;
     }
 
     public RaptorSearchWindowCalculator withMinTripTime(int minTravelTime) {
@@ -64,7 +61,7 @@ public class RaptorSearchWindowCalculator {
 
     public RaptorSearchWindowCalculator withSearchParams(SearchParams params) {
         this.params = params;
-        this.searchWindow = params.searchWindowInSeconds();
+        this.searchWindowSeconds = params.searchWindowInSeconds();
         this.earliestDepartureTime = params.earliestDepartureTime();
         this.latestArrivalTime = params.latestArrivalTime();
         return this;
@@ -76,18 +73,17 @@ public class RaptorSearchWindowCalculator {
         }
 
         if (!params.isSearchWindowSet()) {
-            searchWindow = calculateSearchWindow();
+            searchWindowSeconds = calculateSearchWindow();
         }
 
+        // TravelWindow is the time from the earliest-departure-time to the latest-arrival-time
+        int travelWindow = searchWindowSeconds + roundUpToNearestMinute(minTravelTime);
+
         if (!params.isLatestArrivalTimeSet()) {
-            latestArrivalTime = earliestDepartureTime + (
-                    searchWindow + roundUpToNearestMinute(minTravelTime)
-            );
+            latestArrivalTime = earliestDepartureTime + travelWindow;
         }
         if (!params.isEarliestDepartureTimeSet()) {
-            earliestDepartureTime = latestArrivalTime - (
-                    searchWindow + roundUpToNearestMinute(minTravelTime)
-            );
+            earliestDepartureTime = latestArrivalTime - travelWindow;
         }
         return this;
     }
@@ -108,14 +104,27 @@ public class RaptorSearchWindowCalculator {
      * by the time between the EDT and LAT. The unit is seconds.
      */
     private int calculateSearchWindow() {
-        return roundStep(c + t * minTravelTime);
+        // If both EDT and LAT is set the search window is the time between these, minus the
+        // min-travel-time.
+        if(params.isEarliestDepartureTimeSet() && params.isLatestArrivalTimeSet()) {
+            int travelWindow = params.latestArrivalTime() - params.earliestDepartureTime();
+            // There is no upper limit the the search window when both EDT and LAT is set.
+            return roundStep(travelWindow - minTravelTime);
+        }
+        else {
+            // Set the search window using the min-travel-time.
+            int v = roundStep(minSearchWinSeconds + minTripTimeCoefficient * minTravelTime);
+
+            // Set an upper bound to the search window
+            return Math.min(maxSearchWinSeconds, v);
+        }
     }
 
     /**
-     * Round values to closest increment of given {@code stepInSeconds}. This is used to round of a
+     * Round values to closest increment of given {@code stepSeconds}. This is used to round of a
      * time or duration to the closest "step" of like 10 minutes.
      */
-    int roundStep(float value) {
-        return Math.round(value / stepInSeconds) * stepInSeconds;
+    int roundStep(double value) {
+        return (int) Math.round(value / stepSeconds) * stepSeconds;
     }
 }

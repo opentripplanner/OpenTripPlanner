@@ -1,7 +1,12 @@
 package org.opentripplanner.transit.raptor.speed_test.options;
 
 import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.TransitRoutingConfig;
+import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -14,17 +19,29 @@ public class SpeedTestConfig {
     private static final Logger LOG = LoggerFactory.getLogger(SpeedTestConfig.class);
     public static final String FILE_NAME = "speed-test-config.json";
 
-    private LocalDate testDate = LocalDate.now();
-
-    public void setTestDate(String testDate) {
-        this.testDate = LocalDate.parse(testDate);
-    }
+    private final JsonNode rawNode;
 
     /**
      * The test date is the date used for all test cases. The default value is today.
      */
-    public LocalDate getTestDate() {
-        return testDate;
+    public final LocalDate testDate;
+
+    public final int maxWalkDistanceMeters;
+    public final double walkSpeedMeterPrSecond;
+    public final RaptorTuningParameters tuningParameters;
+
+    public SpeedTestConfig(JsonNode node) {
+        NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
+        this.rawNode = node;
+        testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
+        maxWalkDistanceMeters = adapter.asInt("maxWalkDistanceMeters", 1000);
+        walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
+        tuningParameters = new TransitRoutingConfig(adapter.path("tuningParameters"));
+    }
+
+    @Override
+    public String toString() {
+        return rawNode.toPrettyString();
     }
 
     public static SpeedTestConfig config(File dir) {
@@ -37,13 +54,16 @@ public class SpeedTestConfig {
                         "config is used. Missing file: {}",
                         configFile.getAbsolutePath()
                 );
-                return new SpeedTestConfig();
+                return new SpeedTestConfig(MissingNode.getInstance());
             }
 
             ObjectMapper mapper = new ObjectMapper();
             mapper.configure(JsonParser.Feature.ALLOW_COMMENTS, true);
             mapper.configure(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES, true);
-            return mapper.readValue(configFile, SpeedTestConfig.class);
+
+            SpeedTestConfig config = new SpeedTestConfig(mapper.readTree(configFile));
+            LOG.info("SpeedTest config loaded: " + config);
+            return config;
         }
         catch (IOException e) {
             throw new RuntimeException(e.getMessage(), e);

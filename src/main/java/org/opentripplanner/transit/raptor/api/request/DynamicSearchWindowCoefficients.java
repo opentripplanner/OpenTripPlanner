@@ -3,14 +3,14 @@ package org.opentripplanner.transit.raptor.api.request;
 
 /**
  * The dynamic search window coefficients is used to calculate EDT(earliest-departure-time),
- * LAT(latest-arrival-time) and DW(raptor-search-window) request parameters using heuristics.
+ * LAT(latest-arrival-time) and SW(raptor-search-window) request parameters using heuristics.
  * The heuristics perform a Raptor search (one-iteration) to find a trip witch we use to find a
- * lower bound for the travel duration time - "minTripTime". The heuristic search is used for
+ * lower bound for the travel duration time - the "minTripTime". The heuristic search is used for
  * other purposes too, and is very fast.
  * <p>
- * At least EDT or LAT must be passed into Raptor to perform a Range Raptor search. If
- * unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic
- * coefficients affect the performance and should be tuned to match the deployment.
+ * At least the EDT or the LAT must be passed into Raptor to perform a Range Raptor search. If
+ * unknown/missing the parameters(EDT, LAT, DW) is dynamically calculated. The dynamic coefficients
+ * affect the performance and should be tuned to match the deployment.
  * <p>
  * The request parameters are calculated like this:
  * <pre>
@@ -20,22 +20,41 @@ package org.opentripplanner.transit.raptor.api.request;
  * </pre>
  * The {@code round_N(...)} method is will round the input to the closest multiplication of N.
  * <p>
- * There are 3 coefficients: {@link #c()}, {@link #t()} and {@link #n()}.
+ * The 3 coefficients above are:
+ * <ol>
+ *     <li>{@code C} - {@link #minWinTimeMinutes()}</li>
+ *     <li>{@code T} - {@link #minTripTimeCoefficient()}</li>
+ *     <li>{@code N} - {@link #stepMinutes()}</li>
+ * </ol>
+ * In addition the this an upper bound on the calculation of the search window:
+ * {@link #maxWinTimeMinutes()}.
  */
 public interface DynamicSearchWindowCoefficients {
 
     /**
      * {@code T} - The coefficient to multiply with {@code minTripTime}. Use a value between
      * {@code 0.0} to {@code 3.0}. Using {@code 0.0} will give you a raptor-search-window ≈
-     * {@code C}.
+     * {@link #minWinTimeMinutes()}.
      */
-    default float t() { return 0.4f; }
+    default double minTripTimeCoefficient() { return 0.3f; }
 
     /**
      * {@code C} - The constant minimum number of minutes for a raptor search window. Use a value
-     * between 30-180 minutes in a normal deployment.
+     * between 20-180 minutes in a normal deployment.
      */
-    default int c() { return 30; }
+    default int minWinTimeMinutes() { return 40; }
+
+    /**
+     * Set an upper limit to the calculation of the dynamic search window to prevent exceptionable
+     * cases to cause very long search windows. Long search windows consumes a lot of resources and
+     * may take a long time. Use this parameter to tune the desired maximum search time.
+     * <p>
+     * This is the parameter that affect the response time most, the downside is that a search is
+     * only guarantied to be pareto-optimal within a search-window.
+     * <p>
+     * The default is 3 hours. The unit is minutes.
+     */
+    default int maxWinTimeMinutes() { return 3 * 60; }
 
     /**
      * {@code N} - The search window is rounded of to the closest multiplication of N minutes.
@@ -45,5 +64,5 @@ public interface DynamicSearchWindowCoefficients {
      * Use a value between {@code 1 and 60}. This should be less than the {@code C}
      * (min-raptor-search-window) coefficient.
      */
-    default int n() { return 10; }
+    default int stepMinutes() { return 10; }
 }

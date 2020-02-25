@@ -4,7 +4,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
-import java.util.function.Function;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 /**
@@ -36,6 +36,17 @@ public enum OTPFeature {
 
     private boolean enabled;
 
+
+    /**
+     * This method allowes the application to initilize each OTP feature. Only use this
+     * method at startup-time.
+     *
+     * THIS METHOD IS NOT THREAD-SAFE!
+     */
+    public static void enableFeatures(Map<OTPFeature, Boolean> map) {
+        map.forEach(OTPFeature::set);
+    }
+
     /**
      * Return {@code true} if feature is turned 'on'.
      */
@@ -57,23 +68,10 @@ public enum OTPFeature {
         this.enabled = enabled;
     }
 
-    /**
-     * Configure features using given JSON.
-     */
-    public static void configure(Function<OTPFeature, Boolean> enableFeature) {
-        for (OTPFeature feature : values()) {
-            Boolean value = enableFeature.apply(feature);
-            if(value != null) {
-                feature.set(value);
-            }
-        }
-        logFeatureSetup();
-    }
-
 
     /* private members */
 
-    private static void logFeatureSetup() {
+    public static void logFeatureSetup() {
         LOG.info("Features turned on: \n\t" + valuesAsString(true));
         LOG.info("Features turned off: \n\t" + valuesAsString(false));
     }
