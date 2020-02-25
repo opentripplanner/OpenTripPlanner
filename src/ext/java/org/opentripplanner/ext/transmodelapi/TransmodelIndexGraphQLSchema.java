@@ -3990,7 +3990,7 @@ public class TransmodelIndexGraphQLSchema {
                                 else {
                                     return (stops.stream()
                                             .filter(stop -> stop.place.stopId != null)
-                                            .map(s -> getRoutingService(environment).stopForId.get(s.place.stopId))
+                                            .map(s -> getRoutingService(environment).getStopForId().get(s.place.stopId))
                                             .filter(Objects::nonNull)
                                             .collect(Collectors.toList()));
                                 }
