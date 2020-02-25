@@ -16,8 +16,9 @@ public class TripPlanMapper {
         if(domain == null) { return null; }
         ApiTripPlan api = new ApiTripPlan();
         api.date = domain.date;
-        api.from = PlaceMapper.mapPlace(domain.from);
-        api.to = PlaceMapper.mapPlace(domain.to);
+        // The origin/destination do not have arrival/depature times; Hence {@code null} is used.
+        api.from = PlaceMapper.mapPlace(domain.from, null, null);
+        api.to = PlaceMapper.mapPlace(domain.to, null, null);
         api.itinerary = itineraryMapper.mapItineraries(domain.itineraries);
         return api;
     }

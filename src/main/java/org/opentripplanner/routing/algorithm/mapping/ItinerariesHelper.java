@@ -6,22 +6,10 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 public class ItinerariesHelper {
     private static final Logger LOG = LoggerFactory.getLogger(ItinerariesHelper.class);
-
-    // TODO OTP2 - This was used to limit the number of itineraries, but we need a better
-    //           - way to do this. The code is keept here for reference .
-    //           - DELETE AFTER 2020-05-05
-    public static List<Itinerary> limitNumberOfItineraries(List<Itinerary> itineraries, int max) {
-        return itineraries.stream()
-                .sorted(Comparator.comparing(Itinerary::endTime))
-                .limit(max)
-                .collect(Collectors.toList());
-    }
 
     public static void decorateItinerariesWithRequestData(
             List<Itinerary> itineraries,

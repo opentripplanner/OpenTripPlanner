@@ -83,8 +83,9 @@ public class PlannerResource extends RoutingResource {
         }
         catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass()))
+            if(!PlannerError.isPlanningError(e.getClass())) {
                 LOG.warn("Error while planning path: ", e);
+            }
             response.setError(error);
         } finally {
             if (request != null) {

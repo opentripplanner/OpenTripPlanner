@@ -14,6 +14,8 @@ public class TimeUtilsTest {
     private final int T_09_31_00 = time(9, 31, 0);
     private final int T_09_36_55 = time(9, 36, 55);
     private final int T_13_33_57 = time(13, 33, 57);
+    private final int T_14_00_47 = time(14, 0, 47);
+    private final int T_15_37_00 = time(15, 37, 0);
     private final int T_00_58_59 = time(0, 58, 59);
     private final int T_00_05_51 = time(0, 5, 51);
     private final int T_00_00_09 = time(0, 0, 9);
@@ -35,6 +37,8 @@ public class TimeUtilsTest {
         assertEquals("13:33:57", TimeUtils.timeToStrCompact(T_13_33_57, NOT_SET));
         assertEquals("", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET));
         assertEquals("9:36:07", TimeUtils.timeToStrCompact(CAL));
+        assertEquals("-13:33:57", TimeUtils.timeToStrCompact(-T_13_33_57));
+        assertEquals("-0:09", TimeUtils.timeToStrCompact(-T_00_00_09));
     }
 
     @Test
@@ -46,6 +50,8 @@ public class TimeUtilsTest {
         assertEquals("13:33:57", TimeUtils.timeToStrLong(T_13_33_57, NOT_SET));
         assertEquals("", TimeUtils.timeToStrLong(NOT_SET, NOT_SET));
         assertEquals("09:36:07", TimeUtils.timeToStrLong(CAL));
+        assertEquals("-13:33:57", TimeUtils.timeToStrLong(-T_13_33_57));
+        assertEquals("-00:00:09", TimeUtils.timeToStrLong(-T_00_00_09));
     }
 
     @Test
@@ -55,6 +61,21 @@ public class TimeUtilsTest {
         assertEquals("13:33", TimeUtils.timeToStrShort(T_13_33_57));
         assertEquals("00:00", TimeUtils.timeToStrShort(T_00_00_09));
         assertEquals("09:36", TimeUtils.timeToStrShort(CAL));
+        assertEquals("-13:33", TimeUtils.timeToStrShort(-T_13_33_57));
+        assertEquals("-00:00", TimeUtils.timeToStrShort(-T_00_00_09));
+    }
+
+    @Test
+    public void durationToStr() {
+        assertEquals("9h36m55s", TimeUtils.durationToStr(T_09_36_55));
+        assertEquals("13h33m57s", TimeUtils.durationToStr(T_13_33_57));
+        assertEquals("9h31m", TimeUtils.durationToStr(T_09_31_00));
+        assertEquals("9s", TimeUtils.durationToStr(T_00_00_09));
+        assertEquals("14h47s", TimeUtils.durationToStr(T_14_00_47));
+        assertEquals("15h37m", TimeUtils.durationToStr(T_15_37_00));
+        assertEquals("-13h33m57s", TimeUtils.durationToStr(-T_13_33_57));
+        assertEquals("-9h31m", TimeUtils.durationToStr(-T_09_31_00));
+        assertEquals("-9s", TimeUtils.durationToStr(-T_00_00_09));
     }
 
     @Test
@@ -73,6 +94,7 @@ public class TimeUtilsTest {
             assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(1001));
             assertEquals("9,9 seconds", TimeUtils.timeMsToStrInSec(9_949));
             assertEquals("10 seconds", TimeUtils.timeMsToStrInSec(9_950));
+            assertEquals("-0,456 seconds", TimeUtils.timeMsToStrInSec(-456));
         }
         finally {
             Locale.setDefault(defaultLocale);
