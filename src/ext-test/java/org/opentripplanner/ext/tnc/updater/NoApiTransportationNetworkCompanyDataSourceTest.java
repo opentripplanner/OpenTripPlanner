@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.transportation_network_company;
+package org.opentripplanner.ext.tnc.updater;
 
 import org.junit.Test;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
@@ -9,7 +9,6 @@ import java.util.List;
 import java.util.concurrent.ExecutionException;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 
 public class NoApiTransportationNetworkCompanyDataSourceTest {
 

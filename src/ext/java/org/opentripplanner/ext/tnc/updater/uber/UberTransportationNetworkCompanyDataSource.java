@@ -1,14 +1,14 @@
-package org.opentripplanner.updater.transportation_network_company.uber;
+package org.opentripplanner.ext.tnc.updater.uber;
 
 import com.fasterxml.jackson.databind.DeserializationFeature;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.ext.tnc.updater.Position;
+import org.opentripplanner.ext.tnc.updater.RideEstimateRequest;
+import org.opentripplanner.ext.tnc.updater.TransportationNetworkCompanyDataSource;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
-import org.opentripplanner.updater.transportation_network_company.Position;
-import org.opentripplanner.updater.transportation_network_company.RideEstimateRequest;
-import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

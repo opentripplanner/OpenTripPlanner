@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.transportation_network_company;
+package org.opentripplanner.ext.tnc.updater;
 
 import java.util.Objects;
 

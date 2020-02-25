@@ -1,11 +1,11 @@
-package org.opentripplanner.updater.transportation_network_company;
+package org.opentripplanner.ext.tnc.updater;
 
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Rule;
 import org.junit.Test;
+import org.opentripplanner.ext.tnc.updater.uber.UberTransportationNetworkCompanyDataSource;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.updater.transportation_network_company.uber.UberTransportationNetworkCompanyDataSource;
 
 import java.io.IOException;
 import java.util.List;

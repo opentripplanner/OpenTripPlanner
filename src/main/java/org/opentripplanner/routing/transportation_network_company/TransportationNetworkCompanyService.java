@@ -4,12 +4,12 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.ext.tnc.updater.TransportationNetworkCompanyDataSource;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

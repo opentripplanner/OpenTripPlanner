@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.transportation_network_company;
+package org.opentripplanner.ext.tnc.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;

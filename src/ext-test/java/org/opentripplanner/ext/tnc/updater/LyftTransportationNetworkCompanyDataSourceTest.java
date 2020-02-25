@@ -1,14 +1,14 @@
-package org.opentripplanner.updater.transportation_network_company;
+package org.opentripplanner.ext.tnc.updater;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.tomakehurst.wiremock.junit.WireMockRule;
 import org.junit.Before;
 import org.junit.Rule;
 import org.junit.Test;
+import org.opentripplanner.ext.tnc.updater.lyft.LyftAuthenticationRequestBody;
+import org.opentripplanner.ext.tnc.updater.lyft.LyftTransportationNetworkCompanyDataSource;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.updater.transportation_network_company.lyft.LyftAuthenticationRequestBody;
-import org.opentripplanner.updater.transportation_network_company.lyft.LyftTransportationNetworkCompanyDataSource;
 
 import java.io.IOException;
 import java.util.List;

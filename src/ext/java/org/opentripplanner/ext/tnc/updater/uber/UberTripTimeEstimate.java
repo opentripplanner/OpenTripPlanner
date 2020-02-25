@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.transportation_network_company.uber;
+package org.opentripplanner.ext.tnc.updater.uber;
 
 public class UberTripTimeEstimate {
     public String currency_code;

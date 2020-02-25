@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.transportation_network_company.lyft;
+package org.opentripplanner.ext.tnc.updater.lyft;
 
 public class LyftAuthenticationRequestBody {
 
