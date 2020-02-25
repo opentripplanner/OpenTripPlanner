@@ -31,7 +31,7 @@ public class UberTransportationNetworkCompanyDataSourceTest {
     public WireMockRule wireMockRule = new WireMockRule(
         options()
             .port(8089)
-            .usingFilesUnderDirectory("src/test/resources/updater/")
+            .usingFilesUnderDirectory("src/ext-test/resources/tnc/updater/")
     );
 
     @Test
