@@ -1,4 +1,4 @@
-package org.opentripplanner.api.resource;
+package org.opentripplanner.ext.tnc.api.resource;
 
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;

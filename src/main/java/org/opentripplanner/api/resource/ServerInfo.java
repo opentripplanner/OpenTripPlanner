@@ -19,7 +19,7 @@ import java.nio.charset.Charset;
 public class ServerInfo {
 
     /** Quality value prioritizes MIME types */
-    static final String Q = ";qs=0.5";
+    public static final String Q = ";qs=0.5";
     
     private static final ServerInfo SERVER_INFO = new ServerInfo();
 
