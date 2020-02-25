@@ -78,6 +78,17 @@ class StopTimesMapper {
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
             Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
+            if (stop == null) {
+                LOG.warn("Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
+                        + "Trip {} will not be mapped.",
+                    stopPoint != null && stopPoint.getScheduledStopPointRef() != null
+                        ? stopPoint.getScheduledStopPointRef().getValue().getRef()
+                        : "null"
+                    , stopPoint != null ? stopPoint.getId() : "null"
+                    , journeyPattern.getId()
+                    , trip.getId());
+                return null;
+            }
 
             StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
 
