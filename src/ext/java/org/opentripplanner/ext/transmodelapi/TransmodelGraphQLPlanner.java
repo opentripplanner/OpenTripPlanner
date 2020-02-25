@@ -11,11 +11,11 @@ import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -47,16 +47,15 @@ public class TransmodelGraphQLPlanner {
     }
 
     public PlanResponse plan(DataFetchingEnvironment environment) {
-        Router router = environment.getContext();
+        Router router = ((TransmodelRequestContext)environment.getContext()).getRouter();
+        RoutingService routingService =
+            ((TransmodelRequestContext)environment.getContext()).getRoutingService();
         RoutingRequest request = createRequest(environment);
 
         PlanResponse response = new PlanResponse();
 
         try {
-            RoutingWorker worker = new RoutingWorker(router.raptorConfig, request);
-
-            RoutingResponse res = worker.route(router);
-
+            RoutingResponse res = routingService.route(request, router);
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
         }
@@ -133,7 +132,8 @@ public class TransmodelGraphQLPlanner {
     }
 
     private RoutingRequest createRequest(DataFetchingEnvironment environment) {
-        Router router = environment.getContext();
+        TransmodelRequestContext context = environment.getContext();
+        Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
         TransmodelGraphQLPlanner.CallerWithEnvironment callWith = new TransmodelGraphQLPlanner.CallerWithEnvironment(environment);
