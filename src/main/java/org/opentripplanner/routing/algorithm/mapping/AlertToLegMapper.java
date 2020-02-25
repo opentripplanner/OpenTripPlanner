@@ -112,7 +112,7 @@ public class AlertToLegMapper {
 
     private static Collection<AlertPatch> getAlertsForStopAndRoute(Graph graph, FeedScopedId stopId, FeedScopedId routeId, boolean checkParentStop) {
 
-        Stop stop = graph.index.stopForId.get(stopId);
+        Stop stop = graph.index.getStopForId().get(stopId);
         if (stop == null) {
             return new ArrayList<>();
         }
@@ -149,7 +149,7 @@ public class AlertToLegMapper {
 
     private static Collection<AlertPatch> getAlertsForStopAndTrip(Graph graph, FeedScopedId stopId, FeedScopedId tripId, boolean checkParentStop) {
 
-        Stop stop = graph.index.stopForId.get(stopId);
+        Stop stop = graph.index.getStopForId().get(stopId);
         if (stop == null) {
             return new ArrayList<>();
         }
@@ -184,7 +184,7 @@ public class AlertToLegMapper {
     }
 
     private static Collection<AlertPatch> getAlertsForStop(Graph graph, FeedScopedId stopId, boolean checkParentStop) {
-        Stop stop = graph.index.stopForId.get(stopId);
+        Stop stop = graph.index.getStopForId().get(stopId);
         if (stop == null) {
             return new ArrayList<>();
         }

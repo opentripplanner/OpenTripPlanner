@@ -19,7 +19,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -97,7 +97,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private final TimeZone timeZone;
 
-    private final GraphIndex graphIndex;
+    private final RoutingService routingService;
 
     private final Agency dummyAgency;
 
@@ -109,7 +109,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     public TimetableSnapshotSource(final Graph graph) {
         timeZone = graph.getTimeZone();
-        graphIndex = graph.index;
+        routingService = new RoutingService(graph);
         realtimeTransitLayer = graph.getRealtimeTransitLayer();
         transitLayerUpdater = graph.transitLayerUpdater;
 
@@ -697,7 +697,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
 
         // Add service code to bitset of pattern if needed (using copy on write)
-        final int serviceCode = graph.serviceCodes.get(trip.getServiceId());
+        final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
         if (!pattern.getServices().get(serviceCode)) {
             final BitSet services = (BitSet) pattern.getServices().clone();
             services.set(serviceCode);
@@ -941,8 +941,8 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return trip pattern or null if no trip pattern was found
      */
     private TripPattern getPatternForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
-        TripPattern pattern = graphIndex.patternForTrip.get(trip);
+        Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
+        TripPattern pattern = routingService.getPatternForTrip().get(trip);
         return pattern;
     }
 
@@ -954,7 +954,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = graphIndex.routeForId.get(new FeedScopedId(feedId, routeId));
+        Route route = routingService.getRouteForId().get(new FeedScopedId(feedId, routeId));
         return route;
     }
 
@@ -966,7 +966,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String feedId, String tripId) {
-        Trip trip = graphIndex.tripForId.get(new FeedScopedId(feedId, tripId));
+        Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
         return trip;
     }
 
@@ -978,7 +978,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = graphIndex.stopForId.get(new FeedScopedId(feedId, stopId));
+        Stop stop = routingService.getStopForId().get(new FeedScopedId(feedId, stopId));
         return stop;
     }
 }

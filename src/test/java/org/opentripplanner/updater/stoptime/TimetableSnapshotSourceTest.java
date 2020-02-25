@@ -105,8 +105,8 @@ public class TimetableSnapshotSourceTest {
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
@@ -131,8 +131,8 @@ public class TimetableSnapshotSourceTest {
     public void testHandleDelayedTrip() {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
@@ -264,7 +264,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.stopForId.get(new FeedScopedId(feedId, "A"));
+        Stop stopA = graph.index.getStopForId().get(new FeedScopedId(feedId, "A"));
         // Get trip pattern of last (most recently added) outgoing edge
         // FIXME create a new test to see that add-trip realtime updates work
         TripPattern tripPattern = null;
@@ -397,8 +397,8 @@ public class TimetableSnapshotSourceTest {
         // Original trip pattern
         {
             final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-            final Trip trip = graph.index.tripForId.get(tripId);
-            final TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
+            final Trip trip = graph.index.getTripForId().get(tripId);
+            final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
             final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
             final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -440,8 +440,8 @@ public class TimetableSnapshotSourceTest {
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
 
         updater.maxSnapshotFrequency = 0;
         updater.purgeExpiredData = false;

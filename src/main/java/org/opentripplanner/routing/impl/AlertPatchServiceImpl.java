@@ -58,7 +58,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
             result = new HashSet<>();
             // Search for alerts on parent-stop
             if (graph != null && graph.index != null) {
-                Stop quay = graph.index.stopForId.get(stop);
+                Stop quay = graph.index.getStopForId().get(stop);
                 if (quay != null) {
                     
                     // TODO - SIRI: Add alerts from parent- and multimodal-stops

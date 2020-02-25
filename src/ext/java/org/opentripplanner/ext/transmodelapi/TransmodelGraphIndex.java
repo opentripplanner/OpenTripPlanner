@@ -7,6 +7,7 @@ import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.schema.GraphQLSchema;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -52,10 +53,13 @@ class TransmodelGraphIndex {
             variables = new HashMap<>();
         }
 
+        TransmodelRequestContext transmodelRequestContext =
+            new TransmodelRequestContext(router, new RoutingService(router.graph));
+
         ExecutionInput executionInput = ExecutionInput.newExecutionInput()
                                                 .query(query)
                                                 .operationName(operationName)
-                                                .context(router)
+                                                .context(transmodelRequestContext)
                                                 .root(router)
                                                 .variables(variables)
                                                 .build();
