@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.opentripplanner.ext.examples.statistics.api.model.StatisticsGraphQLSchemaFactory;
-import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
@@ -30,11 +30,11 @@ public class GraphStatisticsResource {
 
     @SuppressWarnings("unused")
     public GraphStatisticsResource(@Context OTPServer server, @PathParam("routerId") String routerId) {
-        this(server.getRouter(routerId).graph.index);
+        this(new RoutingService(server.getRouter(routerId).graph));
     }
 
-    GraphStatisticsResource(GraphIndex graphIndex) {
-        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(graphIndex));
+    GraphStatisticsResource(RoutingService routingService) {
+        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService));
     }
 
     @POST @Path("/graphql")

@@ -45,8 +45,8 @@ public class GtfsGraphBuilderModuleTest {
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new FeedScopedId(feedId.getId(), "t0"));
-        TripPattern pattern = graph.index.patternForTrip.get(trip);
+        Trip trip = graph.index.getTripForId().get(new FeedScopedId(feedId.getId(), "t0"));
+        TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.UNKNOWN,
                 BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t0"))));
@@ -74,8 +74,8 @@ public class GtfsGraphBuilderModuleTest {
         GtfsBundle gtfsBundle = bundleList.get(0);
         GtfsFeedId feedId = gtfsBundle.getFeedId();
 
-        Trip trip = graph.index.tripForId.get(new FeedScopedId(feedId.getId(), "t0"));
-        TripPattern pattern = graph.index.patternForTrip.get(trip);
+        Trip trip = graph.index.getTripForId().get(new FeedScopedId(feedId.getId(), "t0"));
+        TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         List<Trip> trips = pattern.getTrips();
         assertEquals(BikeAccess.ALLOWED,
                 BikeAccess.fromTrip(withId(trips, new FeedScopedId(feedId.getId(), "t0"))));

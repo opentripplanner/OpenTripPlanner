@@ -2,6 +2,7 @@ package org.opentripplanner.routing.core;
 
 import org.junit.Test;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 
