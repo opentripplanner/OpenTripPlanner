@@ -14,7 +14,7 @@ public class TimeUtils {
      */
     public static final int NOT_SET = -1_000_000;
 
-    private enum FormatType { COMPACT, LONG, SHORT }
+    private enum FormatType { COMPACT, LONG, SHORT, DURATION }
     private static final boolean USE_RAW_TIME = false;
 
 
@@ -43,6 +43,10 @@ public class TimeUtils {
 
     public static String timeToStrCompact(int time) {
         return timeToStrCompact(time, -1);
+    }
+
+    public static String durationToStr(int timeSeconds) {
+        return timeStr(timeSeconds, -1, FormatType.DURATION);
     }
 
     public static String timeToStrCompact(int time, int notSetValue) {
@@ -101,13 +105,15 @@ public class TimeUtils {
         if(USE_RAW_TIME) {
             return Integer.toString(time);
         }
+        boolean sign = time < 0;
+        time = Math.abs(time);
 
         int sec = time % 60;
         time =  time / 60;
         int min = time % 60;
         int hour = time / 60;
 
-        return timeStr(hour, min, sec, formatType);
+        return timeStr(sign, hour, min, sec, formatType);
     }
 
     private static String timeStr(Calendar time, FormatType formatType) {
@@ -118,19 +124,26 @@ public class TimeUtils {
         int min = time.get(Calendar.MINUTE);
         int hour = time.get(Calendar.HOUR_OF_DAY);
 
-        return timeStr(hour, min, sec, formatType);
+        return timeStr(false, hour, min, sec, formatType);
     }
 
-    private static String timeStr(int hour, int min, int sec, FormatType formatType) {
+    private static String timeStr(boolean sign, int hour, int min, int sec, FormatType formatType) {
         switch (formatType) {
-            case LONG: return timeStrLong(hour, min, sec);
-            case SHORT: return timeStrShort(hour, min);
-            default: return timeStrCompact(hour, min, sec);
+            case LONG: return sign(sign, timeStrLong(hour, min, sec));
+            case SHORT: return sign(sign, timeStrShort(hour, min));
+            case DURATION: return sign(sign, timeStrDuration(hour, min, sec));
+            default: return sign(sign, timeStrCompact(hour, min, sec));
         }
     }
 
+    private static String sign(boolean sign , String value) {
+        return sign ? "-" + value : value;
+    }
+
     private static String timeStrCompact(int hour, int min, int sec) {
-        return hour == 0 ? String.format("%d:%02d", min, sec) : String.format("%d:%02d:%02d", hour, min, sec);
+        return hour == 0
+                ? String.format("%d:%02d", min, sec)
+                : String.format("%d:%02d:%02d", hour, min, sec);
     }
 
     private static String timeStrLong(int hour, int min, int sec) {
@@ -139,5 +152,13 @@ public class TimeUtils {
 
     private static String timeStrShort(int hour, int min) {
         return String.format("%02d:%02d", hour, min);
+    }
+
+    private static String timeStrDuration(int hour, int min, int sec) {
+        String buf = "";
+        if(hour != 0) { buf += hour + "h"; }
+        if(min != 0) { buf += min + "m"; }
+        if(sec != 0) { buf += sec + "s"; }
+        return buf;
     }
 }

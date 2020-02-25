@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
 
 import java.util.Calendar;
@@ -185,20 +186,20 @@ public class Itinerary {
 
     @Override
     public String toString() {
-        return "Itinerary{"
-                + "nTransfers=" + nTransfers
-                + ", durationSeconds=" + durationSeconds
-                + ", generalizedCost=" + generalizedCost
-                + ", nonTransitTimeSeconds=" + nonTransitTimeSeconds
-                + ", transitTimeSeconds=" + transitTimeSeconds
-                + ", waitingTimeSeconds=" + waitingTimeSeconds
-                + ", nonTransitDistanceMeters=" + nonTransitDistanceMeters
-                + ", nonTransitLimitExceeded=" + nonTransitLimitExceeded
-                + ", tooSloped=" + tooSloped
-                + ", elevationLost=" + elevationLost
-                + ", elevationGained=" + elevationGained
-                + ", legs=" + legs
-                + ", fare=" + fare
-                + '}';
+        return new ToStringBuilder(Itinerary.class)
+                .addNum("nTransfers", nTransfers, -1)
+                .addDuration("duration", durationSeconds)
+                .addNum("generalizedCost", generalizedCost)
+                .addDuration("nonTransitTime", nonTransitTimeSeconds)
+                .addDuration("transitTime", transitTimeSeconds)
+                .addDuration("waitingTime", waitingTimeSeconds)
+                .addNum("nonTransitDistance", nonTransitDistanceMeters, "m")
+                .addBool("nonTransitLimitExceeded", nonTransitLimitExceeded)
+                .addBool("tooSloped", tooSloped)
+                .addNum("elevationLost", elevationLost, 0.0)
+                .addNum("elevationGained", elevationGained, 0.0)
+                .addCol("legs", legs)
+                .addObj("fare", fare)
+                .toString();
     }
 }
