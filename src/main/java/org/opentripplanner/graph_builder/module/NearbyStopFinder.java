@@ -95,10 +95,7 @@ public class NearbyStopFinder {
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
-            /* Filter out destination stops that are already reachable via pathways or transfers. */
-            // FIXME why is the above comment relevant here? how does the next line achieve this?
             TransitStopVertex ts1 = stopAtDistance.tstop;
-            if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.getPatternsForStop().get(ts1.getStop())) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);

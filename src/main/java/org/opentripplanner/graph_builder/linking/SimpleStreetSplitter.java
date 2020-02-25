@@ -182,9 +182,12 @@ public class SimpleStreetSplitter {
         LOG.info(progress.startMessage());
 
         for (T v : vertices) {
-            // TODO OTP2 - Can a vertex already be linked?
+            /* Do not link vertices, which are already linked by TransitToTaggedStopsModule */
             boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
             if (alreadyLinked) { continue; }
+
+            /* Do not link stops connected by pathways */
+            if (v instanceof TransitStopVertex && !((TransitStopVertex) v).isStreetLinkable()) continue;
 
             if (!link(v)) {
                 issueStore.add(unlinkedIssueMapper.apply(v));
