@@ -9,11 +9,8 @@ import java.util.Map;
 import static org.junit.Assert.assertEquals;
 
 public class EnvironmentVariableReplacerTest {
-
-
     private String envName = "<not set>";
     private String envValue = "<not set>";
-
 
     /**
      * To test the system environment variable substitution we must have a name/value pair that
@@ -79,9 +76,9 @@ public class EnvironmentVariableReplacerTest {
     /**
      * Test replacing environment variable fails for unknown environment variable.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = OtpAppException.class)
     public void testMissingEnvironmentVariable() {
-        ConfigLoader.fromString(
+        ConfigLoader.nodeFromString(
                 "None existing env.var: '${none_existing_env_variable}'.", "test"
         );
     }

@@ -27,9 +27,9 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
+import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,22 +44,23 @@ import java.util.Map;
 
 /**
  * Does a complete transit search, including access and egress legs.
+ * <p>
+ * This class has a request scope, hence the "Worker" name.
  */
 public class RoutingWorker {
 
     private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
-    private static final RaptorService<TripSchedule> raptorService = new RaptorService<>(
-            // TODO OTP2 - Load turning parameters from config file
-            new RaptorTuningParameters() {});
+
+    private final RaptorService<TripSchedule> raptorService;
 
     /**
      * To avoid long searches witch might degrade the performance we use an upper limit
      * to the distance for none transit what we would allow.
      */
-    private static final double MAX_WALK_DISTANCE_METERS = 50_000;
+    private static final double MAX_WALK_DISTANCE_METERS =  50_000;
     private static final double MAX_BIKE_DISTANCE_METERS = 150_000;
-    private static final double MAX_CAR_DISTANCE_METERS = 500_000;
+    private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
 
     /** Filter itineraries down to this limit, but not below. */
     private static final int MIN_NUMBER_OF_ITINERARIES = 3;
@@ -71,7 +72,8 @@ public class RoutingWorker {
     private TripSearchMetadata responseMetadata = null;
     private Instant filterOnLatestDepartureTime = null;
 
-    public RoutingWorker(RoutingRequest request) {
+    public RoutingWorker(RaptorConfig<TripSchedule> config, RoutingRequest request) {
+        this.raptorService = new RaptorService<>(config);
         this.request = request;
     }
 

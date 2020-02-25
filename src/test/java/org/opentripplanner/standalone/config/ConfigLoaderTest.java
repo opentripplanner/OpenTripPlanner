@@ -5,6 +5,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.util.OtpAppException;
 
 import java.io.File;
 import java.io.IOException;
@@ -52,7 +53,7 @@ public class ConfigLoaderTest {
         FileUtils.write(file, json, UTF_8);
 
         // when:
-        GraphBuildParameters parameters = new ConfigLoader(tempDir).loadBuildConfig();
+        BuildConfig parameters = new ConfigLoader(tempDir).loadBuildConfig();
 
         // then:
         assertTrue(parameters.areaVisibility);
@@ -65,25 +66,25 @@ public class ConfigLoaderTest {
         FileUtils.write(file, "{key-a : 12}", UTF_8);
 
         // when:
-        JsonNode node = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then:
-        assertEquals(12, node.path("key-a").asInt());
+        assertEquals(12, params.rawJson.path("key-a").asInt());
     }
 
     @Test
     public void whenFileDoNotExistExpectMissingNode() {
         // when: ruter-config.json do not exist
-        JsonNode res = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then: expect missing node
-        assertTrue(res.toString(), res.isMissingNode());
+        assertTrue(res.toString(), res.rawJson.isMissingNode());
     }
 
     @Test
     public void parseJsonString() {
         // when:
-        JsonNode node = ConfigLoader.fromString("{key:\"value\"}", "JSON-STRING");
+        JsonNode node = ConfigLoader.nodeFromString("{key:\"value\"}", "JSON-STRING");
 
         // then:
         assertEquals("value", node.path("key").asText());
@@ -122,7 +123,7 @@ public class ConfigLoaderTest {
         String json = json("{  'key': '${" + eName + "}', 'key2':'${" + eName + "}' }");
 
         // When: parse JSON
-        JsonNode node = ConfigLoader.fromString(json, "test");
+        JsonNode node = ConfigLoader.nodeFromString(json, "test");
 
         // Then: verify that the JSON node have the expected value
         String actualValue = node.path("key").asText(null);
@@ -133,10 +134,10 @@ public class ConfigLoaderTest {
     /**
      * Test replacing environment variables in config fails on a unknown environment variable.
      */
-    @Test(expected = IllegalArgumentException.class)
+    @Test(expected = OtpAppException.class)
     public void testMissingEnvironmentVariable() {
-        ConfigLoader.fromString(
-                "{ key: '${none_existing_env_variable}' }",
+        ConfigLoader.nodeFromString(
+                json("{ key: '${none_existing_env_variable}' }"),
                 "test"
         );
     }
@@ -168,7 +169,7 @@ public class ConfigLoaderTest {
         }
     }
 
-    private static String json(String ... lines) {
-        return String.join("\n", lines).replace('\'', '\"');
+    private static String json(String text) {
+        return text.replace('\'', '\"');
     }
 }

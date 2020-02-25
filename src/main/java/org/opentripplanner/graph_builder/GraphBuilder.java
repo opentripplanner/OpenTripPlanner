@@ -22,7 +22,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.S3BucketConfig;
 import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
@@ -113,7 +113,7 @@ public class GraphBuilder implements Runnable {
      * build a graph from the given data source and configuration directory.
      */
     public static GraphBuilder create(
-            GraphBuildParameters config,
+            BuildConfig config,
             GraphBuilderDataSources dataSources,
             EmbedConfig embedConfig,
             Graph baseGraph

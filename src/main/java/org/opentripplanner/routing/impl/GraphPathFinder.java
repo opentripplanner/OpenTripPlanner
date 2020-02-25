@@ -109,11 +109,7 @@ public class GraphPathFinder {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
 
-        int timeoutIndex = 0;
-        if (timeoutIndex >= router.timeouts.length) {
-            timeoutIndex = router.timeouts.length - 1;
-        }
-        double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
+        double timeout = searchBeginTime + router.streetRoutingTimeoutSeconds() * 1000;
         timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
         timeout /= 1000; // Convert milliseconds to seconds
         if (timeout <= 0) {

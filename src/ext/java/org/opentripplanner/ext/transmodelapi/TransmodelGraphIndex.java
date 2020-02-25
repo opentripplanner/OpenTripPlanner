@@ -43,7 +43,6 @@ class TransmodelGraphIndex {
             Router router,
             Map<String, Object> variables,
             String operationName,
-            int timeout,
             int maxResolves
     ) {
         MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
@@ -80,10 +79,10 @@ class TransmodelGraphIndex {
         return content;
     }
 
-    Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, int maxResolves) {
+    Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int maxResolves) {
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = getGraphQLExecutionResult(
-                query, router, variables, operationName, timeout, maxResolves
+                query, router, variables, operationName, maxResolves
         );
         return res.entity(content).build();
     }

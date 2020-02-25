@@ -13,6 +13,7 @@ import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.util.HashMap;
 import java.util.List;
@@ -36,8 +37,8 @@ public class NetexModule implements GraphBuilderModule {
     private final String netexFeedId;
 
     /**
-     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceStart
-     * @see org.opentripplanner.standalone.config.GraphBuildParameters#transitServiceEnd
+     * @see BuildConfig#transitServiceStart
+     * @see BuildConfig#transitServiceEnd
      */
     private final ServiceDateInterval transitPeriodLimit;
 

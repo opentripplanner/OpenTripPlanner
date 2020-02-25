@@ -68,7 +68,6 @@ public class PlannerResource extends RoutingResource {
 
             // Route
             RoutingService routingService = new RoutingService(router.graph);
-
             res = routingService.route(request, router);
 
             // Map to API

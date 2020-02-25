@@ -45,7 +45,7 @@ public class OTPAppConstruction {
      */
     public OTPAppConstruction(CommandLineParameters commandLineParameters) {
         this.config = new OTPConfiguration(commandLineParameters);
-        initializeFeatures();
+        initializeOtpFeatures();
     }
 
     /**
@@ -118,9 +118,9 @@ public class OTPAppConstruction {
         return graphBuilderDataSources;
     }
 
-    private void initializeFeatures() {
-        // Initialize features from configuration file.
-        OTPFeature.configure(config::isFeatureEnabled);
+    private void initializeOtpFeatures() {
+        OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
+        OTPFeature.logFeatureSetup();
     }
 
     private Application createApplication(Router router) {

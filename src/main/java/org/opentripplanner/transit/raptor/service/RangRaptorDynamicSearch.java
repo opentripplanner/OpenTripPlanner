@@ -240,7 +240,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
             builder.earliestDepartureTime(dynamicSearchParamsCalculator.getEarliestDepartureTime());
         }
         if (!request.searchParams().isSearchWindowSet()) {
-            builder.searchWindowInSeconds(dynamicSearchParamsCalculator.getSearchWindowInSeconds());
+            builder.searchWindowInSeconds(dynamicSearchParamsCalculator.getSearchWindowSeconds());
         }
         // We do not set the latest-arrival-time, because we do not want to limit the forward
         // multi-criteria search, it does not have much effect on the performance - we only risk

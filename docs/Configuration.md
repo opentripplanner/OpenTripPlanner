@@ -372,8 +372,7 @@ These options can be applied by the OTP server without rebuilding the graph.
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
 `routingDefaults` | Default routing parameters, which will be applied to every request | object |  | see [routing defaults](#routing-defaults)
-`timeout` | maximum time limit for route queries | double | null | units: seconds; see [timeouts](#timeouts)
-`timeouts` | when returning multiple itineraries, set different maximum time limits for the 1st, 2nd, etc. itinerary | array of doubles | `[5, 4, 2]` | units: seconds; see [timeouts](#timeouts)
+`streetRoutingTimeout` | maximum time limit for street route queries | double | null | units: seconds; see [timeout](#timeout)
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
 `boardTimes` | change boarding times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
 `alightTimes` | change alighting times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
@@ -498,42 +497,28 @@ seconds needed for the boarding and alighting processes in `router-config.json` 
 }
 ```
 
-## Timeouts
+## Timeout
 
-Path searches can sometimes take a long time to complete, especially certain problematic cases that have yet to be optimized.
-Often a first itinerary is found quickly, but it is time-consuming or impossible to find subsequent alternative itineraries
-and this delays the response. You can set timeouts to avoid tying up server resources on pointless searches and ensure that
-your users receive a timely response. When a search times out, a WARN level log entry is made with information that can
-help identify problematic searches and improve our routing methods. The simplest timeout option is:
+TODO OTP2 - Clean up this text - there is a timeout for the street search but not for the transit 
+search, it should be limited by the size of the search-window, not a timeout.
+
+Path searches can sometimes take a long time to complete, especially certain problematic cases that
+have yet to be optimized. Often the street part of the routing can take a long time if searching
+very long distances. You can set the street routing timeout to avoid tying up server resources on
+pointless searches and ensure that your users receive a timely response. You can also limit the max
+distance to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made
+with information that can help identify problematic searches and improve our routing methods. The
+simplest timeout option is:
 
 ```JSON
 // router-config.json
 {
-  "timeout": 5.5
+  "streetRoutingTimeout": 5.5
 }
 ```
 
 This specifies a single timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
-paths already found are returned to the client. This is equivalent to specifying a `timeouts` array with a single element.
-The alternative is:
-
-```JSON
-// router-config.json
-{
-  "timeouts": [5, 4, 3, 1]
-}
-```
-
-Here, the configuration key is `timeouts` (plural) and we specify an array of times in floating-point seconds. The Nth
-element in the array applies to the Nth itinerary search, and importantly all values are relative to the beginning of the
-search for the *first* itinerary. If OTP is configured to find more itineraries than there are elements in the timeouts
-array, the final element in the timeouts array will apply to all remaining unmatched searches.
-
-This allows you to keep overall response time down while ensuring that the end user will get at least one
-response, providing more only when it won't hurt response time. The timeout values will typically be decreasing to
-reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
-have two for comparison, but we only care about having three, four, or more options if completing those extra searches
-doesn't cause annoyingly long response times.
+paths already found are returned to the client. 
 
 ## Logging incoming requests
 
