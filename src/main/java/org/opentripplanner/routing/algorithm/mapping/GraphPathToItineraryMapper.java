@@ -136,14 +136,13 @@ public abstract class GraphPathToItineraryMapper {
         addWalkSteps(graph, legs, legsStates, requestedLocale);
 
 
-        for (int i = 0; i < legs.size(); i++) {
-            Leg leg = legs.get(i);
-            boolean isFirstLeg = i == 0;
-
-            AlertToLegMapper.addAlertPatchesToLeg(graph, leg, isFirstLeg, requestedLocale);
+        boolean first = true;
+        for (Leg leg : legs) {
+            AlertToLegMapper.addAlertPatchesToLeg(graph, leg, first, requestedLocale);
+            first = false;
         }
 
-        fixupLegs(legs, legsStates);
+        setLegPathwayFlag(legs, legsStates);
 
         Itinerary itinerary = new Itinerary(legs);
 
@@ -280,7 +279,7 @@ public abstract class GraphPathToItineraryMapper {
         TimeZone timeZone = leg.startTime.getTimeZone();
         leg.agencyTimeZoneOffset = timeZone.getOffset(leg.startTime.getTimeInMillis());
 
-        addPlaces(leg, states, edges, showIntermediateStops, requestedLocale);
+        addPlaces(leg, states, requestedLocale);
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
@@ -371,33 +370,13 @@ public abstract class GraphPathToItineraryMapper {
         }
     }
 
-    /**
-     * Fix up a {@link Leg} {@link List} using the information available at the leg boundaries.
-     * This method will fill holes in the arrival and departure times associated with a
-     * {@link Place} within a leg and add board and alight rules. It will also ensure that stop
-     * names propagate correctly to the non-transit legs that connect to them.
-     *
-     * @param legs The legs of the itinerary
-     * @param legsStates The states that go with the legs
-     */
-    private static void fixupLegs(List<Leg> legs, State[][] legsStates) {
+    private static void setLegPathwayFlag(List<Leg> legs, State[][] legsStates) {
+        OUTER:
         for (int i = 0; i < legsStates.length; i++) {
-
             for (int j = 1; j < legsStates[i].length; j++) {
                 if (legsStates[i][j].getBackEdge() instanceof PathwayEdge) {
                     legs.get(i).pathway = true;
-                }
-            }
-
-            if (i + 1 < legsStates.length) {
-                legs.get(i + 1).from.arrival = legs.get(i).to.arrival;
-                legs.get(i).to.departure = legs.get(i + 1).from.departure;
-
-                if (legs.get(i).isTransitLeg() && !legs.get(i + 1).isTransitLeg()) {
-                    legs.get(i + 1).from = legs.get(i).to;
-                }
-                if (!legs.get(i).isTransitLeg() && legs.get(i + 1).isTransitLeg()) {
-                    legs.get(i).to = legs.get(i + 1).from;
+                    break OUTER;
                 }
             }
         }
@@ -475,17 +454,11 @@ public abstract class GraphPathToItineraryMapper {
 
     /**
      * Add {@link Place} fields to a {@link Leg}.
-     * There is some code duplication because of subtle differences between departure, arrival and
-     * intermediate stops.
      *
      * @param leg The leg to add the places to
      * @param states The states that go with the leg
-     * @param edges The edges that go with the leg
-     * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      */
-    private static void addPlaces(
-            Leg leg, State[] states, Edge[] edges, boolean showIntermediateStops,
-        Locale requestedLocale) {
+    private static void addPlaces(Leg leg, State[] states, Locale requestedLocale) {
         Vertex firstVertex = states[0].getVertex();
         Vertex lastVertex = states[states.length - 1].getVertex();
 
@@ -495,35 +468,7 @@ public abstract class GraphPathToItineraryMapper {
                 ((TransitStopVertex) lastVertex).getStop(): null;
 
         leg.from = makePlace(states[0], firstVertex, firstStop, requestedLocale);
-        leg.from.arrival = null;
         leg.to = makePlace(states[states.length - 1], lastVertex, lastStop, requestedLocale);
-        leg.to.departure = null;
-
-        if (showIntermediateStops) {
-            leg.intermediateStops = new ArrayList<Place>();
-
-            Stop previousStop = null;
-            Stop currentStop;
-
-            for (int i = 1; i < edges.length; i++) {
-                Vertex vertex = states[i].getVertex();
-
-                if (!(vertex instanceof TransitStopVertex)) continue;
-
-                currentStop = ((TransitStopVertex) vertex).getStop();
-                if (currentStop == firstStop) continue;
-
-                if (currentStop == previousStop) {                  // Avoid duplication of stops
-                    leg.intermediateStops.get(leg.intermediateStops.size() - 1).departure = makeCalendar(states[i]);
-                    continue;
-                }
-
-                previousStop = currentStop;
-                if (currentStop == lastStop) break;
-
-                leg.intermediateStops.add(makePlace(states[i], vertex, currentStop, requestedLocale));
-            }
-        }
     }
 
     /**
@@ -547,9 +492,7 @@ public abstract class GraphPathToItineraryMapper {
         Place place = new Place(
                 vertex.getX(),
                 vertex.getY(),
-                name,
-                makeCalendar(state),
-                makeCalendar(state)
+                name
         );
 
         if (vertex instanceof TransitStopVertex) {

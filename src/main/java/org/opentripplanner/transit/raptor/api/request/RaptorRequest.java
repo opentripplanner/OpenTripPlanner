@@ -11,7 +11,7 @@ import java.util.Set;
 
 
 /**
- * All input parameters to RangeRaptor that is spesific to a routing request.
+ * All input parameters to RangeRaptor that is specific to a routing request.
  * See {@link TransitDataProvider} for transit data.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
@@ -19,7 +19,7 @@ import java.util.Set;
 public class RaptorRequest<T extends RaptorTripSchedule> {
     private final SearchParams searchParams;
     private final RaptorProfile profile;
-    private final boolean searchForward;
+    private final SearchDirection searchDirection;
     private final Set<Optimization> optimizations;
     private final McCostParams mcCostParams;
     private final DebugRequest<T> debug;
@@ -32,7 +32,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private RaptorRequest() {
         searchParams = SearchParams.defaults();
         profile = RaptorProfile.MULTI_CRITERIA;
-        searchForward = true;
+        searchDirection = SearchDirection.FORWARD;
         optimizations = Collections.emptySet();
         mcCostParams = McCostParams.DEFAULTS;
         debug = DebugRequest.defaults();
@@ -41,7 +41,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     RaptorRequest(RaptorRequestBuilder<T> builder) {
         this.searchParams = builder.searchParams().buildSearchParam();
         this.profile = builder.profile();
-        this.searchForward = builder.searchForward();
+        this.searchDirection = builder.searchDirection();
         this.optimizations = Set.copyOf(builder.optimizations());
         this.mcCostParams = new McCostParams(builder.mcCostFactors());
         this.debug = builder.debug().build();
@@ -90,29 +90,8 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return profile;
     }
 
-    /**
-     * Set search direction to REVERSE to performed a search  from the destination
-     * to the origin. Thie traverse the transit graph backwards in time.
-     * This parameter is used internally to produce heuristics, and is normally not
-     * something you would like to do unless you are testing or analyzing.
-     * <p/>
-     *
-     * @return  NOT {@link #searchForward()}
-     */
-    public boolean searchInReverse() {
-        return !searchForward;
-    }
-
-    /**
-     * When TRUE the search is performed from the origin to the destination in a
-     * normal way.
-     * <p/>
-     * Optional. Default value is 'true'.
-     *
-     * @return true is search is forward.
-     */
-    public boolean searchForward() {
-        return searchForward;
+    public SearchDirection searchDirection() {
+        return searchDirection;
     }
 
     /**
@@ -162,7 +141,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return "RangeRaptorRequest{" +
                 "searchParams=" + searchParams +
                 ", profile=" + profile +
-                ", searchForward=" + searchForward +
+                ", searchForward=" + searchDirection +
                 ", optimizations=" + optimizations +
                 ", mcCostParams=" + mcCostParams +
                 ", debug=" + debug +

@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.service;
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
+import org.opentripplanner.transit.raptor.api.request.SearchDirection;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.util.CompareIntArrays;
 import org.opentripplanner.transit.raptor.util.IntUtils;
@@ -38,7 +39,7 @@ public class DebugHeuristics {
     ) {
         DebugRequest<?> debug = request.debug();
         if (debug.logger().isEnabled(HEURISTICS)) {
-            new DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchForward());
+            new DebugHeuristics(aName, bName, debug).debug(h1, h2, request.searchDirection());
         }
     }
 
@@ -46,7 +47,7 @@ public class DebugHeuristics {
         logger.debug(HEURISTICS, message);
     }
 
-    private void debug(Heuristics fwdHeur, Heuristics revHeur, boolean forward) {
+    private void debug(Heuristics fwdHeur, Heuristics revHeur, SearchDirection direction) {
         log(CompareIntArrays.compare(
                 "NUMBER OF TRANSFERS",
                 aName, fwdHeur.bestNumOfTransfersToIntArray(UNREACHED),
@@ -61,7 +62,7 @@ public class DebugHeuristics {
                 bName, revHeur.bestTravelDurationToIntArray(UNREACHED),
                 UNREACHED,
                 stops,
-                forward ? comparingInt(i -> i) : (l, r) -> r - l
+                direction.isForward() ? comparingInt(i -> i) : (l, r) -> r - l
         ));
     }
 }
