@@ -8,6 +8,9 @@ import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.mapping.StopMapper;
+import org.opentripplanner.api.model.ApiStop;
+import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.index.model.PatternDetail;
@@ -162,7 +165,7 @@ public class IndexAPI {
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
    }
-   
+
    /** Return a list of all stops within a circle around the given coordinate. */
    @GET
    @Path("/stops")
@@ -189,13 +192,13 @@ public class IndexAPI {
            if (radius > MAX_STOP_SEARCH_RADIUS){
                radius = MAX_STOP_SEARCH_RADIUS;
            }
-           List<StopShort> stops = Lists.newArrayList(); 
+           List<ApiStopShort> stops = Lists.newArrayList();
            Coordinate coord = new Coordinate(lon, lat);
            for (TransitStopVertex stopVertex : streetIndex.getNearbyTransitStops(
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
-                   stops.add(new StopShort(stopVertex.getStop(), (int) distance));
+                   stops.add(new ApiStopShort(StopMapper.mapStop(stopVertex.getStop()), (int) distance));
                }
            }
            return Response.status(Status.OK).entity(stops).build();
@@ -207,10 +210,10 @@ public class IndexAPI {
            if (maxLat <= minLat || maxLon <= minLon) {
                return Response.status(Status.BAD_REQUEST).entity(MSG_400).build();
            }
-           List<StopShort> stops = Lists.newArrayList();
+           List<ApiStopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
            for (TransitStopVertex stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
-               stops.add(new StopShort(stopVertex.getStop()));
+               stops.add(new ApiStopShort(StopMapper.mapStop(stopVertex.getStop())));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
@@ -388,7 +391,7 @@ public class IndexAPI {
            Set<Stop> stops = Sets.newHashSet();
            Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
            for (TripPattern pattern : patterns) {
-               stops.addAll(pattern.getStops());
+               stops.addAll(StopMapper.mapStops(pattern.getStops()));
            }
            return Response.status(Status.OK).entity(StopShort.list(stops)).build();
        } else { 
