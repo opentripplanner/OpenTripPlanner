@@ -7,13 +7,13 @@ import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.jsonNodeForTest;
 
 
-public class GraphBuildParametersTest {
+public class BuildConfigTest {
     @Test
     public void testParsePeriodDate() {
         // Given
         JsonNode node  = jsonNodeForTest("{ 'parentStopLinking' : true }");
 
-        GraphBuildParameters subject = new GraphBuildParameters(node, "Test");
+        BuildConfig subject = new BuildConfig(node, "Test");
 
         // Then
         assertTrue(subject.parentStopLinking);

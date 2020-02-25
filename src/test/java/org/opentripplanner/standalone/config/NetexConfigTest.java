@@ -9,11 +9,11 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
-public class NetexParametersTest {
+public class NetexConfigTest {
 
     @Test
     public void testDefaultPatternMatchers() {
-        NetexParameters subject = new NetexParameters(
+        NetexConfig subject = new NetexConfig(
                 new NodeAdapter(MissingNode.getInstance(), "NetexParametersTest")
         );
 
@@ -37,7 +37,7 @@ public class NetexParametersTest {
                 "}"
         );
 
-        NetexParameters subject = new NetexParameters(nodeAdapter);
+        NetexConfig subject = new NetexConfig(nodeAdapter);
 
         assertTrue(subject.ignoreFilePattern.matcher(".ignore").matches());
         assertTrue(subject.ignoreFilePattern.matcher("__ignore").matches());

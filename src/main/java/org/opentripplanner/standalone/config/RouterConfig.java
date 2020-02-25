@@ -15,12 +15,12 @@ import java.util.Map;
 /**
  * This class is an object representation of the 'router-config.json'.
  */
-public class RouterConfigParams implements Serializable {
+public class RouterConfig implements Serializable {
 
     private static final double DEFAULT_STREET_ROUTING_TIMEOUT = 5.0;
-    private static final Logger LOG = LoggerFactory.getLogger(RouterConfigParams.class);
+    private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
-    public static final RouterConfigParams DEFAULT = new RouterConfigParams(
+    public static final RouterConfig DEFAULT = new RouterConfig(
             MissingNode.getInstance(), "DEFAULT"
     );
 
@@ -59,7 +59,7 @@ public class RouterConfigParams implements Serializable {
     public final RoutingRequest routingRequestDefaults;
     public final RaptorTuningParameters raptorTuningParameters;
 
-    public RouterConfigParams(JsonNode node, String source) {
+    public RouterConfig(JsonNode node, String source) {
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
         this.requestLogFile = adapter.asText("requestLogFile", null);
@@ -69,7 +69,7 @@ public class RouterConfigParams implements Serializable {
         this.boardTimes = adapter.asEnumMap("boardTimes", TraverseMode.class, NodeAdapter::asInt);
         this.alightTimes = adapter.asEnumMap("alightTimes", TraverseMode.class, NodeAdapter::asInt);
 
-        this.raptorTuningParameters = new TransitTuningParameters(adapter.path("transit"));
+        this.raptorTuningParameters = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = routingRequestDefaults(adapter.path("routingDefaults"));
 
         adapter.logUnusedParameters(LOG);

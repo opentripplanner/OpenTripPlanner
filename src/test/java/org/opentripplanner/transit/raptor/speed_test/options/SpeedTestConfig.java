@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.standalone.config.TransitTuningParameters;
+import org.opentripplanner.standalone.config.TransitRoutingConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -36,7 +36,7 @@ public class SpeedTestConfig {
         testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
         maxWalkDistanceMeters = adapter.asInt("maxWalkDistanceMeters", 1000);
         walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
-        tuningParameters = new TransitTuningParameters(adapter.path("tuningParameters"));
+        tuningParameters = new TransitRoutingConfig(adapter.path("tuningParameters"));
     }
 
     @Override

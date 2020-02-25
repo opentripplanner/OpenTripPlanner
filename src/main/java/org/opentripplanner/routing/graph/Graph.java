@@ -60,8 +60,8 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
-import org.opentripplanner.standalone.config.RouterConfigParams;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.util.OtpAppException;
@@ -172,10 +172,10 @@ public class Graph implements Serializable {
     private Coordinate center = null;
 
     /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public GraphBuildParameters buildConfig = GraphBuildParameters.DEFAULT;
+    public BuildConfig buildConfig = BuildConfig.DEFAULT;
 
     /** Embed a router configuration inside the graph, for starting up with a single file. */
-    public RouterConfigParams routerConfig = RouterConfigParams.DEFAULT;
+    public RouterConfig routerConfig = RouterConfig.DEFAULT;
 
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;

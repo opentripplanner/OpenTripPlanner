@@ -37,7 +37,7 @@ import java.util.List;
  * artifacts like the loaded graph, saved graph and NeTEx files are loaded and written from/to the local
  * base directory - it they exist.
  */
-public class StorageParameters {
+public class StorageConfig {
 
     /**
      * Local file system path to Google Cloud Platform service accounts credentials file. The
@@ -124,7 +124,7 @@ public class StorageParameters {
     public final URI buildReportDir;
 
 
-    StorageParameters(NodeAdapter config) {
+    StorageConfig(NodeAdapter config) {
         this.gsCredentials = config.asText("gsCredentials",null);
         this.graph = config.asUri("graph", null);
         this.streetGraph = config.asUri("streetGraph", null);

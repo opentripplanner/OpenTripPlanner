@@ -8,7 +8,7 @@ import java.io.IOException;
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.standalone.config.JsonSupport.newNodeAdapterForTest;
 
-public class StorageParametersTest {
+public class StorageConfigTest {
 
     @Test
     public void testCreateGoogleCloudStorageParameters() throws IOException {
@@ -24,7 +24,7 @@ public class StorageParametersTest {
                 + " buildReportDir : 'gs://b/report'\n"
                 + "}"
         );
-        StorageParameters c =  new StorageParameters(nodeAdapter);
+        StorageConfig c =  new StorageConfig(nodeAdapter);
 
         assertEquals("file:/cfile", c.gsCredentials);
         assertEquals("gs://b/g.obj", c.graph.toString());

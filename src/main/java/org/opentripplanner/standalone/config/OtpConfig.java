@@ -9,7 +9,7 @@ import java.util.Map;
 
 
 /**
- * Wraps the 'otp-config.json'
+ * This class is an object representation of the 'otp-config.json'.
  */
 public class OtpConfig {
     private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);

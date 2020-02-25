@@ -53,7 +53,7 @@ public class ConfigLoaderTest {
         FileUtils.write(file, json, UTF_8);
 
         // when:
-        GraphBuildParameters parameters = new ConfigLoader(tempDir).loadBuildConfig();
+        BuildConfig parameters = new ConfigLoader(tempDir).loadBuildConfig();
 
         // then:
         assertTrue(parameters.areaVisibility);
@@ -66,7 +66,7 @@ public class ConfigLoaderTest {
         FileUtils.write(file, "{key-a : 12}", UTF_8);
 
         // when:
-        RouterConfigParams params = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then:
         assertEquals(12, params.rawJson.path("key-a").asInt());
@@ -75,7 +75,7 @@ public class ConfigLoaderTest {
     @Test
     public void whenFileDoNotExistExpectMissingNode() {
         // when: ruter-config.json do not exist
-        RouterConfigParams res = new ConfigLoader(tempDir).loadRouterConfig();
+        RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then: expect missing node
         assertTrue(res.toString(), res.rawJson.isMissingNode());

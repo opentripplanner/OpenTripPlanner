@@ -5,9 +5,9 @@ import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
-import org.opentripplanner.standalone.config.RouterConfigParams;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -43,8 +43,8 @@ public class OTPConfiguration {
      */
     private final CommandLineParameters cli;
     private final OtpConfig otpConfig;
-    private final GraphBuildParameters buildConfig;
-    private RouterConfigParams routerConfig;
+    private final BuildConfig buildConfig;
+    private RouterConfig routerConfig;
 
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
         this.cli = cli;
@@ -72,7 +72,7 @@ public class OTPConfiguration {
         );
     }
 
-    public void setEmbeddedRouterConfig(RouterConfigParams routerConfig) {
+    public void setEmbeddedRouterConfig(RouterConfig routerConfig) {
         if(this.routerConfig.isDefault()) {
             LOG.info("Using the graph embedded JSON router configuration.");
             this.routerConfig = routerConfig;
@@ -98,7 +98,7 @@ public class OTPConfiguration {
     /**
      * Get the graph build config as a java bean - type safe.
      */
-    public GraphBuildParameters buildConfig() {
+    public BuildConfig buildConfig() {
         return buildConfig;
     }
 
@@ -108,7 +108,7 @@ public class OTPConfiguration {
      * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
      * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
      */
-    public RouterConfigParams routerConfig() {
+    public RouterConfig routerConfig() {
         return routerConfig;
     }
 

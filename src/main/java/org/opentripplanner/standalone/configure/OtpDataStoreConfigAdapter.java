@@ -1,7 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
 import org.opentripplanner.datastore.OtpDataStoreConfig;
-import org.opentripplanner.standalone.config.StorageParameters;
+import org.opentripplanner.standalone.config.StorageConfig;
 
 import java.io.File;
 import java.net.URI;
@@ -18,10 +18,10 @@ import java.util.List;
  */
 class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     private final File baseDirectory;
-    private final StorageParameters config;
+    private final StorageConfig config;
 
     OtpDataStoreConfigAdapter(
-            File baseDirectory, StorageParameters config
+            File baseDirectory, StorageConfig config
     ) {
         this.baseDirectory = baseDirectory;
         this.config = config;

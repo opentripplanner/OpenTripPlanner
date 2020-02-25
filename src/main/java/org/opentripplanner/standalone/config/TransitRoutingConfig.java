@@ -2,14 +2,11 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * @see RaptorTuningParameters for documentaion of tuning parameters.
  */
-public final class TransitTuningParameters implements RaptorTuningParameters {
-    private static final Logger LOG = LoggerFactory.getLogger(TransitTuningParameters.class);
+public final class TransitRoutingConfig implements RaptorTuningParameters {
 
     private final int maxNumberOfTransfers;
     private final int scheduledTripBinarySearchThreshold;
@@ -17,7 +14,7 @@ public final class TransitTuningParameters implements RaptorTuningParameters {
     private final int searchThreadPoolSize;
     private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
-    public TransitTuningParameters(NodeAdapter c) {
+    public TransitRoutingConfig(NodeAdapter c) {
         RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
         this.maxNumberOfTransfers = c.asInt("maxNumberOfTransfers", dft.maxNumberOfTransfers());

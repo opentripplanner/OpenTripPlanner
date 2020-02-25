@@ -13,7 +13,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayer
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.RouterConfigParams;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
@@ -29,7 +29,7 @@ public class Router {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
     public final Graph graph;
-    private final RouterConfigParams config;
+    private final RouterConfig config;
     public final RaptorConfig<TripSchedule> raptorConfig;
 
     /**

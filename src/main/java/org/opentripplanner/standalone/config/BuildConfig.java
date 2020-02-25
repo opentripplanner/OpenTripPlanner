@@ -16,6 +16,8 @@ import java.time.LocalDate;
 import java.time.Period;
 
 /**
+ * This class is an object representation of the 'build-config.json'.
+ * <p>
  * These are parameters that when changed, necessitate a Graph rebuild. They are distinct from the
  * RouterParameters which can be applied to a pre-built graph or on the fly at runtime. Eventually
  * both classes may be initialized from the same config file so make sure there is no overlap in the
@@ -28,10 +30,10 @@ import java.time.Period;
  * ones trigger a rebuild ...or just feed the same JSON tree to two different classes, one of which
  * is the build configuration and the other is the router configuration.
  */
-public class GraphBuildParameters {
-    private static final Logger LOG = LoggerFactory.getLogger(GraphBuildParameters.class);
+public class BuildConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(BuildConfig.class);
 
-    public static final GraphBuildParameters DEFAULT = new GraphBuildParameters(MissingNode.getInstance(), "DEFAULT");
+    public static final BuildConfig DEFAULT = new BuildConfig(MissingNode.getInstance(), "DEFAULT");
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
@@ -247,7 +249,7 @@ public class GraphBuildParameters {
     /**
      * Netex specific build parameters.
      */
-    public final NetexParameters netex;
+    public final NetexConfig netex;
 
     /**
      * Otp auto detect input and output files using the command line supplied paths. This parameter
@@ -255,7 +257,7 @@ public class GraphBuildParameters {
      * storage section is optional, and the fallback is to use the auto detection. It is OK to
      * autodetect some file and specify the path to others.
      */
-    public final StorageParameters storage;
+    public final StorageConfig storage;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -263,7 +265,7 @@ public class GraphBuildParameters {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-    public GraphBuildParameters(JsonNode node, String source) {
+    public BuildConfig(JsonNode node, String source) {
         NodeAdapter c = new NodeAdapter(node, source);
         rawJson = node;
         dataImportReport = c.asBoolean("dataImportReport", false);
@@ -301,8 +303,8 @@ public class GraphBuildParameters {
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
 
-        netex = new NetexParameters(c.path("netex"));
-        storage = new StorageParameters(c.path("storage"));
+        netex = new NetexConfig(c.path("netex"));
+        storage = new StorageConfig(c.path("storage"));
 
         c.logUnusedParameters(LOG);
     }

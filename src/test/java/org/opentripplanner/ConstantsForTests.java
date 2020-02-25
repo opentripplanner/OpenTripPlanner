@@ -18,7 +18,7 @@ import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
@@ -153,7 +153,7 @@ public class ConstantsForTests {
             }
             // Add transit data from Netex
             {
-                GraphBuildParameters buildParameters = createNetexBuilderParameters();
+                BuildConfig buildParameters = createNetexBuilderParameters();
                 List<DataSource> dataSources = Collections.singletonList(NETEX_MINIMAL_DATA_SOURCE);
                 NetexModule module = NetexConfig.netexModule(buildParameters, dataSources);
                 module.buildGraph(minNetexGraph, null);
@@ -189,7 +189,7 @@ public class ConstantsForTests {
     }
 
 
-    private static GraphBuildParameters createNetexBuilderParameters() {
+    private static BuildConfig createNetexBuilderParameters() {
         return new ConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
     }
 }

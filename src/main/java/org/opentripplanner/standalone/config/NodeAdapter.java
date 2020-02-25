@@ -26,18 +26,32 @@ import java.util.function.BiFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
+
+/**
+ * This class wrap a {@link JsonNode} and decorate it with type-safe parsing
+ * of types used in OTP like enums, date, time, URIs and so on. By wrapping
+ * the JsonNode we get consistent parsing rules and the possibility to log unused
+ * parameters when the end of parsing a file. Also the configuration POJOs become
+ * cleaner because they do not have any parsing logic in them any more.
+ * <p>
+ * This class have 100% test coverage - keep it that way, for the individual configuration
+ * POJOs a smoke test is good enough.
+ */
 public class NodeAdapter {
 
     private final JsonNode json;
 
     /**
-     * The source should should be a unique identifier for this adapter. The
-     * normal way to do it is to name the source using the configuration "source"
-     * (could be the filename, "DEFAULT", or serialized part of the graph) and the path
-     * of keys in the config, like this:
-     * {@code build-config.json/transit/dynamicSearchWindow}
+     * The source is the origin of the configuration. The source can be "DEFAULT", the name of the
+     * JSON source files or the "SerializedGraph".
      */
     private final String source;
+
+    /**
+     * This class wrap a {@link JsonNode} witch might be a child of another node. We
+     * keep the path string for logging and debugging purposes
+     */
+    private final String contextPath;
 
     /**
      * This parameter is used internally in this class to be able to produce a
@@ -52,8 +66,16 @@ public class NodeAdapter {
     private final Set<NodeAdapter> children = new HashSet<>();
 
     public NodeAdapter(@NotNull JsonNode node, String source) {
-        json = node;
+        this(node, source, null);
+    }
+
+    /**
+     * Constructor for nested configuration nodes.
+     */
+    private NodeAdapter(@NotNull JsonNode node, String source, String contextPath) {
+        this.json = node;
         this.source = source;
+        this.contextPath = contextPath;
     }
 
     JsonNode asRawNode(String paramName) {
@@ -65,7 +87,12 @@ public class NodeAdapter {
     }
 
     public NodeAdapter path(String paramName) {
-        NodeAdapter child = new NodeAdapter(json.path(paramName), source + "/" + paramName);
+        NodeAdapter child = new NodeAdapter(
+                json.path(paramName),
+                source,
+                fullPath(paramName)
+        );
+
         if(!child.isEmpty()) {
             parameterNames.add(paramName);
             children.add(child);
@@ -139,8 +166,11 @@ public class NodeAdapter {
         }
         catch (IllegalArgumentException ignore) {
             List<T> legalValues = (List<T>) Arrays.asList(defaultValue.getClass().getEnumConstants());
-            throw new OtpAppException("The '" + source + "' parameter '" + paramName
-                    + "' : '" + valueAsString + "' is not in legal. Expected one of " + legalValues + ".");
+            throw new OtpAppException(
+                    "The parameter '" + fullPath(paramName)
+                    + "': '" + valueAsString + "' is not in legal. Expected one of " + legalValues
+                    + ". Source: " + source + "."
+            );
         }
     }
 
@@ -199,9 +229,9 @@ public class NodeAdapter {
                         result.add(Enum.valueOf(enumClass, value));
                     }
                     catch (IllegalArgumentException e) {
-                        throw new OtpAppException("The '" + source + "' parameter '" + paramName
-                                + "' : '" + value + "' is not an enum value of "
-                                + enumClass.getSimpleName() + "."
+                        throw new OtpAppException("The parameter '" + fullPath(paramName)
+                                + "': '" + value + "' is not an enum value of "
+                                + enumClass.getSimpleName() + ". Source: " + source + "."
                         );
                     }
             }
@@ -220,8 +250,10 @@ public class NodeAdapter {
         if(parts.length == 1) { return new Locale(parts[0]); }
         if(parts.length == 2) { return new Locale(parts[0], parts[1]); }
         if(parts.length == 3) { return new Locale(parts[0], parts[1], parts[2]); }
-        throw new OtpAppException("The '" + source + "' parameter: '" + paramName
-                + "' is not recognized as a valid Locale. Use: <Language>[_<country>[_<variant>]].");
+        throw new OtpAppException("The parameter: '" + fullPath(paramName)
+                + "' is not recognized as a valid Locale. Use: <Language>[_<country>[_<variant>]]. "
+                + "Source: " + source + "."
+        );
     }
 
     public LocalDate asDateOrRelativePeriod(String paramName, String defaultValue) {
@@ -238,9 +270,9 @@ public class NodeAdapter {
             }
         }
         catch (DateTimeParseException e) {
-            throw new OtpAppException("The " + source + " parameter: '" + paramName
-                    + "' : '" + text + "' is not a Period or LocalDate: " +
-                    e.getLocalizedMessage()
+            throw new OtpAppException("The parameter '" + fullPath(paramName)
+                    + "': '" + text + "' is not a Period or LocalDate. "
+                    + "Source: " + source + ". Details: " + e.getLocalizedMessage()
             );
         }
     }
@@ -271,25 +303,27 @@ public class NodeAdapter {
     public void logUnusedParameters(Logger log) {
         for (String p : unusedParams()) {
             log.warn(
-                    "Unexpected config parameter: '{}'. The parameter is unknown,"
-                    + " is the spelling correct?", p
+                    "Unexpected config parameter: '{}' in '{}'. Is the spelling correct?",
+                    p, source
             );
         }
     }
 
     /**
      * Unused parameters should be logged for each config file read. This method list all
-     * unused parameters, also nested ones. It uses recursion to get child nodes.
+     * unused parameters(full path), also nested ones. It uses recursion to get child nodes.
      */
     private List<String> unusedParams() {
         List<String> unusedParams = new ArrayList<>();
         Iterator<String> it = json.fieldNames();
+
         while (it.hasNext()) {
             String fieldName = it.next();
             if(!parameterNames.contains(fieldName)) {
-                unusedParams.add(source + "/" + fieldName);
+                unusedParams.add(fullPath(fieldName));
             }
         }
+
         for (NodeAdapter c : children) {
             // Recursive call to get child unused parameters
             unusedParams.addAll(c.unusedParams());
@@ -318,6 +352,12 @@ public class NodeAdapter {
         return json.path(paramName);
     }
 
+    private String fullPath(String paramName) {
+        return contextPath == null
+                ? paramName
+                : contextPath + "." + paramName;
+    }
+
     private URI uriFromString(String paramName, String text) {
         if (text == null || text.isBlank()) {
             return null;
@@ -327,9 +367,10 @@ public class NodeAdapter {
         }
         catch (URISyntaxException e) {
             throw new OtpAppException(
-                    "Unable to parse '" + source + "' parameter: "
-                            + "\n\tActual: \"" + paramName + "\" : \"" + text + "\""
-                            + "\n\tExpected valid URI, it should be parsable by java.net.URI class.");
+                    "Unable to parse parameter '" + fullPath(paramName) + "'. The value '" + text
+                    + "' is is not a valid URI, it should be parsable by java.net.URI class. "
+                    + "Source: " + source + "."
+            );
         }
     }
 
@@ -348,15 +389,14 @@ public class NodeAdapter {
     }
 
     private OtpAppException requiredFieldMissingException(String paramName) {
-        return new OtpAppException("Required parameter '" + paramName + "' not found in '" + source + "'.");
+        return new OtpAppException("Required parameter '" + fullPath(paramName) + "' not found in '" + source + "'.");
     }
 
     private void assertIsArray(String paramName, JsonNode array) {
         if(!array.isArray()) {
             throw new OtpAppException(
-                    "Unable to parse '" + source +"' parameter: "
-                            + "\n\tActual: \"" + paramName + "\" : \"" + array.asText() + "\""
-                            + "\n\tExpected an ARRAY."
+                    "Unable to parse parameter '" + fullPath(paramName) + "': '" + array.asText()
+                            + "' expected an ARRAY. Source: " + source + "."
             );
         }
     }

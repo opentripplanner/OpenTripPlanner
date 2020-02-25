@@ -132,7 +132,12 @@ public class NodeAdapterTest {
         // Assert unknown parameter is logged at warning level and with full pathname
         Logger log = Mockito.mock(Logger.class);
         subject.logUnusedParameters(log);
-        Mockito.verify(log).warn(Mockito.anyString(), Mockito.eq("Test/key/unknown"));
+        Mockito.verify(log)
+                .warn(
+                        Mockito.anyString(),
+                        Mockito.eq("key.unknown"),
+                        Mockito.eq("Test")
+                );
     }
 
     @Test
@@ -236,14 +241,14 @@ public class NodeAdapterTest {
 
     @Test
     public void urisNotAnArrayException() {
-        NodeAdapter subject  = newNodeAdapterForTest("{ uris : 'no array' }");
+        NodeAdapter subject  = newNodeAdapterForTest("{ 'uris': 'no array' }");
         try {
             subject.asUris("uris");
             fail("Expected an exception");
         }
         catch (OtpAppException e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("Actual: \"uris\" : \"no array\""));
-            assertTrue(e.getMessage(), e.getMessage().contains("Expected an ARRAY"));
+            assertTrue(e.getMessage(), e.getMessage().contains("'uris': 'no array'"));
+            assertTrue(e.getMessage(), e.getMessage().contains("Source: Test"));
         }
     }
 }

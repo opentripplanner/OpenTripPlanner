@@ -7,7 +7,7 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.standalone.config.CommandLineParameters;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -47,7 +47,7 @@ public class GraphBuilderDataSources {
 
     private GraphBuilderDataSources(
             CommandLineParameters cli,
-            GraphBuildParameters bc,
+            BuildConfig bc,
             OtpDataStore store
     ) {
         this.store = store;
@@ -77,7 +77,7 @@ public class GraphBuilderDataSources {
      */
     public static GraphBuilderDataSources create(
             CommandLineParameters cli,
-            GraphBuildParameters bc,
+            BuildConfig bc,
             OtpDataStore store
 
     ) {
