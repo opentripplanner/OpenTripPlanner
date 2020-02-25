@@ -4,6 +4,7 @@ import java.io.File;
 import java.io.IOException;
 import java.util.HashMap;
 
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.gtfs.GtfsContext;
@@ -77,7 +78,7 @@ public class ConstantsForTests {
         }
 
         StreetLinkerModule ttsnm = new StreetLinkerModule();
-        ttsnm.buildGraph(portlandGraph, new HashMap<Class<?>, Object>());
+        ttsnm.buildGraph(portlandGraph, new GraphBuilderModuleSummary(ttsnm));
     }
     
     public static Graph buildGraph(String path) {

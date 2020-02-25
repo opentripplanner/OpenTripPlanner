@@ -8,6 +8,7 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.junit.Test;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.ParkAndRideEdge;
 import org.opentripplanner.routing.edgetype.ParkAndRideLinkEdge;
@@ -37,7 +38,7 @@ public class TestUnconnectedAreas extends TestCase {
         File file = new File(getClass().getResource("P+R.osm.gz").getFile());
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
 
         assertEquals(1, gg.getBuilderAnnotations().size());
 
@@ -73,7 +74,7 @@ public class TestUnconnectedAreas extends TestCase {
         File file = new File(getClass().getResource("hackett_pr.osm.gz").getFile());
         provider.setPath(file);
         loader.setProvider(provider);
-        loader.buildGraph(g, new HashMap<Class<?>, Object>());
+        loader.buildGraph(g, new GraphBuilderModuleSummary(loader));
     	
         Vertex washTwp = null;
         
@@ -173,7 +174,7 @@ public class TestUnconnectedAreas extends TestCase {
          File file = new File(getClass().getResource(fn).getFile());
          provider.setPath(file);
          loader.setProvider(provider);
-         loader.buildGraph(g, new HashMap<Class<?>, Object>());
+         loader.buildGraph(g, new GraphBuilderModuleSummary(loader));
 
          Vertex pr = null;
          

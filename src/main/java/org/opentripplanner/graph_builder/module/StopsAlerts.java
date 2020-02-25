@@ -11,7 +11,6 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -28,7 +27,7 @@ public class StopsAlerts implements GraphBuilderModule {
     String logFile = "";
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         try {
             PrintWriter pw = new PrintWriter(new File(logFile));
             pw.printf("%s,%s,%s,%s\n","stopId","lon","lat","types");

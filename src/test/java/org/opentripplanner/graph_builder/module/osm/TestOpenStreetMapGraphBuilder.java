@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.openstreetmap.impl.FileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
@@ -34,13 +35,6 @@ import java.util.Set;
 
 public class TestOpenStreetMapGraphBuilder extends TestCase {
 
-    private HashMap<Class<?>, Object> extra;
-    
-    @Before
-    public void setUp() {
-        extra = new HashMap<Class<?>, Object>();
-    }
-
     @Test
     public void testGraphBuilder() throws Exception {
 
@@ -55,7 +49,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, extra);
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
 
         // Kamiennogorska at south end of segment
         Vertex v1 = gg.getVertex("osm:node:280592578");
@@ -113,7 +107,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, extra);
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
         
         // These vertices are labeled in the OSM file as having traffic lights.
         IntersectionVertex iv1 = (IntersectionVertex) gg.getVertex("osm:node:1919595918");
@@ -170,7 +164,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         provider.setPath(file);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, extra);
+        loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
 
         OTPServer otpServer = new OTPServer(new CommandLineParameters(), new GraphService());
         otpServer.getGraphService().registerGraph("A", new MemoryGraphSource("A", gg));
@@ -325,7 +319,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     // pr.setPath(new File(getClass().getResource("otp-multipolygon-test.osm").getPath()));
     // loader.setProvider(pr);
     //
-    // loader.buildGraph(gg, extra);
+    // loader.buildGraph(gg, new GraphBuilderModuleSummary(loader));
     //
     // assertNotNull(gg.getVertex("way -3535 from 4"));
     // }

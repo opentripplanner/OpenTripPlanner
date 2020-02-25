@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -32,7 +31,7 @@ public class GraphCoherencyCheckerModule implements GraphBuilderModule {
     private static final Logger LOG = LoggerFactory.getLogger(GraphCoherencyCheckerModule.class);
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         boolean coherent = true;
         LOG.info("checking graph coherency...");
         for (Vertex v : graph.getVertices()) {

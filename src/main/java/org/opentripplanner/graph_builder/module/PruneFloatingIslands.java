@@ -7,7 +7,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -53,7 +52,7 @@ public class PruneFloatingIslands implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         LOG.info("Pruning isolated islands in street network");
         
         StreetUtils.pruneFloatingIslands(

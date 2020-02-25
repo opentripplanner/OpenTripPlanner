@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Maps;
 import junit.framework.TestCase;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.algorithm.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -38,8 +39,7 @@ public class TestUnroutable extends TestCase {
         File osmDataFile = new File(URLDecoder.decode(osmDataUrl.getFile(), "UTF-8"));
         provider.setPath(osmDataFile);
         osmBuilder.setProvider(provider);
-        HashMap<Class<?>, Object> extra = Maps.newHashMap();
-        osmBuilder.buildGraph(graph, extra); // TODO get rid of this "extra" thing
+        osmBuilder.buildGraph(graph, new GraphBuilderModuleSummary(osmBuilder));
      }
 
     /**

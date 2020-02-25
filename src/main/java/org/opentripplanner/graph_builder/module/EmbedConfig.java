@@ -7,8 +7,6 @@ import com.fasterxml.jackson.databind.ObjectWriter;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 
-import java.util.HashMap;
-
 /**
  * A graph builder that will embed the JSON graph builder and router configuration into the Graph.
  * This allows us to check whether a graph was built with a different configuration file than one found on disk,
@@ -27,7 +25,7 @@ public class EmbedConfig implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
         try {
             graph.builderConfig = serializedConfiguration(builderConfig);
             graph.routerConfig = serializedConfiguration(routerConfig);

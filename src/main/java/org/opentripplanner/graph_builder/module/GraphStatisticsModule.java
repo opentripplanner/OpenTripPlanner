@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import java.util.Arrays;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
@@ -42,7 +41,7 @@ public class GraphStatisticsModule implements GraphBuilderModule {
             .getLogger(GraphStatisticsModule.class);
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
 
         DiscreteDistribution<ConstantQuantifiable<String>> edgeTypeDistribution = new DiscreteDistribution<ConstantQuantifiable<String>>();
         DiscreteDistribution<NumberQuantifiable<Integer>> edgeNameDistribution = new DiscreteDistribution<NumberQuantifiable<Integer>>();

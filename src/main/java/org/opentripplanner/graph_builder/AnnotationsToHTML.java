@@ -14,6 +14,8 @@ import java.util.logging.Level;
 
 import org.apache.commons.io.FileUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
+import org.opentripplanner.graph_builder.module.GraphBuilderTaskSummary;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -59,7 +61,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
 
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
 
         if (outPath == null) {
             LOG.error("Saving folder is empty!");
@@ -118,7 +120,7 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         }
 
         try {
-            HTMLWriter indexFileWriter = new HTMLWriter("index", (Multimap<String, String>)null);
+            HTMLWriter indexFileWriter = new HTMLWriter("index", graph.getBuilderSummaries());
             indexFileWriter.writeFile(annotationClassOccurences, true);
         } catch (FileNotFoundException e) {
             LOG.error("Index file coudn't be created:{}", e);
@@ -178,7 +180,6 @@ public class AnnotationsToHTML implements GraphBuilderModule {
     private void addAnnotation(GraphBuilderAnnotation annotation) {
         String className = annotation.getClass().getSimpleName();
         annotations.put(className, annotation.getHTMLMessage());
-
     }
 
     class HTMLWriter {
@@ -187,6 +188,8 @@ public class AnnotationsToHTML implements GraphBuilderModule {
         private Multimap<String, String> writerAnnotations;
 
         private String annotationClassName;
+
+        private List<GraphBuilderModuleSummary> graphBuilderModuleSummaries = null;
 
         public HTMLWriter(String key, Collection<String> annotations) throws FileNotFoundException {
             LOG.debug("Making file: {}", key);
@@ -198,14 +201,14 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             annotationClassName = key;
         }
 
-        public HTMLWriter(String filename, Multimap<String, String> curMap)
+        public HTMLWriter(String filename, List<GraphBuilderModuleSummary> graphBuilderModuleSummaries)
             throws FileNotFoundException {
             LOG.debug("Making file: {}", filename);
             File newFile = new File(outPath, filename +".html");
             FileOutputStream fileOutputStream = new FileOutputStream(newFile);
             this.out = new PrintStream(fileOutputStream);
-            writerAnnotations = curMap;
             annotationClassName = filename;
+            this.graphBuilderModuleSummaries = graphBuilderModuleSummaries;
         }
 
         private void writeFile(Multiset<String> classes, boolean isIndexFile) {
@@ -217,6 +220,10 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println(
                 "<link rel='stylesheet' href='http://yui.yahooapis.com/pure/0.5.0/pure-min.css'>");
             String css = "\t\t<style>\n"
+                + "\n"
+                + "\t\t\tbody {\n"
+                + "\t\t\t\tmargin:8px;\n"
+                + "\t\t\t}\n"
                 + "\n"
                 + "\t\t\tbutton.pure-button {\n"
                 + "\t\t\t\tmargin:5px;\n"
@@ -250,13 +257,38 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 + "\t\t\t\tbackground: rgb(66, 184, 221); /* this is a light blue */\n"
                 + "\t\t\t}\n"
                 + "\n"
+                + "\t\t\tth, td {\n"
+                + "\t\t\t\tborder: 1px solid black;\n"
+                + "\t\t\t\tpadding: 5px;\n"
+                + "\t\t\t}\n"
+                + "\n"
+                + "\t\t\ttable {\n"
+                + "\t\t\t\tmargin: 5px;\n"
+                + "\t\t\t}\n"
+                + "\n"
+                + "\t\t\t.subtasks table {\n"
+                + "\t\t\t\tmargin: 0;\n"
+                + "\t\t\t}\n"
+                + "\n"
+                + "\t\t\t.subtasks td {\n"
+                + "\t\t\t\tborder: none;\n"
+                + "\t\t\t\tmin-width: 145px;\n"
+                + "\t\t\t}\n"
+                + "\n"
                 + "\t\t</style>\n"
                 + "";
             println(css);
             println("</head><body>");
-            println(String.format("<h1>OpenTripPlanner annotations log for %s</h1>", annotationClassName));
+            println(isIndexFile
+                ? "<h1>OpenTripPlanner Graph Build Report</h1>"
+                : String.format("<h1>OpenTripPlanner annotations log for %s</h1>", annotationClassName));
             println("<h2>Graph report for " + outPath.getParentFile() + "Graph.obj</h2>");
             println("<p>");
+            // add link for home page
+            println(isIndexFile
+                ? "<button class='pure-button pure-button-disabled'>Home</button>"
+                : "<a class='pure-button' href=\"index.html\">Home</a>"
+            );
             //adds links to the other HTML files
             for (Multiset.Entry<String> htmlAnnotationClass : classes.entrySet()) {
                 String label_name = htmlAnnotationClass.getElement();
@@ -276,7 +308,9 @@ public class AnnotationsToHTML implements GraphBuilderModule {
                 }
             }
             println("</p>");
-            if (!isIndexFile) {
+            if (isIndexFile) {
+                writeIndexContent();
+            } else {
                 println("<ul id=\"log\">");
                 writeAnnotations();
                 println("</ul>");
@@ -285,6 +319,71 @@ public class AnnotationsToHTML implements GraphBuilderModule {
             println("</body></html>");
 
             close();
+        }
+
+        /**
+         * Writes the index page contents.
+         */
+        private void writeIndexContent() {
+            println("<h3>Graph builder module report</h3>");
+            println("<table>");
+            println("<thead>");
+            println("<tr><th>Graph Builder Module</th><th>Processing time</th><th>Subtasks</th></tr>");
+            println("</thead>");
+            println("<tbody>");
+            long totalDuration = 0;
+            for (GraphBuilderModuleSummary summary : graphBuilderModuleSummaries) {
+                totalDuration += summary.getDuration();
+            }
+
+            for (GraphBuilderModuleSummary summary: graphBuilderModuleSummaries) {
+                StringBuilder summaryLine = new StringBuilder();
+                summaryLine.append(
+                    String.format(
+                        "<tr><td>%s</td><td>%.1fs (%.0f%%)</td><td class=\"subtasks\">",
+                        summary.getName(),
+                        summary.getDuration() / 1000.0,
+                        summary.getDuration() * 1.0 / totalDuration * 100
+                    )
+                );
+                if (summary.getSubTasks().size() > 0) {
+                    summaryLine.append("<table>");
+                    for (GraphBuilderTaskSummary subTask : summary.getSubTasks()) {
+                        String subTaskName = subTask.getName();
+                        summaryLine.append(
+                            String.format(
+                                "<tr><td>%s</td><td>%.1fs (%.0f%%)</td></tr>",
+                                subTaskName,
+                                subTask.getDuration() / 1000.0,
+                                subTask.getDuration() * 1.0 / summary.getDuration() * 100
+                            )
+                        );
+                    }
+                    summaryLine.append("</table>");
+                }
+                summaryLine.append("</td></tr>");
+                println(summaryLine.toString());
+            }
+            println("</tbody>");
+            println("</table>");
+
+            println("<h3>Annotations</h3>");
+            println("<table>");
+            println("<thead>");
+            println("<tr><th>Annotation Class</th><th>Number of annotations</th></tr>");
+            println("</thead>");
+            println("<tbody>");
+            for (String className : annotations.keySet()) {
+                println(
+                    String.format(
+                        "<tr><td>%s</td><td>%d</td></tr>",
+                        className,
+                        annotations.get(className).size()
+                    )
+                );
+            }
+            println("</tbody>");
+            println("</table>");
         }
 
         /**

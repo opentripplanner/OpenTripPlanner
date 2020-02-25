@@ -11,6 +11,9 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.graph_builder.annotation.ElevationFlattened;
+import org.opentripplanner.graph_builder.annotation.Graphwide;
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
+import org.opentripplanner.graph_builder.module.GraphBuilderTaskSummary;
 import org.opentripplanner.graph_builder.module.extra_elevation_data.ElevationPoint;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -81,7 +84,12 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     @Override
-    public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+    public void buildGraph(Graph graph, GraphBuilderModuleSummary graphBuilderModuleSummary) {
+        GraphBuilderTaskSummary demPrepareTask = graphBuilderModuleSummary.addSubTask(
+            "fetch and prepare elevation data"
+        );
+        log.info(demPrepareTask.start());
+
         gridCoverageFactory.setGraph(graph);
         Coverage gridCov = gridCoverageFactory.getGridCoverage();
 
@@ -90,7 +98,13 @@ public class ElevationModule implements GraphBuilderModule {
         // interpolation internally)
         coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
                 (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
-        log.info("Setting street elevation profiles from digital elevation model...");
+        log.info(demPrepareTask.finish());
+
+        GraphBuilderTaskSummary setElevationsFromDEMTask = graphBuilderModuleSummary.addSubTask(
+            "set elevation profiles with DEM"
+        );
+        log.info(setElevationsFromDEMTask.start());
+
         List<StreetEdge> edgesWithElevation = new ArrayList<StreetEdge>();
         int nProcessed = 0;
         int nTotal = graph.countEdges();
@@ -107,8 +121,12 @@ public class ElevationModule implements GraphBuilderModule {
                         log.info("set elevation on {}/{} edges", nProcessed, nTotal);
                         double failurePercentage = nPointsOutsideDEM / nPointsEvaluated * 100;
                         if (failurePercentage > 50) {
-                            log.warn("Fetching elevation failed at {}/{} points ({}%)",
-                                    nPointsOutsideDEM, nPointsEvaluated, failurePercentage);
+                            log.warn(graph.addBuilderAnnotation(new Graphwide(
+                                String.format(
+                                    "Fetching elevation failed at %d/%d points (%d%%)",
+                                    nPointsOutsideDEM, nPointsEvaluated, failurePercentage
+                                )
+                            )));
                             log.warn("Elevation is missing at a large number of points. DEM may be for the wrong region. " +
                                     "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
                         }
@@ -117,9 +135,14 @@ public class ElevationModule implements GraphBuilderModule {
             }
         }
 
-        @SuppressWarnings("unchecked")
-        HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
-        assignMissingElevations(graph, edgesWithElevation, extraElevation);
+        log.info(setElevationsFromDEMTask.finish());
+
+        GraphBuilderTaskSummary missingElevationsTask = graphBuilderModuleSummary.addSubTask(
+            "calculate missing elevations"
+        );
+        log.info(missingElevationsTask.start());
+        assignMissingElevations(graph, edgesWithElevation);
+        log.info(missingElevationsTask.finish());
     }
 
     class ElevationRepairState {
@@ -148,7 +171,10 @@ public class ElevationModule implements GraphBuilderModule {
      * Assign missing elevations by interpolating from nearby points with known
      * elevation; also handle osm ele tags
      */
-    private void assignMissingElevations(Graph graph, List<StreetEdge> edgesWithElevation, HashMap<Vertex, Double> knownElevations) {
+    private void assignMissingElevations(
+        Graph graph,
+        List<StreetEdge> edgesWithElevation
+    ) {
 
         log.debug("Assigning missing elevations");
 
@@ -157,7 +183,8 @@ public class ElevationModule implements GraphBuilderModule {
         // elevation for each vertex (known or interpolated)
         // knownElevations will be null if there are no ElevationPoints in the data
         // for instance, with the Shapefile loader.)
-        HashMap<Vertex, Double> elevations; 
+        HashMap<Vertex, Double> elevations;
+        HashMap<Vertex, Double> knownElevations = graph.getKnownElevations();
         if (knownElevations != null)
             elevations = (HashMap<Vertex, Double>) knownElevations.clone();
         else

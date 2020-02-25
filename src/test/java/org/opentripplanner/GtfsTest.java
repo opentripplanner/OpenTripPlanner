@@ -9,6 +9,7 @@ import java.util.List;
 
 import junit.framework.TestCase;
 
+import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
@@ -66,7 +67,7 @@ public abstract class GtfsTest extends TestCase {
         router = new Router("TEST", graph);
 
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
-        gtfsGraphBuilderImpl.buildGraph(graph, null);
+        gtfsGraphBuilderImpl.buildGraph(graph, new GraphBuilderModuleSummary(gtfsGraphBuilderImpl));
         // Set the agency ID to be used for tests to the first one in the feed.
         agencyId = graph.getAgencies(feedId.getId()).iterator().next().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
