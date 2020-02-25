@@ -11,6 +11,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -115,6 +116,7 @@ public class RaptorPathToItineraryMapper {
         // Map egress leg
         EgressPathLeg<TripSchedule> egressPathLeg = pathLeg.asEgressLeg();
         mapEgressLeg(legs, egressPathLeg, egressTransfers);
+        propagateStopPlaceNamesToWalkingLegs(legs);
 
         Itinerary itinerary = new Itinerary(legs);
 
@@ -282,6 +284,7 @@ public class RaptorPathToItineraryMapper {
             try {
                 State[] states = transferStates.toArray(new State[0]);
                 GraphPath graphPath = new GraphPath(states[states.length - 1], false);
+
                 Itinerary subItinerary = GraphPathToItineraryMapper
                         .generateItinerary(graphPath, false, true, request.locale);
 
@@ -295,6 +298,26 @@ public class RaptorPathToItineraryMapper {
                 }
             } catch (TrivialPathException e) {
                 // Ignore, no legs need be copied
+            }
+        }
+    }
+
+    /**
+     * Fix up a {@link Place} using the information available at the leg boundaries. This method
+     * will ensure that stop names propagate correctly to the non-transit legs that connect to
+     * transit legs.
+     */
+    public static void propagateStopPlaceNamesToWalkingLegs(List<Leg> legs) {
+        for (int i = 0; i < legs.size()-1; i++) {
+            Leg currLeg = legs.get(i);
+            Leg nextLeg = legs.get(i + 1);
+
+            if (currLeg.isTransitLeg() && !nextLeg.isTransitLeg()) {
+                nextLeg.from = currLeg.to;
+            }
+
+            if (!currLeg.isTransitLeg() && nextLeg.isTransitLeg()) {
+                currLeg.to = nextLeg.from;
             }
         }
     }
@@ -334,11 +357,12 @@ public class RaptorPathToItineraryMapper {
         return c;
     }
 
-    private List<Place> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
-        List<Place> places = new ArrayList<>();
+    private List<StopArrival> extractIntermediateStops(TransitPathLeg<TripSchedule> pathLeg) {
+        List<StopArrival> visits = new ArrayList<>();
         TripPattern tripPattern = pathLeg.trip().getOriginalTripPattern();
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
+
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
             if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
                 break;
@@ -348,15 +372,18 @@ public class RaptorPathToItineraryMapper {
                 Place place = mapStopToPlace(stop);
                 place.stopIndex = j;
                 // TODO: fill out stopSequence
-                place.arrival = createCalendar(tripSchedule.arrival(j));
-                place.departure = createCalendar(tripSchedule.departure(j));
-                places.add(place);
+                StopArrival visit = new StopArrival(
+                        place,
+                        createCalendar(tripSchedule.arrival(j)),
+                        createCalendar(tripSchedule.departure(j))
+                );
+                visits.add(visit);
             }
             if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
                 boarded = true;
             }
         }
-        return places;
+        return visits;
     }
 
     private List<Coordinate> extractTransitLegCoordinates(TransitPathLeg<TripSchedule> pathLeg) {

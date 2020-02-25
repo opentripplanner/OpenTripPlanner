@@ -25,6 +25,7 @@
 - Support for next/previous paging trip search results (#2941)
 - Fix mismatch in duration for walk legs, resulting in negative wait times (#2955)
 - NeTEx import now supports ServiceLinks (#2951)
+- Also check TripPatterns added by realtime when showing stoptimes for stop (#2954)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

@@ -1,12 +1,12 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
@@ -166,12 +166,13 @@ public class Leg {
     */
    public Place to = null;
 
-   /**
-    * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
-    * For non-transit legs, null.
-    * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
-    */
-   public List<Place> intermediateStops;
+    /**
+     * For transit legs, intermediate stops between the Place where the leg originates and the Place
+     * where the leg ends. For non-transit legs, {@code null}. This field is optional i.e. it is
+     * always {@code null} unless {@code showIntermediateStops} parameter is set to "true" in the
+     * planner request.
+     */
+    public List<StopArrival> intermediateStops;
 
    /**
     * The leg's geometry.
@@ -188,7 +189,6 @@ public class Leg {
    public List<AlertPatch> alertPatches = new ArrayList<>();
 
    public String routeShortName;
-
    public String routeLongName;
 
    public String boardRule;
@@ -257,72 +257,46 @@ public class Leg {
     /** Should be used for debug logging only */
     @Override
     public String toString() {
-        final StringBuilder sb = new StringBuilder();
-        toStringAdd(sb, ", from", from);
-        toStringAdd(sb, ", to", to);
-        toStringAddCal(sb, ", startTime", startTime);
-        toStringAddCal(sb, ", endTime", endTime);
-        toStringAddPosInt(sb, ", departureDelay", departureDelay);
-        toStringAddPosInt(sb, ", arrivalDelay", arrivalDelay);
-        toStringAdd(sb, ", realTime", realTime);
-        toStringAdd(sb, ", isNonExactFrequency", isNonExactFrequency);
-        toStringAdd(sb, ", headway", headway);
-        toStringAdd(sb, ", distance", distanceMeters);
-        toStringAdd(sb, ", pathway", pathway);
-        toStringAdd(sb, ", mode", mode);
-        toStringAdd(sb, ", route", route);
-        toStringAdd(sb, ", agencyName", agencyName);
-        toStringAdd(sb, ", agencyUrl", agencyUrl);
-        toStringAdd(sb, ", agencyBrandingUrl", agencyBrandingUrl);
-        toStringAddPosInt(sb, ", agencyTimeZoneOffset", agencyTimeZoneOffset);
-        toStringAdd(sb, ", routeColor", routeColor);
-        toStringAdd(sb, ", routeType", routeType);
-        toStringAdd(sb, ", routeId", routeId);
-        toStringAdd(sb, ", routeTextColor", routeTextColor);
-        toStringAdd(sb, ", interlineWithPreviousLeg", interlineWithPreviousLeg);
-        toStringAdd(sb, ", tripShortName", tripShortName);
-        toStringAdd(sb, ", tripBlockId", tripBlockId);
-        toStringAdd(sb, ", headsign", headsign);
-        toStringAdd(sb, ", agencyId", agencyId);
-        toStringAdd(sb, ", tripId", tripId);
-        toStringAdd(sb, ", serviceDate", serviceDate);
-        toStringAdd(sb, ", routeBrandingUrl", routeBrandingUrl);
-        toStringAdd(sb, ", intermediateStops", intermediateStops);
-        toStringAdd(sb, ", legGeometry", legGeometry);
-        toStringAdd(sb, ", walkSteps", walkSteps);
-        toStringAdd(sb, ", alerts", alerts);
-        toStringAdd(sb, ", alertPatches", alertPatches);
-        toStringAdd(sb, ", routeShortName", routeShortName);
-        toStringAdd(sb, ", routeLongName", routeLongName);
-        toStringAdd(sb, ", boardRule", boardRule);
-        toStringAdd(sb, ", alightRule", alightRule);
-        toStringAdd(sb, ", rentedBike", rentedBike);
-        return "Leg{" + (sb.length() > 0 ? sb.substring(2) : "") + "}";
-    }
-
-    private static void toStringAdd(StringBuilder sb, String name, Boolean value) {
-        if(value == null || !value) { return; }
-        sb.append(name);
-    }
-
-    private static void toStringAdd(StringBuilder sb, String name, String value) {
-        if(value == null) { return; }
-        sb.append(name).append("='").append(value).append("'");
-    }
-
-    private static void toStringAddCal(StringBuilder sb, String name, Calendar value) {
-        if(value == null) { return; }
-        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd mm:hh:ssZZZ");
-        sb.append(name).append("='").append(sdf.format(value.getTime())).append("'");
-    }
-
-    private static void toStringAdd(StringBuilder sb, String name, Object value) {
-        if(value == null) { return; }
-        sb.append(name).append("=").append(value);
-    }
-
-    private static void toStringAddPosInt(StringBuilder sb, String name, int value) {
-        if(value == 0) { return; }
-        sb.append(name);
+        return new ToStringBuilder(Leg.class)
+                .addObj("from", from)
+                .addObj("to", to)
+                .addCalTime("startTime", startTime)
+                .addCalTime("endTime", endTime)
+                .addNum("departureDelay", departureDelay, 0)
+                .addNum("arrivalDelay", arrivalDelay, 0)
+                .addBool("realTime", realTime)
+                .addBool("isNonExactFrequency", isNonExactFrequency)
+                .addNum("headway", headway)
+                .addNum("distance", distanceMeters, "m")
+                .addBool("pathway", pathway)
+                .addEnum("mode", mode)
+                .addStr("route", route)
+                .addStr("agencyName", agencyName)
+                .addStr("agencyUrl", agencyUrl)
+                .addStr("agencyBrandingUrl", agencyBrandingUrl)
+                .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
+                .addStr("routeColor", routeColor)
+                .addNum("routeType", routeType)
+                .addObj("routeId", routeId)
+                .addStr("routeTextColor", routeTextColor)
+                .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
+                .addStr("tripShortName", tripShortName)
+                .addStr("tripBlockId", tripBlockId)
+                .addStr("headsign", headsign)
+                .addStr("agencyId", agencyId)
+                .addObj("tripId", tripId)
+                .addStr("serviceDate", serviceDate)
+                .addStr("routeBrandingUrl", routeBrandingUrl)
+                .addCol("intermediateStops", intermediateStops)
+                .addObj("legGeometry", legGeometry)
+                .addCol("walkSteps", walkSteps)
+                .addCol("alerts", alerts)
+                .addCol("alertPatches", alertPatches)
+                .addStr("routeShortName", routeShortName)
+                .addStr("routeLongName", routeLongName)
+                .addStr("boardRule", boardRule)
+                .addStr("alightRule", alightRule)
+                .addBool("rentedBike", rentedBike)
+                .toString();
     }
 }

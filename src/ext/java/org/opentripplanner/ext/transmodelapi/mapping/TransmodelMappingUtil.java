@@ -11,6 +11,7 @@ import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.RoutingService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -141,16 +142,14 @@ public class TransmodelMappingUtil {
 
     public MonoOrMultiModalStation getMonoOrMultiModalStation(
         String idString,
-        Map<FeedScopedId, Station> stationById,
-        Map<FeedScopedId, MultiModalStation> multiModalStationById,
-        Map<Station, MultiModalStation> multimodalStationForStations
+        RoutingService routingService
     ) {
         FeedScopedId id = fromIdString(idString);
-        Station station = stationById.get(id);
+        Station station = routingService.getStationById(id);
         if (station != null) {
-            return new MonoOrMultiModalStation(station, multimodalStationForStations.get(station));
+            return new MonoOrMultiModalStation(station, routingService.getMultiModalStationForStations().get(station));
         }
-        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        MultiModalStation multiModalStation = routingService.getMultiModalStationById(id);
         if (multiModalStation != null) {
             return new MonoOrMultiModalStation(multiModalStation);
         }

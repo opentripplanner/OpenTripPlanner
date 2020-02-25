@@ -1,6 +1,9 @@
 package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -112,6 +115,14 @@ public class TimetableSnapshot {
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
+
+    /**
+     * This maps contains all of the new TripPatterns added by realtime data indexed on stop. This
+     * has to be kept in order for them to be included in the stop times api call on a specific stop.
+     *
+     * TODO Find a generic way to keep all realtime indexes.
+     */
+    private Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     
     /**
      * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
@@ -220,6 +231,9 @@ public class TimetableSnapshot {
             // Set updated trip times of trip
             tt.setTripTimes(tripIndex, updatedTripTimes);
         }
+
+        // To make these trip patterns visible for departureRow searches.
+        addPatternToIndex(pattern);
         
         // The time tables are finished during the commit
         
@@ -261,6 +275,8 @@ public class TimetableSnapshot {
 
         this.dirtyTimetables.clear();
         this.dirty = false;
+
+        ret.setPatternsForStop(HashMultimap.create(this.patternsForStop));
 
         ret.readOnly = true; // mark the snapshot as henceforth immutable
         return ret;
@@ -369,4 +385,17 @@ public class TimetableSnapshot {
         return timetables.keySet();
     }
 
+    private void addPatternToIndex(TripPattern tripPattern) {
+        for (Stop stop: tripPattern.getStops()) {
+            patternsForStop.put(stop, tripPattern);
+        }
+    }
+
+    public Collection<TripPattern> getPatternsForStop(Stop stop) {
+        return patternsForStop.get(stop);
+    }
+
+    public void setPatternsForStop(Multimap<Stop, TripPattern> patternsForStop) {
+        this.patternsForStop = patternsForStop;
+    }
 }
