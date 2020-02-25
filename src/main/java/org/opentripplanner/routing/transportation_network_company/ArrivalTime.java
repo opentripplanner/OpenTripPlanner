@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.transportation_network_company;
 
-// A class to model estimated arrival times of service from a transportation network company
+/**
+ * A class to model estimated arrival times of service from a transportation network company
+ */
 public class ArrivalTime {
     public TransportationNetworkCompany company;
     public String productId;

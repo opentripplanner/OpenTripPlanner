@@ -546,8 +546,11 @@ public class SimpleStreetSplitter {
      * @param endVertex true if this is destination vertex
      * @return
      */
-    public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
-        boolean endVertex) {
+    public Vertex getClosestVertex(
+            GenericLocation location,
+            RoutingRequest options,
+            boolean endVertex
+    ) {
         if (destructiveSplitting) {
             throw new RuntimeException("Origin and destination search is used with destructive splitting. Something is wrong!");
         }

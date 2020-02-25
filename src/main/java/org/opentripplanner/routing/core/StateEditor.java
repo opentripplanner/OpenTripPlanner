@@ -176,7 +176,16 @@ public class StateEditor {
         child.walkDistance += length;
     }
 
-    public void incrementTransportationNetworkCompanyDistance(double distance) {
+    public void incrementCallAndRideTime(int seconds) {
+        if (seconds < 0) {
+            LOG.warn("A state's call-n-ride time is being incremented by a negative amount.");
+            defectiveTraversal = true;
+            return;
+        }
+        child.callAndRideTime += seconds;
+    }
+
+    public void incrementTncDistance(double distance) {
         cloneStateDataAsNeeded();
         child.transportationNetworkCompanyDriveDistance += distance;
     }
@@ -187,7 +196,6 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-
 
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
@@ -212,13 +220,13 @@ public class StateEditor {
     public void beginVehicleRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = true;
-        child.stateData.nonTransitMode = vehicleMode;
+        child.stateData.mode = vehicleMode;
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.mode = TraverseMode.WALK;
     }
 
     /**
@@ -230,9 +238,9 @@ public class StateEditor {
         child.stateData.carParked = carParked;
         if (carParked) {
             // We do not handle mixed-mode P+BIKE...
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.mode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.mode = TraverseMode.CAR;
         }
     }
 
@@ -240,9 +248,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeParked = bikeParked;
         if (bikeParked) {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.mode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+            child.stateData.mode = TraverseMode.BICYCLE;
         }
     }
 
@@ -270,7 +278,7 @@ public class StateEditor {
 
     public void setNonTransitOptionsFromState(State state){
         cloneStateDataAsNeeded();
-        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.mode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
@@ -327,7 +335,7 @@ public class StateEditor {
     public void alightHailedCar() {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.mode = TraverseMode.WALK;
     }
 
     /**
@@ -346,42 +354,33 @@ public class StateEditor {
     public void boardHailedCar(double initialEdgeDistance) {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = true;
-        child.stateData.nonTransitMode = TraverseMode.CAR;
-        RoutingRequest options = child.getOptions();
-        if (child.isEverBoarded()) {
-            if (options.arriveBy) {
-                child.stateData.hasHailedCarPreTransit = true;
-            } else {
-                child.stateData.hasHailedCarPostTransit = true;
-            }
-        } else {
-            if (options.arriveBy) {
-                child.stateData.hasHailedCarPostTransit = true;
-            } else {
-                child.stateData.hasHailedCarPreTransit = true;
+        child.stateData.mode = TraverseMode.CAR;
+        child.stateData.hasHailedCar = true;
 
-                // add the earliest ETA of a TNC vehicle if using "departing at" mode and if before
-                // transit. This uses the ETA of a TNC vehicle at the origin, so this code is making
-                // the assumption that the ETA estimate obtained for the origin is applicable at
-                // other places and times so long as transit has not been boarded yet.  The way to
-                // obtain ETA estimates for every possible street and vertex would involve making
-                // potentially hundreds of thousands of http requests to existing TNC API endpoints.
-                // It sure would be nice if there were a way to download network-wide ETA estimates
-                // in a single request, but that option currently does not exist.
-                //
-                // FIXME: If a non-transit mode travels a significant distance from the origin prior
-                //  to boarding a TNC, the ETA will still be added when it probably shouldn't be.
-                if (
-                    options.transportationNetworkCompanyEtaAtOrigin > -1 &&
-                        !child.stateData.everBoarded
-                ) {
-                    // increment the time by the ETA at the origin.
-                    incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
-                }
+        RoutingRequest options = child.getOptions();
+
+
+        // TODO TNC - This code might need to handle egress search ?
+        if (!options.arriveBy) {
+            // add the earliest ETA of a TNC vehicle if using "departing after" mode and if before
+            // transit. This uses the ETA of a TNC vehicle at the origin, so this code is making
+            // the assumption that the ETA estimate obtained for the origin is applicable at
+            // other places and times so long as transit has not been boarded yet.  The way to
+            // obtain ETA estimates for every possible street and vertex would involve making
+            // potentially hundreds of thousands of http requests to existing TNC API endpoints.
+            // It sure would be nice if there were a way to download network-wide ETA estimates
+            // in a single request, but that option currently does not exist.
+            //
+            // FIXME: If a non-transit mode travels a significant distance from the origin prior
+            //  to boarding a TNC, the ETA will still be added when it probably shouldn't be.
+            if (options.transportationNetworkCompanyEtaAtOrigin > -1) {
+                // increment the time by the ETA at the origin.
+                incrementTimeInMilliseconds(options.transportationNetworkCompanyEtaAtOrigin * 1000);
             }
         }
-        // Add the initial TNC distance as the first StreetEdge traversed is done so while the usingHailedCar flag is
-        // still set to false
+
+        // Add the initial TNC distance as the first StreetEdge traversed is done so while the
+        // usingHailedCar flag is still set to false
         child.transportationNetworkCompanyDriveDistance = initialEdgeDistance;
     }
 
@@ -392,9 +391,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.usingHailedCar = usingHailedCar;
         if (usingHailedCar) {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.mode = TraverseMode.CAR;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.mode = TraverseMode.WALK;
         }
     }
 

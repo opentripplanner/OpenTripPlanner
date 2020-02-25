@@ -17,8 +17,7 @@ public class StateData implements Cloneable {
     // TODO TNC - Is it possible to solve this in another way? (Next 3 fields)
     protected boolean usingHailedCar;
 
-    protected boolean hasHailedCarPostTransit = false;
-    protected boolean hasHailedCarPreTransit = false;
+    protected boolean hasHailedCar = false;
 
     protected boolean carParked;
 
@@ -26,7 +25,7 @@ public class StateData implements Cloneable {
 
     protected RoutingRequest opt;
 
-    protected TraverseMode nonTransitMode;
+    protected TraverseMode mode;
 
     /**
      * The mode that was used to traverse the backEdge
@@ -43,13 +42,13 @@ public class StateData implements Cloneable {
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.modes;
         if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
+            mode = TraverseMode.CAR;
         else if (modes.getWalk())
-            nonTransitMode = TraverseMode.WALK;
+            mode = TraverseMode.WALK;
         else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
+            mode = TraverseMode.BICYCLE;
         else
-            nonTransitMode = null;
+            mode = null;
     }
 
     protected StateData clone() {
@@ -60,7 +59,5 @@ public class StateData implements Cloneable {
         }
     }
 
-    public boolean hasHailedCarPostTransit() { return hasHailedCarPostTransit; }
-
-    public boolean hasHailedCarPreTransit() { return hasHailedCarPreTransit; }
+    public boolean hasHailedCar() { return hasHailedCar; }
 }

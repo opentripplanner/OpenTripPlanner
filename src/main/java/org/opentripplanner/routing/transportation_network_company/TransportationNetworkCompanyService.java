@@ -1,12 +1,21 @@
 package org.opentripplanner.routing.transportation_network_company;
 
-import org.opentripplanner.api.model.Place;
+import org.opentripplanner.api.common.Message;
+import org.opentripplanner.api.common.ParameterException;
+import org.opentripplanner.api.model.ApiPlace;
+import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.plan.Place;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.StateEditor;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.transportation_network_company.TransportationNetworkCompanyDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,10 +42,23 @@ public class TransportationNetworkCompanyService implements Serializable {
      * @param companies  A comma-separated string listing the companies to request from
      * @param place  The pickup point from which to request an ETA from
      * @return A list of ArrivalEstimates.  If none are found, or no companies match, an empty list will be returned.
-     * @throws ExecutionException
-     * @throws InterruptedException
      */
-    public List<ArrivalTime> getArrivalTimes(double lat, double lon, String companies) throws ExecutionException, InterruptedException {
+    public List<ArrivalTime> getArrivalTimes(String companies, Place place) throws ExecutionException, InterruptedException {
+        return getArrivalTimes(companies, place.lat, place.lon);
+    }
+
+    /**
+     * Get the ETA estimates from the specified TNC companies
+     *
+     * @param companies  A comma-separated string listing the companies to request from
+     * @param location  The pickup point from which to request an ETA from
+     * @return A list of ArrivalEstimates.  If none are found, or no companies match, an empty list will be returned.
+     */
+    public List<ArrivalTime> getArrivalTimes(String companies, GenericLocation location) throws ExecutionException, InterruptedException {
+        return getArrivalTimes(companies, location.lat, location.lng);
+    }
+
+    public List<ArrivalTime> getArrivalTimes(String companies, double lat, double lon) throws ExecutionException, InterruptedException {
         List<ArrivalTime> arrivalTimes = new ArrayList<>();
 
         List<TransportationNetworkCompanyDataSource> companiesToRequestFrom = parseCompanies(companies);
@@ -52,7 +74,12 @@ public class TransportationNetworkCompanyService implements Serializable {
 
         for (TransportationNetworkCompanyDataSource transportationNetworkCompany : companiesToRequestFrom) {
             tasks.add(() -> {
-                LOG.debug("Finding TNC arrival times for {} ({},{})", transportationNetworkCompany.getTransportationNetworkCompanyType(), lat, lon);
+                LOG.debug(
+                        "Finding TNC arrival times for {} ({},{})",
+                        transportationNetworkCompany.getTransportationNetworkCompanyType(),
+                        lat,
+                        lon
+                );
                 return transportationNetworkCompany.getArrivalTimes(lat, lon);
             });
         }
@@ -84,10 +111,21 @@ public class TransportationNetworkCompanyService implements Serializable {
         return companyDataSources;
     }
 
+    public List<RideEstimate> getRideEstimates(String companies, ApiPlace from, ApiPlace to)
+            throws ExecutionException, InterruptedException
+    {
+        return getRideEstimates(companies, from.lat, from.lon, to.lat, to.lon);
+    }
+
+    public List<RideEstimate> getRideEstimates(String companies, Place from, Place to)
+            throws ExecutionException, InterruptedException
+    {
+        return getRideEstimates(companies, from.lat, from.lon, to.lat, to.lon);
+    }
+
     public List<RideEstimate> getRideEstimates(
         String companies,
-        Place fromPlace,
-        Place toPlace
+        Double fromLat, Double fromLon, Double toLat, Double toLon
     ) throws ExecutionException, InterruptedException {
         List<RideEstimate> rideEstimates = new ArrayList<>();
 
@@ -105,16 +143,16 @@ public class TransportationNetworkCompanyService implements Serializable {
                 LOG.debug(
                     "Finding TNC ride/price estimates for {} for trip ({},{}) -> ({},{})",
                     transportationNetworkCompany.getTransportationNetworkCompanyType(),
-                    fromPlace.lat,
-                    fromPlace.lon,
-                    toPlace.lat,
-                    toPlace.lon
+                    fromLat,
+                    fromLon,
+                    toLat,
+                    toLon
                 );
                 return transportationNetworkCompany.getRideEstimates(
-                    fromPlace.lat,
-                    fromPlace.lon,
-                    toPlace.lat,
-                    toPlace.lon
+                    fromLat,
+                    fromLon,
+                    toLat,
+                    toLon
                 );
             });
         }
@@ -134,16 +172,15 @@ public class TransportationNetworkCompanyService implements Serializable {
     private TransportationNetworkCompanyDataSource getTransportationNetworkCompanyDataSource(String company) {
         TransportationNetworkCompany co = TransportationNetworkCompany.valueOf(company);
         if (co == null) {
-            throw new UnsupportedOperationException("Transportation Network Company value " +
-                                                        company +
-                                                        " is not a valid type"
+            throw new UnsupportedOperationException(
+                    "Transportation Network Company value " + company + " is not a valid type"
             );
         }
 
         if (!sources.containsKey(co)) {
-            throw new UnsupportedOperationException("Transportation Network Company value " +
-                                                        company +
-                                                        " is not configured in this router"
+            throw new UnsupportedOperationException(
+                    "Transportation Network Company value " + company
+                    + " is not configured in this router"
             );
         }
 
@@ -179,7 +216,7 @@ public class TransportationNetworkCompanyService implements Serializable {
             TransportationNetworkCompanyService service =
                 router.graph.getService(TransportationNetworkCompanyService.class);
             if (service == null) {
-                LOG.error("Unconfigured Transportation Network Company service for router with id: " + router.id);
+                LOG.error("Unconfigured Transportation Network Company service.");
                 throw new ParameterException(Message.TRANSPORTATION_NETWORK_COMPANY_CONFIG_INVALID);
             }
 
@@ -187,12 +224,8 @@ public class TransportationNetworkCompanyService implements Serializable {
 
             try {
                 arrivalEstimates = service.getArrivalTimes(
-                    companies,
-                    new Place(
-                        request.from.lng,
-                        request.from.lat,
-                        request.from.name
-                    )
+                        companies,
+                        new Place(request.from.lng, request.from.lat, request.from.label)
                 );
             } catch (Exception e) {
                 LOG.error("Unable to query TNC API for arrival estimates!");
@@ -203,12 +236,10 @@ public class TransportationNetworkCompanyService implements Serializable {
                 );
             }
 
-            /**
-             * iterate through results and find earliest ETA of an acceptable ride type
-             * this also checks if any of the ride types are wheelchair accessible or not
-             * if the request requires a wheelchair accessible ride and no arrival estimates are
-             * found, then the TransportationNetworkCompanyAvailabilityException will be thrown.
-             */
+             // Iterate through results and find earliest ETA of an acceptable ride type
+             // this also checks if any of the ride types are wheelchair accessible or not
+             // if the request requires a wheelchair accessible ride and no arrival estimates are
+             // found, then the TransportationNetworkCompanyAvailabilityException will be thrown.
             int earliestEta = Integer.MAX_VALUE;
             for (ArrivalTime arrivalEstimate : arrivalEstimates) {
                 if (
@@ -228,9 +259,9 @@ public class TransportationNetworkCompanyService implements Serializable {
             long now = (new Date()).getTime() / 1000;
             long departureTimeWindow = 1800;
             if (
-                request.arriveBy == false &&
-                    request.dateTime < now + departureTimeWindow &&
-                    request.dateTime > now - departureTimeWindow
+                    !request.arriveBy
+                    && request.dateTime < now + departureTimeWindow
+                    && request.dateTime > now - departureTimeWindow
             ) {
                 request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
             }

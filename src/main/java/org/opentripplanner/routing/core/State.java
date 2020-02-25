@@ -43,6 +43,9 @@ public class State implements Cloneable {
     // The current distance traveled in a transportation network company vehicle
     public double transportationNetworkCompanyDriveDistance;
 
+    int callAndRideTime = 0;
+
+
     /* CONSTRUCTORS */
 
     /**
@@ -112,15 +115,15 @@ public class State implements Cloneable {
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.parkAndRide || options.kissAndRide) {
             this.stateData.carParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+            this.stateData.mode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+            this.stateData.mode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
         // if allowed to hail a car, initialize state with CAR mode if we're already in a hailed car
         else if(OTPFeature.TncRouting.isOn() && options.useTransportationNetworkCompany) {
-            this.stateData.nonTransitMode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK;
+            this.stateData.mode = this.stateData.usingHailedCar ? TraverseMode.CAR : TraverseMode.WALK;
         }
         this.walkDistance = 0;
         this.transportationNetworkCompanyDriveDistance = 0;
@@ -336,7 +339,7 @@ public class State implements Cloneable {
      *         to a rented bicycle.
      */
     public TraverseMode getNonTransitMode() {
-        return stateData.nonTransitMode;
+        return stateData.mode;
     }
     // TODO: There is no documentation about what this means. No one knows precisely.
     // Needs to be replaced with clearly defined fields.
@@ -446,7 +449,7 @@ public class State implements Cloneable {
             editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
             editor.incrementWeight(orig.getWeightDelta());
             editor.incrementWalkDistance(orig.getWalkDistanceDelta());
-            editor.incrementTransportationNetworkCompanyDistance(orig.getTransportationNetworkCompanyDistanceDelta());
+            editor.incrementTncDistance(orig.getTransportationNetworkCompanyDistanceDelta());
 
             // propagate the modes through to the reversed edge
             editor.setBackMode(orig.getBackMode());

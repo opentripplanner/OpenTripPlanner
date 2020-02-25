@@ -107,11 +107,7 @@ public abstract class DominanceFunction implements Serializable {
                 return false;
             }
             // Does one state represent using a hailed car before transit and the other using a hailed car after?
-            if (a.stateData.hasHailedCarPreTransit() != b.stateData.hasHailedCarPreTransit()) {
-                return false;
-            }
-            // Does one state represent using a hailed car before transit and the other using a hailed car after?
-            if (a.stateData.hasHailedCarPostTransit() != b.stateData.hasHailedCarPostTransit()) {
+            if (a.stateData.hasHailedCar() != b.stateData.hasHailedCar()) {
                 return false;
             }
         }

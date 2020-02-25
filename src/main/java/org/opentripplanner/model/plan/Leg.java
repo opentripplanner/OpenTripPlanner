@@ -1,5 +1,6 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -197,9 +198,17 @@ public class Leg {
 
    public Boolean rentedBike;
 
+    /**
+     * Whether this leg involves traveling in a hailed car (Uber or Lyft for example).
+     */
    public Boolean hailedCar;
 
-   /**
+    /**
+     * On legs with hailed car travel, this includes more details specific to TNC travel.
+     */
+    public TransportationNetworkCompanySummary tncData;
+
+    /**
     * Whether this leg is a transit leg or not.
     * @return Boolean true if the leg is a transit leg
     */

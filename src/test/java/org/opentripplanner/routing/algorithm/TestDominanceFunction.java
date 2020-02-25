@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Assert;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -17,7 +18,9 @@ public class TestDominanceFunction extends TestCase {
         DominanceFunction minimumWeightDominanceFunction = new DominanceFunction.MinimumWeight();
         Vertex fromVertex = mock(TransitStopVertex.class);
         Vertex toVertex = mock(TransitStopVertex.class);
+        Graph g = new Graph();
         RoutingRequest request = new RoutingRequest();
+        request.setRoutingContext(g, fromVertex, toVertex);
 
         // Test if domination works in the general case
 

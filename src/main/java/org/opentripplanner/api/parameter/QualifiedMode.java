@@ -3,6 +3,7 @@ package org.opentripplanner.api.parameter;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.OTPFeature;
 
 import java.io.Serializable;
 import java.security.InvalidParameterException;
@@ -55,6 +56,9 @@ public class QualifiedMode implements Serializable {
             if (this.qualifiers.contains(Qualifier.PARK)) {
                 req.parkAndRide = true;
             } else if (this.qualifiers.contains(Qualifier.HAIL)) {
+                if(OTPFeature.TncRouting.isOff()) {
+                    throw new IllegalArgumentException("Hail and ride is not enabled!");
+                }
                 req.useTransportationNetworkCompany = true;
                 req.driveTimeReluctance = 1.75;
                 req.driveDistanceReluctance = 0.2;

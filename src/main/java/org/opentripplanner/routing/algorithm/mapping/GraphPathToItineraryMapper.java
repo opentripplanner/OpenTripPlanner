@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.DirectionUtils;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -31,12 +32,16 @@ import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
+import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.ExitVertex;
@@ -54,6 +59,10 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Set;
 import java.util.TimeZone;
+import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.concurrent.Future;
 
 // TODO OTP2 There is still a lot of transit-related logic here that should be removed. We also need
 //      to decide where real-time updates should be applied to the itinerary.
@@ -364,7 +373,7 @@ public abstract class GraphPathToItineraryMapper {
             Place from = leg.from;
             if (request.transportationNetworkCompanyEtaAtOrigin > -1 &&
                 (i == 0 || (i == 1 && itinerary.legs.get(0).mode.equals("WALK")))) {
-                from = new Place(request.from.lng, request.from.lat, request.from.name);
+                from = new Place(request.from.lng, request.from.lat, request.from.label);
                 tncLegsAreFromOrigin.add(true);
             } else {
                 tncLegsAreFromOrigin.add(false);

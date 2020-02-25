@@ -1,11 +1,15 @@
 package org.opentripplanner.routing.transportation_network_company;
 
-// A class to model the estimated ride time while using service from a transportation network company
+/**
+ * A class to model the estimated ride time while using service from a transportation network
+ * company.
+ */
 public class RideEstimate {
 
     public TransportationNetworkCompany company;
     public String currency;
-    public int duration;  // in seconds
+    /** Unit: seconds */
+    public int duration;
     public double maxCost;
     public double minCost;
     public String rideType;

@@ -3,6 +3,7 @@ package org.opentripplanner.api.resource;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
+import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -47,7 +48,7 @@ public class TransportationNetworkCompanyResource {
             requireParameter(companies, "companies");
             ApiPlace fromPlace = getPlace(from, "from");
             TransportationNetworkCompanyService service = getService(routerId);
-            List<ArrivalTime> arrivalTimes = service.getArrivalTimes(fromPlace.lat, fromPlace.lon, companies);
+            List<ArrivalTime> arrivalTimes = service.getArrivalTimes(companies, fromPlace.lat, fromPlace.lon);
             if (arrivalTimes.size() == 0)
                 throw new Exception("Could not find any arrival estimates for the specified companies and ridetypes");
             response.setEtaEstimates(arrivalTimes);

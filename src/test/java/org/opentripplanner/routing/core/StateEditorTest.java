@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 import org.junit.Test;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 
@@ -38,7 +37,7 @@ public class StateEditorTest {
         state.stateData.carParked = true;
         state.stateData.bikeParked = true;
         state.stateData.usingRentedBike = false;
-        state.stateData.nonTransitMode = TraverseMode.WALK;
+        state.stateData.mode = TraverseMode.WALK;
 
         StateEditor se = new StateEditor(request, null);
         se.setNonTransitOptionsFromState(state);
