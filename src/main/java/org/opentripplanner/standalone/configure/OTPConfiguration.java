@@ -1,14 +1,13 @@
 package org.opentripplanner.standalone.configure;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.datastore.OtpDataStoreConfig;
 import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
-import org.opentripplanner.util.OTPFeature;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,11 +43,8 @@ public class OTPConfiguration {
      */
     private final CommandLineParameters cli;
     private final OtpConfig otpConfig;
-    private final GraphBuildParameters buildConfig;
-
-    // TODO OTP2 - Make a POJO wrapper around the router config to encapsulate the JSON
-    //           - node handling
-    private JsonNode routerConfig;
+    private final BuildConfig buildConfig;
+    private RouterConfig routerConfig;
 
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
         this.cli = cli;
@@ -70,14 +66,16 @@ public class OTPConfiguration {
      * the OTP config, build config and the router config.
      */
     public static OTPConfiguration createForTest(String configJson) {
-        return new OTPConfiguration(new CommandLineParameters(), ConfigLoader.fromString(configJson));
+        return new OTPConfiguration(
+                new CommandLineParameters(),
+                ConfigLoader.fromString(configJson)
+        );
     }
 
-    public void setEmbeddedRouterConfig(String routerConfig) {
-        if(this.routerConfig.isMissingNode()) {
+    public void setEmbeddedRouterConfig(RouterConfig routerConfig) {
+        if(this.routerConfig.isDefault()) {
             LOG.info("Using the graph embedded JSON router configuration.");
-            this.routerConfig = ConfigLoader
-                    .fromString(routerConfig,"Graph embedded router config");
+            this.routerConfig = routerConfig;
         }
     }
 
@@ -91,9 +89,16 @@ public class OTPConfiguration {
     }
 
     /**
+     * Get the otp config as a type safe java bean.
+     */
+    public OtpConfig otpConfig() {
+        return otpConfig;
+    }
+
+    /**
      * Get the graph build config as a java bean - type safe.
      */
-    public GraphBuildParameters buildConfig() {
+    public BuildConfig buildConfig() {
         return buildConfig;
     }
 
@@ -103,7 +108,7 @@ public class OTPConfiguration {
      * Returns a {@link MissingNode} if base directory is {@code null} or the file does not exist.
      * @throws RuntimeException if the file contains syntax errors or cannot be parsed.
      */
-    public JsonNode routerConfig() {
+    public RouterConfig routerConfig() {
         return routerConfig;
     }
 
@@ -112,7 +117,7 @@ public class OTPConfiguration {
      * the graph is serialized.
      */
     public EmbedConfig createEmbedConfig() {
-        return new EmbedConfig(buildConfig.rawJson, routerConfig);
+        return new EmbedConfig(buildConfig, routerConfig);
     }
 
     /**
@@ -120,15 +125,5 @@ public class OTPConfiguration {
      */
     public OtpDataStoreConfig createDataStoreConfig() {
         return new OtpDataStoreConfigAdapter(cli.getBaseDirectory(), buildConfig().storage);
-    }
-
-    /**
-     * When the OTP server start, this method check the settings in the 'otp-config.json'
-     * to determine if a {@link OTPFeature} is on/off/[not set]. If [no set] {@code null}
-     * is returned.
-     */
-    public Boolean isFeatureEnabled(OTPFeature feature) {
-        // delegate to OTP config
-        return otpConfig.isFeatureEnabled(feature);
     }
 }

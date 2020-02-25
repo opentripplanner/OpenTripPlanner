@@ -59,7 +59,7 @@ public class OTPFeatureTest {
         // Given the following config
         String json =
         "{\n"
-                + "  featuresEnabled : {\n"
+                + "  otpFeatures : {\n"
                 + "    APIAlertPatcher : true,\n"
                 + "    APIBikeRental : false\n"
                 + "  }\n"
@@ -76,12 +76,11 @@ public class OTPFeatureTest {
         OTPFeature.APIGraphInspectorTile.set(false);
 
         // When
-        OTPFeature.configure(config::isFeatureEnabled);
+        OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
 
         // Then
         assertTrue(OTPFeature.APIAlertPatcher.isOn());
         assertTrue(OTPFeature.APIBikeRental.isOff());
         assertTrue(OTPFeature.APIExternalGeocoder.isOn());
-        assertTrue(OTPFeature.APIGraphInspectorTile.isOff());
     }
 }

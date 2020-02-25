@@ -7,8 +7,7 @@ import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
-import org.opentripplanner.standalone.config.GraphBuildParameters;
-import org.opentripplanner.standalone.config.NetexParameters;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -22,27 +21,27 @@ import java.util.List;
  * <p>
  * This class inject the build configuration. This way none of the other
  * classes in the `org.opentripplanner.netex` have dependencies to the
- * {@link GraphBuildParameters}.
+ * {@link BuildConfig}.
  * <p>
  * The naming convention used is close to the defacto standard used by Spring.
  */
 public class NetexConfig {
 
-    private final GraphBuildParameters buildParams;
+    private final BuildConfig buildParams;
 
-    private NetexConfig(GraphBuildParameters builderParams) {
+    private NetexConfig(BuildConfig builderParams) {
         this.buildParams = builderParams;
     }
 
 
     public static NetexModule netexModule(
-            GraphBuildParameters buildParams,
+            BuildConfig buildParams,
             Iterable<DataSource> netexSources
     ) {
         return new NetexConfig(buildParams).netexModule(netexSources);
     }
 
-    public static NetexBundle netexBundleForTest(GraphBuildParameters builderParams, File netexZipFile) {
+    public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
         return new NetexConfig(builderParams).netexBundle(new ZipFileDataSource(netexZipFile, FileType.NETEX));
     }
 
@@ -71,7 +70,7 @@ public class NetexConfig {
     }
 
     private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){
-        NetexParameters c = buildParams.netex;
+        org.opentripplanner.standalone.config.NetexConfig c = buildParams.netex;
         return new NetexDataSourceHierarchy(source).prepare(
                 c.ignoreFilePattern,
                 c.sharedFilePattern,

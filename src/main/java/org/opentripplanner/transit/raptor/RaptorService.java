@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
@@ -21,8 +20,8 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
     private final RaptorConfig<T> config;
 
-    public RaptorService(RaptorTuningParameters tuningParameters) {
-        this.config = new RaptorConfig<>(tuningParameters);
+    public RaptorService(RaptorConfig<T> config) {
+        this.config = config;
     }
 
     public RaptorResponse<T> route(RaptorRequest<T> request, TransitDataProvider<T> transitData) {

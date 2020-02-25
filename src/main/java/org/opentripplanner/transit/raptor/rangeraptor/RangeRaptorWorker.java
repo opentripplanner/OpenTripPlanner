@@ -123,7 +123,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
     @Override
     final public Collection<Path<T>> route() {
         timerRoute().time(() -> {
-            timerSetup(transitData::setup);
+            transitData.setup();
 
             // The main outer loop iterates backward over all minutes in the departure times window.
             // Ergo, we re-use the arrival times found in searches that have already occurred that
@@ -132,7 +132,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             final IntIterator it = calculator.rangeRaptorMinutes();
             while (it.hasNext()) {
                 // Run the raptor search for this particular iteration departure time
-                timerRouteByMinute(() -> runRaptorForMinute(it.next()));
+                runRaptorForMinute(it.next());
             }
         });
         return state.extractPaths();
@@ -251,9 +251,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     // Track time spent, measure performance
     // TODO TGR - Replace by performance tests
-    private void timerSetup(Runnable setup) { timers.timerSetup(setup); }
     private AvgTimer timerRoute() { return timers.timerRoute(); }
-    private void timerRouteByMinute(Runnable routeByMinute) { timers.timerRouteByMinute(routeByMinute); }
     private AvgTimer timerByMinuteScheduleSearch() { return timers.timerByMinuteScheduleSearch(); }
     private AvgTimer timerByMinuteTransfers() { return timers.timerByMinuteTransfers(); }
 }

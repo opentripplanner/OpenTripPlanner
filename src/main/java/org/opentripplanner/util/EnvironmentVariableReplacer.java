@@ -40,7 +40,7 @@ public class EnvironmentVariableReplacer {
                     environmentVariables.put(envVar, value);
                 }
                 else {
-                    throw new IllegalArgumentException(
+                    throw new OtpAppException(
                             "Environment variable name '" + nameOnly + "' in config '"
                             + source + "' not found in the system environment variables."
                     );

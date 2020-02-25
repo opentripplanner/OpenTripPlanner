@@ -14,8 +14,12 @@ import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
-import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.kryo.BuildConfigSerializer;
+import org.opentripplanner.kryo.HashBiMapSerializer;
+import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -121,6 +125,11 @@ public class SerializedGraphObject implements Serializable {
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
         kryo.register(HashBiMap.class, new HashBiMapSerializer());
+
+        // Add serializers for "immutable" config classes
+        kryo.register(RouterConfig.class, new RouterConfigSerializer());
+        kryo.register(BuildConfig.class, new BuildConfigSerializer());
+
         // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
         // FIXME we're importing all the contributed kryo-serializers just for this one serializer
         try {
@@ -136,5 +145,4 @@ public class SerializedGraphObject implements Serializable {
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
     }
-
 }

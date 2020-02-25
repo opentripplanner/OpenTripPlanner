@@ -2,34 +2,32 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.util.OTPFeature;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 
 /**
- * Wraps the 'otp-config.json'
+ * This class is an object representation of the 'otp-config.json'.
  */
 public class OtpConfig {
+    private static final Logger LOG = LoggerFactory.getLogger(OtpConfig.class);
+
     public final JsonNode rawConfig;
+    public final Map<OTPFeature, Boolean> otpFeatures;
 
 
-    OtpConfig(JsonNode otpConfig) {
+    OtpConfig(JsonNode otpConfig, String source) {
         this.rawConfig = otpConfig;
-    }
+        NodeAdapter adapter = new NodeAdapter(otpConfig, source);
 
-    /**
-     * Check if a OTP feature is enabled.
-     */
-    public Boolean isFeatureEnabled(OTPFeature feature) {
-        JsonNode node = rawConfig.path("featuresEnabled").path(feature.name());
-        if(node.isMissingNode()) {
-            return null;
-        }
-        if(node.isBoolean()) {
-            return node.booleanValue();
-        }
-        throw new IllegalArgumentException(
-                "Feature values is not boolean 'true' or 'false'." +
-                        " Unable to parse value for feature '" + feature.name() + "'. Value: '" +
-                        node.asText() + "'"
+        this.otpFeatures = adapter.asEnumMap(
+                "otpFeatures",
+                OTPFeature.class,
+                NodeAdapter::asBoolean
         );
+
+        adapter.logUnusedParameters(LOG);
     }
 }

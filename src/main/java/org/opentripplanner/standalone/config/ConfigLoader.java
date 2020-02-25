@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.commons.io.IOUtils;
-import org.opentripplanner.reflect.ReflectionLibrary;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -65,8 +65,8 @@ public class ConfigLoader {
      * Generic method to parse the given json and return a JsonNode tree. The {@code source} is
      * used to generate a proper error message in case the string is not a proper JSON document.
      */
-    public static JsonNode fromString(String json, String source) {
-        return new ConfigLoader(null, json).stringToJsonNode(json, source);
+    public static JsonNode nodeFromString(String json, String source) {
+        return new ConfigLoader(null, null).stringToJsonNode(json, source);
     }
 
     /**
@@ -88,7 +88,7 @@ public class ConfigLoader {
      * @see #loadJsonFile for more details.
      */
     public OtpConfig loadOtpConfig() {
-        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME));
+        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME);
     }
 
     /**
@@ -99,13 +99,12 @@ public class ConfigLoader {
      * <p>
      * @see #loadJsonFile for more details.
      */
-    public GraphBuildParameters loadBuildConfig() {
+    public BuildConfig loadBuildConfig() {
         JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
-
-        if(!node.isMissingNode()) {
-            LOG.info(ReflectionLibrary.dumpFields(new GraphBuildParameters(node), "rawJson"));
+        if(node.isMissingNode()) {
+            return BuildConfig.DEFAULT;
         }
-        return new GraphBuildParameters(node);
+        return new BuildConfig(node, BUILD_CONFIG_FILENAME);
     }
 
     /**
@@ -114,8 +113,12 @@ public class ConfigLoader {
      * <p>
      * @see #loadJsonFile for more details.
      */
-    public JsonNode loadRouterConfig() {
-        return loadJsonByFilename(ROUTER_CONFIG_FILENAME);
+    public RouterConfig loadRouterConfig() {
+        JsonNode node = loadJsonByFilename(ROUTER_CONFIG_FILENAME);
+        if(node.isMissingNode()) {
+            return RouterConfig.DEFAULT;
+        }
+        return new RouterConfig(node, ROUTER_CONFIG_FILENAME);
     }
 
     /**
@@ -157,7 +160,8 @@ public class ConfigLoader {
             );
             JsonNode node = stringToJsonNode(configString, file.toString());
 
-            LOG.info("Found and loaded JSON configuration file '{}'", file.getPath());
+            LOG.info("Load JSON configuration file '{}'", file.getPath());
+            LOG.info("Summarizing '{}': {}", file.getPath(), node.toPrettyString());
             return node;
         }
         catch (FileNotFoundException ex) {
@@ -179,16 +183,16 @@ public class ConfigLoader {
      */
     private JsonNode stringToJsonNode(String jsonAsString, String source) {
         try {
-            if(jsonAsString == null) {
+            if(jsonAsString == null || jsonAsString.isBlank()) {
                 return MissingNode.getInstance();
             }
             jsonAsString = insertEnvironmentVariables(jsonAsString, source);
 
             return mapper.readTree(jsonAsString);
         }
-        catch (IOException e) {
-            LOG.error("Error while parsing JSON config '{}': {}", source, e.getMessage());
-            throw new RuntimeException(e.getLocalizedMessage(), e);
+        catch (IOException ie) {
+            LOG.error("Error while parsing config '{}'.", source, ie);
+            throw new OtpAppException("Failed to load config: " + source);
         }
     }
 

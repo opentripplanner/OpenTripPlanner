@@ -9,7 +9,6 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
@@ -34,27 +33,17 @@ public class SpeedTestRequest {
      */
     private static final int EXPAND_SEARCH_WINDOW_HOURS = 0;
 
-    static final RaptorTuningParameters TUNING_PARAMETERS = new RaptorTuningParameters() {
-        @Override
-        public int maxNumberOfTransfers() {
-            return 12;
-        }
-
-        @Override
-        public int searchThreadPoolSize() {
-            return 0;
-        }
-    };
-
     private final TestCase testCase;
     private final SpeedTestCmdLineOpts opts;
+    private final SpeedTestConfig config;
     private final ZoneId inputZoneId;
     private final LocalDate date;
 
     SpeedTestRequest(TestCase testCase, SpeedTestCmdLineOpts opts, SpeedTestConfig config, ZoneId inputZoneId) {
         this.testCase = testCase;
         this.opts = opts;
-        this.date = config.getTestDate();
+        this.config = config;
+        this.date = config.testDate;
         this.inputZoneId = inputZoneId;
     }
 
@@ -79,11 +68,11 @@ public class SpeedTestRequest {
 
     double getWalkSpeedMeterPrSecond() {
         // 1.4 m/s = ~ 5.0 km/t
-        return 1.4;
+        return config.walkSpeedMeterPrSecond;
     }
 
     public double getAccessEgressMaxWalkDistanceMeters() {
-        return 300;
+        return config.maxWalkDistanceMeters;
     }
 
 
