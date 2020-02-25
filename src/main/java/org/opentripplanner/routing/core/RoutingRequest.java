@@ -6,7 +6,6 @@ import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -975,13 +974,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
-    public NamedPlace getFromPlace() {
-        return new NamedPlace(this.from);
-    }
-
-    public NamedPlace getToPlace() {
-        return new NamedPlace(this.to);
-    }
 
     /* INSTANCE METHODS */
 
