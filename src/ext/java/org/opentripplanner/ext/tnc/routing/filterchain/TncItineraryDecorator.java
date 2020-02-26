@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.tnc.routing.filterchain;
 
-import org.opentripplanner.ext.tnc.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService;
 import org.opentripplanner.ext.tnc.routing.error.TransportationNetworkCompanyAvailabilityException;
+import org.opentripplanner.ext.tnc.routing.mapping.RideOfferMapper;
 import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
 import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -25,6 +25,7 @@ public class TncItineraryDecorator implements ItineraryFilter {
     private List<Itinerary> delete = new ArrayList<>();
 
     private final TransportationNetworkCompanyService service;
+    private final RideOfferMapper offerMapper;
     private final RoutingRequest request;
 
 
@@ -33,6 +34,7 @@ public class TncItineraryDecorator implements ItineraryFilter {
     ) {
         this.service = service;
         this.request = request;
+        this.offerMapper = new RideOfferMapper(TransportationNetworkCompanyService::getTncOperator);
     }
 
     @Override
@@ -49,7 +51,7 @@ public class TncItineraryDecorator implements ItineraryFilter {
     /**
      * TODO TNC - Move this to the appropriate place
      *
-     * Adds TNC data to legs with {@link Leg#hailedCar}=true. This makes asynchronous, concurrent
+     * Adds TNC data to legs with {@link Leg#hailed}=true. This makes asynchronous, concurrent
      * requests to the TNC provider's API for price and ETA estimates and associates this data with
      * its respective TNC leg.
      *
@@ -78,7 +80,7 @@ public class TncItineraryDecorator implements ItineraryFilter {
         // Accumulate TNC request tasks for each TNC leg.
         for (int i = 0; i < itinerary.legs.size(); i++) {
             Leg leg = itinerary.legs.get(i);
-            if (!leg.hailedCar) continue;
+            if (!leg.hailed) continue;
             tncLegs.add(leg);
             // If handling the first or second leg, do not attempt to get an arrival estimate for
             // the leg from location and instead use the trip's start location.  Do this is because:
@@ -160,10 +162,7 @@ public class TncItineraryDecorator implements ItineraryFilter {
                         // The error thrown here is caught within this method below.
                         throw new TransportationNetworkCompanyAvailabilityException();
                     }
-                    tncLegs.get(i).tncData = new TransportationNetworkCompanySummary(
-                            bestRideEstimate,
-                            bestArrivalTime
-                    );
+                    tncLegs.get(i).rideOffer = offerMapper.map(bestRideEstimate, bestArrivalTime);
                 }
             } catch (TransportationNetworkCompanyAvailabilityException e) {
                 LOG.warn("Removing itinerary due to TNC unavailability");

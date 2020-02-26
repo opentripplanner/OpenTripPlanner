@@ -1,7 +1,10 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiLeg;
+import org.opentripplanner.ext.tnc.routing.mapping.TncApiMapper;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.util.OTPFeature;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -80,7 +83,12 @@ public class LegMapper {
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
         api.rentedBike = domain.rentedBike;
+        api.hailedCar = domain.hailed && domain.mode == TraverseMode.CAR;
+
+        if(OTPFeature.TncRouting.isOn()) {
+            api.tncData = TncApiMapper.mapData(domain.rideOffer);
+        }
+
         return api;
     }
-
 }

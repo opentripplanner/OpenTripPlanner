@@ -1,7 +1,5 @@
 package org.opentripplanner.ext.tnc.api.model;
 
-import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
-import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
 import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 
 /**
@@ -42,18 +40,4 @@ public class TransportationNetworkCompanySummary {
      */
     public int estimatedArrival;
 
-    public TransportationNetworkCompanySummary (RideEstimate estimate, ArrivalTime time) {
-        if (estimate != null) {
-            this.company = estimate.company;
-            this.currency = estimate.currency;
-            this.travelDuration = estimate.duration;
-            this.maxCost = estimate.maxCost;
-            this.minCost = estimate.minCost;
-        }
-        if (time != null) {
-            this.productId = time.productId;
-            this.displayName = time.displayName;
-            this.estimatedArrival = time.estimatedSeconds;
-        }
-    }
 }

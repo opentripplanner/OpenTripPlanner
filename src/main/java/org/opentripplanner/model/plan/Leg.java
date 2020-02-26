@@ -1,6 +1,5 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.ext.tnc.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -199,14 +198,14 @@ public class Leg {
    public Boolean rentedBike;
 
     /**
-     * Whether this leg involves traveling in a hailed car (Uber or Lyft for example).
+     * Whether this leg involves traveling in a hailed car(Uber, Lift, Taxi), bus or bike.
      */
-   public Boolean hailedCar;
+   public Boolean hailed;
 
     /**
      * On legs with hailed car travel, this includes more details specific to TNC travel.
      */
-    public TransportationNetworkCompanySummary tncData;
+    public RideOffer rideOffer;
 
     /**
     * Whether this leg is a transit leg or not.
@@ -279,9 +278,11 @@ public class Leg {
                 .addBool("isNonExactFrequency", isNonExactFrequency)
                 .addNum("headway", headway)
                 .addNum("distance", distanceMeters, "m")
+                .addBool("hailed", hailed)
                 .addBool("pathway", pathway)
                 .addEnum("mode", mode)
                 .addStr("route", route)
+                .addObj("rideOffer", rideOffer)
                 .addStr("agencyName", agencyName)
                 .addStr("agencyUrl", agencyUrl)
                 .addStr("agencyBrandingUrl", agencyBrandingUrl)

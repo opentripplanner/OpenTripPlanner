@@ -298,10 +298,11 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
+        // TODO TNC - Make hailed into a NONE Car consept
         if(OTPFeature.TncRouting.isOn()) {
             // check at start or end because either could be the very beginning or end of the trip
             // which are temporary edges and stuff
-            leg.hailedCar = states[0].isUsingHailedCar() || states[states.length - 1].isUsingHailedCar();
+            leg.hailed = states[0].isUsingHailedCar() || states[states.length - 1].isUsingHailedCar();
         }
 
         addModeAndAlerts(graph, leg, states, disableAlertFiltering);

@@ -9,6 +9,8 @@ import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
 import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
 import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 import org.opentripplanner.ext.tnc.updater.TransportationNetworkCompanyDataSource;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.StateEditor;
@@ -32,11 +34,39 @@ public class TransportationNetworkCompanyService implements Serializable {
 
     private static Logger LOG = LoggerFactory.getLogger(TransportationNetworkCompanyService.class);
 
+    /**
+     * A mapping to Operator is provided here as a very simple solution, but this is a hack. The TNC
+     * info(id, name, phone, and/or url) should probably be read from a configuration file,
+     * allowing different deployment to provide local info.
+     */
+    public final static Map<TransportationNetworkCompany, Operator> TNC_OPERATORS = new HashMap<>();
+
+
     private Map<TransportationNetworkCompany, TransportationNetworkCompanyDataSource> sources =
         new HashMap<>();
 
+
+    static  {
+        addTncOperator(TransportationNetworkCompany.LYFT, "Lyft");
+        addTncOperator(TransportationNetworkCompany.UBER, "Uber");
+        addTncOperator(TransportationNetworkCompany.NOAPI, "NO-API");
+    }
+
     public void addSource(TransportationNetworkCompanyDataSource source) {
         sources.put(source.getTransportationNetworkCompanyType(), source);
+    }
+
+    public static Operator getTncOperator(TransportationNetworkCompany company) {
+        return TNC_OPERATORS.get(company);
+    }
+
+    public static TransportationNetworkCompany getCompany(Operator operator) {
+        for (Map.Entry<TransportationNetworkCompany, Operator> it : TNC_OPERATORS.entrySet()) {
+            if(it.getValue().equals(operator)) {
+                return it.getKey();
+            }
+        }
+        throw new IllegalArgumentException("Operator no found in TNC company mapping.");
     }
 
     /**
@@ -269,5 +299,13 @@ public class TransportationNetworkCompanyService implements Serializable {
                 request.transportationNetworkCompanyEtaAtOrigin = earliestEta;
             }
         }
+    }
+
+
+    private static void addTncOperator(TransportationNetworkCompany company, String name) {
+        Operator operator = new Operator();
+        operator.setName(name);
+        operator.setId(new FeedScopedId("TNC", company.name()));
+        TNC_OPERATORS.put(company, operator);
     }
 }

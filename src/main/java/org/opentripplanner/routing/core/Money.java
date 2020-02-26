@@ -30,7 +30,7 @@ public class Money implements Comparable<Money> {
         NumberFormat nf = NumberFormat.getCurrencyInstance();
         Currency cur = currency.getCurrency();
         if (cur == null) {
-            return "Money()";
+            return "Money(" + cents + ")";
         }
         nf.setCurrency(cur);
         String c = nf.format(cents / (Math.pow(10, currency.getDefaultFractionDigits())));
