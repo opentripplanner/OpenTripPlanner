@@ -26,8 +26,6 @@ public class TransitStopVertex extends Vertex {
 
     private boolean wheelchairEntrance;
 
-    private boolean isEntrance;
-
     private Stop stop;
 
     /**
@@ -47,17 +45,12 @@ public class TransitStopVertex extends Vertex {
         this.stop = stop;
         this.modes = modes != null ? modes : new TraverseModeSet();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
-        isEntrance = false; // Entrance not supported in current otp model
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices
         graph.expandToInclude(stop.getLon(), stop.getLat());
     }
 
     public boolean hasWheelchairEntrance() {
         return wheelchairEntrance;
-    }
-
-    public boolean isEntrance() {
-        return isEntrance;
     }
 
     public boolean hasEntrances() {
@@ -92,7 +85,7 @@ public class TransitStopVertex extends Vertex {
     }
     
     public boolean isStreetLinkable() {
-        return isEntrance() || !hasEntrances();
+        return !hasEntrances();
     }
 
     public Stop getStop() {
