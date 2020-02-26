@@ -31,11 +31,12 @@ class PathwayMapper {
         Pathway lhs = new Pathway();
 
         lhs.setId(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
-        lhs.setPathwayType(rhs.getPathwayType());
         lhs.setFromStop(stopMapper.map(rhs.getFromStop()));
         lhs.setToStop(stopMapper.map(rhs.getToStop()));
-        lhs.setTraversalTime(rhs.getTraversalTime());
-        lhs.setWheelchairTraversalTime(rhs.getWheelchairTraversalTime());
+        lhs.setPathwayMode(rhs.getPathwayMode());
+        if(rhs.isTraversalTimeSet()) lhs.setTraversalTime(rhs.getTraversalTime());
+        if(rhs.isLengthSet()) lhs.setLength(rhs.getLength());
+        lhs.setBidirectional(rhs.getIsBidirectional() == 1);
 
         return lhs;
     }

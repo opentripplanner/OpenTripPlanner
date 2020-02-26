@@ -129,19 +129,22 @@ public class AddTransitModelEntitiesToGraph {
             Vertex fromVertex = stopNodes.get(pathway.getFromStop());
             Vertex toVertex = stopNodes.get(pathway.getToStop());
 
-            if(fromVertex != null && toVertex != null) {
-                if (pathway.isWheelchairTraversalTimeSet()) {
-                    new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime(), pathway.getWheelchairTraversalTime());
-                } else {
-                    new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
+            if (fromVertex != null && toVertex != null) {
+                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
+                if (pathway.isBidirectional()) {
+                    new PathwayEdge(toVertex, fromVertex, pathway.getTraversalTime());
                 }
             }
             else {
-                if(fromVertex == null) {
-                    LOG.warn("The 'fromVertex' is missing for pathway from stop: " + pathway.getFromStop().getId());
+                if (fromVertex == null) {
+                    LOG.warn("The 'fromVertex' is missing for pathway from stop: " + pathway
+                        .getFromStop()
+                        .getId());
                 }
-                if(toVertex == null) {
-                    LOG.warn("The 'toVertex' is missing for pathway to stop: " + pathway.getToStop().getId());
+                if (toVertex == null) {
+                    LOG.warn("The 'toVertex' is missing for pathway to stop: " + pathway
+                        .getToStop()
+                        .getId());
                 }
             }
         }

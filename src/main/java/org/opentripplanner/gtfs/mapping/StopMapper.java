@@ -30,7 +30,9 @@ class StopMapper {
 
         otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
         otpStop.setName(gtfsStop.getName());
-        otpStop.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+        if (gtfsStop.isLatSet() && gtfsStop.isLonSet()) {
+          otpStop.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+        }
         otpStop.setCode(gtfsStop.getCode());
         otpStop.setDescription(gtfsStop.getDesc());
         otpStop.setZone(gtfsStop.getZoneId());

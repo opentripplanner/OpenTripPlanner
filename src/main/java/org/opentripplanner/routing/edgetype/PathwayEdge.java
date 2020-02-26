@@ -18,20 +18,14 @@ public class PathwayEdge extends Edge {
 
     private int traversalTime;
 
-    private int wheelchairTraversalTime = -1;
-
-    public PathwayEdge(Vertex fromv, Vertex tov, int traversalTime, int wheelchairTraversalTime) {
-        super(fromv, tov);
-        this.traversalTime = traversalTime;
-        this.wheelchairTraversalTime = wheelchairTraversalTime;
-    }
+    private boolean wheelchairAccessible = true;
 
     public PathwayEdge(Vertex fromv, Vertex tov, int traversalTime) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
     }
 
-    private static final long serialVersionUID = -3311099256178798981L;
+    private static final long serialVersionUID = -3311099256178798982L;
 
     public String getDirection() {
         return null;
@@ -61,13 +55,16 @@ public class PathwayEdge extends Edge {
         return this.getName();
     }
 
+    public void setWheelchairAccessible(boolean wheelchairAccessible) {
+        this.wheelchairAccessible = wheelchairAccessible;
+    }
+
     public State traverse(State s0) {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
-            if (wheelchairTraversalTime < 0) {
+            if (!this.wheelchairAccessible) {
                 return null;
             }
-            time = wheelchairTraversalTime;
         }
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);

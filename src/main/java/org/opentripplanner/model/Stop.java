@@ -66,11 +66,11 @@ public final class Stop extends TransitEntity<FeedScopedId> {
     }
 
     public double getLat() {
-        return coordinate.latitude();
+        return coordinate == null ? 0 : coordinate.latitude();
     }
 
     public double getLon() {
-        return coordinate.longitude();
+        return coordinate == null ? 0 : coordinate.longitude();
     }
 
     public void setCoordinate(WgsCoordinate coordinate) {
