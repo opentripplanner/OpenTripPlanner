@@ -3,6 +3,7 @@ package org.opentripplanner.updater.stoptime;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -28,12 +29,13 @@ public class TripPatternCache {
      * and edges for this trip pattern are also created in the graph.
      * 
      * @param stopPattern stop pattern to retrieve/create trip pattern
-     * @param route route of new trip pattern in case a new trip pattern will be created
+     * @param trip the trip the new trip pattern will be created for
      * @param graph graph to add vertices and edges in case a new trip pattern will be created
      * @return cached or newly created trip pattern
      */
     public synchronized TripPattern getOrCreateTripPattern(final StopPattern stopPattern,
-            final Route route, final Graph graph) {
+            final Trip trip, final Graph graph) {
+        Route route = trip.getRoute();
         // Check cache for trip pattern
         TripPattern tripPattern = cache.get(stopPattern);
         
@@ -49,6 +51,14 @@ public class TripPatternCache {
             
             // Finish scheduled time table
             tripPattern.scheduledTimetable.finish();
+
+            TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+
+            // Copy information from the TripPattern this is replacing
+            if (originalTripPattern != null) {
+                tripPattern.setId(originalTripPattern.getId());
+                tripPattern.setHopGeometriesFromPreviousTripPattern(originalTripPattern);
+            }
             
             // Add pattern to cache
             cache.put(stopPattern, tripPattern);

@@ -68,6 +68,14 @@ public class SiriTripPatternCache {
 //            tripPattern.makePatternVerticesAndEdges(graph, graph.index.stopVertexForStop);
             
             // TODO - SIRI: Add pattern to graph index?
+
+            TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+
+            // Copy information from the TripPattern this is replacing
+            if (originalTripPattern != null) {
+                tripPattern.setId(originalTripPattern.getId());
+                tripPattern.setHopGeometriesFromPreviousTripPattern(originalTripPattern);
+            }
             
             // Add pattern to cache
             cache.put(key, tripPattern);
