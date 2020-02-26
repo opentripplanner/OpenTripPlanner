@@ -2,9 +2,9 @@ package org.opentripplanner.ext.tnc.api.resource;
 
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.ext.tnc.api.model.TransportationNetworkCompanyResponse;
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
+import org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;

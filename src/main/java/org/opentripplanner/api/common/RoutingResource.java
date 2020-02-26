@@ -25,7 +25,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.TimeZone;
 
-import static org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService.setEarliestTransportationNetworkCompanyEta;
+import static org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService.setEarliestTransportationNetworkCompanyEta;
 
 
 /**

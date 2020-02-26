@@ -1,10 +1,13 @@
-package org.opentripplanner.routing.transportation_network_company;
+package org.opentripplanner.ext.tnc.routing;
 
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.ApiPlace;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.tnc.routing.error.TransportationNetworkCompanyAvailabilityException;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
+import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 import org.opentripplanner.ext.tnc.updater.TransportationNetworkCompanyDataSource;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.core.RoutingRequest;

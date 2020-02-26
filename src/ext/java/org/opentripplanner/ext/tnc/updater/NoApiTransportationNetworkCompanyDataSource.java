@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.tnc.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
+import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

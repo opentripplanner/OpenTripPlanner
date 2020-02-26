@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.transportation_network_company;
+package org.opentripplanner.ext.tnc.routing.model;
 
 public enum TransportationNetworkCompany {
     LYFT, NOAPI, UBER;

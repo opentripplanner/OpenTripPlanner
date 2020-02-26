@@ -2,9 +2,9 @@ package org.opentripplanner.ext.tnc.updater;
 
 import com.google.common.cache.Cache;
 import com.google.common.cache.CacheBuilder;
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
+import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 
 import java.io.IOException;
 import java.util.List;

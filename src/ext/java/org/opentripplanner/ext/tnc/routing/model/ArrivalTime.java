@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.transportation_network_company;
+package org.opentripplanner.ext.tnc.routing.model;
 
 /**
  * A class to model estimated arrival times of service from a transportation network company

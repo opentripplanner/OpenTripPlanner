@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.tnc.api.model;
 
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.RideEstimate;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;

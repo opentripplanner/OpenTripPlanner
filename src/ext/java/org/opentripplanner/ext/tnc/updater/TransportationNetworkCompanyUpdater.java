@@ -1,10 +1,10 @@
 package org.opentripplanner.ext.tnc.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService;
 import org.opentripplanner.ext.tnc.updater.lyft.LyftTransportationNetworkCompanyDataSource;
 import org.opentripplanner.ext.tnc.updater.uber.UberTransportationNetworkCompanyDataSource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;

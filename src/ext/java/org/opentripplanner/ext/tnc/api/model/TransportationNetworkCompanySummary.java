@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.tnc.api.model;
 
-import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
-import org.opentripplanner.routing.transportation_network_company.RideEstimate;
-import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompany;
+import org.opentripplanner.ext.tnc.routing.model.ArrivalTime;
+import org.opentripplanner.ext.tnc.routing.model.RideEstimate;
+import org.opentripplanner.ext.tnc.routing.model.TransportationNetworkCompany;
 
 /**
  * TNC summary included with itinerary {@link Leg}.
