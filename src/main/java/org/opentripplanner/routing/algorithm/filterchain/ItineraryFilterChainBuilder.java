@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService;
+import org.opentripplanner.ext.tnc.routing.filterchain.TncItineraryDecorator;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
@@ -10,6 +12,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnWalkingArrivalAndDeparture;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
+import org.opentripplanner.routing.core.RoutingRequest;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -25,7 +28,8 @@ public class ItineraryFilterChainBuilder {
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
-    private boolean debug;
+    private boolean debug = false;
+    private ItineraryFilter tncDecorator = null;
 
     /**
      * Max departure time. This is a absolute filter on the itinerary departure time from the
@@ -80,6 +84,10 @@ public class ItineraryFilterChainBuilder {
         this.debug = true;
     }
 
+    public void enableTncInfoDecoration(RoutingRequest request, TransportationNetworkCompanyService service) {
+        this.tncDecorator = new TncItineraryDecorator(service, request);
+    }
+
     public ItineraryFilter build() {
         final List<ItineraryFilter> filters = new ArrayList<>();
 
@@ -95,6 +103,12 @@ public class ItineraryFilterChainBuilder {
         if (latestDepartureTimeLimit != null) {
             filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));
         }
+
+        // Add TNC data as needed to the itinerary after the above filtering operations so that
+        // OTP does not make unnecessary requests to the TNC API(s) for itineraries that get
+        // filtered out. It is possible that TNC service may not actually be available. If, so
+        // the itinerary is removed from the list of itineraries.
+        if(tncDecorator != null) { filters.add(tncDecorator);  }
 
         // Sort itineraries
         filters.add(new SortOnWalkingArrivalAndDeparture());

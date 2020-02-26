@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.ext.tnc.routing.TransportationNetworkCompanyService;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
@@ -30,6 +31,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -233,6 +235,13 @@ public class RoutingWorker {
 
         if(request.debugItineraryFilter) {
             builder.debug();
+        }
+
+        if(OTPFeature.TncRouting.isOn() && request.useTransportationNetworkCompany && request.companies != null) {
+            builder.enableTncInfoDecoration(
+                    request,
+                    request.rctx.graph.getService(TransportationNetworkCompanyService.class)
+            );
         }
 
         return builder.build();

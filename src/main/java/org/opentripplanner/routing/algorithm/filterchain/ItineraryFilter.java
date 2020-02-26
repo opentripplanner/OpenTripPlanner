@@ -5,17 +5,16 @@ import org.opentripplanner.model.plan.Itinerary;
 import java.util.List;
 
 /**
- * Filter or decorate itineraries. A filter can modify the elements in the list, but not the List. 
- * It should treat the list as immutable. Do not change the list passed into the filter, instead make a copy,
- * change it and return the copy. It is allowed to return the list unchanged.
+ * Filter or decorate itineraries. A filter can modify the elements in the list, but not the List.
+ * It should treat the list as immutable. Do not change the list passed into the filter, instead
+ * make a copy, change it and return the copy. It is allowed to return the list unchanged.
  * <p>
- * A filter should do only one thing! For example do not change the itineraries and delete elements in
- * the same filter. Instead create two filters and insert them after each other in the filter chain.
- * This allows decoration of each filter and make it easier to reuse logic. The
- * {@link org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter} work with
- * both a normal filter chain and the
- * {@link org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain}, and the
- * logic can be reused in several places. So, because of this, most filters can ignore the
+ * It is recommended that a filter do only one thing! For example do not change the itineraries and
+ * delete elements in the same filter. Instead create two filters and insert them after each other
+ * in the filter chain. This allows decoration of each filter and make it easier to reuse logic. The
+ * {@link org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter} work with both a
+ * normal filter chain and the {@link org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain},
+ * and the logic can be reused in several places. So, because of this, most filters can ignore the
  * debug-mode.
  */
 public interface ItineraryFilter {
