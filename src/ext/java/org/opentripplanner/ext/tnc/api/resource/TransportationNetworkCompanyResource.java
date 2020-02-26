@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.tnc.api.resource;
 
 import org.opentripplanner.api.model.ApiPlace;
-import org.opentripplanner.api.model.TransportationNetworkCompanyResponse;
+import org.opentripplanner.ext.tnc.api.model.TransportationNetworkCompanyResponse;
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
 import org.opentripplanner.routing.transportation_network_company.TransportationNetworkCompanyService;

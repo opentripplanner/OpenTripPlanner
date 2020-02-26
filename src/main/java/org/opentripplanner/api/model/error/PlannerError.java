@@ -2,10 +2,10 @@ package org.opentripplanner.api.model.error;
 
 import org.opentripplanner.api.common.LocationNotAccessible;
 import org.opentripplanner.api.common.Message;
+import org.opentripplanner.ext.tnc.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
-import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.slf4j.Logger;

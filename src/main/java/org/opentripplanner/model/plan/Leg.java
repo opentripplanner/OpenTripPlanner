@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.api.model.TransportationNetworkCompanySummary;
+import org.opentripplanner.ext.tnc.api.model.TransportationNetworkCompanySummary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.alertpatch.Alert;

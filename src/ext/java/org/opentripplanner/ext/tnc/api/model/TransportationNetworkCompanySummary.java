@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.ext.tnc.api.model;
 
 import org.opentripplanner.routing.transportation_network_company.ArrivalTime;
 import org.opentripplanner.routing.transportation_network_company.RideEstimate;
