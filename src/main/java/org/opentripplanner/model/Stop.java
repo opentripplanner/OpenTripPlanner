@@ -73,6 +73,10 @@ public final class Stop extends TransitEntity<FeedScopedId> {
         return coordinate == null ? 0 : coordinate.longitude();
     }
 
+    public WgsCoordinate getCoordinate() {
+        return coordinate;
+    }
+
     public void setCoordinate(WgsCoordinate coordinate) {
         this.coordinate = coordinate;
     }

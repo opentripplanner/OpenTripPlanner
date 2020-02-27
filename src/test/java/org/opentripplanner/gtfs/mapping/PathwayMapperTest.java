@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -39,7 +38,11 @@ public class PathwayMapperTest {
         PATHWAY.setTraversalTime(TRAVERSAL_TIME);
     }
 
-    private PathwayMapper subject = new PathwayMapper(new StopMapper());
+    private PathwayMapper subject = new PathwayMapper(
+        new StopMapper(),
+        new EntranceMapper(),
+        new PathwayNodeMapper()
+    );
 
     @Test
     public void testMapCollection() throws Exception {

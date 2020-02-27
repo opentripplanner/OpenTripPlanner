@@ -9,13 +9,21 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     private int pathwayMode;
 
-    private Stop fromStop;
+    private TransitEntity<FeedScopedId> fromStop;
 
-    private Stop toStop;
+    private TransitEntity<FeedScopedId> toStop;
+
+    private String name;
+
+    private String reversedName;
 
     private int traversalTime;
 
     private double length;
+
+    private int stairCount;
+
+    private double slope;
 
     private boolean isBidirectional;
 
@@ -37,20 +45,36 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
         return pathwayMode;
     }
 
-    public void setFromStop(Stop fromStop) {
+    public void setFromStop(TransitEntity<FeedScopedId> fromStop) {
         this.fromStop = fromStop;
     }
 
-    public Stop getFromStop() {
+    public TransitEntity<FeedScopedId> getFromStop() {
         return fromStop;
     }
 
-    public void setToStop(Stop toStop) {
+    public void setToStop(TransitEntity<FeedScopedId> toStop) {
         this.toStop = toStop;
     }
 
-    public Stop getToStop() {
+    public TransitEntity<FeedScopedId> getToStop() {
         return toStop;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getReversedName() {
+        return reversedName;
+    }
+
+    public void setReversedName(String reversedName) {
+        this.reversedName = reversedName;
     }
 
     public void setTraversalTime(int traversalTime) {
@@ -75,6 +99,22 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     public void setBidirectional(boolean bidirectional) {
         isBidirectional = bidirectional;
+    }
+
+    public int getStairCount() {
+        return stairCount;
+    }
+
+    public void setStairCount(int stairCount) {
+        this.stairCount = stairCount;
+    }
+
+    public double getSlope() {
+        return slope;
+    }
+
+    public void setSlope(double slope) {
+        this.slope = slope;
     }
 
     @Override

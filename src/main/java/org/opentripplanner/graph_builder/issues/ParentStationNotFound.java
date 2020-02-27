@@ -1,7 +1,9 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitEntity;
 
 public class ParentStationNotFound implements DataImportIssue {
 
@@ -10,13 +12,13 @@ public class ParentStationNotFound implements DataImportIssue {
 
     final String parentStop;
 
-    final Stop stop;
+    final TransitEntity<FeedScopedId> stop;
 
-    public ParentStationNotFound(Stop stop, String parentStop){
+    public ParentStationNotFound(TransitEntity<FeedScopedId> stop, String parentStop){
     	this.stop = stop;
     	this.parentStop = parentStop;
     }
-    
+
     @Override
     public String getMessage() {
         return String.format(FMT, parentStop, stop);

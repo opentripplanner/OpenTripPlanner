@@ -18,6 +18,10 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final StopMapper stopMapper = new StopMapper();
 
+    private final EntranceMapper entranceMapper = new EntranceMapper();
+
+    private final PathwayNodeMapper pathwayNodeMapper = new PathwayNodeMapper();
+
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
     private final ServiceCalendarDateMapper serviceCalendarDateMapper = new ServiceCalendarDateMapper();
@@ -28,7 +32,11 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final ServiceCalendarMapper serviceCalendarMapper = new ServiceCalendarMapper();
 
-    private final PathwayMapper pathwayMapper = new PathwayMapper(stopMapper);
+    private final PathwayMapper pathwayMapper = new PathwayMapper(
+        stopMapper,
+        entranceMapper,
+        pathwayNodeMapper
+    );
 
     private final RouteMapper routeMapper = new RouteMapper(agencyMapper);
 
@@ -72,14 +80,14 @@ public class GTFSToOtpTransitServiceMapper {
         builder.getFareRules().addAll(fareRuleMapper.map(data.getAllFareRules()));
         builder.getFeedInfos().addAll(feedInfoMapper.map(data.getAllFeedInfos()));
         builder.getFrequencies().addAll(frequencyMapper.map(data.getAllFrequencies()));
-        builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getRoutes().addAll(routeMapper.map(data.getAllRoutes()));
         for (ShapePoint shapePoint : shapePointMapper.map(data.getAllShapePoints())) {
             builder.getShapePoints().put(shapePoint.getShapeId(), shapePoint);
         }
 
-        mapGtfsStopsToOtpStopsAndStations(data, builder);
+        mapGtfsStopsToOtpTypes(data, builder);
 
+        builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
         builder.getTripsById().addAll(tripMapper.map(data.getAllTrips()));
@@ -87,18 +95,24 @@ public class GTFSToOtpTransitServiceMapper {
         return builder;
     }
 
-    private void mapGtfsStopsToOtpStopsAndStations(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
+    private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
         for (Stop it : data.getAllStops()) {
-            if(it.getLocationType() == 0) {
+            if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
                 builder.getStops().add(stopMapper.map(it));
-            }
-            else if(it.getLocationType() == 1) {
+            } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
                 builder.getStations().add(stationMapper.map(it));
+            } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
+                builder.getEntrances().add(entranceMapper.map(it));
+            } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
+                builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
             }
         }
         new LinkStopsAndParentStationsTogether(
                 builder.getStations(),
-                builder.getStops(), issueStore
+                builder.getStops(),
+                builder.getEntrances(),
+                builder.getPathwayNodes(),
+                issueStore
         )
             .link(data.getAllStops());
     }

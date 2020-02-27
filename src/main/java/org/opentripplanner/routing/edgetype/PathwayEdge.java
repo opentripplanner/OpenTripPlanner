@@ -17,12 +17,28 @@ import java.util.Locale;
 public class PathwayEdge extends Edge {
 
     private int traversalTime;
+    private double distance;
+    private int steps;
+    private double angle;
+    private String name = "pathway";
 
     private boolean wheelchairAccessible = true;
 
-    public PathwayEdge(Vertex fromv, Vertex tov, int traversalTime) {
+    public PathwayEdge(
+        Vertex fromv,
+        Vertex tov,
+        String name,
+        int traversalTime,
+        double distance,
+        int steps,
+        double angle
+    ) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
+        this.distance = distance;
+        this.steps = steps;
+        this.angle = angle;
+        if (name != null) { this.name = name; }
     }
 
     private static final long serialVersionUID = -3311099256178798982L;
@@ -32,7 +48,7 @@ public class PathwayEdge extends Edge {
     }
 
     public double getDistanceMeters() {
-        return 0;
+        return this.distance;
     }
     
     public TraverseMode getMode() {
@@ -46,7 +62,7 @@ public class PathwayEdge extends Edge {
     }
 
     public String getName() {
-        return "pathway";
+        return name;
     }
 
     @Override
@@ -64,6 +80,15 @@ public class PathwayEdge extends Edge {
         if (s0.getOptions().wheelchairAccessible) {
             if (!this.wheelchairAccessible) {
                 return null;
+            }
+        }
+        if (time == 0) {
+            if (distance > 0) {
+                time = (int) (distance * s0.getOptions().walkSpeed);
+            }
+            else if (steps > 0) {
+                // 1 step corresponds to 20cm, doubling that to compensate for elevation;
+                time = (int) (0.4 * Math.abs(steps) * s0.getOptions().walkSpeed);
             }
         }
         StateEditor s1 = s0.edit(this);

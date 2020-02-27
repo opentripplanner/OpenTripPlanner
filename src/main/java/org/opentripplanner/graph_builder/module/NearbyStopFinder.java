@@ -16,6 +16,7 @@ import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWe
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -264,6 +265,8 @@ public class NearbyStopFinder {
                     }
                 }
                 effectiveWalkDistance += edge.getEffectiveWalkDistance();
+            } else if (edge instanceof PathwayEdge) {
+                effectiveWalkDistance += edge.getDistanceMeters();
             }
             edges.add(edge);
         }

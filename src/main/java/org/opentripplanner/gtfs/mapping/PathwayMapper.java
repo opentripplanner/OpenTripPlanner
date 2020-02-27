@@ -12,10 +12,16 @@ class PathwayMapper {
 
     private final StopMapper stopMapper;
 
+    private EntranceMapper entranceMapper;
+
+    private PathwayNodeMapper nodeMapper;
+
     private Map<org.onebusaway.gtfs.model.Pathway, Pathway> mappedPathways = new HashMap<>();
 
-    PathwayMapper(StopMapper stopMapper) {
+    PathwayMapper(StopMapper stopMapper, EntranceMapper entranceMapper, PathwayNodeMapper nodeMapper) {
         this.stopMapper = stopMapper;
+        this.entranceMapper = entranceMapper;
+        this.nodeMapper = nodeMapper;
     }
 
     Collection<Pathway> map(Collection<org.onebusaway.gtfs.model.Pathway> allPathways) {
@@ -31,12 +37,42 @@ class PathwayMapper {
         Pathway lhs = new Pathway();
 
         lhs.setId(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
-        lhs.setFromStop(stopMapper.map(rhs.getFromStop()));
-        lhs.setToStop(stopMapper.map(rhs.getToStop()));
         lhs.setPathwayMode(rhs.getPathwayMode());
-        if(rhs.isTraversalTimeSet()) lhs.setTraversalTime(rhs.getTraversalTime());
-        if(rhs.isLengthSet()) lhs.setLength(rhs.getLength());
+        if (rhs.isTraversalTimeSet()) { lhs.setTraversalTime(rhs.getTraversalTime()); }
+        lhs.setName(rhs.getSignpostedAs());
+        lhs.setReversedName(rhs.getReversedSignpostedAs());
+        if (rhs.isLengthSet()) { lhs.setLength(rhs.getLength()); }
+        if (rhs.isStairCountSet()) { lhs.setStairCount(rhs.getStairCount()); }
+        if (rhs.isMaxSlopeSet()) { lhs.setSlope(rhs.getMaxSlope()); }
         lhs.setBidirectional(rhs.getIsBidirectional() == 1);
+
+        if (rhs.getFromStop() != null) {
+            switch (rhs.getFromStop().getLocationType()) {
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP:
+                    lhs.setFromStop(stopMapper.map(rhs.getFromStop()));
+                    break;
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT:
+                    lhs.setFromStop(entranceMapper.map(rhs.getFromStop()));
+                    break;
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE:
+                    lhs.setFromStop(nodeMapper.map(rhs.getFromStop()));
+                    break;
+            }
+        }
+
+        if (rhs.getToStop() != null) {
+            switch (rhs.getToStop().getLocationType()) {
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP:
+                    lhs.setToStop(stopMapper.map(rhs.getToStop()));
+                    break;
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT:
+                    lhs.setToStop(entranceMapper.map(rhs.getToStop()));
+                    break;
+                case org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE:
+                    lhs.setToStop(nodeMapper.map(rhs.getToStop()));
+                    break;
+            }
+        }
 
         return lhs;
     }

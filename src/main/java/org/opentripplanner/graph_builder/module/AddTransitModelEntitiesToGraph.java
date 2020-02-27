@@ -2,21 +2,27 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Transfer;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
+import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Objects;
 
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
@@ -33,8 +40,8 @@ public class AddTransitModelEntitiesToGraph {
 
     private final OtpTransitService transitService;
 
-    // Map of stops and their vertices in the graph
-    private Map<Stop, TransitStopVertex> stopNodes = new HashMap<>();
+    // Map of all gtfs stops and their vertices in the graph
+    private Map<TransitEntity<FeedScopedId>, Vertex> stopNodes = new HashMap<>();
 
     private final int subwayAccessTime;
 
@@ -67,6 +74,8 @@ public class AddTransitModelEntitiesToGraph {
         addStationsToGraph(graph);
         addMultiModalStationsToGraph(graph);
         addGroupsOfStationsToGraph(graph);
+        addEntrancesToGraph(graph);
+        addPathwayNodesToGraph(graph);
 
         // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
         createPathwayEdgesAndAddThemToGraph(graph);
@@ -124,15 +133,50 @@ public class AddTransitModelEntitiesToGraph {
         }
     }
 
+    private void addEntrancesToGraph(Graph graph) {
+        for (Entrance entrance : transitService.getAllEntrances()) {
+            TransitEntranceVertex entranceVertex = new TransitEntranceVertex(graph, entrance);
+            stopNodes.put(entrance, entranceVertex);
+        }
+    }
+
+    private void addPathwayNodesToGraph(Graph graph) {
+        for (PathwayNode node : transitService.getAllPathwayNodes()) {
+            TransitPathwayNodeVertex nodeVertex = new TransitPathwayNodeVertex(graph, node);
+            stopNodes.put(node, nodeVertex);
+        }
+    }
+
     private void createPathwayEdgesAndAddThemToGraph(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
             Vertex fromVertex = stopNodes.get(pathway.getFromStop());
             Vertex toVertex = stopNodes.get(pathway.getToStop());
 
             if (fromVertex != null && toVertex != null) {
-                new PathwayEdge(fromVertex, toVertex, pathway.getTraversalTime());
-                if (pathway.isBidirectional()) {
-                    new PathwayEdge(toVertex, fromVertex, pathway.getTraversalTime());
+                // Elevator
+                if (pathway.getPathwayMode() == 5) {
+                }
+                else {
+                    new PathwayEdge(
+                        fromVertex,
+                        toVertex,
+                        pathway.getName(),
+                        pathway.getTraversalTime(),
+                        pathway.getLength(),
+                        pathway.getStairCount(),
+                        pathway.getSlope()
+                    );
+                    if (pathway.isBidirectional()) {
+                        new PathwayEdge(
+                            toVertex,
+                            fromVertex,
+                            pathway.getReversedName(),
+                            pathway.getTraversalTime(),
+                            pathway.getLength(),
+                            -1 * pathway.getStairCount(),
+                            -1 * pathway.getSlope()
+                        );
+                    }
                 }
             }
             else {

@@ -20,6 +20,7 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.issues.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.issues.EntranceUnlinked;
 import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
@@ -48,6 +49,7 @@ import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
@@ -155,6 +157,7 @@ public class SimpleStreetSplitter {
     /** Link all relevant vertices to the street network */
     public void link () {
         link(TransitStopVertex.class, StopUnlinked::new);
+        link(TransitEntranceVertex.class, EntranceUnlinked::new);
         link(BikeRentalStationVertex.class, BikeRentalStationUnlinked::new);
         link(BikeParkVertex.class, BikeParkUnlinked::new);
     }
@@ -466,6 +469,8 @@ public class SimpleStreetSplitter {
             makeTemporaryEdges((TemporaryStreetLocation) from, to);
         } else if (from instanceof TransitStopVertex) {
             makeTransitLinkEdges((TransitStopVertex) from, to);
+        } else if (from instanceof TransitEntranceVertex) {
+            makeTransitLinkEdges((TransitEntranceVertex) from, to);
         } else if (from instanceof BikeRentalStationVertex) {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
@@ -520,6 +525,23 @@ public class SimpleStreetSplitter {
 
         new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
         new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
+    }
+
+    /**
+     * Make street transit link edges, unless they already exist.
+     */
+    private void makeTransitLinkEdges(TransitEntranceVertex entrance, StreetVertex v) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Transitedges are created with non destructive splitting!");
+        }
+        // ensure that the requisite edges do not already exist
+        // this can happen if we link to duplicate ways that have the same start/end vertices.
+        for (StreetTransitLink e : Iterables.filter(entrance.getOutgoing(), StreetTransitLink.class)) {
+            if (e.getToVertex() == v) { return; }
+        }
+
+        new StreetTransitLink(entrance, v, entrance.isWheelchairEntrance());
+        new StreetTransitLink(v, entrance, entrance.isWheelchairEntrance());
     }
 
     /** Make link edges for bike rental */
