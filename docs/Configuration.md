@@ -103,6 +103,8 @@ config key | description | value type | value default | notes
 `fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
 `elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
 `elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
+`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
@@ -255,6 +257,29 @@ it is possible to define a multiplier that converts the elevation values from so
   "elevationUnitMultiplier": 0.1
 }
 ```
+
+### Elevation Data Calculation Optimizations
+
+Calculating elevations on all StreetEdges can take a dramatically long time. In a very large graph build for multiple Northeast US states, the time it took to download the elevation data and calculate all of the elevations took 5,509 seconds (roughly 1.5 hours).
+
+If you are using cloud computing for your OTP instances, it is recommended to create prebuilt images that contain the elevation data you need. This will save time because all of the data won't need to be downloaded.
+
+However, the bulk of the time will still spent calculating elevations for all of the street edges. Therefore, a further optimazation can be done to calculate and save the elevation data during a graph build and then save it for future use.
+
+In order to write out the precalculated elevation data, add this to your `build-config.json` file:
+
+```JSON
+// build-config.json
+{  
+  "writeCachedElevations": true
+}
+```
+
+After building the graph, a file called `cached_elevations.obj` will be written to the cache directory. By default, this file is not written during graph builds. There is also a graph build parameter called `readCachedElevations` which is set to `true` by default.
+
+In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overriden via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, the time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly 9 minutes).
+
+The cached data is a lookup table where the coordinate sequences of respective street edges are used as keys for calculated data. Therefore, it is expected that over time various edits to OpenStreetMap will cause this cached data to become stale and not include new OSM ways. Therefore, periodic update of this cached data is recommended.
 
 ## Fares configuration
 
