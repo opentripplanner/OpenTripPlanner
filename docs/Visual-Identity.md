@@ -2,9 +2,9 @@
 
 This is the OpenTripPlanner logo in scalable vector format, with knockout transparency:
 
-![OTP Logo](otp-logo.svg)
+![OTP Logo](images/otp-logo.svg)
 
-Here is a link to this SVG logo as a [downloadable file](otp-logo.svg). This is the raw SVG XML source code:
+Here is a link to this SVG logo as a [downloadable file](images/otp-logo.svg). This is the raw SVG XML source code:
 
 ```
 <?xml version="1.0" encoding="utf-8"?>
