@@ -93,8 +93,7 @@ public class ElevationModuleTest {
         // create the elevation module
         File cacheDirectory = new File(ElevationModuleTest.class.getResource("ned").getFile());
         DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
-        NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-        gcf.tileSource = awsTileSource;
+        NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
         ElevationModule elevationModule = new ElevationModule(gcf);
 
         // build to graph to execute the elevation module

@@ -185,11 +185,17 @@ public class GraphBuilderParameters {
     public final Boolean extraEdgesStopPlatformLink;
 
     /**
-     * When set to true (it is by default), this will create a file after building elevations with information about
-     * all the elevations organized by coordinates. Subsequent graph builds will reuse the data in this file to avoid
-     * recalculating all the elevation data again.
+     * When set to true (it is by default), the elevation module will attempt to read this file in order to reuse
+     * calculations of elevation data for various coordinate sequences instead of recalculating them all over again.
      */
-    public boolean cacheElevations;
+    public boolean readCachedElevations;
+
+    /**
+     * When set to true (it is false by default), the elevation module will create a file of a lookup map of the
+     * LineStrings and the corresponding calculated elevation data for those coordinates. Subsequent graph builds can
+     * reuse the data in this file to avoid recalculating all the elevation data again.
+     */
+    public boolean writeCachedElevations;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -227,7 +233,8 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
-        cacheElevations = config.path("cacheElevations").asBoolean(true);
+        readCachedElevations = config.path("readCachedElevations").asBoolean(true);
+        writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
     }
 
 
