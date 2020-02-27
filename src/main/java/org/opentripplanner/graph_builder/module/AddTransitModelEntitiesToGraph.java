@@ -21,6 +21,8 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
+import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -155,6 +157,7 @@ public class AddTransitModelEntitiesToGraph {
             if (fromVertex != null && toVertex != null) {
                 // Elevator
                 if (pathway.getPathwayMode() == 5) {
+                    createElevatorEdgesAndAddThemToGraph(graph, pathway, fromVertex, toVertex);
                 }
                 else {
                     new PathwayEdge(
@@ -164,7 +167,8 @@ public class AddTransitModelEntitiesToGraph {
                         pathway.getTraversalTime(),
                         pathway.getLength(),
                         pathway.getStairCount(),
-                        pathway.getSlope()
+                        pathway.getSlope(),
+                        pathway.getPathwayMode() != 2 && pathway.getPathwayMode() != 4
                     );
                     if (pathway.isBidirectional()) {
                         new PathwayEdge(
@@ -174,7 +178,8 @@ public class AddTransitModelEntitiesToGraph {
                             pathway.getTraversalTime(),
                             pathway.getLength(),
                             -1 * pathway.getStairCount(),
-                            -1 * pathway.getSlope()
+                            -1 * pathway.getSlope(),
+                            pathway.getPathwayMode() != 2 && pathway.getPathwayMode() != 4
                         );
                     }
                 }
@@ -191,6 +196,120 @@ public class AddTransitModelEntitiesToGraph {
                         .getId());
                 }
             }
+        }
+    }
+
+    private void createElevatorEdgesAndAddThemToGraph(
+        Graph graph,
+        Pathway pathway,
+        Vertex fromVertex,
+        Vertex toVertex
+    ) {
+        String fromVertexLevelName = fromVertex.getName();
+        Double fromVertexLevelIndex = null;
+
+        if (fromVertex instanceof TransitStopVertex) {
+            TransitStopVertex tsv = (TransitStopVertex) fromVertex;
+            fromVertexLevelName = tsv.getStop().getLevelName();
+            fromVertexLevelIndex = tsv.getStop().getLevelIndex();
+        }
+        else if (fromVertex instanceof TransitEntranceVertex) {
+            TransitEntranceVertex tev = (TransitEntranceVertex) fromVertex;
+            fromVertexLevelName = tev.getEntrance().getLevelName();
+            fromVertexLevelIndex = tev.getEntrance().getLevelIndex();
+        }
+        else if (fromVertex instanceof TransitPathwayNodeVertex) {
+            TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) fromVertex;
+            fromVertexLevelName = tnv.getNode().getLevelName();
+            fromVertexLevelIndex = tnv.getNode().getLevelIndex();
+        }
+
+        String toVertexLevelName = toVertex.getName();
+        Double toVertexLevelIndex = null;
+
+        if (toVertex instanceof TransitStopVertex) {
+            TransitStopVertex tsv = (TransitStopVertex) toVertex;
+            toVertexLevelName = tsv.getStop().getLevelName();
+            toVertexLevelIndex = tsv.getStop().getLevelIndex();
+        }
+        else if (toVertex instanceof TransitEntranceVertex) {
+            TransitEntranceVertex tev = (TransitEntranceVertex) toVertex;
+            toVertexLevelName = tev.getEntrance().getLevelName();
+            toVertexLevelIndex = tev.getEntrance().getLevelIndex();
+        }
+        else if (toVertex instanceof TransitPathwayNodeVertex) {
+            TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) toVertex;
+            toVertexLevelName = tnv.getNode().getLevelName();
+            toVertexLevelIndex = tnv.getNode().getLevelIndex();
+        }
+
+        double levels = 1;
+        if (fromVertexLevelIndex != null && toVertexLevelIndex != null
+            && !fromVertexLevelIndex.equals(toVertexLevelIndex)) {
+            levels = Math.abs(fromVertexLevelIndex - toVertexLevelIndex);
+        }
+
+        ElevatorOffboardVertex fromOffboardVertex = new ElevatorOffboardVertex(
+            graph,
+            fromVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+            fromVertex.getX(),
+            fromVertex.getY(),
+            fromVertexLevelName
+        );
+        ElevatorOffboardVertex toOffboardVertex = new ElevatorOffboardVertex(
+            graph,
+            toVertex.getLabel() + "_" + pathway.getId() + "_offboard",
+            toVertex.getX(),
+            toVertex.getY(),
+            toVertexLevelName
+        );
+
+        new PathwayEdge(fromVertex, fromOffboardVertex, fromVertex.getName());
+        new PathwayEdge(toOffboardVertex, toVertex, toVertex.getName());
+
+        ElevatorOnboardVertex fromOnboardVertex = new ElevatorOnboardVertex(
+            graph,
+            fromVertex.getLabel() + "_" + pathway.getId() + "_onboard",
+            fromVertex.getX(),
+            fromVertex.getY(),
+            fromVertexLevelName
+        );
+        ElevatorOnboardVertex toOnboardVertex = new ElevatorOnboardVertex(
+            graph,
+            toVertex.getLabel() + "_" + pathway.getId() + "_onboard",
+            toVertex.getX(),
+            toVertex.getY(),
+            toVertexLevelName
+        );
+
+        new ElevatorBoardEdge(fromOffboardVertex, fromOnboardVertex);
+        new ElevatorAlightEdge(toOnboardVertex, toOffboardVertex, toVertexLevelName);
+
+        StreetTraversalPermission permission = StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE;
+        new ElevatorHopEdge(
+            fromOnboardVertex,
+            toOnboardVertex,
+            permission,
+            levels,
+            pathway.getTraversalTime()
+        );
+
+        if (pathway.isBidirectional()) {
+            new PathwayEdge(fromOffboardVertex, fromVertex, fromVertex.getName());
+            new PathwayEdge(toVertex, toOffboardVertex, toVertex.getName());
+            new ElevatorBoardEdge(toOffboardVertex, toOnboardVertex);
+            new ElevatorAlightEdge(
+                fromOnboardVertex,
+                fromOffboardVertex,
+                fromVertexLevelName
+            );
+            new ElevatorHopEdge(
+                toOnboardVertex,
+                fromOnboardVertex,
+                permission,
+                levels,
+                pathway.getTraversalTime()
+            );
         }
     }
 

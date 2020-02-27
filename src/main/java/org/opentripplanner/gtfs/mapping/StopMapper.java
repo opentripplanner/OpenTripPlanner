@@ -38,6 +38,11 @@ class StopMapper {
         otpStop.setZone(gtfsStop.getZoneId());
         otpStop.setUrl(gtfsStop.getUrl());
         otpStop.setWheelchairBoarding(WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding()));
+        var level = gtfsStop.getLevel();
+        if (level != null) {
+            otpStop.setLevelIndex(level.getIndex());
+            otpStop.setLevelName(level.getName());
+        }
 
         return otpStop;
     }

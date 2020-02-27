@@ -43,6 +43,10 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     private WheelChairBoarding wheelchairBoarding;
 
+    private String levelName;
+
+    private double levelIndex;
+
     public Stop() {}
 
     public Stop(FeedScopedId id) {
@@ -127,6 +131,22 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     public void setWheelchairBoarding(WheelChairBoarding wheelchairBoarding) {
         this.wheelchairBoarding = wheelchairBoarding;
+    }
+
+    public String getLevelName() {
+        return levelName;
+    }
+
+    public void setLevelName(String levelName) {
+        this.levelName = levelName;
+    }
+
+    public double getLevelIndex() {
+        return levelIndex;
+    }
+
+    public void setLevelIndex(double levelIndex) {
+        this.levelIndex = levelIndex;
     }
 
     @Override

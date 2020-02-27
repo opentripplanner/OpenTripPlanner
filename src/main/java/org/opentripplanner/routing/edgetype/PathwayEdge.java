@@ -24,6 +24,11 @@ public class PathwayEdge extends Edge {
 
     private boolean wheelchairAccessible = true;
 
+    public PathwayEdge(Vertex fromv, Vertex tov, String name) {
+        super(fromv, tov);
+        if (name != null) this.name = name;
+    }
+
     public PathwayEdge(
         Vertex fromv,
         Vertex tov,
@@ -31,13 +36,15 @@ public class PathwayEdge extends Edge {
         int traversalTime,
         double distance,
         int steps,
-        double angle
+        double angle,
+        boolean wheelchairAccessible
     ) {
         super(fromv, tov);
         this.traversalTime = traversalTime;
         this.distance = distance;
         this.steps = steps;
         this.angle = angle;
+        this.wheelchairAccessible = wheelchairAccessible;
         if (name != null) { this.name = name; }
     }
 
@@ -50,7 +57,7 @@ public class PathwayEdge extends Edge {
     public double getDistanceMeters() {
         return this.distance;
     }
-    
+
     public TraverseMode getMode() {
        return TraverseMode.WALK;
     }
@@ -79,6 +86,9 @@ public class PathwayEdge extends Edge {
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
             if (!this.wheelchairAccessible) {
+                return null;
+            }
+            if (this.angle > s0.getOptions().maxWheelchairSlope) {
                 return null;
             }
         }

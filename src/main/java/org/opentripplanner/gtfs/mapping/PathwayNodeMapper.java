@@ -38,6 +38,11 @@ class PathwayNodeMapper {
         otpPathwayNode.setWheelchairBoarding(
             WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding())
         );
+        var level = gtfsStop.getLevel();
+        if (level != null) {
+            otpPathwayNode.setLevelIndex(level.getIndex());
+            otpPathwayNode.setLevelName(level.getName());
+        }
 
         return otpPathwayNode;
     }

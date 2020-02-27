@@ -37,6 +37,11 @@ class EntranceMapper {
     otpEntrance.setWheelchairBoarding(
         WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding())
     );
+    var level = gtfsStop.getLevel();
+    if (level != null) {
+      otpEntrance.setLevelIndex(level.getIndex());
+      otpEntrance.setLevelName(level.getName());
+    }
 
     return otpEntrance;
   }
