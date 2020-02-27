@@ -34,14 +34,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     /** All tiles for the DEM stitched into a single coverage. */
     UnifiedGridCoverage unifiedCoverage = null;
 
-    private File cacheDirectory;
+    private final File cacheDirectory;
 
-    public NEDTileSource tileSource;
+    public final NEDTileSource tileSource;
 
     private List<VerticalDatum> datums;
 
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
+        this.tileSource = new DegreeGridNEDTileSource();
+    }
+
+    public NEDGridCoverageFactoryImpl(File cacheDirectory, NEDTileSource tileSource) {
+        this.cacheDirectory = cacheDirectory;
+        this.tileSource = tileSource;
     }
 
     private static final String[] DATUM_FILENAMES = {"g2012a00.gtx", "g2012g00.gtx", "g2012h00.gtx", "g2012p00.gtx", "g2012s00.gtx", "g2012u00.gtx"};

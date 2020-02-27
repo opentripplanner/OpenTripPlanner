@@ -63,13 +63,11 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
+    private final ElevationGridCoverageFactory gridCoverageFactory;
+    private final boolean readCachedElevations;
+    private final boolean writeCachedElevations;
+    private final File cachedElevationsFile;
     private DataImportIssueStore issueStore;
-
-    private ElevationGridCoverageFactory gridCoverageFactory;
-
-    private boolean cacheElevations = false;
-
-    private File cachedElevationsFile;
 
     private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
@@ -86,17 +84,33 @@ public class ElevationModule implements GraphBuilderModule {
      * are defined in meters in the source data. If, for example, decimetres are used in the source data,
      * this should be set to 0.1 in build-config.json.
      */
-    private double elevationUnitMultiplier = 1;
+    private final double elevationUnitMultiplier;
 
     /** used to transform street coordinates into the projection used by the elevation data */
     private MathTransform transformer;
 
+    // used only for testing purposes
+    public ElevationModule(ElevationGridCoverageFactory factory) {
+        gridCoverageFactory = factory;
+        cachedElevationsFile = null;
+        readCachedElevations = false;
+        writeCachedElevations = false;
+        elevationUnitMultiplier = 1;
+        distanceBetweenSamplesM = 10;
+    }
+
     public ElevationModule(
         ElevationGridCoverageFactory factory,
+        File cacheDirectory,
+        boolean readCachedElevations,
+        boolean writeCachedElevations,
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM
-        ) {
-        this.setGridCoverageFactory(factory);
+    ) {
+        gridCoverageFactory = factory;
+        cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
+        this.readCachedElevations = readCachedElevations;
+        this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
     }
@@ -107,16 +121,6 @@ public class ElevationModule implements GraphBuilderModule {
 
     public List<String> getPrerequisites() {
         return Arrays.asList("streets");
-    }
-    
-    public void setGridCoverageFactory(ElevationGridCoverageFactory factory) {
-        gridCoverageFactory = factory;
-    }
-
-    public void setCacheElevations(boolean cacheElevations) { this.cacheElevations = cacheElevations; }
-
-    public void setCachedElevationsFile(File cachedElevationsFile) {
-        this.cachedElevationsFile = cachedElevationsFile;
     }
 
     @Override
@@ -148,7 +152,7 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         // try to load in the cached elevation data
-        if (cacheElevations) {
+        if (readCachedElevations) {
             try {
                 ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
@@ -195,7 +199,7 @@ public class ElevationModule implements GraphBuilderModule {
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
 
-        if (cacheElevations) {
+        if (writeCachedElevations) {
             // write information from edgesWithElevation to a new cache file for subsequent graph builds
             HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
             for (StreetEdge streetEdge : edgesWithElevation) {
@@ -553,7 +557,7 @@ public class ElevationModule implements GraphBuilderModule {
         gridCoverageFactory.checkInputs();
 
         // check for the existence of cached elevation data.
-        if (cacheElevations) {
+        if (readCachedElevations) {
             if (Files.exists(cachedElevationsFile.toPath())) {
                 log.info("Cached elevations file found!");
             } else {

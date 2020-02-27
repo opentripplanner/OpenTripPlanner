@@ -185,10 +185,13 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsAccessKey = bucketConfig.accessKey;
             awsTileSource.awsSecretKey = bucketConfig.secretKey;
             awsTileSource.awsBucketName = bucketConfig.bucketName;
-            NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            gcf.tileSource = awsTileSource;
+            NEDGridCoverageFactoryImpl gcf =
+                new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
+                    null,
+                    false,
+                    false,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples
             );
@@ -199,6 +202,9 @@ public class GraphBuilder implements Runnable {
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
+                    null,
+                    false,
+                    false,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples
             );
@@ -209,6 +215,9 @@ public class GraphBuilder implements Runnable {
                 ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demSource);
                 GraphBuilderModule elevationBuilder = new ElevationModule(
                         gcf,
+                        null,
+                        false,
+                        false,
                         config.elevationUnitMultiplier,
                         config.distanceBetweenElevationSamples
                 );
