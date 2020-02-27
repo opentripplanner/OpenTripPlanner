@@ -5,6 +5,7 @@
 - Add Way Property Set for the UK (#2818)
 - Fixes surefire test failure during build (#2816)
 - Improve documentation for `mode` routing parameter (#2809)
+- Optimize elevation calculations
 
 ## 1.4 (2019-07-30)
 
