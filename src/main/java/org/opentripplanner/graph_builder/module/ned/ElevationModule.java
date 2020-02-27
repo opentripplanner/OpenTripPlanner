@@ -62,11 +62,10 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
-    private ElevationGridCoverageFactory gridCoverageFactory;
-
-    private boolean cacheElevations = false;
-
-    private File cachedElevationsFile;
+    private final ElevationGridCoverageFactory gridCoverageFactory;
+    private final boolean readCachedElevations;
+    private final boolean writeCachedElevations;
+    private final File cachedElevationsFile;
 
     private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
@@ -85,10 +84,24 @@ public class ElevationModule implements GraphBuilderModule {
     /** used to transform street coordinates into the projection used by the elevation data */
     private MathTransform transformer;
 
-    public ElevationModule() { /* This makes me a "bean" */ };
-    
+    // used only for testing purposes
     public ElevationModule(ElevationGridCoverageFactory factory) {
-        this.setGridCoverageFactory(factory);
+        gridCoverageFactory = factory;
+        cachedElevationsFile = null;
+        readCachedElevations = false;
+        writeCachedElevations = false;
+    }
+
+    public ElevationModule(
+        ElevationGridCoverageFactory factory,
+        File cacheDirectory,
+        boolean readCachedElevations,
+        boolean writeCachedElevations
+    ) {
+        gridCoverageFactory = factory;
+        cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
+        this.readCachedElevations = readCachedElevations;
+        this.writeCachedElevations = writeCachedElevations;
     }
 
     public List<String> provides() {
@@ -97,20 +110,6 @@ public class ElevationModule implements GraphBuilderModule {
 
     public List<String> getPrerequisites() {
         return Arrays.asList("streets");
-    }
-    
-    public void setGridCoverageFactory(ElevationGridCoverageFactory factory) {
-        gridCoverageFactory = factory;
-    }
-
-    public void setDistanceBetweenSamplesM(double distance) {
-        distanceBetweenSamplesM = distance;
-    }
-
-    public void setCacheElevations(boolean cacheElevations) { this.cacheElevations = cacheElevations; }
-
-    public void setCachedElevationsFile(File cachedElevationsFile) {
-        this.cachedElevationsFile = cachedElevationsFile;
     }
 
     @Override
@@ -140,7 +139,7 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         // try to load in the cached elevation data
-        if (cacheElevations) {
+        if (readCachedElevations) {
             try {
                 ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
@@ -192,7 +191,7 @@ public class ElevationModule implements GraphBuilderModule {
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
 
-        if (cacheElevations) {
+        if (writeCachedElevations) {
             // write information from edgesWithElevation to a new cache file for subsequent graph builds
             HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
             for (StreetEdge streetEdge : edgesWithElevation) {
@@ -558,7 +557,7 @@ public class ElevationModule implements GraphBuilderModule {
         gridCoverageFactory.checkInputs();
 
         // check for the existence of cached elevation data.
-        if (cacheElevations) {
+        if (readCachedElevations) {
             if (Files.exists(cachedElevationsFile.toPath())) {
                 log.info("Cached elevations file found!");
             } else {
