@@ -1,52 +1,42 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.model.Trip;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /** 
- * This represents the connection between a street vertex and a transit vertex
- * where going from the street to the vehicle is immediate -- such as at a 
- * curbside bus stop.
+ * This represents the connection between a street vertex and a transit vertex belonging the street
+ * network.
  */
-public class StreetTransitLink extends Edge {
+public class TransitEntranceLink extends Edge {
 
     private static final long serialVersionUID = -3311099256178798981L;
-    static final int STL_TRAVERSE_COST = 1;
+    static final int TEL_TRAVERSE_COST = 1;
 
     private boolean wheelchairAccessible;
 
-    private TransitStopVertex stopVertex;
+    private TransitEntranceVertex entranceVertex;
 
-    public StreetTransitLink(StreetVertex fromv, TransitStopVertex tov, boolean wheelchairAccessible) {
-    	super(fromv, tov);
-    	stopVertex = tov;
-        this.wheelchairAccessible = wheelchairAccessible;
-    }
-
-    public StreetTransitLink(TransitStopVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+    public TransitEntranceLink(StreetVertex fromv, TransitEntranceVertex tov, boolean wheelchairAccessible) {
         super(fromv, tov);
-        stopVertex = fromv;
+        entranceVertex = tov;
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-    public String getDirection() {
-        return null;
-    }
-
-    public double getDistanceMeters() {
-        return 0;
+    public TransitEntranceLink(TransitEntranceVertex fromv, StreetVertex tov, boolean wheelchairAccessible) {
+        super(fromv, tov);
+        entranceVertex = fromv;
+        this.wheelchairAccessible = wheelchairAccessible;
     }
 
     public LineString getGeometry() {
@@ -54,30 +44,25 @@ public class StreetTransitLink extends Edge {
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
-    public TraverseMode getMode() {
-        return TraverseMode.LEG_SWITCH;
-    }
-
     public String getName() {
-        return "street transit link";
+        return entranceVertex.getName();
     }
 
     @Override
     public String getName(Locale locale) {
         //TODO: localize
-        return this.getName();
+        return entranceVertex.getName();
     }
 
     public State traverse(State s0) {
-
-        // Forbid taking shortcuts composed of two street-transit links associated with the same stop in a row. Also
-        // avoids spurious leg transitions. As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815,
-        // it is possible that two stops can have the same GPS coordinate thus creating a possibility for a
-        // legitimate StreetTransitLink > StreetTransitLink sequence, so only forbid two StreetTransitLinks to be taken
-        // if they are for the same stop.
+        // Forbid taking shortcuts composed of two street-transit links associated with the same entrance in a row.
+        // As noted in https://github.com/opentripplanner/OpenTripPlanner/issues/2815, it is
+        // possible that two stops can have the same GPS coordinate thus creating a possibility for
+        // a legitimate TransitEntranceLink > TransitEntranceLink sequence, so only forbid two
+        // TransitEntranceLinks to be taken if they are for the same entrance.
         if (
-            s0.backEdge instanceof StreetTransitLink &&
-                ((StreetTransitLink) s0.backEdge).stopVertex == this.stopVertex
+            s0.backEdge instanceof TransitEntranceLink &&
+                ((TransitEntranceLink) s0.backEdge).entranceVertex == this.entranceVertex
         ) {
             return null;
         }
@@ -86,6 +71,7 @@ public class StreetTransitLink extends Edge {
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
         }
+
         if (s0.getOptions().bikeParkAndRide && !s0.isBikeParked()) {
             // Forbid taking your own bike in the station if bike P+R activated.
             return null;
@@ -111,17 +97,14 @@ public class StreetTransitLink extends Edge {
             }
         }
 
-        var streetToStopTime = 0;
-        s1.incrementTimeInSeconds(streetToStopTime + STL_TRAVERSE_COST);
-        s1.incrementWeight(STL_TRAVERSE_COST + streetToStopTime);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.incrementTimeInSeconds(TEL_TRAVERSE_COST);
+        s1.incrementWeight(TEL_TRAVERSE_COST);
         return s1.makeState();
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.incrementWeight(STL_TRAVERSE_COST);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
+        s1.incrementWeight(TEL_TRAVERSE_COST);
         return s1.makeState();
     }
     
@@ -140,16 +123,12 @@ public class StreetTransitLink extends Edge {
         return tov;
     }
 
-    public Trip getTrip() {
-        return null;
-    }
-
     public boolean isRoundabout() {
         return false;
     }
 
     public String toString() {
-        return "StreetTransitLink(" + fromv + " -> " + tov + ")";
+        return "TransitEntranceLink(" + fromv + " -> " + tov + ")";
     }
 
 

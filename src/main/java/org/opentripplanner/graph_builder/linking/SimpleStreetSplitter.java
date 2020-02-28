@@ -37,6 +37,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.TransitEntranceLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -536,12 +537,12 @@ public class SimpleStreetSplitter {
         }
         // ensure that the requisite edges do not already exist
         // this can happen if we link to duplicate ways that have the same start/end vertices.
-        for (StreetTransitLink e : Iterables.filter(entrance.getOutgoing(), StreetTransitLink.class)) {
+        for (TransitEntranceLink e : Iterables.filter(entrance.getOutgoing(), TransitEntranceLink.class)) {
             if (e.getToVertex() == v) { return; }
         }
 
-        new StreetTransitLink(entrance, v, entrance.isWheelchairEntrance());
-        new StreetTransitLink(v, entrance, entrance.isWheelchairEntrance());
+        new TransitEntranceLink(entrance, v, entrance.isWheelchairEntrance());
+        new TransitEntranceLink(v, entrance, entrance.isWheelchairEntrance());
     }
 
     /** Make link edges for bike rental */

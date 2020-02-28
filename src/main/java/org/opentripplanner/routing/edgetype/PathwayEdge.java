@@ -45,7 +45,11 @@ public class PathwayEdge extends Edge {
         this.steps = steps;
         this.angle = angle;
         this.wheelchairAccessible = wheelchairAccessible;
-        if (name != null) { this.name = name; }
+        if (name != null) {
+            this.name = name;
+        } else {
+            this.name = tov.getName();
+        }
     }
 
     private static final long serialVersionUID = -3311099256178798982L;
@@ -83,6 +87,7 @@ public class PathwayEdge extends Edge {
     }
 
     public State traverse(State s0) {
+        /* TODO: Consider mode, so that passing through multiple fare gates is not possible */
         int time = traversalTime;
         if (s0.getOptions().wheelchairAccessible) {
             if (!this.wheelchairAccessible) {
