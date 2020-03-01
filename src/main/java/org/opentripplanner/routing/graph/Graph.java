@@ -783,6 +783,8 @@ public class Graph implements Serializable {
         // We might actually want to manually register a serializer for every class, to be safe.
         kryo.setRegistrationRequired(false);
         kryo.setReferences(true);
+        // We serialize in two steps, graph and edges. Reference tracking must not be reset in between.
+        kryo.setAutoReset(false);
         kryo.addDefaultSerializer(TPrimitiveHash.class, ExternalizableSerializer.class);
         kryo.register(TIntArrayList.class, new TIntArrayListSerializer());
         kryo.register(TIntIntHashMap.class, new TIntIntHashMapSerializer());
