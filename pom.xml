@@ -194,7 +194,7 @@
             <plugin>
                 <groupId>com.webcohesion.enunciate</groupId>
                 <artifactId>enunciate-maven-plugin</artifactId>
-                <version>2.11.1</version>
+                <version>2.12.1</version>
                 <executions>
                     <execution>
                         <!-- override default binding to process-sources phase (enunciate generates web services). -->
@@ -206,7 +206,16 @@
                 </executions>
                 <configuration>
                     <docsDir>${project.build.directory}/site/enunciate</docsDir>
+                    <encoding>UTF-8</encoding>
                 </configuration>
+                <dependencies>
+                    <!-- Provides OpenAPI 3 generation -->
+                    <dependency>
+                        <groupId>dk.jyskebank.tooling.enunciate</groupId>
+                        <artifactId>enunciate-openapi</artifactId>
+                        <version>1.1.2</version>
+                    </dependency>
+                </dependencies>
             </plugin>
             <plugin>
                 <!-- This plugin must be configured both here (for attach-javadoc during release)
