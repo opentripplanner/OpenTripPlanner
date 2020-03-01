@@ -37,9 +37,7 @@ public class GraphSerializationTest {
      */
     @Test
     public void testRoundTrip () throws Exception {
-        // This graph does not make an ideal test because it doesn't have any street data.
-        // TODO switch to another graph that has both GTFS and OSM data
-        Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
+        Graph originalGraph = ConstantsForTests.getInstance().getVermontGraph();
         // Remove the transit stations, which have no edges and won't survive serialization.
         List<Vertex> transitVertices = originalGraph.getVertices().stream()
                 .filter(v -> v instanceof TransitStation).collect(Collectors.toList());
@@ -76,9 +74,7 @@ public class GraphSerializationTest {
      */
     @Test
     public void compareGraphToItself () {
-        // This graph does not make an ideal test because it doesn't have any street data.
-        // TODO switch to another graph that has both GTFS and OSM data
-        Graph originalGraph = ConstantsForTests.getInstance().getPortlandGraph();
+        Graph originalGraph = ConstantsForTests.getInstance().getVermontGraph();
         originalGraph.index(new DefaultStreetVertexIndexFactory());
         // We can exclude relatively few classes here, because the object trees are of course perfectly identical.
         // We do skip edge lists - otherwise we trigger a depth-first search of the graph causing a stack overflow.
