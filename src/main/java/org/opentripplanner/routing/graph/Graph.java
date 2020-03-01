@@ -9,6 +9,7 @@ import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
+import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -796,6 +797,7 @@ public class Graph implements Serializable {
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
         kryo.register(HashBiMap.class, new HashBiMapSerializer());
+        kryo.register(HashMultimap.class, new JavaSerializer());
         // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
         // FIXME we're importing all the contributed kryo-serializers just for this one serializer
         try {
