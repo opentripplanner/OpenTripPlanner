@@ -110,7 +110,17 @@ public abstract class Edge implements Serializable {
 
     @Override
     public int hashCode() {
-        return fromv.hashCode() * 31 + tov.hashCode();
+        return id * 31;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Edge))
+            return false;
+        Edge edge = (Edge) o;
+        return id == edge.id;
     }
 
     /**
