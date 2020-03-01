@@ -85,6 +85,16 @@ public abstract class Vertex implements Serializable, Cloneable {
         return index;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o)
+            return true;
+        if (!(o instanceof Vertex))
+            return false;
+        Vertex vertex = (Vertex) o;
+        return index == vertex.index;
+    }
+
     // Stupid method for deserialization, initialize transient fields.
     // Stopgap until old serialization methods are completely replaced.
     public void initEdgeListsIfNeeded () {
