@@ -225,7 +225,7 @@ Calculating elevations on all StreetEdges can take a dramatically long time. In 
 
 If you are using cloud computing for your OTP instances, it is recommended to create prebuilt images that contain the elevation data you need. This will save time because all of the data won't need to be downloaded.
 
-However, the bulk of the time will still spent calculating elevations for all of the street edges. Therefore, a further optimazation can be done to calculate and save the elevation data during a graph build and then save it for future use.
+However, the bulk of the time will still be spent calculating elevations for all of the street edges. Therefore, a further optimization can be done to calculate and save the elevation data during a graph build and then save it for future use.
 
 In order to write out the precalculated elevation data, add this to your `build-config.json` file:
 

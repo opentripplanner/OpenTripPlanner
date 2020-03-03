@@ -106,10 +106,9 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             log.info("Downloading NED degree tile " + path);
             // download the file from S3.
             AWSCredentials awsCredentials = new AWSCredentials(awsAccessKey, awsSecretKey);
-            String key = null;
+            String key = formatLatLon(x, y) + ".tiff";
             try {
                 S3Service s3Service = new RestS3Service(awsCredentials);
-                key = formatLatLon(x, y) + ".tiff";
                 S3Object object = s3Service.getObject(awsBucketName, key);
 
                 InputStream istream = object.getDataInputStream();
