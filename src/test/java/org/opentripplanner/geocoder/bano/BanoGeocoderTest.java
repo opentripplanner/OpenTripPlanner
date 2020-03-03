@@ -1,6 +1,5 @@
 package org.opentripplanner.geocoder.bano;
 
-import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.Ignore;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
