@@ -2,6 +2,7 @@ package org.opentripplanner.geocoder.bano;
 
 import org.junit.Ignore;
 import org.junit.Test;
+import org.junit.Ignore;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.geocoder.GeocoderResult;
 import org.opentripplanner.geocoder.GeocoderResults;
@@ -11,6 +12,9 @@ import org.locationtech.jts.geom.Envelope;
 public class BanoGeocoderTest {
 
     /**
+     * NOTE! THIS TEST RELAY ON AN ON-LINE EXTERNAL API (Bano Geocoder) TO BE UP AN RUNNING, WHICH
+     * MAY NOT BE THE CASE. HENCE THE '@Ignore'.
+     * <p>
      * TODO -- This unit-test rely on an on-line API to be up and running, which may not be the case
      * if a network connection is not active or the server is down.
      */
