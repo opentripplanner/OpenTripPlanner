@@ -162,7 +162,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      *
      * @param other TripPattern to copy geometry from
      */
-    public void setHopGeometriesFromPreviousTripPattern(TripPattern other) {
+    public void setHopGeometriesFromPattern(TripPattern other) {
         this.hopGeometries = new byte[this.getStops().size() - 1][];
         for (int i = 0; i < other.getStops().size() - 1; i++) {
             if (other.getHopGeometry(i) != null

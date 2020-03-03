@@ -57,7 +57,7 @@ public class TripPatternCache {
             // Copy information from the TripPattern this is replacing
             if (originalTripPattern != null) {
                 tripPattern.setId(originalTripPattern.getId());
-                tripPattern.setHopGeometriesFromPreviousTripPattern(originalTripPattern);
+                tripPattern.setHopGeometriesFromPattern(originalTripPattern);
             }
             
             // Add pattern to cache
