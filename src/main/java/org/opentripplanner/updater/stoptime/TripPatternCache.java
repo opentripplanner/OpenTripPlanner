@@ -7,6 +7,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
 
+import javax.validation.constraints.NotNull;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,8 +34,10 @@ public class TripPatternCache {
      * @param graph graph to add vertices and edges in case a new trip pattern will be created
      * @return cached or newly created trip pattern
      */
-    public synchronized TripPattern getOrCreateTripPattern(final StopPattern stopPattern,
-            final Trip trip, final Graph graph) {
+    public synchronized TripPattern getOrCreateTripPattern(
+            @NotNull final StopPattern stopPattern,
+            @NotNull final Trip trip,
+            @NotNull final Graph graph) {
         Route route = trip.getRoute();
         // Check cache for trip pattern
         TripPattern tripPattern = cache.get(stopPattern);
