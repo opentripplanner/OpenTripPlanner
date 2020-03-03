@@ -70,9 +70,10 @@ public class ElevationModule implements GraphBuilderModule {
 
     private Coverage coverage;
 
-    // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings.
-    private AtomicInteger nPointsEvaluated = new AtomicInteger(0);
-    private AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
+    // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings. AtomicInteger is
+    // used to provide thread-safe updating capabilities.
+    private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
+    private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
 
     /**
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
