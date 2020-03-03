@@ -34,8 +34,9 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     /**
      * A spatial index of the intersection of all regions and datums. For smaller-scale deployments, this spatial index
      * might perform more slowly than manually iterating over each region and datum. However, in larger regions, this
-     * can result in 20+% more calculations being done. In smaller-scale deployments since the overall time is not as
-     * long, we leave this in here for the benefit of larger regions where this will result in much better performance.
+     * can result in 20+% more calculations being done during the same time compared to the brute-force method. In
+     * smaller-scale deployments since the overall time is not as long, we leave this in here for the benefit of larger
+     * regions where this will result in much better performance.
      */
     private final SpatialIndex datumRegionIndex;
     private ArrayList<Coverage> regions;
@@ -73,8 +74,7 @@ public class UnifiedGridCoverage extends AbstractCoverage {
         if (coverageCandidates.size() > 0) {
             // Found a match for coverage/datum.
             DatumRegion datumRegion = coverageCandidates.get(0);
-            double[] result;
-            result = datumRegion.region.evaluate(point, values);
+            double[] result = datumRegion.region.evaluate(point, values);
             result[0] += datumRegion.datum.interpolatedHeight(x, y);
             return result;
         }
