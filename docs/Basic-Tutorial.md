@@ -84,7 +84,7 @@ This is the three main phases:
 When starting OTP the command line parameter is used to control witch phases are run. The diagram
 below show the flow depending on the parameters used.
 
-![Command-Line-Parameter-Flow](images/cli-flow.png)
+![Command-Line-Parameter-Flow](images/cli-flow.svg)
 
 You must use at least one of the required 
 parameters: `--load`, `--loadStreet`, `--build`, `--buildStreet`. Some of the parameters are 
