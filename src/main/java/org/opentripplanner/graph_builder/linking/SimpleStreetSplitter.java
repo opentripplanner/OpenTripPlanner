@@ -51,6 +51,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -151,6 +152,8 @@ public class SimpleStreetSplitter {
 
     /** Link all relevant vertices to the street network */
     public void link () {
+        ProgressTracker progress = new ProgressTracker(graph.getVertices().size(), 2000);
+
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
                 boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
@@ -165,6 +168,7 @@ public class SimpleStreetSplitter {
                         issueStore.add(new BikeParkUnlinked((BikeParkVertex) v));
                 };
             }
+            progress.step((i, size) -> LOG.info("Link progress: {} of {} ({}%)", i, size, (100*i)/size));
         }
     }
 
