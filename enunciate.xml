@@ -12,9 +12,13 @@
     <jaxrs disabled="false">
        <application path="/otp/" />
     </jaxrs>
-		<jackson disabled="false" />
+		<jackson disabled ="false" />
 		<jaxb disabled="false" />
 		<jaxrs disabled="false" />
   </modules>
+  <api-classes>
+    <!-- enuciate-openapi 1.4.0 throws an error on ScriptResource's particular use of FormData -->
+    <exclude pattern="org.opentripplanner.api.resource.ScriptResource"/>
+  </api-classes>
 
 </enunciate>
