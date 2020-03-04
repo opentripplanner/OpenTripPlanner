@@ -1,8 +1,8 @@
 package org.opentripplanner.api.common;
 
-import java.util.Locale;
-
 import org.opentripplanner.util.Properties;
+
+import java.util.Locale;
 
 /**
  * The purpose of Messages is to read supply Message.properties to underlying calling code...
@@ -19,8 +19,16 @@ public enum Message {
     NO_TRANSIT_TIMES(406),
     REQUEST_TIMEOUT(408),
     BOGUS_PARAMETER(413),
-    GEOCODE_FROM_NOT_FOUND(440),
-    GEOCODE_TO_NOT_FOUND(450),
+    /**
+     * The request 'from' location is not found. This can also mean that there is no street close
+     * to the given coordinates, no stops nearby. Change the from field and try again.
+     */
+    FROM_NOT_FOUND(440),
+    /**
+     * The request 'to' location is not found. This can also mean that there is no street close to
+     * the given coordinates, no stops nearby. Change the from field and try again.
+     */
+    TO_NOT_FOUND(450),
     GEOCODE_FROM_TO_NOT_FOUND(460),
     TOO_CLOSE(409),
     LOCATION_NOT_ACCESSIBLE(470),
@@ -69,32 +77,5 @@ public enum Message {
     }
     public String get() {
         return get("", Locale.getDefault());
-    }
-
-
-    /** 
-     * will return the enum who's .property value matches the passed in value ...
-     * NOTE: not sure where this will be used...from legacy code in case it's ever needed... 
-     */
-    public static Message findEnumByProperty(String value, Locale l) {
-        Message retVal = null;
-        try {
-            value = value.trim();
-            if (value.length() > 0)
-            {
-                for (Message k : Message.values()) {
-                    if (value.equals(k.get(l))) {
-                        retVal = k;
-                        break;
-                    }
-                }
-            }
-        } catch (Exception ex) {
-        }
-
-        return retVal;
-    }
-    public static Message findEnumByProperty(String value) {
-        return findEnumByProperty(value, Locale.getDefault());
     }
 }

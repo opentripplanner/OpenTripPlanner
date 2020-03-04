@@ -4,9 +4,11 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class PlanResponse {
     public TripPlan plan;
@@ -23,5 +25,12 @@ public class PlanResponse {
                 + ", messages=" + messages
                 + ", debugOutput=" + debugOutput
                 + '}';
+    }
+
+    public List<String> listErrorMessages(String locale) {
+        return messages
+                .stream()
+                .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(locale)))
+                .collect(Collectors.toList());
     }
 }

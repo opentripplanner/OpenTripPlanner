@@ -97,7 +97,7 @@ public class Place {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(Place.class)
+        return ToStringBuilder.of(Place.class)
                 .addStr("name", name)
                 .addObj("stopId", stopId)
                 .addStr("stopCode", stopCode)

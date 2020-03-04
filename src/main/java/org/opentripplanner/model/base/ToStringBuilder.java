@@ -22,22 +22,44 @@ import java.util.function.Function;
  * <p>
  * The naming of the 'add' methods should give a hint to witch type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
- * override, witch often will case the wrong method to get chosen.
+ * override, witch often result in a wrong method call.
  */
 public class ToStringBuilder {
-    private final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
+    private static final String FIELD_SEPARATOR_VO = " ";
+    private static final String FIELD_SEPARATOR_OBJ = ", ";
+    private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
+
+    private final boolean includeMetadata;
+    private final StringBuilder sb = new StringBuilder();
+    private final List<String> unsetFields = new ArrayList<>();
 
     private DecimalFormat coordinateFormat;
     private SimpleDateFormat calTimeFormater;
-    private final StringBuilder sb = new StringBuilder();
-    private final List<String> unsetFields = new ArrayList<>();
     boolean first = true;
 
-    public ToStringBuilder(Class<?> clazz) {
-        this(clazz.getSimpleName());
+    private ToStringBuilder(String name, boolean includeMetadata) {
+        this.includeMetadata = includeMetadata;
+
+        if(this.includeMetadata) {
+            sb.append(name).append("{");
+        }
     }
-    public ToStringBuilder(String name) {
-        sb.append(name).append("{");
+
+    /**
+     * Create a ToStringBuilder for a regular POJO type. This builder
+     * will include metadata(class and field names) when building the to sting.
+     */
+    public static ToStringBuilder of(Class<?> clazz) {
+        return new ToStringBuilder(clazz.getSimpleName(), true);
+    }
+
+    /**
+     * Create a ToStringBuilder for a ValueObject type.
+     * This is used by the {@link ValueObjectToStringBuilder} only; Hence the
+     * package local access modifier.
+     */
+    static ToStringBuilder valueObject() {
+        return new ToStringBuilder(null, false);
     }
 
     /* General purpose formatters */
@@ -74,6 +96,14 @@ public class ToStringBuilder {
     public ToStringBuilder addCoordinate(String name, Number num) {
         return addIfNotNull(name, num, this::formatCoordinate);
     }
+
+    /** Add a Coordinate location: (longitude, latitude) */
+    public ToStringBuilder addCoordinate(String name, Number lat, Number lon) {
+        if(lat == null && lon == null) { return unset(name); }
+        addObj(name, "(" + formatCoordinate(lat) + ", " + formatCoordinate(lon) + ")");
+        return this;
+    }
+
     /**
      * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
      * Note! The DATE is not printed.
@@ -92,17 +122,19 @@ public class ToStringBuilder {
 
     @Override
     public String toString() {
-        if(!unsetFields.isEmpty()) { addIt("NOT_SET", unsetFields.toString()); }
-        sb.append("}");
+        if(includeMetadata) {
+            if(!unsetFields.isEmpty()) { addIt("NOT_SET", unsetFields.toString()); }
+            sb.append("}");
+        }
         return sb.toString();
     }
 
-    private <T> ToStringBuilder addIfNotNull(String name, T value) {
+    private <S> ToStringBuilder addIfNotNull(String name, S value) {
         if(value == null) { return unset(name); }
         return addIt(name, value.toString());
     }
 
-    private <T> ToStringBuilder addIfNotNull(String name, T value, Function<T, String> vToString) {
+    private <S> ToStringBuilder addIfNotNull(String name, S value, Function<S, String> vToString) {
         if(value == null) { return unset(name); }
         return addIt(name, vToString.apply(value));
     }
@@ -110,9 +142,12 @@ public class ToStringBuilder {
     private ToStringBuilder addIt(String name, @NotNull String value) {
         try {
             if (first) { first = false; }
-            else { sb.append(", "); }
+            else { sb.append(includeMetadata ? FIELD_SEPARATOR_OBJ : FIELD_SEPARATOR_VO); }
 
-            sb.append(name).append(":").append(value);
+            if(includeMetadata) {
+                sb.append(name).append(":");
+            }
+            sb.append(value);
             return this;
         }
         catch (RuntimeException e) {
@@ -133,11 +168,12 @@ public class ToStringBuilder {
         return calTimeFormater.format(time.getTime());
     }
 
-
-    private String formatCoordinate(Number value) {
+    String formatCoordinate(Number value) {
         if(coordinateFormat == null) {
             coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
         }
-        return coordinateFormat.format(value);
+        // This need to be null-safe, because one of the coordinates in
+        // #addCoordinate(String name, Number lat, Number lon) could be null.
+        return value == null ? "null" : coordinateFormat.format(value);
     }
 }
