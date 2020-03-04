@@ -59,7 +59,7 @@ public class ProgressTrackerTest {
         long time = System.currentTimeMillis() - start;
         assertTrue(
                 "Time should be close to the wait time: " + WAIT + " but is " + time,
-                Math.abs(time - WAIT) < WAIT/2
+                Math.abs(time - WAIT) < WAIT
         );
         assertTrue(
                 "We expect the loop to be performed between 5 and 12 times: " + i,

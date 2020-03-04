@@ -9,12 +9,14 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -59,6 +61,10 @@ public class TransmodelGraphQLPlanner {
 
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
+
+            if(response.plan.itineraries.isEmpty()) {
+                response.messages.add(new PlannerError(new PathNotFoundException()).message);
+            }
         }
         catch (Exception e) {
             try {
