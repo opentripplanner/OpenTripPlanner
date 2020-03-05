@@ -13,6 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -43,8 +44,11 @@ public class SiriTripPatternCache {
      * @param serviceDate
      * @return cached or newly created trip pattern
      */
-    public synchronized TripPattern getOrCreateTripPattern(final StopPattern stopPattern,
-                                                           final Trip trip, final Graph graph, ServiceDate serviceDate) {
+    public synchronized TripPattern getOrCreateTripPattern(
+            @NotNull final StopPattern stopPattern,
+            @NotNull final Trip trip,
+            @NotNull final Graph graph,
+            @NotNull ServiceDate serviceDate) {
         // Check cache for trip pattern
         StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
         TripPattern tripPattern = cache.get(key);
@@ -68,6 +72,14 @@ public class SiriTripPatternCache {
 //            tripPattern.makePatternVerticesAndEdges(graph, graph.index.stopVertexForStop);
             
             // TODO - SIRI: Add pattern to graph index?
+
+            TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+
+            // Copy information from the TripPattern this is replacing
+            if (originalTripPattern != null) {
+                tripPattern.setId(originalTripPattern.getId());
+                tripPattern.setHopGeometriesFromPattern(originalTripPattern);
+            }
             
             // Add pattern to cache
             cache.put(key, tripPattern);
