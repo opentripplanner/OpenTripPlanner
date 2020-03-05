@@ -29,9 +29,9 @@ public abstract class RentVehicleAnywhereEdge extends Edge {
         return 0;
     }
 
-    public boolean isAvaiable = true;
+    public int isAvaiable = 0;
 
-    boolean isAvaiable(long time) {
+    int isAvaiable(long time) {
         return isAvaiable;
     }
 
@@ -43,7 +43,7 @@ public abstract class RentVehicleAnywhereEdge extends Edge {
         if (s0.getNonTransitMode().equals(traverseMode())) {
             stateEditor.incrementTimeInSeconds(getDropoffTimeInSeconds());
             stateEditor.beginVehicleRenting(traverseMode());
-        } else if (s0.getNonTransitMode().equals(TraverseMode.WALK) && isAvaiable(s0.getTimeSeconds())) {
+        } else if (s0.getNonTransitMode().equals(TraverseMode.WALK) && isAvaiable(s0.getTimeSeconds())>0) {
             stateEditor.incrementTimeInSeconds(getRentTimeInSeconds());
             stateEditor.doneVehicleRenting();
         } else {

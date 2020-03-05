@@ -19,11 +19,11 @@ class VehicleSharingGraphWritterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         for (Edge edge : appeared) {
-            ((RentVehicleAnywhereEdge) edge).isAvaiable = true;
+            ((RentVehicleAnywhereEdge) edge).isAvaiable ++;
         }
 
         for (Edge edge : disappeared) {
-            ((RentVehicleAnywhereEdge) edge).isAvaiable = false;
+            ((RentVehicleAnywhereEdge) edge).isAvaiable --;
         }
 
     }
