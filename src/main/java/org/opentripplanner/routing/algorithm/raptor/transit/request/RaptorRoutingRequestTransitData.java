@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -43,6 +44,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
       Instant departureTime,
       int dayRange,
       TraverseModeSet transitModes,
+      Set<FeedScopedId> bannedRoutes,
       double walkSpeed
   ) {
     // Delegate to the creator to construct the needed data structures. The code is messy so
@@ -55,7 +57,11 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
 
     this.transitLayer = transitLayer;
     this.startOfTime = creator.getSearchStartTime();
-    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(dayRange, transitModes);
+    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(
+        dayRange,
+        transitModes,
+        bannedRoutes
+    );
     this.transfers = creator.calculateTransferDuration(walkSpeed);
   }
 

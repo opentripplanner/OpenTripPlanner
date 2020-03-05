@@ -194,7 +194,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("unpreferred.organisations", (Collection<String> organisations) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
-//        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
+        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
         callWith.argument("banned.organisations", (Collection<String> organisations) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
         callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
