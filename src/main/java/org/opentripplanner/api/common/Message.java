@@ -19,16 +19,8 @@ public enum Message {
     NO_TRANSIT_TIMES(406),
     REQUEST_TIMEOUT(408),
     BOGUS_PARAMETER(413),
-    /**
-     * The request 'from' location is not found. This can also mean that there is no street close
-     * to the given coordinates, no stops nearby. Change the from field and try again.
-     */
-    FROM_NOT_FOUND(440),
-    /**
-     * The request 'to' location is not found. This can also mean that there is no street close to
-     * the given coordinates, no stops nearby. Change the from field and try again.
-     */
-    TO_NOT_FOUND(450),
+    GEOCODE_FROM_NOT_FOUND(440),
+    GEOCODE_TO_NOT_FOUND(450),
     GEOCODE_FROM_TO_NOT_FOUND(460),
     TOO_CLOSE(409),
     LOCATION_NOT_ACCESSIBLE(470),

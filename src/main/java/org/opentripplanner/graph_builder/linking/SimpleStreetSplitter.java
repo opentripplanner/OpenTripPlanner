@@ -152,7 +152,7 @@ public class SimpleStreetSplitter {
 
     /** Link all relevant vertices to the street network */
     public void link () {
-        ProgressTracker progress = new ProgressTracker(graph.getVertices().size(), 2000);
+        ProgressTracker progress = ProgressTracker.totalSize(graph.getVertices().size());
 
         for (Vertex v : graph.getVertices()) {
             if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {

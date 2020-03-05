@@ -18,15 +18,20 @@ import java.util.function.BiConsumer;
 public class ProgressTracker {
     private final int dStep;
     private final int size;
-    private final long notifyEveryMillisecond;
+    private final long quietPeriodMilliseconds;
 
     private int i = 0;
     private long lastProgressNotification;
 
-    public ProgressTracker(int size, long notifyEveryMillisecond) {
+    public static ProgressTracker totalSize(int size) {
+        return new ProgressTracker(size, 2000);
+    }
+
+    /** Package local to allow unit testing. */
+    ProgressTracker(int size, long quietPeriodMilliseconds) {
         this.size = size;
         this.dStep = Math.max(size / 100, 1);
-        this.notifyEveryMillisecond = notifyEveryMillisecond;
+        this.quietPeriodMilliseconds = quietPeriodMilliseconds;
         this.lastProgressNotification = System.currentTimeMillis();
     }
 
@@ -38,7 +43,7 @@ public class ProgressTracker {
 
         // And it is more than N milliseconds since last notification
         long time = System.currentTimeMillis();
-        if(time < lastProgressNotification + notifyEveryMillisecond) { return; }
+        if(time < lastProgressNotification + quietPeriodMilliseconds) { return; }
 
         // The notify
         lastProgressNotification = time;
