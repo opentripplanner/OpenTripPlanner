@@ -8,12 +8,14 @@ import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import java.util.Objects;
 
 import static org.junit.Assert.assertEquals;
 
 public class ToStringBuilderTest {
     private enum  AEnum { A }
     private static class Foo {
+
         int a;
         String b;
 
@@ -24,10 +26,20 @@ public class ToStringBuilderTest {
 
         @Override
         public String toString() {
-            return ToStringBuilder.of(Foo.class)
-                    .addNum("a", a, 0)
-                    .addStr("b", b)
-                    .toString();
+            return ToStringBuilder.of(Foo.class).addNum("a", a, 0).addStr("b", b).toString();
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) { return true; }
+            if (o == null || getClass() != o.getClass()) { return false; }
+            Foo foo = (Foo) o;
+            return a == foo.a && Objects.equals(b, foo.b);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(a, b);
         }
     }
 
@@ -39,7 +51,7 @@ public class ToStringBuilderTest {
     @Test
     public void addNum() {
         assertEquals("ToStringBuilderTest{num:3.0}", subject().addNum("num", 3.0000000d).toString());
-        assertEquals("ToStringBuilderTest{num:3.0}", subject().addNum("num", 3.0000000f).toString());
+        assertEquals("ToStringBuilderTest{num:30,000.0}", subject().addNum("num", 30_000.00f).toString());
         assertEquals("ToStringBuilderTest{num:3}", subject().addNum("num", 3).toString());
         assertEquals("ToStringBuilderTest{num:3}", subject().addNum("num", 3L).toString());
     }
@@ -59,9 +71,9 @@ public class ToStringBuilderTest {
     @Test
     public void testAddNumWithUnit() {
         assertEquals(
-                "ToStringBuilderTest{a:3s, b:7m}",
+                "ToStringBuilderTest{a:3,000s, b:7m}",
                 subject()
-                        .addNum("a", 3, "s")
+                        .addNum("a", 3000, "s")
                         .addNum("b", 7, "m")
                         .toString()
         );
@@ -102,10 +114,40 @@ public class ToStringBuilderTest {
     }
 
     @Test
+    public void addObjWithDefaultValue() {
+        Foo defaultFoo = new Foo(5, "X");
+
+        assertEquals(
+                "ToStringBuilderTest{obj:Foo{a:6, b:'X'}}",
+                subject().addObj("obj", new Foo(6, "X"), defaultFoo).toString()
+        );
+        assertEquals(
+                "ToStringBuilderTest{NOT_SET:[obj]}",
+                subject().addObj("obj", defaultFoo, defaultFoo).toString()
+        );
+        assertEquals(
+                "ToStringBuilderTest{NOT_SET:[obj]}",
+                subject().addObj("obj", new Foo(5, "X"), defaultFoo).toString()
+        );
+    }
+
+    @Test
     public void addCollection() {
         assertEquals(
                 "ToStringBuilderTest{c:[1, 3.0, true]}",
                 subject().addCol("c", List.of(1, 3d, true)).toString()
+        );
+    }
+
+    @Test
+    public void addCollectionWithLimit() {
+        assertEquals(
+                "ToStringBuilderTest{c:[1, 2, 3]}",
+                subject().addColLimited("c", List.of(1, 2, 3), 2).toString()
+        );
+        assertEquals(
+                "ToStringBuilderTest{c(2/4):[1, 2, ..]}",
+                subject().addColLimited("c", List.of(1, 2, 3, 4), 2).toString()
         );
     }
 
@@ -120,6 +162,16 @@ public class ToStringBuilderTest {
         assertEquals(
                 "ToStringBuilderTest{c:23:45:12}",
                 subject().addCalTime("c", c).toString()
+        );
+    }
+
+    @Test
+    public void addSecondsPastMidnight() {
+        // 02:30:04 in seconds is:
+        int seconds = 2 * 3600 + 30 * 60 + 4;
+        assertEquals(
+                "ToStringBuilderTest{t:02:30:04}",
+                subject().addSecondsPastMidnight("t", seconds, -1).toString()
         );
     }
 

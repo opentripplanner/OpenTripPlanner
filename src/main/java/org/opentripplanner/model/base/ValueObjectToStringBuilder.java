@@ -1,7 +1,13 @@
 package org.opentripplanner.model.base;
 
+import org.opentripplanner.transit.raptor.util.TimeUtils;
+
+import java.math.BigInteger;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import java.time.Duration;
-import java.util.Calendar;
+import java.util.Locale;
+import java.util.function.Function;
 
 /**
  * Use this to-string-builder to build value objects. A
@@ -21,13 +27,26 @@ import java.util.Calendar;
  * Use the {@link #of()}  factory method to create a instance of this class.
  */
 public class ValueObjectToStringBuilder {
-    private static final String FNAME = "field-name-skipped";
+    private static final String FIELD_SEPARATOR = " ";
 
-    private final ToStringBuilder buf = ToStringBuilder.valueObject();
+    private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(
+            Locale.US
+    );
+
+    private final StringBuilder sb = new StringBuilder();
+
+    private DecimalFormat coordinateFormat;
+    private DecimalFormat integerFormat;
+    private DecimalFormat decimalFormat;
+    boolean first = true;
 
     /** Use factory method: {@link #of()}. */
     private ValueObjectToStringBuilder() { }
 
+    /**
+     * Create a new toString builder for a [ValueObject](http://wiki.c2.com/?ValueObject) type.
+     * The builder will NOT include metadata(class and field names) when building the string.
+     */
     public static ValueObjectToStringBuilder of() {
         return new ValueObjectToStringBuilder();
     }
@@ -35,71 +54,102 @@ public class ValueObjectToStringBuilder {
     /* General purpose formatters */
 
     public ValueObjectToStringBuilder addNum(Number num) {
-        buf.addNum(FNAME, num);
-        return this;
-    }
-
-    public ValueObjectToStringBuilder addNum(Number value, Number defaultValue) {
-        buf.addNum(FNAME, value, defaultValue);
-        return this;
+        return addIt(num, it -> formatNumber(num));
     }
 
     public ValueObjectToStringBuilder addNum(Number num, String unit) {
-        buf.addNum(FNAME, num, unit);
-        return this;
+        return addIt(num, it -> formatNumber(it) + unit);
     }
 
     public ValueObjectToStringBuilder addBool(Boolean value, String ifTrue, String ifFalse) {
-        if(value == null) { return this; }
-        buf.addObj(FNAME, value ? ifTrue : ifFalse);
-        return this;
+        return addIt(value, it -> it ? ifTrue : ifFalse);
     }
 
     public ValueObjectToStringBuilder addStr(String value) {
-        buf.addStr(FNAME, value);
-        return this;
+        return addIt(value, it -> "'" + it + "'");
     }
 
     public ValueObjectToStringBuilder addEnum(Enum<?> value) {
-        buf.addEnum(FNAME, value);
-        return this;
+        return addIt(value, Enum::name);
     }
 
     public ValueObjectToStringBuilder addObj(Object obj) {
-        buf.addObj(FNAME, obj);
-        return this;
+        return addIt(obj, Object::toString);
     }
+
 
     /* Special purpose formatters */
 
     /** Add a Coordinate location: (longitude, latitude) */
     public ValueObjectToStringBuilder addCoordinate(Number lat, Number lon) {
-        if(lat == null && lon == null) { return this; }
-        buf.addObj(FNAME, "(" + buf.formatCoordinate(lat) + ", " + buf.formatCoordinate(lon) + ")");
-        return this;
+        return addIt("(" + formatCoordinate(lat) + ", " + formatCoordinate(lon) + ")");
     }
 
     /**
-     * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
-     * Note! The DATE is not printed.
+     * Add time in seconds since midnight. Format:  HH:mm:ss.
      */
-    public ValueObjectToStringBuilder addCalTime(Calendar time) {
-        buf.addCalTime(FNAME, time);
-        return this;
+    public  ValueObjectToStringBuilder  addSecondsPastMidnight(int secondsPastMidnight) {
+        // Use a NOT_SET value witch is unlikely to be used
+        return addSecondsPastMidnight(secondsPastMidnight, -87_654_321);
     }
+
+    /**
+     * Add time in seconds since midnight. Format:  HH:mm:ss. Ignore if not set.
+     */
+    public  ValueObjectToStringBuilder  addSecondsPastMidnight(int secondsPastMidnight, int notSet) {
+        return addIt(TimeUtils.timeToStrLong(secondsPastMidnight, notSet));
+    }
+
     /**
      * Add a duration to the string in format like '3h4m35s'. Each component (hours, minutes, and or
      * seconds) is only added if they are not zero {@code 0}. This is the same format as the
-     * {@link Duration#toString()}, but without the prefix.
+     * {@link Duration#toString()}, but without the 'PT' prefix.
      */
     public ValueObjectToStringBuilder addDuration(Integer durationSeconds) {
-        buf.addDuration(FNAME, durationSeconds);
-        return this;
+        return addIt(durationSeconds, TimeUtils::durationToStr);
     }
 
     @Override
     public String toString() {
-        String value = buf.toString();
-        return value.isBlank() ? "<empty>" : value;
+        return sb.toString();
+    }
+
+
+    /* private methods  */
+
+    private  ValueObjectToStringBuilder  addIt(String value) {
+        return addIt(value, it -> it);
+    }
+
+    private <T> ValueObjectToStringBuilder  addIt(T value, Function<T, String> mapToString) {
+        if (first) { first = false; }
+        else { sb.append(FIELD_SEPARATOR); }
+        sb.append(value == null ? "null" : mapToString.apply(value));
+        return this;
+    }
+
+    String formatCoordinate(Number value) {
+        if(coordinateFormat == null) {
+            coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
+        }
+        // This need to be null-safe, because one of the coordinates in
+        // #addCoordinate(String name, Number lat, Number lon) could be null.
+        return value == null ? "null" : coordinateFormat.format(value);
+    }
+
+    String formatNumber(Number value) {
+        if (value == null) { return "null"; }
+
+        if(value instanceof Integer || value instanceof Long || value instanceof BigInteger) {
+            if(integerFormat == null) {
+                integerFormat = new DecimalFormat("#,##0", DECIMAL_SYMBOLS);
+            }
+            return integerFormat.format(value);
+        }
+
+        if(decimalFormat == null) {
+            decimalFormat = new DecimalFormat("#,##0.0##", DECIMAL_SYMBOLS);
+        }
+        return decimalFormat.format(value);
     }
 }
