@@ -694,7 +694,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         final StopPattern stopPattern = new StopPattern(stopTimes);
 
         // Get cached trip pattern or create one if it doesn't exist yet
-        final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);
+        final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip, graph);
 
         // Add service code to bitset of pattern if needed (using copy on write)
         final int serviceCode = graph.getServiceCodes().get(trip.getServiceId());
