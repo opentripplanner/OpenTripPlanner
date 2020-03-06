@@ -30,7 +30,7 @@ public class GraphStatisticsResource {
 
     @SuppressWarnings("unused")
     public GraphStatisticsResource(@Context OTPServer server, @PathParam("routerId") String routerId) {
-        this(server.getRouter(routerId).graph.index);
+        this(server.getRouter().graph.index);
     }
 
     GraphStatisticsResource(GraphIndex graphIndex) {

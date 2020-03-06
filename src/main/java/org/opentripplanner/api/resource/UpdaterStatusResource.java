@@ -27,7 +27,7 @@ public class UpdaterStatusResource {
     Router router;
 
     public UpdaterStatusResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        router = otpServer.getRouter(routerId);
+        router = otpServer.getRouter();
     }
 
     /** Return a list of all agencies in the graph. */
