@@ -7,12 +7,8 @@ public class RentCarAnywhereEdge extends RentVehicleAnywhereEdge {
     int rentTimeInMinutes;
     int dropoffTimeInMinutes;
 
-    protected RentCarAnywhereEdge(Vertex v1, Vertex v2) {
-        super(v1, v2);
-    }
-
-    public RentCarAnywhereEdge(Vertex v1, Vertex v2, int rentTimeInMinutes, int dropoffTimeInMinutes) {
-        super(v1, v2);
+    public RentCarAnywhereEdge(Vertex v, int rentTimeInMinutes, int dropoffTimeInMinutes) {
+        super(v);
         this.rentTimeInMinutes = rentTimeInMinutes;
         this.dropoffTimeInMinutes = dropoffTimeInMinutes;
     }

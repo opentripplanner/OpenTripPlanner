@@ -1,6 +1,7 @@
 package org.opentripplanner.updater.vehicle_sharing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.lucene.util.SloppyMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
@@ -8,14 +9,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.apache.lucene.util.SloppyMath;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -75,9 +73,9 @@ public class SharedCarUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() throws Exception {
-        VehiclePostionsDiff vehiclePostionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
-        List<Vertex> appearedVertex = coordsToVertex(vehiclePostionsDiff.appeared,false);
-        List<Vertex> disappearedVertex = coordsToVertex(vehiclePostionsDiff.disappeared,true);
+        VehiclePositionsDiff vehiclePositionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
+        List<Vertex> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared,false);
+        List<Vertex> disappearedVertex = coordsToVertex(vehiclePositionsDiff.disappeared,true);
         List<Edge> apppearedEdge = new LinkedList<>();
         List<Edge> disappeareedEdge = new LinkedList<>();
 
@@ -100,8 +98,8 @@ public class SharedCarUpdater extends PollingGraphUpdater {
             }
         }
 
-        VehicleSharingGraphWritterRunnable graphWritterRunnable = new VehicleSharingGraphWritterRunnable(apppearedEdge, disappeareedEdge);
-        graphUpdaterManager.execute(graphWritterRunnable);
+        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(apppearedEdge, disappeareedEdge);
+        graphUpdaterManager.execute(graphWriterRunnable);
     }
 
     @Override
@@ -125,5 +123,4 @@ public class SharedCarUpdater extends PollingGraphUpdater {
     public void teardown() {
 
     }
-
 }

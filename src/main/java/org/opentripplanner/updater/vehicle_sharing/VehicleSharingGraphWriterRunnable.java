@@ -7,11 +7,12 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 
 import java.util.List;
 
-class VehicleSharingGraphWritterRunnable implements GraphWriterRunnable {
+class VehicleSharingGraphWriterRunnable implements GraphWriterRunnable {
+
     List<Edge> appeared;
     List<Edge> disappeared;
 
-    public VehicleSharingGraphWritterRunnable(List<Edge> appeared, List<Edge> disappeared) {
+    public VehicleSharingGraphWriterRunnable(List<Edge> appeared, List<Edge> disappeared) {
         this.appeared = appeared;
         this.disappeared = disappeared;
     }
@@ -19,12 +20,10 @@ class VehicleSharingGraphWritterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         for (Edge edge : appeared) {
-            ((RentVehicleAnywhereEdge) edge).isAvaiable ++;
+            ((RentVehicleAnywhereEdge) edge).available++;
         }
-
         for (Edge edge : disappeared) {
-            ((RentVehicleAnywhereEdge) edge).isAvaiable --;
+            ((RentVehicleAnywhereEdge) edge).available--;
         }
-
     }
 }

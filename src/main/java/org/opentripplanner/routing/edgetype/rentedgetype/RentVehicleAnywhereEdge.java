@@ -9,32 +9,32 @@ import org.opentripplanner.routing.graph.Vertex;
 import java.util.Locale;
 
 public abstract class RentVehicleAnywhereEdge extends Edge {
+
+    protected RentVehicleAnywhereEdge(Vertex v) {
+        super(v, v);
+    }
+
     abstract public TraverseMode traverseMode();
 
     @Override
     public String getName() {
-        return "Rent vehicle "+traverseMode();
+        return "Rent " + traverseMode().name() + " in node " + getToVertex().getName();
     }
 
     @Override
     public String getName(Locale locale) {
-        return null; // No idea what to do with it
+        return "Rent " + traverseMode().name() + " in node " + getToVertex().getName(locale);
     }
 
     protected abstract int getRentTimeInSeconds();
 
     protected abstract int getDropoffTimeInSeconds();
 
-    protected int getRentFee(Vertex v) {
-        return 0;
+    public int available = 0;
+
+    boolean isAvailable(long time) {
+        return available > 0;
     }
-
-    public int isAvaiable = 0;
-
-    int isAvaiable(long time) {
-        return isAvaiable;
-    }
-
 
     @Override
     public State traverse(State s0) {
@@ -42,18 +42,13 @@ public abstract class RentVehicleAnywhereEdge extends Edge {
 
         if (s0.getNonTransitMode().equals(traverseMode())) {
             stateEditor.incrementTimeInSeconds(getDropoffTimeInSeconds());
-            stateEditor.beginVehicleRenting(traverseMode());
-        } else if (s0.getNonTransitMode().equals(TraverseMode.WALK) && isAvaiable(s0.getTimeSeconds())>0) {
-            stateEditor.incrementTimeInSeconds(getRentTimeInSeconds());
             stateEditor.doneVehicleRenting();
+        } else if (s0.getNonTransitMode().equals(TraverseMode.WALK) && isAvailable(s0.getTimeSeconds())) {
+            stateEditor.incrementTimeInSeconds(getRentTimeInSeconds());
+            stateEditor.beginVehicleRenting(traverseMode());
         } else {
             return null;
         }
-
         return stateEditor.makeState();
-    }
-
-    protected RentVehicleAnywhereEdge(Vertex v1, Vertex v2) {
-        super(v1, v2);
     }
 }
