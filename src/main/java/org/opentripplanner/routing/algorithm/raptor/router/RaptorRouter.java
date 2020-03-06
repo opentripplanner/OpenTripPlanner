@@ -168,6 +168,6 @@ public class RaptorRouter {
   }
 
   private int maxTransferDistance(Number maxWalkDistance) {
-    return 2000 > maxWalkDistance.intValue() ? maxWalkDistance.intValue() : 2000;
+    return 2000 > maxWalkDistance.intValue() ? 2000 : maxWalkDistance.intValue();
   }
 }
