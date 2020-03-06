@@ -40,6 +40,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private static final int MODE_AIRPLANE = 4096;
 
+    private static final int MODE_RENT = 8192;
+
     private static final int MODE_TRANSIT = MODE_TRAM | MODE_RAIL | MODE_SUBWAY | MODE_FUNICULAR
             | MODE_GONDOLA | MODE_CABLE_CAR | MODE_BUS | MODE_FERRY | MODE_AIRPLANE;
  
@@ -103,6 +105,8 @@ public class TraverseModeSet implements Cloneable, Serializable {
             return MODE_AIRPLANE;
         case TRANSIT:
             return MODE_TRANSIT;
+        case RENT:
+            return MODE_RENT;
         }
         return 0;
     }
@@ -170,6 +174,10 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     public boolean getAirplane() {
         return (modes & MODE_AIRPLANE) != 0;
+    }
+
+    public boolean getRent() {
+        return (modes & MODE_RENT) != 0;
     }
 
     public void setBicycle(boolean bicycle) {

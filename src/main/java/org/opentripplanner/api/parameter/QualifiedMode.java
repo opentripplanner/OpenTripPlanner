@@ -54,6 +54,9 @@ public class QualifiedMode implements Serializable {
         if (usingTransit && this.mode == TraverseMode.CAR) {
             if (this.qualifiers.contains(Qualifier.PARK)) {
                 req.parkAndRide = true;
+            } else if (this.qualifiers.contains(Qualifier.RENT)) {
+                req.allowBikeRental = true;
+                req.modes.setMode(TraverseMode.RENT, true);
             } else {
                 req.kissAndRide = true;
             }
