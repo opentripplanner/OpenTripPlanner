@@ -2,6 +2,7 @@
 
 ## 1.5.0 (in progress)
 
+- Add an openapi.yml specification of the APIs (#2998)
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Add Way Property Set for the UK (#2818)
 - Fixes surefire test failure during build (#2816)
