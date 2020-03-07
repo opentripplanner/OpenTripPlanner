@@ -1,6 +1,8 @@
 # Changelog
 
 ## 2.0 (in progress)
+
+- Add openapi generation (#2998)
 - Sandbox for experimental features (#2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
