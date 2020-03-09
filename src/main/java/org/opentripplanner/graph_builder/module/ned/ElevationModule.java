@@ -38,23 +38,23 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 /**
- * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street data that has already
- * been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
- * in the Graph. Depending on the {@link ElevationGridCoverageFactory} specified
- * this could be auto-downloaded and cached National Elevation Dataset (NED) raster data or
- * a GeoTIFF file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects,
- * where each (x,y) pair represents one sample, with the x-coord representing the distance along
- * the edge measured from the start, and the y-coord representing the sampled elevation at that
+ * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
+ * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
+ * in the Graph. Depending on the {@link ElevationGridCoverageFactory} specified this could be auto-downloaded and
+ * cached National Elevation Dataset (NED) raster data or a GeoTIFF file. The elevation profiles are stored as
+ * {@link PackedCoordinateSequence} objects, where each (x,y) pair represents one sample, with the x-coord representing
+ * the distance along the edge measured from the start, and the y-coord representing the sampled elevation at that
  * point (both in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
@@ -66,14 +66,24 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean writeCachedElevations;
     private final File cachedElevationsFile;
 
-    private HashMap<String, PackedCoordinateSequence> cachedElevations;
+    /**
+     * In regular use of OTP, no transformation is needed, however, in order to make an assertion in a downstream
+     * library pass during testing, a transformation must take place.
+     */
+    private final boolean transformCoordinates;
 
-    private Coverage coverage;
+    private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
     // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings. AtomicInteger is
     // used to provide thread-safe updating capabilities.
+    private AtomicInteger nEdgesProcessed = new AtomicInteger(0);
     private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
     private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
+    /**
+     * This initial value probably won't be shown in logs, but is set to an absurdly high value initially to make things
+     * seem better later.
+     */
+    private int totalElevationEdges = Integer.MAX_VALUE;
 
     /**
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
@@ -91,6 +101,9 @@ public class ElevationModule implements GraphBuilderModule {
     /** used to transform street coordinates into the projection used by the elevation data */
     private MathTransform transformer;
 
+    /** the graph being built */
+    private Graph graph;
+
     // used only for testing purposes
     public ElevationModule(ElevationGridCoverageFactory factory) {
         gridCoverageFactory = factory;
@@ -98,6 +111,7 @@ public class ElevationModule implements GraphBuilderModule {
         readCachedElevations = false;
         writeCachedElevations = false;
         elevationUnitMultiplier = 1;
+        transformCoordinates = true;
     }
 
     public ElevationModule(
@@ -112,6 +126,7 @@ public class ElevationModule implements GraphBuilderModule {
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
+        transformCoordinates = false;
     }
 
     public List<String> provides() {
@@ -124,23 +139,16 @@ public class ElevationModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
+        this.graph = graph;
         gridCoverageFactory.setGraph(graph);
-        Coverage gridCov = gridCoverageFactory.getGridCoverage();
-
-        // If gridCov is a GridCoverage2D, apply a bilinear interpolator. Otherwise, just use the
-        // coverage as is (note: UnifiedGridCoverages created by NEDGridCoverageFactoryImpl handle
-        // interpolation internally)
-        coverage = (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
-                (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
-        try {
-            transformer = CRS.findMathTransform(
-                GeometryUtils.WGS84_XY,
-                coverage.getCoordinateReferenceSystem(),
-                true
-            );
-        } catch (FactoryException e) {
-            log.error("Could not find an appropriate transformer!");
-            throw new RuntimeException(e);
+        if (transformCoordinates) {
+            try {
+                transformer = CRS
+                    .findMathTransform(GeometryUtils.WGS84_XY, getCoverage().getCoordinateReferenceSystem(), true);
+            } catch (FactoryException e) {
+                log.error("Could not find an appropriate transformer!");
+                throw new RuntimeException(e);
+            }
         }
 
         // try to load in the cached elevation data
@@ -156,32 +164,30 @@ public class ElevationModule implements GraphBuilderModule {
         }
         log.info("Setting street elevation profiles from digital elevation model...");
 
-        AtomicInteger nProcessed = new AtomicInteger();
+        // Multithread elevation calculations
+        ForkJoinPool forkJoinPool = new ForkJoinPool();
 
-        LinkedList<StreetWithElevationEdge> edgesToCalculate = new LinkedList<>();
+        // For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
+        // used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage instance for each thread to
+        // avoid other threads waiting for a lock to be released on the Coverage instance. This concurrent HashMap will
+        // store these thread-specific Coverage instances.
+        ConcurrentHashMap<Long, Coverage> coveragesForThread = new ConcurrentHashMap<>();
+
+        List<StreetWithElevationEdge> streetWithElevationEdges = new LinkedList<>();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
-                    edgesToCalculate.add((StreetWithElevationEdge) ee);
+                    forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee, coveragesForThread));
+                    streetWithElevationEdges.add((StreetWithElevationEdge) ee);
                 }
             }
         }
-
-        edgesToCalculate.parallelStream().forEach(edgeWithElevation -> {
-            processEdge(graph, edgeWithElevation);
-            int curNumProcessed = nProcessed.addAndGet(1);
-            if (curNumProcessed % 50000 == 0) {
-                log.info("set elevation on {}/{} edges", curNumProcessed, edgesToCalculate.size());
-            }
-        });
-
-        // iterate again to find edges that had elevation calculated. This is done here instead of in the above loop to
-        // avoid thread locking for writes to a synchronized list
-        LinkedList<StreetEdge> edgesWithElevation = new LinkedList<>();
-        for (StreetWithElevationEdge edgeWithElevation : edgesToCalculate) {
-            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
-                edgesWithElevation.add(edgeWithElevation);
-            }
+        totalElevationEdges = streetWithElevationEdges.size();
+        forkJoinPool.shutdown();
+        try {
+            forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
+        } catch (InterruptedException e) {
+            log.warn(graph.addBuilderAnnotation(new Graphwide("Multi-threaded elevation calculations timed-out!")));
         }
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
@@ -196,10 +202,19 @@ public class ElevationModule implements GraphBuilderModule {
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
 
+        // iterate again to find edges that had elevation calculated. This is done here instead of in the forkJoinPool
+        // to avoid thread locking for writes to a synchronized list
+        LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
+        for (StreetWithElevationEdge edgeWithElevation : streetWithElevationEdges) {
+            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
+                edgesWithCalculatedElevations.add(edgeWithElevation);
+            }
+        }
+
         if (writeCachedElevations) {
             // write information from edgesWithElevation to a new cache file for subsequent graph builds
             HashMap<String, PackedCoordinateSequence> newCachedElevations = new HashMap<>();
-            for (StreetEdge streetEdge : edgesWithElevation) {
+            for (StreetEdge streetEdge : edgesWithCalculatedElevations) {
                 newCachedElevations.put(PolylineEncoder.createEncodings(streetEdge.getGeometry()).getPoints(),
                     streetEdge.getElevationProfile());
             }
@@ -213,10 +228,54 @@ public class ElevationModule implements GraphBuilderModule {
                 log.error(graph.addBuilderAnnotation(new Graphwide("Failed to write cached elevation file!")));
             }
         }
-
         @SuppressWarnings("unchecked")
         HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
-        assignMissingElevations(graph, edgesWithElevation, extraElevation);
+        assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
+    }
+
+    /**
+     * A runnable that contains the relevant info for executing a process edge operation in a particular thread.
+     */
+    private class ProcessEdgeTask implements Runnable {
+        private final StreetWithElevationEdge swee;
+        private final ConcurrentHashMap<Long, Coverage> coveragesForThread;
+
+        public ProcessEdgeTask(StreetWithElevationEdge swee, ConcurrentHashMap<Long, Coverage> coveragesForThread) {
+            this.swee = swee;
+            this.coveragesForThread = coveragesForThread;
+        }
+
+        @Override public void run() {
+            processEdge(swee, getThreadSpecificCoverageInstance());
+        }
+
+        /**
+         * Get the thread-specific Coverage instance to avoid multiple threads waiting for a lock to be released on a
+         * Interpolator2D instance.
+         */
+        private Coverage getThreadSpecificCoverageInstance () {
+            long currentThreadId = Thread.currentThread().getId();
+            Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
+            if (threadSpecificCoverage == null) {
+                threadSpecificCoverage = getCoverage();
+                coveragesForThread.put(currentThreadId, threadSpecificCoverage);
+            }
+            return threadSpecificCoverage;
+        }
+    }
+
+    /**
+     * Get an uncached Coverage instance from the module's ElevationGridCoverageFactory.
+     */
+    private Coverage getCoverage() {
+        // If gridCov is a GridCoverage2D, apply a bilinear interpolator. Otherwise, just use the
+        // coverage as is (note: UnifiedGridCoverages created by NEDGridCoverageFactoryImpl handle
+        // interpolation internally)
+        Coverage gridCov = gridCoverageFactory instanceof NEDGridCoverageFactoryImpl
+            ? ((NEDGridCoverageFactoryImpl) gridCoverageFactory).getUncachedCoverage()
+            : gridCoverageFactory.getGridCoverage();
+        return (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
+            (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
     }
 
     class ElevationRepairState {
@@ -416,11 +475,11 @@ public class ElevationModule implements GraphBuilderModule {
 
     /**
      * Processes a single street edge, creating and assigning the elevation profile.
-     * 
+     *
      * @param ee the street edge
-     * @param graph the graph (used only for error handling)
+     * @param coverage the specific Coverage instance to use in order to avoid competition between threads
      */
-    private void processEdge(Graph graph, StreetWithElevationEdge ee) {
+    private void processEdge(StreetWithElevationEdge ee, Coverage coverage) {
         if (ee.hasPackedElevationProfile()) {
             return; /* already set up */
         }
@@ -447,7 +506,7 @@ public class ElevationModule implements GraphBuilderModule {
             List<Coordinate> coordList = new LinkedList<Coordinate>();
 
             // initial sample (x = 0)
-            coordList.add(new Coordinate(0, getElevation(coords[0])));
+            coordList.add(new Coordinate(0, getElevation(coverage, coords[0])));
 
             // iterate through coordinates calculating the edge length and creating intermediate elevation coordinates at
             // the regularly specified interval
@@ -471,6 +530,7 @@ public class ElevationModule implements GraphBuilderModule {
                         new Coordinate(
                             sampleDistance,
                             getElevation(
+                                coverage,
                                 new Coordinate(
                                     x1 + (pctAlongSeg * (x2 - x1)),
                                     y1 + (pctAlongSeg * (y2 - y1))
@@ -491,7 +551,7 @@ public class ElevationModule implements GraphBuilderModule {
             }
 
             // final sample (x = edge length)
-            coordList.add(new Coordinate(edgeLenM, getElevation(coords[coords.length - 1])));
+            coordList.add(new Coordinate(edgeLenM, getElevation(coverage, coords[coords.length - 1])));
 
             // construct the PCS
             Coordinate coordArr[] = new Coordinate[coordList.size()];
@@ -501,6 +561,10 @@ public class ElevationModule implements GraphBuilderModule {
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (PointOutsideCoverageException | TransformException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
+        }
+        int curNumProcessed = nEdgesProcessed.addAndGet(1);
+        if (curNumProcessed % 50000 == 0) {
+            log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
         }
     }
 
@@ -514,22 +578,24 @@ public class ElevationModule implements GraphBuilderModule {
 
     /**
      * Method for retrieving the elevation at a given Coordinate.
-     * 
+     *
+     * @param coverage the specific Coverage instance to use in order to avoid competition between threads
      * @param c the coordinate (NAD83)
      * @return elevation in meters
      */
-    private double getElevation(Coordinate c) throws PointOutsideCoverageException, TransformException {
-        return getElevation(c.x, c.y);
+    private double getElevation(Coverage coverage, Coordinate c) throws PointOutsideCoverageException, TransformException {
+        return getElevation(coverage, c.x, c.y);
     }
 
     /**
      * Method for retrieving the elevation at a given (x, y) pair.
-     * 
+     *
+     * @param coverage the specific Coverage instance to use in order to avoid competition between threads
      * @param x the query longitude (NAD83)
      * @param y the query latitude (NAD83)
      * @return elevation in meters
      */
-    private double getElevation(double x, double y) throws PointOutsideCoverageException, TransformException {
+    private double getElevation(Coverage coverage, double x, double y) throws PointOutsideCoverageException, TransformException {
         double values[] = new double[1];
         try {
             // We specify a CRS here because otherwise the coordinates are assumed to be in the coverage's native CRS.
@@ -538,9 +604,16 @@ public class ElevationModule implements GraphBuilderModule {
             // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
             // rasters to also use (long, lat).
             DirectPosition2D projectedPosition = new DirectPosition2D(GeometryUtils.WGS84_XY, x, y);
-            DirectPosition2D transformedPosition = new DirectPosition2D();
-            transformer.transform(projectedPosition, transformedPosition);
-            coverage.evaluate(transformedPosition, values);
+            DirectPosition2D position2D;
+            // If this is not done during testing, a downstream library will raise an assertion error
+            if (transformCoordinates) {
+                DirectPosition2D transformedPosition = new DirectPosition2D();
+                transformer.transform(projectedPosition, transformedPosition);
+                position2D = transformedPosition;
+            } else {
+                position2D = projectedPosition;
+            }
+            coverage.evaluate(position2D, values);
         } catch (PointOutsideCoverageException | TransformException e) {
             nPointsOutsideDEM.incrementAndGet();
             throw e;

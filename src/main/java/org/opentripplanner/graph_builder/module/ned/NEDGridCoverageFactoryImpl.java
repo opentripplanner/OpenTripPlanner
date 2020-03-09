@@ -110,21 +110,28 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     /** @return a GeoTools grid coverage for the entire area of interest, lazy-creating it on the first call. */
     public Coverage getGridCoverage() {
         if (unifiedCoverage == null) {
-            loadVerticalDatum();
-            tileSource.setGraph(graph);
-            tileSource.setCacheDirectory(cacheDirectory);
-            List<File> paths = tileSource.getNEDTiles();
-            // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
-            for (File path : paths) {
-                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
-                // TODO might bicubic interpolation give better results?
-                GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
-                        new InterpolationBilinear());
-                if (unifiedCoverage == null) {
-                    unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
-                } else {
-                    unifiedCoverage.add(regionCoverage);
-                }
+            unifiedCoverage = getUncachedCoverage();
+        }
+        return unifiedCoverage;
+    }
+
+    /** @return a GeoTools grid coverage for the entire area of interest */
+    public UnifiedGridCoverage getUncachedCoverage() {
+        loadVerticalDatum();
+        tileSource.setGraph(graph);
+        tileSource.setCacheDirectory(cacheDirectory);
+        List<File> paths = tileSource.getNEDTiles();
+        UnifiedGridCoverage unifiedCoverage = null;
+        // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
+        for (File path : paths) {
+            GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+            // TODO might bicubic interpolation give better results?
+            GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
+                new InterpolationBilinear());
+            if (unifiedCoverage == null) {
+                unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
+            } else {
+                unifiedCoverage.add(regionCoverage);
             }
         }
         return unifiedCoverage;
