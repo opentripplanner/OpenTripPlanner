@@ -226,14 +226,14 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
         callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
 
-        callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
+        callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
 
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
-            request.transferPenalty += 1800;
+            request.transferCost += 1800;
         }
 
         if (optimize != null) {

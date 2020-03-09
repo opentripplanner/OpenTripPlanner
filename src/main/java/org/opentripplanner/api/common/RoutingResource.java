@@ -749,10 +749,10 @@ public abstract class RoutingResource {
 
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
-        if (transferPenalty != null) request.transferPenalty = transferPenalty;
+        if (transferPenalty != null) request.transferCost = transferPenalty;
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
-            request.transferPenalty += 1800;
+            request.transferCost += 1800;
         }
 
         if (optimize != null)
@@ -779,7 +779,7 @@ public abstract class RoutingResource {
             request.transferSlack = minTransferTime; // TODO rename field in routingrequest
 
         if (nonpreferredTransferPenalty != null)
-            request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+            request.nonpreferredTransferCost = nonpreferredTransferPenalty;
 
         if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: " +

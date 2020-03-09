@@ -440,7 +440,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 20, 0), path.getEndTime());
         
         //when optimizing for fewest transfers, take the slow one-bus path
-        options.transferPenalty = 1800;
+        options.transferCost = 1800;
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_d, false);

@@ -263,7 +263,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *                       so it does work similar as before.
      */
     @Deprecated
-    public int transferPenalty = 0;
+    public int transferCost = 0;
 
     /**
      * Penalty for using a non-preferred transfer
@@ -273,7 +273,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *                       so it does work similar as before.
      */
     @Deprecated
-    public int nonpreferredTransferPenalty = 180;
+    public int nonpreferredTransferCost = 180;
 
     /** A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
      *  Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
