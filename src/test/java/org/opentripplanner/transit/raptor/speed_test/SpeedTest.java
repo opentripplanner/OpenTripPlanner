@@ -164,8 +164,8 @@ public class SpeedTest {
     }
 
     private void printProfileStatistics() {
-        ResultPrinter.printProfileResults("Worker: ", workerResults);
-        ResultPrinter.printProfileResults("Total:  ", totalResults);
+        ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
+        ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
     }
 
     private void initProfileStatistics() {
