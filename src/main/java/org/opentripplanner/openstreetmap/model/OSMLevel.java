@@ -19,7 +19,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
 
     public static final Pattern RANGE_PATTERN = Pattern.compile("^[0-9]+\\-[0-9]+$");
     public static final double METERS_PER_FLOOR = 3;
-    public static final OSMLevel DEFAULT = 
+    public static final OSMLevel DEFAULT =
         new OSMLevel(0, 0.0, "default level", "default level", Source.NONE, true);
     public final int floorNumber; // 0-based
     public final double altitudeMeters;
@@ -36,7 +36,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         NONE
     }
 
-    public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName, 
+    public OSMLevel(int floorNumber, double altitudeMeters, String shortName, String longName,
                     Source source, boolean reliable) {
         this.floorNumber = floorNumber;
         this.altitudeMeters = altitudeMeters;
@@ -46,7 +46,7 @@ public class OSMLevel implements Comparable<OSMLevel> {
         this.reliable = reliable;
     }
 
-    /** 
+    /**
      * makes an OSMLevel from one of the semicolon-separated fields in an OSM
      * level map relation's levels= tag.
      */
@@ -145,16 +145,18 @@ public class OSMLevel implements Comparable<OSMLevel> {
         List<String> levelSpecs = new ArrayList<String>();
 
         Matcher m;
-        for (String level : specList.split(";")) {
-            m = RANGE_PATTERN.matcher(level);
-            if (m.matches()) {  // this field specifies a range of levels
-                String[] range = level.split("-");
-                int endOfRange = Integer.parseInt(range[1]);
-                for (int i = Integer.parseInt(range[0]); i <= endOfRange; i++) {
-                    levelSpecs.add(Integer.toString(i));
+        if (specList != null) {
+            for (String level : specList.split(";")) {
+                m = RANGE_PATTERN.matcher(level);
+                if (m.matches()) {  // this field specifies a range of levels
+                    String[] range = level.split("-");
+                    int endOfRange = Integer.parseInt(range[1]);
+                    for (int i = Integer.parseInt(range[0]); i <= endOfRange; i++) {
+                        levelSpecs.add(Integer.toString(i));
+                    }
+                } else {  // this field is not a range, just a single level
+                    levelSpecs.add(level);
                 }
-            } else {  // this field is not a range, just a single level
-                levelSpecs.add(level);
             }
         }
 
