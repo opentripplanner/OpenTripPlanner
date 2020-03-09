@@ -165,10 +165,9 @@ public class ElevationModule implements GraphBuilderModule {
         }
         log.info("Setting street elevation profiles from digital elevation model...");
 
-        List<StreetEdge> edgesWithElevation = Collections.synchronizedList(new ArrayList<>());
         AtomicInteger nProcessed = new AtomicInteger();
 
-        List<StreetWithElevationEdge> edgesToCalculate = new ArrayList<>();
+        LinkedList<StreetWithElevationEdge> edgesToCalculate = new LinkedList<>();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
@@ -179,14 +178,20 @@ public class ElevationModule implements GraphBuilderModule {
 
         edgesToCalculate.parallelStream().forEach(edgeWithElevation -> {
             processEdge(graph, edgeWithElevation);
-            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
-                edgesWithElevation.add(edgeWithElevation);
-            }
             int curNumProcessed = nProcessed.addAndGet(1);
             if (curNumProcessed % 50000 == 0) {
                 log.info("set elevation on {}/{} edges", curNumProcessed, edgesToCalculate.size());
             }
         });
+
+        // iterate again to find edges that had elevation calculated. This is done here instead of in the above loop to
+        // avoid thread locking for writes to a synchronized list
+        LinkedList<StreetEdge> edgesWithElevation = new LinkedList<>();
+        for (StreetWithElevationEdge edgeWithElevation : edgesToCalculate) {
+            if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
+                edgesWithElevation.add(edgeWithElevation);
+            }
+        }
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
         if (failurePercentage > 50) {
