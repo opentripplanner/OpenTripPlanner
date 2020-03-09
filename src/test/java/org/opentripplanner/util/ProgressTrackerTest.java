@@ -5,35 +5,42 @@ import org.junit.Test;
 import static org.junit.Assert.*;
 
 public class ProgressTrackerTest {
-    private int i = -1;
-    private int size = -1;
+    private String msg;
     private boolean breakOut = false;
 
 
     @Test
     public void testStepLessThan100() {
-        ProgressTracker p = new ProgressTracker(30, 0);
+        ProgressTracker p = new ProgressTracker("Pete", 1,-1, 0, false);
 
-        p.step((c, s) -> { i = c; size = s;});
-        assertEquals(1, i);
-        assertEquals(30, size);
+        msg = null;
+        p.step(m -> msg = m);
+        assertEquals("Pete progress: 1 done", msg);
 
-        p.step((c, s) -> { i = c; size = s;});
-        assertEquals(2, i);
-        assertEquals(30, size);
+        msg = null;
+        p.step(m -> msg = m);
+        assertEquals("Pete progress: 2 done", msg);
+
+        msg = p.completeMessage();
+        assertTrue(msg, msg.startsWith("Pete progress tracking complete. 2 done in"));
     }
 
     @Test
     public void testStepMoreThan100() {
-        ProgressTracker p = new ProgressTracker(200, 0);
+        ProgressTracker p = new ProgressTracker("Pete", 2,200, 0, true);
 
-        p.step((c, s) -> { i = c; size = s;});
-        assertEquals(-1, i);
-        assertEquals(-1, size);
+        assertEquals("Pete progress tracking started.", p.startMessage());
 
-        p.step((c, s) -> { i = c; size = s;});
-        assertEquals(2, i);
-        assertEquals(200, size);
+        msg = null;
+        p.step(m -> msg = m);
+        assertNull(msg, msg);
+
+        msg = null;
+        p.step(m -> msg = m);
+        assertEquals("Pete progress: 2 bytes of 200 bytes ( 1%)", msg);
+
+        msg = p.completeMessage();
+        assertTrue(msg, msg.startsWith("Pete progress tracking complete. 2 bytes done in"));
     }
 
     @Test
@@ -46,12 +53,12 @@ public class ProgressTrackerTest {
         long endFuse = start + 2 * WAIT;
 
         // When tracking every step, but not more often than WAIT time
-        ProgressTracker subject = new ProgressTracker(1, WAIT);
+        ProgressTracker subject = new ProgressTracker("Pete", 1, -1, WAIT, false);
         int i = 0;
 
         while (!breakOut && System.currentTimeMillis() < endFuse) {
             sleep(WAIT/10);
-            subject.step((c,size) -> breakOut = true);
+            subject.step(m -> breakOut = true);
             ++i;
         }
 

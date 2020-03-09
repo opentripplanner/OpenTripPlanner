@@ -110,7 +110,7 @@ public class ValueObjectToStringBuilderTest {
                 subject().addDuration(35).toString()
         );
         assertEquals(
-                "26h50m45s",
+                "1d2h50m45s",
                 subject().addDuration((26 * 60 + 50) * 60 + 45).toString()
         );
     }
