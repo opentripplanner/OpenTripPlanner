@@ -155,6 +155,35 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry,false);
     }
 
+    /**
+     * This will copy the geometry from another TripPattern to this one. It checks if each hop is
+     * between the same stops before copying that hop geometry. If the stops are different, a
+     * straight-line hop-geometry will be used instead.
+     *
+     * @param other TripPattern to copy geometry from
+     */
+    public void setHopGeometriesFromPattern(TripPattern other) {
+        this.hopGeometries = new byte[this.getStops().size() - 1][];
+        for (int i = 0; i < other.getStops().size() - 1; i++) {
+            if (other.getHopGeometry(i) != null
+                && other.getStop(i).equals(this.getStop(i))
+                && other.getStop(i + 1).equals(this.getStop(i + 1))) {
+                // Copy hop geometry from previous pattern
+                this.setHopGeometry(i, other.getHopGeometry(i));
+            } else {
+                // Create new straight-line geometry for hop
+                this.setHopGeometry(i,
+                    GeometryUtils.getGeometryFactory().createLineString(
+                        new Coordinate[]{
+                            coordinate(stopPattern.stops[i]),
+                            coordinate(stopPattern.stops[i + 1])
+                        }
+                    )
+                );
+            }
+        }
+    }
+
     public LineString getGeometry() {
         List<LineString> lineStrings = new ArrayList<>();
         for (int i = 0; i < hopGeometries.length - 1; i++) {
