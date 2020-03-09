@@ -44,7 +44,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
             GeoTiffFormat format = new GeoTiffFormat();
             GeoTiffReader reader = format.getReader(getSource(), forceLongLat);
             coverage = reader.read(null);
-            LOG.info("Elevation model CRS is: {}", coverage.getCoordinateReferenceSystem2D());
+            LOG.debug("Elevation model CRS is: {}", coverage.getCoordinateReferenceSystem2D());
         } catch (IOException e) {
             throw new RuntimeException("Error getting coverage automatically. ", e);
         }
