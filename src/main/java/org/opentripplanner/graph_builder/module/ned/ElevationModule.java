@@ -265,7 +265,20 @@ public class ElevationModule implements GraphBuilderModule {
             long currentThreadId = Thread.currentThread().getId();
             Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
             if (threadSpecificCoverage == null) {
-                threadSpecificCoverage = getCoverage();
+                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential deadlocks that
+                // could arise from downstream classes that have synchronized methods.
+                synchronized (coveragesForThread) {
+                    threadSpecificCoverage = getCoverage();
+                    // The Coverage instance relies on some synchronized static methods shared across all threads that
+                    // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+                    // point on the edge to initialize these other items.
+                    Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
+                    double[] dummy = new double[1];
+                    threadSpecificCoverage.evaluate(
+                        new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
+                        dummy
+                    );
+                }
                 coveragesForThread.put(currentThreadId, threadSpecificCoverage);
             }
             return threadSpecificCoverage;
