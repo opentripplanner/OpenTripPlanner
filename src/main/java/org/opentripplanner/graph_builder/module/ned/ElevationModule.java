@@ -68,7 +68,6 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean writeCachedElevations;
     private final File cachedElevationsFile;
     private final boolean includeEllipsoidToGeoidDifference;
-    private final int geoidDifferenceCoordinateValueMultiplier;
 
     /**
      * In regular use of OTP, no transformation is needed, however, in order to make an assertion in a downstream
@@ -118,7 +117,6 @@ public class ElevationModule implements GraphBuilderModule {
         writeCachedElevations = false;
         elevationUnitMultiplier = 1;
         includeEllipsoidToGeoidDifference = true;
-        geoidDifferenceCoordinateValueMultiplier = 10;
         transformCoordinates = true;
     }
 
@@ -128,8 +126,7 @@ public class ElevationModule implements GraphBuilderModule {
         boolean readCachedElevations,
         boolean writeCachedElevations,
         double elevationUnitMultiplier,
-        boolean includeEllipsoidToGeoidDifference,
-        int geoidDifferenceSignficantDigits
+        boolean includeEllipsoidToGeoidDifference
     ) {
         gridCoverageFactory = factory;
         cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
@@ -137,7 +134,6 @@ public class ElevationModule implements GraphBuilderModule {
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
-        geoidDifferenceCoordinateValueMultiplier = (int) Math.pow(10, geoidDifferenceSignficantDigits);
         transformCoordinates = false;
     }
 
@@ -645,20 +641,22 @@ public class ElevationModule implements GraphBuilderModule {
         }
         nPointsEvaluated.incrementAndGet();
         return (values[0] * elevationUnitMultiplier) -
-            (includeEllipsoidToGeoidDifference ? getEllipsoidToGeoidDifference(y, x) : 0);
+            (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
     }
 
     /**
      * The Calculation of the EllipsoidToGeoidDifference is a very expensive operation, so the resulting values are
-     * cached based on the coordinate values and the desired amount of significant digits. The number of significant
-     * digits that should be considered will vary depending on what part of the world the graph is being built for.
+     * cached based on the coordinate values up to 2 significant digits. Two signficant digits is often more than enough
+     * for most parts of the world, but is useful for certain areas that have dramatic changes. Since the values are
+     * computer once and cached, it has almost no affect on performance to have this level of detail.
      * See this image for an approximate mapping of these difference values:
      * https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
      *
      * @param y latitue
      * @param x longitue
      */
-    private double getEllipsoidToGeoidDifference(double y, double x) throws TransformException {
+    private double getApproximateEllipsoidToGeoidDifference(double y, double x) throws TransformException {
+        int geoidDifferenceCoordinateValueMultiplier = 100;
         int xVal = (int) Math.round(x * geoidDifferenceCoordinateValueMultiplier);
         int yVal = (int) Math.round(y * geoidDifferenceCoordinateValueMultiplier);
         int hash = yVal * 104729 + xVal;
