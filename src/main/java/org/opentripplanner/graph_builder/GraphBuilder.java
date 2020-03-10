@@ -192,6 +192,8 @@ public class GraphBuilder implements Runnable {
                     null,
                     false,
                     false,
+                    false,
+                    10,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples
             );
@@ -205,6 +207,8 @@ public class GraphBuilder implements Runnable {
                     null,
                     false,
                     false,
+                    false,
+                    10,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples
             );
@@ -218,6 +222,8 @@ public class GraphBuilder implements Runnable {
                         null,
                         false,
                         false,
+                        false,
+                        10,
                         config.elevationUnitMultiplier,
                         config.distanceBetweenElevationSamples
                 );

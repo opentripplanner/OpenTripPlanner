@@ -13,6 +13,18 @@ import org.opengis.referencing.operation.TransformException;
 
 public class ElevationUtils {
 
+    // Set up a MathTransform based on the EarthGravitationalModel
+    private static MathTransform mt;
+    static {
+        try {
+            mt = new DefaultMathTransformFactory().createParameterizedTransform(
+                new EarthGravitationalModel.Provider().getParameters().createValue()
+            );
+        } catch (FactoryException e) {
+            e.printStackTrace();
+        }
+    }
+
     /**
      * Computes the difference between the ellipsoid and geoid at a specified lat/lon using Geotools EarthGravitationalModel
      *
@@ -23,12 +35,7 @@ public class ElevationUtils {
      * @throws TransformException
      */
 
-    public static double computeEllipsoidToGeoidDifference(double lat, double lon) throws FactoryException, TransformException {
-        // Set up a MathTransform based on the EarthGravitationalModel
-        EarthGravitationalModel.Provider provider = new EarthGravitationalModel.Provider();
-        DefaultMathTransformFactory factory = new DefaultMathTransformFactory();
-        MathTransform mt = factory.createParameterizedTransform(provider.getParameters().createValue());
-
+    public static double computeEllipsoidToGeoidDifference(double lat, double lon) throws TransformException {
         // Compute the offset
         DirectPosition3D dest = new DirectPosition3D();
         mt.transform(new DirectPosition3D(lon, lat, 0), dest);

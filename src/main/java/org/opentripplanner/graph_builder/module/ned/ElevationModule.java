@@ -50,6 +50,8 @@ import java.util.concurrent.ForkJoinPool;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
+import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
+
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
  * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
@@ -68,6 +70,8 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean writeCachedElevations;
     private final File cachedElevationsFile;
     private DataImportIssueStore issueStore;
+    private final boolean includeEllipsoidToGeoidDifference;
+    private final int geoidDifferenceCoordinateValueMultiplier;
 
     /**
      * In regular use of OTP, no transformation is needed, however, in order to make an assertion in a downstream
@@ -103,6 +107,8 @@ public class ElevationModule implements GraphBuilderModule {
     /** the graph being built */
     private Graph graph;
 
+    private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
+
     // used only for testing purposes
     public ElevationModule(ElevationGridCoverageFactory factory) {
         gridCoverageFactory = factory;
@@ -110,6 +116,8 @@ public class ElevationModule implements GraphBuilderModule {
         readCachedElevations = false;
         writeCachedElevations = false;
         elevationUnitMultiplier = 1;
+        includeEllipsoidToGeoidDifference = true;
+        geoidDifferenceCoordinateValueMultiplier = 10;
         transformCoordinates = true;
         distanceBetweenSamplesM = 10;
     }
@@ -119,6 +127,8 @@ public class ElevationModule implements GraphBuilderModule {
         File cacheDirectory,
         boolean readCachedElevations,
         boolean writeCachedElevations,
+        boolean includeEllipsoidToGeoidDifference,
+        int geoidDifferenceSignficantDigits,
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM
     ) {
@@ -127,6 +137,8 @@ public class ElevationModule implements GraphBuilderModule {
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
+        this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
+        geoidDifferenceCoordinateValueMultiplier = (int) Math.pow(10, geoidDifferenceSignficantDigits);
         transformCoordinates = false;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
     }
@@ -640,7 +652,33 @@ public class ElevationModule implements GraphBuilderModule {
             throw e;
         }
         nPointsEvaluated.incrementAndGet();
-        return values[0] * elevationUnitMultiplier;
+        return (values[0] * elevationUnitMultiplier) -
+            (includeEllipsoidToGeoidDifference ? getEllipsoidToGeoidDifference(y, x) : 0);
+    }
+
+    /**
+     * The Calculation of the EllipsoidToGeoidDifference is a very expensive operation, so the resulting values are
+     * cached based on the coordinate values and the desired amount of significant digits. The number of significant
+     * digits that should be considered will vary depending on what part of the world the graph is being built for.
+     * See this image for an approximate mapping of these difference values:
+     * https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
+     *
+     * @param y latitue
+     * @param x longitue
+     */
+    private double getEllipsoidToGeoidDifference(double y, double x) throws TransformException {
+        int xVal = (int) Math.round(x * geoidDifferenceCoordinateValueMultiplier);
+        int yVal = (int) Math.round(y * geoidDifferenceCoordinateValueMultiplier);
+        int hash = yVal * 104729 + xVal;
+        Double difference = geoidDifferenceCache.get(hash);
+        if (difference == null) {
+            difference = computeEllipsoidToGeoidDifference(
+                yVal / (1.0 * geoidDifferenceCoordinateValueMultiplier),
+                xVal / (1.0 * geoidDifferenceCoordinateValueMultiplier)
+            );
+            geoidDifferenceCache.put(hash, difference);
+        }
+        return difference;
     }
 
     @Override
