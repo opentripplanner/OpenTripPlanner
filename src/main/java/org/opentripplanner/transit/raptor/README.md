@@ -49,7 +49,7 @@ See [Wikipedia](https://en.wikipedia.org/wiki/Pareto_efficiency) A pareto-set of
     - Dynamic search-window
     
 ## Filters
-Filtering on stops was implemented and tested with heuristics. We tested removing all stops which could not be part of an optimal path, but this did not have a significant performance impact. If Routes, Trips or Stops can be filtered it is probably better to do it in the transit layer, not in Raptor. Hence; We have removed the stop filter (89c886fd).
+Filtering on stops was implemented and tested with heuristics. We tested removing all stops which could not be part of an optimal path, but this did not have a significant performance impact. If Routes, Trips or Stops can be filtered it is probably better to do it in the transit layer, not in Raptor. Hence; We have removed the stop filter (c96d1af0).
 
 # Design
 The Raptor implementation is implemented as a Java library with its own API and has a single point of access the`RaptorService`. 
@@ -61,3 +61,30 @@ The Raptor implementation is implemented as a Java library with its own API and 
 - Limit on `maxAdditionalNumberOfTransfers` not `maxNumberOfTransfers`. We want to change this to be relative to the trip with fewest transfers.
 - Limit on *destination pareto-set* (not just time). Doing this the first time (not every time) we arrive at a stop might give the best performance.
 - Use _R_ or _RR_ as a "heuristics optimization", possible bi-directional, computing a set of stops/routes that can be used as a filter for the _McRR_. _RR_ is super fast, more than 10x faster than McRR with 4 criteria.
+
+## Understanding the search (range-raptor algorithm implementation)
+The `RangeRaptorWorker` and the `TransitRoutingStrategy` together implement the _range-raptor_ algorithm. There is 3 `TransitRoutingStrategy`:   
+1. The `StdTransitWorker` is the standard Range Raptor implementation. Support both _forward_ and _reverse_ search.
+1. The `NoWaitTransitWorker` is the same as the standard, but it eliminate _wait-time_. It support both _forward_ and _reverse_ search. It is very fast, and can be used to compute various heuristics, like _minimum-number-of-transfers_, _minimum-travel-time_ and _earliest-possible-arrival-time_.
+1. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not** support _reverse_ search - so fare there has not been a need for it.
+ 
+The Range Raptor Search support both _Forward_ and _Reverse_ search. In the diagram below the same 2 results are shown using the _forward_ and _reverse_ search. The to trips have the exact same legs, but some of the calculated times are slightly different. Note! If you remove or time-shift the _Wait_ parts you will get the same result.  
+
+![Raptor Time Line](RaptorTimeLine.svg)
+
+Some important notes to the diagram above:
+
+- The _Stop Arrival_ (or _Stop Arrival Time_) is the decisions points of the algorithm. This is were a path is ACCEPTED, REJECTED or DROPPED, based on the existing _Stop Arrival State_. The `1` and `1'` represent the same _stop arrival_ as **stop 1** for the same path, but at times are different. 
+- There is no important timing point between the _transfer-slack_ and the _board-slack_, so the order do not matter. In the algorithm the _transfer-slack_ is eliminated and it is left to the `TransitCalculator` to include the _transfer-slack_.
+- It might look odd that the _board-slack_ comes before the _wait_ part, but this is just a small trick to be able to calculate the _earliest-board-time_. Remember that the parts between 2 _stop-arrivals_ can technically be swapped around without any effect on the algorithm. 
+- The itinerary mapping process should swap the parts between to _stop-arrivals_ into the most intuitive order and possible do some time-shifting.
+- The _wait_ after the access and before the egress leg should be removed by the itinerary mapper.
+- In a _reverse-search_ the `Worker` code is the same - the exact same algorithm implementation is used. To be able to do this, a special `TransitCalculator` and a special `TripScheduleSearch` is injected into the `RaptorWorker`. The terminology in the diagram above is the terminology used in the algorithm (`worker`). For example the _board-time_ and _alight-time_ is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.  
+  - So be aware that the `ReverseSearchTransitCalculator` have some awkward variable names - depending on the point-of-view.   
+  - The `TripScheduleAlightSearch` search the _alight-times_ and return it as a _board-time_. 
+
+
+
+
+
+

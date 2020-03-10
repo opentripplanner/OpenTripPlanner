@@ -81,7 +81,7 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
+    public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern) {
         return onTrip.arrival(stopPositionInPattern);
     }
 

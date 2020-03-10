@@ -56,7 +56,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         if (onTripIndex != NOT_SET) {
             state.transitToStop(
                     stop,
-                    alightTime(onTrip, stopPositionInPattern),
+                    stopArrivalTime(onTrip, stopPositionInPattern),
                     onTripBoardStop,
                     onTripBoardTime,
                     onTrip
@@ -81,9 +81,9 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         }
     }
 
-    public int alightTime(final T trip, final int stopPositionInPattern) {
+    public int stopArrivalTime(final T trip, final int stopPositionInPattern) {
         // In the normal case the arrivalTime is used, but in reverse search
         // the board slack is added; hence the calculator delegation
-        return calculator.latestArrivalTime(trip, stopPositionInPattern) - onTripTimeShift;
+        return calculator.stopArrivalTime(trip, stopPositionInPattern) - onTripTimeShift;
     }
 }

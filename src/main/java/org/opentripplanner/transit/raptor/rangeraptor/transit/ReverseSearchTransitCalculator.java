@@ -96,7 +96,7 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern) {
+    public final <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern) {
         return plusDuration(onTrip.departure(stopPositionInPattern), boardSlackInSeconds);
     }
 

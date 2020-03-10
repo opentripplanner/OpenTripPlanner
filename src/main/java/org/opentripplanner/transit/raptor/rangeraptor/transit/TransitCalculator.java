@@ -80,7 +80,7 @@ public interface TransitCalculator {
      * @param stopPositionInPattern the stop position/index
      * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern);
+    <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern);
 
 
     /**
