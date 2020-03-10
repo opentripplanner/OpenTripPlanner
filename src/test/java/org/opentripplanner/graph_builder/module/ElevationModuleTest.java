@@ -102,6 +102,6 @@ public class ElevationModuleTest {
 
         // verify that elevation data has been set on the StreetWithElevationEdge
         assertNotNull(edge.getElevationProfile());
-        assertEquals(114.71, edge.getElevationProfile().getY(1), 0.1);
+        assertEquals(133.95, edge.getElevationProfile().getY(1), 0.1);
     }
 }

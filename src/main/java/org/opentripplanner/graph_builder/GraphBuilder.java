@@ -299,7 +299,9 @@ public class GraphBuilder implements Runnable {
                     gcf,
                     params.cacheDirectory,
                     builderParams.readCachedElevations,
-                    builderParams.writeCachedElevations
+                    builderParams.writeCachedElevations,
+                    builderParams.includeEllipsoidToGeoidDifference,
+                    builderParams.geoidDifferenceSignficantDigits
                 )
             );
         }
