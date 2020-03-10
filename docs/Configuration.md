@@ -222,6 +222,8 @@ The second way is to precompute these geoid difference values at a more granular
 }
 ```
 
+If the geoid difference values are precomputed, be careful to not set the routing resource value of `geoidElevation` to true in order to avoid having the graph-wide geoid added again to all elevation values in the relevant street edges in responses.
+
 ### Other raster elevation data
 
 For other parts of the world you will need a GeoTIFF file containing the elevation data. These are often available from
