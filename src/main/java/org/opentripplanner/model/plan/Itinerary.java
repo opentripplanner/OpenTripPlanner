@@ -186,7 +186,7 @@ public class Itinerary {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(Itinerary.class)
+        return ToStringBuilder.of(Itinerary.class)
                 .addNum("nTransfers", nTransfers, -1)
                 .addDuration("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)

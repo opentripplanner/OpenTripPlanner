@@ -61,6 +61,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -72,12 +73,10 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
@@ -101,7 +100,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.enumeration;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -4551,13 +4549,13 @@ public class TransmodelIndexGraphQLSchema {
                         .name("messageStrings")
                         .description("A list of possible error messages in cleartext")
                         .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-                        .dataFetcher(env -> ((PlanResponse) env.getSource()).messages
-                                .stream()
-                                .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(
-                                        env.getArgument("locale"))))
-                                .collect(Collectors.toList())
+                        .dataFetcher(
+                                env -> ((PlanResponse) env.getSource())
+                                .listErrorMessages(env.getArgument("locale"))
                         )
                         .build())
+                // TODO OTP2 - Next version: Wrap errors, include data like witch parameter
+                //           - is causing a problem (like from/to not found).
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("debugOutput")
                         .description("Information about the timings for the trip generation")

@@ -64,6 +64,7 @@ import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -255,7 +256,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         public void buildGraph(HashMap<Class<?>, Object> extra) {
-
             if (staticBikeRental) {
                 processBikeRentalNodes();
             }
@@ -569,6 +569,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
             long wayCount = osmdb.getWays().size();
+            ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
+            LOG.info(progress.startMessage());
 
             WAY:
             for (OSMWay way : osmdb.getWays()) {
@@ -710,7 +712,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
                 }
+
+                //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+                progress.step(m -> LOG.info(m));
             } // END loop over OSM ways
+
+            LOG.info(progress.completeMessage());
         }
 
         // TODO Set this to private once WalkableAreaBuilder is gone

@@ -327,10 +327,11 @@ public class StreetVertexIndex {
             boolean endVertex
     ) {
         // Check if Stop/StopCollection is found by FeedScopeId
-        Set<Vertex> transitStopVertices =
-                graph.getStopVerticesById(location.stopId);
-        if (transitStopVertices != null) {
-            return transitStopVertices;
+        if(location.stopId != null) {
+            Set<Vertex> transitStopVertices = graph.getStopVerticesById(location.stopId);
+            if (transitStopVertices != null) {
+                return transitStopVertices;
+            }
         }
 
         // Check if coordinate is provided and connect it to graph

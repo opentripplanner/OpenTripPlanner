@@ -9,13 +9,14 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -47,26 +48,39 @@ public class TransmodelGraphQLPlanner {
     }
 
     public PlanResponse plan(DataFetchingEnvironment environment) {
-        Router router = ((TransmodelRequestContext)environment.getContext()).getRouter();
-        RoutingService routingService =
-            ((TransmodelRequestContext)environment.getContext()).getRoutingService();
-        RoutingRequest request = createRequest(environment);
-
         PlanResponse response = new PlanResponse();
-
+        RoutingRequest request = null;
         try {
-            RoutingResponse res = routingService.route(request, router);
+            TransmodelRequestContext ctx = environment.getContext();
+            Router router = ctx.getRouter();
+
+            request = createRequest(environment);
+            request.setRoutingContext(router.graph);
+
+            RoutingResponse res = ctx.getRoutingService().route(request, router);
+
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
+
+            if(response.plan.itineraries.isEmpty()) {
+                response.messages.add(new PlannerError(new PathNotFoundException()).message);
+            }
         }
         catch (Exception e) {
-            response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
-            PlannerError error = new PlannerError(e);
-            if (!PlannerError.isPlanningError(e.getClass()))
-                LOG.warn("Error while planning path: ", e);
-            response.messages.add(error.message);
+            try {
+                PlannerError error = new PlannerError(e);
+                if (!PlannerError.isPlanningError(e.getClass())) {
+                    LOG.warn("Error while planning path: ", e);
+                }
+                response.messages.add(error.message);
+                response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
+            }
+            catch (RuntimeException ex) {
+                LOG.error("Root cause: " + e.getMessage(), e);
+                throw ex;
+            }
         } finally {
-            if (request.rctx != null) {
+            if (request != null && request.rctx != null) {
                 response.debugOutput = request.rctx.debugOutput;
             }
         }
@@ -292,8 +306,6 @@ public class TransmodelGraphQLPlanner {
             request.to.vertexId = getLocationOfFirstQuay(request.to.vertexId, ((Router)environment.getContext()).graph.index);
         }
          */
-
-        request.setRoutingContext(router.graph);
 
         return request;
     }
