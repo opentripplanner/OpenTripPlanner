@@ -5,11 +5,8 @@ import org.locationtech.jts.geom.Geometry;
 import org.geotools.coverage.grid.GridCoverage2D;
 import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
-import org.geotools.referencing.CRS;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
-import org.opengis.referencing.FactoryException;
-import org.opengis.referencing.operation.MathTransform;
 import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -63,17 +60,16 @@ public class ElevationModule implements GraphBuilderModule {
 
     private static final Logger log = LoggerFactory.getLogger(ElevationModule.class);
 
+    /** The elevation data to be used in calculating elevations. */
     private final ElevationGridCoverageFactory gridCoverageFactory;
+    /* Whether or not to attempt reading in a file of cached elevations */
     private final boolean readCachedElevations;
+    /* Whether or not to attempt writing out a file of cached elevations */
     private final boolean writeCachedElevations;
+    /* The file of cached elevations */
     private final File cachedElevationsFile;
+    /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
-
-    /**
-     * In regular use of OTP, no transformation is needed, however, in order to make an assertion in a downstream
-     * library pass during testing, a transformation must take place.
-     */
-    private final boolean transformCoordinates;
 
     private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
@@ -82,10 +78,7 @@ public class ElevationModule implements GraphBuilderModule {
     private AtomicInteger nEdgesProcessed = new AtomicInteger(0);
     private final AtomicInteger nPointsEvaluated = new AtomicInteger(0);
     private final AtomicInteger nPointsOutsideDEM = new AtomicInteger(0);
-    /**
-     * This initial value probably won't be shown in logs, but is set to an absurdly high value initially to make things
-     * seem better later.
-     */
+    /** keeps track of the total amount of elevation edges for logging purposes */
     private int totalElevationEdges = Integer.MAX_VALUE;
 
     /**
@@ -101,12 +94,10 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private final double elevationUnitMultiplier;
 
-    /** used to transform street coordinates into the projection used by the elevation data */
-    private MathTransform transformer;
-
     /** the graph being built */
     private Graph graph;
 
+    /** A concurrent hashmap used for storing geoid difference values at various coordinates */
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
     // used only for testing purposes
@@ -117,7 +108,6 @@ public class ElevationModule implements GraphBuilderModule {
         writeCachedElevations = false;
         elevationUnitMultiplier = 1;
         includeEllipsoidToGeoidDifference = true;
-        transformCoordinates = true;
     }
 
     public ElevationModule(
@@ -134,7 +124,6 @@ public class ElevationModule implements GraphBuilderModule {
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
-        transformCoordinates = false;
     }
 
     public List<String> provides() {
@@ -149,15 +138,6 @@ public class ElevationModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         this.graph = graph;
         gridCoverageFactory.setGraph(graph);
-        if (transformCoordinates) {
-            try {
-                transformer = CRS
-                    .findMathTransform(GeometryUtils.WGS84_XY, getCoverage().getCoordinateReferenceSystem(), true);
-            } catch (FactoryException e) {
-                log.error("Could not find an appropriate transformer!");
-                throw new RuntimeException(e);
-            }
-        }
 
         // try to load in the cached elevation data
         if (readCachedElevations) {
@@ -181,16 +161,21 @@ public class ElevationModule implements GraphBuilderModule {
         // store these thread-specific Coverage instances.
         ConcurrentHashMap<Long, Coverage> coveragesForThread = new ConcurrentHashMap<>();
 
-        List<StreetWithElevationEdge> streetWithElevationEdges = new LinkedList<>();
+        // At first, set the totalElevationEdges to the total number of edges in the graph.
+        totalElevationEdges = graph.countEdges();
+        List<StreetWithElevationEdge> streetsWithElevationEdges = new LinkedList<>();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
                     forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee, coveragesForThread));
-                    streetWithElevationEdges.add((StreetWithElevationEdge) ee);
+                    streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
                 }
             }
         }
-        totalElevationEdges = streetWithElevationEdges.size();
+        // update this value to the now-known amount of edges that are StreetWithElevation edges
+        totalElevationEdges = streetsWithElevationEdges.size();
+
+        // shutdown the forkJoinPool and wait until all tasks are finished. If this takes longer than 1 day, give up.
         forkJoinPool.shutdown();
         try {
             forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
@@ -213,7 +198,7 @@ public class ElevationModule implements GraphBuilderModule {
         // iterate again to find edges that had elevation calculated. This is done here instead of in the forkJoinPool
         // to avoid thread locking for writes to a synchronized list
         LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
-        for (StreetWithElevationEdge edgeWithElevation : streetWithElevationEdges) {
+        for (StreetWithElevationEdge edgeWithElevation : streetsWithElevationEdges) {
             if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
                 edgesWithCalculatedElevations.add(edgeWithElevation);
             }
@@ -265,10 +250,11 @@ public class ElevationModule implements GraphBuilderModule {
             long currentThreadId = Thread.currentThread().getId();
             Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
             if (threadSpecificCoverage == null) {
-                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential deadlocks that
+                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
                 // could arise from downstream classes that have synchronized methods.
                 synchronized (coveragesForThread) {
-                    threadSpecificCoverage = getCoverage();
+                    // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
+                    threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
                     // The Coverage instance relies on some synchronized static methods shared across all threads that
                     // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
                     // point on the edge to initialize these other items.
@@ -283,20 +269,6 @@ public class ElevationModule implements GraphBuilderModule {
             }
             return threadSpecificCoverage;
         }
-    }
-
-    /**
-     * Get an uncached Coverage instance from the module's ElevationGridCoverageFactory.
-     */
-    private Coverage getCoverage() {
-        // If gridCov is a GridCoverage2D, apply a bilinear interpolator. Otherwise, just use the
-        // coverage as is (note: UnifiedGridCoverages created by NEDGridCoverageFactoryImpl handle
-        // interpolation internally)
-        Coverage gridCov = gridCoverageFactory instanceof NEDGridCoverageFactoryImpl
-            ? ((NEDGridCoverageFactoryImpl) gridCoverageFactory).getUncachedCoverage()
-            : gridCoverageFactory.getGridCoverage();
-        return (gridCov instanceof GridCoverage2D) ? Interpolator2D.create(
-            (GridCoverage2D) gridCov, new InterpolationBilinear()) : gridCov;
     }
 
     class ElevationRepairState {
@@ -624,18 +596,8 @@ public class ElevationModule implements GraphBuilderModule {
             // GeoTIFFs in various projections. Note that GeoTools defaults to strict EPSG axis ordering of (lat, long)
             // for DefaultGeographicCRS.WGS84, but OTP is using (long, lat) throughout and assumes unprojected DEM
             // rasters to also use (long, lat).
-            DirectPosition2D projectedPosition = new DirectPosition2D(GeometryUtils.WGS84_XY, x, y);
-            DirectPosition2D position2D;
-            // If this is not done during testing, a downstream library will raise an assertion error
-            if (transformCoordinates) {
-                DirectPosition2D transformedPosition = new DirectPosition2D();
-                transformer.transform(projectedPosition, transformedPosition);
-                position2D = transformedPosition;
-            } else {
-                position2D = projectedPosition;
-            }
-            coverage.evaluate(position2D, values);
-        } catch (PointOutsideCoverageException | TransformException e) {
+            coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, x, y), values);
+        } catch (PointOutsideCoverageException e) {
             nPointsOutsideDEM.incrementAndGet();
             throw e;
         }
@@ -652,13 +614,16 @@ public class ElevationModule implements GraphBuilderModule {
      * See this image for an approximate mapping of these difference values:
      * https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
      *
-     * @param y latitue
-     * @param x longitue
+     * @param y latitude
+     * @param x longitude
      */
     private double getApproximateEllipsoidToGeoidDifference(double y, double x) throws TransformException {
         int geoidDifferenceCoordinateValueMultiplier = 100;
         int xVal = (int) Math.round(x * geoidDifferenceCoordinateValueMultiplier);
         int yVal = (int) Math.round(y * geoidDifferenceCoordinateValueMultiplier);
+        // create a hash value that can be used to look up the value for the given rounded coordinate. The expected
+        // value of xVal should never be less than -18000 (-180 * 100) or more than 18000 (180 * 100), so multiply the
+        // yVal by a prime number of a magnitude larger so that there won't be any hash collisions.
         int hash = yVal * 104729 + xVal;
         Double difference = geoidDifferenceCache.get(hash);
         if (difference == null) {

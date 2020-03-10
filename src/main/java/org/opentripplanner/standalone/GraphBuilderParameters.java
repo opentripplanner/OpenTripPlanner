@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.profile.StopClusterMode;
@@ -200,6 +201,10 @@ public class GraphBuilderParameters {
     /**
      * When set to true (it is false by default), the elevation module will include the Ellipsoid to Geiod difference in
      * the calculations of every point along every StreetWithElevationEdge in the graph.
+     *
+     * NOTE: if this is set to true for graph building, make sure to not set the value of
+     * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of the
+     * elevation values in the street edges.
      */
     public boolean includeEllipsoidToGeoidDifference;
 
