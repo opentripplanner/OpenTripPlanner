@@ -775,16 +775,19 @@ public abstract class RoutingResource {
         if (alightSlack != null)
             request.alightSlack = alightSlack;
 
-        if (minTransferTime != null)
-            request.transferSlack = minTransferTime; // TODO rename field in routingrequest
+        if (minTransferTime != null) {
+            int alightAndBoardSlack = request.boardSlack + request.alightSlack;
+            if (alightAndBoardSlack > minTransferTime) {
+                throw new IllegalArgumentException(
+                        "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
+                );
+            }
+            request.transferSlack = minTransferTime - alightAndBoardSlack;
+        }
 
         if (nonpreferredTransferPenalty != null)
             request.nonpreferredTransferCost = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;

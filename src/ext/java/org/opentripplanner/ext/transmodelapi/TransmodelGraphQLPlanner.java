@@ -9,7 +9,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
@@ -311,13 +310,13 @@ public class TransmodelGraphQLPlanner {
     }
 
     public void assertSlack(RoutingRequest r) {
-        if (r.boardSlack + r.alightSlack > r.transferSlack) {
-            // TODO thrown exception type is not consistent with assertTriangleParameters
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        if (r.boardSlack != 0 || r.alightSlack != 0) {
+            throw new IllegalStateException(
+                    "boardSlack and alightSlack should be zero(0), 'transferSlack' is the only "
+                            + "parameter we support int the GraphQL API."
+            );
         }
     }
-
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
         Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds.stream().map(mappingUtil::fromIdString).collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));

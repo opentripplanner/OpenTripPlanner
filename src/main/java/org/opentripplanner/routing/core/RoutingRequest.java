@@ -455,24 +455,31 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * A global minimum transfer time (in seconds) that specifies the minimum amount of time that
      * must pass between exiting one transit vehicle and boarding another. This time is in addition
-     * to time it might take to walk between transit stops. This time should also be overridden by
-     * specific transfer timing information in transfers.txt
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
+     * to time it might take to walk between transit stops, the {@link #alightSlack}, and the
+     * {@link #boardSlack}. This time should also be overridden by specific transfer timing
+     * information in transfers.txt
+     * <p>
+     * This only apply to transfers between two trips, it does not apply when boarding the first
+     * transit.
+     * <p>
+     * Unit is seconds. Default value is 2 minutes.
      */
-    // initialize to zero so this does not inadvertently affect tests, and let Planner handle defaults
-    @Deprecated
-    public int transferSlack = 0;
+    public int transferSlack = 120;
 
     /**
-     * Invariant: boardSlack + alightSlack ≤ transferSlack.
+     * The number of seconds to add before boarding a transit leg. It is recommended to use the
+     * `boardTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
     public int boardSlack = 0;
 
     /**
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
+     * The number of seconds to add after alighting a transit leg. It is recommended to use the
+     * `alightTimes` in the `router-config.json` to set this for each mode.
+     * <p>
+     * Unit is seconds. Default value is 0.
      */
-    @Deprecated
     public int alightSlack = 0;
 
     /**
