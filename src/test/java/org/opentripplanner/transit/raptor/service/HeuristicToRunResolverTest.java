@@ -10,7 +10,6 @@ import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.transit.raptor.service.HeuristicToRunResolver.resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters;
 
 public class HeuristicToRunResolverTest {
@@ -50,27 +49,6 @@ public class HeuristicToRunResolverTest {
         given(_x_, _x_, LAT, WIN).expect(_x_, REV);
         given(_x_, _x_, LAT, _x_).expect(_x_, REV);
         // Skip alternatives with both EAT & LAT off.
-    }
-
-    @Test
-    public void resolveHeuristicToRunForStopFilter() {
-        RaptorRequestBuilder<TestRaptorTripSchedule> b = new RaptorRequestBuilder<>();
-        b.profile(RaptorProfile.MULTI_CRITERIA);
-        // Add some dummy legs
-        b.searchParams().accessLegs().add(dummyLeg());
-        b.searchParams().egressLegs().add(dummyLeg());
-        b.enableOptimization(Optimization.TRANSFERS_STOP_FILTER);
-        b.searchParams().earliestDepartureTime(10_000);
-        b.searchParams().latestArrivalTime(20_000);
-        b.searchParams().searchWindowInSeconds(6_000);
-
-        resolveHeuristicToRunBasedOnOptimizationsAndSearchParameters(
-                b.build(),
-                this::enableForward,
-                this::enableReverse
-        );
-        assertTrue(forward);
-        assertTrue(reverse);
     }
 
     @Test

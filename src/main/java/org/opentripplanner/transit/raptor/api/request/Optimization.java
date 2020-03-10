@@ -18,22 +18,6 @@ public enum Optimization {
     PARALLEL,
 
     /**
-     * This optimization use heuristics to make a list of possible intermediate stops and prune
-     * the multi-criteria search. The {@link SearchParams#numberOfAdditionalTransfers()}
-     * and the heuristics is used calculate the <em>maximum number of transfers - MNT</em>. The
-     * heuristics also give us the number of stops to destination at an intermediate stop. So,
-     * we can use this sto terminate the search at any stop witch exceeds the limit.
-     * <p/>
-     * This only apply to: multi-criteria search.
-     *
-     * @deprecated This optimization is less efficient than the
-     * {@link #PARETO_CHECK_AGAINST_DESTINATION}. We might remove this in the future, but we keep it
-     * for now, because there are potential use-cases for it, like filtering on region.
-     */
-    @Deprecated
-    TRANSFERS_STOP_FILTER,
-
-    /**
      * This optimization use heuristics at each stop calculate an optimistic estimate for all
      * criteria at the destination. Then this "vector" is checked if it qualify in the existing
      * set of pareto optimal destination arrivals.

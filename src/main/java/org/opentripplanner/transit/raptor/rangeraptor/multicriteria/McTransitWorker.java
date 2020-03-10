@@ -1,11 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.StopFilter;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
@@ -20,14 +19,12 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
-    private final StopFilter stopFilter;
 
     private TripPatternInfo<T> pattern;
     private TripScheduleSearch<T> tripSearch;
 
-    public McTransitWorker(McRangeRaptorWorkerState<T> state, StopFilter stopFilter, TransitCalculator calculator) {
+    public McTransitWorker(McRangeRaptorWorkerState<T> state, TransitCalculator calculator) {
         this.state = state;
-        this.stopFilter = stopFilter;
         this.calculator = calculator;
     }
 
@@ -56,15 +53,13 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
                     int alightStopPos = patternStops.next();
                     int alightStopIndex = pattern.stopIndex(alightStopPos);
 
-                    if(stopFilter.allowStopVisit(alightStopIndex)) {
-                        state.transitToStop(
-                                boardFrom,
-                                alightStopIndex,
-                                trip.arrival(alightStopPos),
-                                tripDepartureTime,
-                                trip
-                        );
-                    }
+                    state.transitToStop(
+                            boardFrom,
+                            alightStopIndex,
+                            trip.arrival(alightStopPos),
+                            tripDepartureTime,
+                            trip
+                    );
                 }
             }
         }

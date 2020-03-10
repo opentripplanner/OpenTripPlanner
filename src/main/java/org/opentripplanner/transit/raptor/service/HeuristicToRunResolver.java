@@ -27,11 +27,6 @@ class HeuristicToRunResolver {
         final SearchParams s = req.searchParams();
 
         if (req.profile().is(MULTI_CRITERIA)) {
-            // Both REV and FWD heuristics is required to do stop filtering
-            if (req.useTransfersStopFilter()) {
-                forward = true;
-                reverse = true;
-            }
             // REV heuristics is required to do destination pruning
             if (req.useDestinationPruning()) {
                 reverse = true;

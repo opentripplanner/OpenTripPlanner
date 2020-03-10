@@ -108,10 +108,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         return optimization.isOneOf(optimizations);
     }
 
-    public boolean useTransfersStopFilter() {
-        return optimizationEnabled(Optimization.TRANSFERS_STOP_FILTER);
-    }
-
     public boolean useDestinationPruning() {
         return optimizationEnabled(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
     }
@@ -177,9 +173,6 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private void verify() {
         searchParams.verify();
         if(!profile.is(RaptorProfile.MULTI_CRITERIA)) {
-            if(useTransfersStopFilter()) {
-                Log.warn("Stop filtering is only supported using McRangeRaptor");
-            }
             if(useDestinationPruning()) {
                 Log.warn("Destination pruning is only supported using McRangeRaptor");
             }
