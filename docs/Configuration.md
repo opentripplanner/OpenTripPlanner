@@ -198,6 +198,29 @@ You can configure it as follows in `build-config.json`:
 }
 ```
 
+### Geoid Difference
+
+With some elevation data, the elevation values are specified as relative to the a geoid (irregular estimate of mean sea level). See [issue #2301](https://github.com/opentripplanner/OpenTripPlanner/issues/2301) for detailed discussion of this. In this cases, it is necessary to also add this geoid value onto the elevation value to get the correct result. OTP can automatically calculate these values in one of two ways. 
+
+The first way is to use the geoid difference value that is calculated once at the center of the graph. This value is returned in each trip plan response in the [ElevationMetadata](http://otp-docs.ibi-transit.com/api/json_ElevationMetadata.html) field. Using a single value can be sufficient for smaller OTP deployments, but might result in incorrect values at the edges of larger OTP deployments. If your OTP instance uses this, it is recommended to set a default request value in the `router-config.json` file as follows:
+
+```JSON
+// router-config.json
+{
+    "routingDefaults": {
+        "geoidElevation ": true   
+    }
+}
+```
+
+The second way is to precompute these geoid difference values at a more granular level and include them when calculating elevations for each sampled point along each street edge. In order to speed up calculations, the geoid difference values are calculated and cached using only 2 significant digits of GPS coordinates. This is more than enough detail for most regions of the world and should result in less than one meter of difference in areas that have large changes in geoid difference values. To enable this, include the following in the `build-config.json` file: 
+
+```JSON
+// build-config.json
+{
+  "includeEllipsoidToGeoidDifference": true
+}
+```
 
 ### Other raster elevation data
 
