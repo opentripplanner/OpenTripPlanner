@@ -617,9 +617,9 @@ public class ElevationModule implements GraphBuilderModule {
 
     /**
      * The Calculation of the EllipsoidToGeoidDifference is a very expensive operation, so the resulting values are
-     * cached based on the coordinate values up to 2 significant digits. Two signficant digits is often more than enough
+     * cached based on the coordinate values up to 2 significant digits. Two significant digits are often more than enough
      * for most parts of the world, but is useful for certain areas that have dramatic changes. Since the values are
-     * computer once and cached, it has almost no affect on performance to have this level of detail.
+     * computed once and cached, it has almost no affect on performance to have this level of detail.
      * See this image for an approximate mapping of these difference values:
      * https://earth-info.nga.mil/GandG/images/ww15mgh2.gif
      *
