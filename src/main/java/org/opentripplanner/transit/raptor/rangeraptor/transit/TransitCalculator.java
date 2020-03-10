@@ -48,7 +48,7 @@ public interface TransitCalculator {
     int duration(int timeA, int timeB);
 
     /**
-     * Calculate the earlies possible board time, adding board slack in the case
+     * Calculate the earliest possible board time, adding board slack in the case
      * of a forward search, adding nothing in the case of a reverse search.
      *
      * @param time - the arrival time (forward search) or board time (reverse search)

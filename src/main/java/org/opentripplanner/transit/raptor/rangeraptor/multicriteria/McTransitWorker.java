@@ -42,13 +42,14 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
         final int nPatternStops = pattern.numberOfStopsInPattern();
         int boardStopIndex = pattern.stopIndex(boardStopPos);
 
-        for (AbstractStopArrival<T> boardStop : state.listStopArrivalsPreviousRound(boardStopIndex)) {
+        for (AbstractStopArrival<T> boardFrom : state.listStopArrivalsPreviousRound(boardStopIndex)) {
 
-            int earliestBoardTime = calculator.earliestBoardTime(boardStop.arrivalTime());
+            int earliestBoardTime = calculator.earliestBoardTime(boardFrom.arrivalTime());
             boolean found = tripSearch.search(earliestBoardTime, boardStopPos);
 
             if (found) {
                 T trip = tripSearch.getCandidateTrip();
+                final int tripDepartureTime = trip.departure(boardStopPos);
                 IntIterator patternStops = calculator.patternStopIterator(boardStopPos, nPatternStops);
 
                 while (patternStops.hasNext()) {
@@ -57,10 +58,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
                     if(stopFilter.allowStopVisit(alightStopIndex)) {
                         state.transitToStop(
-                                boardStop,
+                                boardFrom,
                                 alightStopIndex,
                                 trip.arrival(alightStopPos),
-                                trip.departure(boardStopPos),
+                                tripDepartureTime,
                                 trip
                         );
                     }

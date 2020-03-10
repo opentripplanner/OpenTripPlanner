@@ -48,8 +48,8 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     public void routeTransitAtStop(int stopPositionInPattern) {
         int stop = pattern.stopIndex(stopPositionInPattern);
 
-        // attempt to alight if we're on board, done above the board search so that we don't check for alighting
-        // when boarding
+        // attempt to alight if we're on board, done above the board search so that we don't check
+        // for alighting when boarding
         if (onTripIndex != NOT_SET) {
             state.transitToStop(
                     stop,
