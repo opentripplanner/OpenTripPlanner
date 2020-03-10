@@ -205,12 +205,6 @@ public class GraphBuilderParameters {
     public boolean includeEllipsoidToGeoidDifference;
 
     /**
-     * The number of significant digits to use when caching Ellipsoid to Geiod difference values. The defualt is 0 and
-     * is capped at 2.
-     */
-    public int geoidDifferenceSignficantDigits;
-
-    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -250,7 +244,6 @@ public class GraphBuilderParameters {
         readCachedElevations = config.path("readCachedElevations").asBoolean(true);
         writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
         includeEllipsoidToGeoidDifference = config.path("includeEllipsoidToGeoidDifference").asBoolean(false);
-        geoidDifferenceSignficantDigits = Math.min(2, config.path("geoidDifferenceSignficantDigits").asInt(0));
     }
 
 
