@@ -3,7 +3,6 @@ package org.opentripplanner.updater.vehicle_sharing;
 import org.opentripplanner.routing.core.TraverseMode;
 
 public class VehiclePositionsGetter {
-
     long lastUpdate;
     TraverseMode MODE;
 
@@ -13,7 +12,7 @@ public class VehiclePositionsGetter {
     }
 
     VehiclePositionsDiff getVehiclePositionsDiff() {
-        //TODO
+        // TODO
         return null;
     }
 }

@@ -28,7 +28,7 @@ public class SharedCarUpdater extends PollingGraphUpdater {
     VehiclePositionsGetter vehiclePositionsGetter;
     TraverseMode traverseMode;
     Graph graph;
-    List<Vertex> rememberedVehicles;
+    List<Vertex> rememberedVehicles = new LinkedList<>();
 
     public SharedCarUpdater(VehiclePositionsGetter vehiclePositionsGetter, TraverseMode traverseMode) {
         this.vehiclePositionsGetter = vehiclePositionsGetter;
@@ -56,8 +56,11 @@ public class SharedCarUpdater extends PollingGraphUpdater {
         } else {
             stream = vertexesToChoseFrom.stream();
         }
+
+        Vertex v0 = (Vertex)graph.getVertices().toArray()[0];
+
         Vertex closestVertex = stream.
-                reduce(graph.getVertexById(0),
+                reduce(v0,
                         (previous_best, current) -> chooseCloser(vehiclePosition.latitude, vehiclePosition.longitude, previous_best, current));
 
         return closestVertex;
@@ -71,14 +74,23 @@ public class SharedCarUpdater extends PollingGraphUpdater {
 
     }
 
-    @Override
-    protected void runPolling() throws Exception {
-        VehiclePositionsDiff vehiclePositionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
-        List<Vertex> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared,false);
-        List<Vertex> disappearedVertex = coordsToVertex(vehiclePositionsDiff.disappeared,true);
-        List<Edge> apppearedEdge = new LinkedList<>();
-        List<Edge> disappeareedEdge = new LinkedList<>();
+    public List<Edge> prepareAppearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
+        List<Vertex> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared, false);
+        List<Edge> appearedEdge = new LinkedList<>();
+        for (Vertex vertex : appearedVertex) {
+            rememberedVehicles.add(vertex);
+            for (Edge edge : vertex.getOutgoing()) {
+                if (edge instanceof RentCarAnywhereEdge) {
+                    appearedEdge.add(edge);
+                }
+            }
+        }
+        return appearedEdge;
+    }
 
+    public List<Edge> prepareDisappearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
+        List<Vertex> disappearedVertex = coordsToVertex(vehiclePositionsDiff.disappeared, true);
+        List<Edge> disappeareedEdge = new LinkedList<>();
         for (Vertex vertex : disappearedVertex) {
             rememberedVehicles.remove(vertex);
             for (Edge edge : vertex.getOutgoing()) {
@@ -88,22 +100,25 @@ public class SharedCarUpdater extends PollingGraphUpdater {
                 }
             }
         }
-
-        for (Vertex vertex : appearedVertex) {
-            rememberedVehicles.add(vertex);
-            for (Edge edge : vertex.getOutgoing()) {
-                if (edge instanceof RentCarAnywhereEdge) {
-                    apppearedEdge.add(edge);
-                }
-            }
-        }
-
-        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(apppearedEdge, disappeareedEdge);
-        graphUpdaterManager.execute(graphWriterRunnable);
+        return disappeareedEdge;
     }
 
     @Override
+    protected void runPolling() throws Exception {
+        VehiclePositionsDiff vehiclePositionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
+
+        List<Edge> apppearedEdge = prepareAppearedEdge(vehiclePositionsDiff);
+        List<Edge> disappeareedEdge = prepareDisappearedEdge(vehiclePositionsDiff);
+
+        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(apppearedEdge, disappeareedEdge);
+
+        graphUpdaterManager.execute(graphWriterRunnable);
+    }
+//
+    @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+        this.graph = graph;
+        this.simpleStreetSplitter = new SimpleStreetSplitter(graph);
 
     }
 
