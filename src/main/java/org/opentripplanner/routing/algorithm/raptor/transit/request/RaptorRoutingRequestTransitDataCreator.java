@@ -148,8 +148,9 @@ class RaptorRoutingRequestTransitDataCreator {
     return transitLayer
         .getTripPatternsForDate(date)
         .stream()
-        .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode())
-        && !bannedRoutes.contains(p.getTripPattern().getOriginalTripPattern().route.getId()))
+        .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
+        .filter(p -> !bannedRoutes.contains(p.getTripPattern()
+            .getOriginalTripPattern().route.getId()))
         .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
   }
 
