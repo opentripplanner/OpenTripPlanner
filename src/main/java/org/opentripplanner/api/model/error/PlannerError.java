@@ -1,11 +1,7 @@
 package org.opentripplanner.api.model.error;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.LocationNotAccessible;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.TransitTimesException;
@@ -13,6 +9,10 @@ import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /** This API response element represents an error in trip planning. */
 public class PlannerError {
@@ -51,24 +51,6 @@ public class PlannerError {
         this.setMsg(message);
         if (e instanceof VertexNotFoundException)
             this.setMissing(((VertexNotFoundException)e).getMissing());
-    }
-
-    
-    public PlannerError(boolean np) {
-        noPath = np;
-    }
-
-    public PlannerError(Message msg) {
-        setMsg(msg);
-    }
-
-    public PlannerError(List<String> missing) {
-        this.setMissing(missing);
-    }
-
-    public PlannerError(int id, String msg) {
-        this.id  = id;
-        this.msg = msg;
     }
 
     public void setMsg(Message msg) {

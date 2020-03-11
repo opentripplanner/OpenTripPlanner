@@ -20,6 +20,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorReques
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
+import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -157,6 +158,7 @@ public class RoutingWorker {
         LOG.debug("Access/egress routing took {} ms",
                 System.currentTimeMillis() - startTimeAccessEgress
         );
+        verifyEgressAccess(accessTransfers, egressTransfers);
 
         /* Prepare transit search */
 
@@ -299,5 +301,21 @@ public class RoutingWorker {
         }
 
         return limit;
+    }
+
+    private void verifyEgressAccess(
+            Map<?,?> access,
+            Map<?,?> egress
+    ) {
+        boolean accessExist = !access.isEmpty();
+        boolean egressExist = !egress.isEmpty();
+
+        if(accessExist && egressExist) { return; }
+
+        List<String> missingPlaces = new ArrayList<>();
+        if(!accessExist) { missingPlaces.add("from"); }
+        if(!egressExist) { missingPlaces.add("to"); }
+
+        throw new VertexNotFoundException(missingPlaces);
     }
 }

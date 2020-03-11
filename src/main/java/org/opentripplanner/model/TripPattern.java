@@ -495,7 +495,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
                 }
             }
         }
-
     }
 
     /**

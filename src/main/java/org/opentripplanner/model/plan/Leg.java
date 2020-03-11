@@ -257,7 +257,7 @@ public class Leg {
     /** Should be used for debug logging only */
     @Override
     public String toString() {
-        return new ToStringBuilder(Leg.class)
+        return ToStringBuilder.of(Leg.class)
                 .addObj("from", from)
                 .addObj("to", to)
                 .addCalTime("startTime", startTime)

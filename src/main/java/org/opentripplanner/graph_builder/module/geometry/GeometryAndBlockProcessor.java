@@ -35,6 +35,7 @@ import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +102,7 @@ public class GeometryAndBlockProcessor {
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    @SuppressWarnings("Convert2MethodRef")
     public void run(Graph graph, DataImportIssueStore issueStore) {
         this.issueStore = issueStore;
 
@@ -114,9 +116,10 @@ public class GeometryAndBlockProcessor {
 
         LOG.info("Processing geometries and blocks on graph...");
 
-        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving only the tripTimes
-        // (which don't have enough information to build a geometry). So we keep them here. In the current design, a
-        // trip pattern does not have a single geometry, but one per hop, so we store them in an array.
+        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving
+        // only the tripTimes (which don't have enough information to build a geometry). So we keep
+        // them here. In the current design, a trip pattern does not have a single geometry, but
+        // one per hop, so we store them in an array.
         Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
@@ -130,6 +133,13 @@ public class GeometryAndBlockProcessor {
         TripPattern.generateUniqueNames(tripPatterns, issueStore);
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
+        ProgressTracker progress = ProgressTracker.track(
+                "Generate TripPattern geometries",
+                100,
+                tripPatterns.size()
+        );
+        LOG.info(progress.startMessage());
+
         for (TripPattern tripPattern : tripPatterns) {
             for (Trip trip : tripPattern.getTrips()) {
                 // create geometries if they aren't already created
@@ -142,7 +152,10 @@ public class GeometryAndBlockProcessor {
                             createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip)));
                 }
             }
+            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            progress.step(m -> LOG.info(m));
         }
+        LOG.info(progress.completeMessage());
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
