@@ -2,6 +2,9 @@ package org.opentripplanner.graph_builder.module;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import java.util.Collection;
+import java.util.Map;
+import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -10,9 +13,11 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
+import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -163,6 +168,23 @@ public class NearbyStopFinder {
                 }
             }
         }
+        stopsFound.addAll(this.getStopAtDistances(originVertices,
+            spt == null ? Collections.emptyList() : spt.getAllStates()));
+
+        if (removeTempEdges) {
+            routingRequest.cleanup();
+        }
+        return stopsFound;
+    }
+
+    public List<StopAtDistance> getStopAtDistances(Set<Vertex> originVertices, Collection<State> states) {
+        List<StopAtDistance> stopsFound = Lists.newArrayList();
+        states.forEach(state ->{
+            Vertex targetVertex = state.getVertex();
+            if (targetVertex instanceof TransitStopVertex) {
+                stopsFound.add(stopAtDistanceForState(state));
+            }
+        });
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         for (Vertex vertex : originVertices) {
             if (vertex instanceof TransitStopVertex) {
@@ -175,11 +197,30 @@ public class NearbyStopFinder {
                     ));
             }
         }
-        if (removeTempEdges) {
-            routingRequest.cleanup();
-        }
         return stopsFound;
+    }
 
+    public Collection<State> findNearbyStatesViaStreet(Set<Vertex> originVertices,
+        boolean reverseDirection) {
+        ShortestPathTree spt = getShortestPathTree(originVertices, reverseDirection);
+        if(spt!=null){
+            return spt.getAllStates();
+        }else{
+            return Collections.emptyList();
+        }
+
+    }
+
+    private ShortestPathTree getShortestPathTree(Set<Vertex> originVertices,
+        boolean reverseDirection) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        routingRequest.setRoutingContext(graph, originVertices, null);
+        routingRequest.arriveBy = reverseDirection;
+        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
+        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
+        routingRequest.disableRemainingWeightHeuristic = true;
+        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        return astar.getShortestPathTree(routingRequest);
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
