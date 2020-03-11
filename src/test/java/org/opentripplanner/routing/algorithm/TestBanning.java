@@ -11,7 +11,8 @@ import java.util.Arrays;
 import java.util.Collection;
 
 /**
- * Test the banning and whitelisting functionality in the RoutingRequest
+ * Test the banning and whitelisting functionality in the RoutingRequest.
+ * TODO This does not test the that banning/whitelisting affects the routing correctly.
  */
 public class TestBanning {
 
