@@ -49,7 +49,7 @@ public class RaptorRouter {
 
   private final TransitLayer transitLayer;
 
-  private final RoutingRequest request;
+  private RoutingRequest request;
 
   //TODO Naming
   public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
@@ -68,14 +68,11 @@ public class RaptorRouter {
     /* Prepare access/egress transfers */
 
     double startTimeAccessEgress = System.currentTimeMillis();
-
-    Map<Stop, Transfer> accessTransfers =
-        AccessEgressRouter
-            .streetSearch(request, false, maxTransferDistance(request.maxTransferWalkDistance));
-    Map<Stop, Transfer> egressTransfers =
-        AccessEgressRouter
-            .streetSearch(request, true, maxTransferDistance(request.maxWalkDistance));
-
+    AccessEgressRouter accessEgressRouter = new AccessEgressRouter(request,
+        maxTransferDistance(request.maxWalkDistance));
+    Map<Stop, Transfer> accessTransfers = accessEgressRouter.streetSearch(false);
+    Map<Stop, Transfer> egressTransfers = accessEgressRouter.streetSearch(true);
+    request = accessEgressRouter.getRequest();
     TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
         transitLayer);
 
@@ -168,6 +165,10 @@ public class RaptorRouter {
   }
 
   private int maxTransferDistance(Number maxWalkDistance) {
-    return 2000 > maxWalkDistance.intValue() ? 2000 : maxWalkDistance.intValue();
+    if(maxWalkDistance.equals(Double.MAX_VALUE)){
+      return 2000;
+    }else{
+      return maxWalkDistance.intValue();
+    }
   }
 }
