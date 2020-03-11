@@ -72,7 +72,7 @@ class RaptorRoutingRequestTransitDataCreator {
     // accounted for in TripPatternForDates.
     for (int d = -1; d < dayRange - 1; ++d) {
       tripPatternForDates.add(
-        listActiveTripPatterns(
+        filterActiveTripPatterns(
           transitLayer,
           departureDate.plusDays(d),
           transitModes,
@@ -138,7 +138,7 @@ class RaptorRoutingRequestTransitDataCreator {
     return result;
   }
 
-  private static Map<FeedScopedId, TripPatternForDate> listActiveTripPatterns(
+  private static Map<FeedScopedId, TripPatternForDate> filterActiveTripPatterns(
       TransitLayer transitLayer,
       LocalDate date,
       TraverseModeSet transitModes,
