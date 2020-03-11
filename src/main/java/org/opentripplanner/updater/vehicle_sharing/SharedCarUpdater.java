@@ -36,7 +36,9 @@ public class SharedCarUpdater extends PollingGraphUpdater {
     }
 
     private Vertex chooseCloser(float lat, float lon, Vertex vertex1, Vertex vertex2) {
-        if (SloppyMath.haversin(lat, lon, vertex1.getLat(), vertex1.getLon()) <
+        if (vertex1 == null) {
+            return vertex2;
+        } else if (SloppyMath.haversin(lat, lon, vertex1.getLat(), vertex1.getLon()) <
                 SloppyMath.haversin(lat, lon, vertex2.getLat(), vertex2.getLon())) {
             return vertex1;
         } else {
@@ -44,34 +46,33 @@ public class SharedCarUpdater extends PollingGraphUpdater {
         }
     }
 
-    Vertex findClosestVertex(VehiclePosition vehiclePosition, List<Vertex> vertexesToChoseFrom) {
+    Vertex findClosestVertex(VehiclePosition vehiclePosition, List<Vertex> vertexesToChooseFrom) {
         Stream<Vertex> stream;
-        if (vertexesToChoseFrom == null) {
+        if (vertexesToChooseFrom == null) {
             Envelope envelope = new Envelope(new Coordinate(vehiclePosition.latitude, vehiclePosition.longitude));
 
-            stream = simpleStreetSplitter.getIdx().query(envelope).stream().filter(streetEdge -> streetEdge instanceof StreetEdge).
-                    map(edge -> (StreetEdge) edge).
-                    filter(streetEdge -> streetEdge.canTraverse(new TraverseModeSet(WALK))).
-                    map(Edge::getFromVertex);
+            stream = simpleStreetSplitter.getIdx().query(envelope).stream()
+                    .filter(edge -> edge instanceof StreetEdge)
+                    .map(streetEdge -> (StreetEdge) streetEdge)
+                    .filter(streetEdge -> streetEdge.canTraverse(new TraverseModeSet(WALK)))
+                    .map(Edge::getFromVertex);
         } else {
-            stream = vertexesToChoseFrom.stream();
+            stream = vertexesToChooseFrom.stream();
         }
 
-        Vertex v0 = (Vertex)graph.getVertices().toArray()[0];
+        Vertex v0 = graph.getVertices().stream().findFirst().orElse(null);
 
-        Vertex closestVertex = stream.
-                reduce(v0,
-                        (previous_best, current) -> chooseCloser(vehiclePosition.latitude, vehiclePosition.longitude, previous_best, current));
-
-        return closestVertex;
+        return stream
+                .reduce(v0, (previous_best, current) ->
+                        chooseCloser(vehiclePosition.latitude, vehiclePosition.longitude, previous_best, current));
     }
 
     private List<Vertex> coordsToVertex(List<VehiclePosition> vehiclePositions, boolean useRememberedVehicles) {
-        if (useRememberedVehicles)
+        if (useRememberedVehicles) {
             return vehiclePositions.stream().map(a -> findClosestVertex(a, rememberedVehicles)).collect(Collectors.toList());
-        else
+        } else {
             return vehiclePositions.stream().map(a -> findClosestVertex(a, null)).collect(Collectors.toList());
-
+        }
     }
 
     public List<Edge> prepareAppearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
@@ -90,31 +91,31 @@ public class SharedCarUpdater extends PollingGraphUpdater {
 
     public List<Edge> prepareDisappearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
         List<Vertex> disappearedVertex = coordsToVertex(vehiclePositionsDiff.disappeared, true);
-        List<Edge> disappeareedEdge = new LinkedList<>();
+        List<Edge> disappearedEdge = new LinkedList<>();
         for (Vertex vertex : disappearedVertex) {
             rememberedVehicles.remove(vertex);
             for (Edge edge : vertex.getOutgoing()) {
                 if (edge instanceof RentCarAnywhereEdge) {
-                    disappeareedEdge.add(edge);
+                    disappearedEdge.add(edge);
                     break;
                 }
             }
         }
-        return disappeareedEdge;
+        return disappearedEdge;
     }
 
     @Override
     protected void runPolling() throws Exception {
         VehiclePositionsDiff vehiclePositionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
 
-        List<Edge> apppearedEdge = prepareAppearedEdge(vehiclePositionsDiff);
-        List<Edge> disappeareedEdge = prepareDisappearedEdge(vehiclePositionsDiff);
+        List<Edge> appearedEdges = prepareAppearedEdge(vehiclePositionsDiff);
+        List<Edge> disappearedEdges = prepareDisappearedEdge(vehiclePositionsDiff);
 
-        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(apppearedEdge, disappeareedEdge);
+        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(appearedEdges, disappearedEdges);
 
         graphUpdaterManager.execute(graphWriterRunnable);
     }
-//
+
     @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
         this.graph = graph;

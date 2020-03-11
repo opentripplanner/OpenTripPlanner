@@ -1,28 +1,23 @@
 package org.opentripplanner.updater.car_rental;
 
 import junit.framework.TestCase;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.algorithm.AStar;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.vehicle_sharing.SharedCarUpdater;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePosition;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsDiff;
 
-import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 
 public class SharedCarUpdaterTest extends TestCase {
     public void testProjectingVehicles() {
@@ -57,25 +52,16 @@ public class SharedCarUpdaterTest extends TestCase {
 
         SharedCarUpdater sharedCarUpdater = new SharedCarUpdater(null, TraverseMode.RENT);
 
-
         try {
             sharedCarUpdater.setup(graph);
         } catch (Exception e) {
-            assertTrue(true);
+            fail();
         }
 
 //        One vehicle appeared.
-        List<VehiclePosition> appeared = new ArrayList<VehiclePosition>() {
-            {
-                add(new VehiclePosition(vehLong1, vehLat1));
-            }
-        };
+        List<VehiclePosition> appeared = singletonList(new VehiclePosition(vehLong1, vehLat1));
 
-        List<VehiclePosition> disappeared = new ArrayList<VehiclePosition>() {
-            {
-
-            }
-        };
+        List<VehiclePosition> disappeared = emptyList();
 
         VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, disappeared, 0L, 0L);
 
@@ -95,6 +81,5 @@ public class SharedCarUpdaterTest extends TestCase {
         assertEquals(0, appearedEdges.size());
         assertEquals(1, disappearedEdges.size());
         assertEquals(car1, disappearedEdges.get(0));
-
     }
 }
