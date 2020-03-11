@@ -2,8 +2,6 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
@@ -27,7 +25,6 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.media.jai.InterpolationBilinear;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -51,11 +48,10 @@ import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDif
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
  * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
- * in the Graph. Depending on the {@link ElevationGridCoverageFactory} specified this could be auto-downloaded and
- * cached National Elevation Dataset (NED) raster data or a GeoTIFF file. The elevation profiles are stored as
- * {@link PackedCoordinateSequence} objects, where each (x,y) pair represents one sample, with the x-coord representing
- * the distance along the edge measured from the start, and the y-coord representing the sampled elevation at that
- * point (both in meters).
+ * in the Graph. Data sources that could be used include auto-downloaded and cached National Elevation Dataset (NED)
+ * raster data or a GeoTIFF file. The elevation profiles are stored as {@link PackedCoordinateSequence} objects, where
+ * each (x,y) pair represents one sample, with the x-coord representing the distance along the edge measured from the
+ * start, and the y-coord representing the sampled elevation at that point (both in meters).
  */
 public class ElevationModule implements GraphBuilderModule {
 
@@ -133,7 +129,7 @@ public class ElevationModule implements GraphBuilderModule {
         );
         log.info(demPrepareTask.start());
 
-        gridCoverageFactory.setGraph(graph);
+        gridCoverageFactory.fetchData(graph);
 
         // try to load in the cached elevation data
         if (readCachedElevations) {
