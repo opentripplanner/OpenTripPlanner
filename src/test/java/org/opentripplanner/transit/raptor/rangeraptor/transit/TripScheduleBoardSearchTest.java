@@ -18,18 +18,12 @@ public class TripScheduleBoardSearchTest {
      * a trip pattern with 4 trips and 2 stops. This will cover most
      * of the simple cases:
      *
-     * Trip:  |  A   |  S   |  B   |  T
-     * Stop 1 | 1000 | 1900 | 2000 | 2100
-     * Stop 2 | 1500 | 2600 | 2500 | 2400
+     * Trip:  |  A   |  B   |  C
+     * Stop 1 | 1000 | 1200 | 2000
+     * Stop 2 | 1500 | 1600 | 2500
      *
      * Note:
      * - All times are board times, we do not care about the alight times in this test.
-     * - Trip S and T is not in service
-     * - Trip S depart from stop 1 before trip B, but depart from stop 2 after trip B.
-     * - Trip T depart from stop 1 after trip B, but depart from stop 2 before trip B.
-     *
-     * The TripScheduleBoardSearch should handle the above trip variations. The point here
-     * is that trip B, S and T is in order at stop 1, but not at stop 2.
      */
 
 
@@ -42,53 +36,48 @@ public class TripScheduleBoardSearchTest {
     /** A time before all other times */
     private static final int TIME_0 = 0;
 
-    private static final int TIME_A0 = 1000;
-    private static final int TIME_A1 = 1500;
+    private static final int TIME_A1 = 1000;
+    private static final int TIME_A2 = 1500;
 
-    private static final int TIME_B0 = 2000;
-    private static final int TIME_B1 = 2500;
+    private static final int TIME_B1 = 1200;
+    private static final int TIME_B2 = 1600;
 
-    private static final int TIME_S0 = 1900;
-    private static final int TIME_S1 = 2600;
-
-    private static final int TIME_T0 = 2100;
-    private static final int TIME_T1 = 2400;
+    private static final int TIME_C1 = 2000;
+    private static final int TIME_C2 = 2500;
 
     /* Stop position in pattern */
     private static final int STOP_1 = 0;
     private static final int STOP_2 = 1;
 
     private static final int TRIP_A_INDEX = 0;
-    private static final int TRIP_B_INDEX = 2;
+    private static final int TRIP_B_INDEX = 1;
+    private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = createTripScheduleUseingDepartureTimes(TIME_A0, TIME_A1);
-    private TestRaptorTripSchedule tripB = createTripScheduleUseingDepartureTimes(TIME_B0, TIME_B1);
+    private TestRaptorTripSchedule tripA = createTripScheduleUseingDepartureTimes(TIME_A1, TIME_A2);
+    private TestRaptorTripSchedule tripB = createTripScheduleUseingDepartureTimes(TIME_B1, TIME_B2);
+    private TestRaptorTripSchedule tripC = createTripScheduleUseingDepartureTimes(TIME_C1, TIME_C2);
 
-    // Trips not in service
-    private TestRaptorTripSchedule tripS = createTripScheduleUseingDepartureTimes(TIME_S0, TIME_S1);
-    private TestRaptorTripSchedule tripT = createTripScheduleUseingDepartureTimes(TIME_T0, TIME_T1);
-
-    // Trip pattern with trip A, S, B, T.
-    private TripPatternInfo<TestRaptorTripSchedule> pattern = new TestTripPattern(tripA, tripS, tripB, tripT);
+    // Trip pattern with trip A, B, C.
+    private TripPatternInfo<TestRaptorTripSchedule> pattern = new TestTripPattern(tripA, tripB, tripC);
 
     // The service under test - the subject
     private TripScheduleBoardSearch<TestRaptorTripSchedule> subject = new TripScheduleBoardSearch<>(
-            TRIPS_BINARY_SEARCH_THRESHOLD, pattern, this::skip
+            TRIPS_BINARY_SEARCH_THRESHOLD, pattern
     );
 
     @Test
     public void noTripFoundAfterLastTripInServiceDeparture() {
         // When:
-        //   Searching for a trip that board after the last trip i service (Trip B)
+        //   Searching for a trip that board after the last trip i service (Trip C)
         // Then:
         //   No trips are expected as a result
-        // Stop 1: (Trip T depart after B, but is not in service)
-        searchForTrip(latestTimeNotBoardingAt(TIME_B0), STOP_1)
-                .assertNoTripFound();
-        // Stop 1: (Trip S depart after B, but is not in service)
-        searchForTrip(latestTimeNotBoardingAt(TIME_B1), STOP_2)
-                .assertNoTripFound();
+
+        // Stop 1:
+        searchForTrip(TIME_C1 + 1, STOP_1).assertNoTripFound();
+
+        // Stop 2:
+        searchForTrip(TIME_C2 + 1, STOP_2).assertNoTripFound();
     }
 
     @Test
@@ -96,42 +85,31 @@ public class TripScheduleBoardSearchTest {
         searchForTrip(TIME_0, STOP_1)
                 .assertTripFound()
                 .withIndex(TRIP_A_INDEX)
-                .withBoardTime(TIME_A0);
+                .withBoardTime(TIME_A1);
 
         searchForTrip(TIME_0, STOP_2)
                 .assertTripFound()
                 .withIndex(TRIP_A_INDEX)
-                .withBoardTime(TIME_A1);
+                .withBoardTime(TIME_A2);
     }
 
     @Test
     public void boardFirstTripWithTheMinimumPossibleSlack() {
-        searchForTrip(latestTimeToBoardAt(TIME_A0), STOP_1)
-                .assertTripFound()
-                .withIndex(TRIP_A_INDEX)
-                .withBoardTime(TIME_A0);
-
-        searchForTrip(latestTimeToBoardAt(TIME_A1), STOP_2)
+        searchForTrip(TIME_A1, STOP_1)
                 .assertTripFound()
                 .withIndex(TRIP_A_INDEX)
                 .withBoardTime(TIME_A1);
-    }
 
-    @Test
-    public void boardFirstAvailableTripButNotSkippedTrips() {
-        // At stop 1
-        // Search for the next trip after trip A; expect Trip B
-        searchForTrip(latestTimeNotBoardingAt(TIME_A0), STOP_1)
-                .assertTripFound()
-                .withIndex(TRIP_B_INDEX)
-                .withBoardTime(TIME_B0);
+        // Assert board next trip for: time + 1 second
+        searchForTrip(TIME_A1+1, STOP_1).assertTripFound().withIndex(TRIP_B_INDEX);
 
-        // At stop 2
-        // Search for the next trip after trip A; expect Trip B
-        searchForTrip(latestTimeNotBoardingAt(TIME_A1), STOP_2)
+        searchForTrip(TIME_A2, STOP_2)
                 .assertTripFound()
-                .withIndex(TRIP_B_INDEX)
-                .withBoardTime(TIME_B1);
+                .withIndex(TRIP_A_INDEX)
+                .withBoardTime(TIME_A2);
+
+        // Assert board next trip for: time + 1 second
+        searchForTrip(TIME_A2+1, STOP_2).assertTripFound().withIndex(TRIP_B_INDEX);
     }
 
     @Test
@@ -153,7 +131,7 @@ public class TripScheduleBoardSearchTest {
         // Then we expect to find trip A when `tripIndexUpperBound` is B´s index
         searchForTrip(TIME_0, STOP_1, TRIP_INDEX_B)
                 .assertTripFound()
-                .withBoardTime(TIME_A0)
+                .withBoardTime(TIME_A1)
                 .withIndex(TRIP_INDEX_A);
 
         // An then no trip if `tripIndexUpperBound` equals the first trip index (A´s index)
@@ -162,39 +140,11 @@ public class TripScheduleBoardSearchTest {
     }
 
     @Test
-    public void findTripWithGivenTripIndexUpperBoundButNotSkippedTrips() {
-        // Given the default pattern with the following trips: A, S, B, T
-
-        // STOP 1
-        // Then we expect to find trip B when `tripIndexUpperBound` is larger than B´s index.
-        searchForTrip(latestTimeNotBoardingAt(TIME_A0), STOP_1, TRIP_B_INDEX + 1)
-                .assertTripFound()
-                .withBoardTime(TIME_B0)
-                .withIndex(TRIP_B_INDEX);
-
-        // But NOT when `tripIndexUpperBound` equals trip B´s index
-        searchForTrip(latestTimeNotBoardingAt(TIME_A0), STOP_1, TRIP_B_INDEX)
-                .assertNoTripFound();
-
-        // STOP 2
-        // Then we expect to find trip B when `tripIndexUpperBound` is larger than B´s index
-        searchForTrip(latestTimeNotBoardingAt(TIME_A1), STOP_2, TRIP_B_INDEX + 1)
-                .assertTripFound()
-                .withBoardTime(TIME_B1)
-                .withIndex(TRIP_B_INDEX);
-
-        // But NOT when `tripIndexUpperBound` equals trip B´s index
-        searchForTrip(latestTimeNotBoardingAt(TIME_A1), STOP_2, TRIP_B_INDEX)
-                .assertNoTripFound();
-    }
-
-    @Test
     public void boardFirstAvailableTripForABigNumberOfTrips() {
         // For a pattern with N trip schedules,
         // where the first trip departure is at time 1000 and incremented by 1000.
         // We use 1 stop (we search for boardings, we do not care if we can alight)
-        final int n = TRIPS_BINARY_SEARCH_THRESHOLD;
-        final int N = 7 * n + 3;
+        final int N = 7 * TRIPS_BINARY_SEARCH_THRESHOLD + 3;
         final int dT = 1000;
 
         List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
@@ -209,12 +159,12 @@ public class TripScheduleBoardSearchTest {
 
 
         // Search for a trip that board after the last trip, expect no trip in return
-        searchForTrip(latestTimeNotBoardingAt(latestDepartureTime), STOP_1)
+        searchForTrip(latestDepartureTime + 1, STOP_1)
                 .assertNoTripFound();
 
         for (int i = 0; i < N; ++i) {
             int tripBoardTime = dT * (i + 1);
-            int okArrivalTime = latestTimeToBoardAt(tripBoardTime);
+            int okArrivalTime = tripBoardTime;
 
             // Search and find trip 'i'
             searchForTrip(okArrivalTime, STOP_1)
@@ -233,45 +183,6 @@ public class TripScheduleBoardSearchTest {
         }
     }
 
-    /**
-     * If there is a large number of trips not in service, the binary search may return
-     * a best guess index witch is lower than the correct trip index. This test make sure
-     * such trips are found.
-     */
-    @Test
-    public void assertTripIsFoundEvenIfItIsBeforeTheBinarySearchUpperAndLowerBound() {
-        final int N = TRIPS_BINARY_SEARCH_THRESHOLD;
-
-        // Given a pattern with n + 1 trip schedules
-        List<TestRaptorTripSchedule> tripSchedules = new ArrayList<>();
-
-        // Where the N first trips are NOT in service, but with acceptable boarding times
-        addNTimes(tripSchedules, tripS, N);
-
-        // and where the last trip is in service
-        tripSchedules.add(tripB);
-        final int indexB = tripSchedules.size()-1;
-
-        useTripPattern(new TestTripPattern(tripSchedules));
-
-        // Then we expect to find B for both stop 1 and 2
-        // Stop 1
-        searchForTrip(latestTimeToBoardAt(TIME_B0), STOP_1)
-                .assertTripFound()
-                .withIndex(indexB)
-                .withBoardTime(TIME_B0);
-
-        // Stop 2
-        searchForTrip(latestTimeToBoardAt(TIME_B1), STOP_2)
-                .assertTripFound()
-                .withIndex(indexB)
-                .withBoardTime(TIME_B1);
-    }
-
-    private boolean skip(Object trip) {
-        return trip == tripS || trip == tripT;
-    }
-
     private void withTrips(TestRaptorTripSchedule... schedules) {
         useTripPattern(new TestTripPattern(schedules));
     }
@@ -284,24 +195,8 @@ public class TripScheduleBoardSearchTest {
         this.pattern = pattern;
         this.subject = new TripScheduleBoardSearch<>(
                 TRIPS_BINARY_SEARCH_THRESHOLD,
-                this.pattern,
-                this::skip
+                this.pattern
         );
-    }
-
-    private int latestTimeToBoardAt(int boardTime) {
-        return boardTime;
-    }
-
-    private int latestTimeNotBoardingAt(int boardTime) {
-        return boardTime + 1;
-    }
-
-
-    private static void addNTimes(List<TestRaptorTripSchedule> trips, TestRaptorTripSchedule tripS, int n) {
-        for (int i = 0; i < n; i++) {
-            trips.add(tripS);
-        }
     }
 
     private TripAssert searchForTrip(int arrivalTime, int stopPosition) {

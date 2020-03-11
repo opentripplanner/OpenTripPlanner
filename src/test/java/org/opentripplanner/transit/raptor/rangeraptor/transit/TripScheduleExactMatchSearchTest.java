@@ -25,7 +25,7 @@ public class TripScheduleExactMatchSearchTest {
 
     public void setup(boolean forward) {
         TransitCalculator calculator = TransitCalculator.testDummyCalculator(200, forward);
-        subject = calculator.createExactTripSearch(TRIP_PATTERN, (t) -> false);
+        subject = calculator.createExactTripSearch(TRIP_PATTERN);
     }
 
     @Test

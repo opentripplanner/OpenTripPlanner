@@ -1,16 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
-
-import java.util.function.Function;
 
 /**
  * A calculator that will take you back in time not forward, this is the
@@ -155,19 +153,17 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            TripPatternInfo<T> pattern,
-            Function<T, Boolean> skipTripScheduleCallback
+            TripPatternInfo<T> pattern
     ) {
-        return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, pattern, skipTripScheduleCallback);
+        return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, pattern);
     }
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            TripPatternInfo<T> pattern,
-            Function<T, Boolean> skipTripScheduleCallback
+            TripPatternInfo<T> pattern
     ) {
         return new TripScheduleExactMatchSearch<>(
-                createTripSearch(pattern, skipTripScheduleCallback),
+                createTripSearch(pattern),
                 this,
                 -iterationStep
         );

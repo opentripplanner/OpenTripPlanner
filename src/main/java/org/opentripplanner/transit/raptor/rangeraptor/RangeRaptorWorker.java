@@ -235,18 +235,11 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private TripScheduleSearch<T> createTripSearch(TripPatternInfo<T> pattern) {
         if(matchBoardingAlightExactInFirstRound && roundTracker.round() == 1) {
-            return calculator.createExactTripSearch(pattern, this::skipTripSchedule);
+            return calculator.createExactTripSearch(pattern);
         }
         else {
-            return calculator.createTripSearch(pattern, this::skipTripSchedule);
+            return calculator.createTripSearch(pattern);
         }
-    }
-
-    /**
-     * Skip trips NOT running on the day of the search and skip frequency trips
-     */
-    private boolean skipTripSchedule(T trip) {
-        return !transitData.isTripScheduleInService(trip);
     }
 
     // Track time spent, measure performance

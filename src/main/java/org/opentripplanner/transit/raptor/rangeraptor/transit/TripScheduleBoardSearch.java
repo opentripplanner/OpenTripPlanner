@@ -1,9 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-
-import java.util.function.Function;
+import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 
 
 /**
@@ -25,7 +23,6 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
     private final int nTripsBinarySearchThreshold;
     private final TripPatternInfo<T> pattern;
     private final int nTrips;
-    private final Function<T, Boolean> skipTripScheduleCallback;
 
     private int earliestBoardTime;
     private int stopPositionInPattern;
@@ -34,13 +31,11 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
 
     TripScheduleBoardSearch(
             int scheduledTripBinarySearchThreshold,
-            TripPatternInfo<T> pattern,
-            Function<T, Boolean> skipTripScheduleCallback
+            TripPatternInfo<T> pattern
     ) {
         this.nTripsBinarySearchThreshold = scheduledTripBinarySearchThreshold;
         this.pattern = pattern;
         this.nTrips = pattern.numberOfTripSchedules();
-        this.skipTripScheduleCallback = skipTripScheduleCallback;
     }
 
     @Override
@@ -72,7 +67,7 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
      * Find the first trip leaving from the given stop AFTER the the 'earliestBoardTime', but
      * before the given trip ({@code tripIndexUpperBound}).
      *
-     * @param earliestBoardTime     The time of arrival at the given stop for the previous trip plus board slack.
+     * @param earliestBoardTime     The time of arrival at the given stop for the previous trip.
      * @param stopPositionInPattern The stop to board
      * @param tripIndexUpperBound   Upper bound for trip index to search for. Exclusive - search start
      *                              at {@code tripIndexUpperBound - 1}.
@@ -130,11 +125,6 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
     private boolean findBoardingBySteppingBackwardsInTime(int tripIndexUpperBound) {
         for (int i = tripIndexUpperBound-1; i >= 0; --i) {
             T trip = pattern.getTripSchedule(i);
-
-            if (skipTripSchedule(trip)) {
-                continue;
-            }
-
             final int boardTime = trip.departure(stopPositionInPattern);
 
             if (boardTime >= earliestBoardTime) {
@@ -159,11 +149,6 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
     private boolean findBoardingBySteppingForwardInTime(final int tripIndexLowerBound) {
         for (int i = tripIndexLowerBound; i < nTrips; ++i) {
             T trip = pattern.getTripSchedule(i);
-
-            if (skipTripSchedule(trip)) {
-                continue;
-            }
-
             final int boardTime = trip.departure(stopPositionInPattern);
 
             if (boardTime >= earliestBoardTime) {
@@ -177,10 +162,9 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
 
     /**
      * Do a binary search to find the approximate upper bound index for where to start the search.
-     * We IGNORE if the trip schedule is in service.
      * <p/>
-     * This is just a guess and we return when the trip with a best valid departure is in the range of
-     * the next {@link #nTripsBinarySearchThreshold}.
+     * This is just a guess and we return when the trip with a best valid departure is in the range
+     * of the next {@link #nTripsBinarySearchThreshold}.
      *
      * @return a better upper bound index (exclusive)
      */
@@ -188,7 +172,6 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
         int lower = 0, upper = nTrips;
 
         // Do a binary search to find where to start the search.
-        // We IGNORE if the trip schedule is in service.
         while (upper - lower > nTripsBinarySearchThreshold) {
             int m = (lower + upper) / 2;
 
@@ -204,12 +187,5 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
             }
         }
         return upper == nTrips ? nTrips : upper + 1;
-    }
-
-    /**
-     * Skip trips not running on the day of the search and frequency trips
-     */
-    private boolean skipTripSchedule(T trip) {
-        return skipTripScheduleCallback.apply(trip);
     }
 }

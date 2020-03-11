@@ -65,16 +65,6 @@ public interface TransitDataProvider<T extends RaptorTripSchedule> {
     Iterator<? extends TripPatternInfo<T>> patternIterator(IntIterator stops);
 
     /**
-     * The provider needs to know based on the request input (date) if a service is available or not.
-     * The provider can chose to do the filtering int the {@link #patternIterator(IntIterator)}, if so
-     * there is no need to implement this method.
-     *
-     * @param trip The trip to check.
-     * @return true if the trip schedule is in service.
-     */
-    default boolean isTripScheduleInService(T trip) { return true; }
-
-    /**
      * This is the total number of stops, it should be possible to retrieve transfers and pattern for every stop
      * from 0 to {@code numberOfStops()-1}.
      */
