@@ -68,7 +68,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     }
 
     @Override
-    public void setGraph(Graph graph) {
+    public void fetchData(Graph graph) {
         //nothing to do here
     }
 
