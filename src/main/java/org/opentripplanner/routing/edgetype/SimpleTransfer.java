@@ -71,7 +71,12 @@ public class SimpleTransfer extends Edge {
         int time = (int) (effectiveWalkDistance / rr.walkSpeed);
         return (time * rr.walkReluctance);
     }
-    
+
+    @Override
+    public double getDistanceMeters() {
+        return edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+    }
+
     @Override
     public double getEffectiveWalkDistance(){
     	return this.effectiveWalkDistance;
