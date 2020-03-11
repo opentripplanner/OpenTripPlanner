@@ -13,9 +13,11 @@ import org.opentripplanner.routing.graph.Graph;
  */
 
 public interface ElevationGridCoverageFactory {
+    /** Creates a new coverage instance from files already fetched */
     public Coverage getGridCoverage();
 
     public void checkInputs();
 
-    public void setGraph(Graph graph);
+    /** Sets the graph of the factory and initiates the fetching of data that is not present in the cache */
+    public void fetchData(Graph graph);
 }

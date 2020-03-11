@@ -29,11 +29,6 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private static final Logger LOG = LoggerFactory.getLogger(NEDGridCoverageFactoryImpl.class);
 
-    private Graph graph;
-
-    /** All tiles for the DEM stitched into a single coverage. */
-    UnifiedGridCoverage unifiedCoverage = null;
-
     private final File cacheDirectory;
 
     public final NEDTileSource tileSource;
@@ -110,8 +105,6 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     /** @return a GeoTools grid coverage for the entire area of interest. */
     public Coverage getGridCoverage() {
         loadVerticalDatum();
-        tileSource.setGraph(graph);
-        tileSource.setCacheDirectory(cacheDirectory);
         List<File> paths = tileSource.getNEDTiles();
         UnifiedGridCoverage unifiedCoverage = null;
         // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
@@ -184,9 +177,12 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     }
 
-    /** Set the graph that will be used to determine the extent of the NED. */
+    /**
+     * Verify that the needed elevation data exists in the cache and if it does not exist, try to download it. The graph
+     * is used to determine the extent of the NED.
+     */
     @Override
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void fetchData(Graph graph) {
+        tileSource.fetchData(graph, cacheDirectory);
     }
 }

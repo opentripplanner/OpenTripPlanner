@@ -274,7 +274,6 @@ public class GraphBuilder implements Runnable {
             S3BucketConfig bucketConfig = builderParams.elevationBucket;
             File cacheDirectory = new File(params.cacheDirectory, "ned");
             DegreeGridNEDTileSource awsTileSource = new DegreeGridNEDTileSource();
-            awsTileSource = new DegreeGridNEDTileSource();
             awsTileSource.awsAccessKey = bucketConfig.accessKey;
             awsTileSource.awsSecretKey = bucketConfig.secretKey;
             awsTileSource.awsBucketName = bucketConfig.bucketName;

@@ -43,19 +43,18 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
     public String awsBucketName;
 
-    @Override
-    public void setGraph(Graph graph) {
+    @Override public void fetchData(Graph graph, File cacheDirectory) {
         this.graph = graph;
-    }
-
-    @Override
-    public void setCacheDirectory(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
+        getNEDTiles(true);
     }
 
     @Override
     public List<File> getNEDTiles() {
+        return getNEDTiles(false);
+    }
 
+    public List<File> getNEDTiles(boolean downloadIfMissing) {
         HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
 
         for (Vertex v : graph.getVertices()) {
@@ -67,7 +66,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         for (P2<Integer> tile : tiles) {
             int x = tile.first - 1;
             int y = tile.second + 1;
-            File tilePath = getPathToTile(x, y);
+            File tilePath = getPathToTile(x, y, downloadIfMissing);
             if (tilePath != null) {
                 paths.add(tilePath);
             }
@@ -92,10 +91,12 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         return String.format("%s%d%s%03d", northSouth, y, eastWest, x);
     }
 
-    private File getPathToTile(int x, int y) {
+    private File getPathToTile(int x, int y, boolean downloadIfMissing) {
         File path = new File(cacheDirectory, formatLatLon(x, y) + ".tiff");
         if (path.exists()) {
             return path;
+        } else if (!downloadIfMissing) {
+            return null;
         } else {
             path.getParentFile().mkdirs();
 
