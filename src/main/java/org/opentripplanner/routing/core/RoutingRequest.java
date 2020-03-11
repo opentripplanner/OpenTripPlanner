@@ -378,13 +378,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Do not use certain named agencies
      */
-    @Deprecated
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /**
      * Only use certain named agencies
      */
-    @Deprecated
     public HashSet<String> whiteListedAgencies = new HashSet<String>();
 
 
@@ -407,12 +405,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
      * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
      */
-    @Deprecated
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Only use certain named routes
      */
-    @Deprecated
     public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
     /** Set of preferred routes by user.
