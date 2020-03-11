@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -35,6 +36,7 @@ public class TestCarRental extends TestCase {
 
         // it is impossible to get from v1 to v3 by walking
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));
+        options.setStartingMode(TraverseMode.WALK);
         options.setRoutingContext(graph, v1, v3);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v3, false);
@@ -42,6 +44,7 @@ public class TestCarRental extends TestCase {
 
         // or driving + walking (assuming pushing car is disallowed)
         options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
+        options.setStartingMode(TraverseMode.WALK);
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -55,7 +58,8 @@ public class TestCarRental extends TestCase {
 
         // but the are no cars so we still fail
         options = new RoutingRequest();
-        new QualifiedModeSet("CAR_RENT,TRANSIT").applyToRoutingRequest(options);
+        new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
+        options.setStartingMode(TraverseMode.WALK);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);
@@ -66,7 +70,8 @@ public class TestCarRental extends TestCase {
 
         // but we can't park a car at v3, so we still fail
         options = new RoutingRequest();
-        new QualifiedModeSet("CAR_RENT,TRANSIT").applyToRoutingRequest(options);
+        new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
+        options.setStartingMode(TraverseMode.WALK);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);
@@ -79,7 +84,8 @@ public class TestCarRental extends TestCase {
 
         // now we succeed!
         options = new RoutingRequest();
-        new QualifiedModeSet("CAR_RENT,TRANSIT").applyToRoutingRequest(options);
+        new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
+        options.setStartingMode(TraverseMode.WALK);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);

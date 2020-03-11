@@ -107,6 +107,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT. */
     public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
 
+    public TraverseMode startingMode = null;
+
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
     // TODO this should be completely removed and done only with individual cost parameters
@@ -715,6 +717,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
+    public void setStartingMode(TraverseMode mode) {
+        this.startingMode = mode;
+    }
+
     public void setOptimize(OptimizeType optimize) {
         this.optimize = optimize;
         bikeWalkingOptions.optimize = optimize;
@@ -1122,6 +1128,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && worstTime == other.worstTime
                 && maxTransfers == other.maxTransfers
                 && modes.equals(other.modes)
+                && startingMode == other.startingMode
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance

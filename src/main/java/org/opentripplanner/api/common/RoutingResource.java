@@ -14,6 +14,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -180,6 +181,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
+
+    /**
+     * Possible options: WALK, CAR, BIKE. Defaults to null, meaning we use old logic of getting starting mode from `mode` parameter.
+     */
+    @QueryParam("startingMode")
+    protected TraverseMode startingMode;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -604,6 +611,10 @@ public abstract class RoutingResource {
         if (modes != null) {
             modes.applyToRoutingRequest(request);
             request.setModes(request.modes);
+        }
+
+        if (startingMode != null && startingMode.isOnStreetNonTransit()) {
+            request.startingMode = startingMode;
         }
 
         if (request.allowBikeRental && bikeSpeed == null) {
