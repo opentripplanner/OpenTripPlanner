@@ -33,8 +33,6 @@ import java.util.List;
 public class DegreeGridNEDTileSource implements NEDTileSource {
     private static Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
-    private Graph graph;
-
     private File cacheDirectory;
 
     public String awsAccessKey;
@@ -43,18 +41,16 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
 
     public String awsBucketName;
 
-    @Override public void fetchData(Graph graph, File cacheDirectory) {
-        this.graph = graph;
-        this.cacheDirectory = cacheDirectory;
-        getNEDTiles(true);
-    }
+    private List<File> nedTiles;
 
     @Override
     public List<File> getNEDTiles() {
-        return getNEDTiles(false);
+        return nedTiles;
     }
 
-    public List<File> getNEDTiles(boolean downloadIfMissing) {
+    @Override public void fetchData(Graph graph, File cacheDirectory) {
+        this.cacheDirectory = cacheDirectory;
+
         HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
 
         for (Vertex v : graph.getVertices()) {
@@ -66,12 +62,12 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         for (P2<Integer> tile : tiles) {
             int x = tile.first - 1;
             int y = tile.second + 1;
-            File tilePath = getPathToTile(x, y, downloadIfMissing);
+            File tilePath = getPathToTile(x, y);
             if (tilePath != null) {
                 paths.add(tilePath);
             }
         }
-        return paths;
+        nedTiles = paths;
     }
 
     private String formatLatLon(int x, int y) {
@@ -91,12 +87,10 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
         return String.format("%s%d%s%03d", northSouth, y, eastWest, x);
     }
 
-    private File getPathToTile(int x, int y, boolean downloadIfMissing) {
+    private File getPathToTile(int x, int y) {
         File path = new File(cacheDirectory, formatLatLon(x, y) + ".tiff");
         if (path.exists()) {
             return path;
-        } else if (!downloadIfMissing) {
-            return null;
         } else {
             path.getParentFile().mkdirs();
 

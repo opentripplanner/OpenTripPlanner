@@ -45,6 +45,8 @@ public class NEDDownloader implements NEDTileSource {
 
     private double _lonXStep = 0.16;
 
+    private List<File> nedTiles;
+
     private File getPathToNEDArchive(String key) {
         if (!cacheDirectory.exists()) {
             if (!cacheDirectory.mkdirs()) {
@@ -282,20 +284,17 @@ public class NEDDownloader implements NEDTileSource {
         return lft + "_" + rgt + "_" + top + "_" + bot;
     }
 
+    @Override
+    public List<File> getNEDTiles() {
+        return nedTiles;
+    }
+
     @Override public void fetchData(Graph graph, File cacheDirectory) {
         this.graph = graph;
         this.cacheDirectory = cacheDirectory;
 
         log.info("Downloading NED elevation data (or fetching it from local cache).");
-        getNEDTiles(true);
-    }
-
-    @Override
-    public List<File> getNEDTiles() {
-        return getNEDTiles(false);
-    }
-
-    public List<File> getNEDTiles(boolean downloadIfMissing) {
+        
         List<URL> urls = getDownloadURLsCached();
         List<File> files = new ArrayList<File>();
         int tileCount = 0;
@@ -306,9 +305,6 @@ public class NEDDownloader implements NEDTileSource {
             if (tile.exists()) {
                 files.add(tile);
                 log.debug("{} found in NED cache, not downloading: {}", tileProgress, tile);
-                continue;
-            } else if (!downloadIfMissing) {
-                log.debug("{} not found in NED cache, but skipping download: {}", tileProgress, tile);
                 continue;
             }
             REQUEST: for (int req_attempt = 0; req_attempt < 5; ++req_attempt) {
@@ -340,7 +336,7 @@ public class NEDDownloader implements NEDTileSource {
             }
             log.error("Unable to download a NED tile after 5 requests.");
         }
-        return files;
+        nedTiles = files;
     }
 
     private List<URL> getDownloadURLsCached() {
