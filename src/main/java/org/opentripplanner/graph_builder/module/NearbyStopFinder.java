@@ -168,9 +168,18 @@ public class NearbyStopFinder {
                 }
             }
         }
-        stopsFound.addAll(this.getStopAtDistances(originVertices,
-            spt == null ? Collections.emptyList() : spt.getAllStates()));
-
+        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
+        for (Vertex vertex : originVertices) {
+            if (vertex instanceof TransitStopVertex) {
+                stopsFound.add(
+                    new StopAtDistance(
+                        (TransitStopVertex) vertex,
+                        0,
+                        Collections.emptyList(),
+                        null
+                    ));
+            }
+        }
         if (removeTempEdges) {
             routingRequest.cleanup();
         }
