@@ -236,6 +236,10 @@ public class ElevationModule implements GraphBuilderModule {
 
         @Override public void run() {
             processEdge(swee, getThreadSpecificCoverageInstance());
+            int curNumProcessed = nEdgesProcessed.addAndGet(1);
+            if (curNumProcessed % 50000 == 0) {
+                log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
+            }
         }
 
         /**
@@ -550,10 +554,6 @@ public class ElevationModule implements GraphBuilderModule {
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (PointOutsideCoverageException | TransformException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
-        }
-        int curNumProcessed = nEdgesProcessed.addAndGet(1);
-        if (curNumProcessed % 50000 == 0) {
-            log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
         }
     }
 
