@@ -109,6 +109,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public TraverseMode startingMode = null;
 
+    public boolean rentingAllowed = false;
+
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
     // TODO this should be completely removed and done only with individual cost parameters
@@ -721,6 +723,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.startingMode = mode;
     }
 
+    public void setRentingAllowed(boolean rentingAllowed) {
+        this.rentingAllowed = rentingAllowed;
+    }
+
     public void setOptimize(OptimizeType optimize) {
         this.optimize = optimize;
         bikeWalkingOptions.optimize = optimize;
@@ -1129,6 +1135,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxTransfers == other.maxTransfers
                 && modes.equals(other.modes)
                 && startingMode == other.startingMode
+                && rentingAllowed == other.rentingAllowed
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -1197,6 +1204,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + modes.hashCode()
+                + startingMode.hashCode() + (rentingAllowed ? 3 : 0)
                 + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(maxTransferWalkDistance).hashCode()

@@ -37,6 +37,7 @@ public class TestCarRental extends TestCase {
         // it is impossible to get from v1 to v3 by walking
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));
         options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
         options.setRoutingContext(graph, v1, v3);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v3, false);
@@ -45,6 +46,7 @@ public class TestCarRental extends TestCase {
         // or driving + walking (assuming pushing car is disallowed)
         options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
         options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -60,6 +62,7 @@ public class TestCarRental extends TestCase {
         options = new RoutingRequest();
         new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
         options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);
@@ -72,6 +75,7 @@ public class TestCarRental extends TestCase {
         options = new RoutingRequest();
         new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
         options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);
@@ -86,6 +90,7 @@ public class TestCarRental extends TestCase {
         options = new RoutingRequest();
         new QualifiedModeSet("CAR,TRANSIT").applyToRoutingRequest(options);
         options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(v3, false);

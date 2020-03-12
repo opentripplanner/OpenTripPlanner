@@ -188,6 +188,12 @@ public abstract class RoutingResource {
     @QueryParam("startingMode")
     protected TraverseMode startingMode;
 
+    /**
+     * Feature flag which activates vehicle renting possibility. Defaults to false.
+     */
+    @QueryParam("rentingAllowed")
+    protected Boolean rentingAllowed;
+
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
      *  transfers over longer distances might use a longer time. */
@@ -615,6 +621,10 @@ public abstract class RoutingResource {
 
         if (startingMode != null && startingMode.isOnStreetNonTransit()) {
             request.startingMode = startingMode;
+        }
+
+        if (rentingAllowed != null) {
+            request.rentingAllowed = rentingAllowed;
         }
 
         if (request.allowBikeRental && bikeSpeed == null) {

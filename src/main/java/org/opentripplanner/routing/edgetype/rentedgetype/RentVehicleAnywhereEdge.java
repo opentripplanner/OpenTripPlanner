@@ -38,6 +38,10 @@ public abstract class RentVehicleAnywhereEdge extends Edge {
 
     @Override
     public State traverse(State s0) {
+        if (!s0.getOptions().rentingAllowed) {
+            return null;
+        }
+
         StateEditor stateEditor = s0.edit(this);
 
         if (s0.getNonTransitMode().equals(traverseMode())) {
