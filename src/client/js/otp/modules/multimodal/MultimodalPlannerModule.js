@@ -76,6 +76,7 @@ otp.modules.multimodal.MultimodalPlannerModule =
         if(otp.config.showWheelchairOption === undefined || otp.config.showWheelchairOption === true) {
           modeSelector.addModeControl(new otp.widgets.tripoptions.WheelChairSelector(this.optionsWidget));
         }
+        modeSelector.addModeControl(new otp.widgets.tripoptions.DebugItineraryFiltersSelector(this.optionsWidget));
         modeSelector.refreshModeControls();
 
         this.optionsWidget.addSeparator();

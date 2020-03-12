@@ -112,7 +112,6 @@ otp.widgets.ItinerariesWidget =
             $('<div class="otp-itinsWidget-searchLink">[<a href="'+link+'">'+_tr("Link to search")+'</a>]</div>').appendTo(this.footer);
         }
 
-        var header;
         for(var i=0; i<this.itineraries.length; i++) {
             var itin = this.itineraries[i];
             //$('<h3><span id='+divId+'-headerContent-'+i+'>'+this.headerContent(itin, i)+'<span></h3>').appendTo(this.itinsAccord).click(function(evt) {
@@ -121,8 +120,8 @@ otp.widgets.ItinerariesWidget =
             var headerDivId = divId+'-headerContent-'+i;
             var itinSyle = "";
 
-            if(itin.itinData.debugMarkedAsDeleted) {
-                itinSyle = "style=\"background: #FFB3DA\"";
+            if(itin.itinData.systemNotices != null) {
+                itinSyle = "class=\"sysNotice\"";
             }
 
             $('<h3 ' + itinSyle + ' ><div id=' + headerDivId + '></div></h3>')
@@ -467,6 +466,13 @@ otp.widgets.ItinerariesWidget =
         // add start and end time rows and the main leg accordion display
         //TRANSLATORS: Start: Time and date (Shown before path itinerary)
         itinDiv.append("<div class='otp-itinStartRow'><b>" + pgettext('template', "Start") + "</b>: "+itin.getStartTimeStr()+"</div>");
+        if(itin.itinData.systemNotices != null) {
+            let systemTags;
+            for(const it of itin.itinData.systemNotices) {
+                systemTags = (!systemTags) ? it.tag : (systemTags + ", " + it.tag);
+            }
+            itinDiv.append("<div class='otp-itinSysNoticeRow'><b>System tags</b>: " + systemTags + "</div>");
+        }
         itinDiv.append(itinAccord);
         //TRANSLATORS: End: Time and date (Shown after path itinerary)
         itinDiv.append("<div class='otp-itinEndRow'><b>" + _tr("End") + "</b>: "+itin.getEndTimeStr()+"</div>");

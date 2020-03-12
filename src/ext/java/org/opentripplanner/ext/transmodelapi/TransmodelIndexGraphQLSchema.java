@@ -48,6 +48,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -364,6 +365,8 @@ public class TransmodelIndexGraphQLSchema {
     private GraphQLOutputType bookingArrangementType = new GraphQLTypeReference("BookingArrangement");
 
     private GraphQLOutputType contactType = new GraphQLTypeReference("Contact");
+
+    private GraphQLOutputType systemNoticeType = new GraphQLTypeReference("SystemNotice");
 
     private GraphQLInputObjectType locationType;
 
@@ -708,6 +711,26 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
+        systemNoticeType = GraphQLObjectType.newObject()
+                .name("SystemNotice")
+                .description("A system notice is used to tag elements with system information for "
+                        + "debugging or other system related purpose. One use-case is to run a "
+                        + "routing search with 'debugItineraryFilter: true'. This will then tag "
+                        + "itineraries instead of removing them from the result. This make it "
+                        + "possible to inspect the itinerary-filter-chain. A SystemNotice only "
+                        + "have english text, because the primary user are technical staff, like "
+                        + "testers and developers.")
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("tag")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(env -> ((SystemNotice) env.getSource()).tag)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("text")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(env -> ((SystemNotice) env.getSource()).text)
+                        .build())
+                .build();
 
         createPlanType();
 
@@ -4105,22 +4128,22 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).nonTransitDistanceMeters)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("debugMarkedAsDeleted")
-                        .description("This itinerary is marked as deleted by at least one itinerary filter.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((Itinerary) environment.getSource()).debugMarkedAsDeleted)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("legs")
                         .description("A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs.")
                         .type(new GraphQLNonNull(new GraphQLList(legType)))
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).legs)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("systemNotices")
+                        .description("Get all system notices.")
+                        .type(new GraphQLNonNull(new GraphQLList(systemNoticeType)))
+                        .dataFetcher(env -> ((Itinerary) env.getSource()).systemNotices)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("weight")
-                        .description("Weight of the itinerary. Used for debugging. NOT IMPLEMENTED")
+                        .description("Generalized cost or weight of the itinerary. Used for debugging.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> 0.0)
+                        .dataFetcher(env -> ((Itinerary) env.getSource()).generalizedCost)
                         .build())
                 .build();
 
