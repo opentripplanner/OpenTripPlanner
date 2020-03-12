@@ -1,17 +1,17 @@
 package org.opentripplanner.updater.vehicle_sharing;
 
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
+
 import java.util.List;
 
 public class VehiclePositionsDiff {
 
-    List<VehiclePosition> appeared;
-    List<VehiclePosition> disappeared;
+    List<VehicleDescription> appeared;
     Long previousUpdateTime;
     Long currentUpdateTime;
 
-    public VehiclePositionsDiff(List<VehiclePosition> appeared, List<VehiclePosition> disappeared, Long previousUpdateTime, Long currentUpdateTime) {
+    public VehiclePositionsDiff(List<VehicleDescription> appeared, Long previousUpdateTime, Long currentUpdateTime) {
         this.appeared = appeared;
-        this.disappeared = disappeared;
         this.previousUpdateTime = previousUpdateTime;
         this.currentUpdateTime = currentUpdateTime;
     }

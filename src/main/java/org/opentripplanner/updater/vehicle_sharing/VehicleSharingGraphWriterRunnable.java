@@ -1,29 +1,32 @@
 package org.opentripplanner.updater.vehicle_sharing;
 
+import org.apache.commons.lang3.tuple.Pair;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 
 import java.util.List;
+import java.util.Map;
 
 class VehicleSharingGraphWriterRunnable implements GraphWriterRunnable {
 
-    List<Edge> appeared;
-    List<Edge> disappeared;
+    List<Pair<Edge,VehicleDescription>> appeared;
+    List<RentVehicleAnywhereEdge> rememberedVehicles;
 
-    public VehicleSharingGraphWriterRunnable(List<Edge> appeared, List<Edge> disappeared) {
+    public VehicleSharingGraphWriterRunnable(List<Pair<Edge,VehicleDescription>> appeared, List<RentVehicleAnywhereEdge> rememberedVehicles) {
         this.appeared = appeared;
-        this.disappeared = disappeared;
+        this.rememberedVehicles = rememberedVehicles;
     }
 
     @Override
     public void run(Graph graph) {
-        for (Edge edge : appeared) {
-            ((RentVehicleAnywhereEdge) edge).available++;
+        for(RentVehicleAnywhereEdge edge : rememberedVehicles){
+            edge.avaiableVehicles.clear();
         }
-        for (Edge edge : disappeared) {
-            ((RentVehicleAnywhereEdge) edge).available--;
+        for (Pair<Edge,VehicleDescription> p : appeared) {
+            ((RentVehicleAnywhereEdge) p.getLeft()).avaiableVehicles.add(p.getRight());
         }
     }
 }

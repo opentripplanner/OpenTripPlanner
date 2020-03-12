@@ -1,8 +1,10 @@
 package org.opentripplanner.updater.car_rental;
 
 import junit.framework.TestCase;
+import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
@@ -11,7 +13,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.updater.vehicle_sharing.SharedCarUpdater;
-import org.opentripplanner.updater.vehicle_sharing.VehiclePosition;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsDiff;
 
 import java.util.List;
@@ -59,27 +60,24 @@ public class SharedCarUpdaterTest extends TestCase {
         }
 
 //        One vehicle appeared.
-        List<VehiclePosition> appeared = singletonList(new VehiclePosition(vehLong1, vehLat1));
+        List<VehicleDescription> appeared = singletonList(new VehicleDescription(TraverseMode.CAR,vehLong1,vehLat1));
 
-        List<VehiclePosition> disappeared = emptyList();
+        List<VehicleDescription> disappeared = emptyList();
 
-        VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, disappeared, 0L, 0L);
 
-        List<Edge> disappearedEdges = sharedCarUpdater.prepareDisappearedEdge(vehiclePositionsDiff);
-        List<Edge> appearedEdges = sharedCarUpdater.prepareAppearedEdge(vehiclePositionsDiff);
+        VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
+
+        List<Pair<Edge, VehicleDescription>> appearedEdges = sharedCarUpdater.prepareAppearedEdge(vehiclePositionsDiff);
 
         assertEquals(1, appearedEdges.size());
-        assertEquals(0, disappearedEdges.size());
-        assertEquals(car1, appearedEdges.get(0));
+        assertEquals(car1, appearedEdges.get(0).getKey());
 
 
-        vehiclePositionsDiff = new VehiclePositionsDiff(disappeared, appeared, 0L, 0L);
+        vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
 
-        disappearedEdges = sharedCarUpdater.prepareDisappearedEdge(vehiclePositionsDiff);
         appearedEdges = sharedCarUpdater.prepareAppearedEdge(vehiclePositionsDiff);
 
-        assertEquals(0, appearedEdges.size());
-        assertEquals(1, disappearedEdges.size());
-        assertEquals(car1, disappearedEdges.get(0));
+        assertEquals(1, appearedEdges.size());
+        assertEquals(car1, appearedEdges.get(0).getKey());
     }
 }

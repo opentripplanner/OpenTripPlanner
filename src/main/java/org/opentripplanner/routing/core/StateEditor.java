@@ -7,6 +7,7 @@ import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -132,6 +133,12 @@ public class StateEditor {
         return child;
     }
 
+    public void setCurrentVehicle(VehicleDescription vehicleDescription){
+        child.stateData.currentVehicle = vehicleDescription;
+    }
+    public VehicleDescription getCurrentVehicle(){
+        return child.stateData.currentVehicle;
+    }
     public boolean weHaveWalkedTooFar(RoutingRequest options) {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.

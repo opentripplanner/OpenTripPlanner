@@ -1,14 +1,18 @@
 package org.opentripplanner.updater.vehicle_sharing;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 import org.apache.lucene.util.SloppyMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -28,7 +32,8 @@ public class SharedCarUpdater extends PollingGraphUpdater {
     VehiclePositionsGetter vehiclePositionsGetter;
     TraverseMode traverseMode;
     Graph graph;
-    List<Vertex> rememberedVehicles = new LinkedList<>();
+//    List<Vertex> rememberedVehicles = new LinkedList<>();
+    List<RentVehicleAnywhereEdge> rememberedVehicles = new LinkedList<>();
 
     public SharedCarUpdater(VehiclePositionsGetter vehiclePositionsGetter, TraverseMode traverseMode) {
         this.vehiclePositionsGetter = vehiclePositionsGetter;
@@ -46,10 +51,10 @@ public class SharedCarUpdater extends PollingGraphUpdater {
         }
     }
 
-    Vertex findClosestVertex(VehiclePosition vehiclePosition, List<Vertex> vertexesToChooseFrom) {
+    Vertex findClosestVertex(VehicleDescription vehicleDescription, List<Vertex> vertexesToChooseFrom) {
         Stream<Vertex> stream;
         if (vertexesToChooseFrom == null) {
-            Envelope envelope = new Envelope(new Coordinate(vehiclePosition.latitude, vehiclePosition.longitude));
+            Envelope envelope = new Envelope(new Coordinate(vehicleDescription.getLatitude(), vehicleDescription.getLongitude()));
 
             stream = simpleStreetSplitter.getIdx().query(envelope).stream()
                     .filter(edge -> edge instanceof StreetEdge)
@@ -64,54 +69,39 @@ public class SharedCarUpdater extends PollingGraphUpdater {
 
         return stream
                 .reduce(v0, (previous_best, current) ->
-                        chooseCloser(vehiclePosition.latitude, vehiclePosition.longitude, previous_best, current));
+                        chooseCloser(vehicleDescription.getLatitude(), vehicleDescription.getLongitude(), previous_best, current));
     }
 
-    private List<Vertex> coordsToVertex(List<VehiclePosition> vehiclePositions, boolean useRememberedVehicles) {
-        if (useRememberedVehicles) {
-            return vehiclePositions.stream().map(a -> findClosestVertex(a, rememberedVehicles)).collect(Collectors.toList());
-        } else {
-            return vehiclePositions.stream().map(a -> findClosestVertex(a, null)).collect(Collectors.toList());
-        }
+    private List<Pair<Vertex,VehicleDescription>> coordsToVertex(List<VehicleDescription> vehiclePositions) {
+            return vehiclePositions.stream().map(a -> new ImmutablePair<>(findClosestVertex(a, null),a)).collect(Collectors.toList());
     }
 
-    public List<Edge> prepareAppearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
-        List<Vertex> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared, false);
-        List<Edge> appearedEdge = new LinkedList<>();
-        for (Vertex vertex : appearedVertex) {
-            rememberedVehicles.add(vertex);
-            for (Edge edge : vertex.getOutgoing()) {
+    public List<Pair<Edge,VehicleDescription>> prepareAppearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
+        List<Pair<Vertex,VehicleDescription>> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared);
+        List<Pair<Edge,VehicleDescription>> appearedEdge = new LinkedList<>();
+        for (Pair<Vertex,VehicleDescription> vv : appearedVertex) {
+            for (Edge edge : vv.getLeft().getOutgoing()) {
                 if (edge instanceof RentCarAnywhereEdge) {
-                    appearedEdge.add(edge);
+                    rememberedVehicles.add((RentVehicleAnywhereEdge) edge);
+
+                    appearedEdge.add(new ImmutablePair<>(edge,vv.getValue()));
                 }
             }
         }
         return appearedEdge;
     }
 
-    public List<Edge> prepareDisappearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
-        List<Vertex> disappearedVertex = coordsToVertex(vehiclePositionsDiff.disappeared, true);
-        List<Edge> disappearedEdge = new LinkedList<>();
-        for (Vertex vertex : disappearedVertex) {
-            rememberedVehicles.remove(vertex);
-            for (Edge edge : vertex.getOutgoing()) {
-                if (edge instanceof RentCarAnywhereEdge) {
-                    disappearedEdge.add(edge);
-                    break;
-                }
-            }
-        }
-        return disappearedEdge;
-    }
+
 
     @Override
     protected void runPolling() throws Exception {
         VehiclePositionsDiff vehiclePositionsDiff = vehiclePositionsGetter.getVehiclePositionsDiff();
 
-        List<Edge> appearedEdges = prepareAppearedEdge(vehiclePositionsDiff);
-        List<Edge> disappearedEdges = prepareDisappearedEdge(vehiclePositionsDiff);
+        List<Pair<Edge,VehicleDescription>> appearedEdges = prepareAppearedEdge(vehiclePositionsDiff);
+        List<Pair<Edge,VehicleDescription>> disappearedEdges = new LinkedList<>();
+//        List<Edge> disappearedEdges = prepareDisappearedEdge(vehiclePositionsDiff);
 
-        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(appearedEdges, disappearedEdges);
+        VehicleSharingGraphWriterRunnable graphWriterRunnable = new VehicleSharingGraphWriterRunnable(appearedEdges, rememberedVehicles);
 
         graphUpdaterManager.execute(graphWriterRunnable);
     }
