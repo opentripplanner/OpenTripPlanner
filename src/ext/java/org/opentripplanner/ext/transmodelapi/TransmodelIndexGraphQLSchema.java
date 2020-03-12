@@ -766,7 +766,10 @@ public class TransmodelIndexGraphQLSchema {
 
         GraphQLInputObjectType bannedInputType = GraphQLInputObjectType.newInputObject()
                 .name("InputBanned")
-                .description("Filter trips by disallowing trip patterns involving certain elements")
+                .description("Filter trips by disallowing lines involving certain "
+                    + "elements. If both lines and authorities are specified, only one must be valid "
+                    + "for each line to be banned. If a line is both banned and whitelisted, "
+                    + "it will be counted as banned.")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("lines")
                         .description("Set of ids for lines that should not be used")
@@ -814,7 +817,10 @@ public class TransmodelIndexGraphQLSchema {
 
         GraphQLInputObjectType whiteListedInputType = GraphQLInputObjectType.newInputObject()
                 .name("InputWhiteListed")
-                .description("Filter trips by only allowing trip patterns involving certain elements. If both lines and authorities are specificed, only one must be valid for each trip to be used.")
+                .description("Filter trips by only allowing lines involving certain "
+                    + "elements. If both lines and authorities are specified, only one must be valid "
+                    + "for each line to be used. If a line is both banned and whitelisted, it will "
+                    + "be counted as banned.")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("lines")
                         .description("Set of ids for lines that should be used")

@@ -27,6 +27,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
@@ -376,18 +377,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /**
      * Do not use certain named agencies
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @Deprecated
     public HashSet<String> bannedAgencies = new HashSet<String>();
 
     /**
      * Only use certain named agencies
-     *
-     * @deprecated TODO OTP2: Needs to be implemented
      */
-    @Deprecated
     public HashSet<String> whiteListedAgencies = new HashSet<String>();
 
 
@@ -409,17 +404,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Do not use certain named routes.
      * The paramter format is: feedId_routeId,feedId_routeId,feedId_routeId
      * This parameter format is completely nonstandard and should be revised for the 2.0 API, see issue #1671.
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public RouteMatcher bannedRoutes = RouteMatcher.emptyMatcher();
 
     /** Only use certain named routes
-     *
-     * @deprecated TODO OTP2 - Regression. Not currently working in OTP2.
      */
-    @Deprecated
     public RouteMatcher whiteListedRoutes = RouteMatcher.emptyMatcher();
 
     /** Set of preferred routes by user.
@@ -1186,7 +1175,24 @@ public class RoutingRequest implements Cloneable, Serializable {
         bannedTrips.put(trip, BannedStopSet.ALL);
     }
 
-    public boolean routeIsBanned(Route route) {
+    public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
+        Set<FeedScopedId> bannedRoutes = new HashSet<>();
+        for (Route route : routes) {
+            if (routeIsBanned(route)) {
+                bannedRoutes.add(route.getId());
+            }
+        }
+        return bannedRoutes;
+    }
+
+    /**
+     * Checks if the route is banned. Also, if whitelisting is used, the route (or its agency) has
+     * to be whitelisted in order to not count as banned.
+     *
+     * @param route
+     * @return True if the route is banned
+     */
+    private boolean routeIsBanned(Route route) {
         /* check if agency is banned for this plan */
         if (bannedAgencies != null) {
             if (bannedAgencies.contains(route.getAgency().getId())) {
