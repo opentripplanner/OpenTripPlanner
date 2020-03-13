@@ -29,19 +29,20 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private static final Logger LOG = LoggerFactory.getLogger(NEDGridCoverageFactoryImpl.class);
 
-    private Graph graph;
+    private final File cacheDirectory;
 
-    /** All tiles for the DEM stitched into a single coverage. */
-    UnifiedGridCoverage unifiedCoverage = null;
-
-    private File cacheDirectory;
-
-    public NEDTileSource tileSource = new NEDDownloader();
+    public final NEDTileSource tileSource;
 
     private List<VerticalDatum> datums;
 
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
+        this.tileSource = new NEDDownloader();
+    }
+
+    public NEDGridCoverageFactoryImpl(File cacheDirectory, NEDTileSource tileSource) {
+        this.cacheDirectory = cacheDirectory;
+        this.tileSource = tileSource;
     }
 
     private static final String[] DATUM_FILENAMES = {"g2012a00.gtx", "g2012g00.gtx", "g2012h00.gtx", "g2012p00.gtx", "g2012s00.gtx", "g2012u00.gtx"};
@@ -101,24 +102,19 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
         }
     }
 
-    /** @return a GeoTools grid coverage for the entire area of interest, lazy-creating it on the first call. */
+    /** @return a GeoTools grid coverage for the entire area of interest. */
     public Coverage getGridCoverage() {
-        if (unifiedCoverage == null) {
-            loadVerticalDatum();
-            tileSource.setGraph(graph);
-            tileSource.setCacheDirectory(cacheDirectory);
-            List<File> paths = tileSource.getNEDTiles();
-            // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
-            for (File path : paths) {
-                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
-                // TODO might bicubic interpolation give better results?
-                GridCoverage2D regionCoverage = Interpolator2D.create(factory.getGridCoverage(),
-                        new InterpolationBilinear());
-                if (unifiedCoverage == null) {
-                    unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
-                } else {
-                    unifiedCoverage.add(regionCoverage);
-                }
+        loadVerticalDatum();
+        List<File> paths = tileSource.getNEDTiles();
+        UnifiedGridCoverage unifiedCoverage = null;
+        // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
+        for (File path : paths) {
+            GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+            GridCoverage2D regionCoverage = factory.getGridCoverage();
+            if (unifiedCoverage == null) {
+                unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
+            } else {
+                unifiedCoverage.add(regionCoverage);
             }
         }
         return unifiedCoverage;
@@ -181,9 +177,12 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     }
 
-    /** Set the graph that will be used to determine the extent of the NED. */
+    /**
+     * Verify that the needed elevation data exists in the cache and if it does not exist, try to download it. The graph
+     * is used to determine the extent of the NED.
+     */
     @Override
-    public void setGraph(Graph graph) {
-        this.graph = graph;
+    public void fetchData(Graph graph) {
+        tileSource.fetchData(graph, cacheDirectory);
     }
 }

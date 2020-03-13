@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.factory.Hints;
 import org.geotools.gce.geotiff.GeoTiffFormat;
 import org.geotools.gce.geotiff.GeoTiffReader;
@@ -9,6 +10,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.media.jai.InterpolationBilinear;
 import java.io.File;
 import java.io.IOException;
 
@@ -20,7 +22,6 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     private static final Logger LOG = LoggerFactory.getLogger(GeotiffGridCoverageFactoryImpl.class);
 
     private final File path;
-    private GridCoverage2D coverage;
 
     public GeotiffGridCoverageFactoryImpl(File path) {
         this.path = path;
@@ -28,6 +29,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
 
     @Override
     public GridCoverage2D getGridCoverage() {
+        GridCoverage2D coverage;
         try {
             // There is a serious standardization failure around the axis order of WGS84. See issue #1930.
             // GeoTools assumes strict EPSG axis order of (latitude, longitude) unless told otherwise.
@@ -37,7 +39,9 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
             GeoTiffFormat format = new GeoTiffFormat();
             GeoTiffReader reader = format.getReader(path, forceLongLat);
             coverage = reader.read(null);
-            LOG.info("Elevation model CRS is: {}", coverage.getCoordinateReferenceSystem2D());
+            LOG.debug("Elevation model CRS is: {}", coverage.getCoordinateReferenceSystem2D());
+            // TODO might bicubic interpolation give better results?
+            coverage = Interpolator2D.create(coverage, new InterpolationBilinear());
         } catch (IOException e) {
             throw new RuntimeException("Error getting coverage automatically. ", e);
         }
@@ -52,7 +56,7 @@ public class GeotiffGridCoverageFactoryImpl implements ElevationGridCoverageFact
     }
 
     @Override
-    public void setGraph(Graph graph) {
+    public void fetchData(Graph graph) {
         //nothing to do here
     }
 
