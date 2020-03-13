@@ -6,9 +6,9 @@ import java.util.List;
 
 public class VehiclePositionsDiff {
 
-    List<VehicleDescription> appeared;
-    Long previousUpdateTime;
-    Long currentUpdateTime;
+    public final List<VehicleDescription> appeared;
+    public final Long previousUpdateTime;
+    public final Long currentUpdateTime;
 
     public VehiclePositionsDiff(List<VehicleDescription> appeared, Long previousUpdateTime, Long currentUpdateTime) {
         this.appeared = appeared;

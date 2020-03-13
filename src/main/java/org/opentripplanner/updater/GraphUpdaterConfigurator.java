@@ -11,7 +11,7 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
-import org.opentripplanner.updater.vehicle_sharing.SharedCarUpdater;
+import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -114,13 +114,13 @@ public abstract class GraphUpdaterConfigurator {
                 }
             }
         }
-        GraphUpdater updater = new SharedCarUpdater(new VehiclePositionsGetter(TraverseMode.CAR), TraverseMode.CAR);
+        GraphUpdater updater = new SharedVehiclesUpdater(new VehiclePositionsGetter());
         try {
             // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
             // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
             updater.setGraphUpdaterManager(updaterManager);
             // All GraphUpdaters are JsonConfigurable - send them their config information.
-            updater.configure(graph,null);
+            updater.configure(graph, null);
             // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
             updater.setup(graph);
             // Add graph updater to manager.

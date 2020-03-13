@@ -15,7 +15,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.vehicle_sharing.CarSharingBuilderModule;
+import org.opentripplanner.graph_builder.module.vehicle_sharing.VehicleSharingBuilderModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
@@ -136,9 +136,6 @@ public class GraphBuilder implements Runnable {
         }
         
         HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-//        TODO Ugly as fuck.
-        _graphBuilderModules.add(new CarSharingBuilderModule());
-
         for (GraphBuilderModule load : _graphBuilderModules)
             load.buildGraph(graph, extra);
 
@@ -307,6 +304,9 @@ public class GraphBuilder implements Runnable {
             graphBuilder.addModule(new AnnotationsToHTML(params.build, builderParams.maxHtmlAnnotationsPerFile));
         }
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
+
+        graphBuilder.addModule(new VehicleSharingBuilderModule());
+
         return graphBuilder;
     }
 

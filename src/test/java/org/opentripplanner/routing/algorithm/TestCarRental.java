@@ -6,9 +6,10 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.vehicle_sharing.CarDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -55,8 +56,8 @@ public class TestCarRental extends TestCase {
 
         // so we add renting cars
         @SuppressWarnings("unused")
-        RentCarAnywhereEdge car1 = new RentCarAnywhereEdge(v1, 1, 2);
-        RentCarAnywhereEdge car2 = new RentCarAnywhereEdge(v2, 1, 2);
+        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
 
         // but the are no cars so we still fail
         options = new RoutingRequest();
@@ -69,7 +70,7 @@ public class TestCarRental extends TestCase {
         assertNull(path);
 
         // we add a car
-        car2.available++;
+        car2.getAvailableVehicles().add(new CarDescription(v2.getLon(), v2.getLat()));
 
         // but we can't park a car at v3, so we still fail
         options = new RoutingRequest();
@@ -84,7 +85,7 @@ public class TestCarRental extends TestCase {
 
         // we add a parking at v3
         @SuppressWarnings("unused")
-        RentCarAnywhereEdge car3 = new RentCarAnywhereEdge(v3, 1, 2);
+        RentVehicleAnywhereEdge car3 = new RentVehicleAnywhereEdge(v3);
 
         // now we succeed!
         options = new RoutingRequest();

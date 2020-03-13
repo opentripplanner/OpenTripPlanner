@@ -5,7 +5,6 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 
-import org.apache.lucene.util.SloppyMath;
 import org.opentripplanner.common.pqueue.BinHeap;
 import org.opentripplanner.routing.algorithm.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.strategies.SearchTerminationStrategy;
@@ -13,7 +12,6 @@ import org.opentripplanner.routing.algorithm.strategies.TrivialRemainingWeightHe
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.*;
@@ -165,13 +163,6 @@ public class AStar {
             System.out.println("   vertex " + runState.u_vertex);
 
         runState.nVisited += 1;
-
-//        if (runState.u.getNonTransitMode() != TraverseMode.WALK) {
-//            LOG.warn("non walk, dist: " + SloppyMath.haversin(runState.options.from.lat, runState.options.from.lng,
-//                    runState.u_vertex.getLat(), runState.u_vertex.getLon()) + " dist2: " +
-//                    SloppyMath.haversin(runState.options.to.lat, runState.options.to.lng,
-//                    runState.u_vertex.getLat(), runState.u_vertex.getLon()) + ", vertex: " + runState.u_vertex.toString());
-//        }
         
         Collection<Edge> edges = runState.options.arriveBy ? runState.u_vertex.getIncoming() : runState.u_vertex.getOutgoing();
         for (Edge edge : edges) {
@@ -235,16 +226,16 @@ public class AStar {
             /*
              * Terminate based on timeout?
              */
-//            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-//                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
                 // Rather than returning null to indicate that the search was aborted/timed out,
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
-//                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
-//                runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
-//
-//                break;
-//            }
+                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
+
+                break;
+            }
             
             /*
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.

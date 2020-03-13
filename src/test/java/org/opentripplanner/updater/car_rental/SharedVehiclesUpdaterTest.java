@@ -3,16 +3,17 @@ package org.opentripplanner.updater.car_rental;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.vehicle_sharing.CarDescription;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentCarAnywhereEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.updater.vehicle_sharing.SharedCarUpdater;
+import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsDiff;
 
 import java.util.List;
@@ -20,7 +21,8 @@ import java.util.List;
 import static java.util.Collections.emptyList;
 import static java.util.Collections.singletonList;
 
-public class SharedCarUpdaterTest extends TestCase {
+public class SharedVehiclesUpdaterTest extends TestCase {
+
     public void testProjectingVehicles() {
         float long1 = (float) -77.0;
         float long2 = (float) -77.005;
@@ -47,35 +49,27 @@ public class SharedCarUpdaterTest extends TestCase {
                 long3, lat3), "e2", 87, StreetTraversalPermission.CAR, false);
 
         @SuppressWarnings("unused")
-        RentCarAnywhereEdge car1 = new RentCarAnywhereEdge(v1, 1, 2);
-        RentCarAnywhereEdge car2 = new RentCarAnywhereEdge(v2, 1, 2);
-        RentCarAnywhereEdge car3 = new RentCarAnywhereEdge(v3, 1, 2);
+        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
+        RentVehicleAnywhereEdge car3 = new RentVehicleAnywhereEdge(v3);
 
-        SharedCarUpdater sharedCarUpdater = new SharedCarUpdater(null, TraverseMode.RENT);
+        SharedVehiclesUpdater sharedVehiclesUpdater = new SharedVehiclesUpdater(null);
 
         try {
-            sharedCarUpdater.setup(graph);
+            sharedVehiclesUpdater.setup(graph);
         } catch (Exception e) {
             fail();
         }
 
 //        One vehicle appeared.
-        List<VehicleDescription> appeared = singletonList(new VehicleDescription(TraverseMode.CAR,vehLong1,vehLat1));
-
+        List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1));
         List<VehicleDescription> disappeared = emptyList();
-
 
         VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
 
-        List<Pair<Edge, VehicleDescription>> appearedEdges = sharedCarUpdater.prepareAppearedEdge(vehiclePositionsDiff);
 
-        assertEquals(1, appearedEdges.size());
-        assertEquals(car1, appearedEdges.get(0).getKey());
-
-
-        vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
-
-        appearedEdges = sharedCarUpdater.prepareAppearedEdge(vehiclePositionsDiff);
+        List<Pair<Vertex, VehicleDescription>> coordsToVertex = sharedVehiclesUpdater.coordsToVertex(vehiclePositionsDiff.appeared);
+        List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
 
         assertEquals(1, appearedEdges.size());
         assertEquals(car1, appearedEdges.get(0).getKey());

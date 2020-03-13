@@ -717,9 +717,9 @@ public class State implements Cloneable {
                 editor.setBackMode(orig.getBackMode());
 
                 if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
-                    editor.doneVehicleRenting();
+                    editor.doneBikeRenting();
                 } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
-                    editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                    editor.beginBikeRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
                 }
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
@@ -837,4 +837,7 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public boolean isCurrentlyRentingVehicle() {
+        return stateData.currentVehicle != null;
+    }
 }

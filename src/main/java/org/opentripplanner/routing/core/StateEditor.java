@@ -133,12 +133,6 @@ public class StateEditor {
         return child;
     }
 
-    public void setCurrentVehicle(VehicleDescription vehicleDescription){
-        child.stateData.currentVehicle = vehicleDescription;
-    }
-    public VehicleDescription getCurrentVehicle(){
-        return child.stateData.currentVehicle;
-    }
     public boolean weHaveWalkedTooFar(RoutingRequest options) {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
@@ -356,15 +350,28 @@ public class StateEditor {
         child.stateData.everBoarded = true;
     }
 
-    public void beginVehicleRenting(TraverseMode vehicleMode) {
+    public void beginBikeRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-//        child.stateData.usingRentedBike = true;
+        child.stateData.usingRentedBike = true;
         child.stateData.nonTransitMode = vehicleMode;
     }
 
-    public void     doneVehicleRenting() {
+    public void doneBikeRenting() {
         cloneStateDataAsNeeded();
-//        child.stateData.usingRentedBike = false;
+        child.stateData.usingRentedBike = false;
+        child.stateData.nonTransitMode = TraverseMode.WALK;
+    }
+
+    public void beginVehicleRenting(VehicleDescription vehicleDescription) {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
+        child.stateData.nonTransitMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentVehicle = vehicleDescription;
+    }
+
+    public void doneVehicleRenting() {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
         child.stateData.nonTransitMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
