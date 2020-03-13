@@ -15,7 +15,7 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;

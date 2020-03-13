@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;

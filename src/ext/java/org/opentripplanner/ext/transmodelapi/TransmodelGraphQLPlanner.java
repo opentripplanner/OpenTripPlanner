@@ -13,7 +13,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;

@@ -13,7 +13,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;

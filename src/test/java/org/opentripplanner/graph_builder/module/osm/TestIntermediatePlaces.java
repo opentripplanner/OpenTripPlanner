@@ -11,7 +11,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;

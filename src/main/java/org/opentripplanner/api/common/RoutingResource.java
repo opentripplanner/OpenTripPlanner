@@ -3,7 +3,7 @@ package org.opentripplanner.api.common;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;

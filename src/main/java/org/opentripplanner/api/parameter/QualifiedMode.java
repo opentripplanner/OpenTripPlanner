@@ -1,7 +1,7 @@
 package org.opentripplanner.api.parameter;
 
 import com.google.common.collect.Sets;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.io.Serializable;

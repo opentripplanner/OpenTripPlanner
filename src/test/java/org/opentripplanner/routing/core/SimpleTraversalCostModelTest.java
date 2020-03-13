@@ -8,6 +8,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 

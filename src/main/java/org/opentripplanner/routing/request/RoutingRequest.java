@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.request;
 
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
@@ -9,6 +9,13 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -16,7 +23,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
 import org.opentripplanner.routing.impl.PathComparator;
-import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;

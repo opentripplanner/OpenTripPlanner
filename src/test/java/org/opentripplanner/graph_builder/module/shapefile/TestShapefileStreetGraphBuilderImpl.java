@@ -4,7 +4,7 @@ import junit.framework.TestCase;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;

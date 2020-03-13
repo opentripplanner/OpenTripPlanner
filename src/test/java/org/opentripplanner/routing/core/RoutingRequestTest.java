@@ -6,6 +6,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.request.RoutingRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;

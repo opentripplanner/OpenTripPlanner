@@ -4,6 +4,7 @@ import org.opentripplanner.routing.algorithm.astar.NegativeWeightException;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
 import java.util.ArrayList;

@@ -5,7 +5,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;

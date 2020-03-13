@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.router.street;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;

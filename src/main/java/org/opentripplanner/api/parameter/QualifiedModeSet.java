@@ -2,7 +2,7 @@ package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
 
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 
 import java.io.Serializable;

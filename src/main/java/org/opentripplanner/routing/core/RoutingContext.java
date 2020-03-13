@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -16,6 +15,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -23,7 +23,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -221,7 +220,7 @@ public class RoutingContext implements Cloneable {
 
     /* INSTANCE METHODS */
 
-    void checkIfVerticesFound() {
+    public void checkIfVerticesFound() {
         ArrayList<String> notFound = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search

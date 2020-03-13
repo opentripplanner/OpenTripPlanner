@@ -18,7 +18,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
