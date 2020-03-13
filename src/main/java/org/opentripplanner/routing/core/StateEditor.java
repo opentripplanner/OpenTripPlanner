@@ -358,14 +358,15 @@ public class StateEditor {
 
     public void beginVehicleRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = true;
+//        child.stateData.usingRentedBike = true;
         child.stateData.nonTransitMode = vehicleMode;
     }
 
-    public void doneVehicleRenting() {
+    public void     doneVehicleRenting() {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = false;
+//        child.stateData.usingRentedBike = false;
         child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.currentVehicle = null;
     }
 
     /**

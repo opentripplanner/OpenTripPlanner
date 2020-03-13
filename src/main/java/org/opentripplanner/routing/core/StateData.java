@@ -62,7 +62,7 @@ public class StateData implements Cloneable {
 
     protected TraverseMode nonTransitMode;
 
-    protected VehicleDescription currentVehicle;
+    public VehicleDescription currentVehicle;
 
     /**
      * This is the wait time at the beginning of the trip (or at the end of the trip for

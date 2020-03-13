@@ -56,11 +56,16 @@ public class SharedCarUpdater extends PollingGraphUpdater {
         if (vertexesToChooseFrom == null) {
             Envelope envelope = new Envelope(new Coordinate(vehicleDescription.getLatitude(), vehicleDescription.getLongitude()));
 
-            stream = simpleStreetSplitter.getIdx().query(envelope).stream()
-                    .filter(edge -> edge instanceof StreetEdge)
-                    .map(streetEdge -> (StreetEdge) streetEdge)
-                    .filter(streetEdge -> streetEdge.canTraverse(new TraverseModeSet(WALK)))
+            stream = graph.getEdges().stream()
+                    .filter(edge -> edge instanceof RentVehicleAnywhereEdge)
+//                    .map(streetEdge -> (StreetEdge) streetEdge)
+//                    .filter(streetEdge -> streetEdge.canTraverse(new TraverseModeSet(WALK)))
                     .map(Edge::getFromVertex);
+//            stream = simpleStreetSplitter.getIdx().query(envelope).stream()
+//                    .filter(edge -> edge instanceof RentVehicleAnywhereEdge)
+//                    .map(streetEdge -> (StreetEdge) streetEdge)
+//                    .filter(streetEdge -> streetEdge.canTraverse(new TraverseModeSet(WALK)))
+//                    .map(Edge::getFromVertex);
         } else {
             stream = vertexesToChooseFrom.stream();
         }
@@ -79,6 +84,7 @@ public class SharedCarUpdater extends PollingGraphUpdater {
     public List<Pair<Edge,VehicleDescription>> prepareAppearedEdge(VehiclePositionsDiff vehiclePositionsDiff) {
         List<Pair<Vertex,VehicleDescription>> appearedVertex = coordsToVertex(vehiclePositionsDiff.appeared);
         List<Pair<Edge,VehicleDescription>> appearedEdge = new LinkedList<>();
+
         for (Pair<Vertex,VehicleDescription> vv : appearedVertex) {
             for (Edge edge : vv.getLeft().getOutgoing()) {
                 if (edge instanceof RentCarAnywhereEdge) {
@@ -108,9 +114,15 @@ public class SharedCarUpdater extends PollingGraphUpdater {
 
     @Override
     protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+        this.pollingPeriodSeconds = 3;
         this.graph = graph;
         this.simpleStreetSplitter = new SimpleStreetSplitter(graph);
 
+    }
+
+    @Override
+    public void configure(Graph graph, JsonNode config) throws Exception {
+        configurePolling(graph, config);
     }
 
     @Override

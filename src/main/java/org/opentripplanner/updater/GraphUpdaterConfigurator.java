@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -10,6 +11,8 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_sharing.SharedCarUpdater;
+import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -92,7 +95,6 @@ public abstract class GraphUpdaterConfigurator {
                     updater = new WinkkiPollingGraphUpdater();
                 }
             }
-
             if (updater == null) {
                 LOG.error("Unknown updater type: " + type);
             } else {
@@ -111,6 +113,21 @@ public abstract class GraphUpdaterConfigurator {
                     LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
                 }
             }
+        }
+        GraphUpdater updater = new SharedCarUpdater(new VehiclePositionsGetter(TraverseMode.CAR), TraverseMode.CAR);
+        try {
+            // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
+            // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
+            updater.setGraphUpdaterManager(updaterManager);
+            // All GraphUpdaters are JsonConfigurable - send them their config information.
+            updater.configure(graph,null);
+            // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
+            updater.setup(graph);
+            // Add graph updater to manager.
+            updaterManager.addUpdater(updater);
+            LOG.info("Configured GraphUpdater: {}", updater);
+        } catch (Exception e) {
+            LOG.error("Failed to configure graph updater:", e);
         }
         // Now that all the updaters are configured, kick them all off in their own threads.
         updaterManager.startUpdaters();
