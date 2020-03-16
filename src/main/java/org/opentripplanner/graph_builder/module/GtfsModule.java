@@ -4,13 +4,8 @@ import java.awt.Color;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
 import org.onebusaway.csv_entities.EntityHandler;
 import org.onebusaway.gtfs.impl.GtfsRelationalDaoImpl;
@@ -64,9 +59,21 @@ public class GtfsModule implements GraphBuilderModule {
 
     int nextAgencyId = 1; // used for generating agency IDs to resolve ID conflicts
 
-    public List<GtfsBundle> gtfsBundles;
 
-    public GtfsModule(List<GtfsBundle> bundles) { this.gtfsBundles = bundles; }
+
+    private List<GtfsBundle> gtfsBundles;
+
+    public Boolean getUseCached() {
+        return useCached;
+    }
+
+    private Comparator<GtfsBundle> compareByFileName = Comparator.comparing(bundle -> bundle.getPath().getName());
+
+    public GtfsModule(List<GtfsBundle> bundles) {
+        List<GtfsBundle> defensiveCopy = new ArrayList<>(bundles);
+        defensiveCopy.sort(compareByFileName);
+        this.gtfsBundles = defensiveCopy;
+    }
 
     public List<String> provides() {
         List<String> result = new ArrayList<String>();
@@ -95,6 +102,8 @@ public class GtfsModule implements GraphBuilderModule {
         GtfsStopContext stopContext = new GtfsStopContext();
 
         try {
+            String fileNames = gtfsBundles.stream().map(b -> b.getPath().getName()).collect(Collectors.joining(", "));
+            LOG.info("Processing GTFS files in the following order: {}", fileNames);
             for (GtfsBundle gtfsBundle : gtfsBundles) {
                 // apply global defaults to individual GTFSBundles (if globals have been set)
                 if (cacheDirectory != null && gtfsBundle.cacheDirectory == null) {
@@ -392,4 +401,7 @@ public class GtfsModule implements GraphBuilderModule {
         }
     }
 
+    public List<GtfsBundle> getGtfsBundles() {
+        return Collections.unmodifiableList(gtfsBundles);
+    }
 }
