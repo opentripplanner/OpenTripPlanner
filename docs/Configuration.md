@@ -87,7 +87,7 @@ config key | description | value type | value default | notes
 `elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
 `staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
 `staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
 `staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
@@ -296,7 +296,7 @@ It is possible to adjust how OSM data is interpreted by OpenTripPlanner when bui
 OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
 You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
 
-There are currently 2 wayPropertySets defined;
+There are currently 3 wayPropertySets defined;
 
 - `default` which is based on California/US mapping standard
 - `norway` which is adjusted to rules and speeds in Norway
