@@ -241,7 +241,36 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         @Override public void run() {
-            processEdge(swee, getThreadSpecificCoverageInstance());
+            // first check if the edge already has been calculated or if it exists a pre-calculated cache. Checking in
+            // this method avoids potentially waiting for a lock to be released for calculating the thread-specific
+            // coverage.
+            boolean edgeNeedsProcessing = true;
+            // Store the edge geometry in this block to avoid recalculating it twice if the edge needs a full elevation
+            // calculation.
+            Geometry edgeGeometry = null;
+
+            if (swee.hasPackedElevationProfile()) {
+                edgeNeedsProcessing = false; /* already set up */
+            } else {
+                edgeGeometry = swee.getGeometry();
+                // first try to find a cached value if possible
+                if (cachedElevations != null) {
+                    PackedCoordinateSequence coordinateSequence = cachedElevations.get(
+                        PolylineEncoder.createEncodings(edgeGeometry).getPoints()
+                    );
+                    // found a cached value!
+                    if (coordinateSequence != null) {
+                        setEdgeElevationProfile(swee, coordinateSequence, graph);
+                        edgeNeedsProcessing = false;
+                    }
+                }
+            }
+
+            if (edgeNeedsProcessing) {
+                // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
+                // coverage instances in other threads.
+                processEdge(swee, edgeGeometry, getThreadSpecificCoverageInstance());
+            }
             int curNumProcessed = nEdgesProcessed.addAndGet(1);
             if (curNumProcessed % 50000 == 0) {
                 log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
@@ -480,31 +509,15 @@ public class ElevationModule implements GraphBuilderModule {
      * Processes a single street edge, creating and assigning the elevation profile.
      *
      * @param ee the street edge
+     * @param edgeGeomerty The geometry of the edge
      * @param coverage the specific Coverage instance to use in order to avoid competition between threads
      */
-    private void processEdge(StreetWithElevationEdge ee, Coverage coverage) {
-        if (ee.hasPackedElevationProfile()) {
-            return; /* already set up */
-        }
-        Geometry g = ee.getGeometry();
-
-        // first try to find a cached value if possible
-        if (cachedElevations != null) {
-            PackedCoordinateSequence coordinateSequence = cachedElevations.get(
-                PolylineEncoder.createEncodings(g).getPoints()
-            );
-            // found a cached value!
-            if (coordinateSequence != null) {
-                setEdgeElevationProfile(ee, coordinateSequence, graph);
-                return;
-            }
-        }
-
+    private void processEdge(StreetWithElevationEdge ee, Geometry edgeGeomerty, Coverage coverage) {
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
         // process the elevation on the edge
         try {
-            Coordinate[] coords = g.getCoordinates();
+            Coordinate[] coords = edgeGeomerty.getCoordinates();
 
             List<Coordinate> coordList = new LinkedList<Coordinate>();
 
