@@ -235,8 +235,8 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         @Override public void run() {
-            // first check if the edge already has been calculated or if it exists a pre-calculated cache. Checking in
-            // this method avoids potentially waiting for a lock to be released for calculating the thread-specific
+            // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
+            // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
             // coverage.
             boolean edgeNeedsProcessing = true;
             // Store the edge geometry in this block to avoid recalculating it twice if the edge needs a full elevation
@@ -252,8 +252,8 @@ public class ElevationModule implements GraphBuilderModule {
                     PackedCoordinateSequence coordinateSequence = cachedElevations.get(
                         PolylineEncoder.createEncodings(edgeGeometry).getPoints()
                     );
-                    // found a cached value!
                     if (coordinateSequence != null) {
+                        // found a cached value! Set the elevation profile with the pre-calculated data.
                         setEdgeElevationProfile(swee, coordinateSequence, graph);
                         edgeNeedsProcessing = false;
                     }
