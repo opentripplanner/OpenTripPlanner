@@ -24,7 +24,7 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
  * <p>
  * GET - see the registered routerIds(there is just one: default) with the graph.
  * <p>
- * The HTTP request URLs are of the form /ws/routers/{routerId}. The {routerId} is kept to be
+ * The HTTP request URLs are of the form /otp/routers/{routerId}. The {routerId} is kept to be
  * backward compatible, but the value is ignored. There is only one router, the "default" and
  * that is returned - even if you specify something else.
  */
