@@ -32,7 +32,8 @@ otp.modules.planner.defaultQueryParams = {
     triangleTimeFactor              : 0.333,
     triangleSlopeFactor             : 0.333,
     triangleSafetyFactor            : 0.334,
-}
+    debugItineraryFilter            : false,
+};
 
 otp.modules.planner.PlannerModule =
     otp.Class(otp.modules.Module, {

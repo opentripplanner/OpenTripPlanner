@@ -72,9 +72,8 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
-     * This will NOT delete itineraries, but mark them as deleted using the
-     * {@link Itinerary#markAsDeleted()} and add an alert to the first
-     * transit leg.
+     * This will NOT delete itineraries, but tag them as deleted using the
+     * {@link Itinerary#systemNotices}.
      */
     public void debug() {
         this.debug = true;

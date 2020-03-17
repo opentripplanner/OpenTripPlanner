@@ -14,14 +14,6 @@ import java.util.List;
 public class ApiItinerary {
 
     /**
-     * The Itinerary filter may mark itineraries as deleted in stead of actually deleting them. This
-     * is very handy, when tuning the system or debugging - looking for missing expected trips.
-     * <p>
-     * Default is {@code null} - flag is not returned unless set to true.
-     */
-    public Boolean debugMarkedAsDeleted = null;
-
-    /**
      * Duration of the trip on this itinerary, in seconds.
      */
     public Long duration = 0L;
@@ -88,6 +80,18 @@ public class ApiItinerary {
     @XmlElementWrapper(name = "legs")
     @XmlElement(name = "leg")
     public List<ApiLeg> legs = new ArrayList<>();
+
+    /**
+     * A itinerary can be tagged with a system notice. System notices should only be added to a
+     * response if explicit asked for in the request.
+     * <p>
+     * For example when tuning or manually testing the itinerary-filter-chain it you can enable
+     * the {@link org.opentripplanner.routing.core.RoutingRequest#debugItineraryFilter} and instead
+     * of removing itineraries from the result the itineraries would be tagged by the filters
+     * instead. This enable investigating, why an expected itinerary is missing from the result
+     * set.
+     */
+    public List<ApiSystemNotice> systemNotices = null;
 
     /**
      * This itinerary has a greater slope than the user requested (but there are no possible 
