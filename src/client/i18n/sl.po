@@ -1204,6 +1204,11 @@ msgstr "Zdaj"
 msgid "Wheelchair accesible trip:"
 msgstr "Primerno za invalidske vozičke:"
 
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:466
+msgid "Show Filtered Itineraries:"
+msgstr ""
+
 #. Label for dropdown Travel by: [mode of transport]
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:480
 msgid "Travel by"
@@ -1284,7 +1289,4 @@ msgstr "Izposojeno kolo"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1098
 msgid "Plan Your Trip"
 msgstr "Načrtuj pot"
-
-#~ msgid "Debug Itinerary Filters:"
-#~ msgstr ""
 

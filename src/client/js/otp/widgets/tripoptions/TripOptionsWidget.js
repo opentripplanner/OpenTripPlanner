@@ -463,7 +463,7 @@ otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
     {
         id: null,
         //TRANSLATORS: label for checkbox
-        label: _tr("Debug Itinerary Filters:"),
+        label: _tr("Show Filtered Itineraries:"),
 
         initialize: function (tripWidget) {
 

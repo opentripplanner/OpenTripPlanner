@@ -1159,7 +1159,7 @@ msgstr ""
 
 #. label for checkbox
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:466
-msgid "Debug Itinerary Filters:"
+msgid "Show Filtered Itineraries:"
 msgstr ""
 
 #. Label for dropdown Travel by: [mode of transport]
