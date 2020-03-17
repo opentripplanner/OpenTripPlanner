@@ -34,7 +34,8 @@ public class MaxLimitFilter implements ItineraryFilter {
 
         while (i < itineraries.size() && j < maxLimit) {
             Itinerary it = itineraries.get(i);
-            if(!it.debugMarkedAsDeleted) { ++j; }
+            // Skip itineraries with system-notices; they are already "tagged" for removal.
+            if(!it.hasSystemNotices()) { ++j; }
             ++i;
         }
         return itineraries.stream().limit(i).collect(Collectors.toList());

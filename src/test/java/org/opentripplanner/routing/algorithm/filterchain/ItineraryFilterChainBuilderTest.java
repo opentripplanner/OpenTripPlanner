@@ -49,13 +49,14 @@ public class ItineraryFilterChainBuilderTest {
 
     @Test
     public void testDebugFilterChain() {
-        // Given a filter-chain with debuging enabled
+        // Given a filter-chain with debugging enabled
         builder.debug();
 
         ItineraryFilter chain = builder.build();
 
         assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2)));
-        assertFalse(i1.debugMarkedAsDeleted);
-        assertTrue(i2.debugMarkedAsDeleted);
+        assertFalse(i1.hasSystemNotices());
+        assertTrue(i2.hasSystemNotices());
+        assertEquals("transit-walking-filter", i2.systemNotices.get(0).tag);
     }
 }

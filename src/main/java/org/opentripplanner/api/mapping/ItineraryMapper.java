@@ -35,12 +35,10 @@ public class ItineraryMapper {
         api.elevationLost = domain.elevationLost;
         api.elevationGained = domain.elevationGained;
         api.transfers = domain.nTransfers;
+        api.tooSloped = domain.tooSloped;
         api.fare = domain.fare;
         api.legs = legMapper.mapLegs(domain.legs);
-        api.tooSloped = domain.tooSloped;
-
-        // To be backward compatible we set this to {@code null} and not false when not set.
-        api.debugMarkedAsDeleted = domain.debugMarkedAsDeleted ? Boolean.TRUE : null;
+        api.systemNotices = SystemNoticeMapper.mapSystemNotices(domain.systemNotices);
 
         return api;
     }
