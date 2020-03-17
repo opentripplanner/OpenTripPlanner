@@ -235,68 +235,11 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         @Override public void run() {
-            // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
-            // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
-            // coverage.
-            boolean edgeNeedsProcessing = true;
-            // Store the edge geometry in this block to avoid recalculating it twice if the edge needs a full elevation
-            // calculation.
-            Geometry edgeGeometry = null;
-
-            if (swee.hasPackedElevationProfile()) {
-                edgeNeedsProcessing = false; /* already set up */
-            } else {
-                edgeGeometry = swee.getGeometry();
-                // first try to find a cached value if possible
-                if (cachedElevations != null) {
-                    PackedCoordinateSequence coordinateSequence = cachedElevations.get(
-                        PolylineEncoder.createEncodings(edgeGeometry).getPoints()
-                    );
-                    if (coordinateSequence != null) {
-                        // found a cached value! Set the elevation profile with the pre-calculated data.
-                        setEdgeElevationProfile(swee, coordinateSequence, graph);
-                        edgeNeedsProcessing = false;
-                    }
-                }
-            }
-
-            if (edgeNeedsProcessing) {
-                // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
-                // coverage instances in other threads.
-                processEdge(swee, edgeGeometry, getThreadSpecificCoverageInstance());
-            }
+            processEdge(swee, coveragesForThread);
             int curNumProcessed = nEdgesProcessed.addAndGet(1);
             if (curNumProcessed % 50000 == 0) {
                 log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
             }
-        }
-
-        /**
-         * Get the thread-specific Coverage instance to avoid multiple threads waiting for a lock to be released on a
-         * Interpolator2D instance.
-         */
-        private Coverage getThreadSpecificCoverageInstance () {
-            long currentThreadId = Thread.currentThread().getId();
-            Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
-            if (threadSpecificCoverage == null) {
-                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
-                // could arise from downstream classes that have synchronized methods.
-                synchronized (coveragesForThread) {
-                    // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
-                    threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
-                    // The Coverage instance relies on some synchronized static methods shared across all threads that
-                    // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
-                    // point on the edge to initialize these other items.
-                    Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
-                    double[] dummy = new double[1];
-                    threadSpecificCoverage.evaluate(
-                        new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
-                        dummy
-                    );
-                }
-                coveragesForThread.put(currentThreadId, threadSpecificCoverage);
-            }
-            return threadSpecificCoverage;
         }
     }
 
@@ -499,15 +442,38 @@ public class ElevationModule implements GraphBuilderModule {
      * Processes a single street edge, creating and assigning the elevation profile.
      *
      * @param ee the street edge
-     * @param edgeGeomerty The geometry of the edge
-     * @param coverage the specific Coverage instance to use in order to avoid competition between threads
+     * @param coveragesForThread a concurrent hashmap with coverages organized by thread id
      */
-    private void processEdge(StreetWithElevationEdge ee, Geometry edgeGeomerty, Coverage coverage) {
+    private void processEdge(StreetWithElevationEdge ee, ConcurrentHashMap<Long, Coverage> coveragesForThread) {
+        // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
+        // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
+        // coverage.
+        if (ee.hasPackedElevationProfile()) {
+            return; /* already set up */
+        }
+
+        // first try to find a cached value if possible
+        Geometry edgeGeometry = ee.getGeometry();
+        if (cachedElevations != null) {
+            PackedCoordinateSequence coordinateSequence = cachedElevations.get(
+                PolylineEncoder.createEncodings(edgeGeometry).getPoints()
+            );
+            if (coordinateSequence != null) {
+                // found a cached value! Set the elevation profile with the pre-calculated data.
+                setEdgeElevationProfile(ee, coordinateSequence, graph);
+                return;
+            }
+        }
+
+        // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
+        // coverage instances in other threads.
+        Coverage coverage = getThreadSpecificCoverageInstance(ee, coveragesForThread);
+
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
         // process the elevation on the edge
         try {
-            Coordinate[] coords = edgeGeomerty.getCoordinates();
+            Coordinate[] coords = edgeGeometry.getCoordinates();
 
             List<Coordinate> coordList = new LinkedList<Coordinate>();
 
@@ -568,6 +534,37 @@ public class ElevationModule implements GraphBuilderModule {
         } catch (PointOutsideCoverageException | TransformException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
+    }
+
+    /**
+     * Get the thread-specific Coverage instance to avoid multiple threads waiting for a lock to be released on a
+     * Interpolator2D instance.
+     */
+    private Coverage getThreadSpecificCoverageInstance (
+        StreetWithElevationEdge swee,
+        ConcurrentHashMap<Long, Coverage> coveragesForThread
+    ) {
+        long currentThreadId = Thread.currentThread().getId();
+        Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
+        if (threadSpecificCoverage == null) {
+            // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
+            // could arise from downstream classes that have synchronized methods.
+            synchronized (coveragesForThread) {
+                // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
+                threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
+                // The Coverage instance relies on some synchronized static methods shared across all threads that
+                // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+                // point on the edge to initialize these other items.
+                Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
+                double[] dummy = new double[1];
+                threadSpecificCoverage.evaluate(
+                    new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
+                    dummy
+                );
+            }
+            coveragesForThread.put(currentThreadId, threadSpecificCoverage);
+        }
+        return threadSpecificCoverage;
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
