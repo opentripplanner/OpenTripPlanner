@@ -7,7 +7,7 @@ public interface BoardAndAlightSlackProvider<T extends RaptorTripSchedule> {
      * @param pattern
      * @return
      */
-    default int accessBoardSlack(TripPatternInfo<T> pattern) { return 0; }
-    default int boardSlack(TripPatternInfo<T> pattern) { return 0; }
-    default int alightSlack(TripPatternInfo<T> pattern) { return 0; }
+    default int accessBoardSlack(RaptorTripPattern<T> pattern) { return 0; }
+    default int boardSlack(RaptorTripPattern<T> pattern) { return 0; }
+    default int alightSlack(RaptorTripPattern<T> pattern) { return 0; }
 }

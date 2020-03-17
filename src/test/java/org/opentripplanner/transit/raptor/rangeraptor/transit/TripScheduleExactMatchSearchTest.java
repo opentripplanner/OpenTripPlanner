@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestTripPattern;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 
 import static org.junit.Assert.assertEquals;
@@ -19,7 +19,7 @@ public class TripScheduleExactMatchSearchTest {
     private static final boolean FORWARD = true;
     private static final boolean REVERSE = false;
     private static final TestRaptorTripSchedule TRIP_SCHEDULE = createTripSchedule(0, TRIP_TIME);
-    private static final TestTripPattern TRIP_PATTERN = new TestTripPattern(TRIP_SCHEDULE);
+    private static final TestRaptorTripPattern TRIP_PATTERN = new TestRaptorTripPattern(TRIP_SCHEDULE);
 
     private TripScheduleSearch<TestRaptorTripSchedule> subject;
 

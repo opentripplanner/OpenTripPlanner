@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -20,7 +20,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
 
-    private TripPatternInfo<T> pattern;
+    private RaptorTripPattern<T> pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public McTransitWorker(McRangeRaptorWorkerState<T> state, TransitCalculator calculator) {
@@ -29,7 +29,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
     }
 
     @Override
-    public void prepareForTransitWith(TripPatternInfo<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
     }

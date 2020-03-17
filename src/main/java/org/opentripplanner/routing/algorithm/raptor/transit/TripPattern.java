@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.List;
 import java.util.Objects;
@@ -47,7 +48,7 @@ public class TripPattern {
     }
 
     /**
-     * See {@link org.opentripplanner.transit.raptor.api.transit.TripPatternInfo#stopIndex(int)}
+     * See {@link RaptorTripPattern#stopIndex(int)}
      */
     public int stopIndex(int stopPositionInPattern) {
         return stopIndexes[stopPositionInPattern];

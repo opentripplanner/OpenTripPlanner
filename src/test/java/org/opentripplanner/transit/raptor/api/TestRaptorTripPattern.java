@@ -1,19 +1,19 @@
 package org.opentripplanner.transit.raptor.api;
 
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.Collection;
 
-public class TestTripPattern implements TripPatternInfo<TestRaptorTripSchedule> {
+public class TestRaptorTripPattern implements RaptorTripPattern<TestRaptorTripSchedule> {
 
     private final TestRaptorTripSchedule[] schedules;
 
-    public TestTripPattern(TestRaptorTripSchedule... schedules) {
+    public TestRaptorTripPattern(TestRaptorTripSchedule... schedules) {
         this.schedules = schedules;
     }
 
-    public TestTripPattern(Collection<TestRaptorTripSchedule> schedules) {
+    public TestRaptorTripPattern(Collection<TestRaptorTripSchedule> schedules) {
         this.schedules = schedules.toArray(new TestRaptorTripSchedule[0]);
     }
 

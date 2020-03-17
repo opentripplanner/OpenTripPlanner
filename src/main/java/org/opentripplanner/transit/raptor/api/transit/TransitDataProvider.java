@@ -57,12 +57,12 @@ public interface TransitDataProvider<T extends RaptorTripSchedule> {
     /**
      * Return a set of all patterns visiting the given set of stops.
      * <p/>
-     * The implementation may implement a lightweight {@link TripPatternInfo} representation.
+     * The implementation may implement a lightweight {@link RaptorTripPattern} representation.
      * See {@link #getTransfers(int)} for detail on how to implement this.
      *
      * @param stops set of stops for find all patterns for.
      */
-    Iterator<? extends TripPatternInfo<T>> patternIterator(IntIterator stops);
+    Iterator<? extends RaptorTripPattern<T>> patternIterator(IntIterator stops);
 
     /**
      * This is the total number of stops, it should be possible to retrieve transfers and pattern for every stop

@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.Arrays;
 import java.util.List;
@@ -12,7 +12,7 @@ import java.util.List;
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
  * refers to days in order.
  */
-public class TripPatternForDates implements TripPatternInfo<TripSchedule> {
+public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
 
     private final TripPattern tripPattern;
 

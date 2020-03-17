@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 
 /**
@@ -21,7 +21,7 @@ import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
  */
 public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
     private final int nTripsBinarySearchThreshold;
-    private final TripPatternInfo<T> pattern;
+    private final RaptorTripPattern<T> pattern;
     private final int nTrips;
 
     private int latestAlightTime;
@@ -30,7 +30,7 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
     private T candidateTrip;
     private int candidateTripIndex;
 
-    TripScheduleAlightSearch(int scheduledTripBinarySearchThreshold, TripPatternInfo<T> pattern) {
+    TripScheduleAlightSearch(int scheduledTripBinarySearchThreshold, RaptorTripPattern<T> pattern) {
         this.nTripsBinarySearchThreshold = scheduledTripBinarySearchThreshold;
         this.pattern = pattern;
         this.nTrips = pattern.numberOfTripSchedules();

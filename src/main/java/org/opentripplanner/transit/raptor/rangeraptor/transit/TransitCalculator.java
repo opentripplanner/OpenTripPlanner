@@ -4,7 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
@@ -162,15 +162,15 @@ public interface TransitCalculator {
      * @return The trip search strategy implementation.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            TripPatternInfo<T> pattern
+            RaptorTripPattern<T> pattern
     );
 
     /**
-     * Same as {@link #createTripSearch(TripPatternInfo)}, but create a
+     * Same as {@link #createTripSearch(RaptorTripPattern)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            TripPatternInfo<T> pattern
+            RaptorTripPattern<T> pattern
     );
 
     /**

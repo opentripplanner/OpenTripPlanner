@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestTripPattern;
+import org.opentripplanner.transit.raptor.api.TestRaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,7 +59,7 @@ public class TripScheduleAlightSearchTest {
     private TestRaptorTripSchedule tripC = createTripScheduleUseingArrivalTimes(TIME_C1, TIME_C2);
 
     // Trip pattern with trip A and B.
-    private TripPatternInfo<TestRaptorTripSchedule> pattern = new TestTripPattern(tripA, tripB, tripC);
+    private RaptorTripPattern<TestRaptorTripSchedule> pattern = new TestRaptorTripPattern(tripA, tripB, tripC);
 
     // The service under test - the subject
     private TripScheduleAlightSearch<TestRaptorTripSchedule> subject = new TripScheduleAlightSearch<>(
@@ -148,7 +148,7 @@ public class TripScheduleAlightSearchTest {
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
             tripSchedules.add(createTripScheduleUseingArrivalTimes(arrivalTime));
         }
-        useTripPattern(new TestTripPattern(tripSchedules));
+        useTripPattern(new TestRaptorTripPattern(tripSchedules));
 
 
         // Search for a trip that alight before the first trip, expect no trip in return
@@ -193,7 +193,7 @@ public class TripScheduleAlightSearchTest {
         // And where the N next trips are NOT in service, but with acceptable boarding times
         addNTimes(tripSchedules, tripC, TRIPS_BINARY_SEARCH_THRESHOLD);
 
-        useTripPattern(new TestTripPattern(tripSchedules));
+        useTripPattern(new TestRaptorTripPattern(tripSchedules));
 
         // Then we expect to find A for both stop 1 and 2
         // Stop 1
@@ -210,14 +210,14 @@ public class TripScheduleAlightSearchTest {
     }
 
     private void withTrips(TestRaptorTripSchedule... schedules) {
-        useTripPattern(new TestTripPattern(schedules));
+        useTripPattern(new TestRaptorTripPattern(schedules));
     }
 
     private void withTrips(List<TestRaptorTripSchedule> schedules) {
-        useTripPattern(new TestTripPattern(schedules));
+        useTripPattern(new TestRaptorTripPattern(schedules));
     }
 
-    private void useTripPattern(TestTripPattern pattern) {
+    private void useTripPattern(TestRaptorTripPattern pattern) {
         this.pattern = pattern;
         this.subject = new TripScheduleAlightSearch<>(TRIPS_BINARY_SEARCH_THRESHOLD, this.pattern);
     }

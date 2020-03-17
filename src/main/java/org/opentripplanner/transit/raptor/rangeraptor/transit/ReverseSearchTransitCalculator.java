@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
@@ -153,14 +153,14 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            TripPatternInfo<T> pattern
+            RaptorTripPattern<T> pattern
     ) {
         return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, pattern);
     }
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            TripPatternInfo<T> pattern
+            RaptorTripPattern<T> pattern
     ) {
         return new TripScheduleExactMatchSearch<>(
                 createTripSearch(pattern),

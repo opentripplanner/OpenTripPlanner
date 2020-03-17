@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -10,7 +10,7 @@ import java.util.Objects;
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
  */
-public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
+public class TripPatternForDate implements RaptorTripPattern<TripSchedule> {
 
     /**
      * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules.
