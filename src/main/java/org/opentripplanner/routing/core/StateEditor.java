@@ -19,9 +19,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ * <p>
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -40,8 +40,9 @@ public class StateEditor {
 
     /* CONSTRUCTORS */
 
-    protected StateEditor() {}
-    
+    protected StateEditor() {
+    }
+
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -111,7 +112,7 @@ public class StateEditor {
 
         // Check TemporaryVertex on a different request
         if ((getVertex() instanceof TemporaryVertex)
-            && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
+                && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
             return null;
         }
 
@@ -182,6 +183,27 @@ public class StateEditor {
 
     /* Incrementors */
 
+
+    public void incrementDistanceTraversedInMode(Double distance) {
+        if (distance < 0) {
+            LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
+            return;
+        }
+        Double traversed_already = child.stateData.distanceTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0D);
+        traversed_already += distance;
+        child.stateData.distanceTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+    }
+
+    public void incrementTimeTraversedInMode(int timeInSec) {
+        if (timeInSec < 0) {
+            LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
+            return;
+        }
+        Integer traversed_already = child.stateData.timeTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0);
+        traversed_already += timeInSec;
+        child.stateData.timeTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+    }
+
     public void incrementWeight(double weight) {
         if (Double.isNaN(weight)) {
             LOG.warn("A state's weight is being incremented by NaN while traversing edge "
@@ -206,8 +228,10 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-    
+
     public void incrementTimeInMilliseconds(long milliseconds) {
+        incrementTimeTraversedInMode((int) (milliseconds/1000));
+
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
@@ -215,7 +239,7 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
     public void incrementWalkDistance(double length) {
         if (length < 0) {
@@ -223,6 +247,7 @@ public class StateEditor {
             defectiveTraversal = true;
             return;
         }
+        incrementDistanceTraversedInMode(length);
         child.walkDistance += length;
     }
 
@@ -270,7 +295,7 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-    
+
     /**
      * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
      * This happens in Analyst.
@@ -279,28 +304,28 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
     }
-    
+
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
 
-    public void setBackWalkingBike (boolean walkingBike) {
+    public void setBackWalkingBike(boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /** 
+    /**
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
-    public void setLastNextArrivalDelta (int lastNextArrivalDelta) {
+    public void setLastNextArrivalDelta(int lastNextArrivalDelta) {
         cloneStateDataAsNeeded();
         child.stateData.lastNextArrivalDelta = lastNextArrivalDelta;
     }
@@ -423,7 +448,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
@@ -441,7 +466,7 @@ public class StateEditor {
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
-    public void setNonTransitOptionsFromState(State state){
+    public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
         child.stateData.nonTransitMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
@@ -475,7 +500,7 @@ public class StateEditor {
     public Trip getPreviousTrip() {
         return child.getPreviousTrip();
     }
-    
+
     public String getZone() {
         return child.getZone();
     }
@@ -526,6 +551,8 @@ public class StateEditor {
     private void cloneStateDataAsNeeded() {
         if (child.backState != null && child.stateData == child.backState.stateData)
             child.stateData = child.stateData.clone();
+        child.stateData.distanceTraversedInMode = new HashMap<>( child.stateData.distanceTraversedInMode);
+//        child.stateData.timeTraversedInMode = new HashMap<>( child.stateData.timeTraversedInMode);
     }
 
     public void alightTransit() {
