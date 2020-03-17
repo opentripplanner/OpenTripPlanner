@@ -37,7 +37,7 @@ public class PathwayEdge extends Edge {
         return null;
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
     

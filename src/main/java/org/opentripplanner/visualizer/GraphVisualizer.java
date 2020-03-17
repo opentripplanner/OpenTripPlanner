@@ -3,7 +3,6 @@ package org.opentripplanner.visualizer;
 import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.Coordinate;
 import javassist.Modifier;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
@@ -143,7 +142,7 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			stateListModel.addElement( "weightdelta:"+st.getWeightDelta() );
 			stateListModel.addElement( "bikeRenting:"+st.isBikeRenting() );
 			stateListModel.addElement( "carParked:"+st.isCarParked() );
-			stateListModel.addElement( "walkDistance:"+st.getWalkDistance() );
+			stateListModel.addElement( "walkDistance:"+st.getWalkDistanceInMeters() );
 			stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
 			stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
 			outputList.setModel( stateListModel );

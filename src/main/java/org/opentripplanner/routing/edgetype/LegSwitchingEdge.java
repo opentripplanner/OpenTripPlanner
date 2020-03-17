@@ -33,7 +33,7 @@ public class LegSwitchingEdge extends Edge {
 	}
 
 	@Override
-	public double getDistance() {
+	public double getDistanceInMeters() {
 		return 0;
 	}
 

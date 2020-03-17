@@ -536,7 +536,7 @@ public class SIsochrone extends RoutingResource {
                         // check if at least one end is inside, because then we need to
                         // create the sub edge
                         if ((fromTime < maxTime) || (toTime < maxTime)) {
-                            double lineDist = edge.getDistance();
+                            double lineDist = edge.getDistanceInMeters();
                             LineString inputLS = ls;
                             double fraction = 1.0;
                             if (fromTime < toTime) {
@@ -589,7 +589,7 @@ public class SIsochrone extends RoutingResource {
         long dt = Math.abs(toTime - fromTime);
         double distanceToMoveInTimeMissing = distanceToMoveInRemainingTime(maxTime, fromTime, dt,
                 userSpeed, edge, hasCar, true);
-        double lineDist = edge.getDistance();
+        double lineDist = edge.getDistanceInMeters();
         double fraction = (double) distanceToMoveInTimeMissing / (double) lineDist;
         // get the sub-edge geom
         LineString subLine = null;
@@ -645,7 +645,7 @@ public class SIsochrone extends RoutingResource {
                     // Use also a distance based criteria since the angle criteria may fail.
                     // However a distance based one may fail as well for steep terrain.
                     long dt = Math.abs(toTime - fromTime);
-                    double lineDist = edge.getDistance();
+                    double lineDist = edge.getDistanceInMeters();
                     double distanceToWalkInTimeMissing = distanceToMoveInRemainingTime(maxTime,
                             fromTime, dt, userSpeed, edge, hasCar, false);
                     double approxWalkableDistanceInTime = distanceToWalkInTimeMissing
@@ -678,7 +678,7 @@ public class SIsochrone extends RoutingResource {
         boolean isTooFast = false;
         String msg = "";
 
-        double originalTravelSpeed = edge.getDistance() / traverseTime; // this may be wrong for u-shapes
+        double originalTravelSpeed = edge.getDistanceInMeters() / traverseTime; // this may be wrong for u-shapes
 
         if (originalTravelSpeed < userSpeed) {
             // we may have slope effects

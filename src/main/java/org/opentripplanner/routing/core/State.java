@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.model.FeedScopedId;
@@ -17,6 +19,10 @@ import org.slf4j.LoggerFactory;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
+
+
+    protected Map<TraverseMode,Double> distanceTraversedInMode = new HashMap<>();
+    protected Map<TraverseMode,Integer> timeTraversedInMode = new HashMap<>();
     
     // the current time at this state, in milliseconds
     protected long time;
@@ -30,6 +36,7 @@ public class State implements Cloneable {
     // allow path reconstruction from states
     protected State backState;
 
+
     public Edge backEdge;
 
     // allow traverse result chaining (multiple results)
@@ -41,7 +48,7 @@ public class State implements Cloneable {
     // how far have we walked
     // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
     // we should DEFINITELY rename this variable and the associated methods.
-    public double walkDistance;
+    public double walkDistanceInMeters;
 
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
@@ -115,7 +122,7 @@ public class State implements Cloneable {
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
-        this.walkDistance = 0;
+        this.walkDistanceInMeters = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new FeedScopedId[0];
@@ -170,7 +177,7 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
+                " d=" + this.getWalkDistanceInMeters() +
                 " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
@@ -290,8 +297,8 @@ public class State implements Cloneable {
         return stateData.lastAlightedTime;
     }
 
-    public double getWalkDistance() {
-        return walkDistance;
+    public double getWalkDistanceInMeters() {
+        return walkDistanceInMeters;
     }
 
     public int getPreTransitTime() {
@@ -324,7 +331,7 @@ public class State implements Cloneable {
 
     public double getWalkDistanceDelta () {
         if (backState != null)
-            return Math.abs(this.walkDistance - backState.walkDistance);
+            return Math.abs(this.walkDistanceInMeters - backState.walkDistanceInMeters);
         else
             return 0.0;
     }
@@ -558,7 +565,7 @@ public class State implements Cloneable {
     }
 
     public double getWalkSinceLastTransit() {
-        return walkDistance - stateData.lastTransitWalk;
+        return walkDistanceInMeters - stateData.lastTransitWalk;
     }
 
     public double getWalkAtLastTransit() {
@@ -710,7 +717,7 @@ public class State implements Cloneable {
 
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
                 editor.incrementWeight(orig.getWeightDelta());
-                editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                editor.incrementWalkDistanceInMeters(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 
                 // propagate the modes through to the reversed edge

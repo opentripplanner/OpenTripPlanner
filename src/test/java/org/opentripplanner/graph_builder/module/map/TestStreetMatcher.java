@@ -163,7 +163,7 @@ public class TestStreetMatcher {
         
         @Override
         public State traverse(State s0) {
-            double d = getDistance();
+            double d = getDistanceInMeters();
             TraverseMode mode = s0.getNonTransitMode();
             int t = (int) (d / s0.getOptions().getSpeed(mode));
             StateEditor s1 = s0.edit(this);
@@ -194,7 +194,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public double getDistance() {
+        public double getDistanceInMeters() {
             return SphericalDistanceLibrary.distance(getFromVertex().getCoordinate(), getToVertex().getCoordinate());
         }
 

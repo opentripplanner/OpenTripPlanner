@@ -172,7 +172,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         calculateElevations(itinerary, edges);
 
-        itinerary.walkDistance = lastState.getWalkDistance();
+        itinerary.walkDistance = lastState.getWalkDistanceInMeters();
 
         itinerary.transfers = lastState.getNumBoardings();
         if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
@@ -310,7 +310,7 @@ public abstract class GraphPathToTripPlanConverter {
         leg.distance = 0.0;
         for (int i = 0; i < edges.length; i++) {
             edges[i] = states[i + 1].getBackEdge();
-            leg.distance += edges[i].getDistance();
+            leg.distance += edges[i].getDistanceInMeters();
         }
 
         TimeZone timeZone = leg.startTime.getTimeZone();
@@ -868,7 +868,7 @@ public abstract class GraphPathToTripPlanConverter {
                     step.setDirections(previous.angle, thisAngle, false);
                 }
                 // new step, set distance to length of first edge
-                distance = edge.getDistance();
+                distance = edge.getDistanceInMeters();
             } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
                     && (!step.bogusName || !edge.hasBogusName())) ||
                     edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
@@ -900,7 +900,7 @@ public abstract class GraphPathToTripPlanConverter {
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 step.setDirections(lastAngle, thisAngle, edge.isRoundabout());
                 // new step, set distance to length of first edge
-                distance = edge.getDistance();
+                distance = edge.getDistanceInMeters();
             } else {
                 /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
@@ -977,7 +977,7 @@ public abstract class GraphPathToTripPlanConverter {
                         step.setDirections(lastAngle, thisAngle, false);
                         step.stayOn = true;
                         // new step, set distance to length of first edge
-                        distance = edge.getDistance();
+                        distance = edge.getDistanceInMeters();
                     }
                 }
             }
@@ -1062,12 +1062,12 @@ public abstract class GraphPathToTripPlanConverter {
                         step.elevation = s;
                     }
                 }
-                distance += edge.getDistance();
+                distance += edge.getDistanceInMeters();
 
             }
 
             // increment the total length for this step
-            step.distance += edge.getDistance();
+            step.distance += edge.getDistanceInMeters();
             step.addAlerts(graph.streetNotesService.getNotes(forwardState), requestedLocale);
             lastAngle = DirectionUtils.getLastAngle(geom);
 

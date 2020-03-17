@@ -45,7 +45,7 @@ public class PatternHop extends TablePatternEdge implements OnboardEdge, HopEdge
     }
 
     // made more accurate
-    public double getDistance() {
+    public double getDistanceInMeters() {
         double distance = 0;
         LineString line = getGeometry();
         for (int i = 0; i < line.getNumPoints() - 1; i++) {

@@ -62,7 +62,7 @@ public class OnBoardDepartPatternHop extends Edge implements OnboardEdge, Tempor
         this.endStop = to.getStop();
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         /*
          * Do not multiply by positionInHop, as it is already taken into account by the from vertex
          * location.

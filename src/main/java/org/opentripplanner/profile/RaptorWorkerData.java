@@ -336,7 +336,7 @@ public class RaptorWorkerData implements Serializable {
                     continue;
 
                 distances[i++] = vertex.getIndex();
-                distances[i++] = (int) state.getWalkDistance();
+                distances[i++] = (int) state.getWalkDistanceInMeters();
             }
             temporaryStopTreeCache.put(t.index, distances);
 
@@ -421,7 +421,7 @@ public class RaptorWorkerData implements Serializable {
                     int targetStopIndex = indexForStop.get(simpleTransfer.getToVertex().getIndex());
                     if (targetStopIndex != -1) {
                         transfers.add(targetStopIndex);
-                        transfers.add((int) (simpleTransfer.getDistance()));
+                        transfers.add((int) (simpleTransfer.getDistanceInMeters()));
                     }
                 }
             }
@@ -628,7 +628,7 @@ public class RaptorWorkerData implements Serializable {
                     if (useTimes)
                         accessTimes.put(stopIndex, (int) s.getElapsedTimeSeconds());
                     else
-                        accessTimes.put(stopIndex, (int) (s.getWalkDistance() / walkSpeed));
+                        accessTimes.put(stopIndex, (int) (s.getWalkDistanceInMeters() / walkSpeed));
                 }
             }
         }
@@ -648,7 +648,7 @@ public class RaptorWorkerData implements Serializable {
                 State s0 = spt.getState(tstop.sample.v0);
 
                 if (s0 != null) {
-                    dist = s0.getWalkDistance() + tstop.sample.d0;
+                    dist = s0.getWalkDistanceInMeters() + tstop.sample.d0;
                 }
             }
 
@@ -656,7 +656,7 @@ public class RaptorWorkerData implements Serializable {
                 State s1 = spt.getState(tstop.sample.v1);
 
                 if (s1 != null) {
-                    double d1 = s1.getWalkDistance() + tstop.sample.d1;
+                    double d1 = s1.getWalkDistanceInMeters() + tstop.sample.d1;
                     dist = Double.isInfinite(dist) ? d1 : Math.min(d1, dist);
                 }
             }

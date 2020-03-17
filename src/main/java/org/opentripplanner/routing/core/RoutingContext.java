@@ -2,7 +2,6 @@ package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -38,7 +37,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
@@ -191,7 +189,7 @@ public class RoutingContext implements Cloneable {
                     from.getCoordinate(), to.getCoordinate());
 
             double lengthRatio = partial.getLength() / parent.getLength();
-            double length = streetEdge.getDistance() * lengthRatio;
+            double length = streetEdge.getDistanceInMeters() * lengthRatio;
 
             //TODO: localize this
             String name = from.getLabel() + " to " + to.getLabel();

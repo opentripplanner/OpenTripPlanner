@@ -52,7 +52,7 @@ public class ElevatorBoardEdge extends Edge implements ElevatorEdge {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
 

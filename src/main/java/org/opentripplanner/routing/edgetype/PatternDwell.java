@@ -32,7 +32,7 @@ public class PatternDwell extends TablePatternEdge implements OnboardEdge, Dwell
         return getPattern().getDirection();
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
         

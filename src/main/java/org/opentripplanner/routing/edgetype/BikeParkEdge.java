@@ -85,7 +85,7 @@ public class BikeParkEdge extends Edge {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
 

@@ -64,8 +64,7 @@ public class StateData implements Cloneable {
 
     protected VehicleDescription currentVehicle;
 
-    protected Map<TraverseMode,Double> distanceTraversedInMode = new HashMap<>();
-    protected Map<TraverseMode,Integer> timeTraversedInMode = new HashMap<>();
+
 
     /**
      * This is the wait time at the beginning of the trip (or at the end of the trip for

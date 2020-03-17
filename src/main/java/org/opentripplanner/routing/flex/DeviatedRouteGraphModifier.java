@@ -116,7 +116,7 @@ public class DeviatedRouteGraphModifier extends GtfsFlexGraphModifier {
 
     private boolean tooLittleOnRoute(FlexPatternHop originalHop, LengthIndexedLine line, double startIndex, double endIndex) {
         double onRouteDistance = SphericalDistanceLibrary.fastLength((LineString) line.extractLine(startIndex, endIndex));
-        return onRouteDistance <= Math.min(100, originalHop.getDistance());
+        return onRouteDistance <= Math.min(100, originalHop.getDistanceInMeters());
     }
 
     @Override

@@ -2,7 +2,6 @@ package org.opentripplanner.routing.edgetype;
 
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -69,7 +68,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         effectiveWalkFactor = costs.effectiveWalkFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
-        bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
+        bicycleSafetyFactor += costs.slopeSafetyCost / getDistanceInMeters();
         return costs.flattened;
     }
 
@@ -90,12 +89,12 @@ public class StreetWithElevationEdge extends StreetEdge {
 
     @Override
     public double getSlopeSpeedEffectiveLength() {
-        return slopeSpeedFactor * getDistance();
+        return slopeSpeedFactor * getDistanceInMeters();
     }
 
     @Override
     public double getSlopeWorkCostEffectiveLength() {
-        return slopeWorkFactor * getDistance();
+        return slopeWorkFactor * getDistanceInMeters();
     }
 
     /**
@@ -103,13 +102,13 @@ public class StreetWithElevationEdge extends StreetEdge {
      */
     @Override
     public double getSlopeWalkSpeedEffectiveLength() {
-        return effectiveWalkFactor * getDistance();
+        return effectiveWalkFactor * getDistanceInMeters();
     }
 
     @Override
     public String toString() {
         return "StreetWithElevationEdge(" + getId() + ", " + getName() + ", " + fromv + " -> "
-                + tov + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
+                + tov + " length=" + this.getDistanceInMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 }

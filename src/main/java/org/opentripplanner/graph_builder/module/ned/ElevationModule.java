@@ -224,7 +224,7 @@ public class ElevationModule implements GraphBuilderModule {
 
                 Double elevation = elevations.get(tov);
                 if (elevation != null) {
-                    double distance = e.getDistance();
+                    double distance = e.getDistanceInMeters();
                     if (distance < bestDistance) {
                         bestDistance = distance;
                         bestElevation = elevation;
@@ -232,8 +232,8 @@ public class ElevationModule implements GraphBuilderModule {
                 } else {
                     // continue
                     ElevationRepairState newState = new ElevationRepairState(edge, state, tov,
-                            e.getDistance() + state.distance, state.initialElevation);
-                    pq.insert(newState, e.getDistance() + state.distance);
+                            e.getDistanceInMeters() + state.distance, state.initialElevation);
+                    pq.insert(newState, e.getDistanceInMeters() + state.distance);
                 }
             } // end loop over outgoing edges
 
@@ -247,7 +247,7 @@ public class ElevationModule implements GraphBuilderModule {
                     continue;
                 Double elevation = elevations.get(fromv);
                 if (elevation != null) {
-                    double distance = e.getDistance();
+                    double distance = e.getDistanceInMeters();
                     if (distance < bestDistance) {
                         bestDistance = distance;
                         bestElevation = elevation;
@@ -255,8 +255,8 @@ public class ElevationModule implements GraphBuilderModule {
                 } else {
                     // continue
                     ElevationRepairState newState = new ElevationRepairState(edge, state, fromv,
-                            e.getDistance() + state.distance, state.initialElevation);
-                    pq.insert(newState, e.getDistance() + state.distance);
+                            e.getDistanceInMeters() + state.distance, state.initialElevation);
+                    pq.insert(newState, e.getDistanceInMeters() + state.distance);
                 }
             } // end loop over incoming edges
 
@@ -284,7 +284,7 @@ public class ElevationModule implements GraphBuilderModule {
                     }
                     if (state.backState == null)
                         break;
-                    bestDistance += state.backEdge.getDistance();
+                    bestDistance += state.backEdge.getDistanceInMeters();
                     state = state.backState;
                     if (elevations.containsKey(state.vertex))
                         break;
@@ -314,7 +314,7 @@ public class ElevationModule implements GraphBuilderModule {
 
                     Coordinate[] coords = new Coordinate[2];
                     coords[0] = new Coordinate(0, fromElevation);
-                    coords[1] = new Coordinate(edge.getDistance(), toElevation);
+                    coords[1] = new Coordinate(edge.getDistanceInMeters(), toElevation);
 
                     PackedCoordinateSequence profile = new PackedCoordinateSequence.Double(coords);
 

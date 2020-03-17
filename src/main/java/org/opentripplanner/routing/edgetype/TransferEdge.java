@@ -48,7 +48,7 @@ public class TransferEdge extends Edge {
         return null;
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return distance;
     }
 
@@ -76,7 +76,7 @@ public class TransferEdge extends Edge {
            we need a complement operator. */
         if (s0.getBackEdge() instanceof TransferEdge) return null;
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) return null;
-        if (this.getDistance() > s0.getOptions().maxTransferWalkDistance) return null;
+        if (this.getDistanceInMeters() > s0.getOptions().maxTransferWalkDistance) return null;
         StateEditor s1 = s0.edit(this);
         s1.incrementTimeInSeconds(time);
         s1.incrementWeight(time);

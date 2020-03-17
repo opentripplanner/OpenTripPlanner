@@ -72,7 +72,7 @@ public class GraphPath {
 
         /* Put path in chronological order, and optimize as necessary */
         State lastState;
-        walkDistance = s.getWalkDistance();
+        walkDistance = s.getWalkDistanceInMeters();
         if (back) {
             lastState = optimize ? s.optimize() : s.reverse();
         } else {
@@ -189,7 +189,7 @@ public class GraphPath {
         }
         System.out.println(" --- END GRAPHPATH DUMP ---");
         System.out.println("Total meters walked in the preceding graphpath: " +
-               states.getLast().getWalkDistance());
+               states.getLast().getWalkDistanceInMeters());
     }
 
     public void dumpPathParser() {

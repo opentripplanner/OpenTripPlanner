@@ -163,7 +163,7 @@ public class AnalystProfileRouterPrototype {
                 Collection<Edge> outgoingEdges = graph.index.stopVertexForStop.get(stop).getOutgoing();
                 for (SimpleTransfer transfer : Iterables.filter(outgoingEdges, SimpleTransfer.class)) {
                     Stop targetStop = ((TransitStop) transfer.getToVertex()).getStop();
-                    double walkTime = transfer.getDistance() / request.walkSpeed;
+                    double walkTime = transfer.getDistanceInMeters() / request.walkSpeed;
                     TimeRange rangeAfterTransfer = times.get(stop).shift((int)walkTime);
                     if (times.add(targetStop, rangeAfterTransfer)) {
                         stopsUpdated.add(targetStop);

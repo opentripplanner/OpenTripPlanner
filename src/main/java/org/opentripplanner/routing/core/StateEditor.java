@@ -51,6 +51,8 @@ public class StateEditor {
         child = parent.clone();
         child.backState = parent;
         child.backEdge = e;
+        child.timeTraversedInMode = new HashMap<>(child.timeTraversedInMode);
+        child.distanceTraversedInMode = new HashMap<>(child.distanceTraversedInMode);
         // We clear child.next here, since it could have already been set in the
         // parent
         child.next = null;
@@ -138,7 +140,7 @@ public class StateEditor {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
         if (options.modes.isTransit() || !options.softWalkLimiting && options.batch)
-            return child.walkDistance >= options.maxWalkDistance;
+            return child.walkDistanceInMeters >= options.maxWalkDistance;
 
         return false;
     }
@@ -185,13 +187,16 @@ public class StateEditor {
 
 
     public void incrementDistanceTraversedInMode(Double distance) {
+
         if (distance < 0) {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-        Double traversed_already = child.stateData.distanceTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0D);
-        traversed_already += distance;
-        child.stateData.distanceTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+//        child.distanceTraversedInMode = new HashMap<>(child.distanceTraversedInMode);
+
+        Double traversed_already = child.distanceTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0D);
+        traversed_already = traversed_already + distance;
+        child.distanceTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
     }
 
     public void incrementTimeTraversedInMode(int timeInSec) {
@@ -199,9 +204,9 @@ public class StateEditor {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-        Integer traversed_already = child.stateData.timeTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0);
-        traversed_already += timeInSec;
-        child.stateData.timeTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+        Integer traversed_already = child.timeTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0);
+        traversed_already = traversed_already + timeInSec;
+        child.timeTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
     }
 
     public void incrementWeight(double weight) {
@@ -230,7 +235,7 @@ public class StateEditor {
     }
 
     public void incrementTimeInMilliseconds(long milliseconds) {
-        incrementTimeTraversedInMode((int) (milliseconds/1000));
+        incrementTimeTraversedInMode((int) (milliseconds / 1000));
 
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
@@ -241,14 +246,14 @@ public class StateEditor {
         child.time += (traversingBackward ? -milliseconds : milliseconds);
     }
 
-    public void incrementWalkDistance(double length) {
+    public void incrementWalkDistanceInMeters(double length) {
         if (length < 0) {
             LOG.warn("A state's walk distance is being incremented by a negative amount.");
             defectiveTraversal = true;
             return;
         }
         incrementDistanceTraversedInMode(length);
-        child.walkDistance += length;
+        child.walkDistanceInMeters += length;
     }
 
     public void incrementPreTransitTime(int seconds) {
@@ -331,7 +336,7 @@ public class StateEditor {
     }
 
     public void setWalkDistance(double walkDistance) {
-        child.walkDistance = walkDistance;
+        child.walkDistanceInMeters = walkDistance;
     }
 
     public void setPreTransitTime(int preTransitTime) {
@@ -526,7 +531,7 @@ public class StateEditor {
     }
 
     public double getWalkDistance() {
-        return child.getWalkDistance();
+        return child.getWalkDistanceInMeters();
     }
 
     public int getPreTransitTime() {
@@ -551,13 +556,11 @@ public class StateEditor {
     private void cloneStateDataAsNeeded() {
         if (child.backState != null && child.stateData == child.backState.stateData)
             child.stateData = child.stateData.clone();
-        child.stateData.distanceTraversedInMode = new HashMap<>( child.stateData.distanceTraversedInMode);
-//        child.stateData.timeTraversedInMode = new HashMap<>( child.stateData.timeTraversedInMode);
     }
 
     public void alightTransit() {
         cloneStateDataAsNeeded();
-        child.stateData.lastTransitWalk = child.getWalkDistance();
+        child.stateData.lastTransitWalk = child.getWalkDistanceInMeters();
     }
 
     public void setLastPattern(TripPattern pattern) {
