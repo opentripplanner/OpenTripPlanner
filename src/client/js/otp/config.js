@@ -17,10 +17,10 @@ otp.config = {
     //value is name of settings file for localization in locale subfolder
     //File should be loaded in index.html
     locales : {
+        'ca_ES': otp.locale.Catalan,
         'de': otp.locale.German,
         'en': otp.locale.English,
         'es': otp.locale.Spanish,
-        'ca_ES': otp.locale.Catalan,
         'fr': otp.locale.French,
         'it': otp.locale.Italian,
         'no': otp.locale.Norwegian,
