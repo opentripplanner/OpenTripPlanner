@@ -9,6 +9,7 @@ import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -43,6 +44,7 @@ import com.google.common.collect.Lists;
  * */
 public class WalkStep {
 
+    public TraverseMode traverseMode;
     /**
      * The distance in meters that this step takes.
      */

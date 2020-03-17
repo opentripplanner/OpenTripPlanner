@@ -810,7 +810,6 @@ public abstract class GraphPathToTripPlanConverter {
 
             if(edge instanceof RentABikeOnEdge) onBikeRentalState = forwardState;
             if(edge instanceof RentABikeOffEdge) offBikeRentalState = forwardState;
-
             boolean createdNewStep = false, disableZagRemovalForThisStep = false;
             if (edge instanceof FreeEdge) {
                 continue;
@@ -841,7 +840,6 @@ public abstract class GraphPathToTripPlanConverter {
                 step.streetName = ((ElevatorAlightEdge) edge).getName(requestedLocale);
 
                 step.relativeDirection = RelativeDirection.ELEVATOR;
-
                 steps.add(step);
                 continue;
             }
@@ -1118,6 +1116,7 @@ public abstract class GraphPathToTripPlanConverter {
         if (s.getBackEdge() instanceof AreaEdge) {
             step.area = true;
         }
+        step.traverseMode = s.getNonTransitMode();
         return step;
     }
 
