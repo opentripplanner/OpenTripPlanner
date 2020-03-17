@@ -94,7 +94,7 @@ Babel is used to extract strings from the Javascript source code into the shared
 You can install it from your operating system's package repository (if available) or you can use [virtualenv](http://simononsoftware.com/virtualenv-tutorial/).
 
 1. Install virtualenv (This depends on your operating system)
-2. Create virtualenv with name .venv in directory where src and other files resides (Root OpenTripPlanner directory). `virtualenv2 .venv`
+2. Create virtualenv with name .venv in directory where src and other files resides (Root OpenTripPlanner directory). `virtualenv2 .venv`(python 2) or `python3 -m venv .venv` (python 3)
 3. Use virtualenv `source .venv/bin/activate`
 4. Install babel `pip install babel`
 
