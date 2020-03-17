@@ -1,9 +1,11 @@
 package org.opentripplanner.model.plan;
 
 
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
 
+import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
@@ -77,10 +79,14 @@ public class Itinerary {
     public final boolean walkOnly;
 
     /**
-     * The Itinerary filters may mark itineraries as deleted instead of actually deleting them.
-     * This is very handy, when tuning the system or debugging - looking for missing expected trips.
+     * System notices is used to tag itineraries with system information. For example if you run the
+     * itinerary-filter in debug mode, the filters would tag itineraries instead of deleting them
+     * from the result. More than one filter might apply, so there can be more than one notice for
+     * an itinerary. This is very handy, when tuning the system or debugging - looking for missing
+     * expected trips.
      */
-    public boolean debugMarkedAsDeleted;
+    public final List<SystemNotice> systemNotices = new ArrayList<>();
+
 
     /**
      * The cost of this trip
@@ -160,12 +166,21 @@ public class Itinerary {
     }
 
     /**
-     * A itinerary can be marked as deleted instead of actually deleting it. This is very handy
-     * when tuning the system or debugging. This is combined with an alert on the first transit
-     * leg to explain why this itinerary is deleted.
+     * A itinerary can be tagged with a system notice. System notices should only be added to a
+     * response if explicit asked for in the request.
+     * <p>
+     * For example when tuning or manually testing the itinerary-filter-chain it you can enable
+     * the {@link org.opentripplanner.routing.core.RoutingRequest#debugItineraryFilter} and instead
+     * of removing itineraries from the result the itineraries would be tagged by the filters
+     * instead. This enable investigating, why an expected itinerary is missing from the result
+     * set.
      */
-    public void markAsDeleted() {
-        this.debugMarkedAsDeleted = true;
+    public void addSystemNotice(SystemNotice notice) {
+        systemNotices.add(notice);
+    }
+
+    public boolean hasSystemNotices() {
+        return !systemNotices.isEmpty();
     }
 
     /**

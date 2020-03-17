@@ -123,6 +123,14 @@
 .otp-itinStartRow {
     margin-bottom: .5em;
 }
+h3.sysNotice {
+    background: #FFB3DA;
+}
+.otp-itinSysNoticeRow {
+    background: #FFB3DA;
+    color: #141abb;
+    margin-bottom: .5em;
+}
 
 .otp-itinAlertRow {
     background: #C00000;
