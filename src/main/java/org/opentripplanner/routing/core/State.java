@@ -9,6 +9,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -284,7 +285,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && !isCurrentlyRentingVehicle();
     }
 
     public Stop getPreviousStop() {
@@ -844,5 +845,9 @@ public class State implements Cloneable {
 
     public boolean isCurrentlyRentingVehicle() {
         return stateData.currentVehicle != null;
+    }
+
+    public VehicleDescription getCurrentVehicle() {
+        return stateData.currentVehicle;
     }
 }

@@ -62,7 +62,6 @@ public class SharedVehiclesUpdaterTest extends TestCase {
 
 //        One vehicle appeared.
         List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
-        List<VehicleDescription> disappeared = emptyList();
 
         VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
 
@@ -71,6 +70,6 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
 
         assertEquals(1, appearedEdges.size());
-        assertEquals(car1, appearedEdges.get(0).getKey());
+        assertEquals(car2, appearedEdges.get(0).getKey());
     }
 }
