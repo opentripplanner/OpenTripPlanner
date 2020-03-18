@@ -7,6 +7,9 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.vehicle_sharing.CarDescription;
+import org.opentripplanner.routing.core.vehicle_sharing.FuelType;
+import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
+import org.opentripplanner.routing.core.vehicle_sharing.Provider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
@@ -70,7 +73,7 @@ public class TestCarRental extends TestCase {
         assertNull(path);
 
         // we add a car
-        car2.getAvailableVehicles().add(new CarDescription(v2.getLon(), v2.getLat()));
+        car2.getAvailableVehicles().add(new CarDescription(v2.getLon(), v2.getLat(), FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
 
         // but we can't park a car at v3, so we still fail
         options = new RoutingRequest();

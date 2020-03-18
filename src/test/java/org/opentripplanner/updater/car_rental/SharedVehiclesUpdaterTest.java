@@ -3,8 +3,7 @@ package org.opentripplanner.updater.car_rental;
 import junit.framework.TestCase;
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.vehicle_sharing.CarDescription;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
@@ -62,7 +61,7 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         }
 
 //        One vehicle appeared.
-        List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1));
+        List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
         List<VehicleDescription> disappeared = emptyList();
 
         VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);

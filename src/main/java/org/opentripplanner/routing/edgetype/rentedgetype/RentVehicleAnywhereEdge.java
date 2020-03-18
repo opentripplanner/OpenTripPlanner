@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Vertex;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 public class RentVehicleAnywhereEdge extends Edge {
 
@@ -38,16 +39,22 @@ public class RentVehicleAnywhereEdge extends Edge {
             return null;
         }
 
-        StateEditor stateEditor = s0.edit(this);
         if (s0.isCurrentlyRentingVehicle()) {
+            StateEditor stateEditor = s0.edit(this);
             stateEditor.doneVehicleRenting();
-        } else if (!availableVehicles.isEmpty()) {
-            // TODO support for many vehicles in one place
-            VehicleDescription vehicleDescription = availableVehicles.get(0);
-            stateEditor.beginVehicleRenting(vehicleDescription);
+            return stateEditor.makeState();
         } else {
-            return null;
+            List<VehicleDescription> rentableVehicles = availableVehicles.stream()
+                    .filter(v -> s0.getOptions().vehiclesAllowedToRent.isRentable(v))
+                    .collect(Collectors.toList());
+
+            State previous = null;
+            for (VehicleDescription rentableVehicle : rentableVehicles) {
+                StateEditor next = s0.edit(this);
+                next.beginVehicleRenting(rentableVehicle);
+                previous = next.makeState().addToExistingResultChain(previous);
+            }
+            return previous;
         }
-        return stateEditor.makeState();
     }
 }

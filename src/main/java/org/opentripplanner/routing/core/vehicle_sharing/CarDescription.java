@@ -10,8 +10,8 @@ public class CarDescription extends VehicleDescription {
 
     private static final int dropoffTimeInSeconds = 60;
 
-    public CarDescription(double longitude, double latitude) {
-        super(longitude, latitude);
+    public CarDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
+        super(longitude, latitude, fuelType, gearbox, provider);
     }
 
     @Override
