@@ -33,6 +33,10 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         float vehLong1 = (float) (0.3 * long1 + 0.7 * long2);
         float vehLat1 = (float) (0.3 * lat1 + 0.7 * lat2);
 
+
+        float vehLong2 = (float) (0.7 * long1 + 0.3 * long2);
+        float vehLat2 = (float) (0.7 * lat1 + 0.3 * lat2);
+
 //      We need to initialize graph.
         Graph graph = new Graph();
         StreetVertex v1 = new IntersectionVertex(graph, "v1", long1, lat1, "v1");
@@ -71,5 +75,19 @@ public class SharedVehiclesUpdaterTest extends TestCase {
 
         assertEquals(1, appearedEdges.size());
         assertEquals(car2, appearedEdges.get(0).getKey());
+
+
+        appeared = singletonList(new CarDescription(vehLong2, vehLat2, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
+
+        vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
+
+
+        coordsToVertex = sharedVehiclesUpdater.coordsToVertex(vehiclePositionsDiff.appeared);
+        appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
+
+        assertEquals(1, appearedEdges.size());
+        assertEquals(car1, appearedEdges.get(0).getKey());
+
+
     }
 }

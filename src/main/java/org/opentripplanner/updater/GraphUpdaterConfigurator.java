@@ -11,6 +11,7 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_sharing.RandomVehiclePositionsGetter;
 import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
 import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsGetter;
 import org.slf4j.Logger;
@@ -19,14 +20,14 @@ import org.slf4j.LoggerFactory;
 /**
  * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
  * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
+ * <p>
  * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
  * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
  * called "updaters". Each child element represents one updater.
- *
+ * <p>
  * When a graph is unloaded, one must ensure the shutdownGraph() method is called to clean up all resources that may
  * have been used.
- *
+ * <p>
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
  * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
  * provided) configuration takes complete precedence over the embedded one: childrens properties are
@@ -72,26 +73,19 @@ public abstract class GraphUpdaterConfigurator {
             if (type != null) {
                 if (type.equals("bike-rental")) {
                     updater = new BikeRentalUpdater();
-                }
-                else if (type.equals("bike-park")) {
+                } else if (type.equals("bike-park")) {
                     updater = new BikeParkUpdater();
-                }
-                else if (type.equals("stop-time-updater")) {
+                } else if (type.equals("stop-time-updater")) {
                     updater = new PollingStoptimeUpdater();
-                }
-                else if (type.equals("websocket-gtfs-rt-updater")) {
+                } else if (type.equals("websocket-gtfs-rt-updater")) {
                     updater = new WebsocketGtfsRealtimeUpdater();
-                }
-                else if (type.equals("real-time-alerts")) {
+                } else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
-                }
-                else if (type.equals("example-updater")) {
+                } else if (type.equals("example-updater")) {
                     updater = new ExampleGraphUpdater();
-                }
-                else if (type.equals("example-polling-updater")) {
+                } else if (type.equals("example-polling-updater")) {
                     updater = new ExamplePollingGraphUpdater();
-                }
-                else if (type.equals("winkki-polling-updater")) {
+                } else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
                 }
             }
@@ -114,16 +108,21 @@ public abstract class GraphUpdaterConfigurator {
                 }
             }
         }
-        GraphUpdater updater = new SharedVehiclesUpdater(new VehiclePositionsGetter());
+
+//        TODO(mszewczyk) Now Updater is configured mannualy
+//        One fixed car in Bydgoszcz
+//        GraphUpdater updater = new SharedVehiclesUpdater(new VehiclePositionsGetter());
+
+//        Random cars in Bydgoszcz
+//        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 17.79352611652339D, 18.253462294124365D, 52.96911056940485D, 53.25500226408037D));
+
+//      Random cars in Warsaw
+        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 20.45D, 21.46D,  51.91D,  52.48D));
+
         try {
-            // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
-            // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
             updater.setGraphUpdaterManager(updaterManager);
-            // All GraphUpdaters are JsonConfigurable - send them their config information.
             updater.configure(graph, null);
-            // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
             updater.setup(graph);
-            // Add graph updater to manager.
             updaterManager.addUpdater(updater);
             LOG.info("Configured GraphUpdater: {}", updater);
         } catch (Exception e) {

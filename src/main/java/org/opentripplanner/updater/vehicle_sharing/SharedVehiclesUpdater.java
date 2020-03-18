@@ -5,6 +5,9 @@ import com.google.common.annotations.VisibleForTesting;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.apache.lucene.util.SloppyMath;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
@@ -44,15 +47,29 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
     private Vertex findClosestVertex(VehicleDescription vehicleDescription, List<Vertex> vertexesToChooseFrom) {
         Stream<Vertex> stream;
+        Envelope envelope = new Envelope(new Coordinate(vehicleDescription.getLongitude(), vehicleDescription.getLatitude()));
+
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
+
+        final double xscale = Math.cos(vehicleDescription.getLatitude() * Math.PI / 180);
+
+        // Expand more in the longitude direction than the latitude direction to account for converging meridians.
+        envelope.expandBy(radiusDeg / xscale, radiusDeg);
+
+
         if (vertexesToChooseFrom == null) {
-            stream = graph.getEdges().stream()
-                    .filter(edge -> edge instanceof RentVehicleAnywhereEdge)
-                    .map(Edge::getFromVertex);
+            stream = simpleStreetSplitter.getIdx().query(envelope).stream().map(Edge::getFromVertex);
+//            stream = graph.getEdges().stream()
+//                    .filter(edge -> edge instanceof RentVehicleAnywhereEdge)
+//                    .map(Edge::getFromVertex);
         } else {
             stream = vertexesToChooseFrom.stream();
         }
 
+//        closestVertexes
+
         Vertex v0 = graph.getVertices().stream().findFirst().orElse(null);
+
 
         return stream.reduce(v0, (previous_best, current) ->
                 chooseCloser(vehicleDescription.getLatitude(), vehicleDescription.getLongitude(), previous_best, current));
@@ -61,7 +78,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     @VisibleForTesting
     public List<Pair<Vertex, VehicleDescription>> coordsToVertex(List<VehicleDescription> vehiclePositions) {
         return vehiclePositions.stream()
-                .map(a -> new ImmutablePair<>(findClosestVertex(a, null), a))
+                .map(vehicle -> new ImmutablePair<>(findClosestVertex(vehicle, null), vehicle))
                 .collect(toList());
     }
 
@@ -91,13 +108,12 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void runPolling() throws Exception {
+    protected void runPolling() {
         VehiclePositionsDiff diff = vehiclePositionsGetter.getVehiclePositionsDiff();
         List<Pair<Vertex, VehicleDescription>> appearedVertex = coordsToVertex(diff.appeared);
 
         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = prepareAppearedEdge(appearedVertex);
         List<RentVehicleAnywhereEdge> rememberedVehicles = getRememberedEdges(appearedVertex);
-
         VehicleSharingGraphWriterRunnable graphWriterRunnable =
                 new VehicleSharingGraphWriterRunnable(appearedEdges, rememberedVehicles);
         graphUpdaterManager.execute(graphWriterRunnable);

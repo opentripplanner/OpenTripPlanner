@@ -14,4 +14,5 @@ public class VehiclePositionsGetter {
         List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
         return new VehiclePositionsDiff(appeared, 0L, 0L);
     }
+
 }
