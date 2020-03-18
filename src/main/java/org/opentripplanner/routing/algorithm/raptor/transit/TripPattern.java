@@ -4,13 +4,9 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
-import java.util.List;
 import java.util.Objects;
 
 public class TripPattern {
-    // TODO These are only used in an intermediary step during mapping and could be deleted after the mapping has been refactored
-    private final List<TripSchedule> tripSchedules;
-
     private final org.opentripplanner.model.TripPattern originalTripPattern;
 
     private final TraverseMode transitMode;
@@ -18,22 +14,16 @@ public class TripPattern {
     private final int[] stopIndexes;
 
     public TripPattern(
-        List<TripSchedule> tripSchedules,
         TraverseMode transitMode,
         int[] stopIndexes,
         org.opentripplanner.model.TripPattern originalTripPattern
     ) {
-        this.tripSchedules = tripSchedules;
         this.transitMode = transitMode;
         this.stopIndexes = stopIndexes;
         this.originalTripPattern = originalTripPattern;
     }
 
     public FeedScopedId getId() { return originalTripPattern.getId(); }
-
-    public List<TripSchedule> getTripSchedules() {
-        return tripSchedules;
-    }
 
     public TraverseMode getTransitMode() {
         return transitMode;

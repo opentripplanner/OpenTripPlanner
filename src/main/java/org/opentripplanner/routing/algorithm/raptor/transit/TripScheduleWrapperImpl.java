@@ -2,8 +2,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * TODO OTP2 - Performance test this and the other candidate (none wrapper) and clean up code.
@@ -11,10 +9,7 @@ import org.slf4j.LoggerFactory;
  */
 public class TripScheduleWrapperImpl implements TripSchedule {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TripScheduleWrapperImpl.class);
-
     private final TripTimes originalTripTimes;
-
     private final TripPattern originalTripPattern;
 
     public TripScheduleWrapperImpl (TripTimes originalTripTimes, TripPattern originalTripPattern) {

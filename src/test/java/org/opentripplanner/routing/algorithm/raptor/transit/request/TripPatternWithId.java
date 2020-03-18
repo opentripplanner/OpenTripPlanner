@@ -12,12 +12,11 @@ public class TripPatternWithId extends TripPattern {
 
   public TripPatternWithId(
       FeedScopedId id,
-      List<TripSchedule> tripSchedules,
       TraverseMode transitMode,
       int[] stopIndexes,
       org.opentripplanner.model.TripPattern originalTripPattern
   ) {
-    super(tripSchedules, transitMode, stopIndexes, originalTripPattern);
+    super(transitMode, stopIndexes, originalTripPattern);
     this.id = id;
   }
 

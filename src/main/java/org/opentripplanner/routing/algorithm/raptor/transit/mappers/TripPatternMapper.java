@@ -23,10 +23,6 @@ public class TripPatternMapper {
 
     for (org.opentripplanner.model.TripPattern oldTripPattern : oldTripPatterns) {
       TripPattern newTripPattern = new TripPattern(
-          // TripPatternForDate should never access the tripTimes inside the TripPattern,
-          // so I've left them null.
-          // No TripSchedules in the pattern itself; put them in the TripPatternForDate
-          null,
           oldTripPattern.mode,
           stopIndex.listStopIndexesForStops(oldTripPattern.stopPattern.stops),
           oldTripPattern

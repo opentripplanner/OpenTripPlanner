@@ -5,7 +5,6 @@ import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperImpl;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -37,7 +36,7 @@ public class TripPatternForDateMapper {
   private final ConcurrentMap<Timetable, List<TripTimes>> sortedTripTimesForTimetable =
       new ConcurrentHashMap<>();
 
-  private final ConcurrentMap<TripTimes, TripSchedule> tripScheduleForTripTimes =
+  private final ConcurrentMap<TripTimes, TripScheduleWrapperImpl> tripScheduleForTripTimes =
       new ConcurrentHashMap<>();
 
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate;
@@ -69,7 +68,7 @@ public class TripPatternForDateMapper {
 
     org.opentripplanner.model.TripPattern oldTripPattern = timetable.pattern;
 
-    List<TripSchedule> newTripSchedules = new ArrayList<>();
+    List<TripScheduleWrapperImpl> newTripSchedules = new ArrayList<>();
     // The TripTimes are not sorted by departure time in the source timetable because
     // OTP1 performs a simple/ linear search. Raptor results depend on trips being
     // sorted. We reuse the same timetables many times on different days, so cache the
@@ -88,7 +87,7 @@ public class TripPatternForDateMapper {
       if (tripTimes.getRealTimeState() == RealTimeState.CANCELED) {
         continue;
       }
-      TripSchedule tripSchedule = tripScheduleForTripTimes.computeIfAbsent(
+      TripScheduleWrapperImpl tripSchedule = tripScheduleForTripTimes.computeIfAbsent(
           tripTimes,
           // The following are two alternative implementations of TripSchedule
           tt -> new TripScheduleWrapperImpl(tt, oldTripPattern)

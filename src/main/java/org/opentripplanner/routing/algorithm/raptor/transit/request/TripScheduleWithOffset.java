@@ -2,6 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperImpl;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
@@ -13,9 +14,9 @@ public class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
 
-    private final TripSchedule tripSchedule;
+    private final TripScheduleWrapperImpl tripSchedule;
 
-    TripScheduleWithOffset(TripSchedule tripSchedule, int offset) {
+    TripScheduleWithOffset(TripScheduleWrapperImpl tripSchedule, int offset) {
         this.tripSchedule = tripSchedule;
         this.secondsOffset = offset;
     }
