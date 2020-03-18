@@ -448,9 +448,6 @@ public class StreetEdge extends Edge implements Cloneable {
                 realTurnCost = 0; 
             }
 
-//            if (!traverseMode.isDriving()) {
-//                s1.incrementWalkDistanceInMeters(realTurnCost / 100);  // just a tie-breaker TODO What the fuck
-//            }
 
             int turnTime = (int) Math.ceil(realTurnCost);
             roundedTime += turnTime;
@@ -489,7 +486,7 @@ public class StreetEdge extends Edge implements Cloneable {
             // if we're using a soft walk-limit
             if( options.softWalkLimiting ){
                 // just slap a penalty for the overage onto s1
-                weight += calculateOverageWeight(s0.getWalkDistanceInMeters(), s1.getWalkDistance(),
+                weight += calculateOverageWeight(s0.getTraverseDistanceInMeters(), s1.getTraverseDistance(),
                         options.getMaxWalkDistance(), options.softWalkPenalty,
                                 options.softWalkOverageRate);
             } else {

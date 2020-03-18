@@ -115,8 +115,8 @@ public class SampleGridRenderer {
 
             @Override
             public final void visit(Edge e, Coordinate c, State s0, State s1, double d0, double d1, double speedAlongEdge) {
-                double wd0 = s0.getWalkDistanceInMeters() + d0;
-                double wd1 = s0.getWalkDistanceInMeters() + d1;
+                double wd0 = s0.getTraverseDistanceInMeters() + d0;
+                double wd1 = s0.getTraverseDistanceInMeters() + d1;
                 double t0 = wd0 > maxWalkDistance ? Double.POSITIVE_INFINITY : s0.getActiveTime()
                         + d0 / speedAlongEdge;
                 double t1 = wd1 > maxWalkDistance ? Double.POSITIVE_INFINITY : s1.getActiveTime()
@@ -129,11 +129,11 @@ public class SampleGridRenderer {
                         if (t0 < t1) {
                             z.wTime = t0;
                             z.wBoardings = s0.getNumBoardings();
-                            z.wWalkDist = s0.getWalkDistanceInMeters() + d0;
+                            z.wWalkDist = s0.getTraverseDistanceInMeters() + d0;
                         } else {
                             z.wTime = t1;
                             z.wBoardings = s1.getNumBoardings();
-                            z.wWalkDist = s1.getWalkDistanceInMeters() + d1;
+                            z.wWalkDist = s1.getTraverseDistanceInMeters() + d1;
                         }
                         gridSampler.addSamplingPoint(c, z, offRoadWalkSpeedMps);
                     }

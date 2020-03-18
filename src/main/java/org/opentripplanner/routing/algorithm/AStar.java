@@ -226,6 +226,7 @@ public class AStar {
             /*
              * Terminate based on timeout?
              */
+//            TODO uncomment timeout termination
 //            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
 //                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
 //                // Rather than returning null to indicate that the search was aborted/timed out,

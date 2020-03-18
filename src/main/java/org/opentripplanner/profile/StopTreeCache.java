@@ -59,7 +59,7 @@ public class StopTreeCache {
                     continue;
                 
                 distances[i++] = vertex.getIndex();
-                distances[i++] = (int) state.getWalkDistanceInMeters();
+                distances[i++] = (int) state.getTraverseDistanceInMeters();
             }
 
             rr.cleanup();

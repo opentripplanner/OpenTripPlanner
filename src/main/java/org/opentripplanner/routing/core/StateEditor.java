@@ -19,7 +19,7 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * <p>
+ *
  * By virtue of being in the same package as States, it can modify their package private fields.
  *
  * @author andrewbyrd
@@ -140,7 +140,7 @@ public class StateEditor {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
         if (options.modes.isTransit() || !options.softWalkLimiting && options.batch)
-            return child.walkDistanceInMeters >= options.maxWalkDistance;
+            return child.traverseDistanceInMeters >= options.maxWalkDistance;
 
         return false;
     }
@@ -185,28 +185,33 @@ public class StateEditor {
 
     /* Incrementors */
 
-
+    /**
+     * Increments distance traversed in current traverse mode.
+     * @param distance
+     */
     public void incrementDistanceTraversedInMode(Double distance) {
-
         if (distance < 0) {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-//        child.distanceTraversedInMode = new HashMap<>(child.distanceTraversedInMode);
 
-        Double traversed_already = child.distanceTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0D);
-        traversed_already = traversed_already + distance;
-        child.distanceTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+        Double traversedAlready = child.distanceTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0D);
+        traversedAlready = traversedAlready + distance;
+        child.distanceTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
     }
 
+    /**
+     * Increments time spend in current traverse mode.
+     * @param timeInSec
+     */
     public void incrementTimeTraversedInMode(int timeInSec) {
         if (timeInSec < 0) {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-        Integer traversed_already = child.timeTraversedInMode.getOrDefault(child.stateData.nonTransitMode, 0);
-        traversed_already = traversed_already + timeInSec;
-        child.timeTraversedInMode.put(child.stateData.nonTransitMode, traversed_already);
+        Integer traversedAlready = child.timeTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0);
+        traversedAlready = traversedAlready + timeInSec;
+        child.timeTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
     }
 
     public void incrementWeight(double weight) {
@@ -253,7 +258,7 @@ public class StateEditor {
             return;
         }
         incrementDistanceTraversedInMode(length);
-        child.walkDistanceInMeters += length;
+        child.traverseDistanceInMeters += length;
     }
 
     public void incrementPreTransitTime(int seconds) {
@@ -335,8 +340,8 @@ public class StateEditor {
         child.stateData.lastNextArrivalDelta = lastNextArrivalDelta;
     }
 
-    public void setWalkDistance(double walkDistance) {
-        child.walkDistanceInMeters = walkDistance;
+    public void setTraverseDistance(double traverseDistance) {
+        child.traverseDistanceInMeters = traverseDistance;
     }
 
     public void setPreTransitTime(int preTransitTime) {
@@ -383,26 +388,26 @@ public class StateEditor {
     public void beginBikeRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = true;
-        child.stateData.nonTransitMode = vehicleMode;
+        child.stateData.currentTraverseMode = vehicleMode;
     }
 
     public void doneBikeRenting() {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
     }
 
     public void beginVehicleRenting(VehicleDescription vehicleDescription) {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
-        child.stateData.nonTransitMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
 
@@ -415,9 +420,9 @@ public class StateEditor {
         child.stateData.carParked = carParked;
         if (carParked) {
             // We do not handle mixed-mode P+BIKE...
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentTraverseMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.currentTraverseMode = TraverseMode.CAR;
         }
     }
 
@@ -425,9 +430,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeParked = bikeParked;
         if (bikeParked) {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentTraverseMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+            child.stateData.currentTraverseMode = TraverseMode.BICYCLE;
         }
     }
 
@@ -473,7 +478,7 @@ public class StateEditor {
 
     public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.currentTraverseMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
@@ -530,8 +535,8 @@ public class StateEditor {
         return child.getLastAlightedTimeSeconds();
     }
 
-    public double getWalkDistance() {
-        return child.getWalkDistanceInMeters();
+    public double getTraverseDistance() {
+        return child.getTraverseDistanceInMeters();
     }
 
     public int getPreTransitTime() {
@@ -560,7 +565,7 @@ public class StateEditor {
 
     public void alightTransit() {
         cloneStateDataAsNeeded();
-        child.stateData.lastTransitWalk = child.getWalkDistanceInMeters();
+        child.stateData.lastTransitWalk = child.getTraverseDistanceInMeters();
     }
 
     public void setLastPattern(TripPattern pattern) {

@@ -172,7 +172,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         calculateElevations(itinerary, edges);
 
-        itinerary.walkDistance = lastState.getWalkDistanceInMeters();
+        itinerary.walkDistance = lastState.getTraverseDistanceInMeters();
 
         itinerary.transfers = lastState.getNumBoardings();
         if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {

@@ -46,9 +46,7 @@ public class State implements Cloneable {
     public StateData stateData;
 
     // how far have we walked
-    // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
-    // we should DEFINITELY rename this variable and the associated methods.
-    public double walkDistanceInMeters;
+    public double traverseDistanceInMeters;
 
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
@@ -116,13 +114,13 @@ public class State implements Cloneable {
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.parkAndRide || options.kissAndRide) {
             this.stateData.carParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+            this.stateData.currentTraverseMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+            this.stateData.currentTraverseMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
-        this.walkDistanceInMeters = 0;
+        this.traverseDistanceInMeters = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new FeedScopedId[0];
@@ -177,7 +175,7 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistanceInMeters() +
+                " d=" + this.getTraverseDistanceInMeters() +
                 " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
@@ -297,8 +295,8 @@ public class State implements Cloneable {
         return stateData.lastAlightedTime;
     }
 
-    public double getWalkDistanceInMeters() {
-        return walkDistanceInMeters;
+    public double getTraverseDistanceInMeters() {
+        return traverseDistanceInMeters;
     }
 
     public int getPreTransitTime() {
@@ -331,7 +329,7 @@ public class State implements Cloneable {
 
     public double getWalkDistanceDelta () {
         if (backState != null)
-            return Math.abs(this.walkDistanceInMeters - backState.walkDistanceInMeters);
+            return Math.abs(this.traverseDistanceInMeters - backState.traverseDistanceInMeters);
         else
             return 0.0;
     }
@@ -467,7 +465,7 @@ public class State implements Cloneable {
      *         to a rented bicycle.
      */
     public TraverseMode getNonTransitMode() {
-        return stateData.nonTransitMode;
+        return stateData.currentTraverseMode;
     }
     // TODO: There is no documentation about what this means. No one knows precisely.
     // Needs to be replaced with clearly defined fields.
@@ -565,7 +563,7 @@ public class State implements Cloneable {
     }
 
     public double getWalkSinceLastTransit() {
-        return walkDistanceInMeters - stateData.lastTransitWalk;
+        return traverseDistanceInMeters - stateData.lastTransitWalk;
     }
 
     public double getWalkAtLastTransit() {

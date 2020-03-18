@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.core;
 
 import java.util.HashMap;
-import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.model.FeedScopedId;
@@ -60,7 +59,7 @@ public class StateData implements Cloneable {
 
     protected ServiceDay serviceDay;
 
-    protected TraverseMode nonTransitMode;
+    protected TraverseMode currentTraverseMode;
 
     protected VehicleDescription currentVehicle;
 
@@ -95,15 +94,15 @@ public class StateData implements Cloneable {
     public StateData(RoutingRequest options) {
         TraverseModeSet modes = options.modes;
         if (options.startingMode != null)
-            nonTransitMode = options.startingMode;
+            currentTraverseMode = options.startingMode;
         else if (modes.getCar())
-            nonTransitMode = TraverseMode.CAR;
+            currentTraverseMode = TraverseMode.CAR;
         else if (modes.getWalk())
-            nonTransitMode = TraverseMode.WALK;
+            currentTraverseMode = TraverseMode.WALK;
         else if (modes.getBicycle())
-            nonTransitMode = TraverseMode.BICYCLE;
+            currentTraverseMode = TraverseMode.BICYCLE;
         else
-            nonTransitMode = null;
+            currentTraverseMode = null;
     }
 
     protected StateData clone() {

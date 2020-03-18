@@ -38,7 +38,7 @@ public class FlagStopGraphModifier extends GtfsFlexGraphModifier {
 
     @Override
     public SearchTerminationStrategy getSearchTerminationStrategy() {
-        return (o, t, state, s, opt) -> state.getWalkDistanceInMeters() > opt.maxWalkDistance;
+        return (o, t, state, s, opt) -> state.getTraverseDistanceInMeters() > opt.maxWalkDistance;
     }
 
     @Override
