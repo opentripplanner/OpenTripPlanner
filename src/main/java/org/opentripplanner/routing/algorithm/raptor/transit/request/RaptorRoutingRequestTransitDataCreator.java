@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -96,15 +96,15 @@ class RaptorRoutingRequestTransitDataCreator {
     List<TripPatternForDates> combinedList = new ArrayList<>();
 
     // Extract all distinct TripPatterns across the search days
-    Map<FeedScopedId, TripPattern> allTripPatternsById = tripPatternForDateList
+    Map<FeedScopedId, TripPatternWithRaptorStopIndexes> allTripPatternsById = tripPatternForDateList
         .stream()
         .flatMap(t -> t.values().stream())
         .map(TripPatternForDate::getTripPattern)
         .distinct()
-        .collect(Collectors.toMap(TripPattern::getId, t -> t));
+        .collect(Collectors.toMap(TripPatternWithRaptorStopIndexes::getId, t -> t));
 
     // For each TripPattern, time expand each TripPatternForDate and merge into a single TripPatternForDates
-    for (Map.Entry<FeedScopedId, TripPattern> patternEntry : allTripPatternsById.entrySet()) {
+    for (Map.Entry<FeedScopedId, TripPatternWithRaptorStopIndexes> patternEntry : allTripPatternsById.entrySet()) {
       List<TripPatternForDate> tripPatterns = new ArrayList<>();
       List<Integer> offsets = new ArrayList<>();
 
@@ -150,7 +150,7 @@ class RaptorRoutingRequestTransitDataCreator {
         .stream()
         .filter(p -> transitModes.contains(p.getTripPattern().getTransitMode()))
         .filter(p -> !bannedRoutes.contains(p.getTripPattern()
-            .getOriginalTripPattern().route.getId()))
+            .getPattern().route.getId()))
         .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
   }
 

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -14,7 +14,7 @@ import java.util.List;
  */
 public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
 
-    private final TripPattern tripPattern;
+    private final TripPatternWithRaptorStopIndexes tripPattern;
 
     private final TripPatternForDate[] tripPatternForDates;
 
@@ -22,19 +22,19 @@ public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
 
     private final int numberOfTripSchedules;
 
-    TripPatternForDates(TripPattern tripPattern, List<TripPatternForDate> tripPatternForDates, List<Integer> offsets) {
+    TripPatternForDates(TripPatternWithRaptorStopIndexes tripPattern, List<TripPatternForDate> tripPatternForDates, List<Integer> offsets) {
         this.tripPattern = tripPattern;
         this.tripPatternForDates = tripPatternForDates.toArray(new TripPatternForDate[]{});
         this.offsets = offsets.stream().mapToInt(i -> i).toArray();
         this.numberOfTripSchedules = Arrays.stream(this.tripPatternForDates).mapToInt(TripPatternForDate::numberOfTripSchedules).sum();
     }
 
-    public TripPattern getTripPattern() {
+    public TripPatternWithRaptorStopIndexes getTripPattern() {
         return tripPattern;
     }
 
     @Override public int stopIndex(int stopPositionInPattern) {
-        return this.tripPattern.stopIndex(stopPositionInPattern);
+        return tripPattern.stopIndex(stopPositionInPattern);
     }
 
     @Override public int numberOfStopsInPattern() {
@@ -44,8 +44,9 @@ public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
     @Override public TripSchedule getTripSchedule(int index) {
         for (int i = 0; i < tripPatternForDates.length; i++) {
             TripPatternForDate tripPatternForDate = tripPatternForDates[i];
+
             if (index < tripPatternForDate.numberOfTripSchedules()) {
-                return new TripScheduleWithOffset(tripPatternForDate.getTripSchedule(index), offsets[i]);
+                return new TripScheduleWithOffset(tripPattern.getPattern(), tripPatternForDate.getTripTimes(index), offsets[i]);
             }
             index -= tripPatternForDate.numberOfTripSchedules();
         }

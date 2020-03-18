@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleWrapperImpl;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
 /**
@@ -13,22 +12,23 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 public class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
+    private final TripPattern pattern;
+    private final TripTimes tripTimes;
 
-    private final TripScheduleWrapperImpl tripSchedule;
-
-    TripScheduleWithOffset(TripScheduleWrapperImpl tripSchedule, int offset) {
-        this.tripSchedule = tripSchedule;
+    TripScheduleWithOffset(TripPattern pattern, TripTimes tripTimes, int offset) {
+        this.pattern = pattern;
+        this.tripTimes = tripTimes;
         this.secondsOffset = offset;
     }
 
     @Override
     public int arrival(int stopPosInPattern) {
-        return this.tripSchedule.arrival(stopPosInPattern) + secondsOffset;
+        return this.tripTimes.getArrivalTime(stopPosInPattern) + secondsOffset;
     }
 
     @Override
     public int departure(int stopPosInPattern) {
-        return this.tripSchedule.departure(stopPosInPattern) + secondsOffset;
+        return this.tripTimes.getDepartureTime(stopPosInPattern) + secondsOffset;
     }
 
     @Override
@@ -38,12 +38,12 @@ public class TripScheduleWithOffset implements TripSchedule {
 
     @Override
     public TripTimes getOriginalTripTimes() {
-        return this.tripSchedule.getOriginalTripTimes();
+        return this.tripTimes;
     }
 
     @Override
     public TripPattern getOriginalTripPattern() {
-        return this.tripSchedule.getOriginalTripPattern();
+        return this.pattern;
     }
 
     public int getSecondsOffset() {

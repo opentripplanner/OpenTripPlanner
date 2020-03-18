@@ -1,40 +1,37 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.Objects;
 
-public class TripPattern {
-    private final org.opentripplanner.model.TripPattern originalTripPattern;
-
-    private final TraverseMode transitMode;
+public class TripPatternWithRaptorStopIndexes {
+    private final TripPattern pattern;
 
     private final int[] stopIndexes;
 
-    public TripPattern(
-        TraverseMode transitMode,
+    public TripPatternWithRaptorStopIndexes(
         int[] stopIndexes,
-        org.opentripplanner.model.TripPattern originalTripPattern
+        TripPattern pattern
     ) {
-        this.transitMode = transitMode;
         this.stopIndexes = stopIndexes;
-        this.originalTripPattern = originalTripPattern;
+        this.pattern = pattern;
     }
 
-    public FeedScopedId getId() { return originalTripPattern.getId(); }
+    public FeedScopedId getId() { return pattern.getId(); }
 
     public TraverseMode getTransitMode() {
-        return transitMode;
+        return pattern.mode;
     }
 
     public int[] getStopIndexes() {
         return stopIndexes;
     }
 
-    public org.opentripplanner.model.TripPattern getOriginalTripPattern() {
-        return this.originalTripPattern;
+    public final TripPattern getPattern() {
+        return this.pattern;
     }
 
     /**
@@ -48,7 +45,7 @@ public class TripPattern {
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
-        TripPattern that = (TripPattern) o;
+        TripPatternWithRaptorStopIndexes that = (TripPatternWithRaptorStopIndexes) o;
         return getId() == that.getId();
     }
 
@@ -61,7 +58,7 @@ public class TripPattern {
     public String toString() {
         return "TripPattern{" +
                 "id=" + getId() +
-                ", transitMode=" + transitMode +
+                ", transitMode=" + pattern.mode +
                 '}';
     }
 }

@@ -1,7 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
+import org.opentripplanner.routing.trippattern.TripTimes;
+
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -14,24 +15,28 @@ public class TripPatternForDate {
      * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules.
      * Its TripSchedules remain unchanged.
      */
-    private final TripPattern tripPattern;
+    private final TripPatternWithRaptorStopIndexes tripPattern;
 
     /**
      * The filtered TripSchedules for only those trips in the TripPattern that are active on the given day.
      * Invariant: this array should contain a subset of the TripSchedules in tripPattern.tripSchedules.
      */
-    private final TripScheduleWrapperImpl[] tripSchedules;
+    private final TripTimes[] tripTimes;
 
     /** The date for which the filtering was performed. */
     private final LocalDate localDate;
 
-    public TripPatternForDate(TripPattern tripPattern, List<TripScheduleWrapperImpl> tripSchedules, LocalDate localDate) {
+    public TripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate) {
         this.tripPattern = tripPattern;
-        this.tripSchedules = tripSchedules.toArray(new TripScheduleWrapperImpl[]{});
+        this.tripTimes = tripTimes;
         this.localDate = localDate;
     }
 
-    public TripPattern getTripPattern() {
+    public TripTimes[] tripTimes() {
+        return tripTimes;
+    }
+
+    public TripPatternWithRaptorStopIndexes getTripPattern() {
         return tripPattern;
     }
 
@@ -39,12 +44,8 @@ public class TripPatternForDate {
         return this.tripPattern.stopIndex(i);
     }
 
-    public int numberOfStopsInPattern() {
-        return tripPattern.getStopIndexes().length;
-    }
-
-    public TripScheduleWrapperImpl getTripSchedule(int i) {
-        return tripSchedules[i];
+    public TripTimes getTripTimes(int i) {
+        return tripTimes[i];
     }
 
     public LocalDate getLocalDate() {
@@ -52,11 +53,11 @@ public class TripPatternForDate {
     }
 
     public int numberOfTripSchedules() {
-        return tripSchedules.length;
+        return tripTimes.length;
     }
 
     public int hashCode() {
-        return Objects.hash(tripPattern, tripSchedules, localDate);
+        return Objects.hash(tripPattern, tripTimes, localDate);
     }
 
     public boolean equals(Object o) {
