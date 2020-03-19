@@ -17,9 +17,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
 
         private String name;
 
-        private double lat;
-
-        private double lon;
+        private Coordinate coordinate;
 
         /**
          * Public facing station code (short text or number)
@@ -59,19 +57,15 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
         }
 
         public double getLat() {
-                return lat;
+                return coordinate.latitude();
         }
 
-        public void setLat(double lat) {
-                this.lat = lat;
+        public void setCoordinate(Coordinate coordinate) {
+                this.coordinate = coordinate;
         }
 
         public double getLon() {
-                return lon;
-        }
-
-        public void setLon(double lon) {
-                this.lon = lon;
+                return coordinate.longitude();
         }
 
         public String getCode() {

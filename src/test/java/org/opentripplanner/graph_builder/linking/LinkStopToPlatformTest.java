@@ -63,8 +63,7 @@ public class LinkStopToPlatformTest {
 
         Stop stop = new Stop();
         stop.setId(new FeedScopedId("TestAgency", "TestStop"));
-        stop.setLon(10.22213);
-        stop.setLat(59.13545);
+        stop.setCoordinate(new org.opentripplanner.model.Coordinate(59.13545, 10.22213));
 
         TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
     }
@@ -95,8 +94,6 @@ public class LinkStopToPlatformTest {
                 v2.getCoordinate());
         I18NString name = new LocalizedString(nameString, new OSMWithTags());
 
-        AreaEdge areaEdge = new AreaEdge(v1, v2, line, name, line.getLength(), StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area );
-
-        return areaEdge;
+        return new AreaEdge(v1, v2, line, name, line.getLength(), StreetTraversalPermission.PEDESTRIAN_AND_BICYCLE, false, area );
     }
 }

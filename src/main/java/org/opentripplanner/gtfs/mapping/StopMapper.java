@@ -1,5 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.model.Coordinate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
@@ -12,13 +13,14 @@ import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
+
     private Map<org.onebusaway.gtfs.model.Stop, Stop> mappedStops = new HashMap<>();
 
     Collection<Stop> map(Collection<org.onebusaway.gtfs.model.Stop> allStops) {
         return MapUtils.mapToList(allStops, this::map);
     }
 
-    /** Map from GTFS to OTP model, {@code null} safe.  */
+    /** Map from GTFS to OTP model, {@code null} safe. */
     Stop map(org.onebusaway.gtfs.model.Stop orginal) {
         return orginal == null ? null : mappedStops.computeIfAbsent(orginal, this::doMap);
     }
@@ -28,8 +30,7 @@ class StopMapper {
 
         otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
         otpStop.setName(gtfsStop.getName());
-        otpStop.setLat(gtfsStop.getLat());
-        otpStop.setLon(gtfsStop.getLon());
+        otpStop.setCoordinate(new Coordinate(gtfsStop.getLat(), gtfsStop.getLon()));
         otpStop.setCode(gtfsStop.getCode());
         otpStop.setDescription(gtfsStop.getDesc());
         otpStop.setZone(gtfsStop.getZoneId());

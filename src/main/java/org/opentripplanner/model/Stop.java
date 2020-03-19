@@ -16,9 +16,8 @@ public final class Stop extends TransitEntity<FeedScopedId> {
      */
     private String name;
 
-    private double lat;
-
-    private double lon;
+    /** Center point/location for stop. */
+    private Coordinate coordinate;
 
     /**
      * Public facing stop code (short text or number).
@@ -67,19 +66,15 @@ public final class Stop extends TransitEntity<FeedScopedId> {
     }
 
     public double getLat() {
-        return lat;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
+        return coordinate.latitude();
     }
 
     public double getLon() {
-        return lon;
+        return coordinate.longitude();
     }
 
-    public void setLon(double lon) {
-        this.lon = lon;
+    public void setCoordinate(Coordinate coordinate) {
+        this.coordinate = coordinate;
     }
 
     public String getCode() {
