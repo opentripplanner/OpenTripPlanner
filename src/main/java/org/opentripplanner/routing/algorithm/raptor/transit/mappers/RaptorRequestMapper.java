@@ -16,8 +16,8 @@ public class RaptorRequestMapper {
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
             ZonedDateTime startOfTime,
-            Collection<TransferLeg> accessTimes,
-            Collection<TransferLeg> egressTimes
+            Collection<? extends TransferLeg> accessTimes,
+            Collection<? extends TransferLeg> egressTimes
     ) {
         RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
 

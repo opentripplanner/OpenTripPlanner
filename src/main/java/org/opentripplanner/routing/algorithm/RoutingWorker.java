@@ -1,29 +1,22 @@
 package org.opentripplanner.routing.algorithm;
 
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.model.routing.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
-import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
-import org.opentripplanner.routing.algorithm.raptor.router.street.TransferToAccessEgressLegMapper;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
+import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.request.RoutingRequest;
-import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.services.FareService;
-import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -41,7 +34,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Map;
 
 /**
  * Does a complete transit search, including access and egress legs.
@@ -54,14 +46,6 @@ public class RoutingWorker {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     private final RaptorService<TripSchedule> raptorService;
-
-    /**
-     * To avoid long searches witch might degrade the performance we use an upper limit
-     * to the distance for none transit what we would allow.
-     */
-    private static final double MAX_WALK_DISTANCE_METERS =  50_000;
-    private static final double MAX_BIKE_DISTANCE_METERS = 150_000;
-    private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
 
     /** Filter itineraries down to this limit, but not below. */
     private static final int MIN_NUMBER_OF_ITINERARIES = 3;
@@ -82,8 +66,8 @@ public class RoutingWorker {
         try {
             List<Itinerary> itineraries;
 
-            // Street routing
-            itineraries = new ArrayList<>(routeOnStreetGraph(router));
+            // Direct street routing
+            itineraries = new ArrayList<>(DirectStreetRouter.route(router, request));
 
             // Transit routing
             itineraries.addAll(routeTransit(router));
@@ -101,30 +85,6 @@ public class RoutingWorker {
         }
         finally {
             request.cleanup();
-        }
-    }
-
-    private List<Itinerary> routeOnStreetGraph(Router router) {
-        try {
-            if (!request.modes.getNonTransitSet().isValid()) {
-                return Collections.emptyList();
-            }
-            if(!streetDistanceIsReasonable()) { return Collections.emptyList(); }
-
-            RoutingRequest nonTransitRequest = request.clone();
-            nonTransitRequest.modes.setTransit(false);
-
-            // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
-            GraphPathFinder gpFinder = new GraphPathFinder(router);
-            List<GraphPath> paths = gpFinder.graphPathFinderEntryPoint(nonTransitRequest);
-
-            // Convert the internal GraphPaths to itineraries
-            List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, request);
-            ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
-            return response;
-        }
-        catch (PathNotFoundException e) {
-            return Collections.emptyList();
         }
     }
 
@@ -152,8 +112,8 @@ public class RoutingWorker {
 
         double startTimeAccessEgress = System.currentTimeMillis();
 
-        Map<Stop, Transfer> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000);
-        Map<Stop, Transfer> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000);
+        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
+        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
 
         LOG.debug("Access/egress routing took {} ms",
                 System.currentTimeMillis() - startTimeAccessEgress
@@ -164,15 +124,12 @@ public class RoutingWorker {
 
         double startTimeRouting = System.currentTimeMillis();
 
-        TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
-                transitLayer,
-                request.walkSpeed
-        );
+
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
-                accessEgressLegMapper.map(accessTransfers),
-                accessEgressLegMapper.map(egressTransfers)
+                accessTransfers,
+                egressTransfers
         );
 
         // Route transit
@@ -241,19 +198,6 @@ public class RoutingWorker {
         return builder.build();
     }
 
-    private boolean streetDistanceIsReasonable() {
-        // TODO This currently only calculates the distances between the first fromVertex
-        //      and the first toVertex
-        double distance = SphericalDistanceLibrary.distance(
-                request.rctx.fromVertices
-                        .iterator()
-                        .next()
-                        .getCoordinate(),
-                request.rctx.toVertices.iterator().next().getCoordinate()
-        );
-        return distance < calculateDistanceMaxLimit();
-    }
-
     private void setResponseMetadata(
             RaptorRoutingRequestTransitData transitData,
             RaptorResponse<TripSchedule> response
@@ -276,36 +220,9 @@ public class RoutingWorker {
         );
     }
 
-    private double calculateDistanceMaxLimit() {
-        double limit = request.maxWalkDistance * 2;
-        double maxLimit = request.modes.getCar()
-                ? MAX_CAR_DISTANCE_METERS
-                : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
-
-        // Handle overflow and default setting is set to Double MAX_VALUE
-        // Everything above Long.MAX_VALUE is treated as Infinite
-        if(limit< 0 || limit > Long.MAX_VALUE) {
-            LOG.warn(
-                "The max walk/bike/car distance is reduced to {} km from Infinite",
-                (long)maxLimit/1000
-            );
-            return maxLimit;
-        }
-
-        if (limit > maxLimit) {
-            LOG.warn(
-                    "The max walk/bike/car distance is reduced to {} km from {} km",
-                    (long)maxLimit/1000, (long)limit/1000
-            );
-            return maxLimit;
-        }
-
-        return limit;
-    }
-
     private void verifyEgressAccess(
-            Map<?,?> access,
-            Map<?,?> egress
+            Collection<?> access,
+            Collection<?> egress
     ) {
         boolean accessExist = !access.isEmpty();
         boolean egressExist = !egress.isEmpty();

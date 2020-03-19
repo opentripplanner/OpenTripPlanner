@@ -145,7 +145,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public SearchParamsBuilder<T> addAccessStops(Iterable<TransferLeg> accessLegs) {
+    public SearchParamsBuilder<T> addAccessStops(Iterable<? extends TransferLeg> accessLegs) {
         for (TransferLeg it : accessLegs) {
             addAccessStop(it);
         }
@@ -161,7 +161,7 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         return this;
     }
 
-    public SearchParamsBuilder<T> addEgressStops(Iterable<TransferLeg> egressLegs) {
+    public SearchParamsBuilder<T> addEgressStops(Iterable<? extends TransferLeg> egressLegs) {
         for (TransferLeg it : egressLegs) {
             addEgressStop(it);
         }

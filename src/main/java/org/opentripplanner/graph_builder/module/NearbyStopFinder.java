@@ -21,6 +21,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -150,6 +151,7 @@ public class NearbyStopFinder {
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
@@ -171,6 +173,7 @@ public class NearbyStopFinder {
                         (TransitStopVertex) vertex,
                         0,
                         Collections.emptyList(),
+                        null,
                         null
                     ));
             }
@@ -204,7 +207,8 @@ public class NearbyStopFinder {
                 StopAtDistance sd = new StopAtDistance(
                     ts1, distance,
                     null,
-                    geometryFactory.createLineString(coordinates)
+                    geometryFactory.createLineString(coordinates),
+                    null
                 );
                 stopsFound.add(sd);
             }
@@ -221,17 +225,20 @@ public class NearbyStopFinder {
         public final double distance;
         public final LineString geometry;
         public final List<Edge>  edges;
+        public final State state;
 
         public StopAtDistance(
             TransitStopVertex tstop,
             double distance,
             List<Edge> edges,
-            LineString geometry
+            LineString geometry,
+            State state
         ) {
             this.tstop = tstop;
             this.distance = distance;
             this.edges = edges;
             this.geometry = geometry;
+            this.state = state;
         }
 
         @Override
@@ -282,7 +289,8 @@ public class NearbyStopFinder {
                 (TransitStopVertex) state.getVertex(),
                 effectiveWalkDistance, edges,
                 geometryFactory.createLineString(
-                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())));
+                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
+                state);
     }
 
 
