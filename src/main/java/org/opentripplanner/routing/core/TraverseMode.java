@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.model.TransitMode;
+
 import javax.xml.bind.annotation.XmlType;
 
 import java.util.Collections;
@@ -48,5 +50,31 @@ public enum TraverseMode {
 
     public boolean isWalking() {
         return this == WALK;
+    }
+
+    public static TraverseMode fromTransitMode(TransitMode transitMode) {
+        switch (transitMode) {
+            case RAIL:
+                return TraverseMode.RAIL;
+            case COACH:
+            case BUS:
+                return TraverseMode.BUS;
+            case SUBWAY:
+                return TraverseMode.SUBWAY;
+            case TRAM:
+                return TraverseMode.TRAM;
+            case FERRY:
+                return TraverseMode.FERRY;
+            case AIRPLANE:
+                return TraverseMode.AIRPLANE;
+            case CABLE_CAR:
+                return TraverseMode.CABLE_CAR;
+            case GONDOLA:
+                return TraverseMode.GONDOLA;
+            case FUNICULAR:
+                return TraverseMode.FUNICULAR;
+            default:
+                throw new IllegalArgumentException();
+        }
     }
 }

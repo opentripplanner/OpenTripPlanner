@@ -22,7 +22,7 @@ public class RouteShort {
         id = route.getId();
         shortName = route.getShortName();
         longName = route.getLongName();
-        mode = GtfsLibrary.getTraverseMode(route).toString();
+        mode = GtfsLibrary.getTransitMode(route).toString();
         color = route.getColor();
         agencyName = route.getAgency().getName();
     }

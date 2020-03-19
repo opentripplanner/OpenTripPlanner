@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
@@ -43,7 +43,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
       TransitLayer transitLayer,
       Instant departureTime,
       int dayRange,
-      TraverseModeSet transitModes,
+      Set<TransitMode> transitModes,
       Set<FeedScopedId> bannedRoutes,
       double walkSpeed
   ) {

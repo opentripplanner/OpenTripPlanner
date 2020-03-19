@@ -6,6 +6,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -157,7 +158,7 @@ public class ItineraryMapper {
                 leg.agencyId = routeInfo.getAgency().getId();
                 leg.routeShortName = routeInfo.getShortName()   ;
                 leg.routeLongName = routeInfo.getLongName();
-                leg.mode = tripSchedule.getOriginalTripPattern().mode;
+                leg.mode = TraverseMode.fromTransitMode(tripSchedule.getOriginalTripPattern().mode);
 
                 leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
                 leg.endTime = createCalendar(request.getDepartureDate(), it.toTime());

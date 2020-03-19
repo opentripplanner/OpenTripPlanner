@@ -76,7 +76,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.request.StreetMode;
-import org.opentripplanner.routing.request.TransitMode;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.PolylineEncoder;
@@ -2455,7 +2455,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
                         .type(transportModeEnum)
-                        .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
+                        .dataFetcher(environment -> GtfsLibrary.getTransitMode(
                                 environment.getSource()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3362,7 +3362,7 @@ public class TransmodelIndexGraphQLSchema {
                                         .collect(Collectors.toSet());
                                 stream = stream
                                         .filter(route ->
-                                                modes.contains(GtfsLibrary.getTraverseMode(route)));
+                                                modes.contains(GtfsLibrary.getTransitMode(route)));
                             }
                             if ((environment.getArgument("authorities") instanceof Collection)) {
                                 Collection<String> authorityIds = environment.getArgument("authorities");

@@ -102,7 +102,7 @@ public class RoutingWorker {
                 transitLayer,
                 request.getDateTime().toInstant(),
                 TRANSIT_SEARCH_RANGE_IN_DAYS,
-                request.modes,
+                request.allowedModes.transitModes,
                 request.rctx.bannedRoutes,
                 request.walkSpeed
         );

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.request;
+package org.opentripplanner.model;
 
 public enum TransitMode {
   RAIL,

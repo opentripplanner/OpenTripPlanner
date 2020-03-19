@@ -15,21 +15,22 @@ import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.request.StreetMode;
-import org.opentripplanner.routing.request.TransitMode;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
@@ -242,16 +243,16 @@ public class TransmodelGraphQLPlanner {
             AtomicReference<StreetMode> accessMode = new AtomicReference<>();
             AtomicReference<StreetMode> egressMode = new AtomicReference<>();
             AtomicReference<StreetMode> directMode = new AtomicReference<>();
-            AtomicReference<Set<TransitMode>> transitModes = new AtomicReference<>();
+            AtomicReference<ArrayList<TransitMode>> transitModes = new AtomicReference<>();
             callWith.argument("allowedModes.accessMode", accessMode::set);
             callWith.argument("allowedModes.egressMode", egressMode::set);
             callWith.argument("allowedModes.directMode", directMode::set);
-            callWith.argument("allowedModes.transitModes", transitModes::set);
+            callWith.argument("allowedModes.transportMode", transitModes::set);
             request.allowedModes = new AllowedModes(
                 accessMode.get(),
                 egressMode.get(),
                 directMode.get(),
-                transitModes.get()
+                new HashSet<>(transitModes.get())
             );
         }
 

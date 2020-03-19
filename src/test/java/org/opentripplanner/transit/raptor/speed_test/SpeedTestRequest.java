@@ -3,8 +3,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
@@ -20,7 +19,10 @@ import java.time.LocalTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.util.Date;
+import java.util.EnumSet;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 import java.util.function.Consumer;
 
 
@@ -62,8 +64,9 @@ public class SpeedTestRequest {
         return ZonedDateTime.of(date, LocalTime.MIDNIGHT, inputZoneId);
     }
 
-    TraverseModeSet getTransitModes() {
-        return new TraverseModeSet(TraverseMode.BUS, TraverseMode.RAIL, TraverseMode.SUBWAY, TraverseMode.TRAM);
+    Set<TransitMode> getTransitModes() {
+        return new HashSet<>(EnumSet.of(
+            TransitMode.BUS, TransitMode.RAIL, TransitMode.SUBWAY, TransitMode.TRAM));
     }
 
     double getWalkSpeedMeterPrSecond() {

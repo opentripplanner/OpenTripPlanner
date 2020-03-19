@@ -2,6 +2,7 @@ package org.opentripplanner.util;
 
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.model.TransitMode;
 
 import java.util.ArrayList;
 import java.util.HashSet;
@@ -28,7 +29,7 @@ public final class TravelOptionsMaker {
         return makeOptions(graph.getTransitModes(), graph.hasBikeSharing, graph.hasBikeRide, graph.hasParkRide);
     }
 
-    public static List<TravelOption> makeOptions(HashSet<TraverseMode> transitModes, boolean hasBikeSharing,
+    public static List<TravelOption> makeOptions(HashSet<TransitMode> transitModes, boolean hasBikeSharing,
         boolean hasBikeRide, boolean hasParkRide) {
         List<TravelOption> travelOptions = new ArrayList<>(16);
 
@@ -38,7 +39,7 @@ public final class TravelOptionsMaker {
                 String.join(",", TraverseMode.TRANSIT.toString(), TraverseMode.WALK.toString()),
                 TraverseMode.TRANSIT.toString()));
 
-            for (TraverseMode transitMode: transitModes) {
+            for (TransitMode transitMode: transitModes) {
                 travelOptions.add(new TravelOption(
                     String.join(",", transitMode.toString(), TraverseMode.WALK.toString()),
                     transitMode.toString()));

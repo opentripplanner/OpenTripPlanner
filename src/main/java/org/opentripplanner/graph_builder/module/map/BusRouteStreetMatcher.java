@@ -8,9 +8,9 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.model.TransitMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class BusRouteStreetMatcher implements GraphBuilderModule {
         // Why do we need to iterate over the routes? Why not just patterns?
         for (Route route : graph.index.getRouteForId().values()) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
-                if (pattern.mode == TraverseMode.BUS) {
+                if (pattern.mode == TransitMode.BUS) {
                     /* we can only match geometry to streets on bus routes */
                     log.debug("Matching {}", pattern);
                     //If there are no shapes in GTFS pattern geometry is generated

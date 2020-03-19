@@ -4,9 +4,11 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.google.common.hash.Hasher;
 import org.locationtech.jts.geom.Geometry;
 
 
@@ -65,7 +67,11 @@ public class RouterInfo {
         this.buildTime = graph.buildTime;
         this.transitServiceStarts = graph.getTransitServiceStarts();
         this.transitServiceEnds = graph.getTransitServiceEnds();
-        this.transitModes = graph.getTransitModes();
+        this.transitModes = graph
+            .getTransitModes()
+            .stream()
+            .map(TraverseMode::fromTransitMode)
+            .collect(Collectors.toCollection(HashSet::new));
         this.envelope = graph.getEnvelope();
         addCenter(graph.getCenter());
         service = graph.getService(BikeRentalStationService.class, false);

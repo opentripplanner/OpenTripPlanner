@@ -191,7 +191,7 @@ public class RaptorPathToItineraryMapper {
         leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
-        leg.mode = tripPattern.mode;
+        leg.mode = TraverseMode.fromTransitMode(tripPattern.mode);
         leg.tripId = trip.getId();
         leg.from = mapStopToPlace(boardStop);
         leg.to = mapStopToPlace(alightStop);

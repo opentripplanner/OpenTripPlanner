@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.request;
 
+import org.opentripplanner.model.TransitMode;
+
 import java.util.Set;
 
 public class AllowedModes {

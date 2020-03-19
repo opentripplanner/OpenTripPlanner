@@ -15,7 +15,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -79,7 +78,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     /**
      * The traverse mode for all trips in this pattern.
      */
-    public final TraverseMode mode;
+    public final TransitMode mode;
 
     /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
@@ -209,7 +208,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public TripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
-        this.mode = GtfsLibrary.getTraverseMode(this.route);
+        this.mode = GtfsLibrary.getTransitMode(this.route);
         this.stopPattern = stopPattern;
         setStopsFromStopPattern(stopPattern);
     }
