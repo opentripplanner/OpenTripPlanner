@@ -55,7 +55,7 @@ public class StreetBikeRentalLink extends Edge {
 
     public State traverse(State s0) {
         // Do not even consider bike rental vertices unless bike rental is enabled.
-        if ( ! s0.getOptions().allowBikeRental) {
+        if ( ! s0.getOptions().bikeRental) {
             return null;
         }
         // Disallow traversing two StreetBikeRentalLinks in a row.

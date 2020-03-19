@@ -89,7 +89,7 @@ public class RouterConfig implements Serializable {
         // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
-        request.allowBikeRental = c.asBoolean("allowBikeRental", dft.allowBikeRental);
+        request.bikeRental = c.asBoolean("allowBikeRental", dft.bikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
         request.bikeParkAndRide = c.asBoolean("bikeParkAndRide", dft.bikeParkAndRide);
