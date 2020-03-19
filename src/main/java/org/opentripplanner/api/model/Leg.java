@@ -10,6 +10,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
@@ -94,6 +95,8 @@ public class Leg {
     @JsonSerialize
     public int agencyTimeZoneOffset;
 
+    @JsonSerialize
+    public VehicleDescription vehicleDescription = null;
     /**
      * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
      */

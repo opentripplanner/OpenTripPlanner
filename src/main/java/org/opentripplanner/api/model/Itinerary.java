@@ -1,13 +1,11 @@
 package org.opentripplanner.api.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Iterator;
-import java.util.List;
-import java.util.TimeZone;
+import java.util.*;
 
+import javafx.util.Pair;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.TraverseMode;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -42,10 +40,12 @@ public class Itinerary {
     public long waitingTime = 0;
 
     /**
-     * How far the user has to walk, in meters.
+     * How far the user traversed in vehicle or by foot, in meters.
      */
-    public Double walkDistance = 0.0;
-    
+    public Double traverseDistance = 0.0;
+
+    public Map<TraverseMode,Double> traversedInMode = new HashMap<>();
+
     /**
      * Indicates that the walk limit distance has been exceeded for this itinerary when true.
      */
