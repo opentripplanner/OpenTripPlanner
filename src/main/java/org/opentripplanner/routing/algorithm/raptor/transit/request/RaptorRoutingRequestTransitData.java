@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -22,7 +22,7 @@ import java.util.Set;
  * but filters it by dates and modes per request. Transfers durations are pre-calculated per request
  * based on walk speed.
  */
-public class RaptorRoutingRequestTransitData implements TransitDataProvider<TripSchedule> {
+public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvider<TripSchedule> {
 
   private final TransitLayer transitLayer;
 

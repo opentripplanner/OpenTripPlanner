@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Worker;
@@ -71,7 +71,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private final RoundTracker roundTracker;
 
-    private final TransitDataProvider<T> transitData;
+    private final RaptorTransitDataProvider<T> transitData;
 
     private final TransitCalculator calculator;
 
@@ -91,7 +91,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
     public RangeRaptorWorker(
             S state,
             TransitRoutingStrategy<T> transitWorker,
-            TransitDataProvider<T> transitData,
+            RaptorTransitDataProvider<T> transitData,
             Collection<RaptorTransfer> accessLegs,
             RoundProvider roundProvider,
             TransitCalculator calculator,

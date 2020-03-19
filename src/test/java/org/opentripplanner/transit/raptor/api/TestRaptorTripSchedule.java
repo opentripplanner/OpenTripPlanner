@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.api;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Arrays;
@@ -13,11 +14,11 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         return new TestRaptorTripSchedule(departureDelay, arrivalTimes);
     }
 
-    public static TestRaptorTripSchedule createTripScheduleUseingArrivalTimes(int ... arrivalTimes) {
+    public static TestRaptorTripSchedule createTripScheduleUsingArrivalTimes(int ... arrivalTimes) {
         return new TestRaptorTripSchedule(DEFAULT_DEPARTURE_DELAY, arrivalTimes);
     }
 
-    public static TestRaptorTripSchedule createTripScheduleUseingDepartureTimes(int ... departureTimes) {
+    public static TestRaptorTripSchedule createTripScheduleUsingDepartureTimes(int ... departureTimes) {
         int[] arrivalTimes = Arrays.copyOf(departureTimes, departureTimes.length);
         for (int i = 0; i < arrivalTimes.length; i++) {
             arrivalTimes[i] -= DEFAULT_DEPARTURE_DELAY;
@@ -43,6 +44,11 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
     @Override
     public String debugInfo() {
         return Arrays.toString(arrivalTimes);
+    }
+
+    @Override
+    public RaptorTripPattern pattern() {
+        throw new UnsupportedOperationException();
     }
 
     public int size() {

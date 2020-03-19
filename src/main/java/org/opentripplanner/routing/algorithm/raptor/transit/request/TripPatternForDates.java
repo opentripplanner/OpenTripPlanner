@@ -66,7 +66,7 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
             TripPatternForDate tripPatternForDate = tripPatternForDates[i];
 
             if (index < tripPatternForDate.numberOfTripSchedules()) {
-                return new TripScheduleWithOffset(tripPattern.getPattern(), tripPatternForDate.getTripTimes(index), offsets[i]);
+                return new TripScheduleWithOffset(this, tripPatternForDate.getTripTimes(index), offsets[i]);
             }
             index -= tripPatternForDate.numberOfTripSchedules();
         }

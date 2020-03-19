@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
 import java.util.Arrays;
 import java.util.List;
 
-import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes;
+import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes;
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
 
@@ -55,9 +55,9 @@ public class StopArrivalsTestData {
 
     public static final int BOARD_SLACK = 120;
 
-    private static final TestRaptorTripSchedule TRIP_1 = createTripScheduleUseingArrivalTimes(T1000, T1035);
-    private static final TestRaptorTripSchedule TRIP_2 = createTripScheduleUseingArrivalTimes(T1100, T1123);
-    private static final TestRaptorTripSchedule TRIP_3 = createTripScheduleUseingArrivalTimes(T1140, T1153);
+    private static final TestRaptorTripSchedule TRIP_1 = createTripScheduleUsingArrivalTimes(T1000, T1035);
+    private static final TestRaptorTripSchedule TRIP_2 = createTripScheduleUsingArrivalTimes(T1100, T1123);
+    private static final TestRaptorTripSchedule TRIP_3 = createTripScheduleUsingArrivalTimes(T1140, T1153);
 
     /**
      * Create a list of stop arrivals with a destination arrival at the end like this:

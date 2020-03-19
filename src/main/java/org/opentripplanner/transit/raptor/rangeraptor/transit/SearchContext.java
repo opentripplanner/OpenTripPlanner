@@ -8,7 +8,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -35,7 +35,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     /**
      * the transit data role needed for routing
      */
-    protected final TransitDataProvider<T> transit;
+    protected final RaptorTransitDataProvider<T> transit;
 
     private final TransitCalculator calculator;
     private final RaptorTuningParameters tuningParameters;
@@ -48,7 +48,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     public SearchContext(
             RaptorRequest<T> request,
             RaptorTuningParameters tuningParameters,
-            TransitDataProvider<T> transit,
+            RaptorTransitDataProvider<T> transit,
             WorkerPerformanceTimers timers
     ) {
         this.request = request;
@@ -89,7 +89,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return tuningParameters;
     }
 
-    public TransitDataProvider<T> transit() {
+    public RaptorTransitDataProvider<T> transit() {
         return transit;
     }
 

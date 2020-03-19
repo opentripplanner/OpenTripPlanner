@@ -10,7 +10,7 @@ import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
@@ -225,7 +225,7 @@ public class SpeedTest {
 
 
     public TripPlan route(SpeedTestRequest request) {
-        TransitDataProvider<TripSchedule> transitData;
+        RaptorTransitDataProvider<TripSchedule> transitData;
         RaptorRequest<TripSchedule> rRequest;
         RaptorResponse<TripSchedule> response;
 
@@ -261,7 +261,7 @@ public class SpeedTest {
 
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
         streetRouter.route(heurReq);
-        TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
+        RaptorTransitDataProvider<TripSchedule> transitData = transitData(heurReq);
 
         RaptorRequest<TripSchedule> req1 = heuristicRequest(
                 heuristicProfile, heurReq, streetRouter
@@ -346,7 +346,7 @@ public class SpeedTest {
         );
     }
 
-    private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
+    private RaptorTransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),

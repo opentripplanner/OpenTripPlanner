@@ -27,7 +27,7 @@ public class TransitStopArrivalTest {
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
     private static final int TRANSIT_TRAVEL_DURATION = ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
     private static final int TRANSIT_COST = 200;
-    private static final RaptorTripSchedule TRANSIT_TRIP = TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes(TRANSIT_ALIGHT_TIME);
+    private static final RaptorTripSchedule TRANSIT_TRIP = TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes(TRANSIT_ALIGHT_TIME);
     private static final int ROUND = 1;
 
     private static final TransitCalculator TRANSIT_CALCULATOR = testDummyCalculator(BOARD_SLACK, true);

@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.api.request;
 
 import com.esotericsoftware.minlog.Log;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -12,7 +12,7 @@ import java.util.Set;
 
 /**
  * All input parameters to RangeRaptor that is specific to a routing request.
- * See {@link TransitDataProvider} for transit data.
+ * See {@link RaptorTransitDataProvider} for transit data.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

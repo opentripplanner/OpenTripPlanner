@@ -9,7 +9,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes;
+import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes;
 
 
 public class TripScheduleAlightSearchTest {
@@ -54,9 +54,9 @@ public class TripScheduleAlightSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = createTripScheduleUseingArrivalTimes(TIME_A1, TIME_A2);
-    private TestRaptorTripSchedule tripB = createTripScheduleUseingArrivalTimes(TIME_B1, TIME_B2);
-    private TestRaptorTripSchedule tripC = createTripScheduleUseingArrivalTimes(TIME_C1, TIME_C2);
+    private TestRaptorTripSchedule tripA = createTripScheduleUsingArrivalTimes(TIME_A1, TIME_A2);
+    private TestRaptorTripSchedule tripB = createTripScheduleUsingArrivalTimes(TIME_B1, TIME_B2);
+    private TestRaptorTripSchedule tripC = createTripScheduleUsingArrivalTimes(TIME_C1, TIME_C2);
 
     // Trip pattern with trip A and B.
     private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
@@ -146,7 +146,7 @@ public class TripScheduleAlightSearchTest {
         int arrivalTime = firstArrivalTime;
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
-            tripSchedules.add(createTripScheduleUseingArrivalTimes(arrivalTime));
+            tripSchedules.add(createTripScheduleUsingArrivalTimes(arrivalTime));
         }
         useTripPattern(new TestRoute(tripSchedules));
 

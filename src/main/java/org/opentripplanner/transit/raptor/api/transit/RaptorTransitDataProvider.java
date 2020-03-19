@@ -12,7 +12,7 @@ import java.util.Iterator;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TransitDataProvider<T extends RaptorTripSchedule> {
+public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
 
     /**
      * This method is called once, right after the constructor, before the routing start.

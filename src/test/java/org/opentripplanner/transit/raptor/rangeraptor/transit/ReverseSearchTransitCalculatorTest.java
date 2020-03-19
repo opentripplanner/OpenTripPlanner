@@ -110,7 +110,7 @@ public class ReverseSearchTransitCalculatorTest {
     public void latestArrivalTime() {
         // Ignore board slack for reverse search, boardSlack is added to alight times.
         boardSlackInSeconds = 75;
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.createTripScheduleUseingDepartureTimes(500);
+        TestRaptorTripSchedule s = TestRaptorTripSchedule.createTripScheduleUsingDepartureTimes(500);
         assertEquals(425, create().stopArrivalTime(s, 0));
     }
 
