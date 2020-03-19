@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.TestRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -59,11 +59,11 @@ public class TripScheduleBoardSearchTest {
     private TestRaptorTripSchedule tripC = createTripScheduleUseingDepartureTimes(TIME_C1, TIME_C2);
 
     // Trip pattern with trip A, B, C.
-    private RaptorTripPattern<TestRaptorTripSchedule> pattern = new TestRaptorTripPattern(tripA, tripB, tripC);
+    private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
 
     // The service under test - the subject
     private TripScheduleBoardSearch<TestRaptorTripSchedule> subject = new TripScheduleBoardSearch<>(
-            TRIPS_BINARY_SEARCH_THRESHOLD, pattern
+            TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
     @Test
@@ -155,7 +155,7 @@ public class TripScheduleBoardSearchTest {
             tripSchedules.add(createTripScheduleUseingDepartureTimes(departureTime));
             latestDepartureTime = departureTime;
         }
-        useTripPattern(new TestRaptorTripPattern(tripSchedules));
+        useTripPattern(new TestRoute(tripSchedules));
 
 
         // Search for a trip that board after the last trip, expect no trip in return
@@ -184,18 +184,18 @@ public class TripScheduleBoardSearchTest {
     }
 
     private void withTrips(TestRaptorTripSchedule... schedules) {
-        useTripPattern(new TestRaptorTripPattern(schedules));
+        useTripPattern(new TestRoute(schedules));
     }
 
     private void withTrips(List<TestRaptorTripSchedule> schedules) {
-        useTripPattern(new TestRaptorTripPattern(schedules));
+        useTripPattern(new TestRoute(schedules));
     }
 
-    private void useTripPattern(TestRaptorTripPattern pattern) {
-        this.pattern = pattern;
+    private void useTripPattern(TestRoute route) {
+        this.route = route;
         this.subject = new TripScheduleBoardSearch<>(
                 TRIPS_BINARY_SEARCH_THRESHOLD,
-                this.pattern
+                this.route.timetable()
         );
     }
 

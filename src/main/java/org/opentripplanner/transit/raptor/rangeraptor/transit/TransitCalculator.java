@@ -3,8 +3,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
@@ -157,20 +157,20 @@ public interface TransitCalculator {
      * a given pattern. This is used to to inject a forward or reverse
      * search into the worker (strategy design pattern).
      *
-     * @param pattern the pattern to search
+     * @param timeTable the trip time-table to search
      * @param <T> The TripSchedule type defined by the user of the raptor API.
      * @return The trip search strategy implementation.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTripPattern<T> pattern
+            RaptorTimeTable<T> timeTable
     );
 
     /**
-     * Same as {@link #createTripSearch(RaptorTripPattern)}, but create a
+     * Same as {@link #createTripSearch(RaptorTimeTable)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            RaptorTripPattern<T> pattern
+            RaptorTimeTable<T> timeTable
     );
 
     /**

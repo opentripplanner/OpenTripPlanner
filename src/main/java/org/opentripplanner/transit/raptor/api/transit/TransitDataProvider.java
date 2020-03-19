@@ -62,7 +62,7 @@ public interface TransitDataProvider<T extends RaptorTripSchedule> {
      *
      * @param stops set of stops for find all patterns for.
      */
-    Iterator<? extends RaptorTripPattern<T>> patternIterator(IntIterator stops);
+    Iterator<? extends RaptorRoute<T>> routeIterator(IntIterator stops);
 
     /**
      * This is the total number of stops, it should be possible to retrieve transfers and pattern for every stop

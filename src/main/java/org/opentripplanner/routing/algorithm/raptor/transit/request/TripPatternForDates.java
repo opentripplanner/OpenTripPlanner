@@ -3,6 +3,8 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.Arrays;
@@ -12,7 +14,8 @@ import java.util.List;
  * A collection of all the TripSchedules active on a range of consecutive days. The outer list of tripSchedulesByDay
  * refers to days in order.
  */
-public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
+public class TripPatternForDates implements RaptorRoute<TripSchedule>,
+        RaptorTimeTable<TripSchedule>, RaptorTripPattern {
 
     private final TripPatternWithRaptorStopIndexes tripPattern;
 
@@ -33,6 +36,20 @@ public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
         return tripPattern;
     }
 
+
+    // Implementing RaptorRoute
+    @Override
+    public RaptorTimeTable<TripSchedule> timetable() {
+        return this;
+    }
+
+    @Override
+    public RaptorTripPattern pattern() {
+        return this;
+    }
+
+    // Implementing RaptorTripPattern
+
     @Override public int stopIndex(int stopPositionInPattern) {
         return tripPattern.stopIndex(stopPositionInPattern);
     }
@@ -40,6 +57,9 @@ public class TripPatternForDates implements RaptorTripPattern<TripSchedule> {
     @Override public int numberOfStopsInPattern() {
         return tripPattern.getStopIndexes().length;
     }
+
+
+    // Implementing RaptorTimeTable
 
     @Override public TripSchedule getTripSchedule(int index) {
         for (int i = 0; i < tripPatternForDates.length; i++) {

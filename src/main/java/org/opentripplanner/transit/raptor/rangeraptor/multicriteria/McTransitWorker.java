@@ -20,7 +20,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
 
-    private RaptorTripPattern<T> pattern;
+    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public McTransitWorker(McRangeRaptorWorkerState<T> state, TransitCalculator calculator) {
@@ -29,7 +29,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
     }

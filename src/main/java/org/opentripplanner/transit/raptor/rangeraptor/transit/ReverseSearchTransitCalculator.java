@@ -3,8 +3,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.rangeraptor.path.ReversePathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
@@ -153,17 +153,17 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            RaptorTripPattern<T> pattern
+            RaptorTimeTable<T> timeTable
     ) {
-        return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, pattern);
+        return new TripScheduleAlightSearch<>(tripSearchBinarySearchThreshold, timeTable);
     }
 
     @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            RaptorTripPattern<T> pattern
+            RaptorTimeTable<T> timeTable
     ) {
         return new TripScheduleExactMatchSearch<>(
-                createTripSearch(pattern),
+                createTripSearch(timeTable),
                 this,
                 -iterationStep
         );

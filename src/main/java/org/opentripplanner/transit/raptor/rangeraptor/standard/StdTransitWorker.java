@@ -23,7 +23,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     private int onTripBoardTime;
     private int onTripBoardStop;
     private T onTrip;
-    private RaptorTripPattern<T> pattern;
+    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public StdTransitWorker(
@@ -35,7 +35,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.onTripIndex = NOT_SET;

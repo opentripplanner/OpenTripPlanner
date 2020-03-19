@@ -1,19 +1,25 @@
 package org.opentripplanner.transit.raptor.api;
 
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.util.Collection;
 
-public class TestRaptorTripPattern implements RaptorTripPattern<TestRaptorTripSchedule> {
+public class TestRoute
+        implements RaptorRoute<TestRaptorTripSchedule>,
+        RaptorTimeTable<TestRaptorTripSchedule>,
+        RaptorTripPattern
+{
 
     private final TestRaptorTripSchedule[] schedules;
 
-    public TestRaptorTripPattern(TestRaptorTripSchedule... schedules) {
+    public TestRoute(TestRaptorTripSchedule... schedules) {
         this.schedules = schedules;
     }
 
-    public TestRaptorTripPattern(Collection<TestRaptorTripSchedule> schedules) {
+    public TestRoute(Collection<TestRaptorTripSchedule> schedules) {
         this.schedules = schedules.toArray(new TestRaptorTripSchedule[0]);
     }
 
@@ -35,5 +41,15 @@ public class TestRaptorTripPattern implements RaptorTripPattern<TestRaptorTripSc
     @Override
     public int numberOfTripSchedules() {
         return schedules.length;
+    }
+
+    @Override
+    public RaptorTimeTable<TestRaptorTripSchedule> timetable() {
+        return this;
+    }
+
+    @Override
+    public RaptorTripPattern pattern() {
+        return this;
     }
 }

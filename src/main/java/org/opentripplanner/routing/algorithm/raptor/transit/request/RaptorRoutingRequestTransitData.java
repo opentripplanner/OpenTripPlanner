@@ -5,9 +5,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -77,10 +77,8 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
    * Gets all the unique trip patterns touching a set of stops
    */
   @Override
-  public Iterator<? extends RaptorTripPattern<TripSchedule>> patternIterator(
-      IntIterator stops
-  ) {
-    Set<RaptorTripPattern<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
+  public Iterator<? extends RaptorRoute<TripSchedule>> routeIterator(IntIterator stops) {
+    Set<RaptorRoute<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
     while (stops.hasNext()) {
       activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
     }

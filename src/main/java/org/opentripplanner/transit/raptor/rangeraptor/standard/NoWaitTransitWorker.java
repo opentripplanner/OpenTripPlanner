@@ -25,7 +25,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private int onTripBoardStop;
     private T onTrip;
     private int onTripTimeShift;
-    private RaptorTripPattern<T> pattern;
+    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public NoWaitTransitWorker(
@@ -37,7 +37,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.onTripIndex = NOT_SET;
