@@ -5,7 +5,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
@@ -34,7 +34,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
   /**
    * Transfers by stop index
    */
-  private final List<List<TransferLeg>> transfers;
+  private final List<List<RaptorTransfer>> transfers;
 
 
   private final ZonedDateTime startOfTime;
@@ -69,7 +69,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
    * Gets all the transfers starting at a given stop
    */
   @Override
-  public Iterator<TransferLeg> getTransfers(int stopIndex) {
+  public Iterator<RaptorTransfer> getTransfers(int stopIndex) {
     return transfers.get(stopIndex).iterator();
   }
 

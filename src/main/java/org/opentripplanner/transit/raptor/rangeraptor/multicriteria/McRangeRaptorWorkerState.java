@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
@@ -77,7 +77,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     }
 
     @Override
-    public void setInitialTimeForIteration(TransferLeg accessLeg, int iterationDepartureTime) {
+    public void setInitialTimeForIteration(RaptorTransfer accessLeg, int iterationDepartureTime) {
         addStopArrival(
                 new AccessStopArrival<>(
                         accessLeg.stop(),
@@ -124,7 +124,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stops iff it is optimal.
      */
     @Override
-    public void transferToStops(int fromStop, Iterator<? extends TransferLeg> transfers) {
+    public void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
         Iterable<? extends AbstractStopArrival<T>> fromArrivals = stops.listArrivalsAfterMarker(fromStop);
 
         while (transfers.hasNext()) {
@@ -158,7 +158,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     /* private methods */
 
 
-    private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, TransferLeg transfer) {
+    private void transferToStop(Iterable<? extends AbstractStopArrival<T>> fromArrivals, RaptorTransfer transfer) {
         final int transferTimeInSeconds = transfer.durationInSeconds();
 
         for (AbstractStopArrival<T> it : fromArrivals) {

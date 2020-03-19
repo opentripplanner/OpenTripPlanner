@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -67,7 +67,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) {
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
         debug.dropOldStateAndAcceptNewState(
                 transferLeg.stop(),
                 () -> delegate.setNewBestTransferTime(fromStop, arrivalTime, transferLeg)
@@ -75,7 +75,7 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) {
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
         debug.rejectTransfer(fromStop, transferLeg, transferLeg.stop(), arrivalTime);
         delegate.rejectNewBestTransferTime(fromStop, arrivalTime, transferLeg);
     }

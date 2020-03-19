@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes.BestTimes;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -71,7 +71,7 @@ public final class StdRangeRaptorWorkerState<T
     }
 
     @Override
-    public final void setInitialTimeForIteration(TransferLeg accessEgressLeg, int iterationDepartureTime) {
+    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int iterationDepartureTime) {
         int durationInSeconds = accessEgressLeg.durationInSeconds();
         int stop = accessEgressLeg.stop();
         // The time of arrival at the given stop for the current iteration
@@ -146,7 +146,7 @@ public final class StdRangeRaptorWorkerState<T
      * Set the arrival time at all transit stop if time is optimal for the given list of transfers.
      */
     @Override
-    public final void transferToStops(int fromStop, Iterator<? extends TransferLeg> transfers) {
+    public final void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers) {
         int arrivalTimeTransit = bestTimes.transitTime(fromStop);
         while (transfers.hasNext()) {
             transferToStop(arrivalTimeTransit, fromStop, transfers.next());
@@ -158,7 +158,7 @@ public final class StdRangeRaptorWorkerState<T
         return stopArrivalsState.extractPaths();
     }
 
-    private void transferToStop(int arrivalTimeTransit, int fromStop, TransferLeg transferLeg) {
+    private void transferToStop(int arrivalTimeTransit, int fromStop, RaptorTransfer transferLeg) {
         // Use the calculator to make sure the calculation is done correct for a normal
         // forward search and a reverse search.
         final int arrivalTime = calculator.plusDuration(arrivalTimeTransit, transferLeg.durationInSeconds());

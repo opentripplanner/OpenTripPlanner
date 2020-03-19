@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
@@ -46,7 +46,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * Return a fictive Transfer arrival for the rejected transfer stop arrival.
      */
-    public StopArrivalViewAdapter.Transfer<T> rejectedTransfer(int round, int fromStop, TransferLeg transferLeg, int toStop, int arrivalTime) {
+    public StopArrivalViewAdapter.Transfer<T> rejectedTransfer(int round, int fromStop, RaptorTransfer transferLeg, int toStop, int arrivalTime) {
             StopArrivalState<T> arrival = new StopArrivalState<>();
             arrival.transferToStop(fromStop, arrivalTime, transferLeg.durationInSeconds());
             return new StopArrivalViewAdapter.Transfer<>(round, toStop, arrival, this);

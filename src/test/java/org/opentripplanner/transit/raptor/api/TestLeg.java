@@ -1,9 +1,9 @@
 package org.opentripplanner.transit.raptor.api;
 
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
-public class TestLeg implements TransferLeg {
+public class TestLeg implements RaptorTransfer {
     private final int stop;
     private final int durationInSeconds;
 

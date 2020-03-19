@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
@@ -61,20 +61,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
 
-    public Collection<TransferLeg> accessLegs() {
+    public Collection<RaptorTransfer> accessLegs() {
         return request.searchDirection().isForward()
                 ? request.searchParams().accessLegs()
                 : request.searchParams().egressLegs();
     }
 
-    public Collection<TransferLeg> egressLegs() {
+    public Collection<RaptorTransfer> egressLegs() {
         return request.searchDirection().isForward()
                 ? request.searchParams().egressLegs()
                 : request.searchParams().accessLegs();
     }
 
     public int[] egressStops() {
-        return egressLegs().stream().mapToInt(TransferLeg::stop).toArray();
+        return egressLegs().stream().mapToInt(RaptorTransfer::stop).toArray();
     }
 
     public SearchParams searchParams() {

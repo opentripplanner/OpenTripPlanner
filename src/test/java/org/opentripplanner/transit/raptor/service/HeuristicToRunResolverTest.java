@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -119,8 +119,8 @@ public class HeuristicToRunResolverTest {
         reverse = true;
     }
 
-    private TransferLeg dummyLeg() {
-        return new TransferLeg() {
+    private RaptorTransfer dummyLeg() {
+        return new RaptorTransfer() {
             @Override public int stop() { return 1; }
             @Override public int durationInSeconds() { return 10; }
         };

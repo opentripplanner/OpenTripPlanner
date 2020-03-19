@@ -26,7 +26,7 @@ public interface TransitDataProvider<T extends RaptorTripSchedule> {
      * This method is responsible for providing all transfers from a given stop to all
      * possible stops around that stop.
      * <p/>
-     * The implementation may implement a lightweight {@link TransferLeg} representation.
+     * The implementation may implement a lightweight {@link RaptorTransfer} representation.
      * The iterator element only needs to be valid for the duration og a single iterator step.
      * Hence; It is safe to use a cursor/flyweight pattern to represent both the TransferLeg
      * and the Iterator<TransferLeg> - this will most likely be the best performing
@@ -52,7 +52,7 @@ public interface TransitDataProvider<T extends RaptorTripSchedule> {
      * </pre>
      * @return a map of distances from the given input stop to all other stops.
      */
-    Iterator<? extends TransferLeg> getTransfers(int fromStop);
+    Iterator<? extends RaptorTransfer> getTransfers(int fromStop);
 
     /**
      * Return a set of all patterns visiting the given set of stops.

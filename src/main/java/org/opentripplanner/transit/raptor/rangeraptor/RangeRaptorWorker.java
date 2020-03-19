@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
@@ -75,7 +75,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     private final WorkerPerformanceTimers timers;
 
-    private final Collection<TransferLeg> accessLegs;
+    private final Collection<RaptorTransfer> accessLegs;
 
     private final boolean matchBoardingAlightExactInFirstRound;
 
@@ -90,7 +90,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             S state,
             TransitRoutingStrategy<T> transitWorker,
             TransitDataProvider<T> transitData,
-            Collection<TransferLeg> accessLegs,
+            Collection<RaptorTransfer> accessLegs,
             RoundProvider roundProvider,
             TransitCalculator calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
@@ -174,7 +174,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * This method is protected to allow reverce search to override it.
      */
     private void doTransfersForAccessLegs(int iterationDepartureTime) {
-        for (TransferLeg it : accessLegs) {
+        for (RaptorTransfer it : accessLegs) {
             state.setInitialTimeForIteration(it, iterationDepartureTime);
         }
     }

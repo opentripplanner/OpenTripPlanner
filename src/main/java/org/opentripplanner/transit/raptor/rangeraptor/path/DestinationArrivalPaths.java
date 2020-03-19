@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -47,7 +47,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
-    public void add(ArrivalView<T> egressStopArrival, TransferLeg egressLeg, int additionalCost) {
+    public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
         int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
         DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
 

@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.request.Optimization;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequestBuilder;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.time.ZonedDateTime;
 import java.util.Collection;
@@ -16,8 +16,8 @@ public class RaptorRequestMapper {
     public static RaptorRequest<TripSchedule> mapRequest(
             RoutingRequest request,
             ZonedDateTime startOfTime,
-            Collection<TransferLeg> accessTimes,
-            Collection<TransferLeg> egressTimes
+            Collection<RaptorTransfer> accessTimes,
+            Collection<RaptorTransfer> egressTimes
     ) {
         RaptorRequestBuilder<TripSchedule> builder = new RaptorRequestBuilder<>();
 

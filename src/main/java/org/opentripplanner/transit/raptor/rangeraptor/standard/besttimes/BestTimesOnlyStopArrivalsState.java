@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.besttimes;
 
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
 
@@ -67,10 +67,10 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implem
     public void rejectNewBestTransitTime(int stop, int alightTime, T trip, int boardStop, int boardTime) { }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) {
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
         bestNumberOfTransfers.arriveAtStop(transferLeg.stop());
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) { }
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) { }
 }
