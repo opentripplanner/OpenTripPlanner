@@ -75,6 +75,8 @@ import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.VertexNotFoundException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.routing.request.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.PolylineEncoder;
@@ -186,42 +188,49 @@ public class TransmodelIndexGraphQLSchema {
             .build();
     */
 
-    private static GraphQLEnumType modeEnum = GraphQLEnumType.newEnum()
-            .name("Mode")
-            .value("air", TraverseMode.AIRPLANE)
-            .value("bicycle", TraverseMode.BICYCLE)
-            .value("bus", TraverseMode.BUS)
-            .value("cableway", TraverseMode.CABLE_CAR)
-            .value("water", TraverseMode.FERRY)
-            .value("funicular", TraverseMode.FUNICULAR)
-            .value("lift", TraverseMode.GONDOLA)
-            .value("rail", TraverseMode.RAIL)
-            .value("metro", TraverseMode.SUBWAY)
-            .value("tram", TraverseMode.TRAM)
-            .value("coach", TraverseMode.BUS).description("NOT IMPLEMENTED")
-            .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
-            .value("foot", TraverseMode.WALK)
-            .value("car", TraverseMode.CAR)
-            // TODO OTP2 - Car park no added
-            // .value("car_park", TraverseMode.CAR_PARK, "Combine with foot and transit for park and ride.")
-            // .value("car_dropoff", TraverseMode.CAR_DROPOFF, "Combine with foot and transit for kiss and ride.")
-            // .value("car_pickup", TraverseMode.CAR_PICKUP, "Combine with foot and transit for ride and kiss.")
+    private static GraphQLEnumType streetModeEnum = GraphQLEnumType.newEnum()
+            .name("StreetMode")
+            .value("foot", StreetMode.WALK)
+            .value("bicycle", StreetMode.BIKE)
+            .value("bike_park", StreetMode.BIKE_TO_PARK)
+            .value("bike_rental", StreetMode.BIKE_RENTAL)
+            .value("car", StreetMode.CAR)
+            .value("car_park", StreetMode.CAR_TO_PARK)
+            .value("taxi", StreetMode.TAXI)
+            .value("car_rental", StreetMode.CAR_RENTAL)
             .build();
 
     private static GraphQLEnumType transportModeEnum = GraphQLEnumType.newEnum()
             .name("TransportMode")
-            .value("air", TraverseMode.AIRPLANE)
-            .value("bus", TraverseMode.BUS)
-            .value("cableway", TraverseMode.CABLE_CAR)
-            .value("water", TraverseMode.FERRY)
-            .value("funicular", TraverseMode.FUNICULAR)
-            .value("lift", TraverseMode.GONDOLA)
-            .value("rail", TraverseMode.RAIL)
-            .value("metro", TraverseMode.SUBWAY)
-            .value("tram", TraverseMode.TRAM)
-            .value("coach", TraverseMode.BUS).description("NOT IMPLEMENTED")
+            .value("air", TransitMode.AIRPLANE)
+            .value("bus", TransitMode.BUS)
+            .value("cableway", TransitMode.CABLE_CAR)
+            .value("water", TransitMode.FERRY)
+            .value("funicular", TransitMode.FUNICULAR)
+            .value("lift", TransitMode.GONDOLA)
+            .value("rail", TransitMode.RAIL)
+            .value("metro", TransitMode.SUBWAY)
+            .value("tram", TransitMode.TRAM)
+            .value("coach", TransitMode.BUS).description("NOT IMPLEMENTED")
             .value("unknown", "unknown")
             .build();
+
+    private static GraphQLEnumType modeEnum = GraphQLEnumType.newEnum()
+        .name("Mode")
+        .value("air", TraverseMode.AIRPLANE)
+        .value("bicycle", TraverseMode.BICYCLE)
+        .value("bus", TraverseMode.BUS)
+        .value("cableway", TraverseMode.CABLE_CAR)
+        .value("water", TraverseMode.FERRY)
+        .value("funicular", TraverseMode.FUNICULAR)
+        .value("lift", TraverseMode.GONDOLA)
+        .value("rail", TraverseMode.RAIL)
+        .value("metro", TraverseMode.SUBWAY)
+        .value("tram", TraverseMode.TRAM)
+        .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
+        .value("foot", TraverseMode.WALK)
+        .value("car", TraverseMode.CAR)
+        .build();
 
     private static GraphQLEnumType relativeDirectionEnum = GraphQLEnumType.newEnum()
             .name("RelativeDirection")
@@ -370,6 +379,8 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLInputObjectType locationType;
 
+    private GraphQLInputObjectType allowedModesInputType;
+
     private GraphQLObjectType keyValueType;
 
     //private GraphQLObjectType brandingType;
@@ -385,6 +396,8 @@ public class TransmodelIndexGraphQLSchema {
     private GraphQLOutputType tripMetadataType = new GraphQLTypeReference("TripMetadata");
 
     private GraphQLOutputType interchangeType = new GraphQLTypeReference("interchange");
+
+    private GraphQLInputObjectType allowedModesType;
 
     private TransmodelMappingUtil mappingUtil;
 
@@ -693,6 +706,34 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
+        allowedModesInputType = GraphQLInputObjectType.newInputObject()
+            .name("AllowedModes")
+            .description("Input format for specifying which modes will be allowed for this search.")
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("accessMode")
+                .description("The mode used to get from the origin to the access stops in the transit "
+                    + "network the transit network (first-mile).")
+                .type(streetModeEnum)
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("egressMode")
+                .description("The mode used to get from the egress stops in the transit network to"
+                    + "the destination (last-mile).")
+                .type(streetModeEnum)
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("directMode")
+                .description("The mode used to get from the origin to the destination directly, "
+                    + "without using the transit network.")
+                .type(streetModeEnum)
+                .build())
+            .field(GraphQLInputObjectField.newInputObjectField()
+                .name("transportMode")
+                .description("The allowed modes for the transit part of the trip.")
+                .type(new GraphQLList(transportModeEnum))
+                .build())
+            .build();
+
         linkGeometryType = GraphQLObjectType.newObject()
                 .name("PointsOnLink")
                 .description("A list of coordinates encoded as a polyline string (see http://code.google.com/apis/maps/documentation/polylinealgorithm.html)")
@@ -985,10 +1026,10 @@ public class TransmodelIndexGraphQLSchema {
                         .defaultValue(defaultRoutingRequest.transferCost)
                         .build())
                 .argument(GraphQLArgument.newArgument()
-                        .name("modes")
-                        .description("The set of modes that a user is willing to use. Defaults to " + reverseMapEnumVals(modeEnum, defaultRoutingRequest.modes.getModes()))
-                        .type(new GraphQLList(modeEnum))
-                        .defaultValue(defaultRoutingRequest.modes.getModes())
+                        .name("allowedModes")
+                        .description("The set of access/egress/direct/transit modes to be used for "
+                            + "this search.")
+                        .type(allowedModesInputType)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                          .name("transportSubmodes")
@@ -1000,7 +1041,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("allowBikeRental")
                         .description("Is bike rental allowed?")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.allowBikeRental)
+                        .defaultValue(defaultRoutingRequest.bikeRental)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("minimumTransferTime")
@@ -4398,7 +4439,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("allowBikeRental")
                         .description("")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).allowBikeRental)
+                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRental)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikeParkAndRide")
