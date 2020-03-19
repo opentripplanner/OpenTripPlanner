@@ -110,13 +110,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Override
     public boolean isReverseOf(Edge e) {
-        Edge other = e;
-        if (e instanceof TemporaryPartialStreetEdge) {
-            other = ((TemporaryPartialStreetEdge) e).parentEdge;
-        }
-
-        // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
-        return parentEdge.isReverseOf(other);
+        return false;
     }
 
     @Override

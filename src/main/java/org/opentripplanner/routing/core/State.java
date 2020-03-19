@@ -850,4 +850,11 @@ public class State implements Cloneable {
     public VehicleDescription getCurrentVehicle() {
         return stateData.currentVehicle;
     }
+
+    public Map<TraverseMode, Double> getDistanceTraversedInMode() {
+        return distanceTraversedInMode;
+    }
+    public Map<TraverseMode, Integer> getTimeTraversedInMode() {
+        return timeTraversedInMode;
+    }
 }
