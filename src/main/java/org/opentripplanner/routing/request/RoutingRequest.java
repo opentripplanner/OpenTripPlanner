@@ -179,9 +179,23 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useRequestedDateTimeInMaxHours = false;
 
     /**
-     * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
+     * The access/egress/direct/transit modes allowed for this request. The parameter "modes" below
+     * is used for a single A Star sub request.
+     *
+     * // TODO OTP2 Street routing requests should eventually be split into its own request class.
      */
-    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
+    public AllowedModes allowedModes = new AllowedModes(
+        StreetMode.WALK,
+        StreetMode.WALK,
+        StreetMode.WALK,
+        Collections.emptySet()
+    );
+
+    /**
+     * The set of TraverseModes allowed when doing street routing.
+     * // TODO OTP2 Street routing requests should eventually be split into its own request class.
+     */
+    public TraverseModeSet modes = new TraverseModeSet("WALK"); // defaults in constructor overwrite this
 
     /**
      * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
@@ -594,7 +608,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
-    public boolean allowBikeRental = false;
+    public boolean bikeRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
@@ -635,7 +649,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
-    private StreetEdge splitEdge = null;
+    public StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -986,6 +1000,58 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /* INSTANCE METHODS */
+
+    public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
+        RoutingRequest streetRequest = this.clone();
+        streetRequest.modes = new TraverseModeSet();
+
+        switch (streetMode) {
+            case WALK:
+                streetRequest.modes.setWalk(true);
+                break;
+            case BIKE:
+                streetRequest.modes.setBicycle(true);
+                break;
+            case BIKE_TO_PARK: // TODO OTP2 Reimplement
+                streetRequest.modes.setBicycle(true);
+                streetRequest.modes.setWalk(true);
+                streetRequest.bikeParkAndRide = true;
+                break;
+            case BIKE_RENTAL: // TODO OTP2 Reimplement
+                streetRequest.modes.setBicycle(true);
+                streetRequest.modes.setWalk(true);
+                streetRequest.bikeRental = true;
+                break;
+            case CAR:
+                streetRequest.modes.setCar(true);
+                break;
+            case CAR_TO_PARK: // TODO OTP2 Reimplement
+                streetRequest.modes.setCar(true);
+                streetRequest.modes.setWalk(true);
+                streetRequest.parkAndRide = true;
+                break;
+            case TAXI:
+                streetRequest.modes.setCar(true);
+                streetRequest.modes.setWalk(true);
+                streetRequest.kissAndRide = true;
+                break;
+            case CAR_RENTAL: // TODO OTP2 Reimplement
+                streetRequest.modes.setCar(true);
+                streetRequest.modes.setWalk(true);
+        }
+
+        streetRequest.resetRoutingContext();
+
+        return streetRequest;
+    }
+
+    // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
+    private void resetRoutingContext() {
+        Graph graph = rctx.graph;
+        rctx = null;
+        splitEdge = null;
+        setRoutingContext(graph);
+    }
 
     @SuppressWarnings("unchecked")
     @Override
