@@ -457,14 +457,14 @@ public class TestHalfEdges {
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         Edge edge = outgoing.iterator().next();
 
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
 
         outgoing = station2.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         edge = outgoing.iterator().next();
 
         Vertex station2point = edge.getToVertex();

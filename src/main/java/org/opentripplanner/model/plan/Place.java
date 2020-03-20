@@ -1,9 +1,8 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.model.Coordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.util.Constants;
-import org.opentripplanner.util.CoordinateUtils;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -33,14 +32,9 @@ public class Place {
     public String platformCode = null;
 
     /**
-     * The longitude of the place.
+     * The coordinate of the place.
      */
-    public Double lon = null;
-    
-    /**
-     * The latitude of the place.
-     */
-    public Double lat = null;
+    public Coordinate coordinate = null;
 
     public String orig;
 
@@ -69,18 +63,10 @@ public class Place {
 
     public Place() { }
 
-    public Place(Double lon, Double lat, String name) {
-        this.lon = lon;
-        this.lat = lat;
+    public Place(Double lat, Double lon, String name) {
+        this.coordinate = new Coordinate(lat, lon);
         this.name = name;
         this.vertexType = VertexType.NORMAL;
-    }
-
-    /**
-     * Returns the geometry in GeoJSON format
-     */
-    String getGeometry() {
-        return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
     }
 
     /**
@@ -89,8 +75,8 @@ public class Place {
      */
     public boolean sameLocation(Place other) {
         if(this == other) { return true; }
-        if(lat != null && lon != null && other.lat != null && other.lon != null) {
-            return CoordinateUtils.compare(lat, lon, other.lat, other.lon);
+        if(coordinate != null) {
+            return coordinate.equals(other.coordinate);
         }
         return stopId != null && stopId.equals(other.stopId);
     }
@@ -102,8 +88,7 @@ public class Place {
                 .addObj("stopId", stopId)
                 .addStr("stopCode", stopCode)
                 .addStr("platformCode", platformCode)
-                .addCoordinate("lon", lon)
-                .addCoordinate("lat", lat)
+                .addObj("coordinate", coordinate)
                 .addStr("orig", orig)
                 .addStr("zoneId", zoneId)
                 .addNum("stopIndex", stopIndex)

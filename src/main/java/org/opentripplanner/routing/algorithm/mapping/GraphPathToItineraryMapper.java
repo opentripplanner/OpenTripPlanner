@@ -490,8 +490,8 @@ public abstract class GraphPathToItineraryMapper {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
         Place place = new Place(
-                vertex.getX(),
-                vertex.getY(),
+                vertex.getLat(),
+                vertex.getLon(),
                 name
         );
 
@@ -852,8 +852,10 @@ public abstract class GraphPathToItineraryMapper {
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName(wantedLocale);
-        step.lon = en.getFromVertex().getX();
-        step.lat = en.getFromVertex().getY();
+        step.startLocation = new org.opentripplanner.model.Coordinate(
+                en.getFromVertex().getLat(),
+                en.getFromVertex().getLon()
+        );
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
                 s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
