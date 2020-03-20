@@ -47,7 +47,11 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
     /* private factory methods */
 
     private TransitRoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
-        return new McTransitWorker<>(state, context.calculator());
+        return new McTransitWorker<>(
+                state,
+                context.slackProvider(),
+                context.calculator()
+        );
     }
 
     private McRangeRaptorWorkerState<T> createState(Heuristics heuristics) {
@@ -56,6 +60,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
                 createDestinationArrivalPaths(),
                 createHeuristicsProvider(heuristics),
                 context.costCalculator(),
+                context.slackProvider(),
                 context.calculator(),
                 context.lifeCycle()
         );

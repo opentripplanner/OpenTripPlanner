@@ -78,24 +78,17 @@ final class ReverseSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final int earliestBoardTime(int time) {
-        // The boardSlack is NOT added here (as in a forward search) - it is added to the arrival time instead
-        return time;
-    }
-
-    @Override
-    public final int addBoardSlack(int time) {
-        return plusDuration(time, boardSlackInSeconds);
-    }
-
-    @Override
     public final int removeBoardSlack(int time) {
         return minusDuration(time, boardSlackInSeconds);
     }
 
     @Override
-    public final <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern) {
-        return plusDuration(onTrip.departure(stopPositionInPattern), boardSlackInSeconds);
+    public final <T extends RaptorTripSchedule> int stopArrivalTime(
+            T onTrip,
+            int stopPositionInPattern,
+            int alightSlack
+    ) {
+        return plusDuration(onTrip.departure(stopPositionInPattern), alightSlack);
     }
 
     @Override

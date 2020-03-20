@@ -63,24 +63,13 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final int earliestBoardTime(int time) {
-        // When searching forward we must add the board slack before we board.
-        return addBoardSlack(time);
-    }
-
-    @Override
-    public final int addBoardSlack(int time) {
-        return time + boardSlackInSeconds;
-    }
-
-    @Override
     public final int removeBoardSlack(int time) {
         return time - boardSlackInSeconds;
     }
 
     @Override
-    public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern) {
-        return onTrip.arrival(stopPositionInPattern);
+    public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
+        return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
 
     @Override

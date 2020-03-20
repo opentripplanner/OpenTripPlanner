@@ -37,7 +37,7 @@ All paths that is considered *pareto optimal* for a set of criteria is returned 
 See [Wikipedia](https://en.wikipedia.org/wiki/Pareto_efficiency) A pareto-set of paths/itineraries is a set where all elements are better (less than) for at least one criteria than all other elements in the set. Given a set `{ [9,2], [5,6],  [3, 8] }` then `[7, 4]` would make it into the set. This is because  7 < 9 (comparing the 1sr criteria, element 1), while 4 < 6 and 8 (comparing the 2nd criteria, element 2 and 3). `[6,7]` would not make it into the set because `[5,6]` is better for both criteria.
 
 # Features
-## Algorithm implementation (R5 repo)
+## Algorithm implementation
 - Algorithms
     - Raptor (Range Raptor with one iteration)
     - Range Raptor

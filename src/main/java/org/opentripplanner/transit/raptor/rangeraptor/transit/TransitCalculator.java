@@ -46,23 +46,6 @@ public interface TransitCalculator {
     int duration(int timeA, int timeB);
 
     /**
-     * Calculate the earliest possible board time, adding board slack in the case
-     * of a forward search, adding nothing in the case of a reverse search.
-     *
-     * @param time - the arrival time (forward search) or board time (reverse search)
-     * @return the earliest possible board time to use in the next trip search.
-     */
-    int earliestBoardTime(int time);
-
-    /**
-     * Add boardSlack to time.
-     *
-     * @param time - any time
-     * @return the time plus boardSlack
-     */
-    int addBoardSlack(int time);
-
-    /**
      * Remove boardSlack from time.
      *
      * @param time - any time
@@ -78,7 +61,7 @@ public interface TransitCalculator {
      * @param stopPositionInPattern the stop position/index
      * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern);
+    <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack);
 
 
     /**

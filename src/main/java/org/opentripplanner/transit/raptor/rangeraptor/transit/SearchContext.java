@@ -5,17 +5,18 @@ import org.opentripplanner.transit.raptor.api.request.DebugRequest;
 import org.opentripplanner.transit.raptor.api.request.McCostParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
-import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
+import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 import java.util.Collection;
 
@@ -40,6 +41,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private final TransitCalculator calculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
+    private final SlackProvider<T> slackProvider;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
 
@@ -57,6 +59,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
+        this.slackProvider = createSlackProvider(request);
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -97,6 +100,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return calculator;
     }
 
+    public SlackProvider<T> slackProvider() {
+        return slackProvider;
+    }
+
     public CostCalculator costCalculator() {
         McCostParams f = request.multiCriteriaCostFactors();
         return new CostCalculator(
@@ -134,6 +141,24 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return tuningParameters.maxNumberOfTransfers() + 1;
     }
 
+    public RoundProvider roundProvider() {
+        return roundTracker;
+    }
+
+    public WorkerLifeCycle lifeCycle() {
+        return lifeCycleSubscriptions;
+    }
+
+    public LifeCycleEventPublisher createLifeCyclePublisher() {
+        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleSubscriptions);
+        // We want the code to fail (NPE) if someone try to attach to the worker workerlifecycle
+        // after it is iniziated; Hence set the builder to null:
+        lifeCycleSubscriptions = null;
+        return publisher;
+    }
+
+    /* private methods */
+
     /**
      * Create a new calculator depending on the desired search direction.
      */
@@ -150,19 +175,10 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 : request.mutate().debug().reverseDebugRequest().build();
     }
 
-    public RoundProvider roundProvider() {
-        return roundTracker;
-    }
-
-    public WorkerLifeCycle lifeCycle() {
-        return lifeCycleSubscriptions;
-    }
-
-    public LifeCycleEventPublisher createLifeCyclePublisher() {
-        LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleSubscriptions);
-        // We want the code to fail (NPE) if someone try to attach to the worker workerlifecycle
-        // after it is iniziated; Hence set the builder to null:
-        lifeCycleSubscriptions = null;
-        return publisher;
+    private SlackProvider<T> createSlackProvider(RaptorRequest<T> request) {
+        int boardSlack = request.searchParams().boardSlackInSeconds();
+        return request.searchDirection().isForward()
+                ? new ForwardSlackProvider<>(boardSlack, lifeCycle())
+                : new ReverseSlackProvider<>(boardSlack, lifeCycle());
     }
 }

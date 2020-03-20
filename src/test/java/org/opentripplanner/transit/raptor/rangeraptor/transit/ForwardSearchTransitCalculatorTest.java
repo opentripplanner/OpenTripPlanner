@@ -74,21 +74,6 @@ public class ForwardSearchTransitCalculatorTest {
     }
 
     @Test
-    public void boardSlackInSeconds() {
-        boardSlackInSeconds = 120;
-        TransitCalculator subject = create();
-        assertEquals(620, subject.addBoardSlack(500));
-        assertEquals(380, subject.removeBoardSlack(500));
-    }
-
-    @Test
-    public void earliestBoardTime() {
-        boardSlackInSeconds = 120;
-        TransitCalculator subject = create();
-        assertEquals(220, subject.earliestBoardTime(100));
-    }
-
-    @Test
     public void duration() {
         assertEquals(600, create().plusDuration(500, 100));
         assertEquals(400, create().minusDuration(500, 100));
@@ -109,7 +94,7 @@ public class ForwardSearchTransitCalculatorTest {
     @Test
     public void latestArrivalTime() {
         TestRaptorTripSchedule s = TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes(500);
-        assertEquals(500, create().stopArrivalTime(s, 0));
+        assertEquals(500, create().stopArrivalTime(s, 0, 0));
     }
 
     @Test
