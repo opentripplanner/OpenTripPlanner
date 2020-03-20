@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import com.google.common.collect.Multimap;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 
 import java.util.ArrayList;
 import java.util.List;

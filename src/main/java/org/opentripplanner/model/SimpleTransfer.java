@@ -1,6 +1,5 @@
-package org.opentripplanner.routing.edgetype;
+package org.opentripplanner.model;
 
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.io.Serializable;
