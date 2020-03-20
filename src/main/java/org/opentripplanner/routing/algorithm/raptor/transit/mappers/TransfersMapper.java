@@ -1,15 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import com.google.common.collect.Multimap;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
 
 class TransfersMapper {
 
@@ -17,8 +15,8 @@ class TransfersMapper {
      * Copy pre-calculated transfers from the original graph
      */
     static List<List<Transfer>> mapTransfers(
-            Map<Stop, TransitStopVertex> stopVertexForStop,
-            StopIndexForRaptor stopIndex
+        StopIndexForRaptor stopIndex,
+        Multimap<Stop, SimpleTransfer> transfersByStop
     ) {
 
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
@@ -28,16 +26,13 @@ class TransfersMapper {
             ArrayList<Transfer> list = new ArrayList<>();
             transferByStopIndex.add(list);
 
-            for (Edge edge : stopVertexForStop.get(stop).getOutgoing()) {
-                if (edge instanceof SimpleTransfer) {
-                    double effectiveDistance = edge.getEffectiveWalkDistance();
+            for (SimpleTransfer simpleTransfer : transfersByStop.get(stop)) {
+                double effectiveDistance = simpleTransfer.getEffectiveWalkDistance();
+                int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
+                Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
+                    simpleTransfer.getEdges());
 
-                    int toStopIndex = stopIndex.indexByStop.get(((TransitStopVertex) edge.getToVertex()).getStop());
-                    Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
-                            ((SimpleTransfer) edge).getEdges());
-
-                    list.add(transfer);
-                }
+                list.add(transfer);
             }
         }
         return transferByStopIndex;
