@@ -10,6 +10,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
@@ -125,6 +126,7 @@ public class SerializedGraphObject implements Serializable {
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
         kryo.register(HashBiMap.class, new HashBiMapSerializer());
+        kryo.register(HashMultimap.class, new HashMultimapSerializer());
 
         // Add serializers for "immutable" config classes
         kryo.register(RouterConfig.class, new RouterConfigSerializer());

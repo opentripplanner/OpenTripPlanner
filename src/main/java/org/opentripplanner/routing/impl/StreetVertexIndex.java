@@ -14,7 +14,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.request.RoutingRequest;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
@@ -203,8 +202,6 @@ public class StreetVertexIndex {
              * rasterizing splitting long segments.
              */
             for (Edge e : gv.getOutgoing()) {
-                if (e instanceof SimpleTransfer)
-                    continue;
                 LineString geometry = e.getGeometry();
                 if (geometry == null) {
                     continue;

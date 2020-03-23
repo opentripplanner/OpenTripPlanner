@@ -27,8 +27,6 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
@@ -36,12 +34,15 @@ import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
@@ -250,6 +251,9 @@ public class Graph implements Serializable {
 
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
+
+    /** Pre-generated transfers between all stops. */
+    public final Multimap<Stop, SimpleTransfer> transfersByStop = HashMultimap.create();
 
     /** The distance between elevation samples used in CompactElevationProfile. */
     private double distanceBetweenElevationSamples;
@@ -1090,5 +1094,9 @@ public class Graph implements Serializable {
 
     public Map<FeedScopedId, Integer> getServiceCodes() {
         return serviceCodes;
+    }
+
+    public Multimap<Stop, SimpleTransfer> getTransfersByStop() {
+        return transfersByStop;
     }
 }
