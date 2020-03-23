@@ -256,6 +256,10 @@ public class TransmodelGraphQLPlanner {
             );
         }
 
+        if (request.allowedModes.transitModes.isEmpty()) {
+            request.allowedModes.transitModes = new HashSet<>(Arrays.asList(TransitMode.values()));
+        }
+
         /*
         List<Map<String, ?>> transportSubmodeFilters = environment.getArgument("transportSubmodes");
         if (transportSubmodeFilters != null) {

@@ -5,10 +5,10 @@ import org.opentripplanner.model.TransitMode;
 import java.util.Set;
 
 public class AllowedModes {
-  public final StreetMode accessMode;
-  public final StreetMode egressMode;
-  public final StreetMode directMode;
-  public final Set<TransitMode> transitModes;
+  public StreetMode accessMode;
+  public StreetMode egressMode;
+  public StreetMode directMode;
+  public Set<TransitMode> transitModes;
 
   public AllowedModes(
       StreetMode accessMode,

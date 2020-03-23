@@ -673,11 +673,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setModes(modes);
     }
 
-    public RoutingRequest(QualifiedModeSet qmodes) {
-        this();
-        qmodes.applyToRoutingRequest(this);
-    }
-
     public RoutingRequest(String qmodes) {
         this();
         new QualifiedModeSet(qmodes).applyToRoutingRequest(this);
