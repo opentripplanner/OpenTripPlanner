@@ -19,7 +19,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
 
     private final StdWorkerState<T> state;
     private final TransitCalculator calculator;
-    private final SlackProvider<T> slackProvider;
+    private final SlackProvider slackProvider;
 
     private int onTripIndex;
     private int onTripBoardTime;
@@ -30,7 +30,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
 
     public StdTransitWorker(
             StdWorkerState<T> state,
-            SlackProvider<T> slackProvider,
+            SlackProvider slackProvider,
             TransitCalculator calculator
     ) {
         this.state = state;
@@ -56,6 +56,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
         // attempt to alight if we're on board, done above the board search so that we don't check
         // for alighting when boarding
         if (onTripIndex != NOT_SET) {
+            // TODO OTP2 - Are We allowed to alight at stop?
             state.transitToStop(
                     stop,
                     // In the normal case the trip alightTime is used,

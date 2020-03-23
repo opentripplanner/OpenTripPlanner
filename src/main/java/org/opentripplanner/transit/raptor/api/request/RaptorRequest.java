@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.api.request;
 
 import com.esotericsoftware.minlog.Log;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
@@ -23,6 +24,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
     private final Set<Optimization> optimizations;
     private final McCostParams mcCostParams;
     private final DebugRequest<T> debug;
+    private final RaptorSlackProvider slackProvider;
 
 
     static <T extends RaptorTripSchedule> RaptorRequest<T> defaults() {
@@ -35,6 +37,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         searchDirection = SearchDirection.FORWARD;
         optimizations = Collections.emptySet();
         mcCostParams = McCostParams.DEFAULTS;
+        slackProvider = RaptorSlackProvider.defaults();
         debug = DebugRequest.defaults();
     }
 
@@ -44,6 +47,7 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
         this.searchDirection = builder.searchDirection();
         this.optimizations = Set.copyOf(builder.optimizations());
         this.mcCostParams = new McCostParams(builder.mcCostFactors());
+        this.slackProvider = builder.slackProvider();
         this.debug = builder.debug().build();
         verify();
     }
@@ -92,6 +96,10 @@ public class RaptorRequest<T extends RaptorTripSchedule> {
 
     public SearchDirection searchDirection() {
         return searchDirection;
+    }
+
+    public RaptorSlackProvider slackProvider() {
+        return slackProvider;
     }
 
     /**

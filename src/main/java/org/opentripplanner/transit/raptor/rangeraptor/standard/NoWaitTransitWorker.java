@@ -20,7 +20,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
 
     private final StdWorkerState<T> state;
     private final TransitCalculator calculator;
-    private final SlackProvider<T> slackProvider;
+    private final SlackProvider slackProvider;
 
     private int onTripIndex;
     private int onTripBoardTime;
@@ -32,7 +32,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
 
     public NoWaitTransitWorker(
             StdWorkerState<T> state,
-            SlackProvider<T> slackProvider,
+            SlackProvider slackProvider,
             TransitCalculator calculator
     ) {
         this.state = state;

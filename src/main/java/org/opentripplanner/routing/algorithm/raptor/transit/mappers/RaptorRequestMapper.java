@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.Optimization;
@@ -38,7 +39,14 @@ public class RaptorRequestMapper {
 
         builder
                 .profile(RaptorProfile.MULTI_CRITERIA)
-                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION);
+                .enableOptimization(Optimization.PARETO_CHECK_AGAINST_DESTINATION)
+                .slackProvider(new SlackProvider(
+                        request.transferSlack,
+                        request.boardSlack,
+                        request.boardSlackForMode,
+                        request.alightSlack,
+                        request.alightSlackForMode
+                ));
 
         builder
                 .searchParams()

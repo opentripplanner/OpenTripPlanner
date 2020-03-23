@@ -41,7 +41,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private final TransitCalculator calculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
-    private final SlackProvider<T> slackProvider;
+    private final SlackProvider slackProvider;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
 
@@ -59,7 +59,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
-        this.slackProvider = createSlackProvider(request);
+        this.slackProvider = createSlackProvider(request, lifeCycle());
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -88,10 +88,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return request.profile();
     }
 
-    public RaptorTuningParameters tuningParameters() {
-        return tuningParameters;
-    }
-
     public RaptorTransitDataProvider<T> transit() {
         return transit;
     }
@@ -100,7 +96,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
         return calculator;
     }
 
-    public SlackProvider<T> slackProvider() {
+    public SlackProvider slackProvider() {
         return slackProvider;
     }
 
@@ -169,16 +165,20 @@ public class SearchContext<T extends RaptorTripSchedule> {
                 : new ReverseSearchTransitCalculator(s, t);
     }
 
-    private DebugRequest<T> debugRequest(RaptorRequest<T> request) {
+    private static <S extends RaptorTripSchedule> DebugRequest<S> debugRequest(
+            RaptorRequest<S> request
+    ) {
         return request.searchDirection().isForward()
                 ? request.debug()
                 : request.mutate().debug().reverseDebugRequest().build();
     }
 
-    private SlackProvider<T> createSlackProvider(RaptorRequest<T> request) {
-        int boardSlack = request.searchParams().boardSlackInSeconds();
+    private static <S extends RaptorTripSchedule> SlackProvider createSlackProvider(
+            RaptorRequest<S> request,
+            WorkerLifeCycle lifeCycle
+    ) {
         return request.searchDirection().isForward()
-                ? new ForwardSlackProvider<>(boardSlack, lifeCycle())
-                : new ReverseSlackProvider<>(boardSlack, lifeCycle());
+                ? new ForwardSlackProvider<>(request.slackProvider(), lifeCycle)
+                : new ReverseSlackProvider<>(request.slackProvider(), lifeCycle);
     }
 }

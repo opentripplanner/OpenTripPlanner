@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
@@ -12,23 +13,28 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class ForwardSlackProvider<T extends RaptorTripSchedule> implements SlackProvider<T> {
+public final class ForwardSlackProvider<T extends RaptorTripSchedule> implements SlackProvider {
 
-    private final int boardSlack;
-    //private boolean ignoreTransferSlack;
+    private final RaptorSlackProvider source;
+    private boolean ignoreTransferSlack = true;
+    private int boardSlack;
+    private int alightSlack;
 
-    public ForwardSlackProvider(int boardSlack, WorkerLifeCycle lifeCycle) {
-        this.boardSlack = boardSlack;
-
-        //lifeCycle.onPrepareForNextRound(this::notifyNewRound);
+    public ForwardSlackProvider(RaptorSlackProvider source, WorkerLifeCycle lifeCycle) {
+        this.source = source;
+        lifeCycle.onPrepareForNextRound(this::notifyNewRound);
     }
 
     public void notifyNewRound(int round) {
-        //ignoreTransferSlack = round < 2;
+        ignoreTransferSlack = round < 2;
     }
 
     @Override
-    public void setCurrentPattern(RaptorTripPattern pattern) { }
+    public void setCurrentPattern(RaptorTripPattern pattern) {
+        this.boardSlack = source.boardSlack(pattern)
+                + (ignoreTransferSlack ? 0 : source.transferSlack());
+        this.alightSlack = source.alightSlack(pattern);
+    }
 
     @Override
     public final int boardSlack() {
@@ -37,9 +43,6 @@ public final class ForwardSlackProvider<T extends RaptorTripSchedule> implements
 
     @Override
     public final int alightSlack() {
-        return 0;
-        //return ignoreTransferSlack
-        //        ? master.boardSlack(pattern)
-        //        : master.boardSlack(pattern) +  master.transferSlack();
+        return alightSlack;
     }
 }

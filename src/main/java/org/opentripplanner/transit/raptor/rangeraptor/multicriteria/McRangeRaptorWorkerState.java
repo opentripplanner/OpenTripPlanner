@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
@@ -40,7 +39,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     private final List<AbstractStopArrival<T>> arrivalsCache = new ArrayList<>();
     private final CostCalculator costCalculator;
     private final TransitCalculator transitCalculator;
-    private final SlackProvider<T> slackProvider;
 
     /**
      * create a RaptorState for a network with a particular number of stops, and a given maximum duration
@@ -50,7 +48,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
             DestinationArrivalPaths<T> paths,
             HeuristicsProvider<T> heuristics,
             CostCalculator costCalculator,
-            SlackProvider<T> slackProvider,
             TransitCalculator transitCalculator,
             WorkerLifeCycle lifeCycle
 
@@ -59,7 +56,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         this.paths = paths;
         this.heuristics = heuristics;
         this.costCalculator = costCalculator;
-        this.slackProvider = slackProvider;
         this.transitCalculator = transitCalculator;
 
         // Attach to the RR life cycle

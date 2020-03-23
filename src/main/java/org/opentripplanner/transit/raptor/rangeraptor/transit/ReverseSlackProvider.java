@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
@@ -12,31 +13,39 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class ReverseSlackProvider<T extends RaptorTripSchedule> implements SlackProvider<T> {
+public final class ReverseSlackProvider<T extends RaptorTripSchedule> implements SlackProvider {
 
-    private final int boardSlack;
-    //private boolean ignoreTransferSlack;
+    private final RaptorSlackProvider source;
+    private boolean ignoreTransferSlack = true;
+    private int reverseAlightSlack;
+    private int revereBoardSlack;
 
-    public ReverseSlackProvider(int boardSlack, WorkerLifeCycle lifeCycle) {
-        this.boardSlack = boardSlack;
-        //lifeCycle.onPrepareForNextRound(this::notifyNewRound);
+    public ReverseSlackProvider(RaptorSlackProvider source, WorkerLifeCycle lifeCycle) {
+        this.source = source;
+        lifeCycle.onPrepareForNextRound(this::notifyNewRound);
     }
 
-    public final void notifyNewRound(int round) {
-        //ignoreTransferSlack = round < 2;
+    public void notifyNewRound(int round) {
+        ignoreTransferSlack = round < 2;
     }
 
     @Override
-    public final void setCurrentPattern(RaptorTripPattern pattern) { }
+    public void setCurrentPattern(RaptorTripPattern pattern) {
+        this.revereBoardSlack = source.alightSlack(pattern);
+        this.reverseAlightSlack = source.boardSlack(pattern) + transferSlack();
+    }
 
     @Override
     public final int boardSlack() {
-        return 0;
+        return revereBoardSlack;
     }
 
     @Override
     public final int alightSlack() {
-        // return ignoreTransferSlack ? boardSlack : boardSlack + transferSlack;
-        return boardSlack;
+        return reverseAlightSlack;
+    }
+
+    private int transferSlack() {
+        return ignoreTransferSlack ? 0 : source.transferSlack();
     }
 }

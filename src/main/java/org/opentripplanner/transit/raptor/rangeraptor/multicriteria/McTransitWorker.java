@@ -20,12 +20,12 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
-    private final SlackProvider<T> slackProvider;
+    private final SlackProvider slackProvider;
 
     private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
-    public McTransitWorker(McRangeRaptorWorkerState<T> state, SlackProvider<T> slackProvider, TransitCalculator calculator) {
+    public McTransitWorker(McRangeRaptorWorkerState<T> state, SlackProvider slackProvider, TransitCalculator calculator) {
         this.state = state;
         this.slackProvider = slackProvider;
         this.calculator = calculator;
@@ -45,7 +45,11 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
         for (AbstractStopArrival<T> prevStopArrival : state.listStopArrivalsPreviousRound(boardStopIndex)) {
 
-            int earliestBoardTime = calculator.plusDuration(prevStopArrival.arrivalTime(), slackProvider.boardSlack());
+            int earliestBoardTime = calculator.plusDuration(
+                    prevStopArrival.arrivalTime(),
+                    slackProvider.boardSlack()
+            );
+
             boolean found = tripSearch.search(earliestBoardTime, boardStopPos);
 
             if (found) {

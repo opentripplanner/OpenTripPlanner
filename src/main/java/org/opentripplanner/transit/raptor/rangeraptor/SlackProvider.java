@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
  * Responsible for providing {@code boardSlack} and {@code alightSlack} to the Raptor algorithm -
@@ -19,10 +18,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  *     <li>{@link org.opentripplanner.transit.raptor.rangeraptor.transit.ForwardSlackProvider}
  *     <li>{@link org.opentripplanner.transit.raptor.rangeraptor.transit.ReverseSlackProvider}
  * </ul>
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface SlackProvider<T extends RaptorTripSchedule> {
+public interface SlackProvider {
 
     /**
      * Set the trip pattern to use when finding the {@code boardSlack} and {@code alightSlack}.

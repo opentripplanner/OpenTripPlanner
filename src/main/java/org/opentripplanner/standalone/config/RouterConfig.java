@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Map;
 
 /**
  * This class is an object representation of the 'router-config.json'.
@@ -38,23 +37,6 @@ public class RouterConfig implements Serializable {
      */
     public final double streetRoutingTimeoutSeconds;
 
-    /**
-     * TODO OTP2 - Regression; this need to be integrated with Raptor. This parameter was
-     *           - previously on the graph, but should be injected into Raptor instead.
-     *
-     * Has information how much time boarding a vehicle takes. Can be significant
-     * eg in airplanes or ferries. Unit is ?. Default value is ? <-- TODO OTP2
-     */
-    public final Map<TraverseMode, Integer> boardSlackByMode;
-
-    /**
-     * TODO OTP2 - Regression; this need to be integrated with Raptor. This parameter was
-     *           - previously on the graph, but should be injected into Raptor instead.
-     *
-     * Has information how much time alighting a vehicle takes. Can be significant
-     * eg in airplanes or ferries.Unit is ?. Default value is ? <-- TODO OTP2
-     */
-    public final Map<TraverseMode, Integer> alightSlackByMode;
 
     public final RoutingRequest routingRequestDefaults;
     public final RaptorTuningParameters raptorTuningParameters;
@@ -66,8 +48,6 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-        this.boardSlackByMode = adapter.asEnumMap("boardTimes", TraverseMode.class, NodeAdapter::asInt);
-        this.alightSlackByMode = adapter.asEnumMap("alightTimes", TraverseMode.class, NodeAdapter::asInt);
 
         this.raptorTuningParameters = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = routingRequestDefaults(adapter.path("routingDefaults"));
@@ -89,6 +69,7 @@ public class RouterConfig implements Serializable {
         // Keep this alphabetically sorted so it is easy to check if a parameter is missing from the
         // mapping or duplicate exist.
         request.alightSlack = c.asInt("alightSlack", dft.alightSlack);
+        request.alightSlackForMode = c.asEnumMap("alightSlackForMode", TraverseMode.class, NodeAdapter::asInt);
         request.allowBikeRental = c.asBoolean("allowBikeRental", dft.allowBikeRental);
         request.arriveBy = c.asBoolean("arriveBy", dft.arriveBy);
         request.bikeBoardCost = c.asInt("bikeBoardCost", dft.bikeBoardCost);
@@ -105,6 +86,8 @@ public class RouterConfig implements Serializable {
         request.bikeTriangleTimeFactor = c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
         request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
+        request.boardSlack = c.asInt("boardSlack", 0);
+        request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
         request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
         request.carDecelerationSpeed = c.asDouble("carDecelerationSpeed", dft.carDecelerationSpeed);
