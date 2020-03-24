@@ -549,7 +549,7 @@ public class IndexGraphQLSchema {
                 .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                 .name("semanticHash")
-                .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(stopType))))
+                .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .dataFetcher(environment -> index.patternForTrip.get((Trip) environment.getSource())
                     .semanticHashString((Trip) environment.getSource()))
                 .build())
