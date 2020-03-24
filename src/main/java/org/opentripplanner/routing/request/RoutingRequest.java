@@ -673,11 +673,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setStreetSubRequestModes(streetSubRequestModes);
     }
 
-    public RoutingRequest(String qmodes) {
-        this();
-        new QualifiedModeSet(qmodes).applyToRoutingRequest(this);
-    }
-
     public RoutingRequest(TraverseMode mode) {
         this();
         this.setStreetSubRequestModes(new TraverseModeSet(mode));

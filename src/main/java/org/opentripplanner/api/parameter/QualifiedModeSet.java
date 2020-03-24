@@ -3,10 +3,7 @@ package org.opentripplanner.api.parameter;
 import com.beust.jcommander.internal.Sets;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.AllowedModes;
-import org.opentripplanner.routing.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.request.StreetMode;
 
 import java.io.Serializable;
@@ -49,30 +46,30 @@ public class QualifiedModeSet implements Serializable {
         // Set transit modes
         for (QualifiedMode qMode : qModes) {
              switch (qMode.mode) {
-                 case RAIL:
+                 case "RAIL":
                      allowedModes.transitModes.add(TransitMode.RAIL);
                      break;
-                 case SUBWAY:
+                 case "SUBWAY":
                      allowedModes.transitModes.add(TransitMode.SUBWAY);
                      break;
-                 case BUS:
+                 case "BUS":
                      allowedModes.transitModes.add(TransitMode.BUS);
                      break;
-                 case TRAM:
+                 case "TRAM":
                      allowedModes.transitModes.add(TransitMode.TRAM);
                      break;
-                 case FERRY:
+                 case "FERRY":
                      allowedModes.transitModes.add(TransitMode.FERRY);
                      break;
-                 case AIRPLANE:
+                 case "AIRPLANE":
                      allowedModes.transitModes.add(TransitMode.AIRPLANE);
                      break;
-                 case CABLE_CAR:
+                 case "CABLE_CAR":
                      allowedModes.transitModes.add(TransitMode.CABLE_CAR);
-                 case GONDOLA:
+                 case "GONDOLA":
                      allowedModes.transitModes.add(TransitMode.GONDOLA);
                      break;
-                 case FUNICULAR:
+                 case "FUNICULAR":
                      allowedModes.transitModes.add(TransitMode.FUNICULAR);
                      break;
              }
@@ -87,70 +84,50 @@ public class QualifiedModeSet implements Serializable {
         //  TODO OTP2 This should either be updated with missing modes or the REST API should be
         //   redesigned to better reflect the mode structure used in AllowedModes.
         for (QualifiedMode qMode : qModes) {
-            if (qMode.mode == TraverseMode.WALK) {
-                allowedModes.accessMode = StreetMode.WALK;
-                allowedModes.egressMode = StreetMode.WALK;
-                allowedModes.directMode = StreetMode.WALK;
-            } else if (qMode.mode == TraverseMode.BICYCLE) {
-                if (qMode.qualifiers.contains(Qualifier.RENT)) {
-                    allowedModes.accessMode = StreetMode.BIKE_RENTAL;
-                    allowedModes.egressMode = StreetMode.BIKE_RENTAL;
-                    allowedModes.directMode = StreetMode.BIKE_RENTAL;
-                } else if (qMode.qualifiers.contains(Qualifier.PARK)) {
-                    allowedModes.accessMode = StreetMode.BIKE_TO_PARK;
-                    allowedModes.egressMode = StreetMode.WALK;
-                    allowedModes.directMode = StreetMode.BIKE_TO_PARK;
-                } else {
-                    allowedModes.accessMode = StreetMode.BIKE;
-                    allowedModes.egressMode = StreetMode.BIKE;
-                    allowedModes.directMode = StreetMode.BIKE;
-                }
-            } else if (qMode.mode == TraverseMode.CAR) {
-                if (qMode.qualifiers.contains(Qualifier.RENT)) {
-                    allowedModes.accessMode = StreetMode.CAR_RENTAL;
-                    allowedModes.egressMode = StreetMode.CAR_RENTAL;
-                    allowedModes.directMode = StreetMode.CAR_RENTAL;
-                } else if (qMode.qualifiers.contains(Qualifier.PARK)) {
-                    allowedModes.accessMode = StreetMode.CAR_TO_PARK;
-                    allowedModes.egressMode = StreetMode.WALK;
-                    allowedModes.directMode = StreetMode.CAR_TO_PARK;
-                } else {
+            switch (qMode.mode) {
+                case "TraverseMode.WALK":
                     allowedModes.accessMode = StreetMode.WALK;
                     allowedModes.egressMode = StreetMode.WALK;
-                    allowedModes.directMode = StreetMode.CAR;
-                }
+                    allowedModes.directMode = StreetMode.WALK;
+                    break;
+                case "BICYCLE":
+                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                        allowedModes.accessMode = StreetMode.BIKE_RENTAL;
+                        allowedModes.egressMode = StreetMode.BIKE_RENTAL;
+                        allowedModes.directMode = StreetMode.BIKE_RENTAL;
+                    }
+                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                        allowedModes.accessMode = StreetMode.BIKE_TO_PARK;
+                        allowedModes.egressMode = StreetMode.WALK;
+                        allowedModes.directMode = StreetMode.BIKE_TO_PARK;
+                    }
+                    else {
+                        allowedModes.accessMode = StreetMode.BIKE;
+                        allowedModes.egressMode = StreetMode.BIKE;
+                        allowedModes.directMode = StreetMode.BIKE;
+                    }
+                    break;
+                case "TraverseMode.CAR":
+                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                        allowedModes.accessMode = StreetMode.CAR_RENTAL;
+                        allowedModes.egressMode = StreetMode.CAR_RENTAL;
+                        allowedModes.directMode = StreetMode.CAR_RENTAL;
+                    }
+                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                        allowedModes.accessMode = StreetMode.CAR_TO_PARK;
+                        allowedModes.egressMode = StreetMode.WALK;
+                        allowedModes.directMode = StreetMode.CAR_TO_PARK;
+                    }
+                    else {
+                        allowedModes.accessMode = StreetMode.WALK;
+                        allowedModes.egressMode = StreetMode.WALK;
+                        allowedModes.directMode = StreetMode.CAR;
+                    }
+                    break;
             }
         }
 
         return allowedModes;
-    }
-
-    /**
-     * Modify an existing routing request, setting fields to reflect these qualified modes.
-     * This is intended as a temporary solution, and uses the current system of a single mode set,
-     * accompanied by some flags to help with routing.
-     */
-    public void applyToRoutingRequest(RoutingRequest req) {
-
-        if (qModes.isEmpty()) return;
-
-        /* Start with an empty mode set. */
-        TraverseModeSet modes = new TraverseModeSet();
-        req.setStreetSubRequestModes(modes);
-        
-        /* First, copy over all the unqualified modes and see if we are using transit. FIXME HACK */
-        for (QualifiedMode qMode : qModes) {
-            modes.setMode(qMode.mode, true);
-        }
-        boolean usingTransit = modes.isTransit();
-        
-        // We used to always set WALK to true, but this forced walking when someone wanted to use a bike.
-        // We also want it to be possible to force biking-only (e.g. this is done in some consistency tests).
-        // TODO clearly define mode semantics: does presence of mode mean it is allowable, preferred... ?
-
-        for (QualifiedMode qMode : qModes) {
-            qMode.applyToRoutingRequest(req, usingTransit);
-        }
     }
     
     public String toString() {

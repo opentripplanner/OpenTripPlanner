@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -100,7 +99,9 @@ public class TestBikeRental extends TestCase {
 
         // now we succeed!
         options = new RoutingRequest();
-        new QualifiedModeSet("BICYCLE_RENT,TRANSIT").applyToRoutingRequest(options);
+        options.streetSubRequestModes.setWalk(true);
+        options.streetSubRequestModes.setBicycle(true);
+        options.bikeRental = true;
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
 

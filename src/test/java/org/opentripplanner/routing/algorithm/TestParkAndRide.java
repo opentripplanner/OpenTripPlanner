@@ -70,7 +70,7 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
 
         // or CAR+WALK (no P+R).
-        options = new RoutingRequest("WALK,CAR");
+        options = new RoutingRequest(new TraverseModeSet("WALK,CAR"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
@@ -86,7 +86,7 @@ public class TestParkAndRide extends TestCase {
 
         // But it is still impossible to get from A to C by WALK only
         // (AB is CAR only).
-        options = new RoutingRequest("WALK");
+        options = new RoutingRequest(new TraverseModeSet("WALK"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
@@ -94,7 +94,7 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
         
         // Or CAR only (BC is WALK only).
-        options = new RoutingRequest("CAR");
+        options = new RoutingRequest(new TraverseModeSet("CAR"));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
@@ -102,7 +102,8 @@ public class TestParkAndRide extends TestCase {
         assertNull(path);
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false
-        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
+        options.parkAndRide = true;
         //options.arriveBy
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
@@ -110,7 +111,8 @@ public class TestParkAndRide extends TestCase {
         assertNotNull(path);
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true
-        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
+        options.parkAndRide = true;
         options.setArriveBy(true);
         options.setRoutingContext(graph, A, C);
         tree = aStar.getShortestPathTree(options);
@@ -119,7 +121,8 @@ public class TestParkAndRide extends TestCase {
 
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy true interleavedBidiHeuristic
-        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
+        options.parkAndRide = true;
         options.setArriveBy(true);
         options.setRoutingContext(graph, A, C);
         options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
@@ -128,7 +131,8 @@ public class TestParkAndRide extends TestCase {
         assertNotNull(path);
 
         // But we can go from A to C with CAR+WALK mode using P+R. arriveBy false interleavedBidiHeuristic
-        options = new RoutingRequest("WALK,CAR_PARK,TRANSIT");
+        options = new RoutingRequest(new TraverseModeSet("WALK,CAR,TRANSIT"));
+        options.parkAndRide = true;
         //options.arriveBy
         options.setRoutingContext(graph, A, C);
         options.rctx.remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
@@ -142,7 +146,8 @@ public class TestParkAndRide extends TestCase {
         AStar aStar = new AStar();
 
         // Impossible to get from B to D in BIKE+WALK (no bike P+R).
-        RoutingRequest options = new RoutingRequest("BICYCLE_PARK,TRANSIT");
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("BICYCLE,TRANSIT"));
+        options.bikeParkAndRide = true;
         options.freezeTraverseMode();
         options.setRoutingContext(graph, B, D);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
@@ -162,7 +167,7 @@ public class TestParkAndRide extends TestCase {
         new StreetBikeParkLink(C, BPRC);
 
         // Still impossible from B to D by bike only (CD is WALK only).
-        options = new RoutingRequest("BICYCLE");
+        options = new RoutingRequest(new TraverseModeSet("BICYCLE"));
         options.setRoutingContext(graph, B, D);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(D, false);
@@ -174,7 +179,8 @@ public class TestParkAndRide extends TestCase {
         assertTrue(s.getBackMode() == TraverseMode.WALK);
 
         // But we can go from B to D using bike P+R.
-        options = new RoutingRequest("BICYCLE_PARK,WALK,TRANSIT");
+        options = new RoutingRequest(new TraverseModeSet("BICYCLE,WALK,TRANSIT"));
+        options.bikeParkAndRide = true;
         options.setRoutingContext(graph, B, D);
         tree = aStar.getShortestPathTree(options);
         path = tree.getPath(D, false);

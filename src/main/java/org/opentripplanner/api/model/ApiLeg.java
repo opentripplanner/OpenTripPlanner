@@ -4,7 +4,6 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.ApiAlert;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -12,7 +11,6 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.Calendar;
 import java.util.List;
-import java.util.TimeZone;
 
  /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -74,7 +72,7 @@ public class ApiLeg {
      */
     @XmlAttribute
     @JsonSerialize
-    public String mode = TraverseMode.WALK.toString();
+    public String mode = "WALK";
 
     /**
      * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
@@ -240,35 +238,4 @@ public class ApiLeg {
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
-
-    /**
-     * Whether this leg is a transit leg or not.
-     * @return Boolean true if the leg is a transit leg
-     */
-    public Boolean isTransitLeg() {
-        if (mode == null) return null;
-        else if (mode.equals(TraverseMode.WALK.toString())) return false;
-        else if (mode.equals(TraverseMode.CAR.toString())) return false;
-        else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-        else return true;
-    }
-
-    /**
-     * The leg's duration in seconds
-     */
-    @XmlElement
-    @JsonSerialize
-    public double getDuration() {
-        return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
-    }
-
-    public void setTimeZone(TimeZone timeZone) {
-        Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(startTime.getTime());
-        startTime = calendar;
-        calendar = Calendar.getInstance(timeZone);
-        calendar.setTime(endTime.getTime());
-        endTime = calendar;
-        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
-    }
  }
