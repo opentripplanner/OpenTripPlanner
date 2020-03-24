@@ -65,8 +65,8 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = {};
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("WALK"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("WALK"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.WALK), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.WALK), true);
     }
 
     @Test @Ignore public void testOneIntermediatePlace() {
@@ -74,8 +74,8 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.96383, -82.96291);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.92099, -82.95570) };
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("WALK"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("WALK"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.WALK), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.WALK), true);
     }
 
     @Test @Ignore public void testTwoIntermediatePlaces() {
@@ -85,8 +85,8 @@ public class TestIntermediatePlaces {
         intermediateLocations[0] = new GenericLocation(39.92099, -82.95570);
         intermediateLocations[1] = new GenericLocation(39.96146, -82.99552);
 
-        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet("CAR"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet("CAR"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet(TraverseMode.CAR), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet(TraverseMode.CAR), true);
     }
 
     @Test public void testTransitWithoutIntermediatePlaces() {
@@ -94,8 +94,8 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.9998, -83.0198);
         GenericLocation[] intermediateLocations = {};
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT,WALK"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT,WALK"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), true);
     }
 
     @Test public void testThreeBusStopPlaces() {
@@ -103,8 +103,8 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.9058, -82.8841);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.9058, -82.9841) };
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT), true);
     }
 
     @Test public void testTransitOneIntermediatePlace() {
@@ -112,8 +112,8 @@ public class TestIntermediatePlaces {
         GenericLocation toLocation = new GenericLocation(39.9698, -83.0198);
         GenericLocation[] intermediateLocations = { new GenericLocation(39.9948, -83.0148) };
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT,WALK"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT,WALK"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), true);
     }
 
     @Test public void testTransitTwoIntermediatePlaces() {
@@ -123,8 +123,8 @@ public class TestIntermediatePlaces {
         intermediateLocations[0] = new GenericLocation(40.0000, -82.900);
         intermediateLocations[1] = new GenericLocation(39.9100, -83.100);
 
-        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet("TRANSIT,WALK"), false);
-        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet("TRANSIT,WALK"), true);
+        handleRequest(fromLocation, toLocation, intermediateLocations,  new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), false);
+        handleRequest(fromLocation, toLocation, intermediateLocations, new TraverseModeSet(TraverseMode.TRANSIT, TraverseMode.WALK), true);
     }
 
     private void handleRequest(GenericLocation from, GenericLocation to, GenericLocation[] via,

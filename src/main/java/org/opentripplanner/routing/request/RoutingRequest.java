@@ -195,7 +195,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * The set of TraverseModes allowed when doing creating sub requests and doing street routing.
      * // TODO OTP2 Street routing requests should eventually be split into its own request class.
      */
-    public TraverseModeSet streetSubRequestModes = new TraverseModeSet("WALK"); // defaults in constructor overwrite this
+    public TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK); // defaults in constructor overwrite this
 
     /**
      * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or

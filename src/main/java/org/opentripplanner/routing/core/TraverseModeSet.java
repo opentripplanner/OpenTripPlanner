@@ -47,17 +47,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     private int modes = 0;
 
-    public TraverseModeSet(String modelist) {
-        modes = 0;
-        for (String modeStr : modelist.split(",")) {
-            if (modeStr.length() == 0) {
-                continue;
-            }
-            setMode(TraverseMode.valueOf(modeStr), true);
-        }
-
-    }
-
     public TraverseModeSet(TraverseMode... modes) {
         for (TraverseMode mode : modes) {
             this.modes |= getMaskForMode(mode);
@@ -109,10 +98,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     public TraverseModeSet(Collection<TraverseMode> modeList) {
         this(modeList.toArray(new TraverseMode[0]));
-    }
-    
-    public int getMask() {
-        return modes;
     }
 
     public void setMode(TraverseMode mode, boolean value) {

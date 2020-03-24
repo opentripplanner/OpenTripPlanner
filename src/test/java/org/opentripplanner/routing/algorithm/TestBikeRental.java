@@ -4,6 +4,7 @@ import junit.framework.TestCase;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -43,7 +44,7 @@ public class TestBikeRental extends TestCase {
         AStar aStar = new AStar();
 
         // it is impossible to get from v1 to v3 by walking
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet("WALK,TRANSIT"));
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.TRANSIT));
         options.setRoutingContext(graph, v1, v3);
         ShortestPathTree tree = aStar.getShortestPathTree(options);
 
@@ -51,7 +52,7 @@ public class TestBikeRental extends TestCase {
         assertNull(path);
 
         // or biking + walking (assuming walking bikes is disallowed)
-        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
@@ -75,7 +76,7 @@ public class TestBikeRental extends TestCase {
         new RentABikeOffEdge(stationVertex, stationVertex, networks);
 
         // but we can't get off the bike at v3, so we still fail
-        options = new RoutingRequest(new TraverseModeSet("WALK,BICYCLE,TRANSIT"));
+        options = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK,TraverseMode.BICYCLE,TraverseMode.TRANSIT));
         options.freezeTraverseMode();
         options.setRoutingContext(graph, v1, v3);
         tree = aStar.getShortestPathTree(options);
