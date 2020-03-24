@@ -6,6 +6,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
 import org.opentripplanner.standalone.server.GrizzlyServer;
@@ -97,12 +98,16 @@ public class OTPMain {
             DataSource inputGraph = params.doLoadGraph()
                     ? app.store().getGraph()
                     : app.store().getStreetGraph();
-            graph = Graph.load(inputGraph);
-            app.config().setEmbeddedRouterConfig(graph.routerConfig);
+            SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
+            graph = obj.graph;
+            app.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
         }
 
         /* Start graph builder if requested. */
         if (params.doBuildStreet() || params.doBuildTransit()) {
+            // Abort building a graph if the file can not be saved
+            app.graphRepository().verifyTheOutputGraphIsWritableIfDataSourceExist();
+
             GraphBuilder graphBuilder = app.createGraphBuilder(graph);
             if (graphBuilder != null) {
                 graphBuilder.run();
@@ -111,6 +116,9 @@ public class OTPMain {
             } else {
                 throw new IllegalStateException("An error occurred while building the graph.");
             }
+            // Store graph and config used to build it, also store router-config for easy deployment
+            // with using the embedded router config.
+            app.graphRepository().save(graph, app.config().buildConfig(), app.config().routerConfig());
         }
 
         if(graph == null) {
@@ -126,7 +134,7 @@ public class OTPMain {
         // Index graph for travel search
         graph.index();
 
-        Router router = new Router(graph);
+        Router router = new Router(graph, app.config().routerConfig());
         router.startup();
 
         /* Start visualizer if requested. */

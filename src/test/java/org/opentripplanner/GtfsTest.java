@@ -20,6 +20,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
@@ -63,7 +64,7 @@ public abstract class GtfsTest extends TestCase {
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
-        router = new Router(graph);
+        router = new Router(graph, RouterConfig.DEFAULT);
 
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);

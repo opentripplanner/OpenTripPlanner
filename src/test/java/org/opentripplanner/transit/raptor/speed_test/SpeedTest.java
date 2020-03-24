@@ -6,6 +6,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -93,7 +94,8 @@ public class SpeedTest {
     }
 
     private static Graph loadGraph(File rootDir) {
-        Graph graph = Graph.load(OtpDataStore.graphFile(rootDir));
+        Graph graph = SerializedGraphObject.load(OtpDataStore.graphFile(rootDir));
+        if(graph == null) { throw new IllegalStateException(); }
         graph.index();
         return graph;
     }

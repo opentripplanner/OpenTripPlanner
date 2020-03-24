@@ -11,6 +11,8 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -116,14 +118,19 @@ public class GraphSerializationTest {
         originalGraph.clearTimeZone();
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
-        originalGraph.save(new FileDataSource(tempFile, FileType.GRAPH));
-        Graph copiedGraph1 = Graph.load(tempFile);
+        SerializedGraphObject serializedObj = new SerializedGraphObject(
+                originalGraph,
+                BuildConfig.DEFAULT,
+                RouterConfig.DEFAULT
+        );
+        serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
+        Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
         // Index both graph - we do no know if the original is indexed, because it is cached and
         // might be indexed by other tests.
         originalGraph.index();
         copiedGraph1.index();
         assertNoDifferences(originalGraph, copiedGraph1);
-        Graph copiedGraph2 = Graph.load(tempFile);
+        Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
         copiedGraph2.index();
         assertNoDifferences(copiedGraph1, copiedGraph2);
     }
