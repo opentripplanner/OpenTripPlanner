@@ -44,7 +44,9 @@ public class Itinerary {
      */
     public Double traverseDistance = 0.0;
 
-    public Map<TraverseMode,Double> traversedInMode = new HashMap<>();
+    public Map<TraverseMode, Double> distanceTraversedInMode = new HashMap<>();
+
+    public Map<TraverseMode, Integer> timeTraversedInMode = new HashMap<>();
 
     /**
      * Indicates that the walk limit distance has been exceeded for this itinerary when true.
