@@ -85,18 +85,18 @@ public class QualifiedModeSet implements Serializable {
         //   redesigned to better reflect the mode structure used in AllowedModes.
         for (QualifiedMode qMode : qModes) {
             switch (qMode.mode) {
-                case "TraverseMode.WALK":
+                case "WALK":
                     allowedModes.accessMode = StreetMode.WALK;
                     allowedModes.egressMode = StreetMode.WALK;
                     allowedModes.directMode = StreetMode.WALK;
                     break;
                 case "BICYCLE":
-                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                    if (qMode.qualifiers.contains("RENT")) {
                         allowedModes.accessMode = StreetMode.BIKE_RENTAL;
                         allowedModes.egressMode = StreetMode.BIKE_RENTAL;
                         allowedModes.directMode = StreetMode.BIKE_RENTAL;
                     }
-                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                    else if (qMode.qualifiers.contains("PARK")) {
                         allowedModes.accessMode = StreetMode.BIKE_TO_PARK;
                         allowedModes.egressMode = StreetMode.WALK;
                         allowedModes.directMode = StreetMode.BIKE_TO_PARK;
@@ -107,13 +107,13 @@ public class QualifiedModeSet implements Serializable {
                         allowedModes.directMode = StreetMode.BIKE;
                     }
                     break;
-                case "TraverseMode.CAR":
-                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                case "CAR":
+                    if (qMode.qualifiers.contains("RENT")) {
                         allowedModes.accessMode = StreetMode.CAR_RENTAL;
                         allowedModes.egressMode = StreetMode.CAR_RENTAL;
                         allowedModes.directMode = StreetMode.CAR_RENTAL;
                     }
-                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                    else if (qMode.qualifiers.contains("PARK")) {
                         allowedModes.accessMode = StreetMode.CAR_TO_PARK;
                         allowedModes.egressMode = StreetMode.WALK;
                         allowedModes.directMode = StreetMode.CAR_TO_PARK;

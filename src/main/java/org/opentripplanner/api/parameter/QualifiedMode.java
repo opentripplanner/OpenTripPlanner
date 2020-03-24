@@ -9,13 +9,13 @@ public class QualifiedMode implements Serializable {
     private static final long serialVersionUID = 1L;
     
     public final String mode;
-    public final Set<Qualifier> qualifiers = Sets.newHashSet();
+    public final Set<String> qualifiers = Sets.newHashSet();
 
     public QualifiedMode(String qMode) {
         String[] elements = qMode.split("_");
         mode = elements[0].trim();
         for (int i = 1; i < elements.length; i++) {
-            Qualifier q = Qualifier.valueOf(elements[i].trim());
+            String q = elements[i].trim();
             qualifiers.add(q);
         }
     }
@@ -23,7 +23,7 @@ public class QualifiedMode implements Serializable {
     public String toString() {
         StringBuilder sb = new StringBuilder();
         sb.append(mode);
-        for (Qualifier qualifier : qualifiers) {
+        for (String qualifier : qualifiers) {
             sb.append("_");
             sb.append(qualifier);
         }
@@ -44,8 +44,4 @@ public class QualifiedMode implements Serializable {
         return false;
     }
 
-}
-
-enum Qualifier {
-    RENT, HAVE, PARK, KEEP
 }
