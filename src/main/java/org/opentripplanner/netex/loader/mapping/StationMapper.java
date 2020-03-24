@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.Station;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
@@ -27,7 +27,7 @@ class StationMapper {
             station.setName("N/A");
         }
 
-        Coordinate coordinate = mapCoordinate(stopPlace.getCentroid());
+        WgsCoordinate coordinate = mapCoordinate(stopPlace.getCentroid());
 
         if (coordinate == null) {
             LOG.warn("Station {} does not contain any coordinates.", station.getId());

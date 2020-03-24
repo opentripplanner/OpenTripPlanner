@@ -3,7 +3,7 @@ package org.opentripplanner.model.plan;
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
@@ -86,7 +86,7 @@ public class WalkStep {
     /**
      * The coordinate of start of the step
      */
-    public Coordinate startLocation;
+    public WgsCoordinate startLocation;
 
     /**
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this

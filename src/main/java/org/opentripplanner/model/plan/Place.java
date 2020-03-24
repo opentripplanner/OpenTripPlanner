@@ -1,6 +1,6 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
 
@@ -12,7 +12,7 @@ public class Place {
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
      */
-    public String name = null;
+    public final String name;
 
     /** 
      * The ID of the stop. This is often something that users don't care about.
@@ -34,7 +34,7 @@ public class Place {
     /**
      * The coordinate of the place.
      */
-    public Coordinate coordinate = null;
+    public final WgsCoordinate coordinate;
 
     public String orig;
 
@@ -61,12 +61,10 @@ public class Place {
      */
     public String bikeShareId;
 
-    public Place() { }
-
     public Place(Double lat, Double lon, String name) {
-        this.coordinate = new Coordinate(lat, lon);
         this.name = name;
         this.vertexType = VertexType.NORMAL;
+        this.coordinate = WgsCoordinate.creatOptionalCoordinate(lat, lon);
     }
 
     /**
@@ -76,7 +74,7 @@ public class Place {
     public boolean sameLocation(Place other) {
         if(this == other) { return true; }
         if(coordinate != null) {
-            return coordinate.equals(other.coordinate);
+            return coordinate.sameLocation(other.coordinate);
         }
         return stopId != null && stopId.equals(other.stopId);
     }

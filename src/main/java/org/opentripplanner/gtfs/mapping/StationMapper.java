@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.Station;
 
 import java.util.HashMap;
@@ -32,7 +32,7 @@ class StationMapper {
 
         otpStation.setId(mapAgencyAndId(rhs.getId()));
         otpStation.setName(rhs.getName());
-        otpStation.setCoordinate(new Coordinate(rhs.getLat(), rhs.getLon()));
+        otpStation.setCoordinate(new WgsCoordinate(rhs.getLat(), rhs.getLon()));
         otpStation.setCode(rhs.getCode());
         otpStation.setUrl(rhs.getUrl());
         otpStation.setTimezone(

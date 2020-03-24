@@ -20,7 +20,7 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
     // TODO Map from NeTEx
     private PurposeOfGrouping purposeOfGrouping;
 
-    private Coordinate coordinate;
+    private WgsCoordinate coordinate;
 
     private Set<StopCollection> childStations = new HashSet<>();
 
@@ -53,7 +53,7 @@ public class GroupOfStations extends TransitEntity<FeedScopedId> implements Stop
         return coordinate.longitude();
     }
 
-    public void setCoordinate(Coordinate coordinate) {
+    public void setCoordinate(WgsCoordinate coordinate) {
         this.coordinate = coordinate;
     }
 

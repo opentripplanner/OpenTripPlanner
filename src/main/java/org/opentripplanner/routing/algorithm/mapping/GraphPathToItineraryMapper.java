@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -831,7 +832,7 @@ public abstract class GraphPathToItineraryMapper {
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName(wantedLocale);
-        step.startLocation = new org.opentripplanner.model.Coordinate(
+        step.startLocation = new WgsCoordinate(
                 en.getFromVertex().getLat(),
                 en.getFromVertex().getLon()
         );

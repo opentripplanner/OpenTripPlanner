@@ -1,6 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
@@ -30,7 +30,7 @@ class StopMapper {
 
         otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
         otpStop.setName(gtfsStop.getName());
-        otpStop.setCoordinate(new Coordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+        otpStop.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
         otpStop.setCode(gtfsStop.getCode());
         otpStop.setDescription(gtfsStop.getDesc());
         otpStop.setZone(gtfsStop.getZoneId());

@@ -39,8 +39,7 @@ public class PlaceTest {
     }
 
     private static Place place(String name, String stopId) {
-        Place p = new Place();
-        p.name = name;
+        Place p = new Place(null, null, name);
         p.stopId = new FeedScopedId("S", stopId);
         return p;
     }

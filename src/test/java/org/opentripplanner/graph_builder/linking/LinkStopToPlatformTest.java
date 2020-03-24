@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
@@ -63,7 +64,7 @@ public class LinkStopToPlatformTest {
 
         Stop stop = new Stop();
         stop.setId(new FeedScopedId("TestAgency", "TestStop"));
-        stop.setCoordinate(new org.opentripplanner.model.Coordinate(59.13545, 10.22213));
+        stop.setCoordinate(new WgsCoordinate(59.13545, 10.22213));
 
         TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
     }

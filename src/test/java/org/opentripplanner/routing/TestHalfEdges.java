@@ -13,6 +13,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -106,12 +107,12 @@ public class TestHalfEdges {
 
         Stop s1 = new Stop();
         s1.setName("transitVertex 1");
-        s1.setCoordinate(new org.opentripplanner.model.Coordinate(40.0099999, -74.005));
+        s1.setCoordinate(new WgsCoordinate(40.0099999, -74.005));
         s1.setId(new FeedScopedId("A", "fleem station"));
 
         Stop s2 = new Stop();
         s2.setName("transitVertex 2");
-        s2.setCoordinate(new org.opentripplanner.model.Coordinate(40.0099999, -74.002));
+        s2.setCoordinate(new WgsCoordinate(40.0099999, -74.002));
         s2.setId(new FeedScopedId("A", "morx station"));
 
         station1 = new TransitStopVertex(graph, s1, null);
