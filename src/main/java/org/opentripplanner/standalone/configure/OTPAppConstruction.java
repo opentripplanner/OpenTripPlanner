@@ -5,6 +5,7 @@ import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.GraphRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPApplication;
@@ -39,6 +40,8 @@ public class OTPAppConstruction {
     private OtpDataStore store = null;
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
+    private GraphRepository graphRepository = null;
+
 
     /**
      * Create a new OTP configuration instance for a given directory.
@@ -80,9 +83,18 @@ public class OTPAppConstruction {
         return GraphBuilder.create(
                 config.buildConfig(),
                 graphBuilderDataSources(),
-                config.createEmbedConfig(),
                 baseGraph
         );
+    }
+
+    /**
+     * Create or retrieve a data store witch provide access to files, remote or local.
+     */
+    public GraphRepository graphRepository() {
+        if(graphRepository == null) {
+            graphRepository = new GraphRepository(graphBuilderDataSources().getOutputGraph());
+        }
+        return graphRepository;
     }
 
     /**

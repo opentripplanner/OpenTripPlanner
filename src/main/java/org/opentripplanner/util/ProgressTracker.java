@@ -3,6 +3,7 @@ package org.opentripplanner.util;
 import org.opentripplanner.common.LoggingUtil;
 
 import java.io.InputStream;
+import java.io.OutputStream;
 import java.text.DecimalFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -109,6 +110,32 @@ public class ProgressTracker {
         return new ProgressTrackerInputStream(
                 new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
                 inputStream,
+                progressNotification
+        );
+    }
+
+    /**
+     * Create an OutputStream that decorate another OutputStream with progress logging.
+     *
+     * @param actionName the action name to include in the notification strings.
+     * @param minBlockSize the minimum number of steps between each time check. A reasonably value
+     *                     is to use the number of steps witch would take approximately 1 second.
+     *                     Set this lower if the time variation for each step is big.
+     * @param size The expected number the step method is called. If negative
+     *             the size is considered unknown.
+     * @param outputStream the "real" input stream to delegate all operations to.
+     * @param progressNotification the progress notification handler/subscriber.
+     */
+    public static OutputStream track(
+            String actionName,
+            int minBlockSize,
+            long size,
+            OutputStream outputStream,
+            Consumer<String> progressNotification
+    ) {
+        return new ProgressTrackerOutputStream(
+                new ProgressTracker(actionName, minBlockSize, size, QUIET_PERIOD_MILLISECONDS, true),
+                outputStream,
                 progressNotification
         );
     }

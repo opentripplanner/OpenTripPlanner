@@ -8,7 +8,6 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;

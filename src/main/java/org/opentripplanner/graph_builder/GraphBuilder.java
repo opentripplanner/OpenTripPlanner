@@ -6,7 +6,6 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.transferanalyzer.DirectTransferAnalyzer;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.EmbedConfig;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
@@ -49,13 +48,10 @@ public class GraphBuilder implements Runnable {
 
     private final List<GraphBuilderModule> graphBuilderModules = new ArrayList<>();
 
-    private final DataSource graphOut;
-
     private final Graph graph;
 
-    private GraphBuilder(Graph graph, DataSource graphOut) {
-        this.graphOut = graphOut;
-        this.graph = graph == null ? new Graph() : graph;
+    private GraphBuilder(Graph baseGraph) {
+        this.graph = baseGraph == null ? new Graph() : baseGraph;
     }
 
     private void addModule(GraphBuilderModule loader) {
@@ -69,21 +65,6 @@ public class GraphBuilder implements Runnable {
     public void run() {
          // Record how long it takes to build the graph, purely for informational purposes.
         long startTime = System.currentTimeMillis();
-
-        if (graphOut != null) {
-            // Abort building a graph if the file can not be saved
-            if (graphOut.exists()) {
-                LOG.info(
-                        "Graph already exists and will be overwritten at the end of the "
-                        + "build process. Graph: {}", graphOut.path()
-                );
-            }
-            if (!graphOut.isWritable()) {
-                throw new RuntimeException(
-                        "Cannot create or write to graph at: " + graphOut.path()
-                );
-            }
-        }
 
         // Check all graph builder inputs, and fail fast to avoid waiting until the build process
         // advances.
@@ -99,13 +80,9 @@ public class GraphBuilder implements Runnable {
         }
         issueStore.summarize();
 
-        if (graphOut != null) {
-            graph.save(graphOut);
-        } else {
-            LOG.info("Not saving graph to disk, as requested.");
-        }
         long endTime = System.currentTimeMillis();
         LOG.info(String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0));
+        LOG.info("Main graph size: |V|={} |E|={}", graph.countVertices(), graph.countEdges());
     }
 
     /**
@@ -115,7 +92,6 @@ public class GraphBuilder implements Runnable {
     public static GraphBuilder create(
             BuildConfig config,
             GraphBuilderDataSources dataSources,
-            EmbedConfig embedConfig,
             Graph baseGraph
     ) {
 
@@ -128,7 +104,7 @@ public class GraphBuilder implements Runnable {
         boolean hasNetex = dataSources.has(NETEX);
         boolean hasTransitData = hasGtfs || hasNetex;
 
-        GraphBuilder graphBuilder = new GraphBuilder(baseGraph, dataSources.getOutputGraph());
+        GraphBuilder graphBuilder = new GraphBuilder(baseGraph);
 
 
         if ( hasOsm ) {
@@ -250,7 +226,6 @@ public class GraphBuilder implements Runnable {
                 graphBuilder.addModule(new DirectTransferAnalyzer(config.maxTransferDistance));
             }
         }
-        graphBuilder.addModule(embedConfig);
 
         if (config.dataImportReport) {
             graphBuilder.addModule(

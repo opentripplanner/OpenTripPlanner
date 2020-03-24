@@ -2,10 +2,9 @@ package org.opentripplanner.standalone.configure;
 
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.datastore.OtpDataStoreConfig;
-import org.opentripplanner.graph_builder.module.EmbedConfig;
+import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.config.ConfigLoader;
-import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.OtpConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.slf4j.Logger;
@@ -43,7 +42,17 @@ public class OTPConfiguration {
      */
     private final CommandLineParameters cli;
     private final OtpConfig otpConfig;
-    private final BuildConfig buildConfig;
+
+    /**
+     * The build-config in NOT final because it can be set from the embedded
+     * graph.obj build-config after the graph is loaded.
+     */
+    private BuildConfig buildConfig;
+
+    /**
+     * The router-config in NOT final because it can be set from the embedded
+     * graph.obj router-config after the graph is loaded.
+     */
     private RouterConfig routerConfig;
 
     private OTPConfiguration(CommandLineParameters cli, ConfigLoader configLoader) {
@@ -72,7 +81,11 @@ public class OTPConfiguration {
         );
     }
 
-    public void setEmbeddedRouterConfig(RouterConfig routerConfig) {
+    public void updateConfigFromSerializedGraph(BuildConfig buildConfig, RouterConfig routerConfig) {
+        if(this.buildConfig.isDefault()) {
+            LOG.info("Using the graph embedded JSON build configuration.");
+            this.buildConfig = buildConfig;
+        }
         if(this.routerConfig.isDefault()) {
             LOG.info("Using the graph embedded JSON router configuration.");
             this.routerConfig = routerConfig;
@@ -110,14 +123,6 @@ public class OTPConfiguration {
      */
     public RouterConfig routerConfig() {
         return routerConfig;
-    }
-
-    /**
-     * Create embedded config to store as part of the graph to preserve the config when
-     * the graph is serialized.
-     */
-    public EmbedConfig createEmbedConfig() {
-        return new EmbedConfig(buildConfig, routerConfig);
     }
 
     /**

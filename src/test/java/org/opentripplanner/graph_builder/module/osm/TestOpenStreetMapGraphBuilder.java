@@ -17,6 +17,7 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.LocalizedString;
 
@@ -165,7 +166,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         loader.buildGraph(graph, extra);
         new StreetVertexIndex(graph);
 
-        Router router = new Router(graph);
+        Router router = new Router(graph, RouterConfig.DEFAULT);
         router.startup();
 
         RoutingRequest request = new RoutingRequest("WALK");

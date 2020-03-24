@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
@@ -21,12 +22,17 @@ import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.kryo.RouterConfigSerializer;
 import org.opentripplanner.standalone.config.BuildConfig;
 import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.BitSet;
@@ -50,9 +56,60 @@ public class SerializedGraphObject implements Serializable {
 
     private final Collection<Edge> edges;
 
-    public SerializedGraphObject(Graph graph) {
+    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
+    public final BuildConfig buildConfig;
+
+    /** Embed a router configuration inside the graph, for starting up with a single file. */
+    public final RouterConfig routerConfig;
+
+    public SerializedGraphObject(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig) {
         this.graph = graph;
         this.edges = graph.getEdges();
+        this.buildConfig = buildConfig;
+        this.routerConfig = routerConfig;
+    }
+
+    public static void save(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig, DataSource graphSource) {
+        new SerializedGraphObject(graph,buildConfig, routerConfig).save(graphSource);
+    }
+
+    public static SerializedGraphObject load(DataSource source) {
+        return load(source.asInputStream(), source.path());
+    }
+
+    public static Graph load(File file) {
+        try {
+            SerializedGraphObject serObj = SerializedGraphObject.load(
+                    new FileInputStream(file),
+                    file.getAbsolutePath()
+            );
+            return serObj == null ? null : serObj.graph;
+        } catch (FileNotFoundException e) {
+            LOG.error("Graph file not found: " + file, e);
+            throw new OtpAppException(e.getMessage());
+        }
+    }
+
+    public static SerializedGraphObject load(InputStream inputStream, String sourceDescription) {
+        // TODO store version information, halt load if versions mismatch
+        try(inputStream) {
+            LOG.info("Reading graph from '{}'", sourceDescription);
+            Input input = new Input(inputStream);
+            Kryo kryo = SerializedGraphObject.makeKryo();
+            SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
+            Graph graph = serializedGraphObject.graph;
+            LOG.debug("Graph read.");
+            if (graph.graphVersionMismatch()) {
+                throw new RuntimeException("Graph version mismatch detected.");
+            }
+            serializedGraphObject.reconstructEdgeLists();
+            LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            return serializedGraphObject;
+        }
+        catch (IOException e) {
+            LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
+            return null;
+        }
     }
 
     /**
@@ -74,20 +131,22 @@ public class SerializedGraphObject implements Serializable {
 
     public void save(File file) throws IOException {
         try {
-            save(new FileOutputStream(file), file.getName());
+            save(new FileOutputStream(file), file.getName(), file.length());
         } catch (Exception e) {
-            file.delete(); // remove half-written file
+            // remove half-written file
+            file.deleteOnExit();
             throw e;
         }
     }
 
     public void save(DataSource target) {
-        save(target.asOutputStream(), target.name());
+        save(target.asOutputStream(), target.name(), target.size());
     }
 
-    public void save(OutputStream outputStream, String graphName) {
+    private void save(OutputStream outputStream, String graphName, long size) {
+        LOG.info("Writing graph " + graphName + " ...");
+        outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
         Kryo kryo = SerializedGraphObject.makeKryo();
-        LOG.debug("Consolidating edges...");
         Output output = new Output(outputStream);
         kryo.writeClassAndObject(output, this);
         output.close();
@@ -146,5 +205,17 @@ public class SerializedGraphObject implements Serializable {
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    private static OutputStream wrapOutputStreamWithProgressTracker(OutputStream outputStream, long size) {
+        return ProgressTracker.track(
+                "Save graph",
+                500_000,
+                size,
+                outputStream,
+                // Keep this to get correct logging info for class and line number
+                msg -> LOG.info(msg)
+        );
     }
 }
