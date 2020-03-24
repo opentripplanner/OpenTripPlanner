@@ -136,7 +136,7 @@ public class WalkStep {
 
     public void addAlerts(Collection<Alert> alerts) {
         if(alerts == null) { return; }
-        this.addAlerts(alerts);
+        this.alerts.addAll(alerts);
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,

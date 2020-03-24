@@ -4,9 +4,7 @@ import com.google.common.collect.Iterables;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -16,9 +14,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} module that links up the stops of a transit
@@ -82,23 +78,15 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
-            /* Determine the set of stops that are already reachable via other pathways or transfers */
-            Set<TransitStopVertex> pathwayDestinations = new HashSet<TransitStopVertex>();
-            for (Edge e : ts0.getOutgoing()) {
-                if (e instanceof PathwayEdge || e instanceof SimpleTransfer) {
-                    if (e.getToVertex() instanceof TransitStopVertex) {
-                        TransitStopVertex to = (TransitStopVertex) e.getToVertex();
-                        pathwayDestinations.add(to);
-                    }
-                }
-            }
-
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
             int n = 0;
             for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
-                if (sd.tstop == ts0 || pathwayDestinations.contains(sd.tstop)) continue;
-                new SimpleTransfer(ts0, sd.tstop, sd.distance, sd.edges);
+                if (sd.tstop == ts0) continue;
+                graph.transfersByStop.put(
+                    ts0.getStop(),
+                    new SimpleTransfer(ts0.getStop(), sd.tstop.getStop(), sd.distance, sd.edges)
+                );
                 n += 1;
             }
             LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);

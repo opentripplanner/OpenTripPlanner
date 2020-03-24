@@ -7,7 +7,6 @@ import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
@@ -470,8 +469,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
                 if (e.getGeometry() == null)
                     continue;
                 if (e instanceof StreetTransitLink
-                        || e instanceof StreetEdge || e instanceof PathwayEdge
-                        || e instanceof SimpleTransfer) {
+                        || e instanceof StreetEdge || e instanceof PathwayEdge) {
                     env = e.getGeometry().getEnvelopeInternal();
                     edgeIndex.insert(env, e);
                 }
@@ -488,7 +486,7 @@ public class ShowGraph extends PApplet implements MouseWheelListener {
         visibleLinkEdges.clear();
         visibleTransitEdges.clear();
         for (Edge de : (Iterable<Edge>) edgeIndex.query(modelBounds)) {
-            if (de instanceof PathwayEdge || de instanceof StreetTransitLink || de instanceof SimpleTransfer) {
+            if (de instanceof PathwayEdge || de instanceof StreetTransitLink) {
                 visibleLinkEdges.add(de);
             }
             else if (de instanceof StreetEdge) {

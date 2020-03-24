@@ -82,11 +82,6 @@ public class StreetTransitLink extends Edge {
             return null;
         }
 
-        // Do not re-enter the street network following a transfer.
-        if (s0.backEdge instanceof SimpleTransfer) {
-            return null;
-        }
-
         RoutingRequest req = s0.getOptions();
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
