@@ -869,26 +869,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
-     * Clear the allowed modes.
-     */
-    public void clearModes() {
-        streetSubRequestModes.clear();
-    }
-
-    /**
      * Add a TraverseMode to the set of allowed modes.
      */
     public void addMode(TraverseMode mode) {
         streetSubRequestModes.setMode(mode, true);
-    }
-
-    /**
-     * Add multiple modes to the set of allowed modes.
-     */
-    public void addMode(List<TraverseMode> mList) {
-        for (TraverseMode m : mList) {
-            addMode(m);
-        }
     }
 
     public Date getDateTime() {
@@ -1174,38 +1158,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         return walkSpeed;
     }
 
-    /**
-     * @param mode
-     * @return The board cost for a specific traverse mode.
-     */
-    public int getBoardCost(TraverseMode mode) {
-        if (mode == TraverseMode.BICYCLE)
-            return bikeBoardCost;
-        // I assume you can't bring your car in the bus
-        return walkBoardCost;
-    }
-
-    /** @return The lower boarding cost for all possible road-modes. */
-    public int getBoardCostLowerBound() {
-        // Assume walkBoardCost < bikeBoardCost
-        if (streetSubRequestModes.getWalk())
-            return walkBoardCost;
-        return bikeBoardCost;
-    }
-
-    private String getRouteOrAgencyStr(HashSet<String> strings) {
-        StringBuilder builder = new StringBuilder();
-        for (String agency : strings) {
-            builder.append(agency);
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            // trim trailing comma
-            builder.setLength(builder.length() - 1);
-        }
-        return builder.toString();
-    }
-
     public void setMaxWalkDistance(double maxWalkDistance) {
         if (maxWalkDistance > 0) {
             this.maxWalkDistance = maxWalkDistance;
@@ -1237,10 +1189,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (waitAtBeginningFactor > 0) {
             this.waitAtBeginningFactor = waitAtBeginningFactor;
         }
-    }
-
-    public void banTrip(FeedScopedId trip) {
-        bannedTrips.put(trip, BannedStopSet.ALL);
     }
 
     public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
@@ -1322,21 +1270,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferences_penalty += useUnpreferredRoutesPenalty;
         }
         return preferences_penalty;
-    }
-
-    /**
-     * Get the maximum expected speed over all transit modes.
-     * TODO derive actual speeds from GTFS feeds. On the other hand, that's what the bidirectional heuristic does on the fly.
-     */
-    public double getTransitSpeedUpperBound() {
-        if (streetSubRequestModes.contains(TraverseMode.RAIL)) {
-            return 84; // 300kph typical peak speed of a TGV
-        }
-        if (streetSubRequestModes.contains(TraverseMode.CAR)) {
-            return 40; // 130kph max speed of a car on a highway
-        }
-        // Considering that buses can travel on highways, return the same max speed for all other transit.
-        return 40; // TODO find accurate max speeds
     }
 
     /**
