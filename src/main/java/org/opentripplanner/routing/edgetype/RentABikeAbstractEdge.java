@@ -41,7 +41,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To rent a bike, we need to have BICYCLE in allowed modes.
          */
-        if (!options.modes.contains(TraverseMode.BICYCLE))
+        if (!options.streetSubRequestModes.contains(TraverseMode.BICYCLE))
             return null;
 
         BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;

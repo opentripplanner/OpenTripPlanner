@@ -136,7 +136,7 @@ public class QualifiedModeSet implements Serializable {
 
         /* Start with an empty mode set. */
         TraverseModeSet modes = new TraverseModeSet();
-        req.setModes(modes);
+        req.setStreetSubRequestModes(modes);
         
         /* First, copy over all the unqualified modes and see if we are using transit. FIXME HACK */
         for (QualifiedMode qMode : qModes) {

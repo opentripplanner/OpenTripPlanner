@@ -104,7 +104,7 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
             sb.append(' ');
-            sb.append(request.modes.getAsStr());
+            sb.append(request.streetSubRequestModes.getAsStr());
             sb.append(' ');
             sb.append(request.from.lat);
             sb.append(' ');

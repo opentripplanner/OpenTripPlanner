@@ -75,7 +75,7 @@ public class TraversalRequirements {
      * @param options
      */
     private static void initFromRoutingRequest(TraversalRequirements req, RoutingRequest options) {
-        req.modes = options.modes.clone();
+        req.modes = options.streetSubRequestModes.clone();
         req.wheelchairAccessible = options.wheelchairAccessible;
         req.maxWheelchairSlope = options.maxWheelchairSlope;
         req.maxWalkDistance = options.maxWalkDistance;

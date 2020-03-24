@@ -97,7 +97,7 @@ public class TriangleInequalityTest {
 
         
         if (traverseModes != null) {
-            prototypeOptions.setModes(traverseModes);
+            prototypeOptions.setStreetSubRequestModes(traverseModes);
         }
         
         RoutingRequest options = prototypeOptions.clone();

@@ -129,7 +129,7 @@ public class RouterConfig implements Serializable {
         request.maxWalkDistance = c.asDouble("maxWalkDistance", dft.maxWalkDistance);
         request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
-        request.modes = c.exist("modes") ? new TraverseModeSet(c.asEnumSet("modes", TraverseMode.class)) : dft.modes;
+        request.streetSubRequestModes = c.exist("modes") ? new TraverseModeSet(c.asEnumSet("modes", TraverseMode.class)) : dft.streetSubRequestModes;
         request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
         request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
         request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);

@@ -41,7 +41,7 @@ public class PlainStreetEdgeTest {
         proto.setWalkReluctance(1.0);
         proto.stairsReluctance = (1.0);
         proto.turnReluctance = (1.0);
-        proto.setModes(TraverseModeSet.allModes());
+        proto.setStreetSubRequestModes(TraverseModeSet.allModes());
     }
     
     @Test

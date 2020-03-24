@@ -760,7 +760,7 @@ public abstract class RoutingResource {
 
         /* Temporary code to get bike/car parking and renting working. */
         if (modes != null) {
-            request.allowedModes = modes.getAllowedModes();
+            request.modes = modes.getAllowedModes();
         }
 
         if (request.bikeRental && bikeSpeed == null) {

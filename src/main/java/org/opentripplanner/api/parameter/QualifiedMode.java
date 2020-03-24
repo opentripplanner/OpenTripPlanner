@@ -41,10 +41,10 @@ public class QualifiedMode implements Serializable {
     }
 
     public void applyToRoutingRequest (RoutingRequest req, boolean usingTransit) {
-        req.modes.setMode(this.mode, true);
+        req.streetSubRequestModes.setMode(this.mode, true);
         if (this.mode == TraverseMode.BICYCLE) {
             if (this.qualifiers.contains(Qualifier.RENT)) {
-                req.modes.setMode(TraverseMode.WALK, true); // turn on WALK for bike rental mode
+                req.streetSubRequestModes.setMode(TraverseMode.WALK, true); // turn on WALK for bike rental mode
                 req.bikeRental = true;
             }
             if (usingTransit) {
@@ -57,7 +57,7 @@ public class QualifiedMode implements Serializable {
             } else {
                 req.kissAndRide = true;
             }
-            req.modes.setWalk(true); // need to walk after dropping the car off
+            req.streetSubRequestModes.setWalk(true); // need to walk after dropping the car off
         }
     }
 

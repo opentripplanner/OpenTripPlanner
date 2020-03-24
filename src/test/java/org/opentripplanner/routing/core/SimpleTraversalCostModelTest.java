@@ -42,7 +42,7 @@ public class SimpleTraversalCostModelTest {
         options.walkSpeed = 1.0;
         options.carDecelerationSpeed = (2.0);
         options.carAccelerationSpeed  = (2.0);
-        options.setModes(TraverseModeSet.allModes());
+        options.setStreetSubRequestModes(TraverseModeSet.allModes());
     }
     
     @Test

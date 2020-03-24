@@ -37,7 +37,7 @@ public class StateData implements Cloneable {
     protected boolean enteredNoThroughTrafficArea;
 
     public StateData(RoutingRequest options) {
-        TraverseModeSet modes = options.modes;
+        TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
             nonTransitMode = TraverseMode.CAR;
         else if (modes.getWalk())

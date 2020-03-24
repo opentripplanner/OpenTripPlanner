@@ -68,7 +68,7 @@ public class GraphPathFinder {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
-        if (options.modes.isTransit()) {
+        if (options.streetSubRequestModes.isTransit()) {
             throw new UnsupportedOperationException("Transit search not supported");
         }
 

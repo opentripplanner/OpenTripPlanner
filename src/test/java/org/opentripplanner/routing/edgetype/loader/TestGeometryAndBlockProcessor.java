@@ -237,7 +237,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         ShortestPathTree spt;
 
         RoutingRequest options = new RoutingRequest();
-        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"));
+        options.setStreetSubRequestModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
         spt = aStar.getShortestPathTree(options );
@@ -245,7 +245,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         //a to b is bus only
         assertNull(spt.getPath(stop_b, false));
         
-        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,CABLE_CAR,BUS"));
+        options.setStreetSubRequestModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,CABLE_CAR,BUS"));
         spt = aStar.getShortestPathTree(options);
 
         assertNotNull(spt.getPath(stop_b, false));
@@ -271,9 +271,9 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_d = graph.getVertex(feedId + ":D");
 
         RoutingRequest options = new RoutingRequest();
-        options.modes.setWalk(false);
-        options.modes.setBicycle(true);
-        options.modes.setTransit(true);
+        options.streetSubRequestModes.setWalk(false);
+        options.streetSubRequestModes.setBicycle(true);
+        options.streetSubRequestModes.setTransit(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
 
@@ -388,7 +388,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         GraphPath path;
 
         RoutingRequest options = new RoutingRequest();
-        options.setModes(new TraverseModeSet("TRANSIT"));
+        options.setStreetSubRequestModes(new TraverseModeSet("TRANSIT"));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.setRoutingContext(graph, stop_u, stop_v);
         

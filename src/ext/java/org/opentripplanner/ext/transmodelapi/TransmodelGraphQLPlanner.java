@@ -248,7 +248,7 @@ public class TransmodelGraphQLPlanner {
             callWith.argument("allowedModes.egressMode", egressMode::set);
             callWith.argument("allowedModes.directMode", directMode::set);
             callWith.argument("allowedModes.transportMode", transitModes::set);
-            request.allowedModes = new AllowedModes(
+            request.modes = new AllowedModes(
                 accessMode.get(),
                 egressMode.get(),
                 directMode.get(),
@@ -256,8 +256,8 @@ public class TransmodelGraphQLPlanner {
             );
         }
 
-        if (request.allowedModes.transitModes.isEmpty()) {
-            request.allowedModes.transitModes = new HashSet<>(Arrays.asList(TransitMode.values()));
+        if (request.modes.transitModes.isEmpty()) {
+            request.modes.transitModes = new HashSet<>(Arrays.asList(TransitMode.values()));
         }
 
         /*

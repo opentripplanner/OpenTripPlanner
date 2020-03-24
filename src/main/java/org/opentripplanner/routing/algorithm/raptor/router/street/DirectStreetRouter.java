@@ -29,12 +29,12 @@ public class DirectStreetRouter {
 
   public static List<Itinerary> route(Router router, RoutingRequest request) {
     try {
-      if (request.allowedModes.directMode == null) {
+      if (request.modes.directMode == null) {
         return Collections.emptyList();
       }
       if(!streetDistanceIsReasonable(request)) { return Collections.emptyList(); }
 
-      RoutingRequest nonTransitRequest = request.getStreetSearchRequest(request.allowedModes.directMode);
+      RoutingRequest nonTransitRequest = request.getStreetSearchRequest(request.modes.directMode);
 
       // we could also get a persistent router-scoped GraphPathFinder but there's no setup cost here
       GraphPathFinder gpFinder = new GraphPathFinder(router);
@@ -65,9 +65,9 @@ public class DirectStreetRouter {
 
   private static double calculateDistanceMaxLimit(RoutingRequest request) {
     double limit = request.maxWalkDistance * 2;
-    double maxLimit = request.modes.getCar()
+    double maxLimit = request.streetSubRequestModes.getCar()
         ? MAX_CAR_DISTANCE_METERS
-        : (request.modes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
+        : (request.streetSubRequestModes.getBicycle() ? MAX_BIKE_DISTANCE_METERS : MAX_WALK_DISTANCE_METERS);
 
     // Handle overflow and default setting is set to Double MAX_VALUE
     // Everything above Long.MAX_VALUE is treated as Infinite

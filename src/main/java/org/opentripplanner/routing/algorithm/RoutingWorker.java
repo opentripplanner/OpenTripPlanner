@@ -89,7 +89,7 @@ public class RoutingWorker {
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
-        if (!request.modes.isTransit()) { return Collections.emptyList(); }
+        if (!request.streetSubRequestModes.isTransit()) { return Collections.emptyList(); }
 
         long startTime = System.currentTimeMillis();
 
@@ -102,7 +102,7 @@ public class RoutingWorker {
                 transitLayer,
                 request.getDateTime().toInstant(),
                 TRANSIT_SEARCH_RANGE_IN_DAYS,
-                request.allowedModes.transitModes,
+                request.modes.transitModes,
                 request.rctx.bannedRoutes,
                 request.walkSpeed
         );

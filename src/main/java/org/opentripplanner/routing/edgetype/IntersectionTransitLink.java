@@ -40,7 +40,7 @@ public class IntersectionTransitLink extends Edge {
         RoutingRequest options = s0.getOptions();
         StateEditor s1 = s0.edit(this);
 
-        boolean cycling = options.modes.contains(TraverseMode.BICYCLE) && !options.walkingBike;		
+        boolean cycling = options.streetSubRequestModes.contains(TraverseMode.BICYCLE) && !options.walkingBike;
         double speed = cycling ? options.bikeSpeed : options.walkSpeed;
 
         // speed in m/s, length in mm, so we get milliseconds
