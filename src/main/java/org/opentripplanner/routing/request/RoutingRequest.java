@@ -977,7 +977,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
         RoutingRequest streetRequest = this.clone();
         streetRequest.streetSubRequestModes = new TraverseModeSet();
-
+        
         switch (streetMode) {
             case WALK:
                 streetRequest.streetSubRequestModes.setWalk(true);
@@ -985,12 +985,12 @@ public class RoutingRequest implements Cloneable, Serializable {
             case BIKE:
                 streetRequest.streetSubRequestModes.setBicycle(true);
                 break;
-            case BIKE_TO_PARK: // TODO OTP2 Reimplement
+            case BIKE_TO_PARK:
                 streetRequest.streetSubRequestModes.setBicycle(true);
                 streetRequest.streetSubRequestModes.setWalk(true);
                 streetRequest.bikeParkAndRide = true;
                 break;
-            case BIKE_RENTAL: // TODO OTP2 Reimplement
+            case BIKE_RENTAL:
                 streetRequest.streetSubRequestModes.setBicycle(true);
                 streetRequest.streetSubRequestModes.setWalk(true);
                 streetRequest.bikeRental = true;
@@ -998,7 +998,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             case CAR:
                 streetRequest.streetSubRequestModes.setCar(true);
                 break;
-            case CAR_TO_PARK: // TODO OTP2 Reimplement
+            case CAR_TO_PARK:
                 streetRequest.streetSubRequestModes.setCar(true);
                 streetRequest.streetSubRequestModes.setWalk(true);
                 streetRequest.parkAndRide = true;
@@ -1008,7 +1008,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 streetRequest.streetSubRequestModes.setWalk(true);
                 streetRequest.kissAndRide = true;
                 break;
-            case CAR_RENTAL: // TODO OTP2 Reimplement
+            case CAR_RENTAL:
                 streetRequest.streetSubRequestModes.setCar(true);
                 streetRequest.streetSubRequestModes.setWalk(true);
         }

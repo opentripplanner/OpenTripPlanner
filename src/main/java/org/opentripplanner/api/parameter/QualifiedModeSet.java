@@ -83,6 +83,8 @@ public class QualifiedModeSet implements Serializable {
         //  It was unclear what exactly each combination of QualifiedModes should mean.
         //  TODO OTP2 This should either be updated with missing modes or the REST API should be
         //   redesigned to better reflect the mode structure used in RequestModes.
+        //   Also, some StreetModes are implied by combination of QualifiedModes and are not covered
+        //   in this mapping.
         for (QualifiedMode qMode : qModes) {
             switch (qMode.mode) {
                 case "WALK":
