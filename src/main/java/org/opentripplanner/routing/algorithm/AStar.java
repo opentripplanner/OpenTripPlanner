@@ -226,18 +226,17 @@ public class AStar {
             /*
              * Terminate based on timeout?
              */
-//            TODO uncomment timeout termination
-//            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
-//                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
-//                // Rather than returning null to indicate that the search was aborted/timed out,
-//                // we instead set a flag in the routing context and return the SPT anyway. This
-//                // allows returning a partial list results even when a timeout occurs.
-//                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
-//                runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
-//
-//                break;
-//            }
-//
+            if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
+                LOG.warn("Search timeout. origin={} target={}", runState.rctx.origin, runState.rctx.target);
+                // Rather than returning null to indicate that the search was aborted/timed out,
+                // we instead set a flag in the routing context and return the SPT anyway. This
+                // allows returning a partial list results even when a timeout occurs.
+                runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
+                runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
+
+                break;
+            }
+
             /*
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
              * If it has been dominated, the iteration is over; don't bother checking for termination condition.
