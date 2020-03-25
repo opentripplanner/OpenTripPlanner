@@ -173,6 +173,10 @@ public class State implements Cloneable {
     public boolean isBikeRenting() {
         return stateData.usingRentedBike;
     }
+
+    public boolean hasUsedRentedBike() {
+        return stateData.hasUsedRentedBike;
+    }
     
     public boolean isCarParked() {
         return stateData.carParked;
@@ -189,15 +193,19 @@ public class State implements Cloneable {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
         boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
-        boolean bikeRentingOk = false;
-        boolean bikeParkAndRideOk = false;
-        boolean carParkAndRideOk = false;
+        boolean bikeRentingOk;
+        boolean bikeParkAndRideOk;
+        boolean carParkAndRideOk;
         if (stateData.opt.arriveBy) {
-            bikeRentingOk = !isBikeRenting();
+            // Check that we are not renting a bike at the destination
+            // Also check that a bike was rented if bikeRental is specified
+            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
         } else {
-            bikeRentingOk = !isBikeRenting();
+            // Check that we are not renting a bike at the destination
+            // Also check that a bike was rented if bikeRental is specified
+            bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }

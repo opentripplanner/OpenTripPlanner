@@ -44,6 +44,10 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        if (a.hasUsedRentedBike() != b.hasUsedRentedBike()) {
+            return false;
+        }
+
         // In case of bike renting, different networks (ie incompatible bikes) are not comparable
         if (a.isBikeRenting()) {
             if (!Objects.equals(a.getBikeRentalNetworks(), b.getBikeRentalNetworks()))

@@ -20,6 +20,8 @@ public class StateData implements Cloneable {
 
     protected boolean bikeParked;
 
+    protected boolean hasUsedRentedBike;
+
     protected RoutingRequest opt;
 
     protected TraverseMode nonTransitMode;
