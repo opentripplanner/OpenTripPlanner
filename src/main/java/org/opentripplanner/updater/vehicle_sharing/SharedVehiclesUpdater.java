@@ -59,15 +59,11 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
         if (vertexesToChooseFrom == null) {
             stream = simpleStreetSplitter.getIdx().query(envelope).stream().map(Edge::getFromVertex);
-//            stream = graph.getEdges().stream()
-//                    .filter(edge -> edge instanceof RentVehicleAnywhereEdge)
-//                    .map(Edge::getFromVertex);
         } else {
             stream = vertexesToChooseFrom.stream();
         }
 
-//        closestVertexes
-
+        //Any vertexes, needed in stream.reduce
         Vertex v0 = graph.getVertices().stream().findFirst().orElse(null);
 
 
