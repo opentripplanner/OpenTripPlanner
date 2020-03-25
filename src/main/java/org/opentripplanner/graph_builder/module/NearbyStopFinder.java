@@ -141,10 +141,9 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsViaStreets (
             Set<Vertex> originVertices,
             boolean reverseDirection,
-            boolean removeTempEdges
+            boolean removeTempEdges,
+            RoutingRequest routingRequest
     ) {
-
-        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
         routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
@@ -160,7 +159,7 @@ public class NearbyStopFinder {
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (originVertices.contains(targetVertex)) continue;
-                if (targetVertex instanceof TransitStopVertex) {
+                if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
@@ -183,6 +182,20 @@ public class NearbyStopFinder {
         }
         return stopsFound;
 
+    }
+
+    public List<StopAtDistance> findNearbyStopsViaStreets (
+        Set<Vertex> originVertices,
+        boolean reverseDirection,
+        boolean removeTempEdges
+    ) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        return findNearbyStopsViaStreets(
+            originVertices,
+            reverseDirection,
+            removeTempEdges,
+            routingRequest
+        );
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
