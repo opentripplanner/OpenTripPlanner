@@ -1,6 +1,7 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -10,20 +11,23 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
+import org.opentripplanner.updater.vehicle_sharing.RandomVehiclePositionsGetter;
+import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
+import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
  * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
  * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
+ * <p>
  * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
  * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
  * called "updaters". Each child element represents one updater.
- *
+ * <p>
  * When a graph is unloaded, one must ensure the shutdownGraph() method is called to clean up all resources that may
  * have been used.
- *
+ * <p>
  * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
  * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
  * provided) configuration takes complete precedence over the embedded one: childrens properties are
@@ -69,30 +73,22 @@ public abstract class GraphUpdaterConfigurator {
             if (type != null) {
                 if (type.equals("bike-rental")) {
                     updater = new BikeRentalUpdater();
-                }
-                else if (type.equals("bike-park")) {
+                } else if (type.equals("bike-park")) {
                     updater = new BikeParkUpdater();
-                }
-                else if (type.equals("stop-time-updater")) {
+                } else if (type.equals("stop-time-updater")) {
                     updater = new PollingStoptimeUpdater();
-                }
-                else if (type.equals("websocket-gtfs-rt-updater")) {
+                } else if (type.equals("websocket-gtfs-rt-updater")) {
                     updater = new WebsocketGtfsRealtimeUpdater();
-                }
-                else if (type.equals("real-time-alerts")) {
+                } else if (type.equals("real-time-alerts")) {
                     updater = new GtfsRealtimeAlertsUpdater();
-                }
-                else if (type.equals("example-updater")) {
+                } else if (type.equals("example-updater")) {
                     updater = new ExampleGraphUpdater();
-                }
-                else if (type.equals("example-polling-updater")) {
+                } else if (type.equals("example-polling-updater")) {
                     updater = new ExamplePollingGraphUpdater();
-                }
-                else if (type.equals("winkki-polling-updater")) {
+                } else if (type.equals("winkki-polling-updater")) {
                     updater = new WinkkiPollingGraphUpdater();
                 }
             }
-
             if (updater == null) {
                 LOG.error("Unknown updater type: " + type);
             } else {
@@ -111,6 +107,26 @@ public abstract class GraphUpdaterConfigurator {
                     LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
                 }
             }
+        }
+
+//        TODO(mszewczyk) Now Updater is configured mannualy
+//        One fixed car in Bydgoszcz
+//        GraphUpdater updater = new SharedVehiclesUpdater(new VehiclePositionsGetter());
+
+//        Random cars in Bydgoszcz
+//        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 17.79352611652339D, 18.253462294124365D, 52.96911056940485D, 53.25500226408037D));
+
+//      Random cars in Warsaw
+        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 20.45D, 21.46D,  51.91D,  52.48D));
+
+        try {
+            updater.setGraphUpdaterManager(updaterManager);
+            updater.configure(graph, null);
+            updater.setup(graph);
+            updaterManager.addUpdater(updater);
+            LOG.info("Configured GraphUpdater: {}", updater);
+        } catch (Exception e) {
+            LOG.error("Failed to configure graph updater:", e);
         }
         // Now that all the updaters are configured, kick them all off in their own threads.
         updaterManager.startUpdaters();

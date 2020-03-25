@@ -205,7 +205,7 @@ public abstract class Edge implements Serializable {
         return getFromVertex().azimuthTo(getToVertex());
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
 

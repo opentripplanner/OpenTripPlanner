@@ -52,9 +52,9 @@ public class Sample {
         double m0 = Double.NaN;
         double m1 = Double.NaN;
         if (s0 != null)
-            m0 = (s0.getWalkDistance() + d0);
+            m0 = (s0.getTraverseDistanceInMeters() + d0);
         if (s1 != null)
-            m1 = (s1.getWalkDistance() + d1);
+            m1 = (s1.getTraverseDistanceInMeters() + d1);
         return (m0 < m1) ? m0 : m1;
     }
 

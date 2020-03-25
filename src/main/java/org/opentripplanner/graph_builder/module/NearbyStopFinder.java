@@ -219,7 +219,7 @@ public class NearbyStopFinder {
                         coordinates.extend(geometry.getCoordinates(), 1);
                     }
                 }
-                distance += edge.getDistance();
+                distance += edge.getDistanceInMeters();
             }
             edges.add(edge);
         }

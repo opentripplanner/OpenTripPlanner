@@ -1,6 +1,20 @@
 package org.opentripplanner.api.common;
 
-import java.util.*;
+import org.opentripplanner.api.parameter.QualifiedModeSet;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.vehicle_sharing.FuelType;
+import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
+import org.opentripplanner.routing.core.vehicle_sharing.Provider;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDetailsSet;
+import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.standalone.Router;
+import org.opentripplanner.util.ResourceBundleSingleton;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
@@ -9,18 +23,7 @@ import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
-
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import org.opentripplanner.util.ResourceBundleSingleton;
+import java.util.*;
 /**
  * This class defines all the JAX-RS query parameters for a path search as fields, allowing them to 
  * be inherited by other REST resource classes (the trip planner and the Analyst WMS or tile 
@@ -180,6 +183,36 @@ public abstract class RoutingResource {
      */
     @QueryParam("mode")
     protected QualifiedModeSet modes;
+
+    /**
+     * Possible options: WALK, CAR, BIKE. Defaults to null, meaning we use old logic of getting starting mode from `mode` parameter.
+     */
+    @QueryParam("startingMode")
+    protected TraverseMode startingMode;
+
+    /**
+     * Feature flag which activates vehicle renting possibility. Defaults to false.
+     */
+    @QueryParam("rentingAllowed")
+    protected Boolean rentingAllowed;
+
+    /**
+     * Allows filtering vehicles for renting by fuel types. By default we accept renting all vehicles.
+     */
+    @QueryParam("fuelTypesAllowed")
+    protected List<FuelType> fuelTypesAllowed;
+
+    /**
+     * Allows filtering vehicles for renting by Gearbox. By default we accept renting all vehicles.
+     */
+    @QueryParam("gearboxesAllowed")
+    protected List<Gearbox> gearboxesAllowed;
+
+    /**
+     * Allows filtering vehicles for renting by providers. By default we accept renting all vehicles.
+     */
+    @QueryParam("providersAllowed")
+    protected List<Provider> providersAllowed;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -604,6 +637,18 @@ public abstract class RoutingResource {
         if (modes != null) {
             modes.applyToRoutingRequest(request);
             request.setModes(request.modes);
+        }
+
+        if (startingMode != null && startingMode.isOnStreetNonTransit()) {
+            request.startingMode = startingMode;
+        }
+
+        if (rentingAllowed != null) {
+            request.rentingAllowed = rentingAllowed;
+        }
+
+        if (!fuelTypesAllowed.isEmpty() || !gearboxesAllowed.isEmpty() || !providersAllowed.isEmpty()) {
+           request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed);
         }
 
         if (request.allowBikeRental && bikeSpeed == null) {

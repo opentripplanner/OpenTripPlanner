@@ -21,7 +21,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.StreetVertexIndexService;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.SampleVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
@@ -168,8 +167,8 @@ public class StreetVertexIndexServiceImpl implements StreetVertexIndexService {
         double totalGeomLength = geometry.getLength();
         double lengthRatioIn = geometries.first.getLength() / totalGeomLength;
 
-        double lengthIn = street.getDistance() * lengthRatioIn;
-        double lengthOut = street.getDistance() * (1 - lengthRatioIn);
+        double lengthIn = street.getDistanceInMeters() * lengthRatioIn;
+        double lengthOut = street.getDistanceInMeters() * (1 - lengthRatioIn);
 
         if (endVertex) {
             TemporaryPartialStreetEdge temporaryPartialStreetEdge = new TemporaryPartialStreetEdge(

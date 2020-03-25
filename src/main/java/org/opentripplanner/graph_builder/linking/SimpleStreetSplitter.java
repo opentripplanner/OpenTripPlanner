@@ -594,4 +594,8 @@ public class SimpleStreetSplitter {
     public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
         this.addExtraEdgesToAreas = addExtraEdgesToAreas;
     }
+
+    public HashGridSpatialIndex<Edge> getIdx() {
+        return idx;
+    }
 }

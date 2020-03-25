@@ -250,7 +250,7 @@ public class RoundBasedProfileRouter {
                 for (Edge e : tstop.getOutgoing()) {
                     if (e instanceof SimpleTransfer) {
                         SimpleTransfer t = (SimpleTransfer) e;
-                        int time = (int) (t.getDistance() / request.walkSpeed);
+                        int time = (int) (t.getDistanceInMeters() / request.walkSpeed);
                         accessTimes.add(new T2((TransitStop) e.getToVertex(), time));
                     }
                 }

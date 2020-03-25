@@ -7,6 +7,7 @@ import java.util.Set;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -18,9 +19,9 @@ import org.slf4j.LoggerFactory;
 /**
  * This class is a wrapper around a new State that provides it with setter and increment methods,
  * allowing it to be modified before being put to use.
- * 
+ *
  * By virtue of being in the same package as States, it can modify their package private fields.
- * 
+ *
  * @author andrewbyrd
  */
 public class StateEditor {
@@ -39,8 +40,9 @@ public class StateEditor {
 
     /* CONSTRUCTORS */
 
-    protected StateEditor() {}
-    
+    protected StateEditor() {
+    }
+
     public StateEditor(RoutingRequest options, Vertex v) {
         child = new State(v, options);
     }
@@ -49,6 +51,8 @@ public class StateEditor {
         child = parent.clone();
         child.backState = parent;
         child.backEdge = e;
+        child.timeTraversedInMode = new HashMap<>(child.timeTraversedInMode);
+        child.distanceTraversedInMode = new HashMap<>(child.distanceTraversedInMode);
         // We clear child.next here, since it could have already been set in the
         // parent
         child.next = null;
@@ -110,7 +114,7 @@ public class StateEditor {
 
         // Check TemporaryVertex on a different request
         if ((getVertex() instanceof TemporaryVertex)
-            && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
+                && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
             return null;
         }
 
@@ -136,7 +140,7 @@ public class StateEditor {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
         if (options.modes.isTransit() || !options.softWalkLimiting && options.batch)
-            return child.walkDistance >= options.maxWalkDistance;
+            return child.traverseDistanceInMeters >= options.maxWalkDistance;
 
         return false;
     }
@@ -181,6 +185,35 @@ public class StateEditor {
 
     /* Incrementors */
 
+    /**
+     * Increments distance traversed in current traverse mode.
+     * @param distance
+     */
+    public void incrementDistanceTraversedInMode(Double distance) {
+        if (distance < 0) {
+            LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
+            return;
+        }
+
+        Double traversedAlready = child.distanceTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0D);
+        traversedAlready = traversedAlready + distance;
+        child.distanceTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
+    }
+
+    /**
+     * Increments time spend in current traverse mode.
+     * @param timeInSec
+     */
+    public void incrementTimeTraversedInMode(int timeInSec) {
+        if (timeInSec < 0) {
+            LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
+            return;
+        }
+        Integer traversedAlready = child.timeTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0);
+        traversedAlready = traversedAlready + timeInSec;
+        child.timeTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
+    }
+
     public void incrementWeight(double weight) {
         if (Double.isNaN(weight)) {
             LOG.warn("A state's weight is being incremented by NaN while traversing edge "
@@ -205,8 +238,10 @@ public class StateEditor {
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
     }
-    
+
     public void incrementTimeInMilliseconds(long milliseconds) {
+        incrementTimeTraversedInMode((int) (milliseconds / 1000));
+
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
@@ -214,15 +249,16 @@ public class StateEditor {
             return;
         }
         child.time += (traversingBackward ? -milliseconds : milliseconds);
-    }    
+    }
 
-    public void incrementWalkDistance(double length) {
+    public void incrementWalkDistanceInMeters(double length) {
         if (length < 0) {
             LOG.warn("A state's walk distance is being incremented by a negative amount.");
             defectiveTraversal = true;
             return;
         }
-        child.walkDistance += length;
+        incrementDistanceTraversedInMode(length);
+        child.traverseDistanceInMeters += length;
     }
 
     public void incrementPreTransitTime(int seconds) {
@@ -269,7 +305,7 @@ public class StateEditor {
     public void setEnteredNoThroughTrafficArea() {
         child.stateData.enteredNoThroughTrafficArea = true;
     }
-    
+
     /**
      * Initial wait time is recorded so it can be subtracted out of paths in lieu of "reverse optimization".
      * This happens in Analyst.
@@ -278,34 +314,34 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.initialWaitTime = initialWaitTimeSeconds;
     }
-    
+
     public void setBackMode(TraverseMode mode) {
         if (mode == child.stateData.backMode)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backMode = mode;
     }
 
-    public void setBackWalkingBike (boolean walkingBike) {
+    public void setBackWalkingBike(boolean walkingBike) {
         if (walkingBike == child.stateData.backWalkingBike)
             return;
-        
+
         cloneStateDataAsNeeded();
         child.stateData.backWalkingBike = walkingBike;
     }
 
-    /** 
+    /**
      * The lastNextArrivalDelta is the amount of time between the arrival of the last trip
      * the planner used and the arrival of the trip after that.
      */
-    public void setLastNextArrivalDelta (int lastNextArrivalDelta) {
+    public void setLastNextArrivalDelta(int lastNextArrivalDelta) {
         cloneStateDataAsNeeded();
         child.stateData.lastNextArrivalDelta = lastNextArrivalDelta;
     }
 
-    public void setWalkDistance(double walkDistance) {
-        child.walkDistance = walkDistance;
+    public void setTraverseDistance(double traverseDistance) {
+        child.traverseDistanceInMeters = traverseDistance;
     }
 
     public void setPreTransitTime(int preTransitTime) {
@@ -349,16 +385,30 @@ public class StateEditor {
         child.stateData.everBoarded = true;
     }
 
-    public void beginVehicleRenting(TraverseMode vehicleMode) {
+    public void beginBikeRenting(TraverseMode vehicleMode) {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedBike = true;
-        child.stateData.nonTransitMode = vehicleMode;
+        child.stateData.currentTraverseMode = vehicleMode;
+    }
+
+    public void doneBikeRenting() {
+        cloneStateDataAsNeeded();
+        child.stateData.usingRentedBike = false;
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
+    }
+
+    public void beginVehicleRenting(VehicleDescription vehicleDescription) {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
+        child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentVehicle = vehicleDescription;
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
-        child.stateData.usingRentedBike = false;
-        child.stateData.nonTransitMode = TraverseMode.WALK;
+        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
+        child.stateData.currentVehicle = null;
     }
 
     /**
@@ -370,9 +420,9 @@ public class StateEditor {
         child.stateData.carParked = carParked;
         if (carParked) {
             // We do not handle mixed-mode P+BIKE...
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentTraverseMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.CAR;
+            child.stateData.currentTraverseMode = TraverseMode.CAR;
         }
     }
 
@@ -380,9 +430,9 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.bikeParked = bikeParked;
         if (bikeParked) {
-            child.stateData.nonTransitMode = TraverseMode.WALK;
+            child.stateData.currentTraverseMode = TraverseMode.WALK;
         } else {
-            child.stateData.nonTransitMode = TraverseMode.BICYCLE;
+            child.stateData.currentTraverseMode = TraverseMode.BICYCLE;
         }
     }
 
@@ -408,7 +458,7 @@ public class StateEditor {
     /**
      * Set non-incremental state values (ex. {@link State#getRoute()}) from an existing state.
      * Incremental values (ex. {@link State#getNumBoardings()}) are not currently set.
-     * 
+     *
      * @param state
      */
     public void setFromState(State state) {
@@ -426,9 +476,9 @@ public class StateEditor {
         child.stateData.bikeParked = state.stateData.bikeParked;
     }
 
-    public void setNonTransitOptionsFromState(State state){
+    public void setNonTransitOptionsFromState(State state) {
         cloneStateDataAsNeeded();
-        child.stateData.nonTransitMode = state.getNonTransitMode();
+        child.stateData.currentTraverseMode = state.getNonTransitMode();
         child.stateData.carParked = state.isCarParked();
         child.stateData.bikeParked = state.isBikeParked();
         child.stateData.usingRentedBike = state.isBikeRenting();
@@ -460,7 +510,7 @@ public class StateEditor {
     public Trip getPreviousTrip() {
         return child.getPreviousTrip();
     }
-    
+
     public String getZone() {
         return child.getZone();
     }
@@ -485,8 +535,8 @@ public class StateEditor {
         return child.getLastAlightedTimeSeconds();
     }
 
-    public double getWalkDistance() {
-        return child.getWalkDistance();
+    public double getTraverseDistance() {
+        return child.getTraverseDistanceInMeters();
     }
 
     public int getPreTransitTime() {
@@ -515,7 +565,7 @@ public class StateEditor {
 
     public void alightTransit() {
         cloneStateDataAsNeeded();
-        child.stateData.lastTransitWalk = child.getWalkDistance();
+        child.stateData.lastTransitWalk = child.getTraverseDistanceInMeters();
     }
 
     public void setLastPattern(TripPattern pattern) {

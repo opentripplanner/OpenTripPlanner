@@ -67,7 +67,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
     /** Shared configuration code for all polling graph updaters. */
     @Override
-    final public void configure (Graph graph, JsonNode config) throws Exception {
+     public void configure (Graph graph, JsonNode config) throws Exception {
         pollingPeriodSeconds = config.path("frequencySec").asInt(60);
         type = config.path("type").asText("");
         // Additional configuration for the concrete subclass

@@ -31,7 +31,7 @@ public class StreetEdgeInfo {
     
     public StreetEdgeInfo(Edge edge) {
         this.edgeId = edge.getId();
-        this.distance = (int) edge.getDistance();
+        this.distance = (int) edge.getDistanceInMeters();
         if(edge.getGeometry() != null) {
             this.geometry = PolylineEncoder.createEncodings(edge.getGeometry());
         }

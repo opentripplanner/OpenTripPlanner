@@ -31,7 +31,7 @@ public class SampleEdge extends Edge implements TemporaryEdge {
     /** We want to use exactly the same logic here as is used in propagating to samples */
     public State traverse(State s0) {
         StateEditor s1 = s0.edit(this);
-        s1.incrementWalkDistance(this.length);
+        s1.incrementWalkDistanceInMeters(this.length);
         s1.incrementTimeInMilliseconds((int) (1000 * this.length / s0.getOptions().walkSpeed));
         return s1.makeState();
     }

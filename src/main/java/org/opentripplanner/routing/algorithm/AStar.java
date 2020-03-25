@@ -236,7 +236,7 @@ public class AStar {
 
                 break;
             }
-            
+
             /*
              * Get next best state and, if it hasn't already been dominated, add adjacent states to queue.
              * If it has been dominated, the iteration is over; don't bother checking for termination condition.

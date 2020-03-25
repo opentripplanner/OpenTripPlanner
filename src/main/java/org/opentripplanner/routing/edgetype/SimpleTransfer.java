@@ -60,7 +60,7 @@ public class SimpleTransfer extends Edge {
         int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
         se.incrementTimeInSeconds(time);
         se.incrementWeight(time * rr.walkReluctance);
-        se.incrementWalkDistance(distance);
+        se.incrementWalkDistanceInMeters(distance);
         return se.makeState();
     }
 
@@ -82,7 +82,7 @@ public class SimpleTransfer extends Edge {
     }
     
     @Override
-    public double getDistance(){
+    public double getDistanceInMeters(){
     	return this.distance;
     }
     

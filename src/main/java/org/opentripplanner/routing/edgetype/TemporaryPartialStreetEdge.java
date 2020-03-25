@@ -110,13 +110,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     @Override
     public boolean isReverseOf(Edge e) {
-        Edge other = e;
-        if (e instanceof TemporaryPartialStreetEdge) {
-            other = ((TemporaryPartialStreetEdge) e).parentEdge;
-        }
-
-        // TODO(flamholz): is there a case where a partial edge has a reverse of its own?
-        return parentEdge.isReverseOf(other);
+        return false;
     }
 
     @Override
@@ -140,7 +134,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     @Override
     public String toString() {
         return "TemporaryPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
+                + this.getToVertex() + " length=" + this.getDistanceInMeters() + " carSpeed="
                 + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
 
@@ -163,7 +157,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     private void setElevationProfileUsingParents() {
         setElevationProfile(
                 ElevationUtils.getPartialElevationProfile(
-                        getParentEdge().getElevationProfile(), 0, getDistance()
+                        getParentEdge().getElevationProfile(), 0, getDistanceInMeters()
                 ),
                 false
         );

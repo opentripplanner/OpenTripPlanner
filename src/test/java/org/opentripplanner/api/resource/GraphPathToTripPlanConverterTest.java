@@ -954,9 +954,9 @@ public class GraphPathToTripPlanConverterTest {
         }
 
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals(17.0, itinerary.walkDistance, 0.0);
+            assertEquals(17.0, itinerary.traverseDistance, 0.0);
         } else if (type == Type.ONBOARD) {
-            assertEquals(14.0, itinerary.walkDistance, 0.0);
+            assertEquals(14.0, itinerary.traverseDistance, 0.0);
         }
 
         assertFalse(itinerary.walkLimitExceeded);

@@ -206,7 +206,7 @@ public class GraphStats {
                     for (PatternHop ph : Iterables.filter(v.getOutgoing(), PatternHop.class)) {
                         // Vertex fromv = ph.getFromVertex();
                         // Vertex tov = ph.getToVertex();
-                        double distance = ph.getDistance();
+                        double distance = ph.getDistanceInMeters();
                         if (distance < 3)
                             continue;
                         TripPattern ttp = ph.getPattern();

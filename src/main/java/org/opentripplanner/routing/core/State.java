@@ -1,12 +1,15 @@
 package org.opentripplanner.routing.core;
 
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -17,6 +20,10 @@ import org.slf4j.LoggerFactory;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
+
+
+    protected Map<TraverseMode,Double> distanceTraversedInMode = new HashMap<>();
+    protected Map<TraverseMode,Integer> timeTraversedInMode = new HashMap<>();
     
     // the current time at this state, in milliseconds
     protected long time;
@@ -30,6 +37,7 @@ public class State implements Cloneable {
     // allow path reconstruction from states
     protected State backState;
 
+
     public Edge backEdge;
 
     // allow traverse result chaining (multiple results)
@@ -39,9 +47,7 @@ public class State implements Cloneable {
     public StateData stateData;
 
     // how far have we walked
-    // TODO(flamholz): this is a very confusing name as it actually applies to all non-transit modes.
-    // we should DEFINITELY rename this variable and the associated methods.
-    public double walkDistance;
+    public double traverseDistanceInMeters;
 
     // The time traveled pre-transit, for park and ride or kiss and ride searches
     int preTransitTime;
@@ -109,13 +115,13 @@ public class State implements Cloneable {
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
         if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
+            this.stateData.currentTraverseMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
-            this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
+            this.stateData.currentTraverseMode = this.stateData.bikeParked ? TraverseMode.WALK
                     : TraverseMode.BICYCLE;
         }
-        this.walkDistance = 0;
+        this.traverseDistanceInMeters = 0;
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new FeedScopedId[0];
@@ -170,7 +176,7 @@ public class State implements Cloneable {
         return "<State " + new Date(getTimeInMillis()) + 
                 " w=" + this.getWeight() + 
                 " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
+                " d=" + this.getTraverseDistanceInMeters() +
                 " p=" + this.getPreTransitTime() +
                 " b=" + this.getNumBoardings() +
                 " br=" + this.isBikeRenting() +
@@ -279,7 +285,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && !isCurrentlyRentingVehicle();
     }
 
     public Stop getPreviousStop() {
@@ -290,8 +296,8 @@ public class State implements Cloneable {
         return stateData.lastAlightedTime;
     }
 
-    public double getWalkDistance() {
-        return walkDistance;
+    public double getTraverseDistanceInMeters() {
+        return traverseDistanceInMeters;
     }
 
     public int getPreTransitTime() {
@@ -324,7 +330,7 @@ public class State implements Cloneable {
 
     public double getWalkDistanceDelta () {
         if (backState != null)
-            return Math.abs(this.walkDistance - backState.walkDistance);
+            return Math.abs(this.traverseDistanceInMeters - backState.traverseDistanceInMeters);
         else
             return 0.0;
     }
@@ -460,7 +466,7 @@ public class State implements Cloneable {
      *         to a rented bicycle.
      */
     public TraverseMode getNonTransitMode() {
-        return stateData.nonTransitMode;
+        return stateData.currentTraverseMode;
     }
     // TODO: There is no documentation about what this means. No one knows precisely.
     // Needs to be replaced with clearly defined fields.
@@ -558,7 +564,7 @@ public class State implements Cloneable {
     }
 
     public double getWalkSinceLastTransit() {
-        return walkDistance - stateData.lastTransitWalk;
+        return traverseDistanceInMeters - stateData.lastTransitWalk;
     }
 
     public double getWalkAtLastTransit() {
@@ -710,16 +716,16 @@ public class State implements Cloneable {
 
                 editor.incrementTimeInSeconds(orig.getAbsTimeDeltaSeconds());
                 editor.incrementWeight(orig.getWeightDelta());
-                editor.incrementWalkDistance(orig.getWalkDistanceDelta());
+                editor.incrementWalkDistanceInMeters(orig.getWalkDistanceDelta());
                 editor.incrementPreTransitTime(orig.getPreTransitTimeDelta());
                 
                 // propagate the modes through to the reversed edge
                 editor.setBackMode(orig.getBackMode());
 
                 if (orig.isBikeRenting() && !orig.getBackState().isBikeRenting()) {
-                    editor.doneVehicleRenting();
+                    editor.doneBikeRenting();
                 } else if (!orig.isBikeRenting() && orig.getBackState().isBikeRenting()) {
-                    editor.beginVehicleRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
+                    editor.beginBikeRenting(((BikeRentalStationVertex)orig.vertex).getVehicleMode());
                 }
                 if (orig.isCarParked() != orig.getBackState().isCarParked())
                     editor.setCarParked(!orig.isCarParked());
@@ -837,4 +843,18 @@ public class State implements Cloneable {
         return stateData.enteredNoThroughTrafficArea;
     }
 
+    public boolean isCurrentlyRentingVehicle() {
+        return stateData.currentVehicle != null;
+    }
+
+    public VehicleDescription getCurrentVehicle() {
+        return stateData.currentVehicle;
+    }
+
+    public Map<TraverseMode, Double> getDistanceTraversedInMode() {
+        return distanceTraversedInMode;
+    }
+    public Map<TraverseMode, Integer> getTimeTraversedInMode() {
+        return timeTraversedInMode;
+    }
 }

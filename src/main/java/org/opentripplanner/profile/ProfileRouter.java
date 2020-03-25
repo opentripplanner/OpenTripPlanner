@@ -173,7 +173,7 @@ public class ProfileRouter {
                     ride = new Ride(sd.stopCluster, null); // null previous ride because this is the first ride
                     ride.accessStats = new Stats(); // empty stats, times for each access mode will be merged in
                     ride.accessStats.min = Integer.MAX_VALUE; // higher than any value that will be merged in
-                    ride.accessDist = (int) sd.state.getWalkDistance(); // TODO verify correctness and uses
+                    ride.accessDist = (int) sd.state.getTraverseDistanceInMeters(); // TODO verify correctness and uses
                     initialRides.put(sd.stopCluster, ride);
                 }
                 /* Record the access time for this mode in the stats. */

@@ -35,7 +35,7 @@ public class StateEditorTest {
         state.stateData.carParked = true;
         state.stateData.bikeParked = true;
         state.stateData.usingRentedBike = false;
-        state.stateData.nonTransitMode = TraverseMode.WALK;
+        state.stateData.currentTraverseMode = TraverseMode.WALK;
 
         StateEditor se = new StateEditor(request, null);
         se.setNonTransitOptionsFromState(state);

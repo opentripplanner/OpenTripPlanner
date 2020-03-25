@@ -47,6 +47,9 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
+        if(a.getNonTransitMode() != b.getNonTransitMode())
+            return false;
+
         // The result of a SimpleTransfer must not block alighting normally from transit. States that are results of
         // SimpleTransfers are incomparable with states that are not the result of SimpleTransfers.
         if ((a.backEdge instanceof SimpleTransfer) != (b.backEdge instanceof SimpleTransfer)) {
@@ -127,7 +130,7 @@ public abstract class DominanceFunction implements Serializable {
 
         @Override
         protected boolean betterOrEqual(State a, State b) {
-            return a.getWalkDistance() <= b.getWalkDistance(); 
+            return a.getTraverseDistanceInMeters() <= b.getTraverseDistanceInMeters();
         }
 
     }

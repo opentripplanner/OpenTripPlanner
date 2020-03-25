@@ -10,7 +10,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.OsmVertex;
@@ -236,7 +235,7 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
     }
 
@@ -280,7 +279,7 @@ public class StreetEdge extends Edge implements Cloneable {
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis());
         
-        double time = getDistance() / speed;
+        double time = getDistanceInMeters() / speed;
         double weight;
         // TODO(flamholz): factor out this bike, wheelchair and walking specific logic to somewhere central.
         if (options.wheelchairAccessible) {
@@ -289,10 +288,10 @@ public class StreetEdge extends Edge implements Cloneable {
             time = getSlopeSpeedEffectiveLength() / speed;
             switch (options.optimize) {
             case SAFE:
-                weight = bicycleSafetyFactor * getDistance() / speed;
+                weight = bicycleSafetyFactor * getDistanceInMeters() / speed;
                 break;
             case GREENWAYS:
-                weight = bicycleSafetyFactor * getDistance() / speed;
+                weight = bicycleSafetyFactor * getDistanceInMeters() / speed;
                 if (bicycleSafetyFactor <= GREENWAY_SAFETY_FACTOR) {
                     // greenways are treated as even safer than they really are
                     weight *= 0.66;
@@ -300,14 +299,14 @@ public class StreetEdge extends Edge implements Cloneable {
                 break;
             case FLAT:
                 /* see notes in StreetVertex on speed overhead */
-                weight = getDistance() / speed + getSlopeWorkCostEffectiveLength();
+                weight = getDistanceInMeters() / speed + getSlopeWorkCostEffectiveLength();
                 break;
             case QUICK:
                 weight = getSlopeSpeedEffectiveLength() / speed;
                 break;
             case TRIANGLE:
                 double quick = getSlopeSpeedEffectiveLength();
-                double safety = bicycleSafetyFactor * getDistance();
+                double safety = bicycleSafetyFactor * getDistanceInMeters();
                 // TODO This computation is not coherent with the one for FLAT
                 double slope = getSlopeWorkCostEffectiveLength();
                 weight = quick * options.triangleTimeFactor + slope
@@ -316,7 +315,7 @@ public class StreetEdge extends Edge implements Cloneable {
                 weight /= speed;
                 break;
             default:
-                weight = getDistance() / speed;
+                weight = getDistanceInMeters() / speed;
             }
         } else {
             if (walkingBike) {
@@ -419,9 +418,6 @@ public class StreetEdge extends Edge implements Cloneable {
                 realTurnCost = 0; 
             }
 
-            if (!traverseMode.isDriving()) {
-                s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
-            }
 
             int turnTime = (int) Math.ceil(realTurnCost);
             roundedTime += turnTime;
@@ -436,9 +432,7 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        if (!traverseMode.isDriving()) {
-            s1.incrementWalkDistance(getDistance());
-        }
+
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
         if (options.parkAndRide) {
@@ -462,7 +456,7 @@ public class StreetEdge extends Edge implements Cloneable {
             // if we're using a soft walk-limit
             if( options.softWalkLimiting ){
                 // just slap a penalty for the overage onto s1
-                weight += calculateOverageWeight(s0.getWalkDistance(), s1.getWalkDistance(),
+                weight += calculateOverageWeight(s0.getTraverseDistanceInMeters(), s1.getTraverseDistance(),
                         options.getMaxWalkDistance(), options.softWalkPenalty,
                                 options.softWalkOverageRate);
             } else {
@@ -473,7 +467,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         s1.incrementTimeInSeconds(roundedTime);
-        
+        s1.incrementWalkDistanceInMeters(getDistanceInMeters());
         s1.incrementWeight(weight);
 
         return s1;
@@ -527,19 +521,19 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double timeLowerBound(RoutingRequest options) {
-        return this.getDistance() / options.getStreetSpeedUpperBound();
+        return this.getDistanceInMeters() / options.getStreetSpeedUpperBound();
     }
 
     public double getSlopeSpeedEffectiveLength() {
-        return getDistance();
+        return getDistanceInMeters();
     }
 
     public double getSlopeWorkCostEffectiveLength() {
-        return getDistance();
+        return getDistanceInMeters();
     }
 
     public double getSlopeWalkSpeedEffectiveLength() {
-        return getDistance();
+        return getDistanceInMeters();
     }
 
     public void setBicycleSafetyFactor(float bicycleSafetyFactor) {
@@ -556,7 +550,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public String toString() {
         return "StreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
-                + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
+                + " length=" + this.getDistanceInMeters() + " carSpeed=" + this.getCarSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 

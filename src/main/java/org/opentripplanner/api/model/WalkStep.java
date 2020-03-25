@@ -9,6 +9,7 @@ import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
@@ -40,7 +41,7 @@ import com.google.common.collect.Lists;
  * stayOn = true <br/>
  * everything else false <br/>
  * </p>
- * */
+ */
 public class WalkStep {
 
     /**
@@ -107,19 +108,19 @@ public class WalkStep {
 
     /**
      * The walkStep's mode; only populated if this is the first step of that mode in the leg.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     * Used only in generating the streetEdges array in StreetSegment; not serialized.
      */
     public transient String newMode;
 
     /**
      * The street edges that make up this walkStep.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     * Used only in generating the streetEdges array in StreetSegment; not serialized.
      */
     public transient List<Edge> edges = Lists.newArrayList();
 
     /**
      * The bike rental on/off station info.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized. 
+     * Used only in generating the streetEdges array in StreetSegment; not serialized.
      */
     public transient BikeRentalStationInfo bikeRentalOnStation, bikeRentalOffStation;
 
@@ -137,7 +138,7 @@ public class WalkStep {
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
-            boolean roundabout) {
+                                                         boolean roundabout) {
 
         double angleDiff = thisAngle - lastAngle;
         if (angleDiff < 0) {
@@ -184,7 +185,8 @@ public class WalkStep {
         if (alerts == null) {
             alerts = new ArrayList<>();
         }
-        ALERT: for (Alert newAlert : newAlerts) {
+        ALERT:
+        for (Alert newAlert : newAlerts) {
             for (LocalizedAlert alert : alerts) {
                 if (alert.alert.equals(newAlert)) {
                     break ALERT;

@@ -85,7 +85,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         return null;
     }
 
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
 

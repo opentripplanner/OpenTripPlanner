@@ -53,7 +53,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(options.arriveBy ? options.bikeRentalDropoffCost : options.bikeRentalPickupCost);
         s1.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalDropoffTime : options.bikeRentalPickupTime);
-        s1.beginVehicleRenting(((BikeRentalStationVertex)fromv).getVehicleMode());
+        s1.beginBikeRenting(((BikeRentalStationVertex)fromv).getVehicleMode());
         s1.setBikeRentalNetwork(networks);
         s1.setBackMode(s0.getNonTransitMode());
         State s1b = s1.makeState();
@@ -75,14 +75,14 @@ public abstract class RentABikeAbstractEdge extends Edge {
         StateEditor s1e = s0.edit(this);
         s1e.incrementWeight(options.arriveBy ? options.bikeRentalPickupCost : options.bikeRentalDropoffCost);
         s1e.incrementTimeInSeconds(options.arriveBy ? options.bikeRentalPickupTime : options.bikeRentalDropoffTime);
-        s1e.doneVehicleRenting();
+        s1e.doneBikeRenting();
         s1e.setBackMode(TraverseMode.WALK);
         State s1 = s1e.makeState();
         return s1;
     }
 
     @Override
-    public double getDistance() {
+    public double getDistanceInMeters() {
         return 0;
     }
 
