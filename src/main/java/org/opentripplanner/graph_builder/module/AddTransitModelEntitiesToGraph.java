@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -18,11 +19,16 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
+import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
+import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
+import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -78,6 +84,7 @@ public class AddTransitModelEntitiesToGraph {
         addGroupsOfStationsToGraph(graph);
         addEntrancesToGraph(graph);
         addPathwayNodesToGraph(graph);
+        addBoardingAreasToGraph(graph);
 
         // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
         createPathwayEdgesAndAddThemToGraph(graph);
@@ -149,6 +156,26 @@ public class AddTransitModelEntitiesToGraph {
         }
     }
 
+    private void addBoardingAreasToGraph(Graph graph) {
+        for (BoardingArea boardingArea : transitService.getAllBoardingAreas()) {
+            TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
+            stopNodes.put(boardingArea, boardingAreaVertex);
+            if (boardingArea.getParentStop() != null) {
+                new PathwayEdge(
+                    boardingAreaVertex,
+                    stopNodes.get(boardingArea.getParentStop()),
+                    boardingArea.getName()
+                );
+
+                new PathwayEdge(
+                    stopNodes.get(boardingArea.getParentStop()),
+                    boardingAreaVertex,
+                    boardingArea.getName()
+                );
+            }
+        }
+    }
+
     private void createPathwayEdgesAndAddThemToGraph(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
             Vertex fromVertex = stopNodes.get(pathway.getFromStop());
@@ -208,20 +235,23 @@ public class AddTransitModelEntitiesToGraph {
         String fromVertexLevelName = fromVertex.getName();
         Double fromVertexLevelIndex = null;
 
+        // TODO: Shuld these be refactored behind an interface
         if (fromVertex instanceof TransitStopVertex) {
             TransitStopVertex tsv = (TransitStopVertex) fromVertex;
             fromVertexLevelName = tsv.getStop().getLevelName();
             fromVertexLevelIndex = tsv.getStop().getLevelIndex();
-        }
-        else if (fromVertex instanceof TransitEntranceVertex) {
+        } else if (fromVertex instanceof TransitEntranceVertex) {
             TransitEntranceVertex tev = (TransitEntranceVertex) fromVertex;
             fromVertexLevelName = tev.getEntrance().getLevelName();
             fromVertexLevelIndex = tev.getEntrance().getLevelIndex();
-        }
-        else if (fromVertex instanceof TransitPathwayNodeVertex) {
+        } else if (fromVertex instanceof TransitPathwayNodeVertex) {
             TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) fromVertex;
             fromVertexLevelName = tnv.getNode().getLevelName();
             fromVertexLevelIndex = tnv.getNode().getLevelIndex();
+        } else if (fromVertex instanceof TransitBoardingAreaVertex) {
+            TransitBoardingAreaVertex tnv = (TransitBoardingAreaVertex) fromVertex;
+            fromVertexLevelName = tnv.getBoardingArea().getLevelName();
+            fromVertexLevelIndex = tnv.getBoardingArea().getLevelIndex();
         }
 
         String toVertexLevelName = toVertex.getName();
@@ -231,16 +261,18 @@ public class AddTransitModelEntitiesToGraph {
             TransitStopVertex tsv = (TransitStopVertex) toVertex;
             toVertexLevelName = tsv.getStop().getLevelName();
             toVertexLevelIndex = tsv.getStop().getLevelIndex();
-        }
-        else if (toVertex instanceof TransitEntranceVertex) {
+        } else if (toVertex instanceof TransitEntranceVertex) {
             TransitEntranceVertex tev = (TransitEntranceVertex) toVertex;
             toVertexLevelName = tev.getEntrance().getLevelName();
             toVertexLevelIndex = tev.getEntrance().getLevelIndex();
-        }
-        else if (toVertex instanceof TransitPathwayNodeVertex) {
+        } else if (toVertex instanceof TransitPathwayNodeVertex) {
             TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) toVertex;
             toVertexLevelName = tnv.getNode().getLevelName();
             toVertexLevelIndex = tnv.getNode().getLevelIndex();
+        } else if (toVertex instanceof TransitBoardingAreaVertex) {
+            TransitBoardingAreaVertex tnv = (TransitBoardingAreaVertex) toVertex;
+            toVertexLevelName = tnv.getBoardingArea().getLevelName();
+            toVertexLevelIndex = tnv.getBoardingArea().getLevelIndex();
         }
 
         double levels = 1;

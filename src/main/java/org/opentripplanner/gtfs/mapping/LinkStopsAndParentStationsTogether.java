@@ -19,6 +19,7 @@ class LinkStopsAndParentStationsTogether {
     private final EntityById<FeedScopedId, Stop> otpStops;
     private final EntityById<FeedScopedId, Entrance> entrances;
     private final EntityById<FeedScopedId, PathwayNode> nodes;
+    private final EntityById<FeedScopedId, BoardingArea> boardingAreas;
 
     private final DataImportIssueStore issueStore;
 
@@ -29,18 +30,21 @@ class LinkStopsAndParentStationsTogether {
             EntityById<FeedScopedId, Stop> stops,
             EntityById<FeedScopedId, Entrance> entrances,
             EntityById<FeedScopedId, PathwayNode> nodes,
+            EntityById<FeedScopedId, BoardingArea> boardingAreas,
             DataImportIssueStore issueStore
     ) {
         this.otpStations = stations;
         this.otpStops = stops;
         this.entrances = entrances;
         this.nodes = nodes;
+        this.boardingAreas = boardingAreas;
         this.issueStore = issueStore;
     }
 
     void link(Collection<org.onebusaway.gtfs.model.Stop> gtfsStops) {
         for (org.onebusaway.gtfs.model.Stop gtfsStop : gtfsStops) {
-            if (gtfsStop.getLocationType() != 1 && gtfsStop.getParentStation() != null) {
+            if (gtfsStop.getLocationType() != 1 && gtfsStop.getLocationType() != 4
+                    && gtfsStop.getParentStation() != null) {
 
                 TransitEntity<FeedScopedId> otpStop = getOtpStop(gtfsStop);
                 Station otpStation = getOtpParentStation(gtfsStop);
@@ -68,6 +72,23 @@ class LinkStopsAndParentStationsTogether {
                         node.setCoordinate(new WgsCoordinate(otpStation.getLat(), otpStation.getLon()));
                     }
                 }
+            } else if (gtfsStop.getLocationType() == 4 && gtfsStop.getParentStation() != null) {
+                BoardingArea otpBoardingArea = getOtpBoardingArea(gtfsStop);
+                FeedScopedId otpStopId = mapAgencyAndId(gtfsStop.getId());
+                Stop otpStop = otpStops.get(otpStopId);
+
+                if (otpStop == null) {
+                    issueStore.add(
+                        new ParentStationNotFound(
+                            otpBoardingArea,
+                            gtfsStop.getParentStation()
+                        )
+                    );
+                    continue;
+                }
+
+                otpBoardingArea.setParentStop(otpStop);
+                otpStop.addBoardingArea(otpBoardingArea);
             }
         }
     }
@@ -90,5 +111,10 @@ class LinkStopsAndParentStationsTogether {
         if (possiblePathwayNode != null) return possiblePathwayNode;
 
         return null;
+    }
+
+    private BoardingArea getOtpBoardingArea(org.onebusaway.gtfs.model.Stop stop) {
+        FeedScopedId otpStopId = mapAgencyAndId(stop.getId());
+        return boardingAreas.get(otpStopId);
     }
 }

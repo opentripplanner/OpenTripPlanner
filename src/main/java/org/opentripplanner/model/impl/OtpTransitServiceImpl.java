@@ -4,6 +4,7 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
@@ -79,6 +80,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
 
+    private final Map<FeedScopedId, BoardingArea> boardingAreasById;
+
     private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
     private final Collection<Transfer> transfers;
@@ -106,6 +109,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.stopsById = builder.getStops().asImmutableMap();
         this.entrancesById = builder.getEntrances().asImmutableMap();
         this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
+        this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
@@ -199,6 +203,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<PathwayNode> getAllPathwayNodes() {
         return immutableList(pathwayNodesById.values());
+    }
+
+    @Override
+    public Collection<BoardingArea> getAllBoardingAreas() {
+        return immutableList(boardingAreasById.values());
     }
 
     @Override

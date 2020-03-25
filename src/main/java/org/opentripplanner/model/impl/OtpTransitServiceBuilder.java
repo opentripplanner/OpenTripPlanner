@@ -1,9 +1,9 @@
 package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
@@ -86,6 +86,8 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FeedScopedId, Entrance> entrancesById = new EntityById<>();
 
     private final EntityById<FeedScopedId, PathwayNode> pathwayNodesById = new EntityById<>();
+
+    private final EntityById<FeedScopedId, BoardingArea> boardingAreasById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
@@ -176,6 +178,10 @@ public class OtpTransitServiceBuilder {
 
     public EntityById<FeedScopedId, PathwayNode> getPathwayNodes() {
         return pathwayNodesById;
+    }
+
+    public EntityById<FeedScopedId, BoardingArea> getBoardingAreas() {
+        return boardingAreasById;
     }
 
     public TripStopTimes getStopTimesSortedByTrip() {

@@ -1,6 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or
  * a platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
@@ -46,6 +50,8 @@ public final class Stop extends TransitEntity<FeedScopedId> {
     private String levelName;
 
     private double levelIndex;
+
+    private HashSet<BoardingArea> boardingAreas;
 
     public Stop() {}
 
@@ -147,6 +153,17 @@ public final class Stop extends TransitEntity<FeedScopedId> {
 
     public void setLevelIndex(double levelIndex) {
         this.levelIndex = levelIndex;
+    }
+
+    public void addBoardingArea(BoardingArea boardingArea) {
+        if (boardingAreas == null) {
+          boardingAreas = new HashSet<>();
+        }
+        boardingAreas.add(boardingArea);
+    }
+
+    public Collection<BoardingArea> getBoardingAreas() {
+      return boardingAreas != null ? boardingAreas : Collections.emptySet();
     }
 
     @Override

@@ -1,6 +1,5 @@
 package org.opentripplanner.gtfs.mapping;
 
-import org.onebusaway.gtfs.model.Stop;
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.ShapePoint;
@@ -21,6 +20,8 @@ public class GTFSToOtpTransitServiceMapper {
     private final EntranceMapper entranceMapper = new EntranceMapper();
 
     private final PathwayNodeMapper pathwayNodeMapper = new PathwayNodeMapper();
+
+    private final BoardingAreaMapper boardingAreaMapper = new BoardingAreaMapper();
 
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
@@ -96,7 +97,7 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
-        for (Stop it : data.getAllStops()) {
+        for (org.onebusaway.gtfs.model.Stop it : data.getAllStops()) {
             if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
                 builder.getStops().add(stopMapper.map(it));
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
@@ -105,6 +106,8 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getEntrances().add(entranceMapper.map(it));
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
                 builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
+            } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
+                builder.getBoardingAreas().add(boardingAreaMapper.map(it));
             }
         }
         new LinkStopsAndParentStationsTogether(
@@ -112,6 +115,7 @@ public class GTFSToOtpTransitServiceMapper {
                 builder.getStops(),
                 builder.getEntrances(),
                 builder.getPathwayNodes(),
+                builder.getBoardingAreas(),
                 issueStore
         )
             .link(data.getAllStops());
