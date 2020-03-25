@@ -69,8 +69,6 @@ public final class TravelOptionsMaker {
                 travelOptions.add(new TravelOption(String.join(",", "BICYCLE_PARK", TraverseMode.WALK.toString(), TraverseMode.TRANSIT.toString()),
                     "BIKERIDE"));
             }
-            travelOptions.add(new TravelOption(String.join(",", TraverseMode.CAR.toString(), TraverseMode.WALK.toString(), TraverseMode.TRANSIT.toString()),
-                "KISSRIDE"));
         }
 
 

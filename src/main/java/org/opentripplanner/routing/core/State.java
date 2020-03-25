@@ -107,7 +107,7 @@ public class State implements Cloneable {
         this.stateData.usingRentedBike = false;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-        if (options.parkAndRide || options.kissAndRide) {
+        if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
@@ -265,7 +265,7 @@ public class State implements Cloneable {
      */
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-        boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
+        boolean parkAndRide = stateData.opt.parkAndRide;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
         boolean bikeRentingOk = false;
         boolean bikeParkAndRideOk = false;
