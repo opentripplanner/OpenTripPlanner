@@ -231,7 +231,7 @@ public class RoutingWorker {
         ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
-        builder.setGroupByTransferCost(request.walkBoardCost + request.transferPenalty);
+        builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
 
         if(request.debugItineraryFilter) {

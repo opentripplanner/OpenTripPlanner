@@ -3,7 +3,6 @@ package org.opentripplanner.transit.raptor.api.request;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Objects;
@@ -42,7 +41,6 @@ public class SearchParams {
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
     private final boolean allowWaitingBetweenAccessAndTransit;
-    private final BitSet stopFilter;
     private final Collection<TransferLeg> accessLegs;
     private final Collection<TransferLeg> egressLegs;
 
@@ -59,7 +57,6 @@ public class SearchParams {
         relaxCostAtDestination = NOT_SET;
         timetableEnabled = false;
         allowWaitingBetweenAccessAndTransit = true;
-        stopFilter = null;
         accessLegs = Collections.emptyList();
         egressLegs = Collections.emptyList();
     }
@@ -74,7 +71,6 @@ public class SearchParams {
         this.relaxCostAtDestination = builder.relaxCostAtDestination();
         this.timetableEnabled = builder.timetableEnabled();
         this.allowWaitingBetweenAccessAndTransit = builder.allowWaitingBetweenAccessAndTransit();
-        this.stopFilter = builder.stopFilter();
         this.accessLegs = java.util.List.copyOf(builder.accessLegs());
         this.egressLegs = java.util.List.copyOf(builder.egressLegs());
     }
@@ -233,19 +229,6 @@ public class SearchParams {
      */
     public boolean allowWaitingBetweenAccessAndTransit() {
         return allowWaitingBetweenAccessAndTransit;
-    }
-
-    /**
-     * Restrict the search to a limited set of stops. Range Raptor will check the
-     * provided stop filter every time it arrive at a stop, dropping all arrivals
-     * (and paths) during the search.
-     * <p/>
-     * Set bit n to TRUE to enable stop at index n.
-     * </p>
-     * The default is {@code null}
-     */
-    public BitSet stopFilter() {
-        return stopFilter;
     }
 
     /**

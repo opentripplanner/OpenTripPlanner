@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -25,7 +25,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     private int onTripBoardStop;
     private T onTrip;
     private int onTripTimeShift;
-    private TripPatternInfo<T> pattern;
+    private RaptorTripPattern<T> pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public NoWaitTransitWorker(
@@ -37,7 +37,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
     }
 
     @Override
-    public void prepareForTransitWith(TripPatternInfo<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.onTripIndex = NOT_SET;
@@ -56,7 +56,7 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         if (onTripIndex != NOT_SET) {
             state.transitToStop(
                     stop,
-                    alightTime(onTrip, stopPositionInPattern),
+                    stopArrivalTime(onTrip, stopPositionInPattern),
                     onTripBoardStop,
                     onTripBoardTime,
                     onTrip
@@ -81,9 +81,9 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         }
     }
 
-    public int alightTime(final T trip, final int stopPositionInPattern) {
+    public int stopArrivalTime(final T trip, final int stopPositionInPattern) {
         // In the normal case the arrivalTime is used, but in reverse search
         // the board slack is added; hence the calculator delegation
-        return calculator.latestArrivalTime(trip, stopPositionInPattern) - onTripTimeShift;
+        return calculator.stopArrivalTime(trip, stopPositionInPattern) - onTripTimeShift;
     }
 }

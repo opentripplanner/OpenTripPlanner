@@ -13,6 +13,7 @@ import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -106,14 +107,12 @@ public class TestHalfEdges {
 
         Stop s1 = new Stop();
         s1.setName("transitVertex 1");
-        s1.setLon(-74.005);
-        s1.setLat(40.0099999);
+        s1.setCoordinate(new WgsCoordinate(40.0099999, -74.005));
         s1.setId(new FeedScopedId("A", "fleem station"));
 
         Stop s2 = new Stop();
         s2.setName("transitVertex 2");
-        s2.setLon(-74.002);
-        s2.setLat(40.0099999);
+        s2.setCoordinate(new WgsCoordinate(40.0099999, -74.002));
         s2.setId(new FeedScopedId("A", "morx station"));
 
         station1 = new TransitStopVertex(graph, s1, null);
@@ -459,14 +458,14 @@ public class TestHalfEdges {
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         Edge edge = outgoing.iterator().next();
 
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
 
         outgoing = station2.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         edge = outgoing.iterator().next();
 
         Vertex station2point = edge.getToVertex();

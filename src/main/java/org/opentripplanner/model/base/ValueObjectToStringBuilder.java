@@ -80,7 +80,12 @@ public class ValueObjectToStringBuilder {
 
     /* Special purpose formatters */
 
-    /** Add a Coordinate location: (longitude, latitude) */
+    /**
+     * Add a Coordinate location: (longitude, latitude). The coordinate is
+     * printed with a precision of 5 digits after the period. The precision level used
+     * in OTP is 7 digits, so 2 coordinates that appear to be equal (by toString) might not be
+     * exactly equals.
+     */
     public ValueObjectToStringBuilder addCoordinate(Number lat, Number lon) {
         return addIt("(" + formatCoordinate(lat) + ", " + formatCoordinate(lon) + ")");
     }
@@ -130,7 +135,7 @@ public class ValueObjectToStringBuilder {
 
     String formatCoordinate(Number value) {
         if(coordinateFormat == null) {
-            coordinateFormat = new DecimalFormat("#0.0####", DECIMAL_SYMBOLS);
+            coordinateFormat = new DecimalFormat("0.0####", DECIMAL_SYMBOLS);
         }
         // This need to be null-safe, because one of the coordinates in
         // #addCoordinate(String name, Number lat, Number lon) could be null.

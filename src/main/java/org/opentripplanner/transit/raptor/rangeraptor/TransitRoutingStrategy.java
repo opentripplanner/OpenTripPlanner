@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
@@ -15,7 +15,7 @@ public interface TransitRoutingStrategy<T extends RaptorTripSchedule> {
     /**
      * Prepare the {@link TransitRoutingStrategy} to route using the given pattern and tripSearch.
      */
-    void prepareForTransitWith(TripPatternInfo<T> pattern, TripScheduleSearch<T> tripSearch);
+    void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch);
 
     /**
      * Perform the routing with the initialized pattern and tripSearch at the given stopPositionInPattern.
@@ -23,7 +23,7 @@ public interface TransitRoutingStrategy<T extends RaptorTripSchedule> {
      * This method is called for each stop position in a pattern after the first stop reached in the previous round.
      *
      * @param stopPositionInPattern the current stop position in the pattern set
-     *                              in {@link #prepareForTransitWith(TripPatternInfo, TripScheduleSearch)}
+     *                              in {@link #prepareForTransitWith(RaptorTripPattern, TripScheduleSearch)}
      */
     void routeTransitAtStop(final int stopPositionInPattern);
 

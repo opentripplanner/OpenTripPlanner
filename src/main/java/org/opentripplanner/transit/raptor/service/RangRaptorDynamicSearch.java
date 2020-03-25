@@ -72,7 +72,6 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
            runHeuristics();
 
             RaptorRequest<T> mcRequest = originalRequest;
-            mcRequest = addStopFilterFromHeuristics(mcRequest);
             mcRequest = mcRequestWithDynamicSearchParams(mcRequest);
 
             return createAndRunWorker(mcRequest);
@@ -246,25 +245,6 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
         // multi-criteria search, it does not have much effect on the performance - we only risk
         // loosing optimal results.
         return builder.build();
-    }
-
-    /**
-     * Use the TRANSFERS_STOP_FILTER to prune stops for. This method creates the stopFilter
-     * BitSet and add it to the request - ready to be used by the next search.
-     */
-    private RaptorRequest<T> addStopFilterFromHeuristics(RaptorRequest<T> request) {
-        if (!request.useTransfersStopFilter()) { return request; }
-        // If not a mc-search
-        if (!fwdHeuristics.isEnabled() || !revHeuristics.isEnabled()) { return request; }
-
-        int nAddTransfares = originalRequest.searchParams().numberOfAdditionalTransfers();
-
-        BitSet stopFilter = fwdHeuristics
-                .search()
-                .stopFilter(revHeuristics.search(), nAddTransfares);
-
-        LOG.debug("RangeRaptor - Stop Filter using heuristics enabled.");
-        return request.mutate().searchParams().stopFilter(stopFilter).build();
     }
 
     private void calculateDynamicSearchParametersFromHeuristics(Heuristics heuristics) {

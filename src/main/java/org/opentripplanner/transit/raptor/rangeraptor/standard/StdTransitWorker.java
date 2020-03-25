@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
@@ -23,7 +23,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     private int onTripBoardTime;
     private int onTripBoardStop;
     private T onTrip;
-    private TripPatternInfo<T> pattern;
+    private RaptorTripPattern<T> pattern;
     private TripScheduleSearch<T> tripSearch;
 
     public StdTransitWorker(
@@ -35,7 +35,7 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     }
 
     @Override
-    public void prepareForTransitWith(TripPatternInfo<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
         this.onTripIndex = NOT_SET;
@@ -48,14 +48,14 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
     public void routeTransitAtStop(int stopPositionInPattern) {
         int stop = pattern.stopIndex(stopPositionInPattern);
 
-        // attempt to alight if we're on board, done above the board search so that we don't check for alighting
-        // when boarding
+        // attempt to alight if we're on board, done above the board search so that we don't check
+        // for alighting when boarding
         if (onTripIndex != NOT_SET) {
             state.transitToStop(
                     stop,
-                    // In the normal case the arrivalTime is used,
-                    // but in reverse search the board slack is added; hence the calculator delegation
-                    calculator.latestArrivalTime(onTrip, stopPositionInPattern),
+                    // In the normal case the trip alightTime is used,
+                    // but in reverse search the board-slack is added; hence the calculator delegation
+                    calculator.stopArrivalTime(onTrip, stopPositionInPattern),
                     onTripBoardStop,
                     onTripBoardTime,
                     onTrip

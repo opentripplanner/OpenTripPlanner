@@ -4,6 +4,7 @@ import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
@@ -71,8 +72,7 @@ public class FakeGraph {
                 String id = "" + count++;
                 FeedScopedId aid = new FeedScopedId("TEST", id);
                 Stop stop = new Stop();
-                stop.setLat(lat);
-                stop.setLon(lon);
+                stop.setCoordinate(new WgsCoordinate(lat, lon));
                 stop.setName(id);
                 stop.setCode(id);
                 stop.setId(aid);
@@ -91,8 +91,7 @@ public class FakeGraph {
             String id = "EXTRA_" + count++;
             FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
+            stop.setCoordinate(new WgsCoordinate(lat, lon));
             stop.setName(id);
             stop.setCode(id);
             stop.setId(aid);
@@ -108,8 +107,7 @@ public class FakeGraph {
             String id = "" + count++;
             FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
+            stop.setCoordinate(new WgsCoordinate(lat, lon));
             stop.setName(id);
             stop.setCode(id);
             stop.setId(aid);
@@ -125,8 +123,7 @@ public class FakeGraph {
             String id = "" + count++;
             FeedScopedId aid = new FeedScopedId("EXTRA", id);
             Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
+            stop.setCoordinate(new WgsCoordinate(lat, lon));
             stop.setName(id);
             stop.setCode(id);
             stop.setId(aid);

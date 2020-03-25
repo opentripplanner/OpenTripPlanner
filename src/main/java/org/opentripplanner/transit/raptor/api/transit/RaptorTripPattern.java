@@ -6,7 +6,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public interface TripPatternInfo<T extends RaptorTripSchedule> {
+public interface RaptorTripPattern<T extends RaptorTripSchedule> {
 
     /**
      * The stop index

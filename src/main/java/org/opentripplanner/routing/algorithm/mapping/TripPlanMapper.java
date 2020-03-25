@@ -35,6 +35,6 @@ public class TripPlanMapper {
     }
 
     private static Place placeFromGeoLocation(GenericLocation location) {
-        return new Place(location.lng, location.lat, location.label);
+        return new Place(location.lat, location.lng, location.label);
     }
 }
