@@ -10,7 +10,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.request.AllowedModes;
+import org.opentripplanner.routing.request.RequestModes;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
@@ -248,7 +248,7 @@ public class TransmodelGraphQLPlanner {
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
             callWith.argument("modes.transportMode", transitModes::set);
-            request.modes = new AllowedModes(
+            request.modes = new RequestModes(
                 accessMode.get(),
                 egressMode.get(),
                 directMode.get(),

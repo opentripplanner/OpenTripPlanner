@@ -183,7 +183,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * // TODO OTP2 Street routing requests should eventually be split into its own request class.
      */
-    public AllowedModes modes = new AllowedModes(
+    public RequestModes modes = new RequestModes(
         StreetMode.WALK,
         StreetMode.WALK,
         StreetMode.WALK,

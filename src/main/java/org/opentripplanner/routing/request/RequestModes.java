@@ -4,13 +4,13 @@ import org.opentripplanner.model.TransitMode;
 
 import java.util.Set;
 
-public class AllowedModes {
+public class RequestModes {
   public StreetMode accessMode;
   public StreetMode egressMode;
   public StreetMode directMode;
   public Set<TransitMode> transitModes;
 
-  public AllowedModes(
+  public RequestModes(
       StreetMode accessMode,
       StreetMode egressMode,
       StreetMode directMode,
