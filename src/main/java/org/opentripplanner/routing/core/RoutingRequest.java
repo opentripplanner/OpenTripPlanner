@@ -543,7 +543,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean allowBikeRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
-    public boolean kissAndRide  = false;
 
     /* Whether we are in "long-distance mode". This is currently a server-wide setting, but it could be made per-request. */
     // TODO remove

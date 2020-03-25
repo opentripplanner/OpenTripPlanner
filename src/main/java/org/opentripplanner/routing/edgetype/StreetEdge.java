@@ -28,6 +28,7 @@ import java.io.ObjectOutputStream;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 /**
  * This represents a street segment.
@@ -242,39 +243,8 @@ public class StreetEdge extends Edge implements Cloneable {
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
-        final TraverseMode currMode = s0.getNonTransitMode();
         StateEditor editor = doTraverse(s0, options, s0.getNonTransitMode());
-        State state = (editor == null) ? null : editor.makeState();
-        /* Kiss and ride support. Mode transitions occur without the explicit loop edges used in park-and-ride. */
-        if (options.kissAndRide) {
-            if (options.arriveBy) {
-                // Branch search to "unparked" CAR mode ASAP after transit has been used.
-                // Final WALK check prevents infinite recursion.
-                if (s0.isCarParked() && s0.isEverBoarded() && currMode == TraverseMode.WALK) {
-                    editor = doTraverse(s0, options, TraverseMode.CAR);
-                    if (editor != null) {
-                        editor.setCarParked(false); // Also has the effect of switching to CAR
-                        State forkState = editor.makeState();
-                        if (forkState != null) {
-                            forkState.addToExistingResultChain(state);
-                            return forkState; // return both parked and unparked states
-                        }
-                    }
-                }
-            } else { /* departAfter */
-                // Irrevocable transition from driving to walking. "Parking" means being dropped off in this case.
-                // Final CAR check needed to prevent infinite recursion.
-                if ( ! s0.isCarParked() && ! getPermission().allows(TraverseMode.CAR) && currMode == TraverseMode.CAR) {
-                    editor = doTraverse(s0, options, TraverseMode.WALK);
-                    if (editor != null) {
-                        editor.setCarParked(true); // has the effect of switching to WALK and preventing further car use
-                        return editor.makeState(); // return only the "parked" walking state
-                    }
-
-                }
-            }
-        }
-        return state;
+        return Optional.ofNullable(editor).map(StateEditor::makeState).orElse(null);
     }
 
     /** return a StateEditor rather than a State so that we can make parking/mode switch modifications for kiss-and-ride. */
@@ -471,7 +441,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         /* On the pre-kiss/pre-park leg, limit both walking and driving, either soft or hard. */
-        if (options.kissAndRide || options.parkAndRide) {
+        if (options.parkAndRide) {
             if (options.arriveBy) {
                 if (!s0.isCarParked()) s1.incrementPreTransitTime(roundedTime);
             } else {
