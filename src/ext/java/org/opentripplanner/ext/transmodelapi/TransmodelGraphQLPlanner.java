@@ -239,15 +239,15 @@ public class TransmodelGraphQLPlanner {
             request.optimize = optimize;
         }
 
-        if (hasArgument(environment, "allowedModes")) {
+        if (hasArgument(environment, "modes")) {
             AtomicReference<StreetMode> accessMode = new AtomicReference<>();
             AtomicReference<StreetMode> egressMode = new AtomicReference<>();
             AtomicReference<StreetMode> directMode = new AtomicReference<>();
             AtomicReference<ArrayList<TransitMode>> transitModes = new AtomicReference<>();
-            callWith.argument("allowedModes.accessMode", accessMode::set);
-            callWith.argument("allowedModes.egressMode", egressMode::set);
-            callWith.argument("allowedModes.directMode", directMode::set);
-            callWith.argument("allowedModes.transportMode", transitModes::set);
+            callWith.argument("modes.accessMode", accessMode::set);
+            callWith.argument("modes.egressMode", egressMode::set);
+            callWith.argument("modes.directMode", directMode::set);
+            callWith.argument("modes.transportMode", transitModes::set);
             request.modes = new AllowedModes(
                 accessMode.get(),
                 egressMode.get(),

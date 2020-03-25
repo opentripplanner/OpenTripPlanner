@@ -379,7 +379,7 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLInputObjectType locationType;
 
-    private GraphQLInputObjectType allowedModesInputType;
+    private GraphQLInputObjectType modesInputType;
 
     private GraphQLObjectType keyValueType;
 
@@ -706,8 +706,8 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        allowedModesInputType = GraphQLInputObjectType.newInputObject()
-            .name("AllowedModes")
+        modesInputType = GraphQLInputObjectType.newInputObject()
+            .name("Modes")
             .description("Input format for specifying which modes will be allowed for this search.")
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("accessMode")
@@ -1026,10 +1026,10 @@ public class TransmodelIndexGraphQLSchema {
                         .defaultValue(defaultRoutingRequest.transferCost)
                         .build())
                 .argument(GraphQLArgument.newArgument()
-                        .name("allowedModes")
+                        .name("modes")
                         .description("The set of access/egress/direct/transit modes to be used for "
                             + "this search.")
-                        .type(allowedModesInputType)
+                        .type(modesInputType)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                          .name("transportSubmodes")
