@@ -17,7 +17,7 @@ public final class Stop extends TransitEntity<FeedScopedId> {
     private String name;
 
     /** Center point/location for stop. */
-    private Coordinate coordinate;
+    private WgsCoordinate coordinate;
 
     /**
      * Public facing stop code (short text or number).
@@ -73,7 +73,7 @@ public final class Stop extends TransitEntity<FeedScopedId> {
         return coordinate.longitude();
     }
 
-    public void setCoordinate(Coordinate coordinate) {
+    public void setCoordinate(WgsCoordinate coordinate) {
         this.coordinate = coordinate;
     }
 

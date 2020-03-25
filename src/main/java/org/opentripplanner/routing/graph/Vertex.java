@@ -185,22 +185,22 @@ public abstract class Vertex implements Serializable, Cloneable {
     }
     
     /** Get the longitude of the vertex */
-    public double getX() {
-        return x;
+    public final double getX() {
+        return getLon();
     }
 
     /** Get the latitude of the vertex */
-    public double getY() {
-        return y;
+    public final double getY() {
+        return getLat();
     }
 
     /** Get the longitude of the vertex */
-    public double getLon() {
+    public final double getLon() {
         return x;
     }
 
     /** Get the latitude of the vertex */
-    public double getLat() {
+    public final double getLat() {
         return y;
     }
 

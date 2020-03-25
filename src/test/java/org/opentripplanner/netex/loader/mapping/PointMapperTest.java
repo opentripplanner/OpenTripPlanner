@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
@@ -30,7 +30,7 @@ public class PointMapperTest {
                 );
 
         // When map coordinates
-        Coordinate c = PointMapper.mapCoordinate(point);
+        WgsCoordinate c = PointMapper.mapCoordinate(point);
 
         // Then verify coordinate
         assertEquals(LONGITUDE_VALUE, c.longitude(), DELTA);

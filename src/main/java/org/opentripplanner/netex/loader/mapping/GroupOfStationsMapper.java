@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
@@ -43,7 +43,7 @@ class GroupOfStationsMapper {
         groupOfStations.setId(
                 idFactory.createId(groupOfStopPlaces.getId()));
         groupOfStations.setName(groupOfStopPlaces.getName().getValue());
-        Coordinate coordinate = mapCoordinate(groupOfStopPlaces.getCentroid());
+        WgsCoordinate coordinate = mapCoordinate(groupOfStopPlaces.getCentroid());
 
         if (coordinate == null) {
             // TODO OTP2 - This should be an data import issue

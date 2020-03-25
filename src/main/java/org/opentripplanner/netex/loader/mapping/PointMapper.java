@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.Coordinate;
+import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
@@ -21,7 +21,7 @@ class PointMapper {
      * @return true if the handler is successfully invoked with a location, {@code false} if
      *         any of the required data elements are {@code null}.
      */
-    static Coordinate mapCoordinate(SimplePoint_VersionStructure point) {
+    static WgsCoordinate mapCoordinate(SimplePoint_VersionStructure point) {
         if(point == null || point.getLocation() == null) { return null; }
         LocationStructure loc = point.getLocation();
 
@@ -30,6 +30,6 @@ class PointMapper {
             throw new IllegalArgumentException("Coordinate is not valid: " + loc);
         }
         // Location is safe to process
-        return new Coordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
+        return new WgsCoordinate(loc.getLatitude().doubleValue(), loc.getLongitude().doubleValue());
     }
 }

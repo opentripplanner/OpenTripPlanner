@@ -17,7 +17,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
 
         private String name;
 
-        private Coordinate coordinate;
+        private WgsCoordinate coordinate;
 
         /**
          * Public facing station code (short text or number)
@@ -60,7 +60,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
                 return coordinate.latitude();
         }
 
-        public void setCoordinate(Coordinate coordinate) {
+        public void setCoordinate(WgsCoordinate coordinate) {
                 this.coordinate = coordinate;
         }
 
