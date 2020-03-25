@@ -16,13 +16,13 @@ public enum StreetMode {
    *
    * Direct mode and access mode only.
    */
-  // TODO OTP2 Reimplement
+  // TODO OTP2 Only implemented for direct search
   BIKE_TO_PARK(true, false),
   /**
    * Walk to a bike rental point, bike to a bike rental drop-off point, and walk the rest of the
    * way. This can include bike rental at fixed locations or free-floating services.
    */
-  // TODO OTP2 Reimplement
+  // TODO OTP2 Only implemented for direct search
   BIKE_RENTAL(true, true),
   /**
    * Car only
@@ -35,19 +35,19 @@ public enum StreetMode {
    *
    * Direct mode and access mode only.
    */
-  // TODO OTP2 Reimplement
+  // TODO OTP2 Only implemented for direct search
   CAR_TO_PARK(true, false),
   /**
    * Walk to a pickup point along the road, drive to a drop-off point along the road,
    * and walk the rest of the way. This can include various taxi-services or kiss & ride.
    */
-  // TODO OTP2 Reimplement
+  // TODO OTP2 Only implemented for direct search
   TAXI(true, true),
   /**
    * Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    * This can include car rental at fixed locations or free-floating services.
    */
-  // TODO OTP2 Implement
+  // TODO OTP2 Not implemented
   CAR_RENTAL(true, true);
 
   boolean access;
