@@ -67,8 +67,6 @@ public class BinaryOpenStreetMapParser implements OsmHandler {
 
   }
 
-  int nodeCount = 0;
-
   @Override
   public void handle(OsmNode osmNode) throws IOException {
     if (!parseNodes) {
@@ -87,7 +85,6 @@ public class BinaryOpenStreetMapParser implements OsmHandler {
     }
 
     osmdb.addNode(tmp);
-    nodeCount++;
   }
 
   @Override
@@ -111,6 +108,7 @@ public class BinaryOpenStreetMapParser implements OsmHandler {
     for (int index = 0; index < osmWay.getNumberOfNodes(); index++) {
       OSMNodeRef nodeRef = new OSMNodeRef();
       nodeRef.setRef(osmWay.getNodeId(index));
+      tmp.addNodeRef(nodeRef);
     }
     osmdb.addWay(tmp);
   }
