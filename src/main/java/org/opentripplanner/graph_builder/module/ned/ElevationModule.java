@@ -46,7 +46,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 /**
- * THIS CLASS IS MULTI-THEARED
+ * THIS CLASS IS MULTI-THREADED
  * (It uses a ForkJoinPool to distribute elevation calculation tasks for edges.)
  *
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
@@ -251,8 +251,8 @@ public class ElevationModule implements GraphBuilderModule {
         /**
          * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
          * used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage instance for each thread to
-         * avoid other threads waiting for a lock to be released on the Coverage instance. This concurrent HashMap will
-         * store these thread-specific Coverage instances.
+         * avoid other threads waiting for a lock to be released on the Coverage instance. This method will get/lazy-
+         * create a thread-specific Coverage instance.
          *
          * @param swee An exemplar StreetWithElevationEdge to use to initialize a few calculations in the newly created
          *             coverage instance.
