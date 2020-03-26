@@ -45,6 +45,8 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
     private final int stopIndex;
 
     private int modeMask; // TODO: via TablePatternEdge it should be possible to grab this from the pattern
+
+    private TraverseMode mode;
    
     /** True if this edge represents boarding a vehicle, false if it represents alighting. */
     public boolean boarding;
@@ -55,6 +57,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         super(fromStopVertex, toPatternVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
+        this.mode = mode;
         this.boarding = true;
     }
     
@@ -64,6 +67,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
         super(fromPatternStop, toStationVertex);
         this.stopIndex = stopIndex;
         this.modeMask = new TraverseModeSet(mode).getMask();
+        this.mode = mode;
         this.boarding = false;
     }
     
@@ -224,7 +228,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }            
 
             s1.setBackMode(getMode());
-
+            s1.setCurrentTraverseMode(TraverseMode.WALK);
             return s1.makeState();
         } else { 
             /* We are going onto transit and must look for a suitable transit trip on this pattern. */   
@@ -330,6 +334,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             }
 
             s1.incrementWeight(getExtraWeight(options));
+            s1.setCurrentTraverseMode(mode);
 
             // On-the-fly reverse optimization
             // determine if this needs to be reverse-optimized.

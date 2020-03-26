@@ -237,11 +237,10 @@ public class StateEditor {
      */
     public void incrementTimeInSeconds(int seconds) {
         incrementTimeInMilliseconds(seconds * 1000L);
+        incrementTimeTraversedInMode(seconds);
     }
 
-    public void incrementTimeInMilliseconds(long milliseconds) {
-        incrementTimeTraversedInMode((int) (milliseconds / 1000));
-
+    private void incrementTimeInMilliseconds(long milliseconds) {
         if (milliseconds < 0) {
             LOG.warn("A state's time is being incremented by a negative amount while traversing edge "
                     + child.getBackEdge());
@@ -566,6 +565,11 @@ public class StateEditor {
     public void alightTransit() {
         cloneStateDataAsNeeded();
         child.stateData.lastTransitWalk = child.getTraverseDistanceInMeters();
+    }
+
+    public void setCurrentTraverseMode(TraverseMode mode) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentTraverseMode = mode;
     }
 
     public void setLastPattern(TripPattern pattern) {
