@@ -39,12 +39,16 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ForkJoinPool;
+import java.util.concurrent.ForkJoinWorkerThread;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 /**
+ * THIS CLASS IS MULTI-THEARED
+ * (It uses a ForkJoinPool to distribute elevation calculation tasks for edges.)
+ *
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
  * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
  * in the Graph. Data sources that could be used include auto-downloaded and cached National Elevation Dataset (NED)
@@ -96,14 +100,16 @@ public class ElevationModule implements GraphBuilderModule {
     /** A concurrent hashmap used for storing geoid difference values at various coordinates */
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
-    // used only for testing purposes
+    /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
-        gridCoverageFactory = factory;
-        cachedElevationsFile = null;
-        readCachedElevations = false;
-        writeCachedElevations = false;
-        elevationUnitMultiplier = 1;
-        includeEllipsoidToGeoidDifference = true;
+        this(
+            factory,
+            null,
+            false,
+            false,
+            1,
+            true
+        );
     }
 
     public ElevationModule(
@@ -115,7 +121,7 @@ public class ElevationModule implements GraphBuilderModule {
         boolean includeEllipsoidToGeoidDifference
     ) {
         gridCoverageFactory = factory;
-        cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
+        cachedElevationsFile = cacheDirectory != null ? new File(cacheDirectory, "cached_elevations.obj") : null;
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
@@ -148,14 +154,15 @@ public class ElevationModule implements GraphBuilderModule {
         }
         log.info("Setting street elevation profiles from digital elevation model...");
 
-        // Multithread elevation calculations
-        ForkJoinPool forkJoinPool = new ForkJoinPool();
+        ForkJoinPool.ForkJoinWorkerThreadFactory forkJoinWorkerThreadFactory = pool -> new ElevationWorkerThread(pool);
 
-        // For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
-        // used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage instance for each thread to
-        // avoid other threads waiting for a lock to be released on the Coverage instance. This concurrent HashMap will
-        // store these thread-specific Coverage instances.
-        ConcurrentHashMap<Long, Coverage> coveragesForThread = new ConcurrentHashMap<>();
+        // Multithread elevation calculations
+        ForkJoinPool forkJoinPool = new ForkJoinPool(
+            Runtime.getRuntime().availableProcessors(),
+            forkJoinWorkerThreadFactory,
+            null,
+            false
+        );
 
         // At first, set the totalElevationEdges to the total number of edges in the graph.
         totalElevationEdges = graph.countEdges();
@@ -163,7 +170,7 @@ public class ElevationModule implements GraphBuilderModule {
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
-                    forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee, coveragesForThread));
+                    forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee));
                     streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
                 }
             }
@@ -175,8 +182,10 @@ public class ElevationModule implements GraphBuilderModule {
         forkJoinPool.shutdown();
         try {
             forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
-        } catch (InterruptedException e) {
-            log.warn(graph.addBuilderAnnotation(new Graphwide("Multi-threaded elevation calculations timed-out!")));
+        } catch (InterruptedException ex) {
+            log.error("Multi-threaded elevation calculations timed-out!");
+            Thread.currentThread().interrupt();
+            throw new RuntimeException(ex);
         }
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
@@ -223,21 +232,68 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     /**
+     * A special extension of the Thread class so that a thread-specific coverage instance can be stored for each
+     * thread.
+     */
+    private class ElevationWorkerThread extends ForkJoinWorkerThread {
+        private Coverage threadSpecificCoverage;
+
+        /**
+         * Creates a ForkJoinWorkerThread operating in the given pool.
+         *
+         * @param pool the pool this thread works in
+         * @throws NullPointerException if pool is null
+         */
+        protected ElevationWorkerThread(ForkJoinPool pool) {
+            super(pool);
+        }
+
+        /**
+         * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
+         * used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage instance for each thread to
+         * avoid other threads waiting for a lock to be released on the Coverage instance. This concurrent HashMap will
+         * store these thread-specific Coverage instances.
+         *
+         * @param swee An exemplar StreetWithElevationEdge to use to initialize a few calculations in the newly created
+         *             coverage instance.
+         * @return A thread-specific coverage instance that can be used without being locked from other threads.
+         */
+        public Coverage getThreadSpecificCoverageInstance (StreetWithElevationEdge swee) {
+            if (threadSpecificCoverage == null) {
+                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
+                // could arise from downstream classes that have synchronized methods.
+                synchronized (gridCoverageFactory) {
+                    // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
+                    threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
+                    // The Coverage instance relies on some synchronized static methods shared across all threads that
+                    // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+                    // point on the edge to initialize these other items.
+                    Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
+                    double[] dummy = new double[1];
+                    threadSpecificCoverage.evaluate(
+                        new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
+                        dummy
+                    );
+                }
+            }
+            return threadSpecificCoverage;
+        }
+    }
+
+    /**
      * A runnable that contains the relevant info for executing a process edge operation in a particular thread.
      */
     private class ProcessEdgeTask implements Runnable {
         private final StreetWithElevationEdge swee;
-        private final ConcurrentHashMap<Long, Coverage> coveragesForThread;
 
-        public ProcessEdgeTask(StreetWithElevationEdge swee, ConcurrentHashMap<Long, Coverage> coveragesForThread) {
+        public ProcessEdgeTask(StreetWithElevationEdge swee) {
             this.swee = swee;
-            this.coveragesForThread = coveragesForThread;
         }
 
         @Override public void run() {
-            processEdge(swee, coveragesForThread);
+            processEdge(swee);
             int curNumProcessed = nEdgesProcessed.addAndGet(1);
-            if (curNumProcessed % 50000 == 0) {
+            if (curNumProcessed % 50_000 == 0) {
                 log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
             }
         }
@@ -442,9 +498,8 @@ public class ElevationModule implements GraphBuilderModule {
      * Processes a single street edge, creating and assigning the elevation profile.
      *
      * @param ee the street edge
-     * @param coveragesForThread a concurrent hashmap with coverages organized by thread id
      */
-    private void processEdge(StreetWithElevationEdge ee, ConcurrentHashMap<Long, Coverage> coveragesForThread) {
+    private void processEdge(StreetWithElevationEdge ee) {
         // First, check if the edge already has been calculated or if it exists in a pre-calculated cache. Checking
         // with this method avoids potentially waiting for a lock to be released for calculating the thread-specific
         // coverage.
@@ -467,7 +522,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
         // coverage instances in other threads.
-        Coverage coverage = getThreadSpecificCoverageInstance(ee, coveragesForThread);
+        Coverage coverage = ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance(ee);
 
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
@@ -534,37 +589,6 @@ public class ElevationModule implements GraphBuilderModule {
         } catch (PointOutsideCoverageException | TransformException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
-    }
-
-    /**
-     * Get the thread-specific Coverage instance to avoid multiple threads waiting for a lock to be released on a
-     * Interpolator2D instance.
-     */
-    private Coverage getThreadSpecificCoverageInstance (
-        StreetWithElevationEdge swee,
-        ConcurrentHashMap<Long, Coverage> coveragesForThread
-    ) {
-        long currentThreadId = Thread.currentThread().getId();
-        Coverage threadSpecificCoverage = coveragesForThread.get(currentThreadId);
-        if (threadSpecificCoverage == null) {
-            // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
-            // could arise from downstream classes that have synchronized methods.
-            synchronized (coveragesForThread) {
-                // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
-                threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
-                // The Coverage instance relies on some synchronized static methods shared across all threads that
-                // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
-                // point on the edge to initialize these other items.
-                Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
-                double[] dummy = new double[1];
-                threadSpecificCoverage.evaluate(
-                    new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
-                    dummy
-                );
-            }
-            coveragesForThread.put(currentThreadId, threadSpecificCoverage);
-        }
-        return threadSpecificCoverage;
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
