@@ -135,7 +135,9 @@ public class BinaryOpenStreetMapParser implements OsmHandler {
       setRelationMemberTypeString(member, m.getType());
       member.setRole(m.getRole());
       member.setRef(m.getId());
+      tmp.addMember(member);
     }
+    osmdb.addRelation(tmp);
   }
 
   public void complete() {
