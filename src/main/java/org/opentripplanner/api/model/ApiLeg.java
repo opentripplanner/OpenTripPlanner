@@ -11,8 +11,9 @@ import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.Calendar;
 import java.util.List;
+import java.util.TimeZone;
 
- /**
+/**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
  * particular vehicle (or on foot).
  */
@@ -238,4 +239,35 @@ public class ApiLeg {
     @XmlAttribute
     @JsonSerialize
     public Boolean rentedBike;
+
+    /**
+     * Whether this leg is a transit leg or not.
+     * @return Boolean true if the leg is a transit leg
+     */
+    public Boolean isTransitLeg() {
+        if (mode == null) return null;
+        else if (mode.equals("Walk")) return false;
+        else if (mode.equals("Car")) return false;
+        else if (mode.equals("Bicycle")) return false;
+        else return true;
+    }
+
+    /**
+     * The leg's duration in seconds
+     */
+    @XmlElement
+    @JsonSerialize
+    public double getDuration() {
+        return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
+    }
+
+    public void setTimeZone(TimeZone timeZone) {
+        Calendar calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(startTime.getTime());
+        startTime = calendar;
+        calendar = Calendar.getInstance(timeZone);
+        calendar.setTime(endTime.getTime());
+        endTime = calendar;
+        agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
+    }
  }
