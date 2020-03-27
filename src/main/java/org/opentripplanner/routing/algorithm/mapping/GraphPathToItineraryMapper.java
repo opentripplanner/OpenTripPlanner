@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -21,7 +22,6 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
@@ -29,7 +29,6 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -490,8 +489,8 @@ public abstract class GraphPathToItineraryMapper {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
         Place place = new Place(
-                vertex.getX(),
-                vertex.getY(),
+                vertex.getLat(),
+                vertex.getLon(),
                 name
         );
 
@@ -527,25 +526,6 @@ public abstract class GraphPathToItineraryMapper {
         String roundaboutPreviousStreet = null;
 
         State onBikeRentalState = null, offBikeRentalState = null;
-
-        // Check if this leg is a SimpleTransfer; if so, rebuild state array based on stored transfer edges
-        if (states.length == 2 && states[1].getBackEdge() instanceof SimpleTransfer) {
-            SimpleTransfer transferEdge = ((SimpleTransfer) states[1].getBackEdge());
-            List<Edge> transferEdges = transferEdge.getEdges();
-            if (transferEdges != null) {
-                // Create a new initial state. Some parameters may have change along the way, copy them from the first state
-                StateEditor se = new StateEditor(states[0].getOptions(), transferEdges.get(0).getFromVertex());
-                se.setNonTransitOptionsFromState(states[0]);
-                State s = se.makeState();
-                ArrayList<State> transferStates = new ArrayList<>();
-                transferStates.add(s);
-                for (Edge e : transferEdges) {
-                    s = e.traverse(s);
-                    transferStates.add(s);
-                }
-                states = transferStates.toArray(new State[0]);
-            }
-        }
 
         for (int i = 0; i < states.length - 1; i++) {
             State backState = states[i];
@@ -852,8 +832,10 @@ public abstract class GraphPathToItineraryMapper {
         WalkStep step;
         step = new WalkStep();
         step.streetName = en.getName(wantedLocale);
-        step.lon = en.getFromVertex().getX();
-        step.lat = en.getFromVertex().getY();
+        step.startLocation = new WgsCoordinate(
+                en.getFromVertex().getLat(),
+                en.getFromVertex().getLon()
+        );
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
                 s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();

@@ -14,10 +14,10 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * threshold. A linear search is slow when the number of schedules is very large, let
  * say more than 300 trip schedules.
  * <p/>
- * The implementation of this interface is also responsible for adding board slack, and
- * take care the search direction (forward/reverse). For a reverse search (searching
- * backward in time) the trip found departure/arrival times are swapped. This is one of
- * the things that allows for the algorithm to be generic, used in both cases.
+ * The implementation of this interface take care the search direction (forward/reverse).
+ * For a reverse search (searching backward in time) the trip found departure/arrival times
+ * are swapped. This is one of the things that allows for the algorithm to be generic, used
+ * in both cases.
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */

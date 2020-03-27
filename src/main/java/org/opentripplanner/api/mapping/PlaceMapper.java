@@ -30,8 +30,10 @@ public class PlaceMapper {
         api.stopId = domain.stopId;
         api.stopCode = domain.stopCode;
         api.platformCode = domain.platformCode;
-        api.lon = domain.lon;
-        api.lat = domain.lat;
+        if(domain.coordinate != null) {
+            api.lon = domain.coordinate.longitude();
+            api.lat = domain.coordinate.latitude();
+        }
         api.arrival = arrival;
         api.departure = departure;
         api.orig = domain.orig;

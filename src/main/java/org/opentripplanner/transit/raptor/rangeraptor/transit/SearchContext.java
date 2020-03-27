@@ -42,7 +42,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
     private final RoundTracker roundTracker;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
-    private final StopFilter stopFilter;
 
     private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
@@ -60,9 +59,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
-        this.stopFilter = request.searchParams().stopFilter() != null
-                ? new StopFilterBitSet(request.searchParams().stopFilter())
-                : (s -> true);
     }
 
     public Collection<TransferLeg> accessLegs() {
@@ -136,10 +132,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
             return request.searchParams().maxNumberOfTransfers() + 1;
         }
         return tuningParameters.maxNumberOfTransfers() + 1;
-    }
-
-    public StopFilter stopFilter() {
-        return stopFilter;
     }
 
     /**

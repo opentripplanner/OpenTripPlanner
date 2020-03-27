@@ -4,6 +4,8 @@ import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -21,6 +23,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -45,6 +48,8 @@ public class RoutingContext implements Cloneable {
     public final Set<Vertex> fromVertices;
 
     public final Set<Vertex> toVertices;
+
+    public final Set<FeedScopedId> bannedRoutes;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
@@ -166,6 +171,12 @@ public class RoutingContext implements Cloneable {
 
         this.fromVertices = routingRequest.arriveBy ? toVertices : fromVertices;
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
+
+        if (graph.index != null) {
+            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getRouteForId().values());
+        } else {
+            this.bannedRoutes = Collections.emptySet();
+        }
 
         adjustForSameFromToEdge();
 

@@ -70,23 +70,7 @@ public enum SpeedTestProfile {
             RaptorProfile.MULTI_CRITERIA,
             SearchDirection.FORWARD,
             Optimization.PARETO_CHECK_AGAINST_DESTINATION
-    ),
-    mc_filter_stops(
-            "ms",
-            "Multi-Criteria Range Raptor with check on stop filter.",
-            RaptorProfile.MULTI_CRITERIA,
-            SearchDirection.FORWARD,
-            Optimization.TRANSFERS_STOP_FILTER
-    ),
-    mc_stop_destination(
-            "mds",
-            "Multi-Criteria Range Raptor with check on stop filter and destination arrival.",
-            RaptorProfile.MULTI_CRITERIA,
-            SearchDirection.FORWARD,
-            Optimization.PARETO_CHECK_AGAINST_DESTINATION,
-            Optimization.TRANSFERS_STOP_FILTER
-    ),
-    ;
+    );
 
     final String shortName;
     final String description;

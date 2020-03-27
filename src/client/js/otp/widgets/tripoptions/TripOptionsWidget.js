@@ -457,6 +457,42 @@ otp.widgets.tripoptions.WheelChairSelector =
     }
 });
 
+//** Debug Itineraries Filters **//
+otp.widgets.tripoptions.DebugItineraryFiltersSelector = otp.Class(
+    otp.widgets.tripoptions.TripOptionsWidgetControl,
+    {
+        id: null,
+        //TRANSLATORS: label for checkbox
+        label: _tr("Show Filtered Itineraries:"),
+
+        initialize: function (tripWidget) {
+
+            otp.widgets.tripoptions.TripOptionsWidgetControl.prototype.initialize.apply(this, arguments);
+
+            this.id = tripWidget.id;
+
+            ich['otp-tripOptions-debug-filters']({
+                widgetId: this.id,
+                label: this.label,
+            }).appendTo(this.$());
+
+        },
+        doAfterLayout: function () {
+            var this_ = this;
+
+            $("#" + this.id + "-debug-filters-input").change(function () {
+                this_.tripWidget.module.debugItineraryFilter = this.checked;
+            });
+        },
+        restorePlan: function (data) {
+            if (data.queryParams.debugItineraryFilter) {
+                $("#" + this.id + "-debug-filters-input").prop("checked", data.queryParams.debugItineraryFilter);
+            }
+        },
+        isApplicableForMode : function(mode) { return true; }
+    }
+);
+
 
 //** ModeSelector **//
 

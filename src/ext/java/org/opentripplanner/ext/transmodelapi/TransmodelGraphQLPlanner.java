@@ -11,11 +11,11 @@ import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.routing.RoutingResponse;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -47,26 +47,39 @@ public class TransmodelGraphQLPlanner {
     }
 
     public PlanResponse plan(DataFetchingEnvironment environment) {
-        Router router = ((TransmodelRequestContext)environment.getContext()).getRouter();
-        RoutingService routingService =
-            ((TransmodelRequestContext)environment.getContext()).getRoutingService();
-        RoutingRequest request = createRequest(environment);
-
         PlanResponse response = new PlanResponse();
-
+        RoutingRequest request = null;
         try {
-            RoutingResponse res = routingService.route(request, router);
+            TransmodelRequestContext ctx = environment.getContext();
+            Router router = ctx.getRouter();
+
+            request = createRequest(environment);
+            request.setRoutingContext(router.graph);
+
+            RoutingResponse res = ctx.getRoutingService().route(request, router);
+
             response.plan = res.getTripPlan();
             response.metadata = res.getMetadata();
+
+            if(response.plan.itineraries.isEmpty()) {
+                response.messages.add(new PlannerError(new PathNotFoundException()).message);
+            }
         }
         catch (Exception e) {
-            response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
-            PlannerError error = new PlannerError(e);
-            if (!PlannerError.isPlanningError(e.getClass()))
-                LOG.warn("Error while planning path: ", e);
-            response.messages.add(error.message);
+            try {
+                PlannerError error = new PlannerError(e);
+                if (!PlannerError.isPlanningError(e.getClass())) {
+                    LOG.warn("Error while planning path: ", e);
+                }
+                response.messages.add(error.message);
+                response.plan = TripPlanMapper.mapTripPlan(request, Collections.emptyList());
+            }
+            catch (RuntimeException ex) {
+                LOG.error("Root cause: " + e.getMessage(), e);
+                throw ex;
+            }
         } finally {
-            if (request.rctx != null) {
+            if (request != null && request.rctx != null) {
                 response.debugOutput = request.rctx.debugOutput;
             }
         }
@@ -194,7 +207,7 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("unpreferred.organisations", (Collection<String> organisations) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
         callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
-//        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
+        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
         callWith.argument("banned.organisations", (Collection<String> organisations) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
         callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
@@ -212,14 +225,14 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
         callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
 
-        callWith.argument("transferPenalty", (Integer v) -> request.transferPenalty = v);
+        callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
 
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
-            request.transferPenalty += 1800;
+            request.transferCost += 1800;
         }
 
         if (optimize != null) {
@@ -293,19 +306,17 @@ public class TransmodelGraphQLPlanner {
         }
          */
 
-        request.setRoutingContext(router.graph);
-
         return request;
     }
 
     public void assertSlack(RoutingRequest r) {
-        if (r.boardSlack + r.alightSlack > r.transferSlack) {
-            // TODO thrown exception type is not consistent with assertTriangleParameters
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
+        if (r.boardSlack != 0 || r.alightSlack != 0) {
+            throw new IllegalStateException(
+                    "boardSlack and alightSlack should be zero(0), 'transferSlack' is the only "
+                            + "parameter we support int the GraphQL API."
+            );
         }
     }
-
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
         Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds.stream().map(mappingUtil::fromIdString).collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));

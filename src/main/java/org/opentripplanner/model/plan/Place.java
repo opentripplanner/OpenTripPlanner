@@ -1,9 +1,8 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.util.Constants;
-import org.opentripplanner.util.CoordinateUtils;
 
 /** 
 * A Place is where a journey starts or ends, or a transit stop along the way.
@@ -13,7 +12,7 @@ public class Place {
     /** 
      * For transit stops, the name of the stop.  For points of interest, the name of the POI.
      */
-    public String name = null;
+    public final String name;
 
     /** 
      * The ID of the stop. This is often something that users don't care about.
@@ -33,14 +32,9 @@ public class Place {
     public String platformCode = null;
 
     /**
-     * The longitude of the place.
+     * The coordinate of the place.
      */
-    public Double lon = null;
-    
-    /**
-     * The latitude of the place.
-     */
-    public Double lat = null;
+    public final WgsCoordinate coordinate;
 
     public String orig;
 
@@ -67,20 +61,10 @@ public class Place {
      */
     public String bikeShareId;
 
-    public Place() { }
-
-    public Place(Double lon, Double lat, String name) {
-        this.lon = lon;
-        this.lat = lat;
+    public Place(Double lat, Double lon, String name) {
         this.name = name;
         this.vertexType = VertexType.NORMAL;
-    }
-
-    /**
-     * Returns the geometry in GeoJSON format
-     */
-    String getGeometry() {
-        return Constants.GEO_JSON_POINT + lon + "," + lat + Constants.GEO_JSON_TAIL;
+        this.coordinate = WgsCoordinate.creatOptionalCoordinate(lat, lon);
     }
 
     /**
@@ -89,21 +73,20 @@ public class Place {
      */
     public boolean sameLocation(Place other) {
         if(this == other) { return true; }
-        if(lat != null && lon != null && other.lat != null && other.lon != null) {
-            return CoordinateUtils.compare(lat, lon, other.lat, other.lon);
+        if(coordinate != null) {
+            return coordinate.sameLocation(other.coordinate);
         }
         return stopId != null && stopId.equals(other.stopId);
     }
 
     @Override
     public String toString() {
-        return new ToStringBuilder(Place.class)
+        return ToStringBuilder.of(Place.class)
                 .addStr("name", name)
                 .addObj("stopId", stopId)
                 .addStr("stopCode", stopCode)
                 .addStr("platformCode", platformCode)
-                .addCoordinate("lon", lon)
-                .addCoordinate("lat", lat)
+                .addObj("coordinate", coordinate)
                 .addStr("orig", orig)
                 .addStr("zoneId", zoneId)
                 .addNum("stopIndex", stopIndex)

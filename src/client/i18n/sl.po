@@ -6,87 +6,94 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner VERSION\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2015-02-24 12:23+0100\n"
+"POT-Creation-Date: 2020-03-16 14:49+0100\n"
 "PO-Revision-Date: 2015-02-24 12:23+0100\n"
 "Last-Translator: Marko Burjek\n"
+"Language: sl\n"
 "Language-Team: Slovenian <lugos-slo@lugos.si>\n"
 "Plural-Forms: nplurals=4; plural=(n%100==1 ? 1 : n%100==2 ? 2 : n%100==3 "
 "|| n%100==4 ? 3 : 0)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 1.3\n"
+"Generated-By: Babel 2.8.0\n"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:278
+#: src/client/js/otp/config.js:297
 msgid "Transit"
 msgstr "Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:281
+#: src/client/js/otp/config.js:300
 msgid "Bus Only"
 msgstr "Avtobus"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:284
+#: src/client/js/otp/config.js:303
 msgid "Rail Only"
 msgstr "Vlak"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:287
+#: src/client/js/otp/config.js:306
+msgid "Airplane Only"
+msgstr ""
+
+#. Travel by: mode of transport (Used in selection in Travel
+#. Options widgets)
+#: src/client/js/otp/config.js:309
 msgid "Bicycle Only"
 msgstr "Kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:290
+#: src/client/js/otp/config.js:312
 msgid "Bicycle &amp; Transit"
 msgstr "Kolo &amp; Javni prevoz"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:293
+#: src/client/js/otp/config.js:315
 msgid "Walk Only"
 msgstr "Pešačenje"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:296
+#: src/client/js/otp/config.js:318
 msgid "Drive Only"
 msgstr "Avto"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:299
+#: src/client/js/otp/config.js:321
 msgid "Park and Ride"
 msgstr "Parkiraj in se pelji"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets) http://en.wikipedia.org/wiki/Park_and_ride#Kiss_and_ride
-#: src/client/js/otp/config.js:302
+#: src/client/js/otp/config.js:324
 msgid "Kiss and Ride"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets) (Park bicycle at Public transit station and take a
 #. transit
-#: src/client/js/otp/config.js:306
+#: src/client/js/otp/config.js:328
 msgid "Bike and Ride"
 msgstr ""
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:313
+#: src/client/js/otp/config.js:335
 msgid "Rented Bicycle"
 msgstr "Izposojeno kolo"
 
 #. Travel by: mode of transport (Used in selection in Travel
 #. Options widgets)
-#: src/client/js/otp/config.js:316
+#: src/client/js/otp/config.js:338
 msgid "Transit & Rented Bicycle"
 msgstr "Izposojeno kolo &amp; Javni prevoz"
 
@@ -114,28 +121,28 @@ msgid "Unminimize all"
 msgstr "Razširi vse"
 
 #. widget title
-#: src/client/js/otp/layers/StopsLayer.js:70
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
+#: src/client/js/otp/layers/StopsLayer.js:102
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:594
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:31
 msgid "Stop Viewer"
 msgstr "Pregledovalnik postaj"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
-#: src/client/js/otp/layers/StopsLayer.js:72
+#: src/client/js/otp/layers/StopsLayer.js:104
 msgid "Plan Trip"
 msgstr "Načrtuj pot"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
-#: src/client/js/otp/layers/StopsLayer.js:74
+#: src/client/js/otp/layers/StopsLayer.js:106
 msgid "From Stop"
 msgstr "Začetna postaja"
 
 #. Plan Trip [From Stop| To Stop] Used in stoplayer popup
-#: src/client/js/otp/layers/StopsLayer.js:76
+#: src/client/js/otp/layers/StopsLayer.js:108
 msgid "To Stop"
 msgstr "Končna postaja"
 
-#: src/client/js/otp/layers/StopsLayer.js:77
+#: src/client/js/otp/layers/StopsLayer.js:109
 msgid "Routes Serving Stop"
 msgstr "Avtobusi, ki ustavljajo na postaji"
 
@@ -240,6 +247,16 @@ msgstr[3] "<strong>%d</strong> prostori na voljo"
 msgid "Recommended Pick Up:"
 msgstr "Predlagana postaja za izposojo kolesa:"
 
+#. WALK/CYCLE distance to [Bicycle rental] {name}
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:53
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:60
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:68
+#: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:70
+#: src/client/js/otp/util/Itin.js:226
+#, fuzzy
+msgid "Bicycle rental"
+msgstr "postaje za izposojo koles"
+
 #. Recommended Drop Off: bike sharing
 #. station name
 #: src/client/js/otp/modules/bikeshare/BikeStationsWidget.js:60
@@ -253,7 +270,7 @@ msgid "Multimodal Trip Planner"
 msgstr "Načrtovalnik poti"
 
 #. Widget title
-#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:132
+#: src/client/js/otp/modules/multimodal/MultimodalPlannerModule.js:135
 #: src/client/js/otp/modules/planner/ItinerariesWidget.js:42
 msgid "Itineraries"
 msgstr "Načrti poti"
@@ -273,33 +290,33 @@ msgid "Link to search"
 msgstr "Iskanje"
 
 #. button to first itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:171
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:177
 msgid "First"
 msgstr "Prva"
 
 #. button to previous itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:186
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:193
 msgid "Previous"
 msgstr "Prejšnja"
 
 #. button to next itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:202
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:210
 msgid "Next"
 msgstr "Naslednja"
 
 #. button to last itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:218
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:227
 msgid "Last"
 msgstr "Zadnja"
 
 #. Used when passengers can stay on vehicle. Continues
 #. as [agency] route name
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:346
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:357
 msgid "CONTINUES AS"
 msgstr "SE NADALJUJE KOT"
 
 #. Something in Public transport is x minutes late
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:354
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:365
 #, python-format
 msgid "%d min late"
 msgid_plural "%d mins late"
@@ -309,7 +326,7 @@ msgstr[2] "%d min. zamude"
 msgstr[3] "%d min. zamude"
 
 #. Something in Public transport is x minutes early
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:357
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:368
 #, python-format
 msgid "%d min early"
 msgid_plural "%d mins early"
@@ -319,15 +336,15 @@ msgstr[2] "%d min. prehitro"
 msgstr[3] "%d min. prehitro"
 
 #. Something in Public transport is on time
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:360
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:371
 #, fuzzy
 msgid "on time"
 msgstr "pravočasno"
 
 #. [distance] to [name of destination]
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:365
-#: src/client/js/otp/modules/planner/Itinerary.js:252
-#: src/client/js/otp/modules/planner/Itinerary.js:336
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:376
+#: src/client/js/otp/modules/planner/Itinerary.js:258
+#: src/client/js/otp/modules/planner/Itinerary.js:348
 msgctxt "direction"
 msgid " to "
 msgstr " do "
@@ -335,22 +352,22 @@ msgstr " do "
 #. used in sentence like: <Long name of public transport route> "to" <Public
 #. transport
 #. headsign>. Used in showing itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:384
-#: src/client/js/otp/modules/planner/Itinerary.js:248
-#: src/client/js/otp/modules/planner/Itinerary.js:333
-#: src/client/js/otp/widgets/transit/StopViewerWidget.js:127
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:394
+#: src/client/js/otp/modules/planner/Itinerary.js:254
+#: src/client/js/otp/modules/planner/Itinerary.js:345
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:129
 msgctxt "bus_direction"
 msgid " to "
 msgstr " smer "
 
 #. Shown as alert text before showing itinerary.
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:433
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:460
 #, fuzzy
 msgid "Total walk distance for this trip exceeds specified maximum"
 msgstr "Skupna dolžina hoje za to pot je več kot nastavljen maksimum."
 
 #. Start: Time and date (Shown before path itinerary)
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:442
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:469
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:184
 #, fuzzy
 msgctxt "template"
@@ -358,77 +375,82 @@ msgid "Start"
 msgstr "Začetek"
 
 #. End: Time and date (Shown after path itinerary)
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:445
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:472
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:185
 msgid "End"
 msgstr "Konec"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:450
-#: src/client/js/otp/modules/planner/Itinerary.js:299
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:477
+#: src/client/js/otp/modules/planner/Itinerary.js:311
 msgid "Trip Summary"
 msgstr "Povzetek poti"
 
 #. Travel: hour date on which this trip is made
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:452
-#: src/client/js/otp/modules/planner/Itinerary.js:300
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:479
+#: src/client/js/otp/modules/planner/Itinerary.js:312
 msgid "Travel"
 msgstr "Potuj ob"
 
 #. Time: minutes How long is this trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:454
-#: src/client/js/otp/modules/planner/Itinerary.js:301
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:481
+#: src/client/js/otp/modules/planner/Itinerary.js:313
 msgid "Time"
 msgstr "Trajanje"
 
 #. Total foot distance for trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:462
-#: src/client/js/otp/modules/planner/Itinerary.js:305
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:489
+#: src/client/js/otp/modules/planner/Itinerary.js:317
 msgid "Total Walk"
 msgstr "Skupno hoje"
 
 #. Total distance on a bike for this trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:469
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:496
 msgid "Total Bike"
 msgstr "Skupno kolesarjenja"
 
+#. Total distance in a car for this trip
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:503
+msgid "Total drive"
+msgstr ""
+
 #. how many public transit transfers in a trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:475
-#: src/client/js/otp/modules/planner/Itinerary.js:303
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:509
+#: src/client/js/otp/modules/planner/Itinerary.js:315
 msgid "Transfers"
 msgstr "Št. prestopov"
 
 #. cost of trip
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:481
-#: src/client/js/otp/modules/planner/Itinerary.js:308
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:515
+#: src/client/js/otp/modules/planner/Itinerary.js:320
 msgid "Fare"
 msgstr "Cena"
 
 #. Valid date time; When is this trip correct
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:489
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:523
 msgid "Valid"
 msgstr "Veljavno"
 
 #. Links to this itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:494
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:528
 msgid "Link to Itinerary"
 msgstr "Načrt poti"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:499
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:533
 msgid "Print"
 msgstr "Natisni"
 
 #. Default subject when sending trip to email
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:509
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:543
 msgid "Your Trip"
 msgstr "Vaša pot"
 
 #. Link to send trip by email
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:512
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:546
 msgid "Email"
 msgstr "E-pošta"
 
 #. public transport drives every N minutes
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:532
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:566
 #, python-format
 msgid "every %d min"
 msgid_plural "every %d mins"
@@ -438,96 +460,100 @@ msgstr[2] "vsaki %d min"
 msgstr[3] "vsake %d min"
 
 #. Depart station / Board at station in itinerary
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:572
 #, fuzzy
 msgctxt "itinerary"
 msgid "Depart"
 msgstr "Odhod"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:538
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:572
 msgid "<b>Board</b> at "
 msgstr "<b>Vstop</b> na "
 
 #. Public transport <Stop> (stop name)
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:557
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:592
 #: src/client/js/otp/widgets/transit/StopViewerWidget.js:92
 msgid "Stop"
 msgstr "Postaja"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:577
-#: src/client/js/otp/modules/planner/Itinerary.js:262
-#: src/client/js/otp/modules/planner/Itinerary.js:345
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:616
+#: src/client/js/otp/modules/planner/Itinerary.js:274
+#: src/client/js/otp/modules/planner/Itinerary.js:357
 msgid "Time in transit"
 msgstr "Časa na vožnji"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:579
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:618
 #: src/client/js/otp/widgets/transit/TripViewerWidget.js:35
 msgid "Trip Viewer"
 msgstr "Pregledovalnik poti"
 
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:637
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:676
 msgid "late as"
 msgstr ""
 
 #. Stay on board/Alight [at stop name]
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:643
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:682
 #, fuzzy
 msgid "Stay on board"
 msgstr "Ostanite v vozilu"
 
 #. Alight Public transit route name (agency name
 #. Stop ID ) end time
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:643
-#: src/client/js/otp/modules/planner/Itinerary.js:265
-#: src/client/js/otp/modules/planner/Itinerary.js:348
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:682
+#: src/client/js/otp/modules/planner/Itinerary.js:277
+#: src/client/js/otp/modules/planner/Itinerary.js:360
 #, fuzzy
 msgid "Alight"
 msgstr "Izstop"
 
 #. [Stay on board/Alight] at [stop name]
-#: src/client/js/otp/modules/planner/ItinerariesWidget.js:645
+#: src/client/js/otp/modules/planner/ItinerariesWidget.js:684
 msgid "at"
 msgstr "na"
 
 #. Fare Currency Fare price
-#: src/client/js/otp/modules/planner/Itinerary.js:102
+#: src/client/js/otp/modules/planner/Itinerary.js:101
 #, python-format
 msgid "%(currency)s %(price)s"
 msgstr "%(price)s %(currency)s"
 
 #. Start: location at [time date] (Used in print itinerary
 #. when do you start your trip)
-#: src/client/js/otp/modules/planner/Itinerary.js:237
-#: src/client/js/otp/modules/planner/Itinerary.js:322
+#: src/client/js/otp/modules/planner/Itinerary.js:243
+#: src/client/js/otp/modules/planner/Itinerary.js:334
 #, python-format
 msgid "Start: %(location)s at %(time_date)s"
 msgstr "Začetek: %(location)s ob %(time_date)s"
 
 #. Board Public transit route name (agency name
 #. Stop ID ) start time
-#: src/client/js/otp/modules/planner/Itinerary.js:261
-#: src/client/js/otp/modules/planner/Itinerary.js:344
+#: src/client/js/otp/modules/planner/Itinerary.js:273
+#: src/client/js/otp/modules/planner/Itinerary.js:356
 msgid "Board"
 msgstr "Vstop"
 
-#: src/client/js/otp/modules/planner/Itinerary.js:261
-#: src/client/js/otp/modules/planner/Itinerary.js:265
-#: src/client/js/otp/modules/planner/Itinerary.js:344
-#: src/client/js/otp/modules/planner/Itinerary.js:348
+#: src/client/js/otp/modules/planner/Itinerary.js:273
+#: src/client/js/otp/modules/planner/Itinerary.js:277
 #, python-format
 msgid "(%(agency_id)s Stop ID #%(stop_id)s),"
 msgstr "(%(agency_id)s),"
 
 #. End: location at [time date] (Used in print itinerary
 #. when do you come at a destination)
-#: src/client/js/otp/modules/planner/Itinerary.js:295
-#: src/client/js/otp/modules/planner/Itinerary.js:366
+#: src/client/js/otp/modules/planner/Itinerary.js:307
+#: src/client/js/otp/modules/planner/Itinerary.js:378
 #, python-format
 msgid "End: %(location)s at %(time_date)s"
 msgstr "Konec: %(location)s ob %(time_date)s"
 
+#: src/client/js/otp/modules/planner/Itinerary.js:356
+#: src/client/js/otp/modules/planner/Itinerary.js:360
+#, python-format
+msgid "(%(agencyId)s Stop ID #%(id)s),"
+msgstr ""
+
 #. text at end of email %s is link to this itinerary
-#: src/client/js/otp/modules/planner/Itinerary.js:370
+#: src/client/js/otp/modules/planner/Itinerary.js:382
 #, python-format
 msgid ""
 "\n"
@@ -547,19 +573,16 @@ msgstr "Opravičujemo se. Daljinar trenutno ni na voljo. Prosimo poskusite kasne
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:100
 msgid ""
-"Trip is not possible.  You might be trying to plan a trip outside the map"
-" data boundary."
-msgstr "Pot ni mogoča. Mogoče poskušate načrtovati pot izven meja karte."
+"Trip is not possible. You might be trying to plan a trip outside the map "
+"data boundary."
+msgstr ""
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:101
 msgid ""
-"Trip is not possible.  Your start or end point might not be safely "
-"accessible (for instance), you might be starting on a residential street "
-"connected only to a highway)."
+"No trip found. There may be no transit service within the maximum "
+"specified distance or at the specified time, or your start or end point "
+"might not be safely accessible."
 msgstr ""
-"Pot ni mogoča. Do začetne ali končne točke ni mogoče varno priti (na "
-"primer), mogoče začenjate na lokalni cesti, ki je povezana samo na "
-"avtocesto."
 
 #: src/client/js/otp/modules/planner/PlannerModule.js:102
 msgid ""
@@ -647,222 +670,220 @@ msgid ""
 msgstr ""
 
 #. Context menu
-#: src/client/js/otp/modules/planner/PlannerModule.js:194
+#: src/client/js/otp/modules/planner/PlannerModule.js:196
 #, fuzzy
 msgid "Set as Start Location"
 msgstr "Začetek poti"
 
 #. Context menu
-#: src/client/js/otp/modules/planner/PlannerModule.js:198
+#: src/client/js/otp/modules/planner/PlannerModule.js:200
 #, fuzzy
 msgid "Set as End Location"
 msgstr "Konec poti"
 
 #. Shown in a popup on first point of a path in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:219
+#: src/client/js/otp/modules/planner/PlannerModule.js:221
 #, fuzzy
 msgctxt "popup"
 msgid "Start"
 msgstr "Začetek"
 
 #. shown in a popup on last point of a path in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:250
+#: src/client/js/otp/modules/planner/PlannerModule.js:254
 msgid "Destination"
 msgstr "Konec"
 
 #. Used in showing why trip wasn't found
-#: src/client/js/otp/modules/planner/PlannerModule.js:458
+#: src/client/js/otp/modules/planner/PlannerModule.js:482
 #, python-format
 msgid "Error %(error_id)d"
 msgstr "Napaka %(error_id)d"
 
 #. Title of no trip dialog
-#: src/client/js/otp/modules/planner/PlannerModule.js:460
+#: src/client/js/otp/modules/planner/PlannerModule.js:484
 msgid "No Trip Found"
 msgstr "Ne najdemo poti"
 
 #. shown when clicked on route on map
-#: src/client/js/otp/modules/planner/PlannerModule.js:516
+#: src/client/js/otp/modules/planner/PlannerModule.js:540
 #, python-format
 msgid "Your %(bike_share_name)s route"
 msgstr "Kolesarjenje s kolesom izposojenim pri %(bike_share_name)s"
 
 #. Text which is shown when clicking bike route
 #. in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:522
+#: src/client/js/otp/modules/planner/PlannerModule.js:546
 msgid "Your bike route"
 msgstr "Kolesarska pot"
 
 #. Shown in map when clicking on a route
-#: src/client/js/otp/modules/planner/PlannerModule.js:530
+#: src/client/js/otp/modules/planner/PlannerModule.js:554
 #, python-format
 msgid "Walk to the %(bike_share_name)s dock."
 msgstr "Hodite do postaje podjetja %(bike_share_name)s."
 
 #. Shown in map when clicking on a route
-#: src/client/js/otp/modules/planner/PlannerModule.js:534
+#: src/client/js/otp/modules/planner/PlannerModule.js:558
 #, python-format
 msgid "Walk from the %(bike_share_name)s dock to your destination."
 msgstr "Hodite od postaje podjetja %(bike_share_name)s do vašega cilja."
 
 #. Text which is shown when clicking walking
 #. route in a map
-#: src/client/js/otp/modules/planner/PlannerModule.js:540
+#: src/client/js/otp/modules/planner/PlannerModule.js:564
 msgid "Your walk route"
 msgstr "Pot peš"
 
 #. Start on [street name] heading [Absolute direction] used in travel plan
 #. generation
-#: src/client/js/otp/util/Itin.js:111
+#: src/client/js/otp/util/Itin.js:126
 msgid "north"
 msgstr "sever"
 
-#: src/client/js/otp/util/Itin.js:112
+#: src/client/js/otp/util/Itin.js:127
 msgid "northeast"
 msgstr "severovzhod"
 
-#: src/client/js/otp/util/Itin.js:113
+#: src/client/js/otp/util/Itin.js:128
 msgid "east"
 msgstr "vzhod"
 
-#: src/client/js/otp/util/Itin.js:114
+#: src/client/js/otp/util/Itin.js:129
 msgid "southeast"
 msgstr "jugovzhod"
 
-#: src/client/js/otp/util/Itin.js:115
+#: src/client/js/otp/util/Itin.js:130
 msgid "south"
 msgstr "jug"
 
-#: src/client/js/otp/util/Itin.js:116
+#: src/client/js/otp/util/Itin.js:131
 msgid "southwest"
 msgstr "jugozahod"
 
-#: src/client/js/otp/util/Itin.js:117
+#: src/client/js/otp/util/Itin.js:132
 msgid "west"
 msgstr "zahod"
 
-#: src/client/js/otp/util/Itin.js:118
+#: src/client/js/otp/util/Itin.js:133
 msgid "northwest"
 msgstr "severozahod"
 
 #. depart at street name/corner of x y etc. (First instruction in
 #. itinerary)
-#: src/client/js/otp/util/Itin.js:139
+#: src/client/js/otp/util/Itin.js:154
 msgctxt "itinerary"
 msgid "depart"
 msgstr "začni pot"
 
 #. [Relative direction (Hard/Slightly Left/Right...)] to continue
 #. on /on to [streetname]
-#: src/client/js/otp/util/Itin.js:142
+#: src/client/js/otp/util/Itin.js:157
 msgid "hard left"
 msgstr "ostro levo"
 
-#: src/client/js/otp/util/Itin.js:143
+#: src/client/js/otp/util/Itin.js:158
 msgid "left"
 msgstr "levo"
 
-#: src/client/js/otp/util/Itin.js:144
+#: src/client/js/otp/util/Itin.js:159
 msgid "slight left"
 msgstr "rahlo levo"
 
-#: src/client/js/otp/util/Itin.js:145
+#: src/client/js/otp/util/Itin.js:160
 msgid "continue"
 msgstr "nadaljujte"
 
-#: src/client/js/otp/util/Itin.js:146
+#: src/client/js/otp/util/Itin.js:161
 msgid "slight right"
 msgstr "rahlo desno"
 
-#: src/client/js/otp/util/Itin.js:147
+#: src/client/js/otp/util/Itin.js:162
 msgid "right"
 msgstr "desno"
 
-#: src/client/js/otp/util/Itin.js:148
+#: src/client/js/otp/util/Itin.js:163
 msgid "hard right"
 msgstr "ostro desno"
 
-#: src/client/js/otp/util/Itin.js:151
+#: src/client/js/otp/util/Itin.js:166
 msgid "elevator"
 msgstr "pojdite z dvigalom"
 
-#: src/client/js/otp/util/Itin.js:152
+#: src/client/js/otp/util/Itin.js:167
 msgid "U-turn left"
 msgstr "Polkrožno obrnite v levo"
 
-#: src/client/js/otp/util/Itin.js:153
+#: src/client/js/otp/util/Itin.js:168
 msgid "U-turn right"
 msgstr "Polkrožno obrnite v desno"
 
 #. Walk distance to place (itinerary header)
-#: src/client/js/otp/util/Itin.js:177
+#: src/client/js/otp/util/Itin.js:192
 msgid "Walk"
 msgstr "Pešačite"
 
 #. Cycle distance to place (itinerary header)
-#: src/client/js/otp/util/Itin.js:179
+#: src/client/js/otp/util/Itin.js:194
 msgid "Cycle"
 msgstr "Kolesarite"
 
 #. Car distance to place (itinerary header)
-#: src/client/js/otp/util/Itin.js:181
+#: src/client/js/otp/util/Itin.js:196
 msgid "Car"
 msgstr "Avto"
 
 #. Bus: (route number) Start station to end station (itinerary header)
-#: src/client/js/otp/util/Itin.js:183
+#: src/client/js/otp/util/Itin.js:198
 msgid "Bus"
 msgstr "Avtobus"
 
-#: src/client/js/otp/util/Itin.js:184
+#: src/client/js/otp/util/Itin.js:199
 msgid "Subway"
 msgstr "Podzemna železnica"
 
 #. Used for intercity or long-distance travel.
-#: src/client/js/otp/util/Itin.js:186
+#: src/client/js/otp/util/Itin.js:201
 msgid "Train"
 msgstr "Vlak"
 
-#: src/client/js/otp/util/Itin.js:187
+#: src/client/js/otp/util/Itin.js:202
 msgid "Ferry"
 msgstr ""
 
 #. Tram, Streetcar, Light rail. Any light rail or street
 #. level system within a metropolitan area.
-#: src/client/js/otp/util/Itin.js:190
+#: src/client/js/otp/util/Itin.js:205
 msgid "Light Rail"
 msgstr "Tramvaj"
 
 #. Used for street-level cable cars where the cable runs
 #. beneath the car.
-#: src/client/js/otp/util/Itin.js:193
+#: src/client/js/otp/util/Itin.js:208
 msgid "Cable Car"
 msgstr ""
 
 #. Any rail system designed for steep inclines.
-#: src/client/js/otp/util/Itin.js:195
+#: src/client/js/otp/util/Itin.js:210
 msgid "Funicular"
 msgstr ""
 
 #. Gondola, Suspended cable car. Typically used for aerial
 #. cable cars where the car is suspended from the cable.
-#: src/client/js/otp/util/Itin.js:198
+#: src/client/js/otp/util/Itin.js:213
 msgid "Aerial Tram"
 msgstr "Gondola"
 
+#: src/client/js/otp/util/Itin.js:214
+msgid "Airplane"
+msgstr ""
+
 #. WALK/CYCLE distance to [Bicycle rental station]
-#: src/client/js/otp/util/Itin.js:208
+#: src/client/js/otp/util/Itin.js:224
 #, fuzzy
 msgid "Bicycle rental station"
 msgstr "postaje za izposojo koles"
 
-#. WALK/CYCLE distance to [Bicycle rental] {name}
-#: src/client/js/otp/util/Itin.js:210
-#, fuzzy
-msgid "Bicycle rental"
-msgstr "postaje za izposojo koles"
-
-#: src/client/js/otp/util/Itin.js:252
+#: src/client/js/otp/util/Itin.js:268
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>counterclockwise</b> to <b>%(ordinal_exit_number)s</b>"
@@ -871,7 +892,7 @@ msgstr ""
 "V krožišču vozite v <b>nasprotni smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: src/client/js/otp/util/Itin.js:254
+#: src/client/js/otp/util/Itin.js:270
 #, fuzzy, python-format
 msgid ""
 "Take roundabout counterclockwise to %(ordinal_exit_number)s exit on "
@@ -880,7 +901,7 @@ msgstr ""
 "V krožišču vozite v nasprotni smeri urinega kazalca in pri "
 "%(ordinal_exit_number)s izvozu zavijte na %(street_name)s"
 
-#: src/client/js/otp/util/Itin.js:258
+#: src/client/js/otp/util/Itin.js:274
 #, fuzzy, python-format
 msgid ""
 "Take roundabout <b>clockwise</b> to <b>%(ordinal_exit_number)s</b> exit "
@@ -889,7 +910,7 @@ msgstr ""
 "V krožišču vozite v <b>smeri urinega kazalca</b> in pri "
 "<b>%(ordinal_exit_number)s</b> izvozu zavijte na <b>%(street_name)s</b>"
 
-#: src/client/js/otp/util/Itin.js:260
+#: src/client/js/otp/util/Itin.js:276
 #, fuzzy, python-format
 msgid ""
 "Take roundabout clockwise to %(ordinal_exit_number)s exit on "
@@ -898,22 +919,21 @@ msgstr ""
 "V krožišču vozite v smeri urinega kazalca in pri %(ordinal_exit_number)s "
 "izvozu zavijte na %(street_name)s"
 
-#. Start on [stret name] heading [compas direction]
-#: src/client/js/otp/util/Itin.js:268
+#: src/client/js/otp/util/Itin.js:285
 msgid "Start on"
 msgstr "Začnite na"
 
-#: src/client/js/otp/util/Itin.js:268
+#: src/client/js/otp/util/Itin.js:285
 msgid " heading "
 msgstr " v smeri "
 
 #. [Relative direction (Left/Right...)] to continue
 #. on /on to [streetname]
-#: src/client/js/otp/util/Itin.js:274
+#: src/client/js/otp/util/Itin.js:292
 msgid "to continue on"
 msgstr "nadaljujte na"
 
-#: src/client/js/otp/util/Itin.js:274
+#: src/client/js/otp/util/Itin.js:292
 msgid "on to"
 msgstr "na"
 
@@ -978,7 +998,7 @@ msgid "tenth"
 msgstr "desetem"
 
 #. n hour/hours use short form
-#: src/client/js/otp/util/Time.js:29 src/client/js/otp/util/Time.js:45
+#: src/client/js/otp/util/Time.js:29 src/client/js/otp/util/Time.js:44
 #, python-format
 msgid "%d hr"
 msgid_plural "%d hrs"
@@ -988,7 +1008,7 @@ msgstr[2] "%d uri"
 msgstr[3] "%d ure"
 
 #. n minute/minutes use short form
-#: src/client/js/otp/util/Time.js:33 src/client/js/otp/util/Time.js:45
+#: src/client/js/otp/util/Time.js:32 src/client/js/otp/util/Time.js:44
 #, python-format
 msgid "%d min"
 msgid_plural "%d mins"
@@ -998,7 +1018,7 @@ msgstr[2] "%d min."
 msgstr[3] "%d min."
 
 #. n second/seconds use short form
-#: src/client/js/otp/util/Time.js:47
+#: src/client/js/otp/util/Time.js:46
 #, python-format
 msgid "%d sec"
 msgid_plural "%d secs"
@@ -1027,43 +1047,43 @@ msgid "Send to back"
 msgstr "Pošlji v ozadje"
 
 #. Public transit Route: routename (Used in Trip viewer)
-#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:42
+#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:41
 msgid "Route:"
 msgstr "Linija:"
 
 #. Public Transit Route variant: Start - end stop (Used in
 #. trip viewer)
-#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:62
+#: src/client/js/otp/widgets/transit/RouteBasedWidget.js:61
 msgid "Variant:"
 msgstr "Različica:"
 
 #. Widget title
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:31
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:29
 msgid "Stop Finder"
 msgstr "Iskalnik postaj"
 
-#. [Public transport] Agency: Selector for Public transport agencies
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:48
-msgid "Agency"
-msgstr "Podjetje"
+#. [Public transport] : Selector for GTFS feed
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:46
+msgid "Feed"
+msgstr ""
 
 #. Search for Stops by ID
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:50
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:48
 #, fuzzy
 msgid "By ID"
 msgstr "Po ID-ju"
 
 #. Search for Stops by Name
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:52
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:50
 msgid "By Name"
 msgstr "Po imenu"
 
 #. Search for Stops by ID/by Name
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:54
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:52
 msgid "Search"
 msgstr "Poišči"
 
-#: src/client/js/otp/widgets/transit/StopFinderWidget.js:95
+#: src/client/js/otp/widgets/transit/StopFinderWidget.js:94
 msgid "No Stops Found"
 msgstr "Ni najdenih postaj"
 
@@ -1086,7 +1106,7 @@ msgstr "(Nobena postaja ni bila izbrana)"
 #. sequential trips made using the same vehicle, where a passenger
 #. can transfer from one trip to the next just by staying in the
 #. vehicle.)
-#: src/client/js/otp/widgets/transit/StopViewerWidget.js:132
+#: src/client/js/otp/widgets/transit/StopViewerWidget.js:134
 msgid "Block"
 msgstr "Blok"
 
@@ -1163,105 +1183,110 @@ msgstr ""
 
 #. Depart [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of departure
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:313
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:319
 msgctxt "tripoptions"
 msgid "Depart"
 msgstr "Odhod ob"
 
 #. Arrive [time dropdown] [date dropdown]. Used in
 #. dropdown as a label to choose wanted time/date of arrival.
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:316
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:322
 msgid "Arrive"
 msgstr "Prihod do"
 
 #. on button that sets time and date of arrival/departure to now
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:318
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:324
 msgid "Now"
 msgstr "Zdaj"
 
 #. label for checkbox
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:417
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:423
 msgid "Wheelchair accesible trip:"
 msgstr "Primerno za invalidske vozičke:"
 
+#. label for checkbox
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:466
+msgid "Show Filtered Itineraries:"
+msgstr ""
+
 #. Label for dropdown Travel by: [mode of transport]
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:474
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:480
 msgid "Travel by"
 msgstr "Način potovanja "
 
 #. default value for preset values of maximum walk
 #. distances in Trip Options
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:580
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:586
 msgid "Presets"
 msgstr "Iz seznama"
 
 #. label for choosing how much should person's trip on foot be
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:643
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:649
 #, fuzzy
 msgid "Maximum walk"
 msgstr "Največja razdalja peš"
 
 #. label for choosing how much should person's trip on bicycle be
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:666
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:672
 #, fuzzy
 msgid "Maximum bike"
 msgstr "Največja razdalja kolesarjenja"
 
 #. label Preferred Routes: (routes/None)
 #. widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:698
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:709
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:704
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:715
 msgid "Preferred Routes"
 msgstr "Priljubljene linije"
 
 #. button to edit Preffered public transport Routes
 #. buton edit Banned public transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:700
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:809
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:706
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:815
 #, fuzzy
 msgid "Edit"
 msgstr "Uredi"
 
 #. Words in brackets when no Preffered public transport route is set
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:702
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:777
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:872
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:708
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:783
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:818
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:878
 #, fuzzy
 msgid "None"
 msgstr "Brez"
 
 #. Label for Weight slider  to set to preffered public
 #. transport routes
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:705
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:711
 msgid "Weight"
 msgstr "Utež"
 
 #. label Banned public transport Routes: (routes/None)
 #. (Routes you don't want to take)
 #. Widget title
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:812
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:818
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:824
 msgid "Banned routes"
 msgstr "Neželene linije"
 
 #. In Bike share planner radio button: <Use>: My Own Bike A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:947
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:953
 msgid "Use"
 msgstr "Uporabi"
 
 #. In Bike share planner radio button: Use: <My Own Bike> A shared bike
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:949
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:955
 msgid "My Own Bike"
 msgstr "Lastno kolo"
 
 #. In Bike share planner radio button: Use: My Own Bike <A Shared bike>
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:951
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:957
 msgid "A Shared Bike"
 msgstr "Izposojeno kolo"
 
 #. button to send query for trip planning
-#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1092
+#: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1098
 msgid "Plan Your Trip"
 msgstr "Načrtuj pot"
 

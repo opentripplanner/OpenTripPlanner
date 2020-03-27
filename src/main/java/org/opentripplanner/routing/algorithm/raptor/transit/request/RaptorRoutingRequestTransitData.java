@@ -1,12 +1,13 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -43,6 +44,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
       Instant departureTime,
       int dayRange,
       TraverseModeSet transitModes,
+      Set<FeedScopedId> bannedRoutes,
       double walkSpeed
   ) {
     // Delegate to the creator to construct the needed data structures. The code is messy so
@@ -55,7 +57,11 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
 
     this.transitLayer = transitLayer;
     this.startOfTime = creator.getSearchStartTime();
-    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(dayRange, transitModes);
+    this.activeTripPatternsPerStop = creator.createTripPatternsPerStop(
+        dayRange,
+        transitModes,
+        bannedRoutes
+    );
     this.transfers = creator.calculateTransferDuration(walkSpeed);
   }
 
@@ -71,10 +77,10 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
    * Gets all the unique trip patterns touching a set of stops
    */
   @Override
-  public Iterator<? extends TripPatternInfo<TripSchedule>> patternIterator(
+  public Iterator<? extends RaptorTripPattern<TripSchedule>> patternIterator(
       IntIterator stops
   ) {
-    Set<TripPatternInfo<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
+    Set<RaptorTripPattern<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
     while (stops.hasNext()) {
       activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
     }

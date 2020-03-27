@@ -45,7 +45,7 @@ public class RouterConfig implements Serializable {
      * Has information how much time boarding a vehicle takes. Can be significant
      * eg in airplanes or ferries. Unit is ?. Default value is ? <-- TODO OTP2
      */
-    public final Map<TraverseMode, Integer> boardTimes;
+    public final Map<TraverseMode, Integer> boardSlackByMode;
 
     /**
      * TODO OTP2 - Regression; this need to be integrated with Raptor. This parameter was
@@ -54,7 +54,7 @@ public class RouterConfig implements Serializable {
      * Has information how much time alighting a vehicle takes. Can be significant
      * eg in airplanes or ferries.Unit is ?. Default value is ? <-- TODO OTP2
      */
-    public final Map<TraverseMode, Integer> alightTimes;
+    public final Map<TraverseMode, Integer> alightSlackByMode;
 
     public final RoutingRequest routingRequestDefaults;
     public final RaptorTuningParameters raptorTuningParameters;
@@ -66,8 +66,8 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-        this.boardTimes = adapter.asEnumMap("boardTimes", TraverseMode.class, NodeAdapter::asInt);
-        this.alightTimes = adapter.asEnumMap("alightTimes", TraverseMode.class, NodeAdapter::asInt);
+        this.boardSlackByMode = adapter.asEnumMap("boardTimes", TraverseMode.class, NodeAdapter::asInt);
+        this.alightSlackByMode = adapter.asEnumMap("alightTimes", TraverseMode.class, NodeAdapter::asInt);
 
         this.raptorTuningParameters = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = routingRequestDefaults(adapter.path("routingDefaults"));
@@ -130,7 +130,7 @@ public class RouterConfig implements Serializable {
         request.maxWeight = c.asDouble("maxWeight", dft.maxWeight);
         request.maxWheelchairSlope = c.asDouble("maxWheelchairSlope", dft.maxWheelchairSlope); // ADA max wheelchair ramp slope is a good default.
         request.modes = c.exist("modes") ? new TraverseModeSet(c.asEnumSet("modes", TraverseMode.class)) : dft.modes;
-        request.nonpreferredTransferPenalty = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferPenalty);
+        request.nonpreferredTransferCost = c.asInt("nonpreferredTransferPenalty", dft.nonpreferredTransferCost);
         request.numItineraries = c.asInt("numItineraries", dft.numItineraries);
         request.onlyTransitTrips = c.asBoolean("onlyTransitTrips", dft.onlyTransitTrips);
         request.optimize = c.asEnum("optimize", dft.optimize);
@@ -140,7 +140,7 @@ public class RouterConfig implements Serializable {
         request.showIntermediateStops = c.asBoolean("showIntermediateStops", dft.showIntermediateStops);
         request.stairsReluctance = c.asDouble("stairsReluctance", dft.stairsReluctance);
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
-        request.transferPenalty = c.asInt("transferPenalty", dft.transferPenalty);
+        request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);

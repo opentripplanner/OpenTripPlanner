@@ -334,9 +334,9 @@ public class RaptorPathToItineraryMapper {
 
     private Place mapLocationToPlace(GenericLocation location) {
         if (location.label == null || location.label.isEmpty()) {
-            return new Place(location.lng, location.lat, String.format("%.6f, %.6f", location.lat, location.lng));
+            return new Place(location.lat, location.lng, String.format("%.6f, %.6f", location.lat, location.lng));
         } else {
-            return new Place(location.lng, location.lat, location.label);
+            return new Place(location.lat, location.lng, location.label);
         }
     }
 
@@ -345,7 +345,7 @@ public class RaptorPathToItineraryMapper {
     }
 
     private Place mapStopToPlace(Stop stop) {
-        Place place = new Place(stop.getLon(), stop.getLat(), stop.getName());
+        Place place = new Place(stop.getLat(), stop.getLon(), stop.getName());
         place.stopId = stop.getId();
         place.stopCode = stop.getCode();
         place.platformCode = stop.getCode();
@@ -396,13 +396,14 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            int currentStopIndex = transitLayer.getStopIndex().indexByStop.get(tripPattern.getStop(j));
             if (boarded) {
                 transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(j - 1).getCoordinates()));
             }
-            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
+            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime() && currentStopIndex == pathLeg.fromStop()) {
                 boarded = true;
             }
-            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
+            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime() && currentStopIndex == pathLeg.toStop()) {
                 break;
             }
         }

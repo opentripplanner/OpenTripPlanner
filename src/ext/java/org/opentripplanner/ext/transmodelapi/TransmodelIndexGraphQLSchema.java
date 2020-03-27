@@ -48,6 +48,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
+import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -61,6 +62,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -72,12 +74,10 @@ import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.PolylineEncoder;
-import org.opentripplanner.util.ResourceBundleSingleton;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.slf4j.Logger;
@@ -101,7 +101,6 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
-import static java.util.Collections.enumeration;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -366,6 +365,8 @@ public class TransmodelIndexGraphQLSchema {
     private GraphQLOutputType bookingArrangementType = new GraphQLTypeReference("BookingArrangement");
 
     private GraphQLOutputType contactType = new GraphQLTypeReference("Contact");
+
+    private GraphQLOutputType systemNoticeType = new GraphQLTypeReference("SystemNotice");
 
     private GraphQLInputObjectType locationType;
 
@@ -710,6 +711,26 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
+        systemNoticeType = GraphQLObjectType.newObject()
+                .name("SystemNotice")
+                .description("A system notice is used to tag elements with system information for "
+                        + "debugging or other system related purpose. One use-case is to run a "
+                        + "routing search with 'debugItineraryFilter: true'. This will then tag "
+                        + "itineraries instead of removing them from the result. This make it "
+                        + "possible to inspect the itinerary-filter-chain. A SystemNotice only "
+                        + "have english text, because the primary user are technical staff, like "
+                        + "testers and developers.")
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("tag")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(env -> ((SystemNotice) env.getSource()).tag)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("text")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(env -> ((SystemNotice) env.getSource()).text)
+                        .build())
+                .build();
 
         createPlanType();
 
@@ -768,7 +789,10 @@ public class TransmodelIndexGraphQLSchema {
 
         GraphQLInputObjectType bannedInputType = GraphQLInputObjectType.newInputObject()
                 .name("InputBanned")
-                .description("Filter trips by disallowing trip patterns involving certain elements")
+                .description("Filter trips by disallowing lines involving certain "
+                    + "elements. If both lines and authorities are specified, only one must be valid "
+                    + "for each line to be banned. If a line is both banned and whitelisted, "
+                    + "it will be counted as banned.")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("lines")
                         .description("Set of ids for lines that should not be used")
@@ -816,7 +840,10 @@ public class TransmodelIndexGraphQLSchema {
 
         GraphQLInputObjectType whiteListedInputType = GraphQLInputObjectType.newInputObject()
                 .name("InputWhiteListed")
-                .description("Filter trips by only allowing trip patterns involving certain elements. If both lines and authorities are specificed, only one must be valid for each trip to be used.")
+                .description("Filter trips by only allowing lines involving certain "
+                    + "elements. If both lines and authorities are specified, only one must be valid "
+                    + "for each line to be used. If a line is both banned and whitelisted, it will "
+                    + "be counted as banned.")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("lines")
                         .description("Set of ids for lines that should be used")
@@ -955,7 +982,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("transferPenalty")
                         .description("An extra penalty added on transfers (i.e. all boardings except the first one). The transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimise for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers trip pattern is to wait until midnight, when the 4 train runs local the whole way. The actual fastest trip pattern is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimise for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than transferPenalty seconds, then that's what we'll return.")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.transferPenalty)
+                        .defaultValue(defaultRoutingRequest.transferCost)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("modes")
@@ -3671,13 +3698,13 @@ public class TransmodelIndexGraphQLSchema {
                         .name("latitude")
                         .description("The latitude of the place.")
                         .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                        .dataFetcher(environment -> ((Place) environment.getSource()).lat)
+                        .dataFetcher(environment -> ((Place) environment.getSource()).coordinate.latitude())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("longitude")
                         .description("The longitude of the place.")
                         .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                        .dataFetcher(environment -> ((Place) environment.getSource()).lon)
+                        .dataFetcher(environment -> ((Place) environment.getSource()).coordinate.longitude())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quay")
@@ -3786,13 +3813,13 @@ public class TransmodelIndexGraphQLSchema {
                         .name("latitude")
                         .description("The latitude of the step.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).lat)
+                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).startLocation.latitude())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("longitude")
                         .description("The longitude of the step.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).lon)
+                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).startLocation.longitude())
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -4101,22 +4128,22 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).nonTransitDistanceMeters)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("debugMarkedAsDeleted")
-                        .description("This itinerary is marked as deleted by at least one itinerary filter.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((Itinerary) environment.getSource()).debugMarkedAsDeleted)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("legs")
                         .description("A list of legs. Each leg is either a walking (cycling, car) portion of the trip, or a ride leg on a particular vehicle. So a trip where the use walks to the Q train, transfers to the 6, then walks to their destination, has four legs.")
                         .type(new GraphQLNonNull(new GraphQLList(legType)))
                         .dataFetcher(environment -> ((Itinerary) environment.getSource()).legs)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("systemNotices")
+                        .description("Get all system notices.")
+                        .type(new GraphQLNonNull(new GraphQLList(systemNoticeType)))
+                        .dataFetcher(env -> ((Itinerary) env.getSource()).systemNotices)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("weight")
-                        .description("Weight of the itinerary. Used for debugging. NOT IMPLEMENTED")
+                        .description("Generalized cost or weight of the itinerary. Used for debugging.")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> 0.0)
+                        .dataFetcher(env -> ((Itinerary) env.getSource()).generalizedCost)
                         .build())
                 .build();
 
@@ -4187,7 +4214,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("transferPenalty")
                         .description("An extra penalty added on transfers (i.e. all boardings except the first one).")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).transferPenalty)
+                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).transferCost)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("walkReluctance")
@@ -4316,18 +4343,6 @@ public class TransmodelIndexGraphQLSchema {
                         .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another.")
                         .type(Scalars.GraphQLInt)
                         .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).transferSlack)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("boardSlack")
-                        .description("Invariant: boardSlack + alightSlack <= transferSlack.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).boardSlack)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("alightSlack")
-                        .description("Invariant: boardSlack + alightSlack <= transferSlack.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).alightSlack)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("maxTransfers")
@@ -4551,13 +4566,13 @@ public class TransmodelIndexGraphQLSchema {
                         .name("messageStrings")
                         .description("A list of possible error messages in cleartext")
                         .type(new GraphQLNonNull(new GraphQLList(Scalars.GraphQLString)))
-                        .dataFetcher(env -> ((PlanResponse) env.getSource()).messages
-                                .stream()
-                                .map(message -> message.get(ResourceBundleSingleton.INSTANCE.getLocale(
-                                        env.getArgument("locale"))))
-                                .collect(Collectors.toList())
+                        .dataFetcher(
+                                env -> ((PlanResponse) env.getSource())
+                                .listErrorMessages(env.getArgument("locale"))
                         )
                         .build())
+                // TODO OTP2 - Next version: Wrap errors, include data like witch parameter
+                //           - is causing a problem (like from/to not found).
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("debugOutput")
                         .description("Information about the timings for the trip generation")

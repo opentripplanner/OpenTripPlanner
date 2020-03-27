@@ -7,8 +7,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripScheduleImpl;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -574,22 +572,4 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
         }
         return hasher.hash();
     }
-
-    /**
-     * Create a Raptor TripSchedule implementation that references the arrival and departure times in this OTP1 TripTimes.
-     * This method is on the TripTimes class because it needs access to internal private fields. Note that this approach
-     * depends on the fact that we treat TripTimes as immutable once they are committed to a TimetableSnapshot.
-     */
-    public TripScheduleImpl toTripSchedulImpl (TripPattern tripPattern) {
-        int[] arrivals = this.arrivalTimes;
-        int[] departures = this.departureTimes;
-        if (arrivals == null) {
-            arrivals = this.scheduledArrivalTimes;
-        }
-        if (departures == null) {
-            departures = this.scheduledDepartureTimes;
-        }
-        return new TripScheduleImpl(this, tripPattern, arrivals, departures, timeShift);
-    }
-
 }

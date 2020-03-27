@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
 import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.WorkerPerformanceTimers;
@@ -191,10 +191,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private void findAllTransitForRound() {
         IntIterator stops = state.stopsTouchedPreviousRound();
-        Iterator<? extends TripPatternInfo<T>> patternIterator = transitData.patternIterator(stops);
+        Iterator<? extends RaptorTripPattern<T>> patternIterator = transitData.patternIterator(stops);
 
         while (patternIterator.hasNext()) {
-            TripPatternInfo<T> pattern = patternIterator.next();
+            RaptorTripPattern<T> pattern = patternIterator.next();
             TripScheduleSearch<T> tripSearch = createTripSearch(pattern);
 
             transitWorker.prepareForTransitWith(pattern, tripSearch);
@@ -209,7 +209,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * <p/>
      * This is protected to allow reverse search to override and step backwards.
      */
-    private void performTransitForRoundAndEachStopInPattern(final TripPatternInfo<T> pattern) {
+    private void performTransitForRoundAndEachStopInPattern(final RaptorTripPattern<T> pattern) {
         IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
         while (it.hasNext()) {
             transitWorker.routeTransitAtStop(it.next());
@@ -233,20 +233,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * <p/>
      * This is protected to allow reverse search to override and create a alight search instead.
      */
-    private TripScheduleSearch<T> createTripSearch(TripPatternInfo<T> pattern) {
+    private TripScheduleSearch<T> createTripSearch(RaptorTripPattern<T> pattern) {
         if(matchBoardingAlightExactInFirstRound && roundTracker.round() == 1) {
-            return calculator.createExactTripSearch(pattern, this::skipTripSchedule);
+            return calculator.createExactTripSearch(pattern);
         }
         else {
-            return calculator.createTripSearch(pattern, this::skipTripSchedule);
+            return calculator.createTripSearch(pattern);
         }
-    }
-
-    /**
-     * Skip trips NOT running on the day of the search and skip frequency trips
-     */
-    private boolean skipTripSchedule(T trip) {
-        return !transitData.isTripScheduleInService(trip);
     }
 
     // Track time spent, measure performance

@@ -36,8 +36,10 @@ public class WalkStepMapper {
         api.stayOn = domain.stayOn;
         api.area = domain.area;
         api.bogusName = domain.bogusName;
-        api.lon = domain.lon;
-        api.lat = domain.lat;
+        if(domain.startLocation != null) {
+            api.lon = domain.startLocation.longitude();
+            api.lat = domain.startLocation.latitude();
+        }
         api.elevation = mapElevation(domain.elevation);
         api.alerts = alertsMapper.mapAlerts(domain.alerts);
 

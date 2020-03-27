@@ -16,6 +16,7 @@ import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.issues.BikeRentalStationUnlinked;
@@ -51,6 +52,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +60,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -139,7 +142,7 @@ public class SimpleStreetSplitter {
      * active on a graph at any given time.
      *
      * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
-     * @param graph
+
      */
     public SimpleStreetSplitter(Graph graph, DataImportIssueStore issueStore) {
         this(graph, null, null, true, issueStore);
@@ -151,21 +154,45 @@ public class SimpleStreetSplitter {
 
     /** Link all relevant vertices to the street network */
     public void link () {
-        for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
-                boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
-                if (alreadyLinked) continue;
+        link(TransitStopVertex.class, StopUnlinked::new);
+        link(BikeRentalStationVertex.class, BikeRentalStationUnlinked::new);
+        link(BikeParkVertex.class, BikeParkUnlinked::new);
+    }
 
-                if (!link(v)) {
-                    if (v instanceof TransitStopVertex)
-                        issueStore.add(new StopUnlinked((TransitStopVertex) v));
-                    else if (v instanceof BikeRentalStationVertex)
-                        issueStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
-                    else if (v instanceof BikeParkVertex)
-                        issueStore.add(new BikeParkUnlinked((BikeParkVertex) v));
-                };
-            }
+    @SuppressWarnings("Convert2MethodRef")
+    public <T extends Vertex> void link(
+            Class<T> type,
+            Function<T, DataImportIssue> unlinkedIssueMapper
+    ) {
+        @SuppressWarnings("unchecked")
+        List<T> vertices = graph.getVertices()
+                .stream()
+                .filter(type::isInstance)
+                .map(it -> (T)it)
+                .collect(Collectors.toList());
+
+        String actionName = "Link " + type.getSimpleName();
+
+        if(vertices.isEmpty()) {
+            LOG.info("{} skiped. No such data exist.", actionName);
+            return;
         }
+
+        ProgressTracker progress = ProgressTracker.track(actionName, 500, vertices.size());
+        LOG.info(progress.startMessage());
+
+        for (T v : vertices) {
+            // TODO OTP2 - Can a vertex already be linked?
+            boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
+            if (alreadyLinked) { continue; }
+
+            if (!link(v)) {
+                issueStore.add(unlinkedIssueMapper.apply(v));
+            };
+            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            progress.step(m -> LOG.info(m));
+        }
+        LOG.info(progress.completeMessage());
     }
 
     /** Link this vertex into the graph to the closest walkable edge */

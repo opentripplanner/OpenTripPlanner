@@ -27,6 +27,7 @@
 - NeTEx import now supports ServiceLinks (#2951)
 - Also check TripPatterns added by realtime when showing stoptimes for stop (#2954)
 - Copy geometries from previous TripPattern when realtime updates result in a TripPattern being replaced (#2987)
+- Support for the Norwegian language.
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

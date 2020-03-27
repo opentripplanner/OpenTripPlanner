@@ -1,67 +1,66 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
+import org.opentripplanner.routing.trippattern.TripTimes;
 
 import java.time.LocalDate;
-import java.util.List;
 import java.util.Objects;
 
 /**
  * A TripPattern with its TripSchedules filtered by validity on a particular date. This is to avoid
  * having to do any filtering by date during the search itself.
  */
-public class TripPatternForDate implements TripPatternInfo<TripSchedule> {
+public class TripPatternForDate {
 
     /**
      * The original TripPattern whose TripSchedules were filtered to produce this.tripSchedules.
      * Its TripSchedules remain unchanged.
      */
-    private final TripPattern tripPattern;
+    private final TripPatternWithRaptorStopIndexes tripPattern;
 
     /**
      * The filtered TripSchedules for only those trips in the TripPattern that are active on the given day.
      * Invariant: this array should contain a subset of the TripSchedules in tripPattern.tripSchedules.
      */
-    private final TripSchedule[] tripSchedules;
+    private final TripTimes[] tripTimes;
 
     /** The date for which the filtering was performed. */
     private final LocalDate localDate;
 
-    public TripPatternForDate(TripPattern tripPattern, List<TripSchedule> tripSchedules, LocalDate localDate) {
+    public TripPatternForDate(TripPatternWithRaptorStopIndexes tripPattern, TripTimes[] tripTimes, LocalDate localDate) {
         this.tripPattern = tripPattern;
-        this.tripSchedules = tripSchedules.toArray(new TripSchedule[]{});
+        this.tripTimes = tripTimes;
         this.localDate = localDate;
     }
 
-    public TripPattern getTripPattern() {
+    public TripTimes[] tripTimes() {
+        return tripTimes;
+    }
+
+    public TripPatternWithRaptorStopIndexes getTripPattern() {
         return tripPattern;
     }
 
-    @Override public int stopIndex(int i) {
+    public int stopIndex(int i) {
         return this.tripPattern.stopIndex(i);
     }
 
-    @Override public int numberOfStopsInPattern() {
-        return tripPattern.getStopIndexes().length;
-    }
-
-    @Override public TripSchedule getTripSchedule(int i) {
-        return tripSchedules[i];
+    public TripTimes getTripTimes(int i) {
+        return tripTimes[i];
     }
 
     public LocalDate getLocalDate() {
         return localDate;
     }
 
-    @Override public int numberOfTripSchedules() {
-        return tripSchedules.length;
+    public int numberOfTripSchedules() {
+        return tripTimes.length;
     }
 
-    @Override public int hashCode() {
-        return Objects.hash(tripPattern, tripSchedules, localDate);
+    public int hashCode() {
+        return Objects.hash(tripPattern, tripTimes, localDate);
     }
 
-    @Override public boolean equals(Object o) {
+    public boolean equals(Object o) {
         if (this == o)
             return true;
         if (o == null || getClass() != o.getClass())

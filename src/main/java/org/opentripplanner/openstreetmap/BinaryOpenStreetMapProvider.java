@@ -5,6 +5,9 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
+import org.opentripplanner.util.ProgressTracker;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayInputStream;
 import java.io.File;
@@ -16,9 +19,7 @@ import java.io.InputStream;
  * First the relations, then the ways, then the nodes are also loaded.
  */
 public class BinaryOpenStreetMapProvider {
-    private static final int PHASE_RELATIONS = 1;
-    private static final int PHASE_WAYS = 2;
-    private static final int PHASE_NODES = 3;
+    private static final Logger LOG = LoggerFactory.getLogger(BinaryOpenStreetMapProvider.class);
 
     private final DataSource source;
     private final boolean cacheDataImMem;
@@ -39,35 +40,53 @@ public class BinaryOpenStreetMapProvider {
         try {
             BinaryOpenStreetMapParser parser = new BinaryOpenStreetMapParser(osmdb);
 
-            parsePhase(parser, PHASE_RELATIONS);
+            parsePhase(parser, OsmParserPhase.Relations);
             osmdb.doneFirstPhaseRelations();
 
-            parsePhase(parser, PHASE_WAYS);
+            parsePhase(parser, OsmParserPhase.Ways);
             osmdb.doneSecondPhaseWays();
 
-            parsePhase(parser, PHASE_NODES);
+            parsePhase(parser, OsmParserPhase.Nodes);
             osmdb.doneThirdPhaseNodes();
-        } catch (Exception ex) {
+        }
+        catch (Exception ex) {
             throw new IllegalStateException("error loading OSM from path " + source.path(), ex);
         }
     }
 
-    private void parsePhase(BinaryOpenStreetMapParser parser, int phase) throws IOException {
-        parser.setParseRelations(phase == PHASE_RELATIONS);
-        parser.setParseWays(phase == PHASE_WAYS);
-        parser.setParseNodes(phase == PHASE_NODES);
-        new BlockInputStream(createInputStream(), parser).process();
+    private void parsePhase(BinaryOpenStreetMapParser parser, OsmParserPhase phase) throws IOException {
+        parser.setPhase(phase);
+        BlockInputStream in = null;
+        try {
+            in = new BlockInputStream(createInputStream(phase), parser);
+            in.process();
+        }
+        finally {
+            // Close
+            try { if(in != null) { in.close(); } }
+            catch (Exception e) { LOG.error(e.getMessage(), e); }
+        }
     }
 
-    private InputStream createInputStream() {
+    private InputStream createInputStream(OsmParserPhase phase) {
         if(cacheDataImMem) {
             if(cachedBytes == null) {
                 cachedBytes = source.asBytes();
             }
-            return new ByteArrayInputStream(cachedBytes);
+            return track(phase, cachedBytes.length, new ByteArrayInputStream(cachedBytes));
         }
+        return track(phase, source.size(), source.asInputStream());
+    }
 
-        return source.asInputStream();
+    @SuppressWarnings("Convert2MethodRef")
+    private static InputStream track(OsmParserPhase phase, long size, InputStream inputStream) {
+        // Keep logging lambda, replacing it with a method-ref will cause the
+        // logging to report incorrect class and line number
+        return ProgressTracker.track(
+                "Parse OSM " + phase, 1000, size,
+                inputStream,
+                m -> LOG.info(m)
+        );
     }
 
     public String toString() {

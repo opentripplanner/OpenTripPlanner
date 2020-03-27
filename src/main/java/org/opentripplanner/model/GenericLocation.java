@@ -1,6 +1,7 @@
 package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 /**
  * Represents a location that is to be used in a routing request. It can be either a from, to, or
@@ -51,5 +52,13 @@ public class GenericLocation {
             return null;
         }
         return new Coordinate(this.lng, this.lat);
+    }
+
+    @Override
+    public String toString() {
+        return ValueObjectToStringBuilder.of()
+                .addStr(label)
+                .addObj(stopId)
+                .addCoordinate(lat, lng).toString();
     }
 }

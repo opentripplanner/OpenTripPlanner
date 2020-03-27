@@ -1,14 +1,18 @@
 package org.opentripplanner.openstreetmap;
 
+import crosby.binary.BinaryParser;
+import crosby.binary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
-import org.opentripplanner.openstreetmap.model.*;
+import org.opentripplanner.openstreetmap.model.OSMNode;
+import org.opentripplanner.openstreetmap.model.OSMNodeRef;
+import org.opentripplanner.openstreetmap.model.OSMRelation;
+import org.opentripplanner.openstreetmap.model.OSMRelationMember;
+import org.opentripplanner.openstreetmap.model.OSMTag;
+import org.opentripplanner.openstreetmap.model.OSMWay;
 
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
-import crosby.binary.BinaryParser;
-import crosby.binary.Osmformat;
 
 /**
  * Parser for the OpenStreetMap PBF Format.
@@ -18,9 +22,7 @@ import crosby.binary.Osmformat;
 public class BinaryOpenStreetMapParser extends BinaryParser {
 
     private OSMDatabase osmdb;
-    private boolean parseWays = true;
-    private boolean parseRelations = true;
-    private boolean parseNodes = true;
+    private OsmParserPhase parsePhase;
     private Map<String, String> stringTable = new HashMap<String, String>();
 
     public BinaryOpenStreetMapParser(OSMDatabase osmdb) {
@@ -40,15 +42,14 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
         return fromTable;
     }
 
+    @Override
     public void complete() {
         // Jump in circles
     }
 
     @Override
     protected void parseNodes(List<Osmformat.Node> nodes) {
-        if(!parseNodes) {
-            return;
-        }
+        if(parsePhase != OsmParserPhase.Nodes) { return; }
 
         for (Osmformat.Node i : nodes) {
             OSMNode tmp = new OSMNode();
@@ -75,9 +76,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
         long lastId = 0, lastLat = 0, lastLon = 0;
         int j = 0; // Index into the keysvals array.
 
-        if(!parseNodes) {
-            return;
-        }
+        if(parsePhase != OsmParserPhase.Nodes) { return; }
 
         for (int i = 0; i < nodes.getIdCount(); i++) {
             OSMNode tmp = new OSMNode();
@@ -116,9 +115,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseWays(List<Osmformat.Way> ways) {
-        if(!parseWays) {
-            return;
-        }
+        if(parsePhase != OsmParserPhase.Ways) { return; }
 
         for (Osmformat.Way i : ways) {
             OSMWay tmp = new OSMWay();
@@ -148,9 +145,7 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
 
     @Override
     protected void parseRelations(List<Osmformat.Relation> rels) {
-        if(!parseRelations) {
-            return;
-        }
+        if(parsePhase != OsmParserPhase.Relations) { return; }
 
         for (Osmformat.Relation i : rels) {
             OSMRelation tmp = new OSMRelation();
@@ -206,23 +201,9 @@ public class BinaryOpenStreetMapParser extends BinaryParser {
     }
 
     /**
-     * Should relations be parsed
+     * Set the phase to be parsed
      */
-    public void setParseWays(boolean parseWays) {
-        this.parseWays = parseWays;
-    }
-
-    /**
-     * Should relations be parsed
-     */
-    public void setParseRelations(boolean parseRelations) {
-        this.parseRelations = parseRelations;
-    }
-
-    /**
-     * Should nodes be parsed
-     */
-    public void setParseNodes(boolean parseNodes) {
-        this.parseNodes = parseNodes;
+    public void setPhase(OsmParserPhase phase) {
+        this.parsePhase = phase;
     }
 }

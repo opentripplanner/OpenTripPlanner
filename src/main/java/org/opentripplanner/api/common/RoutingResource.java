@@ -749,10 +749,10 @@ public abstract class RoutingResource {
 
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
-        if (transferPenalty != null) request.transferPenalty = transferPenalty;
+        if (transferPenalty != null) request.transferCost = transferPenalty;
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
-            request.transferPenalty += 1800;
+            request.transferCost += 1800;
         }
 
         if (optimize != null)
@@ -775,16 +775,19 @@ public abstract class RoutingResource {
         if (alightSlack != null)
             request.alightSlack = alightSlack;
 
-        if (minTransferTime != null)
-            request.transferSlack = minTransferTime; // TODO rename field in routingrequest
+        if (minTransferTime != null) {
+            int alightAndBoardSlack = request.boardSlack + request.alightSlack;
+            if (alightAndBoardSlack > minTransferTime) {
+                throw new IllegalArgumentException(
+                        "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
+                );
+            }
+            request.transferSlack = minTransferTime - alightAndBoardSlack;
+        }
 
         if (nonpreferredTransferPenalty != null)
-            request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+            request.nonpreferredTransferCost = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;

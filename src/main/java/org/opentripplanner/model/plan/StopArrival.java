@@ -30,7 +30,7 @@ public class StopArrival {
 
     @Override
     public String toString() {
-        return new ToStringBuilder(StopArrival.class)
+        return ToStringBuilder.of(StopArrival.class)
                 .addCalTime("arrival",arrival)
                 .addCalTime("departure", departure)
                 .addObj("place", place)

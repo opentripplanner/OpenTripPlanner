@@ -28,6 +28,7 @@ import java.io.File;
 import java.lang.ref.WeakReference;
 import java.time.ZoneId;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -163,8 +164,8 @@ public class SpeedTest {
     }
 
     private void printProfileStatistics() {
-        ResultPrinter.printProfileResults("Worker: ", workerResults);
-        ResultPrinter.printProfileResults("Total:  ", totalResults);
+        ResultPrinter.printProfileResults("Worker: ", opts.profiles(), workerResults);
+        ResultPrinter.printProfileResults("Total:  ", opts.profiles(), totalResults);
     }
 
     private void initProfileStatistics() {
@@ -349,6 +350,7 @@ public class SpeedTest {
                 request.getDepartureDateWithZone().toInstant(),
                 2,
                 request.getTransitModes(),
+                Collections.emptySet(),
                 request.getWalkSpeedMeterPrSecond()
         );
     }
