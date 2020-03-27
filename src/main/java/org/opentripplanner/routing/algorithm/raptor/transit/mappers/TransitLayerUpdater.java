@@ -6,7 +6,7 @@ import gnu.trove.set.TIntSet;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
-import org.opentripplanner.routing.algorithm.raptor.transit.TripPattern;
+import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -63,7 +63,7 @@ public class TransitLayerUpdater {
     double startTime = System.currentTimeMillis();
 
     // Map TripPatterns for this update to Raptor TripPatterns
-    final Map<org.opentripplanner.model.TripPattern, TripPattern>
+    final Map<org.opentripplanner.model.TripPattern, TripPatternWithRaptorStopIndexes>
         newTripPatternForOld = mapOldTripPatternToRaptorTripPattern(
         realtimeTransitLayer.getStopIndex(),
             updatedTimetables.stream().map(t -> t.pattern).collect(Collectors.toSet()
@@ -95,7 +95,7 @@ public class TransitLayerUpdater {
       Map<org.opentripplanner.model.TripPattern, TripPatternForDate> patternsForDateMap =
           tripPatternForDateMapCache.computeIfAbsent(date, p -> patternsForDate
           .stream()
-          .collect(Collectors.toMap(t -> t.getTripPattern().getOriginalTripPattern(), t -> t)));
+          .collect(Collectors.toMap(t -> t.getTripPattern().getPattern(), t -> t)));
 
       for (Timetable timetable : timetablesForDate) {
         TripPatternForDate tripPatternForDate = tripPatternForDateMapper.map(

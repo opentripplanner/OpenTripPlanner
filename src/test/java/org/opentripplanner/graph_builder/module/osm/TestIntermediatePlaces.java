@@ -168,8 +168,8 @@ public class TestIntermediatePlaces {
                     legIndex < itinerary.legs.size());
                 leg = itinerary.legs.get(legIndex);
                 legIndex++;
-            } while (Math.abs(leg.to.lat - location.lat) > DELTA
-                || Math.abs(leg.to.lon - location.lng) > DELTA);
+            } while (Math.abs(leg.to.coordinate.latitude() - location.lat) > DELTA
+                || Math.abs(leg.to.coordinate.longitude() - location.lng) > DELTA);
         }
     }
 
@@ -177,10 +177,10 @@ public class TestIntermediatePlaces {
     private void validateLegsSpatially(TripPlan plan, Itinerary itinerary) {
         Place place = plan.from;
         for (Leg leg : itinerary.legs) {
-            assertPlacesAreVeryClose(place, leg.from);
+            assertEquals(place.coordinate, leg.from.coordinate);
             place = leg.to;
         }
-        assertPlacesAreVeryClose(place, plan.to);
+        assertEquals(place.coordinate, plan.to.coordinate);
     }
 
     // Check that the start time and end time of each leg are consistent
@@ -212,12 +212,7 @@ public class TestIntermediatePlaces {
     }
 
     private void assertLocationIsVeryCloseToPlace(GenericLocation location, Place place) {
-        assertEquals(location.lat, place.lat, DELTA);
-        assertEquals(location.lng, place.lon, DELTA);
-    }
-
-    private void assertPlacesAreVeryClose(Place a, Place b) {
-        assertEquals(a.lat, b.lat, DELTA);
-        assertEquals(a.lon, b.lon, DELTA);
+        assertEquals(location.lat, place.coordinate.latitude(), DELTA);
+        assertEquals(location.lng, place.coordinate.longitude(), DELTA);
     }
 }

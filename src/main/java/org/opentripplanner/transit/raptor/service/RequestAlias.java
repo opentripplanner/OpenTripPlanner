@@ -18,10 +18,6 @@ public class RequestAlias {
             // Heuristic to prune on pareto optimal Destination arrivals
             alias += "-DP";
         }
-        if (request.useTransfersStopFilter()) {
-            // Heuristic used to generate stop filter based on number of transfers
-            alias += "-SF";
-        }
         return alias;
     }
 }

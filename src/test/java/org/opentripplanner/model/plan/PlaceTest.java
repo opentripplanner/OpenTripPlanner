@@ -10,15 +10,15 @@ public class PlaceTest {
 
     @Test
     public void sameLocationBasedOnInstance() {
-        Place aPlace = new Place(10.0, 60.0, "A Place");
+        Place aPlace = new Place(60.0, 10.0, "A Place");
         assertTrue("same instance", aPlace.sameLocation(aPlace));
     }
 
     @Test
     public void sameLocationBasedOnCoordinates() {
-        Place aPlace = new Place(10.0, 60.0, "A Place");
-        Place samePlace = new Place(10.0000000000001, 60.000000000001, "Same Place");
-        Place otherPlace = new Place(14.0, 65.0, "Other Place");
+        Place aPlace = new Place(60.0, 10.0, "A Place");
+        Place samePlace = new Place(60.000000000001, 10.0000000000001, "Same Place");
+        Place otherPlace = new Place(65.0, 14.0, "Other Place");
 
         assertTrue("same place", aPlace.sameLocation(samePlace));
         assertTrue("same place(symmetric)", samePlace.sameLocation(aPlace));
@@ -39,8 +39,7 @@ public class PlaceTest {
     }
 
     private static Place place(String name, String stopId) {
-        Place p = new Place();
-        p.name = name;
+        Place p = new Place(null, null, name);
         p.stopId = new FeedScopedId("S", stopId);
         return p;
     }

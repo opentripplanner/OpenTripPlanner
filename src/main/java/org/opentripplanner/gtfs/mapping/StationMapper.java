@@ -1,9 +1,8 @@
 package org.opentripplanner.gtfs.mapping;
 
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.Station;
-import org.opentripplanner.util.MapUtils;
 
-import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.TimeZone;
@@ -33,14 +32,14 @@ class StationMapper {
 
         otpStation.setId(mapAgencyAndId(rhs.getId()));
         otpStation.setName(rhs.getName());
-        otpStation.setLat(rhs.getLat());
-        otpStation.setLon(rhs.getLon());
+        otpStation.setCoordinate(new WgsCoordinate(rhs.getLat(), rhs.getLon()));
         otpStation.setCode(rhs.getCode());
         otpStation.setUrl(rhs.getUrl());
         otpStation.setTimezone(
                 rhs.getTimezone() != null
                         ? TimeZone.getTimeZone(rhs.getTimezone())
-                        : null);
+                        : null
+        );
 
         return otpStation;
     }

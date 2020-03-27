@@ -1,15 +1,14 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
 import java.math.BigDecimal;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
+import static org.junit.Assert.assertNull;
 
 public class PointMapperTest {
     private static final double DELTA = 0.01d;
@@ -29,49 +28,39 @@ public class PointMapperTest {
                                 .withLongitude(LONGITUDE)
                                 .withLatitude(LATITUDE)
                 );
-        // And a coordinate
-        final Coord c = new Coord();
 
         // When map coordinates
-        assertTrue(PointMapper.verifyPointAndProcessCoordinate(
-                point, p -> {
-                        c.lat = p.getLatitude().doubleValue();
-                        c.lon = p.getLongitude().doubleValue();
-                }
-        ));
+        WgsCoordinate c = PointMapper.mapCoordinate(point);
+
         // Then verify coordinate
-        assertEquals(LONGITUDE_VALUE, c.lon, DELTA);
-        assertEquals(LATITUDE_VALUE, c.lat, DELTA);
+        assertEquals(LONGITUDE_VALUE, c.longitude(), DELTA);
+        assertEquals(LATITUDE_VALUE, c.latitude(), DELTA);
     }
 
     @Test public void handleCoordinatesWithMissingPoint() {
-        assertFalse(PointMapper.verifyPointAndProcessCoordinate(null, this::failTest));
+        assertNull(PointMapper.mapCoordinate(null));
     }
 
     @Test public void handleCoordinatesWithMissingLocation() {
         SimplePoint_VersionStructure p = new SimplePoint_VersionStructure();
-        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
+        assertNull(PointMapper.mapCoordinate(p));
     }
 
-    @Test public void handleCoordinatesWithMissingLatitude() {
+    @Test(expected = IllegalArgumentException.class)
+    public void handleCoordinatesWithMissingLatitude() {
         SimplePoint_VersionStructure p;
         p = new SimplePoint_VersionStructure().withLocation(
             new LocationStructure().withLongitude(LONGITUDE)
         );
-        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
+        PointMapper.mapCoordinate(p);
     }
 
-    @Test public void handleCoordinatesWithMissingLongitude() {
+    @Test(expected = IllegalArgumentException.class)
+    public void handleCoordinatesWithMissingLongitude() {
         SimplePoint_VersionStructure p;
         p = new SimplePoint_VersionStructure().withLocation(
                 new LocationStructure().withLatitude(LATITUDE)
         );
-        assertFalse(PointMapper.verifyPointAndProcessCoordinate(p, this::failTest));
+        PointMapper.mapCoordinate(p);
     }
-
-    private void failTest(LocationStructure loc) {
-        fail("Handler should not be called if an element is missing");
-    }
-
-    static class Coord { double lon, lat; }
 }

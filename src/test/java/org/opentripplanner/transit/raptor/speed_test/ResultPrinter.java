@@ -79,11 +79,16 @@ class ResultPrinter {
         );
     }
 
-    static void printProfileResults(String header, Map<SpeedTestProfile, List<Integer>> result) {
+    static void printProfileResults(String header, SpeedTestProfile[] profiles, Map<SpeedTestProfile, List<Integer>> result) {
         System.err.println();
         System.err.println(header);
         int labelMaxLen = result.keySet().stream().mapToInt(it -> it.name().length()).max().orElse(20);
-        result.forEach((k,v) -> printProfileResultLine(k.name(), v, labelMaxLen));
+        for (SpeedTestProfile p : profiles) {
+            List<Integer> v = result.get(p);
+            if(v != null) {
+                printProfileResultLine(p.name(), v, labelMaxLen);
+            }
+        }
     }
 
     private static void printProfileResultLine(String label, List<Integer> v, int labelMaxLen) {

@@ -3,11 +3,9 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TripPatternInfo;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
-
-import java.util.function.Function;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
@@ -48,7 +46,7 @@ public interface TransitCalculator {
     int duration(int timeA, int timeB);
 
     /**
-     * Calculate the earlies possible board time, adding board slack in the case
+     * Calculate the earliest possible board time, adding board slack in the case
      * of a forward search, adding nothing in the case of a reverse search.
      *
      * @param time - the arrival time (forward search) or board time (reverse search)
@@ -80,7 +78,7 @@ public interface TransitCalculator {
      * @param stopPositionInPattern the stop position/index
      * @param <T> The TripSchedule type defined by the user of the raptor API.
      */
-    <T extends RaptorTripSchedule> int latestArrivalTime(T onTrip, int stopPositionInPattern);
+    <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern);
 
 
     /**
@@ -164,17 +162,15 @@ public interface TransitCalculator {
      * @return The trip search strategy implementation.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
-            TripPatternInfo<T> pattern,
-            Function<T, Boolean> skipTripScheduleCallback
+            RaptorTripPattern<T> pattern
     );
 
     /**
-     * Same as {@link #createTripSearch(TripPatternInfo, Function)}, but create a
+     * Same as {@link #createTripSearch(RaptorTripPattern)}, but create a
      * trip search that only accept exact trip timeLimit matches.
      */
     <T extends RaptorTripSchedule> TripScheduleSearch<T> createExactTripSearch(
-            TripPatternInfo<T> pattern,
-            Function<T, Boolean> skipTripScheduleCallback
+            RaptorTripPattern<T> pattern
     );
 
     /**
