@@ -496,6 +496,16 @@
             <name>Onebusaway Releases Repo</name>
             <url>http://nexus.onebusaway.org/nexus/content/repositories/releases/</url>
         </repository>
+        <repository>
+            <id>osm4j</id>
+            <name>osm4j repo</name>
+            <url>http://mvn.topobyte.de</url>
+        </repository>
+        <repository>
+            <id>slimjars</id>
+            <name>slimjars repo</name>
+            <url>http://mvn.slimjars.com</url>
+        </repository>
     </repositories>
 
     <dependencies>
@@ -724,7 +734,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>2.6.1</version>
+            <version>3.11.3</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -748,11 +758,24 @@
             <version>0.8.1</version>
         </dependency>
         <!-- OpenStreetMap protobuf (PBF) definitions -->
+<!--        <dependency>-->
+<!--            <groupId>crosby.binary</groupId>-->
+<!--            <artifactId>osmpbf</artifactId>-->
+<!--            <version>1.3.4-SNAPSHOT</version>-->
+<!--        </dependency>-->
+
         <dependency>
-            <groupId>crosby.binary</groupId>
-            <artifactId>osmpbf</artifactId>
-            <version>1.3.4-SNAPSHOT</version>
+            <groupId>de.topobyte</groupId>
+            <artifactId>osm4j-pbf</artifactId>
+            <version>0.2.0</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>com.google.protobuf</groupId>
+                    <artifactId>protobuf-javalite</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
+
         <!-- Command line parameter parsing -->
         <dependency>
             <groupId>com.beust</groupId>
