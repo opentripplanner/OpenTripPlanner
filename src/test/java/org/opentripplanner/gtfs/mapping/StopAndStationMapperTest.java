@@ -26,8 +26,6 @@ public class StopAndStationMapperTest {
 
     private static final double LON = 45.0d;
 
-    private static final int LOCATION_TYPE = 1;
-
     private static final String NAME = "Name";
 
     private static final String PARENT = "Parent";
@@ -55,7 +53,6 @@ public class StopAndStationMapperTest {
         STOP.setDirection(DIRECTION);
         STOP.setLat(LAT);
         STOP.setLon(LON);
-        STOP.setLocationType(LOCATION_TYPE);
         STOP.setName(NAME);
         STOP.setParentStation(PARENT);
         STOP.setPlatformCode(PLATFORM_CODE);

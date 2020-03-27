@@ -41,7 +41,8 @@ public class PathwayMapperTest {
     private PathwayMapper subject = new PathwayMapper(
         new StopMapper(),
         new EntranceMapper(),
-        new PathwayNodeMapper()
+        new PathwayNodeMapper(),
+        new BoardingAreaMapper()
     );
 
     @Test

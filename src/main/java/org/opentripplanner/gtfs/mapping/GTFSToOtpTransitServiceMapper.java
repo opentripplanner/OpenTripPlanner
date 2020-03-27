@@ -36,7 +36,8 @@ public class GTFSToOtpTransitServiceMapper {
     private final PathwayMapper pathwayMapper = new PathwayMapper(
         stopMapper,
         entranceMapper,
-        pathwayNodeMapper
+        pathwayNodeMapper,
+        boardingAreaMapper
     );
 
     private final RouteMapper routeMapper = new RouteMapper(agencyMapper);

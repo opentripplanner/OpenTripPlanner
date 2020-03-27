@@ -24,6 +24,12 @@ class BoardingAreaMapper {
   }
 
   private BoardingArea doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+    if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
+      throw new IllegalArgumentException(
+          "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA
+              + ", but got " + gtfsStop.getLocationType());
+    }
+
     BoardingArea otpBoardingArea = new BoardingArea();
 
     otpBoardingArea.setId(mapAgencyAndId(gtfsStop.getId()));

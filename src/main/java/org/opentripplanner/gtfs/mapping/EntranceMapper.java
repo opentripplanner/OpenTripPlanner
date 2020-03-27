@@ -26,11 +26,19 @@ class EntranceMapper {
   }
 
   private Entrance doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+    if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
+      throw new IllegalArgumentException(
+          "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT
+              + ", but got " + gtfsStop.getLocationType());
+    }
+
     Entrance otpEntrance = new Entrance();
 
     otpEntrance.setId(mapAgencyAndId(gtfsStop.getId()));
     otpEntrance.setName(gtfsStop.getName());
-    otpEntrance.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+    if (gtfsStop.isLonSet() && gtfsStop.isLatSet()) {
+      otpEntrance.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+    }
     otpEntrance.setCode(gtfsStop.getCode());
     otpEntrance.setDescription(gtfsStop.getDesc());
     otpEntrance.setUrl(gtfsStop.getUrl());

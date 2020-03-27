@@ -25,6 +25,12 @@ class PathwayNodeMapper {
     }
 
     private PathwayNode doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+        if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
+            throw new IllegalArgumentException(
+                "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE + ", but got "
+                    + gtfsStop.getLocationType());
+        }
+
         PathwayNode otpPathwayNode = new PathwayNode();
 
         otpPathwayNode.setId(mapAgencyAndId(gtfsStop.getId()));

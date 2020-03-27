@@ -26,6 +26,12 @@ class StopMapper {
     }
 
     private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+        if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
+            throw new IllegalArgumentException(
+                "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP + ", but got "
+                    + gtfsStop.getLocationType());
+        }
+
         Stop otpStop = new Stop();
 
         otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
