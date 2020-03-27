@@ -1,0 +1,43 @@
+version: 2.1
+executors:
+  cci-toolbox-java11:
+    docker:
+      - image: eu.gcr.io/entur-system-1287/circleci-toolbox-image-java11
+        auth:
+          username: _json_key
+          password: $DOCKER_PASSWORD
+    environment:
+      DEBIAN_FRONTEND: "noninteractive"
+      MAVEN_OPTS: -Xmx6G
+    resource_class: large
+aliases:
+  - &post_build
+    name: Update deployment with OTP version
+    command: |
+      chmod u+x .circleci/update_deployment_config
+      .circleci/update_deployment_config
+jobs:
+  build:
+    executor: cci-toolbox-java11
+    steps:
+      - checkout
+      - restore_cache: # The cache key is static, change it if OTP is updated with new dependencies.
+          key: dep-cache-otp2
+      - run: mvn org.apache.maven.plugins:maven-dependency-plugin:3.1.0:go-offline -s /tools/m2/settings.xml
+      - save_cache:
+          paths:
+            - ~/.m2
+          key: dep-cache-otp2
+      - run: mvn install org.apache.maven.plugins:maven-deploy-plugin:2.8.2:deploy -s /tools/m2/settings.xml -DaltDeploymentRepository=snapshots::default::https://entur2.jfrog.io/entur2/libs-release-local
+      - run: *post_build
+workflows:
+  version: 2.1
+  release:
+    jobs:
+      - build:
+          name: build-release
+          context: dev
+          filters:
+            branches:
+              only:
+                - otp2_entur_develop

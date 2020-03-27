@@ -1,0 +1,46 @@
+#!/usr/bin/env bash
+
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ##
+## This script run AFTER OTP is build on the CI Server. It checkout the
+## deployment config and update the version number, commit and push. This
+## trigger the deployment config build witch create and deploy a new OTP2
+## docker image.
+##
+## Note! There is no need to run this script locally, unless you want to debug it.
+## - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - ##
+
+
+set -euo pipefail
+
+OTP_DEPLOYMENT_CONFIG=target/otp-deployment-config
+DOCKER_FILE=Dockerfile
+
+VERSION=$(xmllint --xpath "//*[local-name()='project']/*[local-name()='version']/text()" pom.xml)
+
+echo "Checkout otp-deplyment-config in ${OTP_DEPLOYMENT_CONFIG}"
+git clone -n https://github.com/entur/otp-deployment-config.git --depth 1 ${OTP_DEPLOYMENT_CONFIG}
+
+pushd ${OTP_DEPLOYMENT_CONFIG}
+
+echo "Checkout latest version of master Dockerfile"
+git checkout master ${DOCKER_FILE}
+
+echo "Update OTP version number in ${DOCKER_FILE}"
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  sed -E -i '' "s/OTP_VERSION=[\.0-9]+-entur-[0-9]+/OTP_VERSION=${VERSION}/" ${DOCKER_FILE}
+else
+  sed -E -i "s/OTP_VERSION=[\.0-9]+-entur-[0-9]+/OTP_VERSION=${VERSION}/" ${DOCKER_FILE}
+fi
+
+if [[ "$CIRCLE_USERNAME" != "" ]]; then
+  git config user.email "circleci@entur.no"
+  git config user.name "circleci ($CIRCLE_USERNAME)"
+fi
+
+echo "Add and commit Dockerfile"
+git commit -m "New OTP2 Version ${VERSION}" ${DOCKER_FILE}
+
+echo "Push otp-deployment-config to GitHub"
+git push
+
+popd
