@@ -82,6 +82,9 @@ public class ElevationModule implements GraphBuilderModule {
     /** keeps track of the total amount of elevation edges for logging purposes */
     private int totalElevationEdges = Integer.MAX_VALUE;
 
+    // the first coordinate in the first StreetWithElevationEdge which is used for initializing coverage instances
+    private Coordinate examplarCoordinate;
+
     /**
      * The distance between samples in meters. Defaults to 10m, the approximate resolution of 1/3
      * arc-second NED data.
@@ -179,6 +182,9 @@ public class ElevationModule implements GraphBuilderModule {
         // update this value to the now-known amount of edges that are StreetWithElevation edges
         totalElevationEdges = streetsWithElevationEdges.size();
 
+        // store the first coordinate of the first StreetEdge for later use ininitializing coverage instances
+        examplarCoordinate = streetsWithElevationEdges.get(0).getGeometry().getCoordinates()[0];
+
         // shutdown the forkJoinPool and wait until all tasks are finished. If this takes longer than 1 day, give up.
         forkJoinPool.shutdown();
         try {
@@ -260,29 +266,34 @@ public class ElevationModule implements GraphBuilderModule {
          * avoid other threads waiting for a lock to be released on the Coverage instance. This method will get/lazy-
          * create a thread-specific Coverage instance.
          *
-         * @param swee An exemplar StreetWithElevationEdge to use to initialize a few calculations in the newly created
-         *             coverage instance.
          * @return A thread-specific coverage instance that can be used without being locked from other threads.
          */
-        public Coverage getThreadSpecificCoverageInstance (StreetWithElevationEdge swee) {
+        public Coverage getThreadSpecificCoverageInstance () {
             if (threadSpecificCoverage == null) {
                 // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
                 // could arise from downstream classes that have synchronized methods.
-                synchronized (gridCoverageFactory) {
-                    // Get a new Coverage instance from the module's ElevationGridCoverageFactory.
-                    threadSpecificCoverage = gridCoverageFactory.getGridCoverage();
-                    // The Coverage instance relies on some synchronized static methods shared across all threads that
-                    // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
-                    // point on the edge to initialize these other items.
-                    Coordinate firstEdgeCoord =  swee.getGeometry().getCoordinates()[0];
-                    double[] dummy = new double[1];
-                    threadSpecificCoverage.evaluate(
-                        new DirectPosition2D(GeometryUtils.WGS84_XY, firstEdgeCoord.x, firstEdgeCoord.y),
-                        dummy
-                    );
-                }
+                threadSpecificCoverage = createThreadSpecificCoverage();
             }
             return threadSpecificCoverage;
+        }
+
+        /**
+         * Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that  could arise
+         * from downstream classes that have synchronized methods.
+         */
+        private Coverage createThreadSpecificCoverage() {
+            Coverage coverage;
+            synchronized (gridCoverageFactory) {
+                coverage = gridCoverageFactory.getGridCoverage();
+                // The Coverage instance relies on some synchronized static methods shared across all threads that
+                // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+                // point on the edge to initialize these other items.
+                double[] dummy = new double[1];
+                coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, examplarCoordinate.x, examplarCoordinate.y),
+                    dummy
+                );
+            }
+            return coverage;
         }
     }
 
@@ -532,7 +543,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
         // coverage instances in other threads.
-        Coverage coverage = ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance(ee);
+        Coverage coverage = ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance();
 
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
