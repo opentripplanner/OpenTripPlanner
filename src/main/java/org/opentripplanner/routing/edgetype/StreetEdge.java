@@ -8,6 +8,7 @@ import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.*;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BarrierVertex;
@@ -277,7 +278,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
 
         // Automobiles have variable speeds depending on the edge type
-        double speed = calculateSpeed(options, traverseMode, s0.getTimeInMillis());
+        double speed = calculateSpeed(options, traverseMode,s0.getCurrentVehicle(), s0.getTimeInMillis());
         
         double time = getDistanceInMeters() / speed;
         double weight;
@@ -379,7 +380,7 @@ public class StreetEdge extends Edge implements Cloneable {
             backPSE = (StreetEdge) backEdge;
             RoutingRequest backOptions = backWalkingBike ?
                     s0.getOptions().bikeWalkingOptions : s0.getOptions();
-            double backSpeed = backPSE.calculateSpeed(backOptions, backMode, s0.getTimeInMillis());
+            double backSpeed = backPSE.calculateSpeed(backOptions, backMode, s0.getCurrentVehicle(), s0.getTimeInMillis());
             final double realTurnCost;  // Units are seconds.
 
             // Apply turn restrictions
@@ -495,6 +496,7 @@ public class StreetEdge extends Edge implements Cloneable {
      * the RoutingRequest, and return it in meters per second.
      */
     private double calculateCarSpeed(RoutingRequest options) {
+
         return getCarSpeed();
     }
     
@@ -504,14 +506,24 @@ public class StreetEdge extends Edge implements Cloneable {
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
      */
-    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
-        if (traverseMode == null) {
-            return Double.NaN;
-        } else if (traverseMode.isDriving()) {
-            // NOTE: Automobiles have variable speeds depending on the edge type
-            return calculateCarSpeed(options);
+    public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, VehicleDescription currentVehicle, long timeMillis) {
+        double optionsMaxSpeed = options.getSpeed(traverseMode);
+        double maxVehicleSpeed = Double.POSITIVE_INFINITY;
+        if(currentVehicle != null){
+            maxVehicleSpeed = currentVehicle.getSpeedInMetersPerSecond();
         }
-        return options.getSpeed(traverseMode);
+        double streetMaxSpeed = calculateCarSpeed(options);
+
+
+        return Double.min(optionsMaxSpeed,Double.min(maxVehicleSpeed,streetMaxSpeed));
+
+//        if (traverseMode == null) {
+//            return Double.NaN;
+//        } else if (traverseMode.isDriving()) {
+//             NOTE: Automobiles have variable speeds depending on the edge type
+//            return calculateCarSpeed(options);
+//        }
+//        return options.getSpeed(traverseMode);
     }
 
     @Override
