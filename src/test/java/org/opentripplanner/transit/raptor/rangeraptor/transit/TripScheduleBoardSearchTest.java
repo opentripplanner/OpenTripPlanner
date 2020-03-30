@@ -1,15 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.TestRoute;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRoute;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUsingDepartureTimes;
 
 public class TripScheduleBoardSearchTest {
 
@@ -54,9 +52,18 @@ public class TripScheduleBoardSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = createTripScheduleUsingDepartureTimes(TIME_A1, TIME_A2);
-    private TestRaptorTripSchedule tripB = createTripScheduleUsingDepartureTimes(TIME_B1, TIME_B2);
-    private TestRaptorTripSchedule tripC = createTripScheduleUsingDepartureTimes(TIME_C1, TIME_C2);
+    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
+            .create("T-A")
+            .withDepartureTimes(TIME_A1, TIME_A2)
+            .build();
+    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
+            .create("T-B")
+            .withDepartureTimes(TIME_B1, TIME_B2)
+            .build();
+    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
+            .create("T-C")
+            .withDepartureTimes(TIME_C1, TIME_C2)
+            .build();
 
     // Trip pattern with trip A, B, C.
     private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
@@ -152,7 +159,10 @@ public class TripScheduleBoardSearchTest {
         int latestDepartureTime = -1;
 
         for (int i = 0; i < N; ++i, departureTime += dT) {
-            tripSchedules.add(createTripScheduleUsingDepartureTimes(departureTime));
+            tripSchedules.add(TestRaptorTripSchedule
+                    .create("T-N")
+                    .withDepartureTimes(departureTime)
+                    .build());
             latestDepartureTime = departureTime;
         }
         useTripPattern(new TestRoute(tripSchedules));

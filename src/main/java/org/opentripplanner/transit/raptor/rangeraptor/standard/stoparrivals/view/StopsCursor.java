@@ -1,11 +1,14 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.Stops;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
+
+import java.util.function.ToIntFunction;
 
 
 /**
@@ -23,10 +26,12 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 public class StopsCursor<T extends RaptorTripSchedule> {
     private Stops<T> stops;
     private final TransitCalculator transitCalculator;
+    private final ToIntFunction<RaptorTripPattern> boardSlackProvider;
 
-    public StopsCursor(Stops<T> stops, TransitCalculator transitCalculator) {
+    public StopsCursor(Stops<T> stops, TransitCalculator transitCalculator, ToIntFunction<RaptorTripPattern> boardSlackProvider) {
         this.stops = stops;
         this.transitCalculator = transitCalculator;
+        this.boardSlackProvider = boardSlackProvider;
     }
 
     public boolean exist(int round, int stop) {
@@ -55,10 +60,13 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     /**
      * A access stop arrival, time-shifted according to the first transit boarding/departure time
      */
-    ArrivalView<T> access(int stop, int transitDepartureTime) {
-        return newAccessView(stop, transitDepartureTime);
+    ArrivalView<T> access(int stop, StopArrivalViewAdapter.Transit<T> transitLeg) {
+        return newAccessView(
+                stop,
+                transitLeg.departureTime(),
+                boardSlackProvider.applyAsInt(transitLeg.trip().pattern())
+        );
     }
-
 
     /**
      * Set cursor to the transit state at round and stop. Throws
@@ -87,11 +95,11 @@ public class StopsCursor<T extends RaptorTripSchedule> {
     }
 
     /**
-     * A access stop arrival, time-shifted according to the first transit boarding/departure time
+     * A access stop arrival, time-shifted according to the first transit boarding/departure time.
      */
-    private ArrivalView<T> newAccessView(int stop, int transitDepartureTime) {
+    private ArrivalView<T> newAccessView(int stop, int transitDepartureTime, int boardSlack) {
         StopArrivalState<T> state = stops.get(0, stop);
-        int departureTime = transitCalculator.originDepartureTime(transitDepartureTime, state.accessDuration());
+        int departureTime = transitCalculator.minusDuration(transitDepartureTime, state.accessDuration() + boardSlack);
         int arrivalTime = transitCalculator.plusDuration(departureTime, state.accessDuration());
         return new StopArrivalViewAdapter.Access<>(stop, departureTime, arrivalTime);
     }

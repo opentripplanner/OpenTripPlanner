@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api;
+package org.opentripplanner.transit.raptor._shared;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
@@ -9,8 +9,7 @@ import java.util.Collection;
 
 public class TestRoute
         implements RaptorRoute<TestRaptorTripSchedule>,
-        RaptorTimeTable<TestRaptorTripSchedule>,
-        RaptorTripPattern
+        RaptorTimeTable<TestRaptorTripSchedule>
 {
 
     private final TestRaptorTripSchedule[] schedules;
@@ -21,16 +20,6 @@ public class TestRoute
 
     public TestRoute(Collection<TestRaptorTripSchedule> schedules) {
         this.schedules = schedules.toArray(new TestRaptorTripSchedule[0]);
-    }
-
-    @Override
-    public int stopIndex(int stopPositionInPattern) {
-        return stopPositionInPattern + 1;
-    }
-
-    @Override
-    public int numberOfStopsInPattern() {
-        return schedules[0].size();
     }
 
     @Override
@@ -50,6 +39,6 @@ public class TestRoute
 
     @Override
     public RaptorTripPattern pattern() {
-        return this;
+        return schedules[0].pattern();
     }
 }

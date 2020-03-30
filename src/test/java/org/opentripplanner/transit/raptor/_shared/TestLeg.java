@@ -1,4 +1,4 @@
-package org.opentripplanner.transit.raptor.api;
+package org.opentripplanner.transit.raptor._shared;
 
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;

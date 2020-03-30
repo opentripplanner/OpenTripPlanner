@@ -7,14 +7,13 @@ package org.opentripplanner.transit.raptor.api.transit;
 public interface RaptorSlackProvider {
 
     /**
-     * Return a default implementation witch can be used in unit tests. The
-     * transfer-slack is 60 seconds, while the alight-slack and board-slack is 0 seconds.
+     * Return a default implementation witch can be used in unit-tests.
      */
-    static RaptorSlackProvider defaults() {
+    static RaptorSlackProvider defaults(int transferSlack, int boardSlack, int alightSlack) {
         return new RaptorSlackProvider() {
-            @Override public int transferSlack() { return 60; }
-            @Override public int boardSlack(RaptorTripPattern pattern) { return 0; }
-            @Override public int alightSlack(RaptorTripPattern pattern) { return 0; }
+            @Override public int transferSlack() { return transferSlack; }
+            @Override public int boardSlack(RaptorTripPattern pattern) { return boardSlack; }
+            @Override public int alightSlack(RaptorTripPattern pattern) { return alightSlack; }
         };
     }
 

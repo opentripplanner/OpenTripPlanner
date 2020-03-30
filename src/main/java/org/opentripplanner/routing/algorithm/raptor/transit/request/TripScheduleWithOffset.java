@@ -34,7 +34,8 @@ public class TripScheduleWithOffset implements TripSchedule {
 
     @Override
     public String debugInfo() {
-        return null;
+        TripPattern pattern = this.pattern.getTripPattern().getPattern();
+        return pattern.mode.name() + " " + pattern.route.getShortName();
     }
 
     @Override

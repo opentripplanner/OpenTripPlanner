@@ -169,7 +169,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private StopsCursor<T> stopsCursor() {
         // Always create new cursors
-        return new StopsCursor<>(stops(), ctx.calculator());
+        return new StopsCursor<>(stops(), ctx.calculator(), ctx.boardSlackProvider());
     }
 
     private DestinationArrivalPaths<T> destinationArrivalPaths() {

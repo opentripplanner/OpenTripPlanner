@@ -1,15 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRoute;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRoute;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes;
 
 
 public class TripScheduleAlightSearchTest {
@@ -54,9 +52,18 @@ public class TripScheduleAlightSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = createTripScheduleUsingArrivalTimes(TIME_A1, TIME_A2);
-    private TestRaptorTripSchedule tripB = createTripScheduleUsingArrivalTimes(TIME_B1, TIME_B2);
-    private TestRaptorTripSchedule tripC = createTripScheduleUsingArrivalTimes(TIME_C1, TIME_C2);
+    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
+            .create("T-A")
+            .withArrivalTimes(TIME_A1, TIME_A2)
+            .build();
+    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
+            .create("T-B")
+            .withArrivalTimes(TIME_B1, TIME_B2)
+            .build();
+    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
+            .create("T-C")
+            .withArrivalTimes(TIME_C1, TIME_C2)
+            .build();
 
     // Trip pattern with trip A and B.
     private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
@@ -146,7 +153,9 @@ public class TripScheduleAlightSearchTest {
         int arrivalTime = firstArrivalTime;
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
-            tripSchedules.add(createTripScheduleUsingArrivalTimes(arrivalTime));
+            tripSchedules.add(
+                    TestRaptorTripSchedule.create("T-" + i+1).withArrivalTimes(arrivalTime).build()
+            );
         }
         useTripPattern(new TestRoute(tripSchedules));
 

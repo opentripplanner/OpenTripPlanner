@@ -37,18 +37,21 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator calculator,
+            PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle
     ) {
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
         this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.calculator = calculator;
-        this.pathMapper = calculator.createPathMapper();
+        this.pathMapper = pathMapper;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
     public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
+
         int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
+
         DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
 
         if (calculator.exceedsTimeLimit(arrivalTime)) {

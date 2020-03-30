@@ -5,7 +5,6 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
@@ -46,14 +45,6 @@ public interface TransitCalculator {
     int duration(int timeA, int timeB);
 
     /**
-     * Remove boardSlack from time.
-     *
-     * @param time - any time
-     * @return the time minus boardSlack
-     */
-    int removeBoardSlack(int time);
-
-    /**
      * For a normal search return the trip arrival time at stop position.
      * For a reverse search return the next trips departure time at stop position with the boardSlack added.
      *
@@ -87,12 +78,6 @@ public interface TransitCalculator {
      * @return true is subject is better then the candidate; if not false.
      */
     boolean isBest(int subject, int candidate);
-
-
-    /**
-     * Calculate the origin departure time using the given transitBoardingTime and access leg duration.
-     */
-    int originDepartureTime(final int firstTransitBoardTime, final int accessLegDuration);
 
     /**
      * Uninitialized time values is set to this value to mark them as not set, and to mark the
@@ -157,13 +142,6 @@ public interface TransitCalculator {
     );
 
     /**
-     * Create a new path mapper depending on the search direction.
-     *
-     * @param <T> The TripSchedule type defined by the user of the raptor API.
-     */
-    <T extends RaptorTripSchedule> PathMapper<T> createPathMapper();
-
-    /**
      * Return a calculator for test purpose. The following parameters are fixed:
      * <ul>
      *     <li>'binaryTripSearchThreshold' = 10
@@ -173,19 +151,17 @@ public interface TransitCalculator {
      * </ul>
      * @param forward if true create a calculator for forward search, if false search
      */
-    static TransitCalculator testDummyCalculator(int boardSlackInSeconds, boolean forward) {
+    static TransitCalculator testDummyCalculator(boolean forward) {
         return forward
-                ? new ForwardSearchTransitCalculator(
+                ? new ForwardTransitCalculator(
                         10,
-                        boardSlackInSeconds,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours
                         TIME_NOT_SET,
                         60
                 )
-                : new ReverseSearchTransitCalculator(
+                : new ReverseTransitCalculator(
                         10,
-                        boardSlackInSeconds,
                         hm2time(8,0),
                         2 * 60 * 60, // 2 hours
                         TIME_NOT_SET,

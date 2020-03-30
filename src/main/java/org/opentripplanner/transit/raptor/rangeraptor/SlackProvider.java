@@ -32,7 +32,7 @@ public interface SlackProvider {
      * <p>
      * Implementation notes: In a forward-search the pattern is known, but not the trip.
      * <p>
-     * Unit: seconds, default value is 0.
+     * Unit: seconds.
      */
     int boardSlack();
 
@@ -42,7 +42,7 @@ public interface SlackProvider {
      * <p>
      * Implementation notes: In a reverse-search the pattern is known, but not the trip.
      * <p>
-     * Unit: seconds, default value is 0.
+     * Unit: seconds.
      */
     int alightSlack();
 }

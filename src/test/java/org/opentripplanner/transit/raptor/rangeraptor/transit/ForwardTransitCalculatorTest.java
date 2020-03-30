@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 
 import static org.junit.Assert.assertEquals;
@@ -9,7 +9,7 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 
-public class ForwardSearchTransitCalculatorTest {
+public class ForwardTransitCalculatorTest {
     private static final int TRIP_SEARCH_BINARY_SEARCH_THRESHOLD = 7;
 
     private int boardSlackInSeconds = 30;
@@ -20,9 +20,8 @@ public class ForwardSearchTransitCalculatorTest {
 
 
     private TransitCalculator create() {
-        return new ForwardSearchTransitCalculator(
+        return new ForwardTransitCalculator(
                 TRIP_SEARCH_BINARY_SEARCH_THRESHOLD,
-                boardSlackInSeconds,
                 earliestDepartureTime,
                 searchWindowSizeInSeconds,
                 latestAcceptableArrivalTime,
@@ -85,15 +84,10 @@ public class ForwardSearchTransitCalculatorTest {
         assertEquals(Integer.MAX_VALUE, create().unreachedTime());
     }
 
-    @Test
-    public void originDepartureTime() {
-        boardSlackInSeconds = 50;
-        assertEquals(650, create().originDepartureTime(1200, 500));
-    }
 
     @Test
     public void latestArrivalTime() {
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.createTripScheduleUsingArrivalTimes(500);
+        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T").withArrivalTimes(500).build();
         assertEquals(500, create().stopArrivalTime(s, 0, 0));
     }
 

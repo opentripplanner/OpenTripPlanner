@@ -17,7 +17,7 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     private final TransitPathLeg<T> next;
 
 
-    public AccessPathLeg(int fromTime, int toStop, int toTime, TransitPathLeg<T> next) {
+    public AccessPathLeg(int toStop, int fromTime, int toTime, TransitPathLeg<T> next) {
         this.fromTime = fromTime;
         this.toStop = toStop;
         this.toTime = toTime;
@@ -44,6 +44,11 @@ public final class AccessPathLeg<T extends RaptorTripSchedule> implements PathLe
     @Override
     public TransitPathLeg<T> nextLeg() {
         return next;
+    }
+
+    @Override
+    public String toString() {
+        return "Access " + asString(toStop);
     }
 
     @Override

@@ -99,7 +99,7 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
         @Override
         public ArrivalView<T> previous() {
             return round() == 1
-                    ? cursor.access(boardStop(), departureTime())
+                    ? cursor.access(boardStop(), this)
                     : cursor.stop(round()-1, boardStop());
         }
     }

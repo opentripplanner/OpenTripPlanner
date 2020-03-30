@@ -30,7 +30,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds();
+                l.travelDurationInSeconds() < r.travelDurationInSeconds();
     }
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetable() {
@@ -38,7 +38,7 @@ public class PathParetoSetComparators {
                 l.startTime() > r.startTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds();
+                l.travelDurationInSeconds() < r.travelDurationInSeconds();
     }
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetableAndCost() {
@@ -46,7 +46,7 @@ public class PathParetoSetComparators {
                 l.startTime() > r.startTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds() ||
+                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
                 l.cost() < r.cost();
     }
 
@@ -57,7 +57,7 @@ public class PathParetoSetComparators {
                 l.startTime() > r.startTime() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds() ||
+                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
                 l.cost() < Math.round(r.cost() * relaxCostAtDestinationArrival);
     }
 
@@ -65,7 +65,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds() ||
+                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
                 l.cost() < r.cost();
     }
 
@@ -75,7 +75,7 @@ public class PathParetoSetComparators {
         return (l, r) ->
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
-                l.totalTravelDurationInSeconds() < r.totalTravelDurationInSeconds() ||
+                l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
                 l.cost() < Math.round(r.cost() * relaxCostAtDestinationArrival);
     }
 }

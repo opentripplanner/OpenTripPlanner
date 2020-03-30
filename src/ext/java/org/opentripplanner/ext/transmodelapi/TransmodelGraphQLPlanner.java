@@ -9,6 +9,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
@@ -277,8 +278,11 @@ public class TransmodelGraphQLPlanner {
         }
 
         callWith.argument("minimumTransferTime", (Integer v) -> request.transferSlack = v);
-        assertSlack(request);
-
+        callWith.argument("transferSlack", (Integer v) -> request.transferSlack = v);
+        callWith.argument("boardSlackDefault", (Integer v) -> request.boardSlack = v);
+        callWith.argument("boardSlackList", (Object v) -> request.boardSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
+        callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
+        callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
@@ -307,15 +311,6 @@ public class TransmodelGraphQLPlanner {
          */
 
         return request;
-    }
-
-    public void assertSlack(RoutingRequest r) {
-        if (r.boardSlack != 0 || r.alightSlack != 0) {
-            throw new IllegalStateException(
-                    "boardSlack and alightSlack should be zero(0), 'transferSlack' is the only "
-                            + "parameter we support int the GraphQL API."
-            );
-        }
     }
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {

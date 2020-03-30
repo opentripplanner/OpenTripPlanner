@@ -5,23 +5,23 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.path.ForwardPathMapper;
-import org.opentripplanner.transit.raptor.rangeraptor.path.PathMapper;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
-final class ForwardSearchTransitCalculator implements TransitCalculator {
+
+/**
+ * Used to calculate times in a forward trip search.
+ */
+final class ForwardTransitCalculator implements TransitCalculator {
     private final int tripSearchBinarySearchThreshold;
-    private final int boardSlackInSeconds;
     private final int earliestDepartureTime;
     private final int searchWindowInSeconds;
     private final int latestAcceptableArrivalTime;
     private final int iterationStep;
 
-    ForwardSearchTransitCalculator(SearchParams s, RaptorTuningParameters t) {
+    ForwardTransitCalculator(SearchParams s, RaptorTuningParameters t) {
         this(
                 t.scheduledTripBinarySearchThreshold(),
-                s.boardSlackInSeconds(),
                 s.earliestDepartureTime(),
                 s.searchWindowInSeconds(),
                 s.latestArrivalTime(),
@@ -29,16 +29,14 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
         );
     }
 
-    ForwardSearchTransitCalculator(
+    ForwardTransitCalculator(
             int tripSearchBinarySearchThreshold,
-            int boardSlackInSeconds,
             int earliestDepartureTime,
             int searchWindowInSeconds,
             int latestAcceptableArrivalTime,
             int iterationStep
     ) {
         this.tripSearchBinarySearchThreshold = tripSearchBinarySearchThreshold;
-        this.boardSlackInSeconds = boardSlackInSeconds;
         this.earliestDepartureTime = earliestDepartureTime;
         this.searchWindowInSeconds = searchWindowInSeconds;
         this.latestAcceptableArrivalTime = latestAcceptableArrivalTime == TIME_NOT_SET
@@ -63,11 +61,6 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final int removeBoardSlack(int time) {
-        return time - boardSlackInSeconds;
-    }
-
-    @Override
     public <T extends RaptorTripSchedule> int stopArrivalTime(T onTrip, int stopPositionInPattern, int alightSlack) {
         return onTrip.arrival(stopPositionInPattern) + alightSlack;
     }
@@ -86,11 +79,6 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
     @Override
     public final boolean isBest(final int subject, final int candidate) {
         return subject < candidate;
-    }
-
-    @Override
-    public final int originDepartureTime(int firstTransitBoardTime, int accessLegDuration) {
-        return firstTransitBoardTime - (boardSlackInSeconds + accessLegDuration);
     }
 
     @Override
@@ -141,10 +129,5 @@ final class ForwardSearchTransitCalculator implements TransitCalculator {
                 this,
                 iterationStep
         );
-    }
-
-    @Override
-    public final <T extends RaptorTripSchedule> PathMapper<T> createPathMapper() {
-        return new ForwardPathMapper<>(this);
     }
 }
