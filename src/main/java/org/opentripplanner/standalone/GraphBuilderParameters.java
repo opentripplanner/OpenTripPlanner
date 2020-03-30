@@ -210,6 +210,13 @@ public class GraphBuilderParameters {
     public boolean includeEllipsoidToGeoidDifference;
 
     /**
+     * A customizable level of parallelism with which to process elevation data for street edges. The default is set to
+     * the maximum available processors. For unknown reasons that seem to depend on data and machine settings, it might
+     * be faster to not use all processors available.
+     */
+    public int elevationModuleParallelism;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -249,6 +256,8 @@ public class GraphBuilderParameters {
         readCachedElevations = config.path("readCachedElevations").asBoolean(true);
         writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
         includeEllipsoidToGeoidDifference = config.path("includeEllipsoidToGeoidDifference").asBoolean(false);
+        int maxProcessors = Runtime.getRuntime().availableProcessors();
+        elevationModuleParallelism = Math.min(config.path("elevationModuleParallelism").asInt(maxProcessors), maxProcessors);
     }
 
 
