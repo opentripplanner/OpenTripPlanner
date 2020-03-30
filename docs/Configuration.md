@@ -105,6 +105,7 @@ config key | description | value type | value default | notes
 `elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`elevationModuleParallelism` | Set the number of processors to use during elevation calculations. | int | Current machine's number of processors. | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
@@ -291,6 +292,8 @@ If you are using cloud computing for your OTP instances, it is recommended to cr
 
 However, the bulk of the time will still be spent calculating elevations for all of the street edges. Therefore, a further optimization can be done to calculate and save the elevation data during a graph build and then save it for future use.
 
+#### Reusing elevation data from previous builds
+
 In order to write out the precalculated elevation data, add this to your `build-config.json` file:
 
 ```JSON
@@ -305,6 +308,19 @@ After building the graph, a file called `cached_elevations.obj` will be written 
 In graph builds, the elevation module will attempt to read the `cached_elevations.obj` file from the cache directory. The cache directory defaults to `/var/otp/cache`, but this can be overriden via the CLI argument `--cache <directory>`. For the same graph build for multiple Northeast US states, the time it took with using this predownloaded and precalculated data became 543.7 seconds (roughly 9 minutes).
 
 The cached data is a lookup table where the coordinate sequences of respective street edges are used as keys for calculated data. Therefore, it is expected that over time various edits to OpenStreetMap will cause this cached data to become stale and not include new OSM ways. Therefore, periodic update of this cached data is recommended.
+
+#### Configuring the number of processors during elevation calculations
+
+For unknown reasons that seem to depend on data and machine settings, it might be faster to not use all processors available. For this reason, it is possible to define the parallelism or number of processors used during elevation calculations. It may be helpful to run experiments with different values to determine the optimal amount given the elevation data being used.
+
+By default, the maximum amount of available processors will be used. To set a custom amount of processors, add the following to the `build-config.json` file:
+                                                               
+```JSON
+// build-config.json
+{  
+  "elevationModuleParallelism": 2
+}
+```
 
 ## Fares configuration
 

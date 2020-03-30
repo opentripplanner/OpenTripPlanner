@@ -72,6 +72,11 @@ public class ElevationModule implements GraphBuilderModule {
     private final File cachedElevationsFile;
     /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
+    /*
+     * The parallelism to use when processing edges. For unknown reasons that seem to depend on data and machine
+     * settings, it might be faster to not use all processors available.
+     */
+    private final int parallelism;
 
     private DataImportIssueStore issueStore;
 
@@ -112,7 +117,8 @@ public class ElevationModule implements GraphBuilderModule {
             false,
             1,
             10,
-            true
+            true,
+            1
         );
     }
 
@@ -123,7 +129,8 @@ public class ElevationModule implements GraphBuilderModule {
         boolean writeCachedElevations,
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM,
-        boolean includeEllipsoidToGeoidDifference
+        boolean includeEllipsoidToGeoidDifference,
+        int parallelism
     ) {
         gridCoverageFactory = factory;
         cachedElevationsFile = cacheDirectory != null ? new File(cacheDirectory, "cached_elevations.obj") : null;
@@ -132,6 +139,7 @@ public class ElevationModule implements GraphBuilderModule {
         this.elevationUnitMultiplier = elevationUnitMultiplier;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
+        this.parallelism = parallelism;
     }
 
     public List<String> provides() {
@@ -171,7 +179,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Multithread elevation calculations
         ForkJoinPool forkJoinPool = new ForkJoinPool(
-            Runtime.getRuntime().availableProcessors(),
+            parallelism,
             forkJoinWorkerThreadFactory,
             null,
             false
