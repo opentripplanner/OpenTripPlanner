@@ -91,7 +91,19 @@ public class NearbyStopFinder {
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
             for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
-                closestStopForPattern.putMin(pattern, stopAtDistance);
+                // In certain GTFS feeds, there can be stops where all stop times do not allow boardings and therefore
+                // should not be considered as candidates for creating transfer edges. Therefore, only add a stop for a
+                // pattern if at least one of the stop times associated with the pattern allows boarding at this stop.
+                // Otherwise, there will be issues with certain GTFS feeds where some trips end at an alight-only stop
+                // and then other trips begin at the alight-only stop, but do not allow boarding there.
+                // See this issue for further info: https://github.com/opentripplanner/OpenTripPlanner/issues/3026
+                //
+                // FIXME: this below check will only work for feeds that where all trips associated with a certain
+                //  pattern don't allow pickups. If some trips do allow pickups while others don't, this might not
+                //  create a proper transfer for the trips that do not allow pickups at certain stops.
+                if (pattern.canBoard(pattern.getStops().indexOf(ts1.getStop()))) {
+                    closestStopForPattern.putMin(pattern, stopAtDistance);
+                }
             }
         }
 
