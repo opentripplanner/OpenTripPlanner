@@ -15,6 +15,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 
 import java.util.Calendar;
@@ -48,7 +49,7 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index();
-            Router router = new Router(graph);
+            Router router = new Router(graph, RouterConfig.DEFAULT);
             router.startup();
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();

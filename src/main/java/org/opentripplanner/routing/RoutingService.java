@@ -15,7 +15,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.Router;
-import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 
 import java.util.Calendar;
 import java.util.Collection;
@@ -58,7 +57,7 @@ public class RoutingService {
   // TODO We should probably not have the Router as a parameter here
   public RoutingResponse route(RoutingRequest request, Router router) {
     RoutingWorker worker = new RoutingWorker(
-            new RaptorConfig<>(graph.routerConfig.raptorTuningParameters),
+            router.raptorConfig,
             request
     );
     return worker.route(router);

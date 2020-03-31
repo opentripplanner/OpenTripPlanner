@@ -104,7 +104,7 @@ public class GraphBuilderDataSources {
         return cacheDirectory;
     }
 
-    DataSource getOutputGraph() {
+    public DataSource getOutputGraph() {
         return outputGraph;
     }
 

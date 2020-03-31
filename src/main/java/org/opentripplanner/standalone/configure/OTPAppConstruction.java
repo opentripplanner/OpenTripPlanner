@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.configure;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.graph_builder.GraphBuilder;
@@ -40,6 +42,7 @@ public class OTPAppConstruction {
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
 
+
     /**
      * Create a new OTP configuration instance for a given directory.
      */
@@ -66,7 +69,7 @@ public class OTPAppConstruction {
         return new GrizzlyServer(config.getCli(), createApplication(router));
     }
 
-    public void validateConfigAndDatasources() {
+    public void validateConfigAndDataSources() {
         // Load Graph Builder Data Sources to validate it.
         graphBuilderDataSources();
     }
@@ -80,9 +83,19 @@ public class OTPAppConstruction {
         return GraphBuilder.create(
                 config.buildConfig(),
                 graphBuilderDataSources(),
-                config.createEmbedConfig(),
                 baseGraph
         );
+    }
+
+    /**
+     * The output data source to use for saving the serialized graph.
+     * <p>
+     * This method will return {@code null} if the graph should NOT be saved. The
+     * business logic to make that decision is in the {@link GraphBuilderDataSources}.
+     */
+    @Nullable
+    public DataSource graphOutputDataSource() {
+        return graphBuilderDataSources().getOutputGraph();
     }
 
     /**
