@@ -120,7 +120,7 @@ than McRR with 4 criteria.
 
 ## Understanding the search (range-raptor algorithm implementation)
 The `RangeRaptorWorker` and the `TransitRoutingStrategy` together implement the _range-raptor_ 
-algorithm. There is 3 `TransitRoutingStrategy`:   
+algorithm. There is 3 ot the `TransitRoutingStrategy`:   
 1. The `StdTransitWorker` is the standard Range Raptor implementation. Support both _forward_ and 
 _reverse_ search.
 1. The `NoWaitTransitWorker` is the same as the standard, but it eliminate _wait-time_. It support 
@@ -130,10 +130,10 @@ _earliest-possible-arrival-time_.
 1. The `McTransitWorker` is the _Multi-Criteria Range Raptor_ implementation. It does **not** 
 support _reverse_ search - so fare there has not been a need for it.
  
-The Range Raptor Search support both _Forward_ and _Reverse_ search. In the diagram below the same 
-2 results are shown using the _forward_ and _reverse_ search. The to trips have the exact same 
+The Range Raptor Search support both _Forward_ and _Reverse_ search. In the diagram below, the same 
+journey is shown using the _forward_ and _reverse_ search. The to trips have the exact same 
 legs, but some of the calculated times are slightly different. Note! If you remove or time-shift 
-the _Wait_ parts you will get the same result.  
+the _Wait_ parts you will get the exact same result.  
 
 ![Raptor Time Line](RaptorTimeLine.svg)
 
@@ -143,17 +143,22 @@ Some important notes to the diagram above:
 were a path is ACCEPTED, REJECTED or DROPPED, based on the existing _Stop Arrival State_. The `1` 
 and `1'` represent the same _stop arrival_ at **stop 1** for the same path, but at times are 
 different. 
+- The _Transfer_ is optional and only added to the path, if you need to walk from one stop to 
+another. If the transfer is removed from the diagram, _Stop Arrival 2_ and _Stop Arrival 3'_ then 
+represent the same stop arrival at the same stop. 
 - There is no important timing point between the _transfer-slack_ and the _board-slack_, so the 
 order do not matter. In the algorithm the _transfer-slack_ is eliminated and it is left to the 
-internal Raptor `SlackProvider` to include the _transfer-slack_.
+internal Raptor `SlackProvider` to include the _transfer-slack_ in the _bord-slack_(forward search)
+or in the _alight_slack_(reverse-search).
 - It might look odd that the _board-slack_ comes before the _wait_ part, but this is just a small 
 trick to be able to calculate the _earliest-board-time_. Remember that the parts between 2 
-_stop-arrivals_ can technically be swapped around without any effect on the algorithm. 
-- The itinerary mapping process should swap the parts between to _stop-arrivals_ into the most 
-intuitive order and possible do some time-shifting.
+_stop-arrivals_ can technically be swapped around without any effect on the algorithm. Of cause 
+the result paths need to be adjusted to reflect this. 
+- The path(itinerary) mapping process should swap the parts between to _stop-arrivals_ into an  
+intuitive order seen from a user perspective, this may include time-shifting access or egress.
 - The _wait_ after the access and before the egress leg should be removed by the itinerary mapper.
 - In a _reverse-search_ the `Worker` code is the same - the exact same algorithm implementation is 
-used. To be able to do this, a special `TransitCalculator`, `SlackProvider` and 
+used. To be able to do this, a special _reverse_ `TransitCalculator`, `SlackProvider` and 
 `TripScheduleSearch` is injected into the `RaptorWorker`. The terminology in the diagram above is 
 the terminology used in the algorithm (`worker`). For example the _board-time_ and _alight-time_ 
 is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.  
@@ -163,12 +168,15 @@ is swapped, compared with the `RaptorTripSchedule` in the _transit-layer_.
 
 ### The transfer-slack is added to the board-slack, why?
 The _transfer-slack_ is incorporated into the _board-slack_, instead of being applied to the 
-transfer for 2 reasons: 
-- It is valid to do so. The Raptor algorithm only compare stop-arrivals; This is where the path 
-branching happens. Therefor it is important that the comparison is fare. You can arrive by 
-transfer and transit. So, if the _transfer-slack_ is constant we can safely ignore it from the 
-comparison and add it to the _board-slack_ instead. This have the advantaged that we can use the 
-stop-arrival(transit only) to continue onto the _egress-leg_ - without any _transfer-slack_ 
-added. 
+transfer for the following reasons: 
+- It is valid to do so. The Raptor algorithm branching happens at _stop-arrivals_ where the arrivals
+  are compared. Therefor it is important that the comparison is fare. You can arrive at a stop by 
+  access/transfer or transit. So, because the _transfer-slack_ is constant we can safely remove it 
+  from transfer-arrivals at a particular stop and add it to all transit-legs leaving from the same 
+  stop. 
+  - This is useful, because we do not have zero distance transfer-stop-arrivals in the state. 
+    (The transit-arrival is used in the next round).  
+  - This also allow using the stop-arrival(transit only) to continue onto the _egress-leg_ - 
+    without any _transfer-slack_ added. 
 - It does not have any effect on the performance. Adding a constant to the dynamically calculated 
-_board-slack_ do not have any significant influence on the performance.  
+  _board-slack_ do not have any significant influence on the performance.  
