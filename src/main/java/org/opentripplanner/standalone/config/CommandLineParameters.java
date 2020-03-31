@@ -122,7 +122,7 @@ public class CommandLineParameters implements Cloneable {
 
     /* The remaining single parameter after the switches is the directory with graph files. */
 
-    @Parameter(validateWith = ReadWriteDirectory.class, description = "/graph/or/inputs/directory")
+    @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
     public List<File> baseDirectory;
 
     /**
@@ -208,6 +208,7 @@ public class CommandLineParameters implements Cloneable {
             }
         }
     }
+
     public static class PositiveInteger implements IParameterValidator {
 
         @Override
