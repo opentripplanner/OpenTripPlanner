@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
@@ -217,6 +218,12 @@ public class SerializedGraphObject implements Serializable {
         catch (IOException e) {
             LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
             return null;
+        }
+        catch (KryoException ke) {
+            LOG.warn("Exception while loading graph: {}\n{}", sourceDescription, ke.getLocalizedMessage());
+            throw new OtpAppException("Unable to load graph. The deserialization failed. Is the "
+                    + "loaded graph build with the same OTP version as you are using to load it? "
+                    + "Graph: " + sourceDescription);
         }
     }
 
