@@ -91,7 +91,7 @@ public class OTPMain {
 
         // Validate data sources, command line arguments and config before loading and
         // processing input data to fail early
-        app.validateConfigAndDatasources();
+        app.validateConfigAndDataSources();
 
         /* Load graph from disk if one is not present from build. */
         if (params.doLoadGraph() || params.doLoadStreetGraph()) {
@@ -106,7 +106,9 @@ public class OTPMain {
         /* Start graph builder if requested. */
         if (params.doBuildStreet() || params.doBuildTransit()) {
             // Abort building a graph if the file can not be saved
-            app.graphRepository().verifyTheOutputGraphIsWritableIfDataSourceExist();
+            SerializedGraphObject.verifyTheOutputGraphIsWritableIfDataSourceExist(
+                    app.graphOutputDataSource()
+            );
 
             GraphBuilder graphBuilder = app.createGraphBuilder(graph);
             if (graphBuilder != null) {
@@ -118,7 +120,8 @@ public class OTPMain {
             }
             // Store graph and config used to build it, also store router-config for easy deployment
             // with using the embedded router config.
-            app.graphRepository().save(graph, app.config().buildConfig(), app.config().routerConfig());
+            new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
+                    .save(app.graphOutputDataSource());
         }
 
         if(graph == null) {

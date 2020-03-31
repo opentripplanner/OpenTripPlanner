@@ -1,11 +1,12 @@
 package org.opentripplanner.standalone.configure;
 
+import org.checkerframework.checker.nullness.qual.Nullable;
+import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.GraphRepository;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPApplication;
@@ -40,7 +41,6 @@ public class OTPAppConstruction {
     private OtpDataStore store = null;
     private OTPServer server = null;
     private GraphBuilderDataSources graphBuilderDataSources = null;
-    private GraphRepository graphRepository = null;
 
 
     /**
@@ -69,7 +69,7 @@ public class OTPAppConstruction {
         return new GrizzlyServer(config.getCli(), createApplication(router));
     }
 
-    public void validateConfigAndDatasources() {
+    public void validateConfigAndDataSources() {
         // Load Graph Builder Data Sources to validate it.
         graphBuilderDataSources();
     }
@@ -88,13 +88,14 @@ public class OTPAppConstruction {
     }
 
     /**
-     * Create or retrieve a data store witch provide access to files, remote or local.
+     * The output data source to use for saving the serialized graph.
+     * <p>
+     * This method will return {@code null} if the graph should NOT be saved. The
+     * business logic to make that decision is in the {@link GraphBuilderDataSources}.
      */
-    public GraphRepository graphRepository() {
-        if(graphRepository == null) {
-            graphRepository = new GraphRepository(graphBuilderDataSources().getOutputGraph());
-        }
-        return graphRepository;
+    @Nullable
+    public DataSource graphOutputDataSource() {
+        return graphBuilderDataSources().getOutputGraph();
     }
 
     /**
