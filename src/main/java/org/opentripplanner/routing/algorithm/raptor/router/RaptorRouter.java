@@ -56,7 +56,7 @@ public class RaptorRouter {
     double startTime = System.currentTimeMillis();
     ZonedDateTime startOfTime = calculateStartOfTime(request);
     this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
-        transitLayer, startOfTime, 2, request.modes, request.walkSpeed
+      transitLayer, startOfTime, 2, request.modes, request.walkSpeed
     );
     LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
     this.transitLayer = transitLayer;
@@ -68,8 +68,7 @@ public class RaptorRouter {
     /* Prepare access/egress transfers */
 
     double startTimeAccessEgress = System.currentTimeMillis();
-    AccessEgressRouter accessEgressRouter = new AccessEgressRouter(request,
-        maxTransferDistance(request.maxWalkDistance));
+    AccessEgressRouter accessEgressRouter = new AccessEgressRouter(request, maxTransferDistance(request.maxWalkDistance));
     Map<Stop, Transfer> accessTransfers = accessEgressRouter.streetSearch(false);
     Map<Stop, Transfer> egressTransfers = accessEgressRouter.streetSearch(true);
     request = accessEgressRouter.getRequest();
@@ -104,6 +103,7 @@ public class RaptorRouter {
         .searchParams()
         .earliestDepartureTime(departureTime)
         .searchWindowInSeconds(request.raptorSearchWindow)
+        .numberOfAdditionalTransfers(request.maxTransfers)
         .addAccessStops(accessTimes)
         .addEgressStops(egressTimes)
         .boardSlackInSeconds(request.boardSlack)
@@ -152,9 +152,7 @@ public class RaptorRouter {
             itineraries.add(itinerary);
         }
 
-    LOG.debug("Creating itineraries took {} ms", itineraries.size(),
-        System.currentTimeMillis() - startItineraries);
-
+    LOG.debug("Creating itineraries took {} ms", itineraries.size(), System.currentTimeMillis() - startItineraries);
     return itineraries;
   }
 
@@ -164,11 +162,12 @@ public class RaptorRouter {
     return DateMapper.asStartOfService(zdt);
   }
 
-  private int maxTransferDistance(Number maxWalkDistance) {
-    if(maxWalkDistance.equals(Double.MAX_VALUE)){
+  private int maxTransferDistance(double maxWalkDistance) {
+    if (Double.compare(maxWalkDistance, Double.MAX_VALUE) == 0) {
+      // No idea where 2000 comes from ...
       return 2000;
     }else{
-      return maxWalkDistance.intValue();
+      return Double.valueOf(maxWalkDistance).intValue();
     }
   }
 }

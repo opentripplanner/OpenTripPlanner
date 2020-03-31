@@ -87,7 +87,9 @@ public class PlannerResource extends RoutingResource {
                 if (limit < 0 || distance < limit) {
                     itineraries.addAll(findNonTransitItineraries(request, router));
                     if(!itineraries.isEmpty()){
-                        request.setMaxWalkDistance(distance);
+                        request.maxWalkDistance = distance;
+                        request.maxTransferWalkDistance = distance;
+                        request.maxPreTransitTime = populateMinTransitTime(itineraries);
                     }
                 }
             }
@@ -112,8 +114,9 @@ public class PlannerResource extends RoutingResource {
 
         } catch (Exception e) {
             PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass()))
-                LOG.warn("Error while planning path: ", e);
+            if (!PlannerError.isPlanningError(e.getClass())) {
+              LOG.warn("Error while planning path: ", e);
+            }
             response.setError(error);
         } finally {
             if (request != null) {
@@ -174,18 +177,30 @@ public class PlannerResource extends RoutingResource {
         }
     }
 
-    private TripPlan createTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
-        Place from = new Place();
-        Place to = new Place();
-        if (!itineraries.isEmpty()) {
-            from = itineraries.get(0).legs.get(0).from;
-            to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
-        }
-        TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
-        itineraries = itineraries.stream().sorted(Comparator.comparing(i -> i.endTime))
-                .limit(request.numItineraries).collect(Collectors.toList());
-        tripPlan.itinerary = itineraries;
-        LOG.debug("Returning {} itineraries", itineraries.size());
-        return tripPlan;
+  private TripPlan createTripPlan(RoutingRequest request, List<Itinerary> itineraries) {
+    LOG.debug("Create trip plan with {} itineraries", itineraries.size());
+    Place from = new Place();
+    Place to = new Place();
+    if (!itineraries.isEmpty()) {
+      from = itineraries.get(0).legs.get(0).from;
+      to = itineraries.get(0).legs.get(itineraries.get(0).legs.size() - 1).to;
     }
+    TripPlan tripPlan = new TripPlan(from, to, request.getDateTime());
+    tripPlan.itinerary = itineraries
+      .stream()
+      .filter(it -> !it.walkLimitExceeded) // Remove all itineraries with exceeded walk distance
+      .sorted(Comparator.comparing(i -> i.endTime))
+      .limit(request.numItineraries)
+      .collect(Collectors.toList());
+    LOG.debug("Returning {} itineraries", tripPlan.itinerary.size());
+    return tripPlan;
+  }
+
+  private int populateMinTransitTime(List<Itinerary> itineraries) {
+    return itineraries.stream()
+      .mapToInt(it -> it.duration.intValue())
+      .min()
+      .orElseGet(() -> otpServer.getRouter().defaultRoutingRequest.maxPreTransitTime);
+  }
+
 }

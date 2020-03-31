@@ -2,9 +2,6 @@ package org.opentripplanner.graph_builder.module;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
-import java.util.Collection;
-import java.util.Map;
-import java.util.stream.Collectors;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -17,7 +14,6 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -33,8 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -187,26 +186,20 @@ public class NearbyStopFinder {
     }
 
     public List<StopAtDistance> getStopAtDistances(Set<Vertex> originVertices, Collection<State> states) {
-        List<StopAtDistance> stopsFound = Lists.newArrayList();
-        states.forEach(state ->{
-            Vertex targetVertex = state.getVertex();
-            if (targetVertex instanceof TransitStopVertex) {
-                stopsFound.add(stopAtDistanceForState(state));
-            }
+        Map<String, StopAtDistance> stopsFound = new HashMap<>();
+        states.forEach(state -> {
+          Vertex targetVertex = state.getVertex();
+          if (targetVertex instanceof TransitStopVertex) {
+            stopsFound.putIfAbsent(stopAtDistanceForState(state).tstop.getStop().getId().toString(), stopAtDistanceForState(state));
+          }
         });
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         for (Vertex vertex : originVertices) {
-            if (vertex instanceof TransitStopVertex) {
-                stopsFound.add(
-                    new StopAtDistance(
-                        (TransitStopVertex) vertex,
-                        0,
-                        Collections.emptyList(),
-                        null
-                    ));
-            }
+          if (vertex instanceof TransitStopVertex) {
+            stopsFound.putIfAbsent(((TransitStopVertex) vertex).getStop().getId().toString(), newStopAtDistance(vertex));
+          }
         }
-        return stopsFound;
+        return new ArrayList<>(stopsFound.values());
     }
 
     public Collection<State> findNearbyStatesViaStreet(Set<Vertex> originVertices,
@@ -217,7 +210,10 @@ public class NearbyStopFinder {
         }else{
             return Collections.emptyList();
         }
+    }
 
+    private StopAtDistance newStopAtDistance(Vertex vertex) {
+      return new StopAtDistance((TransitStopVertex) vertex, 0, Collections.EMPTY_LIST, null);
     }
 
     private ShortestPathTree getShortestPathTree(Set<Vertex> originVertices,
