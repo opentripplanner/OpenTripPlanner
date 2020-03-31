@@ -120,8 +120,10 @@ public class CommandLineParameters implements Cloneable {
             description = "Open a graph visualizer window for debugging.")
     public boolean visualize;
 
-    /* The remaining single parameter after the switches is the directory with graph files. */
-
+    /**
+     * The remaining single parameter after the switches is the directory with the configuration
+     * files. This directory may contain other files like the graph, input data and report files.
+     */
     @Parameter(validateWith = ReadableDirectory.class, description = "/graph/or/inputs/directory")
     public List<File> baseDirectory;
 
