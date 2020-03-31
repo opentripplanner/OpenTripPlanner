@@ -126,7 +126,11 @@ public class ItineraryMapper {
         itinerary.endTime = createCalendar(egressPathLeg.toTime());
         itinerary.duration = (long) egressPathLeg.toTime() - path.accessLeg().fromTime();
         itinerary.waitingTime = itinerary.duration - itinerary.walkTime - itinerary.transitTime;
-        itinerary.walkLimitExceeded = itinerary.walkDistance > request.maxWalkDistance;
+
+        // Make sure each single leg doesn't exceed the maxWalkTime
+        itinerary.walkLimitExceeded = itinerary.legs.stream()
+          .filter(it -> TraverseMode.WALK.toString().equals(it.mode))
+          .anyMatch(it -> it.distance > request.maxWalkDistance);
 
         return itinerary;
     }
