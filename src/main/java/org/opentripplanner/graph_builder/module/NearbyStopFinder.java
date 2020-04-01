@@ -96,11 +96,12 @@ public class NearbyStopFinder {
                 // pattern if at least one of the stop times associated with the pattern allows boarding at this stop.
                 // Otherwise, there will be issues with certain GTFS feeds where some trips end at an alight-only stop
                 // and then other trips begin at the alight-only stop, but do not allow boarding there.
-                // See this issue for further info: https://github.com/opentripplanner/OpenTripPlanner/issues/3026
                 //
-                // FIXME: this below check will only work for feeds where all trips associated with a certain pattern
-                //  don't allow pickups. If some trips do allow pickups while others don't, this might not create a
-                //  proper transfer for the trips that do not allow pickups at certain stops.
+                // TripPatterns are created based off of StopPatterns which differentiate between stop sequences with
+                // the same stops, but different boarding and alighting values. Therefore, this check applies to all
+                // possible stop pattern combinations.
+                //
+                // See this issue for further info: https://github.com/opentripplanner/OpenTripPlanner/issues/3026
                 if (pattern.canBoard(pattern.getStops().indexOf(ts1.getStop()))) {
                     closestStopForPattern.putMin(pattern, stopAtDistance);
                 }
