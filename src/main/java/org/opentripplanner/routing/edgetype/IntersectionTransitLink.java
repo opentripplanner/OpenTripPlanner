@@ -43,8 +43,8 @@ public class IntersectionTransitLink extends Edge {
         boolean cycling = options.modes.contains(TraverseMode.BICYCLE) && !options.walkingBike;		
         double speed = cycling ? options.bikeSpeed : options.walkSpeed;
 
-        // speed in m/s, length in mm, so we get milliseconds
-        s1.incrementTimeInMilliseconds((long) (length_mm / speed));
+        // speed in m/s, length in mm, so we divide by 1000 to get seconds
+        s1.incrementTimeInSeconds((int) ((length_mm / 1000) / speed));
 
         if (!cycling)
             s1.incrementWalkDistanceInMeters(length_mm / 1000d);
