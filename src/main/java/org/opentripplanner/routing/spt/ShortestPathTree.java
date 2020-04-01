@@ -36,6 +36,7 @@ public class ShortestPathTree {
     public ShortestPathTree (RoutingRequest options, DominanceFunction dominanceFunction) {
         this.options = options;
         this.dominanceFunction = dominanceFunction;
+//        this.dominanceFunction =  new DominanceFunction.EarliestArrival();
         stateSets = new IdentityHashMap<Vertex, List<State>>();
     }
 

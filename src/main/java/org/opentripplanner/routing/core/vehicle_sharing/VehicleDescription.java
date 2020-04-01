@@ -11,6 +11,12 @@ public abstract class VehicleDescription {
     private final Gearbox gearbox;
     private final Provider provider;
 
+    public double getSpeedInMetersPerSecond() {
+        return speedInMetersPerSecond;
+    }
+
+    private final double speedInMetersPerSecond=40;
+
     public VehicleDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
         this.longitude = longitude;
         this.latitude = latitude;

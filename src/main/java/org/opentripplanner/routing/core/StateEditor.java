@@ -140,7 +140,7 @@ public class StateEditor {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
         if (options.modes.isTransit() || !options.softWalkLimiting && options.batch)
-            return child.traverseDistanceInMeters >= options.maxWalkDistance;
+            return child.getDistanceTraversedInMode().getOrDefault(TraverseMode.WALK,0D) >= options.maxWalkDistance;
 
         return false;
     }
