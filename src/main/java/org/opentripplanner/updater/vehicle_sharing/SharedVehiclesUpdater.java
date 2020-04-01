@@ -16,6 +16,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.LinkedList;
@@ -23,12 +25,19 @@ import java.util.List;
 import java.util.stream.Stream;
 
 import static java.util.stream.Collectors.toList;
+import static org.apache.lucene.util.SloppyMath.haversin;
 
 public class SharedVehiclesUpdater extends PollingGraphUpdater {
-    SimpleStreetSplitter simpleStreetSplitter;
-    GraphUpdaterManager graphUpdaterManager;
-    VehiclePositionsGetter vehiclePositionsGetter;
-    Graph graph;
+
+    private static Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);
+
+    private static final double MAX_RADIUS = 500;
+    private static final double MAX_DISTANCE = 200;
+
+    private final VehiclePositionsGetter vehiclePositionsGetter;
+    private SimpleStreetSplitter simpleStreetSplitter;
+    private GraphUpdaterManager graphUpdaterManager;
+    private Graph graph;
 
     public SharedVehiclesUpdater(VehiclePositionsGetter vehiclePositionsGetter) {
         this.vehiclePositionsGetter = vehiclePositionsGetter;
@@ -47,11 +56,13 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
     private Vertex findClosestVertex(VehicleDescription vehicleDescription, List<Vertex> vertexesToChooseFrom) {
         Stream<Vertex> stream;
-        Envelope envelope = new Envelope(new Coordinate(vehicleDescription.getLongitude(), vehicleDescription.getLatitude()));
+        double latitude = vehicleDescription.getLatitude();
+        double longitude = vehicleDescription.getLongitude();
+        Envelope envelope = new Envelope(new Coordinate(latitude, longitude));
 
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(500);
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_RADIUS);
 
-        final double xscale = Math.cos(vehicleDescription.getLatitude() * Math.PI / 180);
+        final double xscale = Math.cos(latitude * Math.PI / 180);
 
         // Expand more in the longitude direction than the latitude direction to account for converging meridians.
         envelope.expandBy(radiusDeg / xscale, radiusDeg);
@@ -63,18 +74,21 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
             stream = vertexesToChooseFrom.stream();
         }
 
-        //Any vertexes, needed in stream.reduce
-        Vertex v0 = graph.getVertices().stream().findFirst().orElse(null);
+        Vertex result = stream.reduce(null, (previous_best, current) ->
+                chooseCloser(latitude, longitude, previous_best, current));
 
-
-        return stream.reduce(v0, (previous_best, current) ->
-                chooseCloser(vehicleDescription.getLatitude(), vehicleDescription.getLongitude(), previous_best, current));
+        if (result == null || haversin(latitude, longitude, result.getLat(), result.getLon()) > MAX_DISTANCE) {
+            LOG.warn("Cannot place vehicle {} on a map", vehicleDescription);
+            return null;
+        }
+        return result;
     }
 
     @VisibleForTesting
     public List<Pair<Vertex, VehicleDescription>> coordsToVertex(List<VehicleDescription> vehiclePositions) {
         return vehiclePositions.stream()
                 .map(vehicle -> new ImmutablePair<>(findClosestVertex(vehicle, null), vehicle))
+                .filter(pair -> pair.getLeft() != null)
                 .collect(toList());
     }
 

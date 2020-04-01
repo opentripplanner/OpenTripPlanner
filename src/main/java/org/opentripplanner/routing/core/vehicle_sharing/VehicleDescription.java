@@ -15,7 +15,7 @@ public abstract class VehicleDescription {
         return speedInMetersPerSecond;
     }
 
-    private final double speedInMetersPerSecond=40;
+    private final double speedInMetersPerSecond = 40;
 
     public VehicleDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
         this.longitude = longitude;
@@ -23,6 +23,18 @@ public abstract class VehicleDescription {
         this.fuelType = fuelType;
         this.gearbox = gearbox;
         this.provider = provider;
+    }
+
+    @Override
+    public String toString() {
+        return "VehicleDescription{" +
+                "longitude=" + longitude +
+                ", latitude=" + latitude +
+                ", fuelType=" + fuelType +
+                ", gearbox=" + gearbox +
+                ", provider=" + provider +
+                ", speedInMetersPerSecond=" + speedInMetersPerSecond +
+                '}';
     }
 
     public double getLongitude() {
