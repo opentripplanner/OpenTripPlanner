@@ -1,13 +1,11 @@
 package org.opentripplanner.routing.algorithm.raptor.router.street;
 
 import static java.util.stream.Collectors.groupingBy;
-import static java.util.stream.Collectors.toList;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
-import java.util.UUID;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
@@ -21,8 +19,6 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -84,8 +80,7 @@ public class AccessEgressRouter {
     }
 
     private Map<Stop,Transfer> streetSearch(boolean fromTarget,Set<Vertex> origin,boolean checkNearBy) {
-        Collection<State> states = nearbyStopFinder
-            .findNearbyStatesViaStreet(origin, fromTarget);
+        Collection<State> states = nearbyStopFinder.findNearbyStatesViaStreet(origin, fromTarget);
         Set<Vertex> vertexes = new HashSet<>();
         boolean transitStopFound = false;
         for(State s:states){
@@ -133,15 +128,9 @@ public class AccessEgressRouter {
             }
         }
 
-        Map<Stop, Transfer> result = new HashMap<>();
-        for (NearbyStopFinder.StopAtDistance stopAtDistance : stopsFound) {
-            result.put(
-                stopAtDistance.tstop.getStop(),
-                new Transfer(-1,
-                    (int) stopAtDistance.edges.stream().map(Edge::getEffectiveWalkDistance)
-                        .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum(),
-                    stopAtDistance.edges));
-        }
+        Map<Stop, Transfer> result = stopsFound
+          .stream()
+          .collect(Collectors.toMap(stopAtDistance -> stopAtDistance.tstop.getStop(), this::newTransferToStop));
         LOG.debug("Found {} {} stops", result.size(), fromTarget ? "egress" : "access");
         return result;
     }
@@ -165,4 +154,25 @@ public class AccessEgressRouter {
         request.rctx = null;
         request.setRoutingContext(reference);
     }
+
+  /**
+   * Instantiate a new {@link Transfer} for a given {@link StopAtDistance}
+   */
+  private Transfer newTransferToStop(NearbyStopFinder.StopAtDistance stopAtDistance) {
+    return new Transfer(-1, getTotalEffectiveWalkDistance(stopAtDistance), stopAtDistance.edges);
+  }
+
+  /**
+   * calculate the total effective walk distance to the stop
+   *
+   * @param stopAtDistance is a stop within an acceptable distance
+   * @return the total effective walk distance in a {@link Integer} value
+   */
+  private int getTotalEffectiveWalkDistance(NearbyStopFinder.StopAtDistance stopAtDistance) {
+    return (int) (stopAtDistance.edges.stream()
+      .map(Edge::getEffectiveWalkDistance)
+      .collect(Collectors.summarizingDouble(Double::doubleValue))
+      .getSum() + 0.5);
+  }
+
 }
