@@ -98,9 +98,9 @@ public class NearbyStopFinder {
                 // and then other trips begin at the alight-only stop, but do not allow boarding there.
                 // See this issue for further info: https://github.com/opentripplanner/OpenTripPlanner/issues/3026
                 //
-                // FIXME: this below check will only work for feeds that where all trips associated with a certain
-                //  pattern don't allow pickups. If some trips do allow pickups while others don't, this might not
-                //  create a proper transfer for the trips that do not allow pickups at certain stops.
+                // FIXME: this below check will only work for feeds where all trips associated with a certain pattern
+                //  don't allow pickups. If some trips do allow pickups while others don't, this might not create a
+                //  proper transfer for the trips that do not allow pickups at certain stops.
                 if (pattern.canBoard(pattern.getStops().indexOf(ts1.getStop()))) {
                     closestStopForPattern.putMin(pattern, stopAtDistance);
                 }
