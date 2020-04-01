@@ -28,6 +28,6 @@ public class OtpConfig {
                 NodeAdapter::asBoolean
         );
 
-        adapter.logUnusedParameters(LOG);
+        adapter.logAllUnusedParameters(LOG);
     }
 }

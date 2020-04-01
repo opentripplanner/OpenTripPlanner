@@ -52,7 +52,7 @@ public class RouterConfig implements Serializable {
         this.raptorTuningParameters = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
 
-        adapter.logUnusedParameters(LOG);
+        adapter.logAllUnusedParameters(LOG);
     }
 
     /**

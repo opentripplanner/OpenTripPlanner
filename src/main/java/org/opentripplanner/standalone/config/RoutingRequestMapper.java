@@ -13,10 +13,7 @@ public class RoutingRequestMapper {
     public static RoutingRequest mapRoutingRequest(NodeAdapter c) {
         RoutingRequest dft = new RoutingRequest();
 
-        if (c.isEmpty()) {
-            LOG.info("No default routing parameters were found in the router config JSON. Using built-in OTP defaults.");
-            return dft;
-        }
+        if (c.isEmpty()) { return dft; }
 
         LOG.debug("Loading default routing parameters from JSON.");
         RoutingRequest request = new RoutingRequest();

@@ -15,7 +15,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumSet;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
@@ -57,13 +56,13 @@ public class NodeAdapter {
      * This parameter is used internally in this class to be able to produce a
      * list of parameters witch is NOT requested.
      */
-    private final Set<String> parameterNames = new HashSet<>();
+    private final List<String> parameterNames = new ArrayList<>();
 
     /**
      * The collection of children is used to be able to produce a list of unused parameters
      * for all children.
      */
-    private final Set<NodeAdapter> children = new HashSet<>();
+    private final List<NodeAdapter> children = new ArrayList<>();
 
     public NodeAdapter(@NotNull JsonNode node, String source) {
         this(node, source, null);
@@ -76,6 +75,10 @@ public class NodeAdapter {
         this.json = node;
         this.source = source;
         this.contextPath = contextPath;
+    }
+
+    public String getSource() {
+        return source;
     }
 
     JsonNode asRawNode(String paramName) {
@@ -300,7 +303,11 @@ public class NodeAdapter {
         return uriFromString(paramName, asText(paramName, defaultValue));
     }
 
-    public void logUnusedParameters(Logger log) {
+    /**
+     * Log unused parameters for the entire configuration file/noe tree. Call this method for
+     * thew root adapter for each config file read.
+     */
+    public void logAllUnusedParameters(Logger log) {
         for (String p : unusedParams()) {
             log.warn(
                     "Unexpected config parameter: '{}' in '{}'. Is the spelling correct?",
@@ -310,8 +317,8 @@ public class NodeAdapter {
     }
 
     /**
-     * Unused parameters should be logged for each config file read. This method list all
-     * unused parameters(full path), also nested ones. It uses recursion to get child nodes.
+     * This method list all unused parameters(full path), also nested ones.
+     * It uses recursion to get child nodes.
      */
     private List<String> unusedParams() {
         List<String> unusedParams = new ArrayList<>();
@@ -335,13 +342,14 @@ public class NodeAdapter {
     public boolean equals(Object o) {
         if (this == o) { return true; }
         if (o == null || getClass() != o.getClass()) { return false; }
-        NodeAdapter adapter = (NodeAdapter) o;
-        return source.equals(adapter.source);
+        NodeAdapter other = (NodeAdapter) o;
+        return Objects.equals(source, other.source)
+                && Objects.equals(contextPath, other.contextPath);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(source);
+        return Objects.hash(source, contextPath);
     }
 
 

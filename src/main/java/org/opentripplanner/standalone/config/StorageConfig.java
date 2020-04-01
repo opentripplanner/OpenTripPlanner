@@ -1,5 +1,8 @@
 package org.opentripplanner.standalone.config;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import javax.validation.constraints.NotNull;
 import java.net.URI;
 import java.util.ArrayList;
@@ -38,6 +41,8 @@ import java.util.List;
  * base directory - it they exist.
  */
 public class StorageConfig {
+
+    private static final Logger LOG = LoggerFactory.getLogger(StorageConfig.class);
 
     /**
      * Local file system path to Google Cloud Platform service accounts credentials file. The
