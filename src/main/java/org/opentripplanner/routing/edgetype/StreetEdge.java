@@ -514,16 +514,7 @@ public class StreetEdge extends Edge implements Cloneable {
         }
         double streetMaxSpeed = calculateCarSpeed(options);
 
-
         return Double.min(optionsMaxSpeed,Double.min(maxVehicleSpeed,streetMaxSpeed));
-
-//        if (traverseMode == null) {
-//            return Double.NaN;
-//        } else if (traverseMode.isDriving()) {
-//             NOTE: Automobiles have variable speeds depending on the edge type
-//            return calculateCarSpeed(options);
-//        }
-//        return options.getSpeed(traverseMode);
     }
 
     @Override
