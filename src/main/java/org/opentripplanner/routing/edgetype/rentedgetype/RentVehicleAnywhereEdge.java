@@ -43,6 +43,8 @@ public class RentVehicleAnywhereEdge extends Edge {
             StateEditor stateEditor = s0.edit(this);
             stateEditor.doneVehicleRenting();
             return stateEditor.makeState();
+        } else if (s0.getOptions().reverseOptimizing) {
+            return null; // TODO AdamWiktor return something useful to enable reverse optimizing
         } else {
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
                     .filter(v -> s0.getOptions().vehiclesAllowedToRent.isRentable(v))
