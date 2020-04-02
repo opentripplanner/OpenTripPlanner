@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone;
 
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.profile.StopClusterMode;
@@ -256,8 +257,7 @@ public class GraphBuilderParameters {
         readCachedElevations = config.path("readCachedElevations").asBoolean(true);
         writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
         includeEllipsoidToGeoidDifference = config.path("includeEllipsoidToGeoidDifference").asBoolean(false);
-        int maxProcessors = Runtime.getRuntime().availableProcessors();
-        elevationModuleParallelism = Math.min(config.path("elevationModuleParallelism").asInt(maxProcessors), maxProcessors);
+        elevationModuleParallelism = ElevationModule.fromConfig(config.path("elevationModuleParallelism"));
     }
 
 
