@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.StopArrivalsState;
@@ -56,11 +56,11 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements
     }
 
     @Override
-    public void setNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) {
+    public void setNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
         stops.transferToStop(fromStop, transferLeg, arrivalTime);
     }
 
     @Override
-    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, TransferLeg transferLeg) {
+    public void rejectNewBestTransferTime(int fromStop, int arrivalTime, RaptorTransfer transferLeg) {
     }
 }

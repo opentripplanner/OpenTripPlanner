@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -37,18 +37,21 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator calculator,
+            PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle
     ) {
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
         this.debugHandler = debugHandlerFactory.debugStopArrival();
         this.calculator = calculator;
-        this.pathMapper = calculator.createPathMapper();
+        this.pathMapper = pathMapper;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
-    public void add(ArrivalView<T> egressStopArrival, TransferLeg egressLeg, int additionalCost) {
+    public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
+
         int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
+
         DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
 
         if (calculator.exceedsTimeLimit(arrivalTime)) {

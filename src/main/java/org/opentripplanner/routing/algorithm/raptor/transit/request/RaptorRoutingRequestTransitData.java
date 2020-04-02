@@ -5,9 +5,9 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 
 import java.time.Instant;
 import java.time.ZonedDateTime;
@@ -22,7 +22,7 @@ import java.util.Set;
  * but filters it by dates and modes per request. Transfers durations are pre-calculated per request
  * based on walk speed.
  */
-public class RaptorRoutingRequestTransitData implements TransitDataProvider<TripSchedule> {
+public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvider<TripSchedule> {
 
   private final TransitLayer transitLayer;
 
@@ -34,7 +34,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
   /**
    * Transfers by stop index
    */
-  private final List<List<TransferLeg>> transfers;
+  private final List<List<RaptorTransfer>> transfers;
 
 
   private final ZonedDateTime startOfTime;
@@ -69,7 +69,7 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
    * Gets all the transfers starting at a given stop
    */
   @Override
-  public Iterator<TransferLeg> getTransfers(int stopIndex) {
+  public Iterator<RaptorTransfer> getTransfers(int stopIndex) {
     return transfers.get(stopIndex).iterator();
   }
 
@@ -77,10 +77,8 @@ public class RaptorRoutingRequestTransitData implements TransitDataProvider<Trip
    * Gets all the unique trip patterns touching a set of stops
    */
   @Override
-  public Iterator<? extends RaptorTripPattern<TripSchedule>> patternIterator(
-      IntIterator stops
-  ) {
-    Set<RaptorTripPattern<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
+  public Iterator<? extends RaptorRoute<TripSchedule>> routeIterator(IntIterator stops) {
+    Set<RaptorRoute<TripSchedule>> activeTripPatternsForGivenStops = new HashSet<>();
     while (stops.hasNext()) {
       activeTripPatternsForGivenStops.addAll(activeTripPatternsPerStop.get(stops.next()));
     }

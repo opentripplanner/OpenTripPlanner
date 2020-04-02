@@ -132,6 +132,14 @@ public class ToStringBuilderTest {
     }
 
     @Test
+    public void addIntArray() {
+        assertEquals(
+                "ToStringBuilderTest{a:[1, 2, 3]}",
+                subject().addInts("a", new int[] { 1, 2, 3}).toString()
+        );
+    }
+
+    @Test
     public void addCollection() {
         assertEquals(
                 "ToStringBuilderTest{c:[1, 3.0, true]}",
@@ -171,7 +179,7 @@ public class ToStringBuilderTest {
         int seconds = 2 * 3600 + 30 * 60 + 4;
         assertEquals(
                 "ToStringBuilderTest{t:02:30:04}",
-                subject().addSecondsPastMidnight("t", seconds, -1).toString()
+                subject().addServiceTime("t", seconds, -1).toString()
         );
     }
 

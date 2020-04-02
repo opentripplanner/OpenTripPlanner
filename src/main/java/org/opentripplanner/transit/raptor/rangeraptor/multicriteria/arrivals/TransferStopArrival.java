@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  */
 public final class TransferStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
 
-    public TransferStopArrival(AbstractStopArrival<T> previousState, TransferLeg transferLeg, int arrivalTime, int additionalCost) {
+    public TransferStopArrival(AbstractStopArrival<T> previousState, RaptorTransfer transferLeg, int arrivalTime, int additionalCost) {
         super(
                 previousState,
                 transferLeg.stop(),

@@ -1,7 +1,9 @@
 package org.opentripplanner.transit.raptor.api.request;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.EnumSet;
 import java.util.Set;
@@ -22,6 +24,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     // Search
     private final SearchParamsBuilder<T> searchParams;
     private SearchDirection searchDirection;
+    private RaptorSlackProvider slackProvider;
 
     // Algorithm
     private RaptorProfile profile;
@@ -39,6 +42,7 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     RaptorRequestBuilder(RaptorRequest<T> defaults) {
         this.searchParams = new SearchParamsBuilder<>(this, defaults.searchParams());
         this.searchDirection = defaults.searchDirection();
+        this.slackProvider = defaults.slackProvider();
 
         // Algorithm
         this.profile = defaults.profile();
@@ -69,6 +73,14 @@ public class RaptorRequestBuilder<T extends RaptorTripSchedule> {
     public RaptorRequestBuilder<T> searchDirection(SearchDirection searchDirection) {
         this.searchDirection = searchDirection;
         return this;
+    }
+
+    public RaptorSlackProvider slackProvider() {
+        return slackProvider;
+    }
+
+    public void slackProvider(@NotNull RaptorSlackProvider slackProvider) {
+        this.slackProvider = slackProvider;
     }
 
     public Collection<Optimization> optimizations() {

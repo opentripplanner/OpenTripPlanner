@@ -6,10 +6,13 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
+
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.getTripTimes;
 
 
 /**
@@ -17,10 +20,15 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
  * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
  */
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
-    private final TransitCalculator calculator;
 
-    public ForwardPathMapper(TransitCalculator calculator) {
-        this.calculator = calculator;
+    /**
+     * Note! This is not the Raptor internal SlackProvider, but the slack-provider
+     * submitted by the transit layer.
+     */
+    private final RaptorSlackProvider transitLayerSlackProvider;
+
+    public ForwardPathMapper(RaptorSlackProvider slackProvider) {
+        this.transitLayerSlackProvider = slackProvider;
     }
 
     @Override
@@ -29,7 +37,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         ArrivalView<T> to;
         PathLeg<T> lastLeg;
         TransitPathLeg<T> transitLeg;
-        int numberOfTransits = 0;
 
         from = destinationArrival.previous();
         lastLeg = new EgressPathLeg<>(
@@ -41,13 +48,20 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         do {
             to = from;
             from = from.previous();
-            ++numberOfTransits;
+
+            TripTimesSearch.Result r = getTripTimes(
+                    to.trip(),
+                    from.stop(),
+                    from.arrivalTime(),
+                    to.stop(),
+                    to.arrivalTime()
+            );
 
             transitLeg = new TransitPathLeg<>(
                     from.stop(),
-                    to.departureTime(),
+                    r.boardTime,
                     to.stop(),
-                    to.arrivalTime(),
+                    r.alightTime,
                     to.trip(),
                     lastLeg
             );
@@ -71,20 +85,15 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         AccessPathLeg<T> accessLeg = createAccessPathLeg(from, transitLeg);
 
-        return new Path<>(
-                accessLeg,
-                destinationArrival.arrivalTime(),
-                numberOfTransits - 1,
-                CostCalculator.toOtpDomainCost(destinationArrival.cost())
-        );
+        return new Path<>(accessLeg, CostCalculator.toOtpDomainCost(destinationArrival.cost()));
     }
 
-    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> transitLeg) {
-        int boardTimeTransit = transitLeg.fromTime();
-        int accessDurationInSeconds = from.arrivalTime() - from.departureTime();
-        int originDepartureTime = calculator.originDepartureTime(boardTimeTransit, accessDurationInSeconds);
-        int accessArrivalTime = originDepartureTime + accessDurationInSeconds;
+    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {
+        int boardSlack = transitLayerSlackProvider.boardSlack(nextLeg.trip().pattern());
+        int arrivalTime = nextLeg.fromTime() - boardSlack;
+        int timeShift = arrivalTime - from.arrivalTime();
+        int departureTime = from.departureTime() + timeShift;
 
-        return new AccessPathLeg<>(originDepartureTime, from.stop(), accessArrivalTime, transitLeg);
+        return new AccessPathLeg<>(from.stop(), departureTime, arrivalTime, nextLeg);
     }
 }

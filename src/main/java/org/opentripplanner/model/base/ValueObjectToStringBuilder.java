@@ -38,7 +38,7 @@ public class ValueObjectToStringBuilder {
     private DecimalFormat coordinateFormat;
     private DecimalFormat integerFormat;
     private DecimalFormat decimalFormat;
-    boolean first = true;
+    boolean skipSep = true;
 
     /** Use factory method: {@link #of()}. */
     private ValueObjectToStringBuilder() { }
@@ -77,6 +77,17 @@ public class ValueObjectToStringBuilder {
         return addIt(obj, Object::toString);
     }
 
+    /**
+     * A text/labels to your string. No separator character is writen to the buffer
+     * before or after the label - hence you need to include white space in the label if you
+     * want it.
+     */
+    public ValueObjectToStringBuilder addLbl(String label) {
+        sb.append(label);
+        skipSep = true;
+        return this;
+    }
+
 
     /* Special purpose formatters */
 
@@ -93,15 +104,15 @@ public class ValueObjectToStringBuilder {
     /**
      * Add time in seconds since midnight. Format:  HH:mm:ss.
      */
-    public  ValueObjectToStringBuilder  addSecondsPastMidnight(int secondsPastMidnight) {
+    public  ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight) {
         // Use a NOT_SET value witch is unlikely to be used
-        return addSecondsPastMidnight(secondsPastMidnight, -87_654_321);
+        return addServiceTime(secondsPastMidnight, -87_654_321);
     }
 
     /**
      * Add time in seconds since midnight. Format:  HH:mm:ss. Ignore if not set.
      */
-    public  ValueObjectToStringBuilder  addSecondsPastMidnight(int secondsPastMidnight, int notSet) {
+    public  ValueObjectToStringBuilder addServiceTime(int secondsPastMidnight, int notSet) {
         return addIt(TimeUtils.timeToStrLong(secondsPastMidnight, notSet));
     }
 
@@ -127,7 +138,7 @@ public class ValueObjectToStringBuilder {
     }
 
     private <T> ValueObjectToStringBuilder  addIt(T value, Function<T, String> mapToString) {
-        if (first) { first = false; }
+        if (skipSep) { skipSep = false; }
         else { sb.append(FIELD_SEPARATOR); }
         sb.append(value == null ? "null" : mapToString.apply(value));
         return this;

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
@@ -17,12 +17,12 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 public class CalculateTransferToDestination<T extends RaptorTripSchedule>
         implements ParetoSetEventListener<ArrivalView<T>> {
 
-    private final TransferLeg egressLeg;
+    private final RaptorTransfer egressLeg;
     private final DestinationArrivalPaths<T> destinationArrivals;
     private final CostCalculator costCalculator;
 
     CalculateTransferToDestination(
-            TransferLeg egressLeg,
+            RaptorTransfer egressLeg,
             DestinationArrivalPaths<T> destinationArrivals,
             CostCalculator costCalculator
     ) {

@@ -4,7 +4,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.service.HeuristicSearchTask;
 import org.opentripplanner.transit.raptor.service.RangRaptorDynamicSearch;
@@ -24,7 +24,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
         this.config = config;
     }
 
-    public RaptorResponse<T> route(RaptorRequest<T> request, TransitDataProvider<T> transitData) {
+    public RaptorResponse<T> route(RaptorRequest<T> request, RaptorTransitDataProvider<T> transitData) {
         if(request.isDynamicSearch()) {
             return new RangRaptorDynamicSearch<>(config, transitData, request).route();
         }
@@ -34,7 +34,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
     public void compareHeuristics(
             RaptorRequest<T> r1,
             RaptorRequest<T> r2,
-            TransitDataProvider<T> transitData
+            RaptorTransitDataProvider<T> transitData
     ) {
         HeuristicSearchTask<T> fwdHeur = new HeuristicSearchTask<>(r1, config, transitData);
         HeuristicSearchTask<T> revHeur = new HeuristicSearchTask<>(r2, config, transitData);
@@ -51,7 +51,7 @@ public class RaptorService<T extends RaptorTripSchedule> {
 
     /* private methods */
 
-    private RaptorResponse<T> routeUsingStdWorker(TransitDataProvider<T> transitData, RaptorRequest<T> request) {
+    private RaptorResponse<T> routeUsingStdWorker(RaptorTransitDataProvider<T> transitData, RaptorRequest<T> request) {
         Collection<Path<T>> paths = config.createStdWorker(transitData, request).route();
         return new RaptorResponse<>(paths, request, request);
     }

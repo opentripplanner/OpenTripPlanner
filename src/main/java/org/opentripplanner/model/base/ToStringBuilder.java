@@ -9,6 +9,7 @@ import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
@@ -91,6 +92,10 @@ public class ToStringBuilder {
         return addIfNotDefault(name, obj, defaultValue);
     }
 
+    public <T> ToStringBuilder addInts(String name, int[] intArray) {
+        return addIfNotNull(name, intArray, Arrays::toString);
+    }
+
     public ToStringBuilder addCol(String name, Collection<?> c) {
         return addIfNotNull(name, c);
     }
@@ -127,10 +132,23 @@ public class ToStringBuilder {
     }
 
     /**
-     * Add time in seconds since midnight. Format:  HH:mm:ss. Ignore default values.
+     * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
      */
-    public ToStringBuilder addSecondsPastMidnight(String name, int timeSecondsPastMidnight, int defaultValue) {
+    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int defaultValue) {
         return addIfNotDefault(name, timeSecondsPastMidnight, defaultValue, TimeUtils::timeToStrLong);
+    }
+
+    /**
+     * Add times in seconds since midnight. Format:  hh:mm. Ignore default values.
+     */
+    public <T> ToStringBuilder addAsHhMm(String name, int[] intArray) {
+        return addIfNotNull(
+                name,
+                intArray,
+                a -> Arrays.stream(a)
+                        .mapToObj(TimeUtils::timeToStrShort)
+                        .collect(Collectors.joining(", ", "[", "]"))
+        );
     }
 
     /**
