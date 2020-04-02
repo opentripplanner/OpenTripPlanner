@@ -64,37 +64,36 @@ least 1GB of memory when working with the Portland TriMet data set, and several 
  [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with
  the [VisualGC plugin](https://visualvm.github.io/plugins.html).
 
-### OTP main phases. 
-Otp have three phases that can be run in sequence or by them self. It's possible to analyze the 
+### OTP Main Phases
+OTP has three phases that can be run in sequence or in isolation. It's possible to analyze the 
 GTFS, OSM and any other input data and save the resulting representation of the transit network 
 (what we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)) to disk. Depending 
-on the data it might take a wile to build a graph. Normally building the street-graph, especially 
-with elevation data, takes a long time, so it can be convenient to build the street-graph once, and
-then use that as a starting point for building the transit data into the final graph. The final 
+on the data it might take a while to build a graph. Normally, building the street graph, especially 
+with elevation data, takes a long time, so it can be convenient to build the street graph once, and
+then use that as a starting point into which we add transit data to make the final graph. The final 
 graph can then be saved for later or served by the same OTP instance. When an OTP server is 
 restarted it can reload a pre-built graph, which is significantly faster than building it from 
 scratch. 
 
-This is the three main phases:     
+These are the three main phases:
 
 1. Building a street-graph _streetGraph.obj_. 
-2. Building transit data into the _graph.obj_.
+2. Building adding transit data to produce _graph.obj_.
 3. Serving the graph.
 
-When starting OTP the command line parameter is used to control witch phases are run. The diagram
-below show the flow depending on the parameters used.
+Steps 1 and 2 can be combined for smaller or simpler street networks. When starting OTP the command line parameter is used to control witch phases are run. The diagram below shows the flow depending on the parameters used.
 
 ![Command-Line-Parameter-Flow](images/cli-flow.svg)
 
 You must use at least one of the required 
 parameters: `--load`, `--loadStreet`, `--build`, `--buildStreet`. Some of the parameters are 
-implied depending on the _required_ parameter, like _`--serve`_ have no effect when used together
-with `--load`.    
+implied by a _required_ parameter. For example `--serve` has no effect when used together
+with `--load` because `--load` implies `--serve`.    
 
 
 ### Building a graph and serving it 
 
-The simplest way to start OTP is to build everything and start serving the graph. The command to do
+The simplest way to start OTP is to build everything and start serving the graph without saving it. The command to do
 so is:
 
 `$ java -Xmx2G -jar otp.shaded.jar --build --serve /home/username/otp`
@@ -120,14 +119,14 @@ same graph, building the graph and starting the server need to be done in two or
 this example we start the OTP instance in the current directory(`.`)  where the data and config 
 files are saved:
 
-- To build a graph with street and transit data use the `--build` and `--save` parameter:
+- To build a graph from street and transit data, then save it to a file, use the `--build` and `--save` parameters:
 
     `$ java -Xmx2G -jar otp.shaded.jar --build --save .`
 
-- To build a street-graph (OSM and elevation data only):
+- To build a street-graph (OSM and elevation data only, ignoring transit input files):
 
     `$ java -Xmx2G -jar otp.shaded.jar --buildStreet --save .`
 
-- To build a graph using the existing street-graph:
+- To build a graph layering transit data on top of an existing street graph (built using the previous command):
 
     `$ java -Xmx2G -jar otp.shaded.jar --loadStreet --build --save .`
