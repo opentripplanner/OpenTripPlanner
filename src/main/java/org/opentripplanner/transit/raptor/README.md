@@ -120,7 +120,7 @@ than McRR with 4 criteria.
 
 ## Understanding the search (range-raptor algorithm implementation)
 The `RangeRaptorWorker` and the `TransitRoutingStrategy` together implement the _range-raptor_ 
-algorithm. There is 3 ot the `TransitRoutingStrategy`:   
+algorithm. There are 3 `TransitRoutingStrategy` implementations:
 1. The `StdTransitWorker` is the standard Range Raptor implementation. Support both _forward_ and 
 _reverse_ search.
 1. The `NoWaitTransitWorker` is the same as the standard, but it eliminate _wait-time_. It support 
