@@ -31,8 +31,8 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
     private static Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);
 
-    private static final double MAX_DISTANCE_TO_EDGE = 500;
-    private static final double MAX_DISTANCE_TO_VERTEX = 200;
+    private static final double MAX_DISTANCE_TO_EDGE_IN_METERS = 500;
+    private static final double MAX_DISTANCE_TO_VERTEX_IN_KM = 0.2;
 
     private final VehiclePositionsGetter vehiclePositionsGetter;
     private SimpleStreetSplitter simpleStreetSplitter;
@@ -58,9 +58,9 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
         Stream<Vertex> stream;
         double latitude = vehicleDescription.getLatitude();
         double longitude = vehicleDescription.getLongitude();
-        Envelope envelope = new Envelope(new Coordinate(latitude, longitude));
+        Envelope envelope = new Envelope(new Coordinate(longitude, latitude));
 
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_DISTANCE_TO_EDGE);
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_DISTANCE_TO_EDGE_IN_METERS);
 
         final double xscale = Math.cos(latitude * Math.PI / 180);
 
@@ -77,7 +77,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
         Vertex result = stream.reduce(null, (previous_best, current) ->
                 chooseCloser(latitude, longitude, previous_best, current));
 
-        if (result == null || haversin(latitude, longitude, result.getLat(), result.getLon()) > MAX_DISTANCE_TO_VERTEX) {
+        if (result == null || haversin(latitude, longitude, result.getLat(), result.getLon()) > MAX_DISTANCE_TO_VERTEX_IN_KM) {
             LOG.warn("Cannot place vehicle {} on a map", vehicleDescription);
             return null;
         }
