@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.server;
 
 import ch.qos.logback.classic.Level;
-import ch.qos.logback.classic.Logger;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
@@ -29,31 +28,34 @@ public class Router {
 
     private static final org.slf4j.Logger LOG = LoggerFactory.getLogger(Router.class);
     public final Graph graph;
-    private final RouterConfig config;
+    public final RouterConfig routerConfig;
     public final RaptorConfig<TripSchedule> raptorConfig;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger
      *  rather than something simple like a PrintStream because requests come in multi-threaded.
      */
-    public Logger requestLogger = null;
+    public ch.qos.logback.classic.Logger requestLogger = null;
 
     /* TODO The fields for "components" are slowly disappearing... maybe at some point a router
         will be nothing but configuration values tied to a Graph. */
 
-    // Inspector/debug services
+    /** Inspector/debug services */
     public TileRendererManager tileRendererManager;
 
-    // A RoutingRequest containing default parameters that will be cloned when handling each request
+    /**
+     * A RoutingRequest containing default parameters that will be cloned when handling each
+     * request.
+     */
     public RoutingRequest defaultRoutingRequest;
 
     /** A graphical window that is used for visualizing search progress (debugging). */
     public GraphVisualizer graphVisualizer = null;
 
-    public Router(Graph graph) {
+    public Router(Graph graph, RouterConfig routerConfig) {
         this.graph = graph;
-        this.config = graph.routerConfig;
-        this.raptorConfig = new RaptorConfig<>(config.raptorTuningParameters);
+        this.routerConfig = routerConfig;
+        this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters);
     }
 
     /*
@@ -66,13 +68,12 @@ public class Router {
      * Start up a new router once it has been created.
      */
     public void startup() {
-
         this.tileRendererManager = new TileRendererManager(this.graph);
-        this.defaultRoutingRequest = config.routingRequestDefaults;
+        this.defaultRoutingRequest = routerConfig.routingRequestDefaults;
 
-        if (config.requestLogFile != null) {
-            this.requestLogger = createLogger(config.requestLogFile);
-            LOG.info("Logging incoming requests at '{}'", config.requestLogFile);
+        if (routerConfig.requestLogFile != null) {
+            this.requestLogger = createLogger(routerConfig.requestLogFile);
+            LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile);
         } else {
             LOG.info("Incoming requests will not be logged.");
         }
@@ -92,7 +93,7 @@ public class Router {
         }
 
         /* Create Graph updater modules from JSON config. */
-        GraphUpdaterConfigurator.setupGraph(this.graph, config.rawJson);
+        GraphUpdaterConfigurator.setupGraph(this.graph, routerConfig.rawJson);
 
         /* Compute ellipsoidToGeoidDifference for this Graph */
         try {
@@ -115,7 +116,7 @@ public class Router {
      * Programmatically (i.e. not in XML) create a Logback logger for requests happening on this router.
      * http://stackoverflow.com/a/17215011/778449
      */
-    private static Logger createLogger(String file) {
+    private static ch.qos.logback.classic.Logger createLogger(String file) {
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
         PatternLayoutEncoder ple = new PatternLayoutEncoder();
         ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
@@ -126,7 +127,7 @@ public class Router {
         fileAppender.setEncoder(ple);
         fileAppender.setContext(lc);
         fileAppender.start();
-        Logger logger = (Logger) LoggerFactory.getLogger("REQ_LOG");
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("REQ_LOG");
         logger.addAppender(fileAppender);
         logger.setLevel(Level.INFO);
         logger.setAdditive(false);
@@ -134,6 +135,6 @@ public class Router {
     }
 
     public double streetRoutingTimeoutSeconds() {
-        return config.streetRoutingTimeoutSeconds;
+        return  routerConfig.streetRoutingTimeoutSeconds;
     }
 }

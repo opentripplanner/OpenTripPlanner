@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.debug;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
@@ -50,7 +50,7 @@ class StateDebugger<T extends RaptorTripSchedule> {
         }
     }
 
-    void rejectTransfer(int fromStop, TransferLeg transferLeg, int toStop, int arrivalTime) {
+    void rejectTransfer(int fromStop, RaptorTransfer transferLeg, int toStop, int arrivalTime) {
         if (isDebug(transferLeg.stop())) {
             reject(cursor.rejectedTransfer(round(), fromStop, transferLeg, toStop, arrivalTime));
         }

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 
 /**
@@ -21,7 +21,7 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
     private static final int NOT_SET = -1;
 
     private final int nTripsBinarySearchThreshold;
-    private final RaptorTripPattern<T> pattern;
+    private final RaptorTimeTable<T> timeTable;
     private final int nTrips;
 
     private int earliestBoardTime;
@@ -31,11 +31,11 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
 
     TripScheduleBoardSearch(
             int scheduledTripBinarySearchThreshold,
-            RaptorTripPattern<T> pattern
+            RaptorTimeTable<T> timeTable
     ) {
         this.nTripsBinarySearchThreshold = scheduledTripBinarySearchThreshold;
-        this.pattern = pattern;
-        this.nTrips = pattern.numberOfTripSchedules();
+        this.timeTable = timeTable;
+        this.nTrips = timeTable.numberOfTripSchedules();
     }
 
     @Override
@@ -124,7 +124,7 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
      */
     private boolean findBoardingBySteppingBackwardsInTime(int tripIndexUpperBound) {
         for (int i = tripIndexUpperBound-1; i >= 0; --i) {
-            T trip = pattern.getTripSchedule(i);
+            T trip = timeTable.getTripSchedule(i);
             final int boardTime = trip.departure(stopPositionInPattern);
 
             if (boardTime >= earliestBoardTime) {
@@ -148,7 +148,7 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
      */
     private boolean findBoardingBySteppingForwardInTime(final int tripIndexLowerBound) {
         for (int i = tripIndexLowerBound; i < nTrips; ++i) {
-            T trip = pattern.getTripSchedule(i);
+            T trip = timeTable.getTripSchedule(i);
             final int boardTime = trip.departure(stopPositionInPattern);
 
             if (boardTime >= earliestBoardTime) {
@@ -175,7 +175,7 @@ public class TripScheduleBoardSearch<T extends RaptorTripSchedule> implements Tr
         while (upper - lower > nTripsBinarySearchThreshold) {
             int m = (lower + upper) / 2;
 
-            RaptorTripSchedule trip = pattern.getTripSchedule(m);
+            RaptorTripSchedule trip = timeTable.getTripSchedule(m);
 
             int departure = trip.departure(stopPositionInPattern);
 

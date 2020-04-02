@@ -12,12 +12,12 @@ public class PathStringBuilderTest {
 
     @Test
     public void walk() {
-        assertPath("Walk 5:12", new PathStringBuilder().walk(D_5_12));
+        assertPath("Walk 5m12s", new PathStringBuilder().walk(D_5_12));
     }
 
     @Test
     public void transit() {
-        assertPath("Transit 10:46-10:55", new PathStringBuilder().transit(T_10_46, T_10_55));
+        assertPath("Transit 10:46 10:55", new PathStringBuilder().transit(T_10_46, T_10_55));
     }
 
     @Test
@@ -27,14 +27,17 @@ public class PathStringBuilderTest {
 
     @Test
     public void sep() {
-        assertPath(" > ", new PathStringBuilder().sep());
+        assertPath(" - ", new PathStringBuilder().sep());
     }
 
     @Test
     public void path() {
         assertPath(
-                "Walk 0:37 > 7 > Transit 10:46-10:55 > 11 > Walk 0:07",
-                new PathStringBuilder().walk(37).sep().stop(7).sep().transit(T_10_46, T_10_55).sep().stop(11).sep().walk(7)
+                "Walk 37s - 227 - Transit 10:46 10:55 - 112 - Walk 1h37m7s",
+                new PathStringBuilder()
+                        .walk(37).sep().stop(227).sep()
+                        .transit(T_10_46, T_10_55).sep().stop(112).sep()
+                        .walk(3600 + 37 * 60 + 7)
         );
     }
 

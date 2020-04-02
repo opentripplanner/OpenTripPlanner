@@ -27,16 +27,16 @@ public class CostCalculatorTest {
     @Test
     public void transitArrivalCost() {
         LifeCycleEventPublisher lifeCycle = new LifeCycleEventPublisher(lifeCycleSubscriptions);
-        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 1, 1));
-        assertEquals("Transit + board cost", 600, subject.transitArrivalCost(1, 1, 2));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(0, 0));
+        assertEquals("Transit + board cost", 600, subject.transitArrivalCost(0, 1));
         // There is no wait cost for the first transit leg
-        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 2, 2));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 0));
 
         // Simulate round 2
         lifeCycle.prepareForNextRound(2);
         // There is a small cost (2-1) * 0.5 * 100 = 50 added for the second transit leg
-        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(1, 2, 2));
-        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(1, 2, 4));
+        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(1, 0));
+        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(1, 2));
     }
 
     @Test
@@ -47,13 +47,14 @@ public class CostCalculatorTest {
 
     @Test
     public void calculateMinCost() {
-        assertEquals(0, subject.calculateMinCost(0, 0));
-        assertEquals(100, subject.calculateMinCost(1, 0));
-        assertEquals(650, subject.calculateMinCost(0, 1));
+        // Board cost is 500, then add:
+        assertEquals(500, subject.calculateMinCost(0, 0));
+        assertEquals(600, subject.calculateMinCost(1, 0));
+        assertEquals(1150, subject.calculateMinCost(0, 1));
 
         // Expect:  precision * (minTravelTime + minNumTransfers * (boardCost + boardSlack * waitReluctance)
         // =>  100 * ( 200 + 3 * (5 + 3 * 0.5))
-        assertEquals(21_950, subject.calculateMinCost(200, 3));
+        assertEquals(22_450, subject.calculateMinCost(200, 3));
     }
 
     @Test
@@ -61,6 +62,7 @@ public class CostCalculatorTest {
         assertEquals(0, CostCalculator.toOtpDomainCost(49));
         assertEquals(1, CostCalculator.toOtpDomainCost(50));
         assertEquals(300, CostCalculator.toOtpDomainCost(30_000));
-        assertEquals(5, CostCalculator.toOtpDomainCost(subject.calculateMinCost(5,0)));
+        assertEquals(BOARD_COST, CostCalculator.toOtpDomainCost(subject.calculateMinCost(0,0)));
+        assertEquals(3 + BOARD_COST, CostCalculator.toOtpDomainCost(subject.calculateMinCost(3,0)));
     }
 }

@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 
 /**
@@ -21,7 +21,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
  */
 public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements TripScheduleSearch<T> {
     private final int nTripsBinarySearchThreshold;
-    private final RaptorTripPattern<T> pattern;
+    private final RaptorTimeTable<T> timeTable;
     private final int nTrips;
 
     private int latestAlightTime;
@@ -30,10 +30,10 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
     private T candidateTrip;
     private int candidateTripIndex;
 
-    TripScheduleAlightSearch(int scheduledTripBinarySearchThreshold, RaptorTripPattern<T> pattern) {
+    TripScheduleAlightSearch(int scheduledTripBinarySearchThreshold, RaptorTimeTable<T> timeTable) {
         this.nTripsBinarySearchThreshold = scheduledTripBinarySearchThreshold;
-        this.pattern = pattern;
-        this.nTrips = pattern.numberOfTripSchedules();
+        this.timeTable = timeTable;
+        this.nTrips = timeTable.numberOfTripSchedules();
     }
 
     @Override
@@ -118,7 +118,7 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
      */
     private boolean findBoardingSearchForwardInTime(int tripIndexLowerBound) {
         for (int i = tripIndexLowerBound; i < nTrips;  ++i) {
-            T trip = pattern.getTripSchedule(i);
+            T trip = timeTable.getTripSchedule(i);
 
             final int arrival = trip.arrival(stopPositionInPattern);
 
@@ -143,7 +143,7 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
      */
     private boolean findBoardingSearchBackwardsInTime(final int tripIndexUpperBound) {
         for (int i = tripIndexUpperBound-1; i >=0; --i) {
-            T trip = pattern.getTripSchedule(i);
+            T trip = timeTable.getTripSchedule(i);
 
             final int arrival = trip.arrival(stopPositionInPattern);
 
@@ -173,7 +173,7 @@ public class TripScheduleAlightSearch<T extends RaptorTripSchedule> implements T
         while (upper - lower > nTripsBinarySearchThreshold) {
             int m = (lower + upper) / 2;
 
-            RaptorTripSchedule trip = pattern.getTripSchedule(m);
+            RaptorTripSchedule trip = timeTable.getTripSchedule(m);
 
             int arrival = trip.arrival(stopPositionInPattern);
 

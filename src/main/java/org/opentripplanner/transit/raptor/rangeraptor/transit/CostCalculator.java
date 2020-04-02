@@ -40,9 +40,7 @@ public class CostCalculator {
         lifeCycle.onPrepareForNextRound(this::initWaitFactor);
     }
 
-    public int transitArrivalCost(int prevStopArrivalTime, int boardTime, int alightTime) {
-        int waitTime = boardTime - prevStopArrivalTime;
-        int transitTime = alightTime - boardTime;
+    public int transitArrivalCost(int waitTime, int transitTime) {
         return waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
     }
 
@@ -51,7 +49,7 @@ public class CostCalculator {
     }
 
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-        return transitFactor * minTravelTime + minNumTransfers * minTransferCost;
+        return  minTransferCost * minNumTransfers + transitFactor * minTravelTime  + boardCost;
     }
 
     private void initWaitFactor(int round) {

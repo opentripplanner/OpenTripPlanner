@@ -89,14 +89,6 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
         return paths.qualify(departureTime, minArrivalTime, minNumberOfTransfers, minCost);
     }
 
-    private HeuristicAtStop createHeuristicAtStop(int bestTravelDuration, int bestNumOfTransfers) {
-        return new HeuristicAtStop(
-                bestTravelDuration,
-                bestNumOfTransfers,
-                costCalculator.calculateMinCost(bestTravelDuration, bestNumOfTransfers)
-        );
-    }
-
     private String rejectErrorMessage(int stop) {
         return get(stop) == null
                 ? "The stop was not reached in the heuristic calculation."
@@ -106,8 +98,19 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
 
     private HeuristicAtStop get(int stop) {
         if(stops[stop] == null && heuristics.reached(stop)) {
-            stops[stop] = createHeuristicAtStop(heuristics.bestTravelDuration(stop), heuristics.bestNumOfTransfers(stop));
+            stops[stop] = createHeuristicAtStop(
+                    heuristics.bestTravelDuration(stop),
+                    heuristics.bestNumOfTransfers(stop)
+            );
         }
         return stops[stop];
+    }
+
+    private HeuristicAtStop createHeuristicAtStop(int bestTravelDuration, int bestNumOfTransfers) {
+        return new HeuristicAtStop(
+                bestTravelDuration,
+                bestNumOfTransfers,
+                costCalculator.calculateMinCost(bestTravelDuration, bestNumOfTransfers)
+        );
     }
 }

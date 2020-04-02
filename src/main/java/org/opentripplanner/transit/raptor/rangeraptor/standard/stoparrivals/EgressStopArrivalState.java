@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.function.Consumer;
@@ -13,10 +13,10 @@ import java.util.function.Consumer;
  */
 public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends StopArrivalState<T> {
     private final int round;
-    private final TransferLeg egressLeg;
+    private final RaptorTransfer egressLeg;
     private final Consumer<EgressStopArrivalState<T>> transitCallback;
 
-    EgressStopArrivalState(int round, TransferLeg egressLeg, Consumer<EgressStopArrivalState<T>> transitCallback) {
+    EgressStopArrivalState(int round, RaptorTransfer egressLeg, Consumer<EgressStopArrivalState<T>> transitCallback) {
         this.round = round;
         this.egressLeg = egressLeg;
         this.transitCallback = transitCallback;
@@ -31,7 +31,7 @@ public final class EgressStopArrivalState<T extends RaptorTripSchedule> extends 
     }
 
 
-    public final TransferLeg egressLeg() {
+    public final RaptorTransfer egressLeg() {
         return egressLeg;
     }
 

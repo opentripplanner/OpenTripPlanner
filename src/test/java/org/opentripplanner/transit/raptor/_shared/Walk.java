@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor._shared;
 
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 class Walk extends AbstractStopArrival {

@@ -6,7 +6,7 @@ import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.request.SearchParamsBuilder;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
@@ -14,7 +14,6 @@ import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
@@ -42,7 +41,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
     private static final Logger LOG = LoggerFactory.getLogger(RangRaptorDynamicSearch.class);
 
     private final RaptorConfig<T> config;
-    private final TransitDataProvider<T> transitData;
+    private final RaptorTransitDataProvider<T> transitData;
     private final RaptorRequest<T> originalRequest;
     private final RaptorSearchWindowCalculator dynamicSearchParamsCalculator;
 
@@ -51,7 +50,7 @@ public class RangRaptorDynamicSearch<T extends RaptorTripSchedule> {
 
     public RangRaptorDynamicSearch(
             RaptorConfig<T> config,
-            TransitDataProvider<T> transitData,
+            RaptorTransitDataProvider<T> transitData,
             RaptorRequest<T> originalRequest
     ) {
         this.config = config;

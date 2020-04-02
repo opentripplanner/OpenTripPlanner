@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -13,6 +14,8 @@ import org.slf4j.LoggerFactory;
 import java.io.File;
 import java.io.IOException;
 import java.time.LocalDate;
+
+import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
 public class SpeedTestConfig {
 
@@ -29,6 +32,7 @@ public class SpeedTestConfig {
     public final int maxWalkDistanceMeters;
     public final double walkSpeedMeterPrSecond;
     public final RaptorTuningParameters tuningParameters;
+    public final RoutingRequest request;
 
     public SpeedTestConfig(JsonNode node) {
         NodeAdapter adapter = new NodeAdapter(node, FILE_NAME);
@@ -37,6 +41,7 @@ public class SpeedTestConfig {
         maxWalkDistanceMeters = adapter.asInt("maxWalkDistanceMeters", 1000);
         walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
         tuningParameters = new TransitRoutingConfig(adapter.path("tuningParameters"));
+        request = mapRoutingRequest(adapter.path("routingDefaults"));
     }
 
     @Override

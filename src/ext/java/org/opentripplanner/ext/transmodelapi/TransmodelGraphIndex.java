@@ -8,6 +8,7 @@ import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.schema.GraphQLSchema;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -31,11 +32,11 @@ class TransmodelGraphIndex {
 
     final ExecutorService threadPool;
 
-    TransmodelGraphIndex(Graph graph) {
+    TransmodelGraphIndex(Graph graph, RoutingRequest defaultRoutingRequest) {
         threadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
         );
-        indexSchema = new TransmodelIndexGraphQLSchema(graph).indexSchema;
+        indexSchema = new TransmodelIndexGraphQLSchema(graph, defaultRoutingRequest).indexSchema;
     }
 
     HashMap<String, Object> getGraphQLExecutionResult(

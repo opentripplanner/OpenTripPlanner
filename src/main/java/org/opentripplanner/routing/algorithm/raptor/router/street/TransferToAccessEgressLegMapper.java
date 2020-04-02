@@ -4,7 +4,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.TransferWithDuration;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -20,8 +20,8 @@ public class TransferToAccessEgressLegMapper {
         this.walkSpeed = walkSpeed;
     }
 
-    public Collection<TransferLeg> map(Map<Stop, Transfer> input) {
-        List<TransferLeg> result = new ArrayList<>();
+    public Collection<RaptorTransfer> map(Map<Stop, Transfer> input) {
+        List<RaptorTransfer> result = new ArrayList<>();
         for (Map.Entry<Stop, Transfer> entry : input.entrySet()) {
             Stop stop = entry.getKey();
             Transfer transfer = entry.getValue();
