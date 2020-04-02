@@ -10,23 +10,38 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
  * The {@link RaptorTripPattern} for this schedule return {@code stopIndex == stopPosInPattern + 1 }.
  */
 public class TestRaptorTripSchedule implements RaptorTripSchedule {
+    private static final int DELAY_BETWEEN_ALIGHT_AND_BOARD = 10;
     private final String name;
     private final int[] arrivalTimes;
-    private final int[] depatureTimes;
+    private final int[] departureTimes;
     private final int[] stopIndexes;
+    private final int[] restrictions;
 
     private final RaptorTripPattern pattern = new RaptorTripPattern() {
         @Override public int stopIndex(int stopPositionInPattern) {
             return stopIndexes[stopPositionInPattern];
         }
+        @Override
+        public boolean boardingPossibleAt(int stopPositionInPattern) {
+            return isNotRestricted(stopPositionInPattern, 0b001);
+        }
+        @Override
+        public boolean alightingPossibleAt(int stopPositionInPattern) {
+            return isNotRestricted(stopPositionInPattern, 0b010);
+        }
         @Override public int numberOfStopsInPattern() { return stopIndexes.length; }
+
+        private boolean isNotRestricted(int index, int mask) {
+            return restrictions == null || (restrictions[index] & mask) > 0;
+        }
     };
 
-    private TestRaptorTripSchedule(String name, int[] arrivalTimes, int[] depatureTimes, int[] stopIndexes) {
+    private TestRaptorTripSchedule(String name, int[] arrivalTimes, int[] departureTimes, int[] stopIndexes, int[] restrictions) {
         this.name = name;
         this.arrivalTimes = arrivalTimes;
-        this.depatureTimes = depatureTimes;
+        this.departureTimes = departureTimes;
         this.stopIndexes = stopIndexes;
+        this.restrictions = restrictions;
     }
 
     public static Builder create(String name) { return new Builder(name); }
@@ -38,7 +53,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
 
     @Override
     public int departure(int stopPosInPattern) {
-        return depatureTimes[stopPosInPattern];
+        return departureTimes[stopPosInPattern];
     }
 
     @Override
@@ -60,7 +75,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         return ToStringBuilder
                 .of(TestRaptorTripSchedule.class)
                 .addAsHhMm("arrivals", arrivalTimes)
-                .addAsHhMm("departures", depatureTimes)
+                .addAsHhMm("departures", departureTimes)
                 .addInts("stops", stopIndexes)
                 .toString();
     }
@@ -70,20 +85,25 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         private int[] departureTimes = null;
         private int[] arrivalTimes = null;
         private int[] stopIndexes = null;
-        private int stopIndexDelta = 1;
-        private int departureDelay = 10;
+        private int[] boardAlightRestrictions;
 
         private Builder(String name) {
             this.name = name;
         }
 
-        public Builder withArrivalTimes(int ... arrivalTimes) {
+        public Builder withAlightTimes(int ... arrivalTimes) {
             this.arrivalTimes = arrivalTimes;
             return this;
         }
 
-        public Builder withDepartureTimes(int ... departureTimes) {
+        public Builder withBoardTimes(int ... departureTimes) {
             this.departureTimes = departureTimes;
+            return this;
+        }
+
+        public Builder withBoardAndAlightTimes(int ... times) {
+            this.departureTimes = times;
+            this.arrivalTimes = times;
             return this;
         }
 
@@ -92,14 +112,18 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
             return this;
         }
 
-        public Builder withDepartureDelay(int departureDelay) {
-            this.departureDelay = departureDelay;
-            return this;
-        }
-
-        public Builder withStopIndexDelta(int stopIndexDelta) {
-            this.stopIndexDelta = stopIndexDelta;
-            return this;
+        /**
+         * 0 - 000 : No restriction
+         * 1 - 001 : No Boarding.
+         * 2 - 010 : No Alighting.
+         * 3 - 011 : No Boarding. No Alighting.
+         * 4 - 100 : No wheelchair.
+         * 5 - 101 : No wheelchair. No Boarding. No Alighting.
+         * 6 - 110 : No wheelchair. No Alighting.
+         * 7 - 111 : No wheelchair. No Boarding. No Alighting.
+         */
+        public void setBoardAlightRestrictions(int[] boardAlightRestrictions) {
+            this.boardAlightRestrictions = boardAlightRestrictions;
         }
 
         public TestRaptorTripSchedule build() {
@@ -109,22 +133,28 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
             if(arrivalTimes == null) {
                 arrivalTimes = new int[departureTimes.length];
                 for (int i = 0; i < departureTimes.length; i++) {
-                    arrivalTimes[i] = departureTimes[i] - departureDelay;
+                    arrivalTimes[i] = departureTimes[i] - DELAY_BETWEEN_ALIGHT_AND_BOARD;
                 }
             }
             else if(departureTimes == null) {
                 departureTimes = new int[arrivalTimes.length];
                 for (int i = 0; i < arrivalTimes.length; i++) {
-                    departureTimes[i] = arrivalTimes[i] + departureDelay;
+                    departureTimes[i] = arrivalTimes[i] + DELAY_BETWEEN_ALIGHT_AND_BOARD;
                 }
             }
             if(stopIndexes == null) {
                 stopIndexes = new int[arrivalTimes.length];
                 for (int i = 0; i < stopIndexes.length; i++) {
-                    stopIndexes[i] = i + stopIndexDelta;
+                    stopIndexes[i] = i + 1;
                 }
             }
-            return new TestRaptorTripSchedule(name, arrivalTimes, departureTimes, stopIndexes);
+            return new TestRaptorTripSchedule(
+                    name,
+                    arrivalTimes,
+                    departureTimes,
+                    stopIndexes,
+                    boardAlightRestrictions
+            );
         }
     }
 }

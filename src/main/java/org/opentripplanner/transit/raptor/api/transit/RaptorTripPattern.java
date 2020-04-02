@@ -14,6 +14,23 @@ public interface RaptorTripPattern {
      */
     int stopIndex(int stopPositionInPattern);
 
+
+    /**
+     * Return {@code true} if it is allowed/possible to board at a particular stop index. This
+     * should include checks like: Does the pattern allow boarding at the given stop? Is this
+     * accessible to wheelchairs (if requested).
+     *
+     * @param stopPositionInPattern stop position number in pattern, starting at 0.
+     */
+    boolean boardingPossibleAt(int stopPositionInPattern);
+
+
+    /**
+     * Same as {@link #boardingPossibleAt(int)}, but for getting off a trip.
+     * @param stopPositionInPattern stop position number in pattern, starting at 0.
+     */
+    boolean alightingPossibleAt(int stopPositionInPattern);
+
     /**
      * Number of stops in pattern.
      */
