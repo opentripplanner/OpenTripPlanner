@@ -92,6 +92,11 @@ public abstract class DominanceFunction implements Serializable {
             }
         }
 
+        if (a.getCurrentVehicle() != null && a.getCurrentVehicle() != null) {
+            if (a.getCurrentVehicle().getVehicleType() != b.getCurrentVehicle().getVehicleType())
+                return false;
+        }
+
         // These two states are comparable (they are on the same "plane" or "copy" of the graph).
         return betterOrEqual(a, b);
 
