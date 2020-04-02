@@ -30,6 +30,11 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> extends Interme
     }
 
     @Override
+    public String toString() {
+        return "Walk " + asString(toStop());
+    }
+
+    @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (!super.equals(o)) return false;

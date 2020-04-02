@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
@@ -23,7 +23,7 @@ public class HeuristicsAdapter implements Heuristics {
     private int originDepartureTime = -1;
     private final BestTimes times;
     private final BestNumberOfTransfers transfers;
-    private final Collection<TransferLeg> egressLegs;
+    private final Collection<RaptorTransfer> egressLegs;
     private final TransitCalculator calculator;
     private boolean aggregatedResultsCalculated = false;
 
@@ -33,7 +33,7 @@ public class HeuristicsAdapter implements Heuristics {
     public HeuristicsAdapter(
             BestTimes times,
             BestNumberOfTransfers transfers,
-            Collection<TransferLeg> egressLegs,
+            Collection<RaptorTransfer> egressLegs,
             TransitCalculator calculator,
             WorkerLifeCycle lifeCycle
     ) {
@@ -111,7 +111,7 @@ public class HeuristicsAdapter implements Heuristics {
     private void calculateAggregatedResults() {
         if(aggregatedResultsCalculated) { return; }
 
-        for (TransferLeg it : egressLegs) {
+        for (RaptorTransfer it : egressLegs) {
             if(reached(it.stop())) {
                 int t = bestTravelDuration(it.stop()) + it.durationInSeconds();
                 minJourneyTravelDuration = Math.min(minJourneyTravelDuration, t);

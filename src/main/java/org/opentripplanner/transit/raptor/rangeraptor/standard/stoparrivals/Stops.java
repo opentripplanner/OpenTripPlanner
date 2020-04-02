@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals;
 
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoundProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.BestNumberOfTransfers;
@@ -31,11 +31,11 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
      * Setup egress arrivals with a callback witch is notified when a new transit egress arrival happens.
      */
     public void setupEgressStopStates(
-            Iterable<TransferLeg> egressLegs,
+            Iterable<RaptorTransfer> egressLegs,
             Consumer<EgressStopArrivalState<T>> transitArrivalCallback
     ) {
         for (int round = 1; round < stops.length; round++) {
-            for (TransferLeg leg : egressLegs) {
+            for (RaptorTransfer leg : egressLegs) {
                 EgressStopArrivalState<T> state = new EgressStopArrivalState<>(
                         round,
                         leg,
@@ -82,7 +82,7 @@ public final class Stops<T extends RaptorTripSchedule> implements BestNumberOfTr
     /**
      * Set the time at a transit index iff it is optimal. This sets both the best time and the transfer time
      */
-    void transferToStop(int fromStop, TransferLeg transferLeg, int arrivalTime) {
+    void transferToStop(int fromStop, RaptorTransfer transferLeg, int arrivalTime) {
         int stop = transferLeg.stop();
         StopArrivalState<T> state = findOrCreateStopIndex(round(), stop);
 

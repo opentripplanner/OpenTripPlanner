@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -27,10 +27,13 @@ public class TransitStopArrivalTest {
     private static final int TRANSIT_ALIGHT_TIME = TRANSIT_BOARD_TIME + TRANSIT_LEG_DURATION;
     private static final int TRANSIT_TRAVEL_DURATION = ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION;
     private static final int TRANSIT_COST = 200;
-    private static final RaptorTripSchedule TRANSIT_TRIP = TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes(TRANSIT_ALIGHT_TIME);
+    private static final RaptorTripSchedule TRANSIT_TRIP = TestRaptorTripSchedule
+            .create("T1")
+            .withArrivalTimes(TRANSIT_ALIGHT_TIME)
+            .build();
     private static final int ROUND = 1;
 
-    private static final TransitCalculator TRANSIT_CALCULATOR = testDummyCalculator(BOARD_SLACK, true);
+    private static final TransitCalculator TRANSIT_CALCULATOR = testDummyCalculator(true);
 
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
             ACCESS_TO_STOP,

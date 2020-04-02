@@ -20,7 +20,7 @@ public final class Path<T extends RaptorTripSchedule> {
     private final int numberOfTransfers;
     private final int cost;
     private final AccessPathLeg<T> accessLeg;
-    private EgressPathLeg<T> egressPathLeg = null;
+    private final EgressPathLeg<T> egressPathLeg;
 
 
     /**
@@ -40,13 +40,15 @@ public final class Path<T extends RaptorTripSchedule> {
         this.numberOfTransfers = numberOfTransfers;
         this.cost = cost;
         this.accessLeg = null;
+        this.egressPathLeg = null;
     }
 
-    public Path(AccessPathLeg<T> accessLeg, int endTime, int numberOfTransfers, int cost) {
+    public Path(AccessPathLeg<T> accessLeg, int cost) {
         this.accessLeg = accessLeg;
+        this.egressPathLeg = findEgressLeg(accessLeg);
         this.startTime = accessLeg.fromTime();
-        this.endTime = endTime;
-        this.numberOfTransfers = numberOfTransfers;
+        this.endTime = egressPathLeg.toTime();
+        this.numberOfTransfers = countNumberOfTransfers(accessLeg);
         this.cost = cost;
     }
 
@@ -67,7 +69,7 @@ public final class Path<T extends RaptorTripSchedule> {
     /**
      * The total journey duration in seconds.
      */
-    public final int totalTravelDurationInSeconds() {
+    public final int travelDurationInSeconds() {
         return endTime - startTime;
     }
 
@@ -96,11 +98,6 @@ public final class Path<T extends RaptorTripSchedule> {
      * The last leg of this journey.
      */
     public final EgressPathLeg<T> egressLeg() {
-        if(egressPathLeg == null) {
-            PathLeg<T> leg = accessLeg;
-            while (!leg.isEgressLeg()) leg = leg.nextLeg();
-            egressPathLeg = leg.asEgressLeg();
-        }
         return egressPathLeg;
     }
 
@@ -145,8 +142,10 @@ public final class Path<T extends RaptorTripSchedule> {
         buf.sep().stop(leg.asEgressLeg().fromStop()).sep().walk(leg.duration());
 
         return buf.toString() +
-                " (tot: " + TimeUtils.timeToStrCompact(endTime-startTime) +
-                (cost <= 0 ? "" : ", cost: " + cost) + ")";
+                " [" + TimeUtils.timeToStrLong(startTime) +
+                " " + TimeUtils.timeToStrLong(endTime) +
+                " " + TimeUtils.durationToStr(endTime-startTime) +
+                (cost <= 0 ? "" : ", cost: " + cost) + "]";
     }
 
     @Override
@@ -163,5 +162,22 @@ public final class Path<T extends RaptorTripSchedule> {
     @Override
     public int hashCode() {
         return Objects.hash(startTime, endTime, numberOfTransfers, accessLeg);
+    }
+
+
+    private static <S extends RaptorTripSchedule> EgressPathLeg<S> findEgressLeg(PathLeg<S> leg) {
+        while (!leg.isEgressLeg()) { leg = leg.nextLeg(); }
+        return (EgressPathLeg<S>) leg;
+    }
+
+    private static <S extends RaptorTripSchedule> int countNumberOfTransfers(AccessPathLeg<S> accessLeg) {
+        // Skip first transit
+        PathLeg<S> leg = accessLeg.nextLeg().nextLeg();
+        int i = 0;
+        while (!leg.isEgressLeg()) {
+            if(leg.isTransitLeg()) { ++i; }
+            leg = leg.nextLeg();
+        }
+        return i;
     }
 }

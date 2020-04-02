@@ -35,4 +35,10 @@ public interface RaptorTripSchedule {
      * {@code "P-5_T-12"}
      */
     String debugInfo();
+
+
+    /**
+     * Return the pattern for this trip.
+     */
+    RaptorTripPattern pattern();
 }

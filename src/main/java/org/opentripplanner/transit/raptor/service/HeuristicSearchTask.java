@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.service;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.request.SearchDirection;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.heuristics.HeuristicSearch;
@@ -27,7 +27,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     private final SearchDirection direction;
     private final String name;
     private final RaptorConfig<T> config;
-    private final TransitDataProvider<T> transitData;
+    private final RaptorTransitDataProvider<T> transitData;
 
     private boolean run = false;
     private HeuristicSearch<T> search = null;
@@ -36,7 +36,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     public HeuristicSearchTask(
             RaptorRequest<T> request,
             RaptorConfig<T> config,
-            TransitDataProvider<T> transitData
+            RaptorTransitDataProvider<T> transitData
     ) {
         this(
                 request.searchDirection(),
@@ -51,7 +51,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
             SearchDirection direction,
             String name,
             RaptorConfig<T> config,
-            TransitDataProvider<T> transitData
+            RaptorTransitDataProvider<T> transitData
     ) {
         this.direction = direction;
         this.name = name;

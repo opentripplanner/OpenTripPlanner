@@ -54,7 +54,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
                 p.egressLeg().fromStop(),
                 TimeUtils.timeToStrLong(p.accessLeg().fromTime()),
                 TimeUtils.timeToStrLong(p.egressLeg().toTime()),
-                timeToStrCompact(p.totalTravelDurationInSeconds()),
+                timeToStrCompact(p.travelDurationInSeconds()),
                 p.cost(),
                 details(e.action().toString(), e.reason(), e.toString())
         );

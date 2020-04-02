@@ -91,14 +91,13 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
     }
 
     private TransitRoutingStrategy<T> createWorkerStrategy(StdWorkerState<T> state) {
-
         switch (ctx.profile()) {
             case STANDARD:
             case BEST_TIME:
-                return new StdTransitWorker<>(state, ctx.calculator());
+                return new StdTransitWorker<>(state, ctx.slackProvider(), ctx.calculator());
             case NO_WAIT_STD:
             case NO_WAIT_BEST_TIME:
-                return new NoWaitTransitWorker<>(state, ctx.calculator());
+                return new NoWaitTransitWorker<>(state, ctx.slackProvider(), ctx.calculator());
         }
         throw new IllegalArgumentException(ctx.profile().toString());
     }
@@ -170,7 +169,7 @@ public class StdRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     private StopsCursor<T> stopsCursor() {
         // Always create new cursors
-        return new StopsCursor<>(stops(), ctx.calculator());
+        return new StopsCursor<>(stops(), ctx.calculator(), ctx.boardSlackProvider());
     }
 
     private DestinationArrivalPaths<T> destinationArrivalPaths() {

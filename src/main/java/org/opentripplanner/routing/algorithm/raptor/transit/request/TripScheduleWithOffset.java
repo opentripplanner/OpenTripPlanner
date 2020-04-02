@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
@@ -12,10 +13,10 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 public class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
-    private final TripPattern pattern;
+    private final TripPatternForDates pattern;
     private final TripTimes tripTimes;
 
-    TripScheduleWithOffset(TripPattern pattern, TripTimes tripTimes, int offset) {
+    TripScheduleWithOffset(TripPatternForDates pattern, TripTimes tripTimes, int offset) {
         this.pattern = pattern;
         this.tripTimes = tripTimes;
         this.secondsOffset = offset;
@@ -33,7 +34,13 @@ public class TripScheduleWithOffset implements TripSchedule {
 
     @Override
     public String debugInfo() {
-        return null;
+        TripPattern pattern = this.pattern.getTripPattern().getPattern();
+        return pattern.mode.name() + " " + pattern.route.getShortName();
+    }
+
+    @Override
+    public RaptorTripPattern pattern() {
+        return pattern;
     }
 
     @Override
@@ -43,7 +50,7 @@ public class TripScheduleWithOffset implements TripSchedule {
 
     @Override
     public TripPattern getOriginalTripPattern() {
-        return this.pattern;
+        return pattern.getTripPattern().getPattern();
     }
 
     public int getSecondsOffset() {

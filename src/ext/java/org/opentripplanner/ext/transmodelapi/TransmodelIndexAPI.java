@@ -40,7 +40,7 @@ public class TransmodelIndexAPI {
 
     public TransmodelIndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
         this.router = otpServer.getRouter(routerId);
-        index = new TransmodelGraphIndex(router.graph);
+        index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
     }
 
     /**

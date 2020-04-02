@@ -40,10 +40,13 @@ public class Router {
     /* TODO The fields for "components" are slowly disappearing... maybe at some point a router
         will be nothing but configuration values tied to a Graph. */
 
-    // Inspector/debug services
+    /** Inspector/debug services */
     public TileRendererManager tileRendererManager;
 
-    // A RoutingRequest containing default parameters that will be cloned when handling each request
+    /**
+     * A RoutingRequest containing default parameters that will be cloned when handling each
+     * request.
+     */
     public RoutingRequest defaultRoutingRequest;
 
     /** A graphical window that is used for visualizing search progress (debugging). */

@@ -6,7 +6,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRapto
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -154,14 +154,14 @@ class RaptorRoutingRequestTransitDataCreator {
         .collect(toMap(p -> p.getTripPattern().getId(), p -> p));
   }
 
-  List<List<TransferLeg>> calculateTransferDuration(double walkSpeed) {
+  List<List<RaptorTransfer>> calculateTransferDuration(double walkSpeed) {
     return transitLayer
         .getTransferByStopIndex()
         .stream()
         .map(t -> t
             .stream()
             .map(s -> new TransferWithDuration(s, walkSpeed))
-            .collect(Collectors.<TransferLeg>toList()))
+            .collect(Collectors.<RaptorTransfer>toList()))
         .collect(toList());
   }
 }

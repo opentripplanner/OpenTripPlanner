@@ -6,7 +6,7 @@ package org.opentripplanner.transit.raptor.api.transit;
  * between the access (origin to first stop), transfer (stop to stop) or egress (last stop to destination),
  * to Raptor - all these are the same thing.
  */
-public interface TransferLeg {
+public interface RaptorTransfer {
 
     /**
      * <ul>

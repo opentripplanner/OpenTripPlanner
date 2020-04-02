@@ -5,6 +5,8 @@
 These properties changed names from:
  - `htmlAnnotations` to `dataImportReport`
  - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`
+ - `boardTimes` to `routingDefaults.boardSlackByMode`
+ - `alightTimes` to `routingDefaults.alightSlackByMode`
  
  ## Command line
  TODO OTP2
@@ -20,9 +22,12 @@ These properties changed names from:
  `metadata` returned by the rout call.
  
  ### RoutingRequest changes
- See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. Her is a short list of new filed:
+ See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. 
+ Her is a short list of new filed:
  
  - `searchWindow` Limit the departure window or arrival window for the routing search.
+ - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
+ - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
   
  ### Response changes
 
