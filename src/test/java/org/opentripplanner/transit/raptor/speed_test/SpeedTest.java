@@ -22,6 +22,7 @@ import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -82,15 +83,20 @@ public class SpeedTest {
     }
 
     public static void main(String[] args) throws Exception {
-        // Given the following setup
-        AvgTimer.enableTimers(true);
-        SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
+        try {
+            // Given the following setup
+            AvgTimer.enableTimers(true);
+            SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
 
-        // create a new test
-        SpeedTest speedTest = new SpeedTest(opts);
+            // create a new test
+            SpeedTest speedTest = new SpeedTest(opts);
 
-        // and run it
-        speedTest.runTest();
+            // and run it
+            speedTest.runTest();
+        }
+        catch (OtpAppException ae) {
+            LOG.error(ae.getMessage());
+        }
     }
 
     private static Graph loadGraph(File rootDir) {
