@@ -1,5 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.geotools.geometry.DirectPosition2D;
@@ -108,6 +109,9 @@ public class ElevationModule implements GraphBuilderModule {
     /** A concurrent hashmap used for storing geoid difference values at various coordinates */
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
+    /** Used only when the ElevationModule is requested to be ran with a single thread */
+    private Coverage singleThreadedCoverageInstance;
+
     /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
         this(
@@ -140,6 +144,15 @@ public class ElevationModule implements GraphBuilderModule {
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
         this.parallelism = parallelism;
+    }
+
+    /**
+     * Gets the desired amount of processors to use for elevation calculations from the build-config setting. It will
+     * return at least 1 processor and no more than the maximum available processors.
+     */
+    public static int fromConfig(JsonNode elevationModuleParallelism) {
+        int maxProcessors = Runtime.getRuntime().availableProcessors();
+        return Math.max(1, Math.min(elevationModuleParallelism.asInt(maxProcessors), maxProcessors));
     }
 
     public List<String> provides() {
@@ -175,15 +188,14 @@ public class ElevationModule implements GraphBuilderModule {
         }
         log.info("Setting street elevation profiles from digital elevation model...");
 
-        ForkJoinPool.ForkJoinWorkerThreadFactory forkJoinWorkerThreadFactory = pool -> new ElevationWorkerThread(pool);
+        ForkJoinPool forkJoinPool = null;
+        if (parallelism > 1) {
+            // Create a thread factory for multi-threaded elevation calculations
+            ForkJoinPool.ForkJoinWorkerThreadFactory forkJoinWorkerThreadFactory = pool -> new ElevationWorkerThread(
+                pool);
 
-        // Multithread elevation calculations
-        ForkJoinPool forkJoinPool = new ForkJoinPool(
-            parallelism,
-            forkJoinWorkerThreadFactory,
-            null,
-            false
-        );
+            forkJoinPool = new ForkJoinPool(parallelism, forkJoinWorkerThreadFactory, null, false);
+        }
 
         // At first, set the totalElevationEdges to the total number of edges in the graph.
         totalElevationEdges = graph.countEdges();
@@ -191,7 +203,16 @@ public class ElevationModule implements GraphBuilderModule {
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
-                    forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee));
+                    if (parallelism > 1) {
+                        // Multi-threaded execution requested, check and prepare a few things that are used only during
+                        // multi-threaded runs.
+                        if (examplarCoordinate == null) {
+                            // store the first coordinate of the first StreetEdge for later use in initializing coverage
+                            // instances
+                            examplarCoordinate = ee.getGeometry().getCoordinates()[0];
+                        }
+                        forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee));
+                    }
                     streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
                 }
             }
@@ -199,17 +220,22 @@ public class ElevationModule implements GraphBuilderModule {
         // update this value to the now-known amount of edges that are StreetWithElevation edges
         totalElevationEdges = streetsWithElevationEdges.size();
 
-        // store the first coordinate of the first StreetEdge for later use ininitializing coverage instances
-        examplarCoordinate = streetsWithElevationEdges.get(0).getGeometry().getCoordinates()[0];
-
-        // shutdown the forkJoinPool and wait until all tasks are finished. If this takes longer than 1 day, give up.
-        forkJoinPool.shutdown();
-        try {
-            forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
-        } catch (InterruptedException ex) {
-            log.error("Multi-threaded elevation calculations timed-out!");
-            Thread.currentThread().interrupt();
-            throw new RuntimeException(ex);
+        if (parallelism == 1) {
+            // If using just a single thread, process each edge inline
+            for (StreetWithElevationEdge ee : streetsWithElevationEdges) {
+                processEdgeWithProgress(ee);
+            }
+        } else {
+            // Multi-threaded execution
+            // shutdown the forkJoinPool and wait until all tasks are finished. If this takes longer than 1 day, give up.
+            forkJoinPool.shutdown();
+            try {
+                forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
+            } catch (InterruptedException ex) {
+                log.error("Multi-threaded elevation calculations timed-out!");
+                Thread.currentThread().interrupt();
+                throw new RuntimeException(ex);
+            }
         }
 
         double failurePercentage = nPointsOutsideDEM.get() / nPointsEvaluated.get() * 100;
@@ -320,11 +346,7 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         @Override public void run() {
-            processEdge(swee);
-            int curNumProcessed = nEdgesProcessed.addAndGet(1);
-            if (curNumProcessed % 50_000 == 0) {
-                log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
-            }
+            processEdgeWithProgress(swee);
         }
     }
 
@@ -524,6 +546,17 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     /**
+     * Processes a street edge and updates the current progress.
+     */
+    private void processEdgeWithProgress(StreetWithElevationEdge ee) {
+        processEdge(ee);
+        int curNumProcessed = nEdgesProcessed.addAndGet(1);
+        if (curNumProcessed % 50_000 == 0) {
+            log.info("set elevation on {}/{} edges", curNumProcessed, totalElevationEdges);
+        }
+    }
+
+    /**
      * Processes a single street edge, creating and assigning the elevation profile.
      *
      * @param ee the street edge
@@ -551,7 +584,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
         // coverage instances in other threads.
-        Coverage coverage = ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance();
+        Coverage coverage = getThreadSpecificCoverageInstance();
 
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
@@ -617,6 +650,21 @@ public class ElevationModule implements GraphBuilderModule {
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (PointOutsideCoverageException | TransformException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
+        }
+    }
+
+    /**
+     * Gets a coverage instance specific to the current thread. If using multiple threads, get the coverage instance
+     * associated with the ElevationWorkerThread. Otherwise, use a class field.
+     */
+    private Coverage getThreadSpecificCoverageInstance() {
+        if (parallelism == 1) {
+            if (singleThreadedCoverageInstance == null) {
+                singleThreadedCoverageInstance = gridCoverageFactory.getGridCoverage();
+            }
+            return singleThreadedCoverageInstance;
+        } else {
+            return ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance();
         }
     }
 
