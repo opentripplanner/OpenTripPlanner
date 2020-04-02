@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -19,19 +20,22 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
+    private final SlackProvider slackProvider;
 
-    private RaptorTripPattern<T> pattern;
+    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
-    public McTransitWorker(McRangeRaptorWorkerState<T> state, TransitCalculator calculator) {
+    public McTransitWorker(McRangeRaptorWorkerState<T> state, SlackProvider slackProvider, TransitCalculator calculator) {
         this.state = state;
+        this.slackProvider = slackProvider;
         this.calculator = calculator;
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
+        slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
@@ -39,9 +43,13 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
         final int nPatternStops = pattern.numberOfStopsInPattern();
         int boardStopIndex = pattern.stopIndex(boardStopPos);
 
-        for (AbstractStopArrival<T> boardFrom : state.listStopArrivalsPreviousRound(boardStopIndex)) {
+        for (AbstractStopArrival<T> prevStopArrival : state.listStopArrivalsPreviousRound(boardStopIndex)) {
 
-            int earliestBoardTime = calculator.earliestBoardTime(boardFrom.arrivalTime());
+            int earliestBoardTime = calculator.plusDuration(
+                    prevStopArrival.arrivalTime(),
+                    slackProvider.boardSlack()
+            );
+
             boolean found = tripSearch.search(earliestBoardTime, boardStopPos);
 
             if (found) {
@@ -54,9 +62,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
                     int alightStopIndex = pattern.stopIndex(alightStopPos);
 
                     state.transitToStop(
-                            boardFrom,
+                            prevStopArrival,
                             alightStopIndex,
                             trip.arrival(alightStopPos),
+                            slackProvider.alightSlack(),
                             tripDepartureTime,
                             trip
                     );

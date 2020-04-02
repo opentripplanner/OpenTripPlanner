@@ -2,11 +2,11 @@ package org.opentripplanner.transit.raptor.api.transit;
 
 
 /**
- * This interface represent a trip pattern.
- *
- * @param <T> The TripSchedule type defined by the user of the raptor API.
+ * This interface represent a trip pattern. A trip-pattern in the raptor context is
+ * just a list of stops visited by ALL trips in the pattern. The stops must be ordered
+ * in the same sequence, with no gaps, as the trips visit the stops.
  */
-public interface RaptorTripPattern<T extends RaptorTripSchedule> {
+public interface RaptorTripPattern {
 
     /**
      * The stop index
@@ -18,19 +18,4 @@ public interface RaptorTripPattern<T extends RaptorTripSchedule> {
      * Number of stops in pattern.
      */
     int numberOfStopsInPattern();
-
-    /**
-     * Get trip schedule by index. Trip schedules should be listed in order by the
-     * departure time for the first stop in the pattern.
-     * <p/>
-     * This method needs to be FAST - it is in the most critical line of execution in Raptor.
-     *
-     * @param index the trip schedule index in pattern starting at 0.
-     */
-    T getTripSchedule(int index);
-
-    /**
-     * Number of trips in pattern.
-     */
-    int numberOfTripSchedules();
 }

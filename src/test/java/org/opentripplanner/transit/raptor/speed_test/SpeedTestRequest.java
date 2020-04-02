@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test;
 
 import gnu.trove.iterator.TIntIntIterator;
 import gnu.trove.map.TIntIntMap;
+import org.opentripplanner.routing.algorithm.raptor.transit.SlackProvider;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -118,6 +119,14 @@ public class SpeedTestRequest {
         if(profile.raptorProfile.isOneOf(RaptorProfile.NO_WAIT_STD, RaptorProfile.NO_WAIT_BEST_TIME)) {
             builder.searchParams().searchOneIterationOnly();
         }
+
+        builder.slackProvider(new SlackProvider(
+                config.request.transferSlack,
+                config.request.boardSlack,
+                config.request.boardSlackForMode,
+                config.request.alightSlack,
+                config.request.alightSlackForMode
+        ));
 
         builder.searchDirection(profile.direction);
 

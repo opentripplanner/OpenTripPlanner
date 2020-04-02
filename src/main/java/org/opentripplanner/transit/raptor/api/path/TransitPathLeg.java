@@ -42,12 +42,16 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
         if (this == o) return true;
         if (!super.equals(o)) return false;
         TransitPathLeg<?> that = (TransitPathLeg<?>) o;
-        return next.equals(that.next) &&
-                trip.equals(that.trip);
+        return trip.equals(that.trip) && next.equals(that.next);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(super.hashCode(), next, trip);
+    }
+
+    @Override
+    public String toString() {
+        return trip.debugInfo() + " " + asString(toStop());
     }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.api.request;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.Collection;
@@ -41,8 +41,8 @@ public class SearchParams {
     private final double relaxCostAtDestination;
     private final boolean timetableEnabled;
     private final boolean allowWaitingBetweenAccessAndTransit;
-    private final Collection<TransferLeg> accessLegs;
-    private final Collection<TransferLeg> egressLegs;
+    private final Collection<RaptorTransfer> accessLegs;
+    private final Collection<RaptorTransfer> egressLegs;
 
     /**
      * Default values is defined in the default constructor.
@@ -236,19 +236,19 @@ public class SearchParams {
      * <p/>
      * Required, at least one access leg must exist.
      */
-    public Collection<TransferLeg> accessLegs() {
+    public Collection<RaptorTransfer> accessLegs() {
         return accessLegs;
     }
 
     /**
      * List of all possible egress stops and time to reach destination in seconds.
      * <p>
-     * NOTE! The {@link TransferLeg#stop()} is the stop where the egress leg
+     * NOTE! The {@link RaptorTransfer#stop()} is the stop where the egress leg
      * start, NOT the destination - think of it as a reversed leg.
      * <p/>
      * Required, at least one egress leg must exist.
      */
-    public Collection<TransferLeg> egressLegs() {
+    public Collection<RaptorTransfer> egressLegs() {
         return egressLegs;
     }
 

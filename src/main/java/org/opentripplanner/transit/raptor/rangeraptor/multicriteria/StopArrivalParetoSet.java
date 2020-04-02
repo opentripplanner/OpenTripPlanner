@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
@@ -41,7 +41,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
      * new destination arrivals for each accepted egress stop arrival.
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
-            TransferLeg egressLeg,
+            RaptorTransfer egressLeg,
             CostCalculator costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,
             DebugHandlerFactory<T> debugHandlerFactory
