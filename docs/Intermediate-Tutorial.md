@@ -23,7 +23,7 @@ If you run this query as is you will very likely get a response saying that a tr
 ## Calculating travel time isochrones
 OpenTripPlanner can also be used to calculate the area which is accessible from a point within a given travel time, also known as a travel time isochrone. 
 
-![example of a set of travel time isochrones](example-isochrone.png "")
+![example of a set of travel time isochrones](images/example-isochrone.png "")
 
 (_Image courtesy of [marcusyoung](https://github.com/marcusyoung)_)
 

@@ -53,38 +53,80 @@ I find [this tool](https://boundingbox.klokantech.com/) useful for determining t
 If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both the original file and the extract in a later step. See the [page on preparing OSM data](Preparing-OSM) for additional information and example commands for cropping and filtering OSM data.
 
 ## Start up OTP
-
-**TODO OTP2**
- 
-THIS SECTION NEEDS CLEANUP - THERE IS STILL A FEW PR HANGING AND WE WILL NOT 
-UPDATE THIS SECTION BEFORE ALL OF THEM ARE MERGED - THIS SHOULD BE FIXED AT 
-LATEST AT THE TIME OF THE OTP 2 BETA/RELEASE CANDIDATE. 
-
-INCLUDE IMAGE FROM [ISSUE #2904](https://github.com/opentripplanner/OpenTripPlanner/issues/2904) HERE. THIS IMAGE IS THE BEST DOC ON PARAMETERS TOGETER WITH THE `--help` OPTION RIGHT NOW.
-
 As a Java program, OTP must be run within a Java virtual machine (JVM), which is provided as part of the Java runtime (JRE) or Java development kit (JDK). Run `java -version` to check that you have version 11 or newer of the JVM installed. If you do not, you will need to install a recent OpenJDK or Oracle Java package for your operating system.
 
-GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <options>`. The `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. If you have sufficient memory in your computer,
-set this to a couple of gigabytes (e.g. `-Xmx2G`); when OTP doesn't have enough memory "breathing room" it can grind to a halt. [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with the [VisualGC plugin](https://visualvm.github.io/plugins.html).
+GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at 
+least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger
+ inputs. A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <options>`. The 
+ `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. If you have
+ sufficient memory in your computer, set this to a couple of gigabytes (e.g. `-Xmx2G`); when OTP 
+ doesn't have enough memory "breathing room" it can grind to a halt. 
+ [VisualVM](https://visualvm.github.io) is a good way to inspect Java memory usage, especially with
+ the [VisualGC plugin](https://visualvm.github.io/plugins.html).
 
-It's possible to analyze the GTFS, OSM and any other input data and save the resulting representation of the transit network (what we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)) to disk. Then when the OTP server is restarted it can reload this pre-built graph, which is significantly faster than building it from scratch. For simplicity, in this introductory tutorial we'll skip saving the graph file. After the graph is built we'll immediately pass it to an OTP server in memory. The command to do so is:
+### OTP Main Phases
+OTP has three phases that can be run in sequence or in isolation. It's possible to analyze the 
+GTFS, OSM and any other input data and save the resulting representation of the transit network 
+(what we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29)) to disk. Depending 
+on the data it might take a while to build a graph. Normally, building the street graph, especially 
+with elevation data, takes a long time, so it can be convenient to build the street graph once, and
+then use that as a starting point into which we add transit data to make the final graph. The final 
+graph can then be saved for later or served by the same OTP instance. When an OTP server is 
+restarted it can reload a pre-built graph, which is significantly faster than building it from 
+scratch. 
 
-`$ java -Xmx2G -jar otp.shaded.jar --build --inMemory /home/username/otp`
+These are the three main phases:
 
-where `/home/username/otp` should be the directory where you put your input files.
+1. Building a street-graph _streetGraph.obj_. 
+2. Building adding transit data to produce _graph.obj_.
+3. Serving the graph.
 
-The graph build operation should take about one minute to complete, and then you'll see a `Grizzly server running` message. At this point you have an OpenTripPlanner server running locally and can open [http://localhost:8080/](http://localhost:8080/) in a web browser. You should be presented with a web client that will interact with your local OpenTripPlanner instance.
+Steps 1 and 2 can be combined for smaller or simpler street networks. When starting OTP the command line parameter is used to control witch phases are run. The diagram below shows the flow depending on the parameters used.
 
-This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your local machine. It can be informative to watch the HTTP requests and responses being generated using the developer tools in your web browser. OTP's built-in web server will run by default on ports 8080 and 8081. If by any chance some other software is already using those port numbers, you can specify different port numbers with switches like `--port 8801 --securePort 8802`.
+![Command-Line-Parameter-Flow](images/cli-flow.svg)
 
-## Saving a Graph
+You must use at least one of the required 
+parameters: `--load`, `--loadStreet`, `--build`, `--buildStreet`. Some of the parameters are 
+implied by a _required_ parameter. For example `--serve` has no effect when used together
+with `--load` because `--load` implies `--serve`.    
 
-If you want to save the graph to speed up the process of repeatedly starting up a server with the same graph, building the graph and starting the server need to be done in two stages, leaving off the `--inMemory` switch:
 
-`$ java -Xmx2G -jar otp.shaded.jar --build /home/username/otp`
+### Building a graph and serving it 
 
-`$ java -Xmx2G -jar otp.shaded.jar --load /home/username/otp`
+The simplest way to start OTP is to build everything and start serving the graph without saving it. The command to do
+so is:
 
-## Startup Scripts
+`$ java -Xmx2G -jar otp.shaded.jar --build --serve /home/username/otp`
 
-TODO explain `./otp --build .`
+where `/home/username/otp` should be the directory where you put your configuration and input files.
+ 
+The graph build operation should take about one minute to complete, and then you'll see a 
+`Grizzly server running` message. At this point you have an OpenTripPlanner server running locally 
+and can open [http://localhost:8080/](http://localhost:8080/) in a web browser. You should be 
+presented with a web client that will interact with your local OpenTripPlanner instance.
+
+This map-based user interface is in fact sending HTTP GET requests to the OTP server running on your
+local machine. It can be informative to watch the HTTP requests and responses being generated using
+the developer tools in your web browser. OTP's built-in web server will run by default on ports
+8080 and 8081. If by any chance some other software is already using those port numbers, you can
+specify different port numbers with switches like `--port 8801 --securePort 8802`.
+
+
+### Saving a graph
+
+If you want to save the graph to speed up the process of repeatedly starting up a server with the
+same graph, building the graph and starting the server need to be done in two or three stages. In 
+this example we start the OTP instance in the current directory(`.`)  where the data and config 
+files are saved:
+
+- To build a graph from street and transit data, then save it to a file, use the `--build` and `--save` parameters:
+
+    `$ java -Xmx2G -jar otp.shaded.jar --build --save .`
+
+- To build a street-graph (OSM and elevation data only, ignoring transit input files):
+
+    `$ java -Xmx2G -jar otp.shaded.jar --buildStreet --save .`
+
+- To build a graph layering transit data on top of an existing street graph (built using the previous command):
+
+    `$ java -Xmx2G -jar otp.shaded.jar --loadStreet --build --save .`

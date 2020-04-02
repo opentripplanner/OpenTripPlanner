@@ -1,11 +1,13 @@
 package org.opentripplanner.common.model;
 
-import static org.junit.Assert.*;
 import org.junit.Test;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNull;
 
 public class LocationStringParserTest {
 
