@@ -211,8 +211,9 @@ public class GraphBuilderParameters {
 
     /**
      * A customizable level of parallelism with which to process elevation data for street edges. The default is set to
-     * the maximum available processors. For unknown reasons that seem to depend on data and machine settings, it might
-     * be faster to not use all processors available.
+     * the 1 processor. For unknown reasons that seem to depend on data and machine settings, it might be faster to use
+     * a single processors. The maximum amount of processors is capped according to the maximum number of processors
+     * that java detects on the current machine.
      */
     public int elevationModuleParallelism;
 

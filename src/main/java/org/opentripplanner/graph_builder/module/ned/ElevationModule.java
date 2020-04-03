@@ -48,7 +48,7 @@ import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDif
 
 /**
  * THIS CLASS IS MULTI-THREADED
- * (It uses a ForkJoinPool to distribute elevation calculation tasks for edges.)
+ * (When configured to do so, it uses a ForkJoinPool to distribute elevation calculation tasks for edges.)
  *
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
  * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
@@ -73,7 +73,8 @@ public class ElevationModule implements GraphBuilderModule {
     private final boolean includeEllipsoidToGeoidDifference;
     /*
      * The parallelism to use when processing edges. For unknown reasons that seem to depend on data and machine
-     * settings, it might be faster to not use all processors available.
+     * settings, it might be faster to use a single processor. If the parallelism is set to 1, then this module will not
+     * do any multi-threading and instead do all calculations in the OTP thread.
      */
     private final int parallelism;
 
@@ -145,7 +146,8 @@ public class ElevationModule implements GraphBuilderModule {
 
     /**
      * Gets the desired amount of processors to use for elevation calculations from the build-config setting. It will
-     * return at least 1 processor and no more than the maximum available processors.
+     * return at least 1 processor and no more than the maximum available processors. The default return value is 1
+     * processor.
      */
     public static int fromConfig(JsonNode elevationModuleParallelism) {
         int maxProcessors = Runtime.getRuntime().availableProcessors();
@@ -153,21 +155,13 @@ public class ElevationModule implements GraphBuilderModule {
         return Math.max(minimumProcessors, Math.min(elevationModuleParallelism.asInt(minimumProcessors), maxProcessors));
     }
 
-    public List<String> provides() {
-        return Arrays.asList("elevation");
-    }
-
-    public List<String> getPrerequisites() {
-        return Arrays.asList("streets");
-    }
-
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         this.graph = graph;
         gridCoverageFactory.fetchData(graph);
 
-        // try to load in the cached elevation data
         if (readCachedElevations) {
+            // try to load in the cached elevation data
             try {
                 ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
@@ -307,7 +301,7 @@ public class ElevationModule implements GraphBuilderModule {
         }
 
         /**
-         * Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that  could arise
+         * Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that could arise
          * from downstream classes that have synchronized methods.
          */
         private Coverage createThreadSpecificCoverage() {
@@ -537,7 +531,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     /**
-     * Processes a street edge and updates the current progress.
+     * Calculate the elevation for a single street edge. After the calculation is complete, update the current progress.
      */
     private void processEdgeWithProgress(StreetWithElevationEdge ee) {
         processEdge(ee);
@@ -548,7 +542,7 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     /**
-     * Processes a single street edge, creating and assigning the elevation profile.
+     * Calculate the elevation for a single street edge, creating and assigning the elevation profile.
      *
      * @param ee the street edge
      */
@@ -573,7 +567,7 @@ public class ElevationModule implements GraphBuilderModule {
             }
         }
 
-        // Needs full calculation. Calculate with a thread-specific coverage to avoid waiting for any locks on
+        // Needs full calculation. Calculate with a thread-specific coverage instance to avoid waiting for any locks on
         // coverage instances in other threads.
         Coverage coverage = getThreadSpecificCoverageInstance();
 

@@ -285,9 +285,9 @@ The cached data is a lookup table where the coordinate sequences of respective s
 
 #### Configuring the number of processors during elevation calculations
 
-For unknown reasons that seem to depend on data and machine settings, it might be faster to not use all processors available. For this reason, it is possible to define the parallelism or number of processors used during elevation calculations. It may be helpful to run experiments with different values to determine the optimal amount given the elevation data being used.
+For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single processor. For this reason, it is possible to define the parallelism or number of processors used during elevation calculations. It may be helpful to run experiments with different values to determine the optimal amount given the elevation data being used.
 
-By default, the maximum amount of available processors will be used. To set a custom amount of processors, add the following to the `build-config.json` file:
+By default, only 1 processor will be used. The maximum amount of processors is capped according to the maximum number of processors that java detects on the current machine. To set a custom amount of processors, add the following to the `build-config.json` file:
                                                                
 ```JSON
 // build-config.json
