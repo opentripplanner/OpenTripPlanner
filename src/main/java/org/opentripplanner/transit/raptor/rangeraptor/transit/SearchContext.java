@@ -132,7 +132,6 @@ public class SearchContext<T extends RaptorTripSchedule> {
         McCostParams f = request.multiCriteriaCostFactors();
         return new CostCalculator(
                 f.boardCost(),
-                request.searchParams().boardSlackInSeconds(),
                 f.walkReluctanceFactor(),
                 f.waitReluctanceFactor(),
                 lifeCycle()

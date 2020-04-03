@@ -11,7 +11,6 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
  */
 public class CostCalculator {
     private static final int PRECISION = 100;
-    private final int minTransferCost;
     private final int boardCost;
     private final int walkFactor;
     private final int waitFactor;
@@ -27,7 +26,6 @@ public class CostCalculator {
 
     CostCalculator(
             int boardCost,
-            int boardSlackInSeconds,
             double walkReluctanceFactor,
             double waitReluctanceFactor,
             WorkerLifeCycle lifeCycle
@@ -36,7 +34,6 @@ public class CostCalculator {
         this.walkFactor = (int) (PRECISION * walkReluctanceFactor);
         this.waitFactor = (int) (PRECISION * waitReluctanceFactor);
         this.transitFactor = PRECISION;
-        this.minTransferCost = this.boardCost +  this.waitFactor * boardSlackInSeconds;
         lifeCycle.onPrepareForNextRound(this::initWaitFactor);
     }
 
@@ -49,7 +46,7 @@ public class CostCalculator {
     }
 
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-        return  minTransferCost * minNumTransfers + transitFactor * minTravelTime  + boardCost;
+        return  boardCost * (minNumTransfers + 1) + transitFactor * minTravelTime;
     }
 
     private void initWaitFactor(int round) {
