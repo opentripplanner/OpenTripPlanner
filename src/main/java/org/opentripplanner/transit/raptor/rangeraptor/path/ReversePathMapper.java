@@ -9,7 +9,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 

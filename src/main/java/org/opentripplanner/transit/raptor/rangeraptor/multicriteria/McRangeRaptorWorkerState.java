@@ -12,7 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.Tra
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.heuristic.HeuristicsProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import java.util.ArrayList;

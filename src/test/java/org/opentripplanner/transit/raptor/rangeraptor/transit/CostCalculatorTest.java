@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -15,7 +16,7 @@ public class CostCalculatorTest {
     private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
 
-    private CostCalculator subject = new CostCalculator(
+    private CostCalculator subject = new DefaultCostCalculator(
             BOARD_COST,
             WALK_RELUCTANCE_FACTOR,
             WAIT_RELUCTANCE_FACTOR,

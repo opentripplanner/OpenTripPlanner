@@ -8,7 +8,8 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 import java.util.Arrays;
@@ -41,7 +42,7 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
 public class StopArrivalsTestData {
 
     /** Provide a Cost Calculator for tests that dont care to much avout testing the cost */
-    public static final CostCalculator COST_CALCULATOR = new CostCalculator(
+    public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
             0, 2.0, 1.0, new LifeCycleSubscriptions()
     );
 

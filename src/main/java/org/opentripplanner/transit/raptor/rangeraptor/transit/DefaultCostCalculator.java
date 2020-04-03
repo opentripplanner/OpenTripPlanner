@@ -1,15 +1,15 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 /**
- * The responsibility for the cost calculator is to calculate the
- * multi-criteria cost.
+ * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
  * <P/>
  * This class is immutable and thread safe.
  */
-public class CostCalculator {
+public class DefaultCostCalculator implements CostCalculator {
     private static final int PRECISION = 100;
     private final int boardCost;
     private final int walkFactor;
@@ -24,7 +24,7 @@ public class CostCalculator {
     private int waitFactorApplied = 0;
 
 
-    public CostCalculator(
+    public DefaultCostCalculator(
             int boardCost,
             double walkReluctanceFactor,
             double waitReluctanceFactor,
@@ -37,14 +37,17 @@ public class CostCalculator {
         lifeCycle.onPrepareForNextRound(this::initWaitFactor);
     }
 
+    @Override
     public int transitArrivalCost(int waitTime, int transitTime) {
         return waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
     }
 
+    @Override
     public int walkCost(int walkTimeInSeconds) {
         return walkFactor * walkTimeInSeconds;
     }
 
+    @Override
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
         return  boardCost * (minNumTransfers + 1) + transitFactor * minTravelTime;
     }
@@ -54,6 +57,7 @@ public class CostCalculator {
      * is 1/100 of a "transit second", while in the OTP domain is 1 "transit second". Cost in
      * raptor is calculated using integers ot be fast.
      */
+    @Override
     public int toOtpDomainCost(int raptorCost) {
         return (int) Math.round((double) raptorCost / PRECISION);
     }

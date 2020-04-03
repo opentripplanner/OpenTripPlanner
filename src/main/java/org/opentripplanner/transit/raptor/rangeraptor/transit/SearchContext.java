@@ -7,6 +7,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorProfile;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
@@ -222,7 +223,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static CostCalculator createCostCalculator(McCostParams f, WorkerLifeCycle lifeCycle) {
-        return new CostCalculator(
+        return new DefaultCostCalculator(
                 f.boardCost(),
                 f.walkReluctanceFactor(),
                 f.waitReluctanceFactor(),
