@@ -8,6 +8,7 @@ import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -33,6 +34,8 @@ import java.util.List;
 public class DegreeGridNEDTileSource implements NEDTileSource {
     private static Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
+    private Graph graph;
+
     private File cacheDirectory;
 
     public String awsAccessKey;
@@ -49,6 +52,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     }
 
     @Override public void fetchData(Graph graph, File cacheDirectory) {
+        this.graph = graph;
         this.cacheDirectory = cacheDirectory;
 
         HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
@@ -120,7 +124,13 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
                 ostream.close();
                 istream.close();
             } catch (ServiceException | IOException e) {
-                log.error("Error downloading tile {}! Error: {}.", key, e.getMessage());
+                log.error(
+                    graph.addBuilderAnnotation(
+                        new Graphwide(
+                            String.format("Error downloading elevation tile %s! Error: %s.", key, e.getMessage())
+                        )
+                    )
+                );
                 path.deleteOnExit();
                 return null;
             }
