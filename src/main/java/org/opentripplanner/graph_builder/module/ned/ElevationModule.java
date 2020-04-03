@@ -149,7 +149,8 @@ public class ElevationModule implements GraphBuilderModule {
      */
     public static int fromConfig(JsonNode elevationModuleParallelism) {
         int maxProcessors = Runtime.getRuntime().availableProcessors();
-        return Math.max(1, Math.min(elevationModuleParallelism.asInt(maxProcessors), maxProcessors));
+        int minimumProcessors = 1;
+        return Math.max(minimumProcessors, Math.min(elevationModuleParallelism.asInt(minimumProcessors), maxProcessors));
     }
 
     public List<String> provides() {
