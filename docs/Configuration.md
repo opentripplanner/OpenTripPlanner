@@ -86,7 +86,7 @@ config key | description | value type | value default | notes
 `elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`elevationModuleParallelism` | Set the number of processors to use during elevation calculations. | int | Current machine's number of processors. | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`elevationModuleParallelism` | Set the number of processors to use during elevation calculations. | int | 1 | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`
