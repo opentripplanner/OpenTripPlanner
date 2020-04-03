@@ -24,7 +24,7 @@ public class CostCalculator {
     private int waitFactorApplied = 0;
 
 
-    CostCalculator(
+    public CostCalculator(
             int boardCost,
             double walkReluctanceFactor,
             double waitReluctanceFactor,
@@ -49,18 +49,18 @@ public class CostCalculator {
         return  boardCost * (minNumTransfers + 1) + transitFactor * minTravelTime;
     }
 
-    private void initWaitFactor(int round) {
-        // For access(round 0) and the first transit round(1) skip adding a cost for waiting,
-        // we assume we can time-shift the access leg.
-        this.waitFactorApplied = round < 2 ? 0 : waitFactor;
-    }
-
     /**
      * Convert Raptor internal cost to OTP domain model cost. Inside Raptor the 1 cost unit
      * is 1/100 of a "transit second", while in the OTP domain is 1 "transit second". Cost in
      * raptor is calculated using integers ot be fast.
      */
-    public static int toOtpDomainCost(int raptorCost) {
+    public int toOtpDomainCost(int raptorCost) {
         return (int) Math.round((double) raptorCost / PRECISION);
+    }
+
+    private void initWaitFactor(int round) {
+        // For access(round 0) and the first transit round(1) skip adding a cost for waiting,
+        // we assume we can time-shift the access leg.
+        this.waitFactorApplied = round < 2 ? 0 : waitFactor;
     }
 }

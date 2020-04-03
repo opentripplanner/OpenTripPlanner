@@ -57,10 +57,10 @@ public class CostCalculatorTest {
 
     @Test
     public void testConvertBetweenRaptorAndMainOtpDomainModel() {
-        assertEquals(0, CostCalculator.toOtpDomainCost(49));
-        assertEquals(1, CostCalculator.toOtpDomainCost(50));
-        assertEquals(300, CostCalculator.toOtpDomainCost(30_000));
-        assertEquals(BOARD_COST, CostCalculator.toOtpDomainCost(subject.calculateMinCost(0,0)));
-        assertEquals(3 + BOARD_COST, CostCalculator.toOtpDomainCost(subject.calculateMinCost(3,0)));
+        assertEquals(0, subject.toOtpDomainCost(49));
+        assertEquals(1, subject.toOtpDomainCost(50));
+        assertEquals(300, subject.toOtpDomainCost(30_000));
+        assertEquals(BOARD_COST, subject.toOtpDomainCost(subject.calculateMinCost(0,0)));
+        assertEquals(3 + BOARD_COST, subject.toOtpDomainCost(subject.calculateMinCost(3,0)));
     }
 }

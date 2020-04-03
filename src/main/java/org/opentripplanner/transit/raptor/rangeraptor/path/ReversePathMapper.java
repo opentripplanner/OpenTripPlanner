@@ -33,8 +33,14 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
      */
     private final RaptorSlackProvider transitLayerSlackProvider;
 
-    public ReversePathMapper(RaptorSlackProvider slackProvider) {
+    /**
+     * Cost calculator used to convert a Raptor cost to a OTP internal domain cost.
+     */
+    private final CostCalculator costCalculator;
+
+    public ReversePathMapper(RaptorSlackProvider slackProvider, CostCalculator costCalculator) {
         this.transitLayerSlackProvider = slackProvider;
+        this.costCalculator = costCalculator;
     }
 
     @Override
@@ -49,7 +55,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
 
         return new Path<>(
                 accessLeg,
-                CostCalculator.toOtpDomainCost(destinationArrival.cost())
+                costCalculator.toOtpDomainCost(destinationArrival.cost())
         );
     }
 

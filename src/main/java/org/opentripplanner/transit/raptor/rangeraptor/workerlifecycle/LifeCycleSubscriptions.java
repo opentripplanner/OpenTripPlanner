@@ -22,9 +22,11 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
     final List<Consumer<Boolean>> roundCompleteListeners = new ArrayList<>();
     final List<Runnable> iterationCompleteListeners = new ArrayList<>();
 
+    private boolean openForSubscription = true;
 
     @Override
     public void onSetupIteration(IntConsumer setupIterationWithDepartureTime) {
+        assertIsOpen();
         if(setupIterationWithDepartureTime != null) {
             this.setupIterationListeners.add(setupIterationWithDepartureTime);
         }
@@ -32,6 +34,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onPrepareForNextRound(IntConsumer prepareForNextRound) {
+        assertIsOpen();
         if(prepareForNextRound != null) {
             this.prepareForNextRoundListeners.add(prepareForNextRound);
         }
@@ -39,6 +42,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onTransitsForRoundComplete(Runnable transitsForRoundComplete) {
+        assertIsOpen();
         if(transitsForRoundComplete != null) {
             this.transitsForRoundCompleteListeners.add(transitsForRoundComplete);
         }
@@ -46,6 +50,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onTransfersForRoundComplete(Runnable transfersForRoundComplete) {
+        assertIsOpen();
         if(transfersForRoundComplete != null) {
             this.transfersForRoundCompleteListeners.add(transfersForRoundComplete);
         }
@@ -53,6 +58,7 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onRoundComplete(Consumer<Boolean> roundCompleteWithDestinationReached) {
+        assertIsOpen();
         if(roundCompleteWithDestinationReached != null) {
             this.roundCompleteListeners.add(roundCompleteWithDestinationReached);
         }
@@ -60,8 +66,19 @@ public final class LifeCycleSubscriptions implements WorkerLifeCycle {
 
     @Override
     public void onIterationComplete(Runnable iterationComplete) {
+        assertIsOpen();
         if(iterationComplete != null) {
             this.iterationCompleteListeners.add(iterationComplete);
+        }
+    }
+
+    public void close() {
+        this.openForSubscription = false;
+    }
+
+    private void assertIsOpen() {
+        if(!openForSubscription) {
+            throw new IllegalStateException("Unable to add subscription, worker already created.");
         }
     }
 }

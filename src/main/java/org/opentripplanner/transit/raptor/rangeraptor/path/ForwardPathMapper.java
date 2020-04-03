@@ -25,8 +25,15 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
      */
     private final RaptorSlackProvider transitLayerSlackProvider;
 
-    public ForwardPathMapper(RaptorSlackProvider slackProvider) {
+    /**
+     * Cost calculator used to convert a Raptor cost to a OTP internal domain cost.
+     */
+    private final CostCalculator costCalculator;
+
+
+    public ForwardPathMapper(RaptorSlackProvider slackProvider, CostCalculator costCalculator) {
         this.transitLayerSlackProvider = slackProvider;
+        this.costCalculator = costCalculator;
     }
 
     @Override
@@ -82,7 +89,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         AccessPathLeg<T> accessLeg = createAccessPathLeg(from, transitLeg);
 
-        return new Path<>(accessLeg, CostCalculator.toOtpDomainCost(destinationArrival.cost()));
+        return new Path<>(accessLeg, costCalculator.toOtpDomainCost(destinationArrival.cost()));
     }
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {

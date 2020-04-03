@@ -12,7 +12,6 @@ import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.ba
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrLong;
 
 public class ReversePathMapperTest {
-
     @Test
     public void mapToPathReverseSearch() {
         // Given:
@@ -23,7 +22,7 @@ public class ReversePathMapperTest {
                 egress.additionalCost()
         );
         PathMapper<TestRaptorTripSchedule> mapper = new ReversePathMapper<>(
-                StopArrivalsTestData.SLACK_PROVIDER
+                StopArrivalsTestData.SLACK_PROVIDER, StopArrivalsTestData.COST_CALCULATOR
         );
 
         //When:

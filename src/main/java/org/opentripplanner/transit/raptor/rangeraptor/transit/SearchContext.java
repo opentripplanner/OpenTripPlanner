@@ -44,13 +44,14 @@ public class SearchContext<T extends RaptorTripSchedule> {
     protected final RaptorTransitDataProvider<T> transit;
 
     private final TransitCalculator calculator;
+    private final CostCalculator costCalculator;
     private final RaptorTuningParameters tuningParameters;
     private final RoundTracker roundTracker;
     private final PathMapper<T> pathMapper;
     private final WorkerPerformanceTimers timers;
     private final DebugHandlerFactory<T> debugFactory;
 
-    private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
+    private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
     public SearchContext(
             RaptorRequest<T> request,
@@ -63,8 +64,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
+        this.costCalculator = createCostCalculator(request.multiCriteriaCostFactors(), lifeCycle());
         this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
-        this.pathMapper = createPathMapper(request);
+        this.pathMapper = createPathMapper(request, this.costCalculator);
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -129,13 +131,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     public CostCalculator costCalculator() {
-        McCostParams f = request.multiCriteriaCostFactors();
-        return new CostCalculator(
-                f.boardCost(),
-                f.walkReluctanceFactor(),
-                f.waitReluctanceFactor(),
-                lifeCycle()
-        );
+        return costCalculator;
     }
 
     public WorkerPerformanceTimers timers() {
@@ -174,9 +170,9 @@ public class SearchContext<T extends RaptorTripSchedule> {
 
     public LifeCycleEventPublisher createLifeCyclePublisher() {
         LifeCycleEventPublisher publisher = new LifeCycleEventPublisher(lifeCycleSubscriptions);
-        // We want the code to fail (NPE) if someone try to attach to the worker workerlifecycle
-        // after it is iniziated; Hence set the builder to null:
-        lifeCycleSubscriptions = null;
+        // We want the code to fail if someone try to attach to the worker lifecycle
+        // after it is initialized; Hence close for new subscriptions
+        lifeCycleSubscriptions.close();
         return publisher;
     }
 
@@ -218,11 +214,21 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-            RaptorRequest<S> request
+            RaptorRequest<S> request, CostCalculator costCalculator
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider())
-                : new ReversePathMapper<>(request.slackProvider());
+                ? new ForwardPathMapper<>(request.slackProvider(), costCalculator)
+                : new ReversePathMapper<>(request.slackProvider(), costCalculator);
     }
+
+    private static CostCalculator createCostCalculator(McCostParams f, WorkerLifeCycle lifeCycle) {
+        return new CostCalculator(
+                f.boardCost(),
+                f.walkReluctanceFactor(),
+                f.waitReluctanceFactor(),
+                lifeCycle
+        );
+    }
+
 
 }
