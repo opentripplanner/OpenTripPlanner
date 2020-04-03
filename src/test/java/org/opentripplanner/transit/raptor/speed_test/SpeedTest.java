@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test;
 
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.OtpDataStore;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -23,8 +24,6 @@ import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 import org.opentripplanner.util.OtpAppException;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.lang.ref.WeakReference;
@@ -41,8 +40,6 @@ import java.util.stream.Collectors;
  * Also demonstrates how to run basic searches without using the graphQL profile routing API.
  */
 public class SpeedTest {
-
-    private static final Logger LOG = LoggerFactory.getLogger(SpeedTest.class);
     private static final boolean TEST_NUM_OF_ADDITIONAL_TRANSFERS = false;
     private static final String TRAVEL_SEARCH_FILENAME = "travelSearch";
 
@@ -95,7 +92,11 @@ public class SpeedTest {
             speedTest.runTest();
         }
         catch (OtpAppException ae) {
-            LOG.error(ae.getMessage());
+            System.err.println(ae.getMessage());
+        }
+        catch (Exception e) {
+            System.err.println(e.getMessage());
+            e.printStackTrace(System.err);
         }
     }
 
@@ -107,7 +108,7 @@ public class SpeedTest {
     }
 
     private void runTest() throws Exception {
-        LOG.info("Run Speed Test");
+        System.err.println("Run Speed Test");
         final SpeedTestProfile[] speedTestProfiles = opts.profiles();
         final int nSamples = opts.numberOfTestsSamplesToRun();
 
@@ -120,10 +121,11 @@ public class SpeedTest {
         printProfileStatistics();
 
         service.shutdown();
+        System.err.println("\nSpeedTest done! " + MavenVersion.VERSION.getShortVersionString());
     }
 
     private void runSingleTest(int sample, int nSamples) throws Exception {
-        LOG.info("Run a single test sample (all test cases once)");
+        System.err.println("Run a single test sample (all test cases once)");
 
         CsvFileIO tcIO = new CsvFileIO(opts.rootDir(), TRAVEL_SEARCH_FILENAME);
         List<TestCase> testCases = tcIO.readTestCasesFromFile();
@@ -286,7 +288,7 @@ public class SpeedTest {
             int sample,
             int nSamples
     ) {
-        LOG.info("Set up test");
+        System.out.println("Set up test");
         if (opts.compareHeuristics()) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
