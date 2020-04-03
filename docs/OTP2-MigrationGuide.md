@@ -15,20 +15,28 @@ These properties changed names from:
    
 ## REST API
  
- A lot of the parameters in the REST API is ignored/deprecated look at the `RoutingRequest` class 
- for documentation.
+ A lot of the query parameters in the REST API is ignored/deprecated look at the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+ class for documentation on what is currently supported - we are adding features one by on. The 
+ plan is to go over the API documentation before the release - we do not prioritize to keep 
+ the documentation up to date, exept for this document.
  
+Support for XML as a request/response format is removed. The only supported format is JSON.
+ 
+### Planning query parameter changes
+ A lot of the query parameters in the REST API is ignored/deprecated look at the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+ class for documentation on what is currently supported - we are adding back features one by on. 
+ The plan is to go over the API documentation before the release - we do not prioritize to keep 
+ the documentation up to date, except for this document.
+ 
+ #### Paging
  In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
  in something like the `last-depature-time` + 1 minute to the next request, to get trips to add to 
  the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
- `metadata` returned by the rout call.
- 
- Support for XML as a request/response format is removed. The only supported format is JSON.
- 
-### RoutingRequest changes
- See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. 
- Her is a short list of new fields:
- 
+ `metadata` returned by the router call.
+
+#### New query parameters in the plan request
  - `searchWindow` Limit the departure window or arrival window for the routing search.
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
