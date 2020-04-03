@@ -6,8 +6,8 @@ import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDista
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
@@ -65,34 +65,36 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
         int stopsAnalyzed = 0;
 
-        for (TransitStopVertex originStop : Iterables.filter(graph.getVertices(), TransitStopVertex.class)) {
+        for (TransitStopVertex originStopVertex : Iterables.filter(graph.getVertices(), TransitStopVertex.class)) {
             if (++stopsAnalyzed % 1000 == 0) {
                 LOG.info("{} stops analyzed", stopsAnalyzed);
             }
 
             /* Find nearby stops by euclidean distance */
-            Map<TransitStopVertex, NearbyStopFinder.StopAtDistance> stopsEuclidean =
-                    nearbyStopFinderEuclidian.findNearbyStopsEuclidean(originStop).stream()
+            Map<Stop, NearbyStopFinder.StopAtDistance> stopsEuclidean =
+                    nearbyStopFinderEuclidian.findNearbyStopsEuclidean(originStopVertex).stream()
                             .collect(Collectors.toMap(t -> t.tstop, t -> t));
 
             /* Find nearby stops by street distance */
-            Map<TransitStopVertex, NearbyStopFinder.StopAtDistance> stopsStreets =
-                    nearbyStopFinderStreets.findNearbyStopsViaStreets(originStop).stream()
+            Map<Stop, NearbyStopFinder.StopAtDistance> stopsStreets =
+                    nearbyStopFinderStreets.findNearbyStopsViaStreets(originStopVertex).stream()
                             .collect(Collectors.toMap(t -> t.tstop, t -> t));
 
+            Stop originStop = originStopVertex.getStop();
+
             /* Get stops found by both street and euclidean search */
-            List<TransitStopVertex> stopsConnected =
+            List<Stop> stopsConnected =
                     stopsEuclidean.keySet().stream().filter(t -> stopsStreets.keySet().contains(t)
                             && t != originStop)
                             .collect(Collectors.toList());
 
             /* Get stops found by euclidean search but not street search */
-            List<TransitStopVertex> stopsUnconnected =
+            List<Stop> stopsUnconnected =
                     stopsEuclidean.keySet().stream().filter(t -> !stopsStreets.keySet().contains(t)
                             && t != originStop)
                             .collect(Collectors.toList());
 
-            for (TransitStopVertex destStop : stopsConnected) {
+            for (Stop destStop : stopsConnected) {
                 NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
                 NearbyStopFinder.StopAtDistance streetStop = stopsStreets.get(destStop);
 
@@ -109,7 +111,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                 }
             }
 
-            for (TransitStopVertex destStop : stopsUnconnected) {
+            for (Stop destStop : stopsUnconnected) {
                 NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
 
                 /* Log transfers that are found by euclidean search but not by street search */
@@ -157,15 +159,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
     }
 
     private static class TransferInfo {
-        final TransitStopVertex origin;
-        final TransitStopVertex destination;
+        final Stop origin;
+        final Stop destination;
         final double directDistance;
         final double streetDistance;
         final double ratio;
 
         TransferInfo(
-                TransitStopVertex origin,
-                TransitStopVertex destination,
+                Stop origin,
+                Stop destination,
                 double directDistance,
                 double streetDistance) {
             this.origin = origin;

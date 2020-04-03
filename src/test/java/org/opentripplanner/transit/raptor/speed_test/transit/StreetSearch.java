@@ -72,7 +72,7 @@ class StreetSearch {
         }
 
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
-            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.tstop.getStop());
+            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.tstop);
             int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             resultTimesSecByStopIndex.put(stopIndex, accessTimeSec);

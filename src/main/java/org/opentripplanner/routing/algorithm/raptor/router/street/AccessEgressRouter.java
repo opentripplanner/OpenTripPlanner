@@ -43,7 +43,7 @@ public class AccessEgressRouter {
         Map<Stop, Transfer> result = new HashMap<>();
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
             result.put(
-                    stopAtDistance.tstop.getStop(),
+                    stopAtDistance.tstop,
                     new Transfer(-1,
                             (int)stopAtDistance.edges.stream().map(Edge::getEffectiveWalkDistance)
                                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum(),
