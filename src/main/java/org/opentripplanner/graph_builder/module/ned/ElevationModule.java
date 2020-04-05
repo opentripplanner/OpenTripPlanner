@@ -3,6 +3,8 @@ package org.opentripplanner.graph_builder.module.ned;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.vividsolutions.jts.geom.Coordinate;
 import com.vividsolutions.jts.geom.Geometry;
+import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
@@ -26,6 +28,7 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.media.jai.InterpolationBilinear;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -34,7 +37,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.nio.file.Files;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedList;
@@ -79,6 +81,12 @@ public class ElevationModule implements GraphBuilderModule {
      */
     private final int parallelism;
 
+    /**
+     * A map of PackedCoordinateSequence values identified by Strings of encoded polylines.
+     *
+     * Note: Since this map has a key of only the encoded polylines, it is assumed that all other inputs are the same as
+     * those that occurred in the graph build that produced this data.
+     */
     private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
     // Keep track of the proportion of elevation fetch operations that fail so we can issue warnings. AtomicInteger is
@@ -105,7 +113,7 @@ public class ElevationModule implements GraphBuilderModule {
     private final ConcurrentHashMap<Integer, Double> geoidDifferenceCache = new ConcurrentHashMap<>();
 
     /** Used only when the ElevationModule is requested to be ran with a single thread */
-    private Coverage singleThreadedCoverageInstance;
+    private Coverage singleThreadedCoverageInterpolator;
 
     /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
@@ -277,7 +285,7 @@ public class ElevationModule implements GraphBuilderModule {
      * thread.
      */
     private class ElevationWorkerThread extends ForkJoinWorkerThread {
-        private Coverage threadSpecificCoverage;
+        private Coverage threadSpecificCoverageInterpolator;
 
         /**
          * Creates a ForkJoinWorkerThread operating in the given pool.
@@ -291,29 +299,29 @@ public class ElevationModule implements GraphBuilderModule {
 
         /**
          * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
-         * used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage instance for each thread to
-         * avoid other threads waiting for a lock to be released on the Coverage instance. This method will get/lazy-
-         * create a thread-specific Coverage instance.
+         * used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage interpolator instance for
+         * each thread to avoid other threads waiting for a lock to be released on the Coverage interpolator instance.
+         * This method will get/lazy-create a thread-specific Coverage interpolator instance.
          *
-         * @return A thread-specific coverage instance that can be used without being locked from other threads.
+         * @return A thread-specific coverage interpolator instance.
          */
-        public Coverage getThreadSpecificCoverageInstance () {
-            if (threadSpecificCoverage == null) {
+        public Coverage getThreadSpecificCoverageInterpolator() {
+            if (threadSpecificCoverageInterpolator == null) {
                 // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
                 // could arise from downstream classes that have synchronized methods.
-                threadSpecificCoverage = createThreadSpecificCoverage();
+                threadSpecificCoverageInterpolator = createThreadSpecificCoverageInterpolator();
             }
-            return threadSpecificCoverage;
+            return threadSpecificCoverageInterpolator;
         }
 
         /**
          * Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that could arise
          * from downstream classes that have synchronized methods.
          */
-        private Coverage createThreadSpecificCoverage() {
+        private Coverage createThreadSpecificCoverageInterpolator() {
             Coverage coverage;
             synchronized (gridCoverageFactory) {
-                coverage = gridCoverageFactory.getGridCoverage();
+                coverage = createNewCoverageInterpolator();
                 // The Coverage instance relies on some synchronized static methods shared across all threads that
                 // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
                 // point on the edge to initialize these other items.
@@ -579,7 +587,7 @@ public class ElevationModule implements GraphBuilderModule {
 
         // Needs full calculation. Calculate with a thread-specific coverage instance to avoid waiting for any locks on
         // coverage instances in other threads.
-        Coverage coverage = getThreadSpecificCoverageInstance();
+        Coverage coverage = getThreadSpecificCoverageInterpolator();
 
         // did not find a cached value, calculate
         // If any of the coordinates throw an error when trying to lookup their value, immediately bail and do not
@@ -649,18 +657,33 @@ public class ElevationModule implements GraphBuilderModule {
     }
 
     /**
-     * Gets a coverage instance specific to the current thread. If using multiple threads, get the coverage instance
-     * associated with the ElevationWorkerThread. Otherwise, use a class field.
+     * Gets a coverage interpolator instance specific to the current thread. If using multiple threads, get the coverage
+     * interpolator instance associated with the ElevationWorkerThread. Otherwise, use a class field.
      */
-    private Coverage getThreadSpecificCoverageInstance() {
+    private Coverage getThreadSpecificCoverageInterpolator() {
         if (parallelism == 1) {
-            if (singleThreadedCoverageInstance == null) {
-                singleThreadedCoverageInstance = gridCoverageFactory.getGridCoverage();
+            if (singleThreadedCoverageInterpolator == null) {
+                singleThreadedCoverageInterpolator = gridCoverageFactory.getGridCoverage();
             }
-            return singleThreadedCoverageInstance;
+            return singleThreadedCoverageInterpolator;
         } else {
-            return ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInstance();
+            return ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInterpolator();
         }
+    }
+
+    /**
+     * Create a new coverage interpolator instance.
+     */
+    private Coverage createNewCoverageInterpolator() {
+        // If the grid coverage factory is the NEDGridCoverageFactoryImpl, then get the grid coverage from that factory.
+        // Otherwise, apply a bilinear interpolator.
+        // (note: UnifiedGridCoverages created by NEDGridCoverageFactoryImpl handle interpolation internally)
+        return gridCoverageFactory instanceof NEDGridCoverageFactoryImpl
+            ? gridCoverageFactory.getGridCoverage()
+            : Interpolator2D.create(
+                (GridCoverage2D) gridCoverageFactory.getGridCoverage(),
+                new InterpolationBilinear()
+            );
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
