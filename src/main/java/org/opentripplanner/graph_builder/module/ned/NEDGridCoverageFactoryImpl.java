@@ -31,6 +31,9 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
 
     private final File cacheDirectory;
 
+    /** All tiles for the DEM stitched into a single coverage. */
+    UnifiedGridCoverage unifiedCoverage = null;
+
     public final NEDTileSource tileSource;
 
     private List<VerticalDatum> datums;
@@ -102,19 +105,30 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
         }
     }
 
-    /** @return a GeoTools grid coverage for the entire area of interest. */
+    /**
+     * Loads the coverage data by creating a UnifiedGridCoverage instance comprised of multiple Geotiff files. Each of
+     * these Geotiff files is wrapped in an Interpolator2D instance. The data is saved to a single unifiedGridCoverage
+     * instance. During a refactor in the year 2020, the code at one point was written such that a new
+     * UnifiedGridCoverage instance was created for each thread to use. However, benchmarking showed that this caused
+     * longer run times which is likely due to too much memory competing for a slot in the processor cache.
+     */
     public Coverage getGridCoverage() {
-        loadVerticalDatum();
-        List<File> paths = tileSource.getNEDTiles();
-        UnifiedGridCoverage unifiedCoverage = null;
-        // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
-        for (File path : paths) {
-            GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
-            GridCoverage2D regionCoverage = factory.getGridCoverage();
-            if (unifiedCoverage == null) {
-                unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
-            } else {
-                unifiedCoverage.add(regionCoverage);
+        if (unifiedCoverage == null) {
+            loadVerticalDatum();
+            List<File> paths = tileSource.getNEDTiles();
+            // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
+            for (File path : paths) {
+                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+                // TODO might bicubic interpolation give better results?
+                GridCoverage2D regionCoverage = Interpolator2D.create(
+                    factory.getGridCoverage(),
+                    new InterpolationBilinear()
+                );
+                if (unifiedCoverage == null) {
+                    unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
+                } else {
+                    unifiedCoverage.add(regionCoverage);
+                }
             }
         }
         return unifiedCoverage;
@@ -174,7 +188,6 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
                 throw new RuntimeException(ex);
             }
         }
-
     }
 
     /**
