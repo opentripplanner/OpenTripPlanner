@@ -2,7 +2,6 @@ package org.opentripplanner.api.model;
 
 import java.util.*;
 
-import javafx.util.Pair;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.TraverseMode;

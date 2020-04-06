@@ -5,6 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -29,6 +30,8 @@ public class RentVehicleAnywhereEdgeTest {
         edge  = new RentVehicleAnywhereEdge(v);
         request = new RoutingRequest();
         request.setDummyRoutingContext(graph);
+        request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR));
+        request.setStartingMode(TraverseMode.WALK);
         s = new State(v, request);
     }
 
