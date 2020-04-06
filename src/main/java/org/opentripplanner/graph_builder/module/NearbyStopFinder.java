@@ -10,6 +10,7 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -28,8 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 /**
@@ -179,7 +183,49 @@ public class NearbyStopFinder {
             routingRequest.cleanup();
         }
         return stopsFound;
+    }
 
+    public List<StopAtDistance> getStopAtDistances(Set<Vertex> originVertices, Collection<State> states) {
+        Map<String, StopAtDistance> stopsFound = new HashMap<>();
+        states.forEach(state -> {
+          Vertex targetVertex = state.getVertex();
+          if (targetVertex instanceof TransitStopVertex) {
+            stopsFound.putIfAbsent(stopAtDistanceForState(state).tstop.getStop().getId().toString(), stopAtDistanceForState(state));
+          }
+        });
+        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
+        for (Vertex vertex : originVertices) {
+          if (vertex instanceof TransitStopVertex) {
+            stopsFound.putIfAbsent(((TransitStopVertex) vertex).getStop().getId().toString(), newStopAtDistance(vertex));
+          }
+        }
+        return new ArrayList<>(stopsFound.values());
+    }
+
+    public Collection<State> findNearbyStatesViaStreet(Set<Vertex> originVertices,
+        boolean reverseDirection) {
+        ShortestPathTree spt = getShortestPathTree(originVertices, reverseDirection);
+        if(spt!=null){
+            return spt.getAllStates();
+        }else{
+            return Collections.emptyList();
+        }
+    }
+
+    private StopAtDistance newStopAtDistance(Vertex vertex) {
+      return new StopAtDistance((TransitStopVertex) vertex, 0, Collections.EMPTY_LIST, null);
+    }
+
+    private ShortestPathTree getShortestPathTree(Set<Vertex> originVertices,
+        boolean reverseDirection) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        routingRequest.setRoutingContext(graph, originVertices, null);
+        routingRequest.arriveBy = reverseDirection;
+        int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
+        routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
+        routingRequest.disableRemainingWeightHeuristic = true;
+        routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        return astar.getShortestPathTree(routingRequest);
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {

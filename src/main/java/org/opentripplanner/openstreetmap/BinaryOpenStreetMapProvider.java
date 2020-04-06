@@ -5,8 +5,6 @@ import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import java.io.File;
 import java.io.FileInputStream;
 
-import crosby.binary.file.BlockInputStream;
-
 /**
  * Parser for the OpenStreetMap PBF format. Parses files in three passes:
  * First the relations, then the ways, then the nodes are also loaded.
@@ -22,19 +20,19 @@ public class BinaryOpenStreetMapProvider {
             FileInputStream input = new FileInputStream(path);
             parser.setParseNodes(false);
             parser.setParseWays(false);
-            (new BlockInputStream(input, parser)).process();
+            parser.process(input);
             osmdb.doneFirstPhaseRelations();
 
             input = new FileInputStream(path);
             parser.setParseRelations(false);
             parser.setParseWays(true);
-            (new BlockInputStream(input, parser)).process();
+            parser.process(input);
             osmdb.doneSecondPhaseWays();
 
             input = new FileInputStream(path);
             parser.setParseNodes(true);
             parser.setParseWays(false);
-            (new BlockInputStream(input, parser)).process();
+            parser.process(input);
             osmdb.doneThirdPhaseNodes();
         } catch (Exception ex) {
             throw new IllegalStateException("error loading OSM from path " + path, ex);

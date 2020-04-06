@@ -49,14 +49,14 @@ public class RaptorRouter {
 
   private final TransitLayer transitLayer;
 
-  private final RoutingRequest request;
+  private RoutingRequest request;
 
   //TODO Naming
   public RaptorRouter(RoutingRequest request, TransitLayer transitLayer) {
     double startTime = System.currentTimeMillis();
     ZonedDateTime startOfTime = calculateStartOfTime(request);
     this.otpRRDataProvider = new RaptorRoutingRequestTransitData(
-        transitLayer, startOfTime, 2, request.modes, request.walkSpeed
+      transitLayer, startOfTime, 2, request.modes, request.walkSpeed
     );
     LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
     this.transitLayer = transitLayer;
@@ -68,14 +68,10 @@ public class RaptorRouter {
     /* Prepare access/egress transfers */
 
     double startTimeAccessEgress = System.currentTimeMillis();
-
-    Map<Stop, Transfer> accessTransfers =
-        AccessEgressRouter
-            .streetSearch(request, false, maxTransferDistance(request.maxTransferWalkDistance));
-    Map<Stop, Transfer> egressTransfers =
-        AccessEgressRouter
-            .streetSearch(request, true, maxTransferDistance(request.maxWalkDistance));
-
+    AccessEgressRouter accessEgressRouter = new AccessEgressRouter(request, maxTransferDistance(request.maxWalkDistance));
+    Map<Stop, Transfer> accessTransfers = accessEgressRouter.streetSearch(false);
+    Map<Stop, Transfer> egressTransfers = accessEgressRouter.streetSearch(true);
+    request = accessEgressRouter.getRequest();
     TransferToAccessEgressLegMapper accessEgressLegMapper = new TransferToAccessEgressLegMapper(
         transitLayer);
 
@@ -107,6 +103,7 @@ public class RaptorRouter {
         .searchParams()
         .earliestDepartureTime(departureTime)
         .searchWindowInSeconds(request.raptorSearchWindow)
+        .numberOfAdditionalTransfers(request.maxTransfers)
         .addAccessStops(accessTimes)
         .addEgressStops(egressTimes)
         .boardSlackInSeconds(request.boardSlack)
@@ -155,9 +152,7 @@ public class RaptorRouter {
             itineraries.add(itinerary);
         }
 
-    LOG.debug("Creating itineraries took {} ms", itineraries.size(),
-        System.currentTimeMillis() - startItineraries);
-
+    LOG.debug("Creating itineraries took {} ms", itineraries.size(), System.currentTimeMillis() - startItineraries);
     return itineraries;
   }
 
@@ -167,7 +162,12 @@ public class RaptorRouter {
     return DateMapper.asStartOfService(zdt);
   }
 
-  private int maxTransferDistance(Number maxWalkDistance) {
-    return 2000 > maxWalkDistance.intValue() ? 2000 : maxWalkDistance.intValue();
+  private int maxTransferDistance(double maxWalkDistance) {
+    if (Double.compare(maxWalkDistance, Double.MAX_VALUE) == 0) {
+      // No idea where 2000 comes from ...
+      return 2000;
+    }else{
+      return Double.valueOf(maxWalkDistance).intValue();
+    }
   }
 }

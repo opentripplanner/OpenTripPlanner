@@ -35,14 +35,14 @@ public abstract class Vertex implements Serializable, Cloneable {
      * https://en.wikipedia.org/wiki/Graph_labeling
      */
     private final String label;
-    
+
     /* Longer human-readable name for the client */
     private I18NString name;
 
     private final double x;
 
     private final double y;
-    
+
     private transient Edge[] incoming = new Edge[0];
 
     private transient Edge[] outgoing = new Edge[0];
@@ -183,7 +183,7 @@ public abstract class Vertex implements Serializable, Cloneable {
     public int getDegreeIn() {
         return incoming.length;
     }
-    
+
     /** Get the longitude of the vertex */
     public double getX() {
         return x;
@@ -265,5 +265,9 @@ public abstract class Vertex implements Serializable, Cloneable {
             result.add((StreetEdge) out);
         }
         return result;
+    }
+
+    public I18NString getOriginalName(){
+        return name;
     }
 }

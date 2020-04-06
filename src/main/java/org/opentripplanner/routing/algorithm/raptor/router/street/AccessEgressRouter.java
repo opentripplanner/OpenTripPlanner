@@ -1,11 +1,25 @@
 package org.opentripplanner.routing.algorithm.raptor.router.street;
 
+import static java.util.stream.Collectors.groupingBy;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import org.locationtech.jts.geom.Coordinate;
+import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
+import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,8 +35,13 @@ import java.util.stream.Collectors;
 public class AccessEgressRouter {
     private static Logger LOG = LoggerFactory.getLogger(AccessEgressRouter.class);
 
-    private AccessEgressRouter() {}
+    public AccessEgressRouter(RoutingRequest rr,int distanceMeters) {
+        this.request = rr;
+        this.nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
+    }
 
+    private RoutingRequest request;
+    private NearbyStopFinder nearbyStopFinder;
     /**
      *
      * @param rr the current routing request
@@ -54,4 +73,106 @@ public class AccessEgressRouter {
 
         return result;
     }
+
+    public Map<Stop, Transfer> streetSearch(boolean fromTarget) {
+        Set<Vertex> vertices = fromTarget ? request.rctx.toVertices : request.rctx.fromVertices;
+        return streetSearch(fromTarget,vertices,true);
+    }
+
+    private Map<Stop,Transfer> streetSearch(boolean fromTarget,Set<Vertex> origin,boolean checkNearBy) {
+        Collection<State> states = nearbyStopFinder.findNearbyStatesViaStreet(origin, fromTarget);
+        Set<Vertex> vertexes = new HashSet<>();
+        boolean transitStopFound = false;
+        for(State s:states){
+            if(!(s.getVertex() instanceof TemporaryStreetLocation)){
+                vertexes.add(s.getVertex());
+            }
+            if(s.getVertex() instanceof TransitStopVertex){
+                transitStopFound = true;
+            }
+        }
+        // if there's no direct vertex to any stop, we need to update the request & try again.
+        if (!transitStopFound && checkNearBy) {
+            return streetSearch(fromTarget,vertexes,false);
+        }
+
+        List<StopAtDistance> stopsFound = nearbyStopFinder.getStopAtDistances(origin, states);
+        if(!checkNearBy){
+            Map<Vertex,List<StopAtDistance>> stopGroups = stopsFound.stream().collect(groupingBy(stop -> stop.edges.get(0).getFromVertex()));
+            int count = 0;
+            Vertex target = null;
+            for(Vertex v: stopGroups.keySet()){
+                List<StopAtDistance> value = stopGroups.get(v);
+                if(value.size()>count){
+                    count = value.size();
+                    stopsFound = value;
+                    target = v;
+                }
+            }
+            if(target!=null) {
+                TemporaryFreeEdge freeEdge = new TemporaryFreeEdge(
+                    new TemporaryStreetLocation(target.getLabel(), target.getCoordinate(),
+                        target.getOriginalName(), false), target);
+                try {
+                    this.setRequest(fromTarget, target.getCoordinate());
+                } catch (Exception e) {
+                    //set request failed
+                    return Collections.emptyMap();
+                }
+                stopsFound = stopsFound.stream().map(stop -> {
+                    List<Edge> newEdges = new ArrayList();
+                    newEdges.add(freeEdge);
+                    newEdges.addAll(stop.edges);
+                    return new StopAtDistance(stop.tstop, stop.distance, newEdges, stop.geometry);
+                }).collect(Collectors.toList());
+            }
+        }
+
+        Map<Stop, Transfer> result = stopsFound
+          .stream()
+          .collect(Collectors.toMap(stopAtDistance -> stopAtDistance.tstop.getStop(), this::newTransferToStop));
+        LOG.debug("Found {} {} stops", result.size(), fromTarget ? "egress" : "access");
+        return result;
+    }
+
+    public RoutingRequest getRequest() {
+        return request;
+    }
+
+    private void setRequest(boolean fromTarget, Coordinate target) {
+        this.request = request.clone();
+        GenericLocation location = new GenericLocation(target.y, target.x);
+        if (fromTarget) {
+            this.request.to = location;
+        } else {
+            double distance = this.request.from.getCoordinate().distance(target);
+            int walkTime = (int) (distance / request.walkSpeed);
+            this.request.from = location;
+            this.request.dateTime = this.request.dateTime + walkTime;
+        }
+        Graph reference = request.rctx.graph;
+        request.rctx = null;
+        request.setRoutingContext(reference);
+    }
+
+  /**
+   * Instantiate a new {@link Transfer} for a given {@link StopAtDistance}
+   */
+  private Transfer newTransferToStop(NearbyStopFinder.StopAtDistance stopAtDistance) {
+    return new Transfer(-1, getTotalEffectiveWalkDistance(stopAtDistance), stopAtDistance.edges);
+  }
+
+  /**
+   * calculate the total effective walk distance to the stop
+   *
+   * @param stopAtDistance is a stop within an acceptable distance
+   * @return the total effective walk distance in a {@link Integer} value
+   */
+  private int getTotalEffectiveWalkDistance(NearbyStopFinder.StopAtDistance stopAtDistance) {
+    return (int) (stopAtDistance.edges.stream()
+      .map(Edge::getEffectiveWalkDistance)
+      .collect(Collectors.summarizingDouble(Double::doubleValue))
+      .getSum() + 0.5);
+  }
+
 }
