@@ -6,26 +6,26 @@ import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 import org.opentripplanner.model.FeedScopedId;
 
-public class AgencyAndIdArrayListAdapter extends XmlAdapter<ArrayList<AgencyAndIdType>, ArrayList<FeedScopedId>> {
+public class AgencyAndIdArrayListAdapter extends XmlAdapter<ArrayList<ApiFeedScopedId>, ArrayList<FeedScopedId>> {
 
     @Override
-    public ArrayList<FeedScopedId> unmarshal(ArrayList<AgencyAndIdType> arg) throws Exception {
+    public ArrayList<FeedScopedId> unmarshal(ArrayList<ApiFeedScopedId> arg) throws Exception {
         if (arg == null) {
             return null;
         }
         ArrayList<FeedScopedId> result = new ArrayList<FeedScopedId>();
-        for (AgencyAndIdType a : arg)
+        for (ApiFeedScopedId a : arg)
             result.add(new FeedScopedId(a.agency, a.id));
         return result;
     }
 
     @Override
-    public ArrayList<AgencyAndIdType> marshal(ArrayList<FeedScopedId> arg) throws Exception {
+    public ArrayList<ApiFeedScopedId> marshal(ArrayList<FeedScopedId> arg) throws Exception {
         if (arg == null) {
             return null;
         }
-        ArrayList<AgencyAndIdType> result = new ArrayList<AgencyAndIdType>();
-        for(FeedScopedId a:arg) result.add(new AgencyAndIdType(a.getFeedId(), a.getId()));
+        ArrayList<ApiFeedScopedId> result = new ArrayList<ApiFeedScopedId>();
+        for(FeedScopedId a:arg) result.add(new ApiFeedScopedId(a.getFeedId(), a.getId()));
         return result;
     }
 

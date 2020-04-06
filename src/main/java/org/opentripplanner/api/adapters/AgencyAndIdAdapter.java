@@ -4,10 +4,10 @@ import org.opentripplanner.model.FeedScopedId;
 
 import javax.xml.bind.annotation.adapters.XmlAdapter;
 
-public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedScopedId> {
+public class AgencyAndIdAdapter extends XmlAdapter<ApiFeedScopedId, FeedScopedId> {
 
     @Override
-    public FeedScopedId unmarshal(AgencyAndIdType arg) {
+    public FeedScopedId unmarshal(ApiFeedScopedId arg) {
         if (arg == null) {
             return null;
         }
@@ -15,11 +15,11 @@ public class AgencyAndIdAdapter extends XmlAdapter<AgencyAndIdType, FeedScopedId
     }
 
     @Override
-    public AgencyAndIdType marshal(FeedScopedId arg) {
+    public ApiFeedScopedId marshal(FeedScopedId arg) {
         if (arg == null) {
             return null;
         }
-        return new AgencyAndIdType(arg.getFeedId(), arg.getId());
+        return new ApiFeedScopedId(arg.getFeedId(), arg.getId());
     }
 
 }

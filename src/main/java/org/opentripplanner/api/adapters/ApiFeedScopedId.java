@@ -6,13 +6,13 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
 
 @XmlRootElement(name = "AgencyAndId")
-public class AgencyAndIdType {
-    public AgencyAndIdType(String agency, String id) {
+public class ApiFeedScopedId {
+    public ApiFeedScopedId(String agency, String id) {
         this.agency = agency;
         this.id = id;
     }
 
-    public AgencyAndIdType() {
+    public ApiFeedScopedId() {
     }
 
     @XmlAttribute
