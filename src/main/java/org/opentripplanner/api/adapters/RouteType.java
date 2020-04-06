@@ -1,12 +1,12 @@
 package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.Route;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
    Holds data about a GTFS route from routes.txt.  Data includes id,
@@ -20,7 +20,7 @@ public class RouteType {
     }
 
     public RouteType(Route route) {
-        this.id = route.getId();
+        this.id = FeedScopedIdMapper.mapToApi(route.getId());
         this.routeShortName = route.getShortName();
         this.routeLongName = route.getLongName();
         this.routeDesc = route.getDesc();
@@ -32,7 +32,7 @@ public class RouteType {
     }
 
     public RouteType(Route route, Boolean extended) {
-        this.id = route.getId();
+        this.id = FeedScopedIdMapper.mapToApi(route.getId());
         this.routeShortName = route.getShortName();
         this.routeType = route.getType();
         this.routeLongName = route.getLongName();
@@ -45,17 +45,12 @@ public class RouteType {
         }
     }
     
-    public FeedScopedId getId(){
-        return this.id;
-    }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    public FeedScopedId id;
+    public ApiFeedScopedId id;
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    public FeedScopedId serviceId;
+    public ApiFeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize

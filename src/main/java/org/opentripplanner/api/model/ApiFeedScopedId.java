@@ -12,9 +12,6 @@ public class ApiFeedScopedId {
         this.id = id;
     }
 
-    public ApiFeedScopedId() {
-    }
-
     @XmlAttribute
     @JsonSerialize
     public String agency;
@@ -22,5 +19,4 @@ public class ApiFeedScopedId {
     @XmlAttribute
     @JsonSerialize
     public String id;
-
 }

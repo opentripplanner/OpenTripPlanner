@@ -1,22 +1,18 @@
-package org.opentripplanner.api.adapters;
+package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.FeedScopedId;
 
-import javax.xml.bind.annotation.adapters.XmlAdapter;
+public class FeedScopedIdMapper {
 
-public class AgencyAndIdAdapter extends XmlAdapter<ApiFeedScopedId, FeedScopedId> {
-
-    @Override
-    public FeedScopedId unmarshal(ApiFeedScopedId arg) {
+    public static FeedScopedId mapToDomain(ApiFeedScopedId arg) {
         if (arg == null) {
             return null;
         }
         return new FeedScopedId(arg.agency, arg.id);
     }
 
-    @Override
-    public ApiFeedScopedId marshal(FeedScopedId arg) {
+    public static ApiFeedScopedId mapToApi(FeedScopedId arg) {
         if (arg == null) {
             return null;
         }

@@ -1,6 +1,8 @@
 package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -19,7 +21,7 @@ public class StopType {
     }
 
     public StopType(Stop stop) {
-        this.id = stop.getId();
+        this.id = FeedScopedIdMapper.mapToApi(stop.getId());
         this.stopLat = stop.getLat();
         this.stopLon = stop.getLon();
         this.stopCode = stop.getCode();
@@ -33,7 +35,7 @@ public class StopType {
     }
 
     public StopType(Station station) {
-        this.id = station.getId();
+        this.id = FeedScopedIdMapper.mapToApi(station.getId());
         this.stopLat = station.getLat();
         this.stopLon = station.getLon();
         this.stopCode = station.getCode();
@@ -44,7 +46,7 @@ public class StopType {
     }
 
     public StopType(Stop stop, Boolean extended) {
-        this.id = stop.getId();
+        this.id = FeedScopedIdMapper.mapToApi(stop.getId());
         this.stopLat = stop.getLat();
         this.stopLon = stop.getLon();
         this.stopCode = stop.getCode();
@@ -59,9 +61,8 @@ public class StopType {
         }
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    public FeedScopedId id;
+    public ApiFeedScopedId id;
 
     @XmlAttribute
     @JsonSerialize

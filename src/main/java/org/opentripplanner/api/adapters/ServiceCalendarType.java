@@ -1,19 +1,20 @@
 package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "Calendar")
 public class ServiceCalendarType {
 
     public ServiceCalendarType(FeedScopedId serviceId, int monday, int tuesday, int wednesday,
                                int thursday, int friday, int saturday, int sunday, long startDate, long endDate) {
-        this.serviceId = serviceId;
+        this.serviceId = FeedScopedIdMapper.mapToApi(serviceId);
         this.monday = monday;
         this.tuesday = tuesday;
         this.wednesday = wednesday;
@@ -26,7 +27,7 @@ public class ServiceCalendarType {
     }
 
     public ServiceCalendarType(ServiceCalendar arg) {
-        this.serviceId = arg.getServiceId();
+        this.serviceId = FeedScopedIdMapper.mapToApi(arg.getServiceId());
         this.monday = arg.getMonday();
         this.tuesday = arg.getTuesday();
         this.wednesday = arg.getWednesday();
@@ -41,9 +42,8 @@ public class ServiceCalendarType {
     public ServiceCalendarType() {
     }
 
-    @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    public FeedScopedId serviceId;
+    public ApiFeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
