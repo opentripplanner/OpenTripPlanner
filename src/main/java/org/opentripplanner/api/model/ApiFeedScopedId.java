@@ -1,4 +1,4 @@
-package org.opentripplanner.api.adapters;
+package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
