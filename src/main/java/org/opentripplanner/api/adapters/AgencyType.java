@@ -35,30 +35,30 @@ public class AgencyType {
 
     @XmlAttribute
     @JsonSerialize
-    String id;
+    public String id;
 
     @XmlAttribute
     @JsonSerialize
-    String name;
+    public String name;
 
     @XmlAttribute
     @JsonSerialize
-    String url;
+    public String url;
 
     @XmlAttribute
     @JsonSerialize
-    String timezone;
+    public String timezone;
 
     @XmlAttribute
     @JsonSerialize
-    String lang;
+    public String lang;
 
     @XmlAttribute
     @JsonSerialize
-    String phone;
+    public String phone;
 
     @XmlAttribute
     @JsonSerialize
-    String fareUrl;
+    public String fareUrl;
 
 }

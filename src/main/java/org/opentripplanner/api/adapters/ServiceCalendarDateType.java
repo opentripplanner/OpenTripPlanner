@@ -48,18 +48,18 @@ public class ServiceCalendarDateType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId serviceId;
+    public FeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
-    Long date;
+    public Long date;
 
     @XmlAttribute
     @JsonSerialize
-    Integer exceptionType;
+    public Integer exceptionType;
 
     @XmlAttribute
     @JsonSerialize
-    String exception;
+    public String exception;
 
 }

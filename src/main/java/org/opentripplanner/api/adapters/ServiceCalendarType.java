@@ -43,42 +43,42 @@ public class ServiceCalendarType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId serviceId;
+    public FeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
-    Integer monday;
+    public Integer monday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer tuesday;
+    public Integer tuesday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer wednesday;
+    public Integer wednesday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer thursday;
+    public Integer thursday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer friday;
+    public Integer friday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer saturday;
+    public Integer saturday;
 
     @XmlAttribute
     @JsonSerialize
-    Integer sunday;
+    public Integer sunday;
 
     @XmlAttribute
     @JsonSerialize
-    Long startDate;
+    public Long startDate;
 
     @XmlAttribute
     @JsonSerialize
-    Long endDate;
+    public Long endDate;
 
 }

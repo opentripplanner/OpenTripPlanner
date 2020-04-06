@@ -1,18 +1,16 @@
 package org.opentripplanner.api.adapters;
 
-import java.util.List;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
-import org.opentripplanner.model.FeedScopedId;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
+import java.util.List;
 
 @XmlRootElement(name = "Stop")
 public class StopType {
@@ -63,51 +61,51 @@ public class StopType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId id;
+    public FeedScopedId id;
 
     @XmlAttribute
     @JsonSerialize
-    String stopName;
+    public String stopName;
 
     @XmlAttribute
     @JsonSerialize
-    Double stopLat;
+    public Double stopLat;
 
     @XmlAttribute
     @JsonSerialize
-    Double stopLon;
+    public Double stopLon;
 
     @XmlAttribute
     @JsonSerialize
-    String stopCode;
+    public String stopCode;
 
     @XmlAttribute
     @JsonSerialize
-    String stopDesc;
+    public String stopDesc;
 
     @XmlAttribute
     @JsonSerialize
-    String zoneId;
+    public String zoneId;
 
     @XmlAttribute
     @JsonSerialize
-    String stopUrl;
+    public String stopUrl;
 
     @XmlAttribute
     @JsonSerialize
-    Integer locationType;
+    public Integer locationType;
 
     @XmlAttribute
     @JsonSerialize
-    String parentStation;
+    public String parentStation;
 
     @XmlAttribute
     @JsonSerialize
-    Integer wheelchairBoarding;
+    public Integer wheelchairBoarding;
 
     @XmlAttribute
     @JsonSerialize
-    String direction;
+    public String direction;
 
     @XmlElements(value = @XmlElement(name = "route"))
     public List<FeedScopedId> routes;

@@ -1,11 +1,10 @@
 package org.opentripplanner.api.adapters;
 
-import java.io.Serializable;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
 
 @XmlRootElement(name = "Headsign")
 public class HeadsignsInfo implements Serializable {
@@ -28,13 +27,13 @@ public class HeadsignsInfo implements Serializable {
 
     @XmlAttribute
     @JsonSerialize
-    String headsign;
+    public String headsign;
 
     @XmlAttribute
     @JsonSerialize
-    Integer numberOfTrips;
+    public Integer numberOfTrips;
 
     @XmlAttribute
     @JsonSerialize
-    String calendarId;
+    public String calendarId;
 }

@@ -1,13 +1,12 @@
 package org.opentripplanner.api.adapters;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
    Holds data about a GTFS route from routes.txt.  Data includes id,
@@ -52,42 +51,41 @@ public class RouteType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId id;
+    public FeedScopedId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId serviceId;
+    public FeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
-    String routeShortName;
+    public String routeShortName;
 
     @XmlAttribute
     @JsonSerialize
-    String routeLongName;
+    public String routeLongName;
 
     @XmlAttribute
     @JsonSerialize
-    String routeDesc;
+    public String routeDesc;
 
     @XmlAttribute
     @JsonSerialize
-    String routeUrl;
+    public String routeUrl;
 
     @XmlAttribute
     @JsonSerialize
-    String routeColor;
+    public String routeColor;
 
     @XmlAttribute
     @JsonSerialize
-    Integer routeType;
+    public Integer routeType;
 
     @XmlAttribute
     @JsonSerialize
-    String routeTextColor;
+    public String routeTextColor;
 
     @XmlAttribute
     @JsonSerialize
-    Integer routeBikesAllowed;
-
+    public Integer routeBikesAllowed;
 }

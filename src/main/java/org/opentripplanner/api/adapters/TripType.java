@@ -1,14 +1,13 @@
 package org.opentripplanner.api.adapters;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import javax.xml.bind.annotation.XmlAttribute;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 @XmlRootElement(name = "trip")
 public class TripType {
@@ -52,51 +51,47 @@ public class TripType {
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId id;
+    public FeedScopedId id;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId serviceId;
+    public FeedScopedId serviceId;
 
     @XmlAttribute
     @JsonSerialize
-    String tripShortName;
+    public String tripShortName;
 
     @XmlAttribute
     @JsonSerialize
-    String tripHeadsign;
+    public String tripHeadsign;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId routeId;
+    public FeedScopedId routeId;
 
     @XmlAttribute
     @JsonSerialize
-    String directionId;
+    public String directionId;
 
     @XmlAttribute
     @JsonSerialize
-    String blockId;
+    public String blockId;
 
     @XmlJavaTypeAdapter(AgencyAndIdAdapter.class)
     @JsonSerialize
-    FeedScopedId shapeId;
+    public FeedScopedId shapeId;
 
     @XmlAttribute
     @JsonSerialize
-    Integer wheelchairAccessible;
+    public Integer wheelchairAccessible;
 
     @XmlAttribute
     @JsonSerialize
-    Integer tripBikesAllowed;
+    public Integer tripBikesAllowed;
     
     @XmlAttribute
     @JsonSerialize
-    Integer bikesAllowed;
+    public Integer bikesAllowed;
 
-    Route route;
-
-    public Route getRoute() {
-        return route;
-    }
+    public Route route;
 }

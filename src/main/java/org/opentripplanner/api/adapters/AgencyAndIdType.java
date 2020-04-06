@@ -1,9 +1,9 @@
 package org.opentripplanner.api.adapters;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlRootElement;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 @XmlRootElement(name = "AgencyAndId")
 public class AgencyAndIdType {
@@ -17,10 +17,10 @@ public class AgencyAndIdType {
 
     @XmlAttribute
     @JsonSerialize
-    String agency;
+    public String agency;
 
     @XmlAttribute
     @JsonSerialize
-    String id;
+    public String id;
 
 }
