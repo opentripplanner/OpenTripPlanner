@@ -7,7 +7,7 @@ import org.opentripplanner.model.FeedScopedId;
 public class ApiTripTimeShort {
     public static final int UNDEFINED = -1;
 
-    public ApiFeedScopedId stopId;
+    public String stopId;
     public int stopIndex;
     public int stopCount;
     public int scheduledArrival = UNDEFINED ;

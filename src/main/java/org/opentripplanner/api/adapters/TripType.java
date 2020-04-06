@@ -2,7 +2,6 @@ package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 
@@ -50,10 +49,10 @@ public class TripType {
     }
 
     @JsonSerialize
-    public ApiFeedScopedId id;
+    public String id;
 
     @JsonSerialize
-    public ApiFeedScopedId serviceId;
+    public String serviceId;
 
     @XmlAttribute
     @JsonSerialize
@@ -64,7 +63,7 @@ public class TripType {
     public String tripHeadsign;
 
     @JsonSerialize
-    public ApiFeedScopedId routeId;
+    public String routeId;
 
     @XmlAttribute
     @JsonSerialize
@@ -75,7 +74,7 @@ public class TripType {
     public String blockId;
 
     @JsonSerialize
-    public ApiFeedScopedId shapeId;
+    public String shapeId;
 
     @XmlAttribute
     @JsonSerialize

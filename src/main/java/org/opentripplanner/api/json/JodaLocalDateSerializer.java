@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.api.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
@@ -6,25 +6,26 @@ import com.fasterxml.jackson.core.Version;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.module.SimpleModule;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.joda.time.LocalDate;
+import org.joda.time.format.ISODateTimeFormat;
 
 import java.io.IOException;
 
 /**
- * Serialize traverse mode sets as strings.
+ * Serialize localDates to YYYY-MM-DD
  */
-public class TraverseModeSetSerializer extends JsonSerializer<TraverseModeSet> {
+public class JodaLocalDateSerializer extends JsonSerializer<LocalDate> {
     /** Create a module including the serializer and deserializer for local dates */
     public static SimpleModule makeModule () {
         Version moduleVersion = new Version(1, 0, 0, null, null, null);
-        SimpleModule module = new SimpleModule("TraverseModeSet", moduleVersion);
-        module.addSerializer(TraverseModeSet.class, new TraverseModeSetSerializer());
-        module.addDeserializer(TraverseModeSet.class, new TraverseModeSetDeserializer());
+        SimpleModule module = new SimpleModule("LocalDate", moduleVersion);
+        module.addSerializer(LocalDate.class, new JodaLocalDateSerializer());
+        module.addDeserializer(LocalDate.class, new JodaLocalDateDeserializer());
         return module;
     }
 
-    @Override public void serialize(TraverseModeSet traverseModeSet, JsonGenerator jsonGenerator,
+    @Override public void serialize(LocalDate localDate, JsonGenerator jsonGenerator,
             SerializerProvider serializerProvider) throws IOException, JsonProcessingException {
-        jsonGenerator.writeString(traverseModeSet.getAsStr());
+        jsonGenerator.writeString(localDate.toString(ISODateTimeFormat.date()));
     }
 }

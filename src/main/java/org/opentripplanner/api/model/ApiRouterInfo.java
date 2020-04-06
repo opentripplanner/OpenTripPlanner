@@ -1,20 +1,9 @@
 package org.opentripplanner.api.model;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Optional;
-
 import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.locationtech.jts.geom.Geometry;
-
-
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
-
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.common.geometry.GeometrySerializer;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -24,8 +13,16 @@ import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
+import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Optional;
+
 @XmlRootElement(name = "RouterInfo")
-public class RouterInfo {
+public class ApiRouterInfo {
 
     private final BikeRentalStationService service;
 
@@ -59,7 +56,7 @@ public class RouterInfo {
     public List<TravelOption> travelOptions;
 
 
-    public RouterInfo(String routerId, Graph graph) {
+    public ApiRouterInfo(String routerId, Graph graph) {
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;

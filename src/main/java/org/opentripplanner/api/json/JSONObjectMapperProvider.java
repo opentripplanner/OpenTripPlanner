@@ -1,12 +1,12 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.api.json;
+
+import com.fasterxml.jackson.annotation.JsonInclude.Include;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.ext.ContextResolver;
 import javax.ws.rs.ext.Provider;
-
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.ObjectMapper;
 
 /**
  * AgencyAndId is a third-party class in One Bus Away which represents a GTFS element's ID,

@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model;
+package org.opentripplanner.api.json;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;

@@ -2,7 +2,6 @@ package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.Route;
 
 import javax.xml.bind.annotation.XmlAttribute;
@@ -47,10 +46,10 @@ public class RouteType {
     
 
     @JsonSerialize
-    public ApiFeedScopedId id;
+    public String id;
 
     @JsonSerialize
-    public ApiFeedScopedId serviceId;
+    public String serviceId;
 
     @XmlAttribute
     @JsonSerialize

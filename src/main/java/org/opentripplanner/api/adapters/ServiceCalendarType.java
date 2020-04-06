@@ -2,7 +2,6 @@ package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.calendar.ServiceCalendar;
 
@@ -43,7 +42,7 @@ public class ServiceCalendarType {
     }
 
     @JsonSerialize
-    public ApiFeedScopedId serviceId;
+    public String serviceId;
 
     @XmlAttribute
     @JsonSerialize

@@ -10,7 +10,7 @@ import org.glassfish.jersey.server.ServerProperties;
 import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
-import org.opentripplanner.api.model.JSONObjectMapperProvider;
+import org.opentripplanner.api.json.JSONObjectMapperProvider;
 import org.slf4j.bridge.SLF4JBridgeHandler;
 
 import javax.ws.rs.core.Application;

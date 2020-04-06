@@ -2,7 +2,6 @@ package org.opentripplanner.api.adapters;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.api.model.ApiFeedScopedId;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -11,7 +10,6 @@ import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElements;
 import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.List;
 
 @XmlRootElement(name = "Stop")
@@ -62,7 +60,7 @@ public class StopType {
     }
 
     @JsonSerialize
-    public ApiFeedScopedId id;
+    public String id;
 
     @XmlAttribute
     @JsonSerialize
