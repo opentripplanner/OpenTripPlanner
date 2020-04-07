@@ -15,11 +15,11 @@ package org.opentripplanner.updater.car_rental;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
 import junit.framework.TestCase;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.routing.car_rental.CarFuelType;
 import org.opentripplanner.routing.car_rental.CarRentalRegion;
 import org.opentripplanner.routing.car_rental.CarRentalStation;

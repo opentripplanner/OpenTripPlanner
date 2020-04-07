@@ -13,7 +13,7 @@
 
 package org.opentripplanner.api.resource;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.routing.car_rental.CarRentalStation;
 import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.standalone.OTPServer;

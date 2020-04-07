@@ -1,14 +1,8 @@
 package org.opentripplanner.routing.core;
 
-<<<<<<< HEAD
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.GeometryFactory;
-import com.vividsolutions.jts.geom.LineString;
-=======
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
->>>>>>> otp/dev-1.x
 import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -20,10 +14,6 @@ import org.opentripplanner.routing.edgetype.TemporaryEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-<<<<<<< HEAD
-=======
-import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
->>>>>>> otp/dev-1.x
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
@@ -64,11 +54,7 @@ public class RoutingContextDestroyTest {
         createStreetEdge(a, b, "a -> b");
         createStreetEdge(b, a, "b -> a");
         createStreetEdge(a, c, "a -> c");
-<<<<<<< HEAD
         g.index(false);
-=======
-        g.index(new DefaultStreetVertexIndexFactory());
->>>>>>> otp/dev-1.x
     }
 
     @Test public void temporaryChangesRemovedOnContextDestroy() {
