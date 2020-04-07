@@ -15,7 +15,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import java.util.Locale;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -83,6 +83,17 @@ public abstract class Vertex implements Serializable, Cloneable {
     @Override
     public int hashCode() {
         return index;
+    }
+
+    // Stupid method for deserialization, initialize transient fields.
+    // Stopgap until old serialization methods are completely replaced.
+    public void initEdgeListsIfNeeded () {
+        if (this.outgoing == null) {
+            this.outgoing = new Edge[0];
+        }
+        if (this.incoming == null) {
+            this.incoming = new Edge[0];
+        }
     }
 
     /* EDGE UTILITY METHODS (use arrays to eliminate copy-on-write set objects) */

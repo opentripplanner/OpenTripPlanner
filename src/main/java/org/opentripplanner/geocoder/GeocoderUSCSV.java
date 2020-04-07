@@ -12,7 +12,7 @@ import java.util.Collection;
 
 import javax.ws.rs.core.UriBuilder;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 
 public class GeocoderUSCSV implements Geocoder {
 

@@ -8,13 +8,13 @@ import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * A StreetEdge with elevation data.
- * 
+ *
  * @author laurent
  */
 public class StreetWithElevationEdge extends StreetEdge {
@@ -44,14 +44,20 @@ public class StreetWithElevationEdge extends StreetEdge {
     // overestimate of aerodynamic drag.
     private double maximumDragResistiveForceComponent;
 
+    private double effectiveWalkFactor = 1.0;
+
+    /**
+     * Remember to call the {@link #setElevationProfile(PackedCoordinateSequence, boolean)} to initiate elevation data.
+     */
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
-            I18NString name, double length, StreetTraversalPermission permission, boolean back) {
+        I18NString name, double length, StreetTraversalPermission permission, boolean back) {
         super(v1, v2, geometry, name, length, permission, back);
+
     }
 
     public StreetWithElevationEdge(StreetVertex v1, StreetVertex v2, LineString geometry,
-            String name, double length, StreetTraversalPermission permission, boolean back) {
-        super(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
+        String name, double length, StreetTraversalPermission permission, boolean back) {
+        this(v1, v2, geometry, new NonLocalizedString(name), length, permission, back);
     }
 
     @Override
@@ -74,6 +80,7 @@ public class StreetWithElevationEdge extends StreetEdge {
         slopeWorkFactor = (float)costs.slopeWorkFactor;
         maxSlope = (float)costs.maxSlope;
         flattened = costs.flattened;
+        effectiveWalkFactor = costs.effectiveWalkFactor;
 
         bicycleSafetyFactor *= costs.lengthMultiplier;
         bicycleSafetyFactor += costs.slopeSafetyCost / getDistance();
@@ -126,10 +133,12 @@ public class StreetWithElevationEdge extends StreetEdge {
     @Override
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, long timeMillis) {
         // use default StreetEdge method to calculate speed if the traverseMode is not micromobility
-        if (traverseMode != TraverseMode.MICROMOBILITY) return super.calculateSpeed(options, traverseMode, timeMillis);
+        if (traverseMode != TraverseMode.MICROMOBILITY)
+            return super.calculateSpeed(options, traverseMode, timeMillis);
 
         // TODO: figure out why this is null sometimes
-        if (gradients == null) return super.calculateSpeed(options, traverseMode, timeMillis);
+        if (gradients == null)
+            return super.calculateSpeed(options, traverseMode, timeMillis);
 
         // calculate and accumulate the total travel time and distance it would take to traverse each gradient
         // these values will eventually be used to calculate an overall average speed.
@@ -164,10 +173,18 @@ public class StreetWithElevationEdge extends StreetEdge {
         return distance / time;
     }
 
+    /**
+     * The effective walk distance is adjusted to take the elevation into account.
+     */
+    @Override
+    public double getSlopeWalkSpeedEffectiveLength() {
+        return effectiveWalkFactor * getDistance();
+    }
+
     @Override
     public String toString() {
         return "StreetWithElevationEdge(" + getId() + ", " + getName() + ", " + fromv + " -> "
-                + tov + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
-                + " permission=" + this.getPermission() + ")";
+            + tov + " length=" + this.getDistance() + " carSpeed=" + this.getCarSpeed()
+            + " permission=" + this.getPermission() + ")";
     }
 }

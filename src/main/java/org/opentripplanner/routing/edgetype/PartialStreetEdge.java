@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -31,7 +31,7 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
      * The elevation data is calculated using the 'parentEdge' and given 'length'.
      */
     public PartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2,
-            LineString geometry, I18NString name, double length) {
+        LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), parentEdge.isBack());
         this.parentEdge = parentEdge;
 
@@ -123,16 +123,16 @@ public class PartialStreetEdge extends StreetWithElevationEdge {
     @Override
     public String toString() {
         return "PartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
-                + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
-                + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+            + this.getToVertex() + " length=" + this.getDistance() + " carSpeed="
+            + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
     }
 
     private void setElevationProfileUsingParents() {
         setElevationProfile(
-                ElevationUtils.getPartialElevationProfile(
-                        getParentEdge().getElevationProfile(), 0, getDistance()
-                ),
-                false
+            ElevationUtils.getPartialElevationProfile(
+                getParentEdge().getElevationProfile(), 0, getDistance()
+            ),
+            false
         );
     }
 }

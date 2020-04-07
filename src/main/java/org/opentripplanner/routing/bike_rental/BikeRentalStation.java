@@ -5,9 +5,6 @@ import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
-
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.vehicle_rental.RentalStation;
 import org.opentripplanner.util.I18NString;
@@ -16,24 +13,34 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 public class BikeRentalStation extends RentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;
 
-    @XmlAttribute
+    @JsonSerialize
+    public String id;
+    //Serialized in TranslatedBikeRentalStation
+    @JsonIgnore
+    public I18NString name;
+    @JsonSerialize
+    public double x, y; //longitude, latitude
     @JsonSerialize
     public int bikesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
+    @JsonSerialize
+    public boolean allowDropoff = true;
     @JsonSerialize
     public boolean isFloatingBike = false;
-    @XmlAttribute
     @JsonSerialize
     public boolean isCarStation = false;
-    
+
+    /**
+     * List of compatible network names. Null (default) to be compatible with all.
+     */
+    @JsonSerialize
+    public Set<String> networks = null;
+
     /**
      * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
      * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
      */
-    @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
 
@@ -50,7 +57,6 @@ public class BikeRentalStation extends RentalStation implements Serializable, Cl
      *
      */
     @JsonIgnore
-    @XmlTransient
     public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
 
     /**
@@ -64,13 +70,13 @@ public class BikeRentalStation extends RentalStation implements Serializable, Cl
         BikeRentalStation other = (BikeRentalStation) o;
         return other.id.equals(id);
     }
-    
+
     public int hashCode() {
         return id.hashCode() + 1;
     }
-    
+
     public String toString () {
-        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x); 
+        return String.format(Locale.US, "Bike rental station %s at %.6f, %.6f", name, y, x);
     }
 
     @Override
@@ -85,7 +91,6 @@ public class BikeRentalStation extends RentalStation implements Serializable, Cl
     /**
      * Gets translated name of bike rental station based on locale
      */
-    @XmlAttribute
     @JsonSerialize
     public String getName() {
         return name.toString(locale);

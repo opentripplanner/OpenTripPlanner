@@ -36,7 +36,7 @@ import static org.junit.Assert.assertTrue;
 public class TestIntermediatePlaces {
 
     /**
-     * The spacial deviation that we allow in degrees
+     * The spatial deviation that we allow in degrees
      */
     public static final double DELTA = 0.005;
 
@@ -56,12 +56,9 @@ public class TestIntermediatePlaces {
             Router router = otpServer.getGraphService().getRouter("A");
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-            assert false : "Could not build graph: " + e.getMessage();
         } catch (Exception e) {
             e.printStackTrace();
-            assert false : "Could not add transit data: " + e.getMessage();
+            assert false : "Could not add transit data: " + e.toString();
         }
     }
 

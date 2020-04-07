@@ -24,7 +24,6 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.GraphBuilderParameters;
 import org.opentripplanner.standalone.OTPMain;
@@ -47,7 +46,7 @@ import java.util.zip.ZipFile;
  * It is modular: GraphBuilderModules are placed in a list and run in sequence.
  */
 public class GraphBuilder implements Runnable {
-    
+
     private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
 
     public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
@@ -55,13 +54,13 @@ public class GraphBuilder implements Runnable {
     private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
 
     private final File graphFile;
-    
+
     private boolean _alwaysRebuild = true;
 
     private List<RoutingRequest> modeList;
-    
+
     private String baseGraph = null;
-    
+
     private Graph graph = new Graph();
 
     /** Should the graph be serialized to disk after being created or not? */
@@ -83,11 +82,11 @@ public class GraphBuilder implements Runnable {
     public void setAlwaysRebuild(boolean alwaysRebuild) {
         _alwaysRebuild = alwaysRebuild;
     }
-    
+
     public void setBaseGraph(String baseGraph) {
         this.baseGraph = baseGraph;
         try {
-            graph = Graph.load(new File(baseGraph), LoadLevel.FULL);
+            graph = Graph.load(new File(baseGraph));
         } catch (Exception e) {
             throw new RuntimeException("error loading base graph");
         }
@@ -100,7 +99,7 @@ public class GraphBuilder implements Runnable {
     public void setModes(List<RoutingRequest> modeList) {
         this.modeList = modeList;
     }
-    
+
     public Graph getGraph() {
         return this.graph;
     }
@@ -110,7 +109,7 @@ public class GraphBuilder implements Runnable {
         long startTime = System.currentTimeMillis();
 
         if (serializeGraph) {
-        	
+
             if (graphFile == null) {
                 throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
             }
@@ -119,7 +118,7 @@ public class GraphBuilder implements Runnable {
                 LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
                 return;
             }
-        	
+
             try {
                 if (!graphFile.getParentFile().exists()) {
                     if (!graphFile.getParentFile().mkdirs()) {
@@ -193,24 +192,24 @@ public class GraphBuilder implements Runnable {
 
         for (File file : dir.listFiles()) {
             switch (InputFileType.forFile(file)) {
-                case GTFS:
-                    LOG.info("Found GTFS file {}", file);
-                    gtfsFiles.add(file);
-                    break;
-                case OSM:
-                    LOG.info("Found OSM file {}", file);
-                    osmFiles.add(file);
-                    break;
-                case DEM:
-                    if (!builderParams.fetchElevationUS && demFile == null) {
-                        LOG.info("Found DEM file {}", file);
-                        demFile = file;
-                    } else {
-                        LOG.info("Skipping DEM file {}", file);
-                    }
-                    break;
-                case OTHER:
-                    LOG.warn("Skipping unrecognized file '{}'", file);
+            case GTFS:
+                LOG.info("Found GTFS file {}", file);
+                gtfsFiles.add(file);
+                break;
+            case OSM:
+                LOG.info("Found OSM file {}", file);
+                osmFiles.add(file);
+                break;
+            case DEM:
+                if (!builderParams.fetchElevationUS && demFile == null) {
+                    LOG.info("Found DEM file {}", file);
+                    demFile = file;
+                } else {
+                    LOG.info("Skipping DEM file {}", file);
+                }
+                break;
+            case OTHER:
+                LOG.warn("Skipping unrecognized file '{}'", file);
             }
         }
         boolean hasOSM  = builderParams.streets && !osmFiles.isEmpty();
@@ -299,7 +298,8 @@ public class GraphBuilder implements Runnable {
                     params.cacheDirectory,
                     builderParams.readCachedElevations,
                     builderParams.writeCachedElevations,
-                    builderParams.includeEllipsoidToGeoidDifference
+                    builderParams.includeEllipsoidToGeoidDifference,
+                    builderParams.elevationUnitMultiplier
                 )
             );
         }

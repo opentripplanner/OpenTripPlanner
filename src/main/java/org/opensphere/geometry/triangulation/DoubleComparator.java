@@ -4,7 +4,7 @@ package org.opensphere.geometry.triangulation;
 import java.util.Comparator;
 import java.util.Map;
 
-import com.vividsolutions.jts.triangulate.quadedge.QuadEdge;
+import org.locationtech.jts.triangulate.quadedge.QuadEdge;
 
 /**
  * Comparator of a map containing QuadEdge as key

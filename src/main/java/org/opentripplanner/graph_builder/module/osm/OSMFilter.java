@@ -26,23 +26,30 @@ public class OSMFilter {
      * (as well as ways where all access is specifically forbidden to the public).
      * http://wiki.openstreetmap.org/wiki/Tag:highway%3Dproposed
      */
-    public static boolean isWayRoutable(OSMWithTags way) {
-        if (!isOsmEntityRoutable(way))
+    static boolean isWayRoutable(OSMWithTags way) {
+        if (!isOsmEntityRoutable(way)) {
             return false;
+        }
 
         String highway = way.getTag("highway");
-        if (highway != null
-                && (highway.equals("conveyer") || highway.equals("proposed")
-                        || highway.equals("construction") || highway.equals("raceway") || highway
-                            .equals("unbuilt")))
-            return false;
+        if (highway != null) {
+            if(
+                    highway.equals("conveyer") ||
+                    highway.equals("proposed") ||
+                    highway.equals("construction") ||
+                    highway.equals("razed") ||
+                    highway.equals("raceway") ||
+                    highway.equals("unbuilt")
+            ) {
+                return false;
+            }
+        }
 
         if (way.isGeneralAccessDenied()) {
             // There are exceptions.
             return (way.isMotorcarExplicitlyAllowed() || way.isBicycleExplicitlyAllowed() || way
                     .isPedestrianExplicitlyAllowed() || way.isMotorVehicleExplicitlyAllowed());
         }
-
         return true;
     }
 
