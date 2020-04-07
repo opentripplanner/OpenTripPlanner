@@ -510,7 +510,7 @@ public class StreetEdge extends Edge implements Cloneable {
         double optionsMaxSpeed = options.getSpeed(traverseMode);
         double maxVehicleSpeed = Double.POSITIVE_INFINITY;
         if(currentVehicle != null){
-            maxVehicleSpeed = currentVehicle.getSpeedInMetersPerSecond();
+            maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond();
         }
         double streetMaxSpeed = calculateCarSpeed(options);
 

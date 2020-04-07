@@ -24,11 +24,11 @@ public class SharedVehiclesUpdaterTest extends TestCase {
 
     public void testProjectingVehicles() {
         float long1 = (float) -77.0;
-        float long2 = (float) -77.005;
-        float long3 = (float) -77.01;
+        float long2 = (float) -77.0005;
+        float long3 = (float) -77.001;
         float lat1 = (float) 38.0;
-        float lat2 = (float) 38.005;
-        float lat3 = (float) -38.01;
+        float lat2 = (float) 38.0005;
+        float lat3 = (float) -38.001;
 
         float vehLong1 = (float) (0.3 * long1 + 0.7 * long2);
         float vehLat1 = (float) (0.3 * lat1 + 0.7 * lat2);

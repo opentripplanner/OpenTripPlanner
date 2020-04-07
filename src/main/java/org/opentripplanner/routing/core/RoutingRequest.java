@@ -1275,6 +1275,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @return The road speed for a specific traverse mode.
      */
     public double getSpeed(TraverseMode mode) {
+        if (mode == null) {
+            return Double.NaN;
+        }
         switch (mode) {
         case WALK:
             return walkSpeed;

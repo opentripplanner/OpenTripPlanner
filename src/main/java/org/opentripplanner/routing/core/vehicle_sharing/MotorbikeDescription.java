@@ -2,19 +2,19 @@ package org.opentripplanner.routing.core.vehicle_sharing;
 
 import org.opentripplanner.routing.core.TraverseMode;
 
-public class CarDescription extends VehicleDescription {
+public class MotorbikeDescription extends VehicleDescription {
 
-    private static final double MAX_SPEED_IN_METERS_PER_SECOND = 40;
-    
+    private static final double MAX_SPEED_IN_METERS_PER_SECOND = 12;
+
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.CAR;
 
-    private static final int RENT_TIME_IN_SECONDS = 90;
+    private static final int RENT_TIME_IN_SECONDS = 60;
 
-    private static final int DROPOFF_TIME_IN_SECONDS = 90;
+    private static final int DROPOFF_TIME_IN_SECONDS = 60;
 
-    private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
+    private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;
 
-    public CarDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
+    public MotorbikeDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
         super(longitude, latitude, fuelType, gearbox, provider);
     }
 

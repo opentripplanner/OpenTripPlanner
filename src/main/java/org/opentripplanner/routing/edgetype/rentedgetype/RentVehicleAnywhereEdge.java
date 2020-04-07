@@ -48,6 +48,7 @@ public class RentVehicleAnywhereEdge extends Edge {
         } else {
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
                     .filter(v -> s0.getOptions().vehiclesAllowedToRent.isRentable(v))
+                    .filter(v -> s0.getOptions().modes.contains(v.getTraverseMode()))
                     .collect(Collectors.toList());
 
             State previous = null;
