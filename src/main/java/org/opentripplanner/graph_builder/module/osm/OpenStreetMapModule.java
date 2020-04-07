@@ -244,7 +244,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
      * value is returned if that operation was unsuccessful in any way.
      */
     private PreparedGeometry parseGeometry(String areaUrlOrFile) {
-        if (areaUrlOrFile == null) {
+        if (areaUrlOrFile == null || areaUrlOrFile.equals("")) {
             return null;
         }
         InputStream data = null;
