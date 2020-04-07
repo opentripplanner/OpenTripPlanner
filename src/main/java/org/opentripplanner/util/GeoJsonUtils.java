@@ -8,6 +8,9 @@ import org.geojson.GeoJsonObject;
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.geom.GeometryCollection;
 import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.PrecisionModel;
+import org.locationtech.jts.geom.TopologyException;
+import org.locationtech.jts.precision.GeometryPrecisionReducer;
 import org.opentripplanner.analyst.UnsupportedGeometryException;
 import org.opentripplanner.common.geometry.GeometryUtils;
 
@@ -16,6 +19,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GeoJsonUtils {
+    // Create a precision reducer that can be used to reduce geometry precision in case JTS doesn't feel like dealing
+    // with large amounts of coordinate precision. This will round the geometry precision to a maximum of 7 significant
+    // digits.
+    private static GeometryPrecisionReducer precisionReducer = new GeometryPrecisionReducer(
+        new PrecisionModel(1_000_000)
+    );
+
     public static Geometry parsePolygonOrMultiPolygonFromJsonNode(
         JsonNode jsonNode
     ) throws UnsupportedGeometryException, IOException {
@@ -46,7 +56,17 @@ public class GeoJsonUtils {
             GeometryFactory geometryFactory = new GeometryFactory();
             GeometryCollection geometryCollection =
                 (GeometryCollection) geometryFactory.buildGeometry(geometries);
-            return geometryCollection.union();
+            try {
+                return geometryCollection.union();
+            } catch (TopologyException topologyException) {
+                // Sometimes JTS can fail with valid geometries. Retry with reduced precision and a 0 buffer addition if
+                // a TopologyException occurs.
+                // See https://github.com/locationtech/jts/issues/120
+                // See https://github.com/locationtech/jts/issues/511
+                geometryCollection = (GeometryCollection) precisionReducer.reduce(geometryCollection);
+                GeometryCollection bufferedGeometryCollection = (GeometryCollection) geometryCollection.buffer(0);
+                return bufferedGeometryCollection.union();
+            }
         }
     }
 }
