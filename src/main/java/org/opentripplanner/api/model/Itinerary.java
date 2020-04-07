@@ -42,10 +42,16 @@ public class Itinerary {
      * How far the user traversed in vehicle or by foot, in meters.
      */
     public Double traverseDistance = 0.0;
-
+    /**
+     * How far user traversed in each non transit  mode.
+     */
     public Map<TraverseMode, Double> distanceTraversedInMode = new HashMap<>();
-
+    /**
+     * How long user traversed in each transit mode.
+     */
     public Map<TraverseMode, Integer> timeTraversedInMode = new HashMap<>();
+
+    public String itineraryType;
 
     /**
      * Indicates that the walk limit distance has been exceeded for this itinerary when true.
@@ -82,30 +88,32 @@ public class Itinerary {
     public List<Leg> legs = new ArrayList<Leg>();
 
     /**
-     * This itinerary has a greater slope than the user requested (but there are no possible 
-     * itineraries with a good slope). 
+     * This itinerary has a greater slope than the user requested (but there are no possible
+     * itineraries with a good slope).
      */
     public boolean tooSloped = false;
 
-    /** 
+    /**
      * adds leg to array list
+     *
      * @param leg
      */
     public void addLeg(Leg leg) {
-        if(leg != null)
+        if (leg != null)
             legs.add(leg);
     }
 
-    /** 
-     * remove the leg from the list of legs 
+    /**
+     * remove the leg from the list of legs
+     *
      * @param leg object to be removed
      */
     public void removeLeg(Leg leg) {
-        if(leg != null) {
+        if (leg != null) {
             legs.remove(leg);
         }
     }
-    
+
     public void fixupDates(CalendarServiceData service) {
         TimeZone startTimeZone = null;
         TimeZone timeZone = null;
@@ -119,8 +127,8 @@ public class Itinerary {
             } else {
                 timeZone = service.getTimeZoneForAgencyId(leg.agencyId);
                 if (startTimeZone == null) {
-                    startTimeZone = timeZone; 
-                 }
+                    startTimeZone = timeZone;
+                }
             }
         }
         if (timeZone != null) {
@@ -141,5 +149,35 @@ public class Itinerary {
             calendar.setTime(endTime.getTime());
             endTime = calendar;
         }
+    }
+
+    public void prepareItineraryType() {
+        itineraryType = "";
+        boolean isTransit = false;
+        for (TraverseMode traverseMode : TraverseMode.values()) {
+            for (Leg leg : legs) {
+                if (traverseMode.toString().equals(leg.mode)) {
+                    if (!traverseMode.isTransit()) {
+                        if (itineraryType.equals("")) {
+                            itineraryType = traverseMode.toString();
+                        } else {
+                            itineraryType = itineraryType + "+" + traverseMode.toString();
+                        }
+                        break;
+                    } else {
+                        isTransit = true;
+                    }
+                }
+
+            }
+        }
+        if (isTransit) {
+            if (itineraryType.equals("")) {
+                itineraryType = "TRANSIT";
+            } else {
+                itineraryType = itineraryType + "+TRANSIT";
+            }
+        }
+
     }
 }

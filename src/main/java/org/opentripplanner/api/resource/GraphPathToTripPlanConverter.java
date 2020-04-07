@@ -81,6 +81,7 @@ public abstract class GraphPathToTripPlanConverter {
             if (itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = itinerary.walkTime;
             }
+            itinerary.prepareItineraryType();
             itineraries.add(itinerary);
         }
 
