@@ -5,6 +5,7 @@ import com.beust.jcommander.internal.Sets;
 import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.api.mapping.StopMapper;
 import org.opentripplanner.api.model.ApiStop;
@@ -115,7 +116,7 @@ public class IndexAPI {
    public Response getAgency (@PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId) {
        for (Agency agency : getRoutingService().getAgenciesForFeedId().get(feedId).values()) {
            if (agency.getId().equals(agencyId)) {
-               return Response.status(Status.OK).entity(agency).build();
+               return Response.status(Status.OK).entity(AgencyMapper.mapToApi(agency)).build();
            }
        }
        return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
