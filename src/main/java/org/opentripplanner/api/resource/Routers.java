@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import org.opentripplanner.api.model.ApiRouterInfo;
-import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.api.model.ApiRouterList;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -53,8 +53,8 @@ public class Routers {
      */
     @GET
     @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
-    public RouterList getRouterIds() {
-        RouterList routerList = new RouterList();
+    public ApiRouterList getRouterIds() {
+        ApiRouterList routerList = new ApiRouterList();
         routerList.routerInfo.add(getRouterInfo());
         return routerList;
     }

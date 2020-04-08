@@ -1,9 +1,12 @@
 package org.opentripplanner.api.model;
 
+import javax.xml.bind.annotation.XmlRootElement;
+
 /**
  * The real-time state of a trip
  */
-public enum RealTimeState {
+@XmlRootElement(name = "RealTimeState")
+public enum ApiRealTimeState {
 
     /**
      * The trip information comes from the GTFS feed, i.e. no real-time update has been applied.
@@ -32,19 +35,19 @@ public enum RealTimeState {
      */
     MODIFIED;
 
-    public static RealTimeState RealTimeState(
+    public static ApiRealTimeState RealTimeState(
         org.opentripplanner.routing.trippattern.RealTimeState other) {
         switch (other) {
             case SCHEDULED:
-                return RealTimeState.SCHEDULED;
+                return ApiRealTimeState.SCHEDULED;
             case UPDATED:
-                return RealTimeState.UPDATED;
+                return ApiRealTimeState.UPDATED;
             case CANCELED:
-                return RealTimeState.CANCELED;
+                return ApiRealTimeState.CANCELED;
             case ADDED:
-                return RealTimeState.ADDED;
+                return ApiRealTimeState.ADDED;
             case MODIFIED:
-                return RealTimeState.MODIFIED;
+                return ApiRealTimeState.MODIFIED;
             default:
                 throw new IllegalArgumentException();
         }

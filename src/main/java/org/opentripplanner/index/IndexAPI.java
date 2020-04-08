@@ -6,6 +6,7 @@ import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.model.ApiStopTimesInPattern;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.index.model.ApiTransfer;
 import org.opentripplanner.index.model.PatternDetail;
@@ -249,10 +250,10 @@ public class IndexAPI {
         Stop stop = routingService.getStopForId().get(convertIdFromString(stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
 
-        List<org.opentripplanner.api.model.StopTimesInPattern> stopTimesInPatterns =
+        List<ApiStopTimesInPattern> stopTimesInPatterns =
             routingService
                 .stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )
-                .stream().map(org.opentripplanner.api.model.StopTimesInPattern::new)
+                .stream().map(ApiStopTimesInPattern::new)
                 .collect(Collectors.toList());
 
         return Response.status(Status.OK).entity(stopTimesInPatterns).build();

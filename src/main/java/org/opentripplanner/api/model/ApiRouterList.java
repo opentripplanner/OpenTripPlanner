@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @XmlRootElement(name = "RouterList")
-public class RouterList {
+public class ApiRouterList {
     @XmlElements(value = { @XmlElement(name="routerInfo") })
     public List<ApiRouterInfo> routerInfo = new ArrayList<>();
     

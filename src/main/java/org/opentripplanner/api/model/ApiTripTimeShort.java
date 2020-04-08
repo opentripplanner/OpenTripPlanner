@@ -4,7 +4,10 @@ import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TripTimeShort;
 
+import javax.xml.bind.annotation.XmlRootElement;
 
+
+@XmlRootElement(name = "TripTimeShort")
 public class ApiTripTimeShort {
     public static final int UNDEFINED = -1;
 
@@ -19,7 +22,7 @@ public class ApiTripTimeShort {
     public int departureDelay = UNDEFINED ;
     public boolean timepoint = false;
     public boolean realtime = false;
-    public RealTimeState realtimeState = RealTimeState.SCHEDULED ;
+    public ApiRealTimeState realtimeState = ApiRealTimeState.SCHEDULED ;
     public long serviceDay;
     public FeedScopedId tripId;
     public String blockId;
@@ -37,7 +40,7 @@ public class ApiTripTimeShort {
         departureDelay     = other.departureDelay;
         timepoint          = other.timepoint;
         realtime           = other.realtime;
-        realtimeState      = RealTimeState.RealTimeState(other.realtimeState);
+        realtimeState      = ApiRealTimeState.RealTimeState(other.realtimeState);
         blockId            = other.blockId;
         headsign           = other.headsign;
     }
