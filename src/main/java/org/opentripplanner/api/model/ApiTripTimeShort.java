@@ -1,15 +1,14 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.api.mapping.FeedScopedIdMapper;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TripTimeShort;
-
 import javax.xml.bind.annotation.XmlRootElement;
+import java.io.Serializable;
 
 
 @XmlRootElement(name = "TripTimeShort")
-public class ApiTripTimeShort {
-    public static final int UNDEFINED = -1;
+public class ApiTripTimeShort implements Serializable {
+    private static final long serialVersionUID = 1L;
+
+    private static final int UNDEFINED = -1;
 
     public String stopId;
     public int stopIndex;
@@ -24,24 +23,7 @@ public class ApiTripTimeShort {
     public boolean realtime = false;
     public ApiRealTimeState realtimeState = ApiRealTimeState.SCHEDULED ;
     public long serviceDay;
-    public FeedScopedId tripId;
+    public String tripId;
     public String blockId;
     public String headsign;
-
-    public ApiTripTimeShort(TripTimeShort other) {
-        stopId             = FeedScopedIdMapper.mapToApi(other.stopId);
-        stopIndex          = other.stopIndex;
-        stopCount          = other.stopCount;
-        scheduledArrival   = other.scheduledArrival;
-        scheduledDeparture = other.scheduledDeparture;
-        realtimeArrival    = other.realtimeArrival;
-        realtimeDeparture  = other.realtimeDeparture;
-        arrivalDelay       = other.arrivalDelay;
-        departureDelay     = other.departureDelay;
-        timepoint          = other.timepoint;
-        realtime           = other.realtime;
-        realtimeState      = ApiRealTimeState.RealTimeState(other.realtimeState);
-        blockId            = other.blockId;
-        headsign           = other.headsign;
-    }
 }

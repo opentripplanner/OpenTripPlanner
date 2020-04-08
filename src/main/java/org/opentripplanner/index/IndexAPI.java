@@ -6,29 +6,31 @@ import com.google.common.collect.Collections2;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.AgencyMapper;
+import org.opentripplanner.api.mapping.FeedInfoMapper;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.api.mapping.RouteMapper;
 import org.opentripplanner.api.mapping.StopMapper;
+import org.opentripplanner.api.mapping.StopTimesInPatternMapper;
+import org.opentripplanner.api.mapping.TripPatternMapper;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopTimesInPattern;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.index.model.ApiTransfer;
-import org.opentripplanner.index.model.ApiPatternDetail;
-import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.index.model.ApiRouteShort;
 import org.opentripplanner.index.model.ApiStopShort;
-import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.index.model.ApiTransfer;
 import org.opentripplanner.index.model.ApiTripShort;
-import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
@@ -99,7 +101,7 @@ public class IndexAPI {
         if (feedInfo == null) {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         } else {
-            return Response.status(Status.OK).entity(feedInfo).build();
+            return Response.status(Status.OK).entity(FeedInfoMapper.mapToApi(feedInfo)).build();
         }
     }
 
@@ -258,7 +260,7 @@ public class IndexAPI {
         List<ApiStopTimesInPattern> stopTimesInPatterns =
             routingService
                 .stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups )
-                .stream().map(ApiStopTimesInPattern::new)
+                .stream().map(StopTimesInPatternMapper::mapToApi)
                 .collect(Collectors.toList());
 
         return Response.status(Status.OK).entity(stopTimesInPatterns).build();
@@ -493,7 +495,7 @@ public class IndexAPI {
        RoutingService routingService = getRoutingService();
        TripPattern pattern = routingService.getTripPatternForId(patternIdString);
        if (pattern != null) {
-           return Response.status(Status.OK).entity(new ApiPatternDetail(pattern)).build();
+           return Response.status(Status.OK).entity(TripPatternMapper.mapToApi(pattern)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }

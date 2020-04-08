@@ -104,4 +104,10 @@ public class ServiceDateTest {
         }
     }
 
+    @Test
+    public void asISO8601() {
+        assertNull("MAX", ServiceDate.MAX_DATE.asISO8601());
+        assertNull("MIN", ServiceDate.MIN_DATE.asISO8601());
+        assertEquals("2020-03-12", new ServiceDate(2020, 3, 12).asISO8601());
+    }
 }

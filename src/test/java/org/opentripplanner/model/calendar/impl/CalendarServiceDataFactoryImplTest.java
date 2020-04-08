@@ -181,6 +181,6 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static List<String> sevenFirstDays(List<ServiceDate> dates) {
-        return dates.stream().limit(7).map(ServiceDate::getAsString).collect(toList());
+        return dates.stream().limit(7).map(ServiceDate::asCompactString).collect(toList());
     }
 }

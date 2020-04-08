@@ -1,8 +1,6 @@
 package org.opentripplanner.model;
 
-import com.google.common.collect.Lists;
-import org.opentripplanner.index.model.PatternShort;
-
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -11,11 +9,11 @@ import java.util.List;
  */
 public class StopTimesInPattern {
 
-    public PatternShort pattern;
-    public List<TripTimeShort> times = Lists.newArrayList();
+    public TripPattern pattern;
+    public List<TripTimeShort> times = new ArrayList<>();
 
     public StopTimesInPattern(TripPattern pattern) {
-        this.pattern = new PatternShort(pattern);
+        this.pattern = pattern;
     }
 
 }

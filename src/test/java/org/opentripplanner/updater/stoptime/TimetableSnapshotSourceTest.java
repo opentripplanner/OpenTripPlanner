@@ -193,7 +193,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(addedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -300,7 +300,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(modifiedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -455,7 +455,7 @@ public class TimetableSnapshotSourceTest {
 
         tripDescriptorBuilder.setTripId("1.1");
         tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-        tripDescriptorBuilder.setStartDate(previously.getAsString());
+        tripDescriptorBuilder.setStartDate(previously.asCompactString());
 
         final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 
