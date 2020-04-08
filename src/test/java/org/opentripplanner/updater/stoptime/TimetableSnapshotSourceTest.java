@@ -53,9 +53,14 @@ public class TimetableSnapshotSourceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        // The ".turnOnSetAgencyToFeedIdForAllElements()" is commented out so it can be
+        // removed from the code, it in no longer in use. It is not deleted here to better
+        // allow the reader of the test understand how the test once worked. There should
+        // be new test to replace this one.
+
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withIssueStoreAndDeduplicator(graph)
-                .turnOnSetAgencyToFeedIdForAllElements()
+                //.turnOnSetAgencyToFeedIdForAllElements()
                 .build();
 
         feedId = context.getFeedId().getId();

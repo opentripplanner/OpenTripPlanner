@@ -1,7 +1,6 @@
 package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
-import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FareAttribute;
@@ -206,18 +205,6 @@ public class OtpTransitServiceBuilder {
     public OtpTransitService build() {
         generateNoneExistentIds(feedInfos);
         return new OtpTransitServiceImpl(this);
-    }
-
-    /**
-     * For entities with mutable ids the internal map becomes invalid after the ids are changed.
-     * Calling this method fixes this problem by reindexing the maps.
-     */
-    public void regenerateIndexes() {
-        this.agenciesById.reindex();
-        this.tripsById.reindex();
-        this.stopsById.reindex();
-        this.routesById.reindex();
-        this.stopTimesByTrip.reindex();
     }
 
     /**

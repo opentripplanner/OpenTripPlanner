@@ -183,7 +183,7 @@ public class GraphBuilderDataSources {
 
     private void log(String op, DataSource source) {
         String opTxt = String.format(op, source.type().text());
-        LOG.info("  - {} {}", opTxt, source.detailedInfo());
+        LOG.info("- {} {}", opTxt, source.detailedInfo());
     }
 
     private void include(boolean include, FileType type) {

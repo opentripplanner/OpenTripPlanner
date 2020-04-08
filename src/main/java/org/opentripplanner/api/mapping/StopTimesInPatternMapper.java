@@ -20,7 +20,7 @@ public class StopTimesInPatternMapper {
 
         ApiStopTimesInPattern api = new ApiStopTimesInPattern();
 
-        api.pattern = TripPatternMapper.mapToApi(domain.pattern);
+        api.pattern = TripPatternMapper.mapToApiShort(domain.pattern);
         api.times = TripTimeMapper.mapToApi(domain.times);
 
         return api;

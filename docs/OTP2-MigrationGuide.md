@@ -45,4 +45,7 @@ These properties changed names from:
 - `Route`
   - Deprecated 'routeBikesAllowed' field removed.
   - `sortOrder` will be empty (missing) when empty, NOT -999 as before.
-
+- To access or references `TripPattern` the `tripPatternId` is used, not `code`. In OTP1 the
+  `code` was used. The code was the same as the id without the feedId prefix. The `code`
+  is removed from OTP2. Clients may not be affected by this change, unless they toke advantage 
+  of the semantics in the old `code`.

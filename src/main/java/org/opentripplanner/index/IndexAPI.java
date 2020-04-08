@@ -19,7 +19,6 @@ import org.opentripplanner.index.model.ApiRouteShort;
 import org.opentripplanner.index.model.ApiStopShort;
 import org.opentripplanner.index.model.ApiTransfer;
 import org.opentripplanner.index.model.ApiTripShort;
-import org.opentripplanner.index.model.PatternShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -236,7 +235,7 @@ public class IndexAPI {
        Stop stop = routingService.getStopForId().get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Collection<TripPattern> patterns = routingService.getPatternsForStop().get(stop);
-       return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+       return Response.status(Status.OK).entity(TripPatternMapper.mapToApiShort(patterns)).build();
    }
 
     /** Return upcoming vehicle arrival/departure times at the given stop.
@@ -358,7 +357,7 @@ public class IndexAPI {
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
-           return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+           return Response.status(Status.OK).entity(TripPatternMapper.mapToApiShort(patterns)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -474,8 +473,8 @@ public class IndexAPI {
         Trip trip = routingService.getTripForId().get(tripId);
         if (trip != null) {
             TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
-            // TODO OTP2 - Refactor to use the pattern ID
-            return getGeometryForPattern(tripPattern.getCode());
+            EncodedPolylineBean geometry = PolylineEncoder.createEncodings(tripPattern.getGeometry());
+            return Response.status(Status.OK).entity(geometry).build();
         } else {
             return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         }
@@ -486,16 +485,17 @@ public class IndexAPI {
    public Response getPatterns () {
        RoutingService routingService = getRoutingService();
        Collection<TripPattern> patterns = routingService.getTripPatterns();
-       return Response.status(Status.OK).entity(PatternShort.list(patterns)).build();
+       return Response.status(Status.OK).entity(TripPatternMapper.mapToApiShort(patterns)).build();
    }
 
    @GET
    @Path("/patterns/{patternId}")
    public Response getPattern (@PathParam("patternId") String patternIdString) {
+        FeedScopedId patternId = FeedScopedIdMapper.mapToDomain("patternId", patternIdString);
        RoutingService routingService = getRoutingService();
-       TripPattern pattern = routingService.getTripPatternForId(patternIdString);
+       TripPattern pattern = routingService.getTripPatternForId(patternId);
        if (pattern != null) {
-           return Response.status(Status.OK).entity(TripPatternMapper.mapToApi(pattern)).build();
+           return Response.status(Status.OK).entity(TripPatternMapper.mapToApiShort(pattern)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -504,8 +504,9 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{patternId}/trips")
    public Response getTripsForPattern (@PathParam("patternId") String patternIdString) {
+       FeedScopedId patternId = FeedScopedIdMapper.mapToDomain("patternId", patternIdString);
        RoutingService routingService = getRoutingService();
-       TripPattern pattern = routingService.getTripPatternForId(patternIdString);
+       TripPattern pattern = routingService.getTripPatternForId(patternId);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
            return Response.status(Status.OK).entity(ApiTripShort.list(trips)).build();
@@ -517,9 +518,10 @@ public class IndexAPI {
    @GET
    @Path("/patterns/{patternId}/stops")
    public Response getStopsForPattern (@PathParam("patternId") String patternIdString) {
+       FeedScopedId patternId = FeedScopedIdMapper.mapToDomain("patternId", patternIdString);
        RoutingService routingService = getRoutingService();
        // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
-       TripPattern pattern = routingService.getTripPatternForId(patternIdString);
+       TripPattern pattern = routingService.getTripPatternForId(patternId);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
            return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
@@ -531,9 +533,10 @@ public class IndexAPI {
     @GET
     @Path("/patterns/{patternId}/semanticHash")
     public Response getSemanticHashForPattern (@PathParam("patternId") String patternIdString) {
+        FeedScopedId patternId = FeedScopedIdMapper.mapToDomain("patternId", patternIdString);
         RoutingService routingService = getRoutingService();
         // Pattern names are graph-unique because we made them that way (did not read them from GTFS).
-        TripPattern pattern = routingService.getTripPatternForId(patternIdString);
+        TripPattern pattern = routingService.getTripPatternForId(patternId);
         if (pattern != null) {
             String semanticHash = pattern.semanticHashString(null);
             return Response.status(Status.OK).entity(semanticHash).build();
@@ -546,8 +549,9 @@ public class IndexAPI {
     @GET
     @Path("/patterns/{patternId}/geometry")
     public Response getGeometryForPattern (@PathParam("patternId") String patternIdString) {
+        FeedScopedId patternId = FeedScopedIdMapper.mapToDomain("patternId", patternIdString);
         RoutingService routingService = getRoutingService();
-        TripPattern pattern = routingService.getTripPatternForId(patternIdString);
+        TripPattern pattern = routingService.getTripPatternForId(patternId);
         if (pattern != null) {
             EncodedPolylineBean geometry = PolylineEncoder.createEncodings(pattern.getGeometry());
             return Response.status(Status.OK).entity(geometry).build();

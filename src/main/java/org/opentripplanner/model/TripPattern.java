@@ -112,20 +112,16 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     private byte[][] hopGeometries = null;
 
+    /**
+     * The unique identifier for this trip pattern. For GTFS feeds this is generally
+     * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
+     * NeTEx the JourneyPattern id is used.
+     */
     @Override
     public FeedScopedId getId() { return id; }
 
     @Override
     public void setId(FeedScopedId id) { this.id = id; }
-
-    /**
-     * The short unique identifier for this trip pattern,
-     * generally in the format Agency:RouteId:DirectionId:PatternNumber (GTFS)
-     * or if the id is set, then {@code id.getId()} (Netex).
-     */
-    public String getCode() {
-        return id.getId();
-    }
 
     public LineString getHopGeometry(int stopIndex) {
         if (hopGeometries != null) {
@@ -558,7 +554,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     public String toString () {
-        return String.format("<TripPattern %s>", this.getCode());
+        return String.format("<TripPattern %s>", this.getId());
     }
 
 	public Trip getExemplar() {

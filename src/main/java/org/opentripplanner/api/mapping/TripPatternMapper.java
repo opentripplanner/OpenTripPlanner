@@ -13,17 +13,17 @@ import java.util.stream.Collectors;
 
 public class TripPatternMapper {
 
-    public static List<ApiPatternShort> mapToApi(Collection<TripPattern> domainList) {
+    public static List<ApiPatternShort> mapToApiShort(Collection<TripPattern> domainList) {
         if(domainList == null) {
             return null;
         }
         return domainList
                 .stream()
-                .map(TripPatternMapper::mapToApi)
+                .map(TripPatternMapper::mapToApiShort)
                 .collect(Collectors.toList());
     }
 
-    public static ApiPatternShort mapToApi(TripPattern domain) {
+    public static ApiPatternShort mapToApiShort(TripPattern domain) {
         if(domain == null) {
             return null;
         }
@@ -43,9 +43,8 @@ public class TripPatternMapper {
     }
 
     private static <T extends ApiPatternShort> T mapBaseToApi(TripPattern domain, Supplier<T> create) {
-        // TODO OTP2 - Refactor to use the pattern ID
         T api = create.get();
-        api.id = domain.getCode();
+        api.id = FeedScopedIdMapper.mapToApi(domain.getId());
         api.desc = domain.name;
         return api;
     }

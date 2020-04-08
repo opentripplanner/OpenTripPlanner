@@ -227,7 +227,7 @@ public class Graph implements Serializable {
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
      * vertices/edges anymore.
      */
-    public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+    public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
@@ -997,7 +997,7 @@ public class Graph implements Serializable {
         return res == null ? Collections.emptyList() : res;
     }
 
-    public TripPattern getTripPatternForId(String id) {
+    public TripPattern getTripPatternForId(FeedScopedId id) {
         return tripPatternForId.get(id);
     }
 
