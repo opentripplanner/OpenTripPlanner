@@ -1,14 +1,13 @@
 package org.opentripplanner.index.model;
 
-import java.util.Collection;
-import java.util.List;
-
+import com.beust.jcommander.internal.Lists;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 
-import com.beust.jcommander.internal.Lists;
+import java.util.Collection;
+import java.util.List;
 
-public class TripShort {
+public class ApiTripShort {
 
     public FeedScopedId id;
     public String tripHeadsign;
@@ -18,7 +17,7 @@ public class TripShort {
 
     // INCLUDE start and end time, pattern and route in detail version
     
-    public TripShort (Trip trip) {
+    public ApiTripShort(Trip trip) {
         id = trip.getId();
         tripHeadsign = trip.getTripHeadsign();
         serviceId = trip.getServiceId();
@@ -28,9 +27,9 @@ public class TripShort {
         direction = directionId == null ? null : Integer.parseInt(directionId);
     }
 
-    public static List<TripShort> list (Collection<Trip> in) {
-        List<TripShort> out = Lists.newArrayList();
-        for (Trip trip : in) out.add(new TripShort(trip));
+    public static List<ApiTripShort> list (Collection<Trip> in) {
+        List<ApiTripShort> out = Lists.newArrayList();
+        for (Trip trip : in) out.add(new ApiTripShort(trip));
         return out;
     }    
 
