@@ -40,6 +40,9 @@ These properties changed names from:
 
 ### Changes to the Index API
 - Error handling is improved, this is now consistently applied and uses build in framework support. 
-  - The HTTP 400 and 404 response now contains an error message in plain text in addition to the header "FOUR HUNDRED" and "FOUR ZERO FOUR".   
-   
-   
+  - The HTTP 400 and 404 response now contains an error message in plain text in addition to the
+    header "FOUR HUNDRED" and "FOUR ZERO FOUR".   
+- `Route`
+  - Deprecated 'routeBikesAllowed' field removed.
+  - `sortOrder` will be empty (missing) when empty, NOT -999 as before.
+
