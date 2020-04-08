@@ -1,8 +1,8 @@
 package org.opentripplanner.routing;
 
 import lombok.experimental.Delegate;
-import org.opentripplanner.index.model.StopTimesInPattern;
-import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;

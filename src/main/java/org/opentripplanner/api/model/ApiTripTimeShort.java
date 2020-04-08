@@ -2,6 +2,7 @@ package org.opentripplanner.api.model;
 
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TripTimeShort;
 
 
 public class ApiTripTimeShort {
@@ -24,7 +25,7 @@ public class ApiTripTimeShort {
     public String blockId;
     public String headsign;
 
-    public ApiTripTimeShort(org.opentripplanner.index.model.TripTimeShort other) {
+    public ApiTripTimeShort(TripTimeShort other) {
         stopId             = FeedScopedIdMapper.mapToApi(other.stopId);
         stopIndex          = other.stopIndex;
         stopCount          = other.stopCount;

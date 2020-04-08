@@ -1,6 +1,6 @@
 package org.opentripplanner.routing;
 
-import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;

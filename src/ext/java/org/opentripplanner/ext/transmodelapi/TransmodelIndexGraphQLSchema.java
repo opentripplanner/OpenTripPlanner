@@ -40,8 +40,8 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesSca
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.index.model.StopTimesInPattern;
-import org.opentripplanner.index.model.TripTimeShort;
+import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
