@@ -7,6 +7,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.mapping.AgencyMapper;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
+import org.opentripplanner.api.mapping.RouteMapper;
 import org.opentripplanner.api.mapping.StopMapper;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopTimesInPattern;
@@ -138,7 +139,7 @@ public class IndexAPI {
         }
         routes = agencyRoutes;
         if (detail){
-            return Response.status(Status.OK).entity(routes).build();
+            return Response.status(Status.OK).entity(RouteMapper.mapToApi(routes)).build();
         }
         else {
             return Response.status(Status.OK).entity(ApiRouteShort.list(routes)).build();
@@ -340,7 +341,7 @@ public class IndexAPI {
        FeedScopedId routeId = convertIdFromString(routeIdString);
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
-           return Response.status(Status.OK).entity(route).build();
+           return Response.status(Status.OK).entity(RouteMapper.mapToApi(route)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
