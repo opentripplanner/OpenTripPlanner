@@ -150,7 +150,7 @@ public class IndexAPI {
    @GET
    @Path("/stops/{stopId}")
    public Response getStop (@PathParam("stopId") String stopIdString) {
-       FeedScopedId stopId = convertIdFromString(stopIdString);
+       FeedScopedId stopId = createId("stopId", stopIdString);
        Stop stop = getRoutingService().getStopForId().get(stopId);
        if (stop != null) {
            ApiStop apiStop = StopMapper.mapToApi(stop);
@@ -217,7 +217,7 @@ public class IndexAPI {
    @Path("/stops/{stopId}/routes")
    public Response getRoutesForStop (@PathParam("stopId") String stopId) {
        RoutingService routingService = getRoutingService();
-       Stop stop = routingService.getStopForId().get(convertIdFromString(stopId));
+       Stop stop = routingService.getStopForId().get(createId("stopId", stopId));
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Set<Route> routes = Sets.newHashSet();
        for (TripPattern pattern : routingService.getPatternsForStop().get(stop)) {
@@ -230,7 +230,7 @@ public class IndexAPI {
    @Path("/stops/{stopId}/patterns")
    public Response getPatternsForStop (@PathParam("stopId") String stopIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId id = convertIdFromString(stopIdString);
+       FeedScopedId id = createId("stopId", stopIdString);
        Stop stop = routingService.getStopForId().get(id);
        if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        Collection<TripPattern> patterns = routingService.getPatternsForStop().get(stop);
@@ -252,7 +252,7 @@ public class IndexAPI {
                                          @QueryParam("numberOfDepartures") @DefaultValue("2") int numberOfDepartures,
                                          @QueryParam("omitNonPickups") boolean omitNonPickups) {
         RoutingService routingService = getRoutingService();
-        Stop stop = routingService.getStopForId().get(convertIdFromString(stopIdString));
+        Stop stop = routingService.getStopForId().get(createId("stopId", stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
 
         List<ApiStopTimesInPattern> stopTimesInPatterns =
@@ -274,7 +274,7 @@ public class IndexAPI {
                                                 @PathParam("date") String date,
                                                 @QueryParam("omitNonPickups") boolean omitNonPickups) {
         RoutingService routingService = getRoutingService();
-        Stop stop = routingService.getStopForId().get(convertIdFromString(stopIdString));
+        Stop stop = routingService.getStopForId().get(createId("stopId", stopIdString));
         if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
         ServiceDate sd;
         try {
@@ -295,7 +295,7 @@ public class IndexAPI {
     @Path("/stops/{stopId}/transfers")
     public Response getTransfers(@PathParam("stopId") String stopIdString) {
         RoutingService routingService = getRoutingService();
-        Stop stop = routingService.getStopForId().get(convertIdFromString(stopIdString));
+        Stop stop = routingService.getStopForId().get(createId("stopId", stopIdString));
         
         if (stop != null) {
             // get the transfers for the stop
@@ -321,7 +321,7 @@ public class IndexAPI {
            // Protective copy, we are going to calculate the intersection destructively
            routes = Lists.newArrayList(routes);
            for (String stopId : stopIds) {
-               Stop stop = routingService.getStopForId().get(convertIdFromString(stopId));
+               Stop stop = routingService.getStopForId().get(createId("stopId", stopId));
                if (stop == null) return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
                Set<Route> routesHere = Sets.newHashSet();
                for (TripPattern pattern : routingService.getPatternsForStop().get(stop)) {
@@ -338,7 +338,7 @@ public class IndexAPI {
    @Path("/routes/{routeId}")
    public Response getRoute (@PathParam("routeId") String routeIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId routeId = convertIdFromString(routeIdString);
+       FeedScopedId routeId = createId("routeId", routeIdString);
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
            return Response.status(Status.OK).entity(RouteMapper.mapToApi(route)).build();
@@ -352,7 +352,7 @@ public class IndexAPI {
    @Path("/routes/{routeId}/patterns")
    public Response getPatternsForRoute (@PathParam("routeId") String routeIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId routeId = convertIdFromString(routeIdString);
+       FeedScopedId routeId = createId("routeId", routeIdString);
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
            Collection<TripPattern> patterns = routingService.getPatternsForRoute().get(route);
@@ -367,7 +367,7 @@ public class IndexAPI {
    @Path("/routes/{routeId}/stops")
    public Response getStopsForRoute (@PathParam("routeId") String routeIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId routeId = convertIdFromString(routeIdString);
+       FeedScopedId routeId = createId("routeId", routeIdString);
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
            Set<Stop> stops = Sets.newHashSet();
@@ -386,7 +386,7 @@ public class IndexAPI {
    @Path("/routes/{routeId}/trips")
    public Response getTripsForRoute (@PathParam("routeId") String routeIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId routeId = convertIdFromString(routeIdString);
+       FeedScopedId routeId = createId("routeId", routeIdString);
        Route route = routingService.getRouteForId().get(routeId);
        if (route != null) {
            List<Trip> trips = Lists.newArrayList();
@@ -408,7 +408,7 @@ public class IndexAPI {
    @Path("/trips/{tripId}")
    public Response getTrip (@PathParam("tripId") String tripIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId tripId = convertIdFromString(tripIdString);
+       FeedScopedId tripId = createId("tripId", tripIdString);
        Trip trip = routingService.getTripForId().get(tripId);
        if (trip != null) {
            return Response.status(Status.OK).entity(trip).build();
@@ -421,7 +421,7 @@ public class IndexAPI {
    @Path("/trips/{tripId}/stops")
    public Response getStopsForTrip (@PathParam("tripId") String tripIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId tripId = convertIdFromString(tripIdString);
+       FeedScopedId tripId = createId("tripId", tripIdString);
        Trip trip = routingService.getTripForId().get(tripId);
        if (trip != null) {
            TripPattern pattern = routingService.getPatternForTrip().get(trip);
@@ -436,7 +436,7 @@ public class IndexAPI {
     @Path("/trips/{tripId}/semanticHash")
     public Response getSemanticHashForTrip (@PathParam("tripId") String tripIdString) {
         RoutingService routingService = getRoutingService();
-        FeedScopedId tripId = convertIdFromString(tripIdString);
+        FeedScopedId tripId = createId("tripId", tripIdString);
         Trip trip = routingService.getTripForId().get(tripId);
         if (trip != null) {
             TripPattern pattern = routingService.getPatternForTrip().get(trip);
@@ -451,7 +451,7 @@ public class IndexAPI {
    @Path("/trips/{tripId}/stoptimes")
    public Response getStoptimesForTrip (@PathParam("tripId") String tripIdString) {
        RoutingService routingService = getRoutingService();
-       FeedScopedId tripId = convertIdFromString(tripIdString);
+       FeedScopedId tripId = createId("tripId", tripIdString);
        Trip trip = routingService.getTripForId().get(tripId);
        if (trip != null) {
            TripPattern pattern = routingService.getPatternForTrip().get(trip);
@@ -468,7 +468,7 @@ public class IndexAPI {
     @Path("/trips/{tripId}/geometry")
     public Response getGeometryForTrip (@PathParam("tripId") String tripIdString) {
         RoutingService routingService = getRoutingService();
-        FeedScopedId tripId = convertIdFromString(tripIdString);
+        FeedScopedId tripId = createId("tripId", tripIdString);
         Trip trip = routingService.getTripForId().get(tripId);
         if (trip != null) {
             TripPattern tripPattern = routingService.getPatternForTrip().get(trip);
@@ -585,7 +585,7 @@ public class IndexAPI {
         return new RoutingService(graph);
     }
 
-    private static FeedScopedId convertIdFromString(String value) {
-        return FeedScopedIdMapper.mapToDomain(value);
+    private static FeedScopedId createId(String name, String value) {
+        return FeedScopedIdMapper.mapToDomain(name, value);
     }
 }
