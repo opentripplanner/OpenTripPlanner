@@ -25,7 +25,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     private static final long serialVersionUID = 1L;
 
-    private static final Pattern PATTERN = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
+    private static final Pattern PATTERN = Pattern.compile("^(\\d{4})-?(\\d{2})-?(\\d{2})$");
 
     private static final NumberFormat YEAR_FORMAT = new DecimalFormat("0000");
 
