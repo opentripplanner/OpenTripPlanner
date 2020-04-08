@@ -384,6 +384,24 @@ public class ElevationModule implements GraphBuilderModule {
         else
             elevations = new HashMap<Vertex, Double>();
 
+        // If including the EllipsoidToGeoidDifference, subtract these from the known elevations found in OpenStreetMap
+        // data.
+        if (includeEllipsoidToGeoidDifference) {
+            elevations.forEach((vertex, elevation) -> {
+                try {
+                    elevations.put(
+                        vertex, elevation - getApproximateEllipsoidToGeoidDifference(vertex.getY(), vertex.getX())
+                    );
+                } catch (TransformException e) {
+                    log.error(
+                        "Error processing elevation for known elevation at vertex: {} due to error: {}",
+                        vertex,
+                        e
+                    );
+                }
+            });
+        }
+
         HashSet<Vertex> closed = new HashSet<Vertex>();
 
         // initialize queue with all vertices which already have known elevation
