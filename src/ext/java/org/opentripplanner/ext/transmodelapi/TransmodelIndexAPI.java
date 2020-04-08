@@ -6,6 +6,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -58,7 +59,7 @@ public class TransmodelIndexAPI {
     public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
         if (queryParameters==null || !queryParameters.containsKey("query")) {
             LOG.debug("No query found in body");
-            return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("No query found in body").build();
+            throw new BadRequestException("No query found in body");
         }
 
         String query = (String) queryParameters.get("query");
@@ -71,7 +72,7 @@ public class TransmodelIndexAPI {
             try {
                 variables = deserializer.readValue((String) queryVariables, Map.class);
             } catch (IOException e) {
-                return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                throw new BadRequestException("Variables must be a valid json object");
             }
         } else {
             variables = new HashMap<>();
@@ -101,7 +102,7 @@ public class TransmodelIndexAPI {
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
-                    return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                    throw new BadRequestException("Variables must be a valid json object");
                 }
             } else {
                 variables = null;

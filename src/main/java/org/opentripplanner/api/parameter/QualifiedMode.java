@@ -4,8 +4,8 @@ import com.google.common.collect.Sets;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
+import javax.ws.rs.BadRequestException;
 import java.io.Serializable;
-import java.security.InvalidParameterException;
 import java.util.Set;
 
 public class QualifiedMode implements Serializable {
@@ -15,18 +15,18 @@ public class QualifiedMode implements Serializable {
     public final Set<Qualifier> qualifiers = Sets.newHashSet();
 
     public QualifiedMode(String qMode) {
-        String[] elements = qMode.split("_");
-        mode = TraverseMode.valueOf(elements[0].trim());
-        if (mode == null) {
-            throw new InvalidParameterException();
-        }
-        for (int i = 1; i < elements.length; i++) {
-            Qualifier q = Qualifier.valueOf(elements[i].trim());
-            if (q == null) {
-                throw new InvalidParameterException();
-            } else {
+        try {
+            String[] elements = qMode.split("_");
+            mode = TraverseMode.valueOf(elements[0].trim());
+            for (int i = 1; i < elements.length; i++) {
+                Qualifier q = Qualifier.valueOf(elements[i].trim());
                 qualifiers.add(q);
             }
+        }
+        catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            throw new BadRequestException(
+                    "Qualified mode is not valid: '" + qMode + "', details: " + e.getMessage()
+            );
         }
     }
     

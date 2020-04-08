@@ -5,6 +5,7 @@ import graphql.ExecutionResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.HashMap;
@@ -43,35 +44,23 @@ public class HttpToGraphQLMapper {
             try {
                 variables = deserializer.readValue((String) queryVariables, Map.class);
             } catch (IOException e) {
-                LOG.error("Variables must be a valid json object");
-                return new QlRequestParams(null, null, null, true);
+                throw new BadRequestException("Variables must be a valid json object");
             }
         } else {
             variables = new HashMap<>();
         }
-
-        return new QlRequestParams(query, operationName, variables, false);
+        return new QlRequestParams(query, operationName, variables);
     }
 
     public static class QlRequestParams {
         public final String query ;
         public final String operationName;
         public final Map<String, Object> variables;
-        private final boolean parsingRequestFailed;
 
-        private QlRequestParams(String query, String operationName, Map<String, Object> variables, boolean parsingRequestFailed) {
+        private QlRequestParams(String query, String operationName, Map<String, Object> variables) {
             this.query = query;
             this.operationName = operationName;
             this.variables = variables;
-            this.parsingRequestFailed = parsingRequestFailed;
-        }
-
-        public boolean isFailed() {
-            return parsingRequestFailed;
-        }
-
-        public Response getFailedResponse() {
-            return Response.status(Response.Status.BAD_REQUEST).entity("FOUR HUNDRED").build();
         }
     }
 }

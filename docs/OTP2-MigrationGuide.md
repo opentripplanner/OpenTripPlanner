@@ -37,6 +37,9 @@ These properties changed names from:
   - `searchWindowUsed`
   - `nextDateTime`
   - `prevDateTime`
-   
+
+### Changes to the Index API
+- Error handling is improved, this is now consistently applied and uses build in framework support. 
+  - The HTTP 400 and 404 response now contains an error message in plain text in addition to the header "FOUR HUNDRED" and "FOUR ZERO FOUR".   
    
    

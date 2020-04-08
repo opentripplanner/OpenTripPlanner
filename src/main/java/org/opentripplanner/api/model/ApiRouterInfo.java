@@ -32,7 +32,7 @@ public class ApiRouterInfo {
     
     @JsonSerialize(using= GeometrySerializer.class)
     @JsonDeserialize(using= GeometryDeserializer.class)
-    @XmlJavaTypeAdapter(value= GeometryAdapter.class,type=Geometry.class)
+    @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 
     @XmlElement

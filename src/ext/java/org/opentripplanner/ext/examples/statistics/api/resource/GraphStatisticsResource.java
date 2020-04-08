@@ -8,6 +8,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
@@ -43,10 +44,6 @@ public class GraphStatisticsResource {
         HttpToGraphQLMapper.QlRequestParams req = mapHttpQuerryParamsToQLParams(
                 queryParameters, deserializer
         );
-
-        if(req.isFailed()) {
-            return req.getFailedResponse();
-        }
 
         ExecutionResult executionResult = graphQL.execute(
                 req.query, req.operationName, null, req.variables
