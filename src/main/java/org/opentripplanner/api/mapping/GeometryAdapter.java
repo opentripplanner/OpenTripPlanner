@@ -1,12 +1,11 @@
-package org.opentripplanner.api.model;
-
-import javax.xml.bind.annotation.adapters.XmlAdapter;
-
-import org.opentripplanner.common.geometry.GeometryUtils;
+package org.opentripplanner.api.mapping;
 
 import org.locationtech.jts.geom.Geometry;
 import org.locationtech.jts.io.WKTReader;
 import org.locationtech.jts.io.gml2.GMLWriter;
+import org.opentripplanner.common.geometry.GeometryUtils;
+
+import javax.xml.bind.annotation.adapters.XmlAdapter;
 
 public class GeometryAdapter extends XmlAdapter<String,Geometry> {
     public Geometry unmarshal(String val) throws Exception {

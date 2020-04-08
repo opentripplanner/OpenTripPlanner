@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.mapping.GeometryAdapter;
 import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.common.geometry.GeometrySerializer;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
@@ -31,7 +32,7 @@ public class ApiRouterInfo {
     
     @JsonSerialize(using= GeometrySerializer.class)
     @JsonDeserialize(using= GeometryDeserializer.class)
-    @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
+    @XmlJavaTypeAdapter(value= GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 
     @XmlElement
