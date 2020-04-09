@@ -43,7 +43,8 @@ class LinkStopsAndParentStationsTogether {
 
     void link(Collection<org.onebusaway.gtfs.model.Stop> gtfsStops) {
         for (org.onebusaway.gtfs.model.Stop gtfsStop : gtfsStops) {
-            if (gtfsStop.getLocationType() != 1 && gtfsStop.getLocationType() != 4
+            if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION
+                    && gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA
                     && gtfsStop.getParentStation() != null) {
 
                 TransitEntity<FeedScopedId> otpStop = getOtpStop(gtfsStop);
@@ -72,7 +73,8 @@ class LinkStopsAndParentStationsTogether {
                         node.setCoordinate(new WgsCoordinate(otpStation.getLat(), otpStation.getLon()));
                     }
                 }
-            } else if (gtfsStop.getLocationType() == 4 && gtfsStop.getParentStation() != null) {
+            } else if (gtfsStop.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA
+                    && gtfsStop.getParentStation() != null) {
                 BoardingArea otpBoardingArea = getOtpBoardingArea(gtfsStop);
                 FeedScopedId otpStopId = mapAgencyAndId(gtfsStop.getId());
                 Stop otpStop = otpStops.get(otpStopId);
