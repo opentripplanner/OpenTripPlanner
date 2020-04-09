@@ -38,7 +38,6 @@ import org.slf4j.LoggerFactory;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.Objects;
 
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
@@ -195,7 +194,7 @@ public class AddTransitModelEntitiesToGraph {
                         pathway.getLength(),
                         pathway.getStairCount(),
                         pathway.getSlope(),
-                        pathway.getPathwayMode() != 2 && pathway.getPathwayMode() != 4
+                        pathway.isPathwayModeWheelchairAccessible()
                     );
                     if (pathway.isBidirectional()) {
                         new PathwayEdge(
@@ -206,7 +205,7 @@ public class AddTransitModelEntitiesToGraph {
                             pathway.getLength(),
                             -1 * pathway.getStairCount(),
                             -1 * pathway.getSlope(),
-                            pathway.getPathwayMode() != 2 && pathway.getPathwayMode() != 4
+                            pathway.isPathwayModeWheelchairAccessible()
                         );
                     }
                 }

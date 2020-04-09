@@ -121,4 +121,8 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
     public String toString() {
         return "<Pathway " + this.id + ">";
     }
+
+    public boolean isPathwayModeWheelchairAccessible() {
+        return getPathwayMode() != 2 && getPathwayMode() != 4;
+    }
 }
