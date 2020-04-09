@@ -1,0 +1,21 @@
+{
+  "name": "opentripplanner",
+  "version": "2.0.0",
+  "description": "OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as a map-based Javascript client. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. For more information, see the project website: http://opentripplanner.org",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/opentripplanner/OpenTripPlanner.git"
+  },
+  "license": "GPL-3.0-or-later",
+  "bugs": {
+    "url": "https://github.com/opentripplanner/OpenTripPlanner/issues"
+  },
+  "homepage": "https://github.com/opentripplanner/OpenTripPlanner#readme",
+  "devDependencies": {
+    "@graphql-codegen/add": "1.13.2",
+    "@graphql-codegen/cli": "1.13.2",
+    "@graphql-codegen/java": "1.13.2",
+    "@graphql-codegen/java-resolvers": "1.13.2",
+    "graphql": "15.0.0"
+  }
+}
