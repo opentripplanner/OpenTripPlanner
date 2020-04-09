@@ -40,7 +40,6 @@ class PathwayNodeMapper {
         }
         otpPathwayNode.setCode(gtfsStop.getCode());
         otpPathwayNode.setDescription(gtfsStop.getDesc());
-        otpPathwayNode.setUrl(gtfsStop.getUrl());
         otpPathwayNode.setWheelchairBoarding(
             WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding())
         );

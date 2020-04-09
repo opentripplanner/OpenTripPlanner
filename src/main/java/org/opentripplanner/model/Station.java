@@ -60,6 +60,10 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
                 return coordinate.latitude();
         }
 
+        public WgsCoordinate getCoordinate() {
+                return coordinate;
+        }
+
         public void setCoordinate(WgsCoordinate coordinate) {
                 this.coordinate = coordinate;
         }

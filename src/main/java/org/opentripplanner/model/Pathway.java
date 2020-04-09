@@ -9,9 +9,9 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     private int pathwayMode;
 
-    private TransitEntity<FeedScopedId> fromStop;
+    private StationElement fromStop;
 
-    private TransitEntity<FeedScopedId> toStop;
+    private StationElement toStop;
 
     private String name;
 
@@ -45,19 +45,19 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
         return pathwayMode;
     }
 
-    public void setFromStop(TransitEntity<FeedScopedId> fromStop) {
+    public void setFromStop(StationElement fromStop) {
         this.fromStop = fromStop;
     }
 
-    public TransitEntity<FeedScopedId> getFromStop() {
+    public StationElement getFromStop() {
         return fromStop;
     }
 
-    public void setToStop(TransitEntity<FeedScopedId> toStop) {
+    public void setToStop(StationElement toStop) {
         this.toStop = toStop;
     }
 
-    public TransitEntity<FeedScopedId> getToStop() {
+    public StationElement getToStop() {
         return toStop;
     }
 

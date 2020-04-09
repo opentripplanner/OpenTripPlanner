@@ -41,7 +41,6 @@ class EntranceMapper {
     }
     otpEntrance.setCode(gtfsStop.getCode());
     otpEntrance.setDescription(gtfsStop.getDesc());
-    otpEntrance.setUrl(gtfsStop.getUrl());
     otpEntrance.setWheelchairBoarding(
         WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding())
     );

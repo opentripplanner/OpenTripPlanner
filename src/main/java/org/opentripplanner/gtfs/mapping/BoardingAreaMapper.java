@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
 
@@ -34,15 +35,11 @@ class BoardingAreaMapper {
 
     otpBoardingArea.setId(mapAgencyAndId(gtfsStop.getId()));
     otpBoardingArea.setName(gtfsStop.getName());
-    if (gtfsStop.isLatSet()) {
-      otpBoardingArea.setLat(gtfsStop.getLat());
-    }
-    if (gtfsStop.isLonSet()) {
-      otpBoardingArea.setLon(gtfsStop.getLon());
+    if (gtfsStop.isLatSet() && gtfsStop.isLonSet()) {
+      otpBoardingArea.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
     }
     otpBoardingArea.setCode(gtfsStop.getCode());
     otpBoardingArea.setDescription(gtfsStop.getDesc());
-    otpBoardingArea.setUrl(gtfsStop.getUrl());
     otpBoardingArea.setWheelchairBoarding(WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding()));
     var level = gtfsStop.getLevel();
     if (level != null) {

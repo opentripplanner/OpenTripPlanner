@@ -32,8 +32,6 @@ public class BoardingAreaMapperTest  {
 
   private static final String TIMEZONE = "GMT";
 
-  private static final String URL = "www.url.me";
-
   private static final int VEHICLE_TYPE = 5;
 
   private static final int WHEELCHAIR_BOARDING = 1;
@@ -55,7 +53,6 @@ public class BoardingAreaMapperTest  {
     STOP.setName(NAME);
     STOP.setParentStation(PARENT);
     STOP.setTimezone(TIMEZONE);
-    STOP.setUrl(URL);
     STOP.setVehicleType(VEHICLE_TYPE);
     STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
     STOP.setZoneId(ZONE_ID);
@@ -80,7 +77,6 @@ public class BoardingAreaMapperTest  {
     assertEquals(LAT, result.getLat(), 0.0001d);
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName());
-    assertEquals(URL, result.getUrl());
     assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
   }
 
@@ -100,7 +96,6 @@ public class BoardingAreaMapperTest  {
     assertNull(result.getName());
     assertNull(result.getParentStop());
     assertNull(result.getCode());
-    assertNull(result.getUrl());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
   }
 
