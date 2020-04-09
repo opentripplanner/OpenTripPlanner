@@ -1,8 +1,8 @@
 package org.opentripplanner.index.model;
 
 import com.beust.jcommander.internal.Lists;
+import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 
 import java.util.Collection;
@@ -10,7 +10,7 @@ import java.util.List;
 
 public class ApiRouteShort {
 
-    public FeedScopedId id;
+    public String id;
     public String shortName;
     public String longName;
     public String mode;
@@ -18,7 +18,7 @@ public class ApiRouteShort {
     public String agencyName;
 
     public ApiRouteShort(Route route) {
-        id = route.getId();
+        id = FeedScopedIdMapper.mapToApi(route.getId());
         shortName = route.getShortName();
         longName = route.getLongName();
         mode = GtfsLibrary.getTraverseMode(route).toString();
