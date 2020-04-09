@@ -2,7 +2,12 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.onebusaway.gtfs.services.GtfsRelationalDao;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.Entrance;
+import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.ShapePoint;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 
 /**
@@ -98,27 +103,31 @@ public class GTFSToOtpTransitServiceMapper {
     }
 
     private void mapGtfsStopsToOtpTypes(GtfsRelationalDao data, OtpTransitServiceBuilder builder) {
+        StopToParentStationLinker stopToParentStationLinker = new StopToParentStationLinker(issueStore);
         for (org.onebusaway.gtfs.model.Stop it : data.getAllStops()) {
             if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
-                builder.getStops().add(stopMapper.map(it));
+                Stop stop = stopMapper.map(it);
+                builder.getStops().add(stop);
+                stopToParentStationLinker.addStationElement(stop, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
-                builder.getStations().add(stationMapper.map(it));
+                Station station = stationMapper.map(it);
+                builder.getStations().add(station);
+                stopToParentStationLinker.addStation(station);
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_ENTRANCE_EXIT) {
-                builder.getEntrances().add(entranceMapper.map(it));
+                Entrance entrance = entranceMapper.map(it);
+                builder.getEntrances().add(entrance);
+                stopToParentStationLinker.addStationElement(entrance, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_NODE) {
-                builder.getPathwayNodes().add(pathwayNodeMapper.map(it));
+                PathwayNode pathwayNode = pathwayNodeMapper.map(it);
+                builder.getPathwayNodes().add(pathwayNode);
+                stopToParentStationLinker.addStationElement(pathwayNode, it.getParentStation());
             } else if(it.getLocationType() == org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_BOARDING_AREA) {
-                builder.getBoardingAreas().add(boardingAreaMapper.map(it));
+                BoardingArea boardingArea = boardingAreaMapper.map(it);
+                builder.getBoardingAreas().add(boardingArea);
+                stopToParentStationLinker.addBoardingArea(boardingArea, it.getParentStation());
             }
         }
-        new LinkStopsAndParentStationsTogether(
-                builder.getStations(),
-                builder.getStops(),
-                builder.getEntrances(),
-                builder.getPathwayNodes(),
-                builder.getBoardingAreas(),
-                issueStore
-        )
-            .link(data.getAllStops());
+
+        stopToParentStationLinker.link();
     }
 }
