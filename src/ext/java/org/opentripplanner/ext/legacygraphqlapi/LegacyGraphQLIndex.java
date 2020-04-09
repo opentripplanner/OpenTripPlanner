@@ -16,6 +16,8 @@ import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLAgencyImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLQueryTypeImpl;
 import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLScalars;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
@@ -56,6 +58,8 @@ class LegacyGraphQLIndex {
           .type("Node", type -> type.typeResolver(node -> null))
           //TODO
           .type("PlaceInterface", type -> type.typeResolver(node -> null))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLAgencyImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLQueryTypeImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
