@@ -111,7 +111,7 @@ public class StreetTransitLink extends Edge {
             }
         }
 
-        var streetToStopTime = 0;
+        int streetToStopTime = stopVertex.hasPathways() ? 0 : stopVertex.getStreetToStopTime();
         s1.incrementTimeInSeconds(streetToStopTime + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + streetToStopTime);
         s1.setBackMode(TraverseMode.LEG_SWITCH);
