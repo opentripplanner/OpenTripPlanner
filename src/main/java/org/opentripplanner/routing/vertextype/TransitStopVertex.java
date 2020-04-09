@@ -53,7 +53,7 @@ public class TransitStopVertex extends Vertex {
         return wheelchairEntrance;
     }
 
-    public boolean hasEntrances() {
+    public boolean hasPathways() {
         for (Edge e : this.getOutgoing()) {
             if (e instanceof PathwayEdge) {
                 return true;
@@ -82,10 +82,6 @@ public class TransitStopVertex extends Vertex {
 
     public void addMode(TraverseMode mode) {
         modes.setMode(mode, true);
-    }
-    
-    public boolean isStreetLinkable() {
-        return !hasEntrances();
     }
 
     public Stop getStop() {

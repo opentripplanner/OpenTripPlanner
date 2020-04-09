@@ -186,12 +186,14 @@ public class SimpleStreetSplitter {
         LOG.info(progress.startMessage());
 
         for (T v : vertices) {
-            /* Do not link vertices, which are already linked by TransitToTaggedStopsModule */
+            // Do not link vertices, which are already linked by TransitToTaggedStopsModule
             boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
             if (alreadyLinked) { continue; }
 
-            /* Do not link stops connected by pathways */
-            if (v instanceof TransitStopVertex && !((TransitStopVertex) v).isStreetLinkable()) continue;
+            //Do not link stops connected by pathways
+            if (v instanceof TransitStopVertex && ((TransitStopVertex) v).hasPathways()) {
+                continue;
+            };
 
             if (!link(v)) {
                 issueStore.add(unlinkedIssueMapper.apply(v));
