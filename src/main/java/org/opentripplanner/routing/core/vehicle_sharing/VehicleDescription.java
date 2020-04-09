@@ -6,6 +6,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 public abstract class VehicleDescription {
 
+    private final long id;
     private final double longitude;
     private final double latitude;
 
@@ -18,7 +19,8 @@ public abstract class VehicleDescription {
     @JsonSerialize
     private final Provider provider;
 
-    public VehicleDescription(double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
+    public VehicleDescription(long id, double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
+        this.id = id;
         this.longitude = longitude;
         this.latitude = latitude;
         this.fuelType = fuelType;
@@ -29,12 +31,17 @@ public abstract class VehicleDescription {
     @Override
     public String toString() {
         return "VehicleDescription{" +
-                "longitude=" + longitude +
+                "id=" + id +
+                ", longitude=" + longitude +
                 ", latitude=" + latitude +
                 ", fuelType=" + fuelType +
                 ", gearbox=" + gearbox +
                 ", provider=" + provider +
                 '}';
+    }
+
+    public long getId() {
+        return id;
     }
 
     public double getLongitude() {

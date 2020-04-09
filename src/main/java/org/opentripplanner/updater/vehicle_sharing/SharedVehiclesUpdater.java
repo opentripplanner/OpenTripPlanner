@@ -34,14 +34,11 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     private static final double MAX_DISTANCE_TO_EDGE_IN_METERS = 500;
     private static final double MAX_DISTANCE_TO_VERTEX_IN_KM = 0.2;
 
-    private final VehiclePositionsGetter vehiclePositionsGetter;
+    private final VehiclePositionsGetter vehiclePositionsGetter = new VehiclePositionsGetter();
     private SimpleStreetSplitter simpleStreetSplitter;
     private GraphUpdaterManager graphUpdaterManager;
     private Graph graph;
-
-    public SharedVehiclesUpdater(VehiclePositionsGetter vehiclePositionsGetter) {
-        this.vehiclePositionsGetter = vehiclePositionsGetter;
-    }
+    private String url;
 
     private Vertex chooseCloser(double lat, double lon, Vertex vertex1, Vertex vertex2) {
         if (vertex1 == null) {
@@ -119,21 +116,27 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() {
-        VehiclePositionsDiff diff = vehiclePositionsGetter.getVehiclePositionsDiff();
-        List<Pair<Vertex, VehicleDescription>> appearedVertex = coordsToVertex(diff.appeared);
+        LOG.info("Polling vehicles from API");
+        VehiclePositionsDiff diff = vehiclePositionsGetter.getVehiclePositionsDiff(graph, url);
+        LOG.info("Got {} vehicles possible to place on a map", diff.getAppeared().size());
+        List<Pair<Vertex, VehicleDescription>> appearedVertex = coordsToVertex(diff.getAppeared());
+        LOG.info("Got {} vehicles mapped to vertexes", appearedVertex.size());
 
-        List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = prepareAppearedEdge(appearedVertex);
+         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = prepareAppearedEdge(appearedVertex);
         List<RentVehicleAnywhereEdge> rememberedVehicles = getRememberedEdges(appearedVertex);
         VehicleSharingGraphWriterRunnable graphWriterRunnable =
                 new VehicleSharingGraphWriterRunnable(appearedEdges, rememberedVehicles);
         graphUpdaterManager.execute(graphWriterRunnable);
+        LOG.info("Finished updating vehicles positions");
     }
 
     @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        this.pollingPeriodSeconds = 3;
-        this.graph = graph;
-        this.simpleStreetSplitter = new SimpleStreetSplitter(graph);
+    protected void configurePolling(Graph graph, JsonNode config) throws IllegalStateException {
+        this.pollingPeriodSeconds = 60;
+        this.url = System.getProperty("sharedVehiclesApi"); // TODO (AdamWiktor) use router-config for this
+        if (this.url == null) {
+            throw new IllegalStateException("Please provide global variable `-DsharedVehiclesApi=<URL>`");
+        }
     }
 
     @Override

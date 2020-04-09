@@ -1,7 +1,6 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -11,9 +10,7 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
-import org.opentripplanner.updater.vehicle_sharing.RandomVehiclePositionsGetter;
 import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
-import org.opentripplanner.updater.vehicle_sharing.VehiclePositionsGetter;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -110,14 +107,7 @@ public abstract class GraphUpdaterConfigurator {
         }
 
 //        TODO(mszewczyk) Now Updater is configured mannualy
-//        One fixed car in Bydgoszcz
-//        GraphUpdater updater = new SharedVehiclesUpdater(new VehiclePositionsGetter());
-
-//        Random cars in Bydgoszcz
-//        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 17.79352611652339D, 18.253462294124365D, 52.96911056940485D, 53.25500226408037D));
-
-//      Random cars in Warsaw
-        GraphUpdater updater = new SharedVehiclesUpdater(new RandomVehiclePositionsGetter(3000, 20.45D, 21.46D,  51.91D,  52.48D));
+        GraphUpdater updater = new SharedVehiclesUpdater();
 
         try {
             updater.setGraphUpdaterManager(updaterManager);
