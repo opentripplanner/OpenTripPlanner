@@ -4,9 +4,9 @@ import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
+import graphql.schema.GraphQLNamedOutputType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.routing.RoutingService;
@@ -15,7 +15,7 @@ public class StatisticsGraphQLSchemaFactory {
 
     private GraphQLSchema schema;
 
-    private GraphQLOutputType graphStatisticsType = new GraphQLTypeReference("GraphStatistics");
+    private GraphQLNamedOutputType graphStatisticsType = new GraphQLTypeReference("GraphStatistics");
 
     private Relay relay = new Relay();
 
@@ -65,7 +65,7 @@ public class StatisticsGraphQLSchemaFactory {
                 .build();
     }
 
-    private GraphQLObjectType.Builder createType(GraphQLOutputType ref) {
+    private GraphQLObjectType.Builder createType(GraphQLNamedOutputType ref) {
         return GraphQLObjectType.newObject().name(ref.getName()).withInterface(nodeInterface);
     }
 }

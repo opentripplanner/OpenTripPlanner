@@ -13,6 +13,7 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNamedOutputType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -119,7 +120,7 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType operatorType = new GraphQLTypeReference("Operator");
 
-    private GraphQLOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
+    private GraphQLNamedOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
 
     private GraphQLOutputType bikeRentalStationType = new GraphQLTypeReference("BikeRentalStation");
 
@@ -143,11 +144,11 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType serviceJourneyType = new GraphQLTypeReference("ServiceJourney");
 
-    private GraphQLOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
+    private GraphQLNamedOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
 
     private GraphQLOutputType multilingualStringType = new GraphQLTypeReference("TranslatedString");
 
-    private GraphQLOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
+    private GraphQLNamedOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
 
     private GraphQLOutputType bookingArrangementType = new GraphQLTypeReference("BookingArrangement");
 
