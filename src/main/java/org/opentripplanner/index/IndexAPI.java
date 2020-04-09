@@ -11,6 +11,7 @@ import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.api.mapping.RouteMapper;
 import org.opentripplanner.api.mapping.StopMapper;
 import org.opentripplanner.api.mapping.StopTimesInPatternMapper;
+import org.opentripplanner.api.mapping.TripMapper;
 import org.opentripplanner.api.mapping.TripPatternMapper;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopTimesInPattern;
@@ -412,7 +413,7 @@ public class IndexAPI {
        FeedScopedId tripId = createId("tripId", tripIdString);
        Trip trip = routingService.getTripForId().get(tripId);
        if (trip != null) {
-           return Response.status(Status.OK).entity(trip).build();
+           return Response.status(Status.OK).entity(TripMapper.mapToApi(trip)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }

@@ -49,3 +49,7 @@ These properties changed names from:
   `code` was used. The code was the same as the id without the feedId prefix. The `code`
   is removed from OTP2. Clients may not be affected by this change, unless they toke advantage 
   of the semantics in the old `code`.
+- `Trip`
+  - The deprecated `tripBikesAllowed` is removed.
+  - The `routeId` replace `route`. The route is no longer part of the trip.
+    To obtain the Route object call the Index API with the routeId.
