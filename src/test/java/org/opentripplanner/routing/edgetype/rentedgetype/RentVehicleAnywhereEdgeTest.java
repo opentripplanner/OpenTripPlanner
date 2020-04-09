@@ -16,8 +16,8 @@ import static org.junit.Assert.*;
 
 public class RentVehicleAnywhereEdgeTest {
 
-    private static final CarDescription CAR_1 = new CarDescription(0, 0, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY);
-    private static final CarDescription CAR_2 = new CarDescription(0, 0, FuelType.FOSSIL, Gearbox.MANUAL, Provider.PANEK);
+    private static final CarDescription CAR_1 = new CarDescription(1, 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY);
+    private static final CarDescription CAR_2 = new CarDescription(2, 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, Provider.PANEK);
 
     private RentVehicleAnywhereEdge edge;
     private RoutingRequest request;

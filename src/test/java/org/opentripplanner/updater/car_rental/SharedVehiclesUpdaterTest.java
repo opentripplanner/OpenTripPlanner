@@ -54,9 +54,8 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         @SuppressWarnings("unused")
         RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
         RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
-        RentVehicleAnywhereEdge car3 = new RentVehicleAnywhereEdge(v3);
 
-        SharedVehiclesUpdater sharedVehiclesUpdater = new SharedVehiclesUpdater(null);
+        SharedVehiclesUpdater sharedVehiclesUpdater = new SharedVehiclesUpdater();
 
         try {
             sharedVehiclesUpdater.setup(graph);
@@ -65,24 +64,18 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         }
 
 //        One vehicle appeared.
-        List<VehicleDescription> appeared = singletonList(new CarDescription(vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
+        List<VehicleDescription> appeared = singletonList(new CarDescription(1, vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY));
 
-        VehiclePositionsDiff vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
-
-
-        List<Pair<Vertex, VehicleDescription>> coordsToVertex = sharedVehiclesUpdater.coordsToVertex(vehiclePositionsDiff.appeared);
+        List<Pair<Vertex, VehicleDescription>> coordsToVertex = sharedVehiclesUpdater.coordsToVertex(appeared);
         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
 
         assertEquals(1, appearedEdges.size());
         assertEquals(car2, appearedEdges.get(0).getKey());
 
 
-        appeared = singletonList(new CarDescription(vehLong2, vehLat2, FuelType.ELECTRIC, Gearbox.AUTOMAT, Provider.INNOGY));
+        appeared = singletonList(new CarDescription(1, vehLong2, vehLat2, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY));
 
-        vehiclePositionsDiff = new VehiclePositionsDiff(appeared, 0L, 0L);
-
-
-        coordsToVertex = sharedVehiclesUpdater.coordsToVertex(vehiclePositionsDiff.appeared);
+        coordsToVertex = sharedVehiclesUpdater.coordsToVertex(appeared);
         appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
 
         assertEquals(1, appearedEdges.size());
