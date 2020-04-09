@@ -12,6 +12,7 @@ import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
@@ -225,54 +226,28 @@ public class AddTransitModelEntitiesToGraph {
         }
     }
 
+    /**
+     * Create elevator edges from GTFS pathways. As GTFS elevators are not vertices, but edges in
+     * the GTFS pathway model, we have to model each possible movement as an onboard-offboard pair,
+     * instead of having only one set of vertices per level and edges between them.
+     */
     private void createElevatorEdgesAndAddThemToGraph(
         Graph graph,
         Pathway pathway,
         Vertex fromVertex,
         Vertex toVertex
     ) {
-        String fromVertexLevelName = fromVertex.getName();
-        Double fromVertexLevelIndex = null;
+        StationElement fromStation = fromVertex.getStationElement();
+        String fromVertexLevelName = fromStation == null
+            ? fromVertex.getName()
+            : fromStation.getLevelName();
+        Double fromVertexLevelIndex = fromStation == null ? null : fromStation.getLevelIndex();
 
-        // TODO: Shuld these be refactored behind an interface
-        if (fromVertex instanceof TransitStopVertex) {
-            TransitStopVertex tsv = (TransitStopVertex) fromVertex;
-            fromVertexLevelName = tsv.getStop().getLevelName();
-            fromVertexLevelIndex = tsv.getStop().getLevelIndex();
-        } else if (fromVertex instanceof TransitEntranceVertex) {
-            TransitEntranceVertex tev = (TransitEntranceVertex) fromVertex;
-            fromVertexLevelName = tev.getEntrance().getLevelName();
-            fromVertexLevelIndex = tev.getEntrance().getLevelIndex();
-        } else if (fromVertex instanceof TransitPathwayNodeVertex) {
-            TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) fromVertex;
-            fromVertexLevelName = tnv.getNode().getLevelName();
-            fromVertexLevelIndex = tnv.getNode().getLevelIndex();
-        } else if (fromVertex instanceof TransitBoardingAreaVertex) {
-            TransitBoardingAreaVertex tnv = (TransitBoardingAreaVertex) fromVertex;
-            fromVertexLevelName = tnv.getBoardingArea().getLevelName();
-            fromVertexLevelIndex = tnv.getBoardingArea().getLevelIndex();
-        }
-
-        String toVertexLevelName = toVertex.getName();
-        Double toVertexLevelIndex = null;
-
-        if (toVertex instanceof TransitStopVertex) {
-            TransitStopVertex tsv = (TransitStopVertex) toVertex;
-            toVertexLevelName = tsv.getStop().getLevelName();
-            toVertexLevelIndex = tsv.getStop().getLevelIndex();
-        } else if (toVertex instanceof TransitEntranceVertex) {
-            TransitEntranceVertex tev = (TransitEntranceVertex) toVertex;
-            toVertexLevelName = tev.getEntrance().getLevelName();
-            toVertexLevelIndex = tev.getEntrance().getLevelIndex();
-        } else if (toVertex instanceof TransitPathwayNodeVertex) {
-            TransitPathwayNodeVertex tnv = (TransitPathwayNodeVertex) toVertex;
-            toVertexLevelName = tnv.getNode().getLevelName();
-            toVertexLevelIndex = tnv.getNode().getLevelIndex();
-        } else if (toVertex instanceof TransitBoardingAreaVertex) {
-            TransitBoardingAreaVertex tnv = (TransitBoardingAreaVertex) toVertex;
-            toVertexLevelName = tnv.getBoardingArea().getLevelName();
-            toVertexLevelIndex = tnv.getBoardingArea().getLevelIndex();
-        }
+        StationElement toStation = toVertex.getStationElement();
+        String toVertexLevelName = toStation == null
+            ? toVertex.getName()
+            : toStation.getLevelName();
+        Double toVertexLevelIndex = toStation == null ? null : toStation.getLevelIndex();
 
         double levels = 1;
         if (fromVertexLevelIndex != null && toVertexLevelIndex != null

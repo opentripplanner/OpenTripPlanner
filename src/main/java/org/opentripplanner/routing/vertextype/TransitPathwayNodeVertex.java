@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.PathwayNode;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -44,6 +45,11 @@ public class TransitPathwayNodeVertex extends Vertex {
   }
 
   public PathwayNode getNode() {
+    return this.node;
+  }
+
+  @Override
+  public StationElement getStationElement() {
     return this.node;
   }
 }

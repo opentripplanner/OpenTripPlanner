@@ -9,7 +9,7 @@ import java.util.HashSet;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or
  * a platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class Stop extends TransitEntity<FeedScopedId> {
+public final class Stop extends TransitEntity<FeedScopedId> implements StationElement {
 
     private static final long serialVersionUID = 1L;
 

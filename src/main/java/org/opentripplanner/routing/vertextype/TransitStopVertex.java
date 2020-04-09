@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.RoutingService;
@@ -86,5 +87,10 @@ public class TransitStopVertex extends Vertex {
 
     public Stop getStop() {
             return this.stop;
+    }
+
+    @Override
+    public StationElement getStationElement() {
+        return this.stop;
     }
 }

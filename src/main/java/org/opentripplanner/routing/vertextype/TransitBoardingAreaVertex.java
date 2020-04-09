@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -39,6 +40,11 @@ public class TransitBoardingAreaVertex extends Vertex {
   }
 
   public BoardingArea getBoardingArea() {
+    return this.boardingArea;
+  }
+
+  @Override
+  public StationElement getStationElement() {
     return this.boardingArea;
   }
 }

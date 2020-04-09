@@ -4,7 +4,7 @@ package org.opentripplanner.model;
 /**
  * A place where a station connects to the street network. Equivalent to GTFS stop location .
  */
-public final class PathwayNode extends TransitEntity<FeedScopedId> {
+public final class PathwayNode extends TransitEntity<FeedScopedId> implements StationElement {
 
   private static final long serialVersionUID = 1L;
 

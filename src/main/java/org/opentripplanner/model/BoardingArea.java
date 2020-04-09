@@ -4,7 +4,7 @@ package org.opentripplanner.model;
 /**
  * A place along a platform, where the vehicle van be boarded. Equivalent to GTFS stop location.
  */
-public final class BoardingArea extends TransitEntity<FeedScopedId> {
+public final class BoardingArea extends TransitEntity<FeedScopedId> implements StationElement {
 
   private static final long serialVersionUID = 1L;
 

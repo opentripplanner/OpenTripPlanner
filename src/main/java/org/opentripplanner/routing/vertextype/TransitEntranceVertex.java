@@ -2,6 +2,7 @@ package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.Entrance;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -45,6 +46,11 @@ public class TransitEntranceVertex extends Vertex {
   }
 
   public Entrance getEntrance() {
+    return this.entrance;
+  }
+
+  @Override
+  public StationElement getStationElement() {
     return this.entrance;
   }
 }
