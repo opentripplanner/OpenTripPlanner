@@ -19,7 +19,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Objects;
 import java.util.Set;
 import java.util.function.BiFunction;
 import java.util.function.Function;
@@ -336,20 +335,6 @@ public class NodeAdapter {
             unusedParams.addAll(c.unusedParams());
         }
         return unusedParams;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) { return true; }
-        if (o == null || getClass() != o.getClass()) { return false; }
-        NodeAdapter other = (NodeAdapter) o;
-        return Objects.equals(source, other.source)
-                && Objects.equals(contextPath, other.contextPath);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(source, contextPath);
     }
 
 

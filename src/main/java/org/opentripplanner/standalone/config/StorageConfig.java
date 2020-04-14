@@ -42,8 +42,6 @@ import java.util.List;
  */
 public class StorageConfig {
 
-    private static final Logger LOG = LoggerFactory.getLogger(StorageConfig.class);
-
     /**
      * Local file system path to Google Cloud Platform service accounts credentials file. The
      * credentials is used to access GCS urls. When using GCS from outside of the bucket cluster you

@@ -10,8 +10,6 @@ import org.slf4j.LoggerFactory;
  */
 public final class TransitRoutingConfig implements RaptorTuningParameters {
 
-    private static final Logger LOG = LoggerFactory.getLogger(TransitRoutingConfig.class);
-
     private final int maxNumberOfTransfers;
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
