@@ -1,6 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TransitEntity;
 
 import javax.ws.rs.BadRequestException;
 
@@ -19,7 +20,8 @@ public class FeedScopedIdMapper {
         }
         catch (IndexOutOfBoundsException e) {
             throw new BadRequestException(
-                    "'" + name + "' is not a valid id on the form: FEED_ID:ENTITY_ID"
+                    "'" + name + "' is not a valid id on the form: FEED_ID" + SEPARATOR
+                    + "ENTITY_ID"
             );
         }
     }
@@ -28,6 +30,10 @@ public class FeedScopedIdMapper {
         if (arg == null) {
             return null;
         }
-        return arg.getFeedId() + ":" + arg.getId();
+        return arg.getFeedId() + SEPARATOR + arg.getId();
+    }
+
+    public static String mapToApi(TransitEntity<FeedScopedId> entity) {
+        return entity == null ? null : mapToApi(entity.getId());
     }
 }

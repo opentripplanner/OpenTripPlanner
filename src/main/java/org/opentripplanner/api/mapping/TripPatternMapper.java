@@ -2,8 +2,6 @@ package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiPatternShort;
 import org.opentripplanner.index.model.ApiPatternDetail;
-import org.opentripplanner.index.model.ApiStopShort;
-import org.opentripplanner.index.model.ApiTripShort;
 import org.opentripplanner.model.TripPattern;
 
 import java.util.Collection;
@@ -36,9 +34,9 @@ public class TripPatternMapper {
         }
 
         ApiPatternDetail api = mapBaseToApi(domain, ApiPatternDetail::new);
-        api.routeId = domain.route.getId();
-        api.stops = ApiStopShort.list(domain.getStops());
-        api.trips = ApiTripShort.list(domain.getTrips());
+        api.routeId = FeedScopedIdMapper.mapToApi(domain.route);
+        api.stops = StopMapper.mapToApiShort(domain.getStops());
+        api.trips = TripMapper.mapToApiShort(domain.getTrips());
         return api;
     }
 

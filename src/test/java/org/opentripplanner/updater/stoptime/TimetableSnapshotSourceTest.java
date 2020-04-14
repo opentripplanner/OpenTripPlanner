@@ -60,7 +60,6 @@ public class TimetableSnapshotSourceTest {
 
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withIssueStoreAndDeduplicator(graph)
-                //.turnOnSetAgencyToFeedIdForAllElements()
                 .build();
 
         feedId = context.getFeedId().getId();

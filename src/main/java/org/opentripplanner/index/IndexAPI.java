@@ -16,10 +16,8 @@ import org.opentripplanner.api.mapping.TripPatternMapper;
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopTimesInPattern;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.index.model.ApiRouteShort;
 import org.opentripplanner.index.model.ApiStopShort;
 import org.opentripplanner.index.model.ApiTransfer;
-import org.opentripplanner.index.model.ApiTripShort;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -144,7 +142,7 @@ public class IndexAPI {
             return Response.status(Status.OK).entity(RouteMapper.mapToApi(routes)).build();
         }
         else {
-            return Response.status(Status.OK).entity(ApiRouteShort.list(routes)).build();
+            return Response.status(Status.OK).entity(RouteMapper.mapToApiShort(routes)).build();
         }
     }
    
@@ -177,7 +175,7 @@ public class IndexAPI {
        /* When no parameters are supplied, return all stops. */
        if (uriInfo.getQueryParameters().isEmpty()) {
            Collection<Stop> stops = getRoutingService().getStopForId().values();
-           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
+           return Response.status(Status.OK).entity(StopMapper.mapToApiShort(stops)).build();
        }
        /* If any of the circle parameters are specified, expect a circle not a box. */
        boolean expectCircle = (lat != null || lon != null || radius != null);
@@ -194,7 +192,7 @@ public class IndexAPI {
                     new Coordinate(lon, lat), radius)) {
                double distance = SphericalDistanceLibrary.fastDistance(stopVertex.getCoordinate(), coord);
                if (distance < radius) {
-                   stops.add(new ApiStopShort(stopVertex.getStop(), (int) distance));
+                   stops.add(StopMapper.mapToApiShort(stopVertex.getStop(), (int) distance));
                }
            }
            return Response.status(Status.OK).entity(stops).build();
@@ -209,7 +207,7 @@ public class IndexAPI {
            List<ApiStopShort> stops = Lists.newArrayList();
            Envelope envelope = new Envelope(new Coordinate(minLon, minLat), new Coordinate(maxLon, maxLat));
            for (TransitStopVertex stopVertex : streetIndex.getTransitStopForEnvelope(envelope)) {
-               stops.add(new ApiStopShort(stopVertex.getStop()));
+               stops.add(StopMapper.mapToApiShort(stopVertex.getStop()));
            }
            return Response.status(Status.OK).entity(stops).build();           
        }
@@ -225,7 +223,7 @@ public class IndexAPI {
        for (TripPattern pattern : routingService.getPatternsForStop().get(stop)) {
            routes.add(pattern.route);
        }
-       return Response.status(Status.OK).entity(ApiRouteShort.list(routes)).build();
+       return Response.status(Status.OK).entity(RouteMapper.mapToApiShort(routes)).build();
    }
 
    @GET
@@ -332,7 +330,7 @@ public class IndexAPI {
                routes.retainAll(routesHere);
            }
        }
-       return Response.status(Status.OK).entity(ApiRouteShort.list(routes)).build();
+       return Response.status(Status.OK).entity(RouteMapper.mapToApiShort(routes)).build();
    }
 
    /** Return specific route in the graph, for the given ID. */
@@ -377,7 +375,7 @@ public class IndexAPI {
            for (TripPattern pattern : patterns) {
                stops.addAll(pattern.getStops());
            }
-           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
+           return Response.status(Status.OK).entity(StopMapper.mapToApiShort(stops)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -396,7 +394,7 @@ public class IndexAPI {
            for (TripPattern pattern : patterns) {
                trips.addAll(pattern.getTrips());
            }
-           return Response.status(Status.OK).entity(ApiTripShort.list(trips)).build();
+           return Response.status(Status.OK).entity(TripMapper.mapToApiShort(trips)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -428,7 +426,7 @@ public class IndexAPI {
        if (trip != null) {
            TripPattern pattern = routingService.getPatternForTrip().get(trip);
            Collection<Stop> stops = pattern.getStops();
-           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
+           return Response.status(Status.OK).entity(StopMapper.mapToApiShort(stops)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -510,7 +508,7 @@ public class IndexAPI {
        TripPattern pattern = routingService.getTripPatternForId(patternId);
        if (pattern != null) {
            List<Trip> trips = pattern.getTrips();
-           return Response.status(Status.OK).entity(ApiTripShort.list(trips)).build();
+           return Response.status(Status.OK).entity(TripMapper.mapToApiShort(trips)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }
@@ -525,7 +523,7 @@ public class IndexAPI {
        TripPattern pattern = routingService.getTripPatternForId(patternId);
        if (pattern != null) {
            List<Stop> stops = pattern.getStops();
-           return Response.status(Status.OK).entity(ApiStopShort.list(stops)).build();
+           return Response.status(Status.OK).entity(StopMapper.mapToApiShort(stops)).build();
        } else { 
            return Response.status(Status.NOT_FOUND).entity(MSG_404).build();
        }

@@ -18,6 +18,12 @@ public class ApiStop implements Serializable {
     public String zoneId;
     public String url;
     public Integer locationType;
+
+    /** The fully qualified parent station id including the feedId. */
+    public String stationId;
+
+    /** @deprecated Use "stationId" instead */
+    @Deprecated
     public String parentStation;
     public Integer wheelchairBoarding;
     public String direction;

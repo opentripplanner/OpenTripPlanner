@@ -1,6 +1,8 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiRoute;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.index.model.ApiRouteShort;
 import org.opentripplanner.model.Route;
 
 import java.util.Collection;
@@ -30,6 +32,25 @@ public class RouteMapper {
         api.bikesAllowed = domain.getBikesAllowed();
         api.sortOrder = domain.isSortOrderSet() ? domain.getSortOrder() : null;
         api.brandingUrl = domain.getBrandingUrl();
+
+        return api;
+    }
+
+    public static List<ApiRouteShort> mapToApiShort(Collection<Route> domain) {
+        if(domain == null) { return null; }
+        return domain.stream().map(RouteMapper::mapToApiShort).collect(Collectors.toList());
+    }
+
+    public static ApiRouteShort mapToApiShort(Route domain) {
+        if(domain == null) { return null; }
+
+        ApiRouteShort api = new ApiRouteShort();
+        api.id = FeedScopedIdMapper.mapToApi(domain.getId());
+        api.shortName = domain.getShortName();
+        api.longName = domain.getLongName();
+        api.mode = GtfsLibrary.getTraverseMode(domain).toString();
+        api.color = domain.getColor();
+        api.agencyName = domain.getAgency().getName();
 
         return api;
     }
