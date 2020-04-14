@@ -87,7 +87,7 @@ public class ForwardTransitCalculatorTest {
 
     @Test
     public void latestArrivalTime() {
-        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T").withArrivalTimes(500).build();
+        TestRaptorTripSchedule s = TestRaptorTripSchedule.create("T").withAlightTimes(500).build();
         assertEquals(500, create().stopArrivalTime(s, 0, 0));
     }
 
