@@ -1,7 +1,13 @@
 package org.opentripplanner.api.resource;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import org.geotools.geometry.Envelope2D;
+import org.opentripplanner.analyst.core.SlippyTile;
+import org.opentripplanner.analyst.request.TileRequest;
+import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
@@ -12,18 +18,8 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.core.SlippyTile;
-import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.api.common.RoutingResource;
-import org.opentripplanner.api.parameter.MIMEImageFormat;
-
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
-import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -99,7 +95,7 @@ public class GraphInspectorTileResource extends RoutingResource {
      * @return 
      */
     @GET @Path("layers")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces(MediaType.APPLICATION_JSON)
     public InspectorLayersList getLayers() {
 
         Router router = otpServer.getRouter(routerId);

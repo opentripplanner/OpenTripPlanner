@@ -6,17 +6,14 @@ import org.opentripplanner.api.model.error.PlannerError;
 
 import javax.ws.rs.core.UriInfo;
 import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
-@XmlRootElement
-public class Response {
+public class TripPlannerResponse {
 
     /** A dictionary of the parameters provided in the request that triggered this response. */
-    @XmlElement
     public HashMap<String, String> requestParameters;
     private ApiTripPlan plan;
     private ApiTripSearchMetadata metadata;
@@ -29,10 +26,10 @@ public class Response {
 
     /** This no-arg constructor exists to make JAX-RS happy. */ 
     @SuppressWarnings("unused")
-    private Response() {};
+    private TripPlannerResponse() {};
 
     /** Construct an new response initialized with all the incoming query parameters. */
-    public Response(UriInfo info) {
+    public TripPlannerResponse(UriInfo info) {
         this.requestParameters = new HashMap<String, String>();
         if (info == null) { 
             // in tests where there is no HTTP request, just leave the map empty
@@ -66,7 +63,6 @@ public class Response {
     }
 
     /** The error (if any) that this response raised. */
-    @XmlElement(required=false)
     public PlannerError getError() {
         return error;
     }

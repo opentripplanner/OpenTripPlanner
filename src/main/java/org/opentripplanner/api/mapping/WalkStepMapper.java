@@ -41,7 +41,7 @@ public class WalkStepMapper {
             api.lat = domain.startLocation.latitude();
         }
         api.elevation = mapElevation(domain.elevation);
-        api.alerts = alertsMapper.mapAlerts(domain.alerts);
+        api.alerts = alertsMapper.mapToApi(domain.alerts);
 
         return api;
     }

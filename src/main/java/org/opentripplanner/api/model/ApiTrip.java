@@ -4,7 +4,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 
-@XmlRootElement(name = "Trip")
 public class ApiTrip implements Serializable {
 
         private static final long serialVersionUID = 1L;

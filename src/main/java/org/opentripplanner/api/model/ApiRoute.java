@@ -5,7 +5,6 @@ import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 
-@XmlRootElement(name = "Route")
 public final class ApiRoute implements Serializable {
     private static final long serialVersionUID = 1L;
 

@@ -1,9 +1,7 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.ApiAlert;
 
-import javax.xml.bind.annotation.XmlElement;
 import java.util.List;
 
 /**
@@ -92,8 +90,6 @@ public class ApiWalkStep {
      */
     public String elevation;
 
-    @XmlElement
-    @JsonSerialize
     public List<ApiAlert> alerts;
 
     public String toString() {

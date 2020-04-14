@@ -23,6 +23,8 @@ These properties changed names from:
  the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
  `metadata` returned by the rout call.
  
+ Support for XML as a request/response format is removed. The only supported format is JSON.
+ 
 ### RoutingRequest changes
  See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. 
  Her is a short list of new fields:
@@ -32,7 +34,6 @@ These properties changed names from:
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
   
 ### Response changes
-
 - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
   - `searchWindowUsed`
   - `nextDateTime`

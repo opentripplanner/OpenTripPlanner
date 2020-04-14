@@ -73,8 +73,8 @@ public class LegMapper {
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;
-        api.walkSteps = walkStepMapper.mapWalkSteps(domain.walkSteps);
-        api.alerts = alertMapper.mapAlerts(domain.alerts);
+        api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
+        api.alerts = alertMapper.mapToApi(domain.alerts);
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;

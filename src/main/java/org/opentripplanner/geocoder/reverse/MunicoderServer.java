@@ -31,7 +31,7 @@ public class MunicoderServer {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON}) // APPLICATION_XML + "; charset=UTF-8", MediaType.APPLICATION_JSON + "; charset=UTF-8"})
+    @Produces(MediaType.APPLICATION_JSON)
     public String resolveLocation(
             @QueryParam("location") String location,
             @QueryParam("callback") String callback) {

@@ -14,8 +14,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
 /**
  * This REST API endpoint returns some meta-info about a router. OTP2 does no longer support
  * remotely loading, reloading, and evicting graphs on a running server (Supported in OTP1).
@@ -40,7 +38,7 @@ public class Routers {
      */
     @GET
     @Path("{routerId}")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
+    @Produces(MediaType.APPLICATION_JSON)
     public ApiRouterInfo getGraphId(@PathParam("routerId") String routerId) {
         return getRouterInfo();
     }
@@ -52,7 +50,7 @@ public class Routers {
      * on the Accept header in the HTTP request.
      */
     @GET
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
+    @Produces(MediaType.APPLICATION_JSON)
     public ApiRouterList getRouterIds() {
         ApiRouterList routerList = new ApiRouterList();
         routerList.routerInfo.add(getRouterInfo());

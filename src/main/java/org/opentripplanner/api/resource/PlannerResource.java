@@ -23,8 +23,6 @@ import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
 /**
  * This is the primary entry point for the trip planning web service.
  * All parameters are passed in the query string. These parameters are defined as fields in the abstract
@@ -42,8 +40,8 @@ public class PlannerResource extends RoutingResource {
     // parameters in the outgoing response. This is a TriMet requirement.
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    public Response plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public TripPlannerResponse plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -54,7 +52,7 @@ public class PlannerResource extends RoutingResource {
          */
 
         // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
-        Response response = new Response(uriInfo);
+        TripPlannerResponse response = new TripPlannerResponse(uriInfo);
         RoutingRequest request = null;
         Router router = null;
         RoutingResponse res = null;

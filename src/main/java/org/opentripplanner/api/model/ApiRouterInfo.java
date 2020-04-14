@@ -1,11 +1,8 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.api.mapping.GeometryAdapter;
-import org.opentripplanner.common.geometry.GeometryDeserializer;
 import org.opentripplanner.common.geometry.GeometrySerializer;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -14,34 +11,22 @@ import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
-@XmlRootElement(name = "RouterInfo")
 public class ApiRouterInfo {
 
-    private final BikeRentalStationService service;
-
-    @XmlElement
     public String routerId;
     
     @JsonSerialize(using= GeometrySerializer.class)
-    @JsonDeserialize(using= GeometryDeserializer.class)
-    @XmlJavaTypeAdapter(value=GeometryAdapter.class,type=Geometry.class)
     public Geometry polygon;
 
-    @XmlElement
     public Date buildTime;
 
-    @XmlElement
     public long transitServiceStarts;
 
-    @XmlElement
     public long transitServiceEnds;
 
     public HashSet<TraverseMode> transitModes;
@@ -54,10 +39,18 @@ public class ApiRouterInfo {
 
     public boolean hasParkRide;
 
+    public boolean hasBikeSharing;
+
+    public boolean hasBikePark;
+
     public List<TravelOption> travelOptions;
 
 
     public ApiRouterInfo(String routerId, Graph graph) {
+        BikeRentalStationService service = graph.getService(
+                BikeRentalStationService.class, false
+        );
+
         this.routerId = routerId;
         this.polygon = graph.getConvexHull();
         this.buildTime = graph.buildTime;
@@ -65,13 +58,14 @@ public class ApiRouterInfo {
         this.transitServiceEnds = graph.getTransitServiceEnds();
         this.transitModes = graph.getTransitModes();
         this.envelope = graph.getEnvelope();
+        this.hasParkRide = graph.hasParkRide;
+        this.hasBikeSharing = mapHasBikeSharing(service);
+        this.hasBikePark = mapHasBikePark(service);
+        this.travelOptions = TravelOptionsMaker.makeOptions(graph);
         addCenter(graph.getCenter());
-        service = graph.getService(BikeRentalStationService.class, false);
-        hasParkRide = graph.hasParkRide;
-        travelOptions = TravelOptionsMaker.makeOptions(graph);
     }
 
-    public boolean getHasBikeSharing() {
+    public boolean mapHasBikeSharing(BikeRentalStationService service) {
         if (service == null) {
             return false;
         }
@@ -80,11 +74,10 @@ public class ApiRouterInfo {
         return service.getBikeRentalStations().size() > 1;
     }
 
-    public boolean getHasBikePark() {
+    public boolean mapHasBikePark(BikeRentalStationService service) {
         if (service == null) {
             return false;
         }
-
         return !service.getBikeParks().isEmpty();
     }
 
@@ -94,7 +87,6 @@ public class ApiRouterInfo {
      *
      * It is first called when OSM is loaded. Then after transit data is loaded.
      * So that center is set in all combinations of street and transit loading.
-     * @param center
      */
     public void addCenter(Optional<Coordinate> center) {
         //Transit data was loaded and center was calculated with calculateTransitCenter
