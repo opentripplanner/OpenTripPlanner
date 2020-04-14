@@ -306,7 +306,7 @@ public class BuildConfig {
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
 
-        c.logUnusedParameters(LOG);
+        c.logAllUnusedParameters(LOG);
     }
 
     /**
