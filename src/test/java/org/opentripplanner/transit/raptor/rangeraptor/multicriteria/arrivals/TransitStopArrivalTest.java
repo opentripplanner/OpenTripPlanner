@@ -29,7 +29,7 @@ public class TransitStopArrivalTest {
     private static final int TRANSIT_COST = 200;
     private static final RaptorTripSchedule TRANSIT_TRIP = TestRaptorTripSchedule
             .create("T1")
-            .withArrivalTimes(TRANSIT_ALIGHT_TIME)
+            .withAlightTimes(TRANSIT_ALIGHT_TIME)
             .build();
     private static final int ROUND = 1;
 

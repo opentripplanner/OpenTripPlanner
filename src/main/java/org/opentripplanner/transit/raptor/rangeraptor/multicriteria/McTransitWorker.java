@@ -40,13 +40,20 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
     @Override
     public void routeTransitAtStop(int boardStopPos) {
+
+        // If it is not possible to board the pattern at this stop, then return
+        if(!pattern.boardingPossibleAt(boardStopPos)) {
+            return;
+        }
+
         final int nPatternStops = pattern.numberOfStopsInPattern();
         int boardStopIndex = pattern.stopIndex(boardStopPos);
 
-        for (AbstractStopArrival<T> prevStopArrival : state.listStopArrivalsPreviousRound(boardStopIndex)) {
+        // For each arrival at the current stop
+        for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(boardStopIndex)) {
 
             int earliestBoardTime = calculator.plusDuration(
-                    prevStopArrival.arrivalTime(),
+                    prevArrival.arrivalTime(),
                     slackProvider.boardSlack()
             );
 
@@ -57,18 +64,22 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
                 final int tripDepartureTime = trip.departure(boardStopPos);
                 IntIterator patternStops = calculator.patternStopIterator(boardStopPos, nPatternStops);
 
+                // Visit all stops after the boarded stop position and add transit arrival to
+                // each alight stop
                 while (patternStops.hasNext()) {
                     int alightStopPos = patternStops.next();
-                    int alightStopIndex = pattern.stopIndex(alightStopPos);
+                    if(pattern.alightingPossibleAt(alightStopPos)) {
+                        int alightStopIndex = pattern.stopIndex(alightStopPos);
 
-                    state.transitToStop(
-                            prevStopArrival,
-                            alightStopIndex,
-                            trip.arrival(alightStopPos),
-                            slackProvider.alightSlack(),
-                            tripDepartureTime,
-                            trip
-                    );
+                        state.transitToStop(
+                                prevArrival,
+                                alightStopIndex,
+                                trip.arrival(alightStopPos),
+                                slackProvider.alightSlack(),
+                                tripDepartureTime,
+                                trip
+                        );
+                    }
                 }
             }
         }

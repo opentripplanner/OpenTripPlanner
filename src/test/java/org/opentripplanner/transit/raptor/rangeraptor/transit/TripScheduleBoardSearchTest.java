@@ -54,15 +54,15 @@ public class TripScheduleBoardSearchTest {
     // Trips in service
     private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
             .create("T-A")
-            .withDepartureTimes(TIME_A1, TIME_A2)
+            .withBoardTimes(TIME_A1, TIME_A2)
             .build();
     private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
             .create("T-B")
-            .withDepartureTimes(TIME_B1, TIME_B2)
+            .withBoardTimes(TIME_B1, TIME_B2)
             .build();
     private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
             .create("T-C")
-            .withDepartureTimes(TIME_C1, TIME_C2)
+            .withBoardTimes(TIME_C1, TIME_C2)
             .build();
 
     // Trip pattern with trip A, B, C.
@@ -161,7 +161,7 @@ public class TripScheduleBoardSearchTest {
         for (int i = 0; i < N; ++i, departureTime += dT) {
             tripSchedules.add(TestRaptorTripSchedule
                     .create("T-N")
-                    .withDepartureTimes(departureTime)
+                    .withBoardTimes(departureTime)
                     .build());
             latestDepartureTime = departureTime;
         }
