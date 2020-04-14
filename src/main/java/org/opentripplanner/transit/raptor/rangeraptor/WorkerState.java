@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import java.util.Collection;
@@ -14,7 +14,7 @@ import java.util.Iterator;
  */
 public interface WorkerState<T extends RaptorTripSchedule> {
 
-    void setInitialTimeForIteration(TransferLeg accessEgressLeg, int iterationDepartureTime);
+    void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int iterationDepartureTime);
 
     boolean isNewRoundAvailable();
 
@@ -22,7 +22,7 @@ public interface WorkerState<T extends RaptorTripSchedule> {
 
     IntIterator stopsTouchedByTransitCurrentRound();
 
-    void transferToStops(int fromStop, Iterator<? extends TransferLeg> transfers);
+    void transferToStops(int fromStop, Iterator<? extends RaptorTransfer> transfers);
 
     /**
      * Extract paths after the search is complete. This method is optional,

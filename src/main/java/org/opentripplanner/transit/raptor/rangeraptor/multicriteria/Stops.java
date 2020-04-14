@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.debug.DebugLogger;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.debug.DebugHandlerFactory;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -36,7 +36,7 @@ public final class Stops<T extends RaptorTripSchedule> {
      */
     public Stops(
             int nStops,
-            Collection<TransferLeg> egressLegs,
+            Collection<RaptorTransfer> egressLegs,
             DestinationArrivalPaths<T> paths,
             CostCalculator costCalculator,
             DebugHandlerFactory<T> debugHandlerFactory,
@@ -48,7 +48,7 @@ public final class Stops<T extends RaptorTripSchedule> {
         this.debugHandlerFactory = debugHandlerFactory;
         this.debugStats = new DebugStopArrivalsStatistics(debugLogger);
 
-        for (TransferLeg it : egressLegs) {
+        for (RaptorTransfer it : egressLegs) {
             glueTogetherEgressStopWithDestinationArrivals(it, costCalculator, paths);
         }
     }
@@ -104,7 +104,7 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            TransferLeg egressLeg,
+            RaptorTransfer egressLeg,
             CostCalculator costCalculator,
             DestinationArrivalPaths<T> paths
     ) {

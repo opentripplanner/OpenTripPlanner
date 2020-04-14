@@ -6,10 +6,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.api.transit.TransitDataProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
@@ -21,6 +22,7 @@ import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
+import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,19 +83,25 @@ public class SpeedTest {
     }
 
     public static void main(String[] args) throws Exception {
-        // Given the following setup
-        AvgTimer.enableTimers(true);
-        SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
+        try {
+            // Given the following setup
+            AvgTimer.enableTimers(true);
+            SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
 
-        // create a new test
-        SpeedTest speedTest = new SpeedTest(opts);
+            // create a new test
+            SpeedTest speedTest = new SpeedTest(opts);
 
-        // and run it
-        speedTest.runTest();
+            // and run it
+            speedTest.runTest();
+        }
+        catch (OtpAppException ae) {
+            LOG.error(ae.getMessage());
+        }
     }
 
     private static Graph loadGraph(File rootDir) {
-        Graph graph = Graph.load(OtpDataStore.graphFile(rootDir));
+        Graph graph = SerializedGraphObject.load(OtpDataStore.graphFile(rootDir));
+        if(graph == null) { throw new IllegalStateException(); }
         graph.index();
         return graph;
     }
@@ -223,7 +231,7 @@ public class SpeedTest {
 
 
     public TripPlan route(SpeedTestRequest request) {
-        TransitDataProvider<TripSchedule> transitData;
+        RaptorTransitDataProvider<TripSchedule> transitData;
         RaptorRequest<TripSchedule> rRequest;
         RaptorResponse<TripSchedule> response;
 
@@ -259,7 +267,7 @@ public class SpeedTest {
 
     private void compareHeuristics(SpeedTestRequest heurReq, SpeedTestRequest routeReq) {
         streetRouter.route(heurReq);
-        TransitDataProvider<TripSchedule> transitData = transitData(heurReq);
+        RaptorTransitDataProvider<TripSchedule> transitData = transitData(heurReq);
 
         RaptorRequest<TripSchedule> req1 = heuristicRequest(
                 heuristicProfile, heurReq, streetRouter
@@ -344,7 +352,7 @@ public class SpeedTest {
         );
     }
 
-    private TransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
+    private RaptorTransitDataProvider<TripSchedule> transitData(SpeedTestRequest request) {
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),

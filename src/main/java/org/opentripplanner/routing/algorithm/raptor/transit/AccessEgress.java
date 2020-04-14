@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.transit.raptor.api.transit.TransferLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
-public class AccessEgress implements TransferLeg {
+public class AccessEgress implements RaptorTransfer {
 
   /**
    * "To stop" in the case of access, "from stop" in the case of egress.

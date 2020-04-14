@@ -1,7 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Assert;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 
 class TripAssert {
     private final TripScheduleSearch<TestRaptorTripSchedule> subject;

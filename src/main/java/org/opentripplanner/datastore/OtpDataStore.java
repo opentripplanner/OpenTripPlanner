@@ -99,12 +99,12 @@ public class OtpDataStore {
      * {@link OtpDataStore} - this is used by other application and tests that want to load the
      * graph from a directory on the local file system.
      *
-     * Never use this method in OTP main application to access the graph, use the data store.
+     * Never use this method in the OTP application to access the graph, use the data-store.
      *
      * @param path the location where the graph file must exist.
      *
      * @return The graph file - the graph is not loaded, you can use the
-     * {@link org.opentripplanner.routing.graph.Graph#load(File)} to load the graph.
+     * {@link org.opentripplanner.routing.graph.SerializedGraphObject#load(File)} to load the graph.
      */
     public static File graphFile(File path) {
         return new File(path, GRAPH_FILENAME);

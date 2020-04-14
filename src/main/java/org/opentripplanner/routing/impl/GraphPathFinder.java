@@ -2,7 +2,7 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;

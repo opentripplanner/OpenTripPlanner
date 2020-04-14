@@ -1,15 +1,13 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripPattern;
-import org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor._shared.TestRoute;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.transit.RaptorRoute;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-
-import static org.opentripplanner.transit.raptor.api.TestRaptorTripSchedule.createTripScheduleUseingArrivalTimes;
 
 
 public class TripScheduleAlightSearchTest {
@@ -54,16 +52,25 @@ public class TripScheduleAlightSearchTest {
     private static final int TRIP_C_INDEX = 2;
 
     // Trips in service
-    private TestRaptorTripSchedule tripA = createTripScheduleUseingArrivalTimes(TIME_A1, TIME_A2);
-    private TestRaptorTripSchedule tripB = createTripScheduleUseingArrivalTimes(TIME_B1, TIME_B2);
-    private TestRaptorTripSchedule tripC = createTripScheduleUseingArrivalTimes(TIME_C1, TIME_C2);
+    private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
+            .create("T-A")
+            .withAlightTimes(TIME_A1, TIME_A2)
+            .build();
+    private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
+            .create("T-B")
+            .withAlightTimes(TIME_B1, TIME_B2)
+            .build();
+    private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
+            .create("T-C")
+            .withAlightTimes(TIME_C1, TIME_C2)
+            .build();
 
     // Trip pattern with trip A and B.
-    private RaptorTripPattern<TestRaptorTripSchedule> pattern = new TestRaptorTripPattern(tripA, tripB, tripC);
+    private RaptorRoute<TestRaptorTripSchedule> route = new TestRoute(tripA, tripB, tripC);
 
     // The service under test - the subject
     private TripScheduleAlightSearch<TestRaptorTripSchedule> subject = new TripScheduleAlightSearch<>(
-            TRIPS_BINARY_SEARCH_THRESHOLD, pattern
+            TRIPS_BINARY_SEARCH_THRESHOLD, route.timetable()
     );
 
     @Test
@@ -146,9 +153,11 @@ public class TripScheduleAlightSearchTest {
         int arrivalTime = firstArrivalTime;
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
-            tripSchedules.add(createTripScheduleUseingArrivalTimes(arrivalTime));
+            tripSchedules.add(
+                    TestRaptorTripSchedule.create("T-" + i+1).withAlightTimes(arrivalTime).build()
+            );
         }
-        useTripPattern(new TestRaptorTripPattern(tripSchedules));
+        useTripPattern(new TestRoute(tripSchedules));
 
 
         // Search for a trip that alight before the first trip, expect no trip in return
@@ -193,7 +202,7 @@ public class TripScheduleAlightSearchTest {
         // And where the N next trips are NOT in service, but with acceptable boarding times
         addNTimes(tripSchedules, tripC, TRIPS_BINARY_SEARCH_THRESHOLD);
 
-        useTripPattern(new TestRaptorTripPattern(tripSchedules));
+        useTripPattern(new TestRoute(tripSchedules));
 
         // Then we expect to find A for both stop 1 and 2
         // Stop 1
@@ -210,16 +219,19 @@ public class TripScheduleAlightSearchTest {
     }
 
     private void withTrips(TestRaptorTripSchedule... schedules) {
-        useTripPattern(new TestRaptorTripPattern(schedules));
+        useTripPattern(new TestRoute(schedules));
     }
 
     private void withTrips(List<TestRaptorTripSchedule> schedules) {
-        useTripPattern(new TestRaptorTripPattern(schedules));
+        useTripPattern(new TestRoute(schedules));
     }
 
-    private void useTripPattern(TestRaptorTripPattern pattern) {
-        this.pattern = pattern;
-        this.subject = new TripScheduleAlightSearch<>(TRIPS_BINARY_SEARCH_THRESHOLD, this.pattern);
+    private void useTripPattern(TestRoute pattern) {
+        this.route = pattern;
+        this.subject = new TripScheduleAlightSearch<>(
+                TRIPS_BINARY_SEARCH_THRESHOLD,
+                this.route.timetable()
+        );
     }
 
     private static void addNTimes(List<TestRaptorTripSchedule> trips, TestRaptorTripSchedule tripS, int n) {

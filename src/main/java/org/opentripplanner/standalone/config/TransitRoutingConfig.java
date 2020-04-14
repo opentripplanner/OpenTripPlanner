@@ -2,6 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @see RaptorTuningParameters for documentaion of tuning parameters.

@@ -1,4 +1,4 @@
-![OTP Logo](otp-logo.svg)
+![OTP Logo](images/otp-logo.svg)
 # OpenTripPlanner
 
 ## *OTP2* IS WORK IN PROGRESS. 

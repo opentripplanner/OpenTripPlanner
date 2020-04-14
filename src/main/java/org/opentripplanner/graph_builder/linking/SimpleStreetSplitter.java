@@ -14,7 +14,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;

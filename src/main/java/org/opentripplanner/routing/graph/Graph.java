@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -14,7 +12,6 @@ import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
-import org.joda.time.DateTime;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -22,7 +19,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
-import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -61,20 +57,13 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
-import org.opentripplanner.standalone.config.BuildConfig;
-import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.lang.reflect.InvocationTargetException;
@@ -172,17 +161,8 @@ public class Graph implements Serializable {
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
 
-    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public BuildConfig buildConfig = BuildConfig.DEFAULT;
-
-    /** Embed a router configuration inside the graph, for starting up with a single file. */
-    public RouterConfig routerConfig = RouterConfig.DEFAULT;
-
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
-
-    /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
-    public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
 
     /** List of transit modes that are availible in GTFS data used in this graph**/
     private HashSet<TransitMode> transitModes = new HashSet<>();
@@ -681,49 +661,6 @@ public class Graph implements Serializable {
         return transitModes;
     }
 
-    /* (de) serialization */
-
-    public void save(DataSource graphSource) {
-        LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
-        LOG.info("Writing graph " + graphSource.path() + " ...");
-        new SerializedGraphObject(this).save(graphSource);
-    }
-
-    public static Graph load(File file) {
-        try {
-            return load(new FileInputStream(file), file.getAbsolutePath());
-        } catch (FileNotFoundException e) {
-            LOG.error("Graph file not found: " + file, e);
-            throw new OtpAppException(e.getMessage());
-        }
-    }
-
-    public static Graph load(DataSource source) {
-        return load(source.asInputStream(), source.path());
-    }
-
-    public static Graph load(InputStream inputStream, String sourceDescription) {
-        // TODO store version information, halt load if versions mismatch
-        try(inputStream) {
-            LOG.info("Reading graph from '{}'", sourceDescription);
-            Input input = new Input(inputStream);
-            Kryo kryo = SerializedGraphObject.makeKryo();
-            SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
-            Graph graph = serializedGraphObject.graph;
-            LOG.debug("Graph read.");
-            if (graph.graphVersionMismatch()) {
-                throw new RuntimeException("Graph version mismatch detected.");
-            }
-            serializedGraphObject.reconstructEdgeLists();
-            LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-            return graph;
-        }
-        catch (IOException e) {
-            LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
-            return null;
-        }
-    }
-
     /**
      * Perform indexing on vertices, edges, and timetables, and create transient data structures.
      * This used to be done in readObject methods upon deserialization, but stand-alone mode now
@@ -751,7 +688,7 @@ public class Graph implements Serializable {
      * @return false if Maven versions match (even if commit ids do not match), true if Maven version of graph does not match this version of OTP or
      *         graphs are otherwise obviously incompatible.
      */
-    private boolean graphVersionMismatch() {
+    boolean graphVersionMismatch() {
         MavenVersion v = MavenVersion.VERSION;
         MavenVersion gv = this.mavenVersion;
         LOG.info("Graph version: {}", gv);

@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
@@ -407,13 +407,14 @@ public class RaptorPathToItineraryMapper {
         TripSchedule tripSchedule = pathLeg.trip();
         boolean boarded = false;
         for (int j = 0; j < tripPattern.stopPattern.stops.length; j++) {
+            int currentStopIndex = transitLayer.getStopIndex().indexByStop.get(tripPattern.getStop(j));
             if (boarded) {
                 transitLegCoordinates.addAll(Arrays.asList(tripPattern.getHopGeometry(j - 1).getCoordinates()));
             }
-            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime()) {
+            if (!boarded && tripSchedule.departure(j) == pathLeg.fromTime() && currentStopIndex == pathLeg.fromStop()) {
                 boarded = true;
             }
-            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime()) {
+            if (boarded && tripSchedule.arrival(j) == pathLeg.toTime() && currentStopIndex == pathLeg.toStop()) {
                 break;
             }
         }

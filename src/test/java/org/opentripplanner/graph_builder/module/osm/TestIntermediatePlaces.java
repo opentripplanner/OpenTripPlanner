@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.BeforeClass;
 import org.junit.Ignore;
 import org.junit.Test;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.FakeGraph;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -17,6 +17,7 @@ import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.standalone.server.Router;
 
 import java.util.Calendar;
@@ -50,7 +51,7 @@ public class TestIntermediatePlaces {
             FakeGraph.addPerpendicularRoutes(graph);
             FakeGraph.link(graph);
             graph.index();
-            Router router = new Router(graph);
+            Router router = new Router(graph, RouterConfig.DEFAULT);
             router.startup();
             TestIntermediatePlaces.graphPathFinder = new GraphPathFinder(router);
             timeZone = graph.getTimeZone();

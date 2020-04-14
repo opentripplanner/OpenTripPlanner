@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
@@ -19,29 +20,43 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
 
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
+    private final SlackProvider slackProvider;
 
-    private RaptorTripPattern<T> pattern;
+    private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
 
-    public McTransitWorker(McRangeRaptorWorkerState<T> state, TransitCalculator calculator) {
+    public McTransitWorker(McRangeRaptorWorkerState<T> state, SlackProvider slackProvider, TransitCalculator calculator) {
         this.state = state;
+        this.slackProvider = slackProvider;
         this.calculator = calculator;
     }
 
     @Override
-    public void prepareForTransitWith(RaptorTripPattern<T> pattern, TripScheduleSearch<T> tripSearch) {
+    public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
+        slackProvider.setCurrentPattern(pattern);
     }
 
     @Override
     public void routeTransitAtStop(int boardStopPos) {
+
+        // If it is not possible to board the pattern at this stop, then return
+        if(!pattern.boardingPossibleAt(boardStopPos)) {
+            return;
+        }
+
         final int nPatternStops = pattern.numberOfStopsInPattern();
         int boardStopIndex = pattern.stopIndex(boardStopPos);
 
-        for (AbstractStopArrival<T> boardFrom : state.listStopArrivalsPreviousRound(boardStopIndex)) {
+        // For each arrival at the current stop
+        for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(boardStopIndex)) {
 
-            int earliestBoardTime = calculator.earliestBoardTime(boardFrom.arrivalTime());
+            int earliestBoardTime = calculator.plusDuration(
+                    prevArrival.arrivalTime(),
+                    slackProvider.boardSlack()
+            );
+
             boolean found = tripSearch.search(earliestBoardTime, boardStopPos);
 
             if (found) {
@@ -49,17 +64,22 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Tran
                 final int tripDepartureTime = trip.departure(boardStopPos);
                 IntIterator patternStops = calculator.patternStopIterator(boardStopPos, nPatternStops);
 
+                // Visit all stops after the boarded stop position and add transit arrival to
+                // each alight stop
                 while (patternStops.hasNext()) {
                     int alightStopPos = patternStops.next();
-                    int alightStopIndex = pattern.stopIndex(alightStopPos);
+                    if(pattern.alightingPossibleAt(alightStopPos)) {
+                        int alightStopIndex = pattern.stopIndex(alightStopPos);
 
-                    state.transitToStop(
-                            boardFrom,
-                            alightStopIndex,
-                            trip.arrival(alightStopPos),
-                            tripDepartureTime,
-                            trip
-                    );
+                        state.transitToStop(
+                                prevArrival,
+                                alightStopIndex,
+                                trip.arrival(alightStopPos),
+                                slackProvider.alightSlack(),
+                                tripDepartureTime,
+                                trip
+                        );
+                    }
                 }
             }
         }

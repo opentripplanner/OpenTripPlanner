@@ -27,9 +27,11 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
+import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequest;
+import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
-import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
@@ -53,11 +55,9 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
-import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
@@ -70,7 +70,6 @@ import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.VertexNotFoundException;
@@ -78,7 +77,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.request.StreetMode;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.routing.trippattern.RealTimeState;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TranslatedString;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -98,11 +96,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
-import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -114,224 +114,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 public class TransmodelIndexGraphQLSchema {
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelIndexGraphQLSchema.class);
 
-    private static GraphQLEnumType wheelchairBoardingEnum = GraphQLEnumType.newEnum()
-            .name("WheelchairBoarding")
-            .value("noInformation", 0, "There is no accessibility information for the stopPlace/quay.")
-            .value("possible", 1, "Boarding wheelchair-accessible serviceJourneys is possible at this stopPlace/quay.")
-            .value("notPossible", 2, "Wheelchair boarding/alighting is not possible at this stop.")
-            .build();
-
-    private static GraphQLEnumType interchangeWeightingEnum = GraphQLEnumType.newEnum()
-            .name("InterchangeWeighting")
-            .value("preferredInterchange", 2, "Highest priority interchange.")
-            .value("recommendedInterchange", 1, "Second highest priority interchange.")
-            .value("interchangeAllowed",0, "Third highest priority interchange.")
-            .value("noInterchange", -1, "Interchange not allowed.")
-            .build();
-
-    private static GraphQLEnumType bikesAllowedEnum = GraphQLEnumType.newEnum()
-            .name("BikesAllowed")
-            .value("noInformation", 0, "There is no bike information for the trip.")
-            .value("allowed", 1, "The vehicle being used on this particular trip can accommodate at least one bicycle.")
-            .value("notAllowed", 2, "No bicycles are allowed on this trip.")
-            .build();
-
-    private static GraphQLEnumType reportTypeEnum = GraphQLEnumType.newEnum()
-            .name("ReportType") //SIRI - ReportTypeEnumeration
-            .value("general", "general", "Indicates a general info-message that should not affect trip.")
-            .value("incident", "incident", "Indicates an incident that may affect trip.")
-            .build();
-
-    private static GraphQLEnumType severityEnum = GraphQLEnumType.newEnum()
-            .name("Severity") //SIRI - SeverityEnumeration
-            .value("noImpact", "noImpact", "Situation has no impact on trips.")
-            .value("slight", "slight", "Situation has a small impact on trips.")
-            .value("normal", "normal", "Situation has an impact on trips (default).")
-            .value("severe", "severe", "Situation has a severe impact on trips.")
-            .build();
-
-    /* TODO OTP2 - StopCondition does not exist yet
-    private static GraphQLEnumType stopConditionEnum = GraphQLEnumType.newEnum()
-            .name("StopCondition") //SIRI - RoutePointTypeEnumeration
-            .value("destination", StopCondition.DESTINATION, "Situation applies when stop is the destination of the leg.")
-            .value("startPoint", StopCondition.START_POINT, "Situation applies when stop is the startpoint of the leg.")
-            .value("exceptionalStop", StopCondition.EXCEPTIONAL_STOP, "Situation applies when transfering to another leg at the stop.")
-            .value("notStopping", StopCondition.NOT_STOPPING, "Situation applies when passing the stop, without stopping.")
-            .value("requestStop", StopCondition.REQUEST_STOP, "Situation applies when at the stop, and the stop requires a request to stop.")
-            .build();
-     */
-
-    private static GraphQLEnumType realtimeStateEnum = GraphQLEnumType.newEnum()
-            .name("RealtimeState")
-            .value("scheduled", RealTimeState.SCHEDULED, "The service journey information comes from the regular time table, i.e. no real-time update has been applied.")
-            .value("updated", RealTimeState.UPDATED, "The service journey information has been updated, but the journey pattern stayed the same as the journey pattern of the scheduled service journey.")
-            .value("canceled", RealTimeState.CANCELED, "The service journey has been canceled by a real-time update.")
-            .value("Added", RealTimeState.ADDED, "The service journey has been added using a real-time update, i.e. the service journey was not present in the regular time table.")
-            .value("modified", RealTimeState.MODIFIED, "The service journey information has been updated and resulted in a different journey pattern compared to the journey pattern of the scheduled service journey.")
-            .build();
-
-    private static GraphQLEnumType vertexTypeEnum = GraphQLEnumType.newEnum()
-            .name("VertexType")
-            .value("normal", VertexType.NORMAL)
-            .value("transit", VertexType.TRANSIT)
-            .value("bikePark", VertexType.BIKEPARK)
-            .value("bikeShare", VertexType.BIKESHARE)
-            //TODO QL: .value("parkAndRide", VertexType.PARKANDRIDE)
-            .build();
-
-    /* TODO QL
-    private static GraphQLEnumType serviceAlterationEnum = GraphQLEnumType.newEnum()
-            .name("ServiceAlteration")
-            .value("planned", Trip.ServiceAlteration.planned)
-            .value("cancellation", Trip.ServiceAlteration.cancellation)
-            .value("extraJourney", Trip.ServiceAlteration.extraJourney)
-            .build();
-    */
-
-    private static GraphQLEnumType streetModeEnum = GraphQLEnumType.newEnum()
-            .name("StreetMode")
-            .value("foot", StreetMode.WALK)
-            .value("bicycle", StreetMode.BIKE)
-            .value("bike_park", StreetMode.BIKE_TO_PARK)
-            .value("bike_rental", StreetMode.BIKE_RENTAL)
-            .value("car", StreetMode.CAR)
-            .value("car_park", StreetMode.CAR_TO_PARK)
-            .value("taxi", StreetMode.TAXI)
-            .value("car_rental", StreetMode.CAR_RENTAL)
-            .build();
-
-    private static GraphQLEnumType transportModeEnum = GraphQLEnumType.newEnum()
-            .name("TransportMode")
-            .value("air", TransitMode.AIRPLANE)
-            .value("bus", TransitMode.BUS)
-            .value("cableway", TransitMode.CABLE_CAR)
-            .value("water", TransitMode.FERRY)
-            .value("funicular", TransitMode.FUNICULAR)
-            .value("lift", TransitMode.GONDOLA)
-            .value("rail", TransitMode.RAIL)
-            .value("metro", TransitMode.SUBWAY)
-            .value("tram", TransitMode.TRAM)
-            .value("coach", TransitMode.BUS).description("NOT IMPLEMENTED")
-            .value("unknown", "unknown")
-            .build();
-
-    private static GraphQLEnumType modeEnum = GraphQLEnumType.newEnum()
-        .name("Mode")
-        .value("air", TraverseMode.AIRPLANE)
-        .value("bicycle", TraverseMode.BICYCLE)
-        .value("bus", TraverseMode.BUS)
-        .value("cableway", TraverseMode.CABLE_CAR)
-        .value("water", TraverseMode.FERRY)
-        .value("funicular", TraverseMode.FUNICULAR)
-        .value("lift", TraverseMode.GONDOLA)
-        .value("rail", TraverseMode.RAIL)
-        .value("metro", TraverseMode.SUBWAY)
-        .value("tram", TraverseMode.TRAM)
-        .value("transit", TraverseMode.TRANSIT, "Any for of public transportation")
-        .value("foot", TraverseMode.WALK)
-        .value("car", TraverseMode.CAR)
-        .build();
-
-    private static GraphQLEnumType relativeDirectionEnum = GraphQLEnumType.newEnum()
-            .name("RelativeDirection")
-            .value("depart", RelativeDirection.DEPART)
-            .value("hardLeft", RelativeDirection.HARD_LEFT)
-            .value("left", RelativeDirection.LEFT)
-            .value("slightlyLeft", RelativeDirection.SLIGHTLY_LEFT)
-            .value("continue", RelativeDirection.CONTINUE)
-            .value("slightlyRight", RelativeDirection.SLIGHTLY_RIGHT)
-            .value("right", RelativeDirection.RIGHT)
-            .value("hardRight", RelativeDirection.HARD_RIGHT)
-            .value("circleClockwise", RelativeDirection.CIRCLE_CLOCKWISE)
-            .value("circleCounterclockwise", RelativeDirection.CIRCLE_COUNTERCLOCKWISE)
-            .value("elevator", RelativeDirection.ELEVATOR)
-            .value("uturnLeft", RelativeDirection.UTURN_LEFT)
-            .value("uturnRight", RelativeDirection.UTURN_RIGHT)
-            .build();
-
-    private static GraphQLEnumType absoluteDirectionEnum = GraphQLEnumType.newEnum()
-            .name("AbsoluteDirection")
-            .value("north", AbsoluteDirection.NORTH)
-            .value("northeast", AbsoluteDirection.NORTHEAST)
-            .value("east", AbsoluteDirection.EAST)
-            .value("southeast", AbsoluteDirection.SOUTHEAST)
-            .value("south", AbsoluteDirection.SOUTH)
-            .value("southwest", AbsoluteDirection.SOUTHWEST)
-            .value("west", AbsoluteDirection.WEST)
-            .value("northwest", AbsoluteDirection.NORTHWEST)
-            .build();
-
-    private static GraphQLEnumType localeEnum = GraphQLEnumType.newEnum()
-            .name("Locale")
-            .value("no", "no")
-            .value("us", "us")
-            .build();
-
-    private static GraphQLEnumType multiModalModeEnum = GraphQLEnumType.newEnum()
-             .name("MultiModalMode")
-             .value("parent", "parent", "Multi modal parent stop places without their mono modal children.")
-             .value("child", "child", "Only mono modal children stop places, not their multi modal parent stop")
-             .value("all", "all", "Both multiModal parents and their mono modal child stop places.")
-             .build();
-
-    /*
-    private static GraphQLEnumType stopTypeEnum = GraphQLEnumType.newEnum()
-            .name("StopType")
-            .value("regular", Stop.stopTypeEnumeration.REGULAR)
-            .value("flexible_area", Stop.stopTypeEnumeration.FLEXIBLE_AREA)
-            .build();
-
-*/
-    private static GraphQLEnumType transportSubmode = TransmodelIndexGraphQLSchema.createEnum("TransportSubmode", TransmodelTransportSubmode.values(), (t -> t.getValue()));
-    /*
-
-    private static GraphQLEnumType flexibleLineTypeEnum = TransmodelIndexGraphQLSchema.createEnum("FlexibleLineType", Route.FlexibleRouteTypeEnum.values(), (t -> t.name()));
-
-    private static GraphQLEnumType flexibleServiceTypeEnum = TransmodelIndexGraphQLSchema.createEnum("FlexibleServiceType", Trip.FlexibleTripTypeEnum.values(), (t -> t.name()));
-
-    private static GraphQLEnumType purchaseMomentEnum = TransmodelIndexGraphQLSchema.createEnum("PurchaseMoment", BookingArrangement.PurchaseMomentEnum.values(), (t -> t.name()));
-
-    private static GraphQLEnumType purchaseWhenEnum = TransmodelIndexGraphQLSchema.createEnum("PurchaseWhen", BookingArrangement.PurchaseWhenEnum.values(), (t -> t.name()));
-
-    private static GraphQLEnumType bookingAccessEnum = TransmodelIndexGraphQLSchema.createEnum("BookingAccess", BookingArrangement.BookingAccessEnum.values(), (t -> t.name()));
-
-    private static GraphQLEnumType bookingMethodEnum = TransmodelIndexGraphQLSchema.createEnum("BookingMethod", BookingArrangement.BookingMethodEnum.values(), (t -> t.name()));
-*/
-
-    private static <T extends Enum> GraphQLEnumType createEnum(String name, T[] values, Function<T, String> mapping) {
-        GraphQLEnumType.Builder enumBuilder = GraphQLEnumType.newEnum().name(name);
-        Arrays.stream(values).forEach(type -> enumBuilder.value(mapping.apply(type), type));
-        return enumBuilder.build();
-    }
-
-
-    private static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
-            .name("FilterPlaceType")
-            .value("quay", TransmodelPlaceType.QUAY, "Quay")
-            .value("stopPlace", TransmodelPlaceType.STOP_PLACE, "StopPlace")
-            .value("bicycleRent", TransmodelPlaceType.BICYCLE_RENT, "Bicycle rent stations")
-            .value("bikePark",TransmodelPlaceType.BIKE_PARK, "Bike parks")
-            .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
-            .build();
-
-    private static GraphQLEnumType optimisationMethodEnum = GraphQLEnumType.newEnum()
-            .name("OptimisationMethod")
-            .value("quick", OptimizeType.QUICK)
-            .value("safe", OptimizeType.SAFE)
-            .value("flat", OptimizeType.FLAT)
-            .value("greenways", OptimizeType.GREENWAYS)
-            .value("triangle", OptimizeType.TRIANGLE)
-            .value("transfers", OptimizeType.TRANSFERS)
-            .build();
-
-    private static GraphQLEnumType directionTypeEnum = GraphQLEnumType.newEnum()
-            .name("DirectionType")
-            .value("unknown",-1)
-            .value("outbound", 0)
-            .value("inbound", 1)
-            .value("clockwise", 2)
-            .value("anticlockwise", 3)
-            .build();
+    private final DefaultRoutingRequest routing;
 
     private GraphQLOutputType noticeType = new GraphQLTypeReference("Notice");
 
@@ -388,8 +171,6 @@ public class TransmodelIndexGraphQLSchema {
     private GraphQLObjectType linkGeometryType;
 
     private GraphQLObjectType queryType;
-
-    private GraphQLOutputType routingParametersType = new GraphQLTypeReference("RoutingParameters");
 
     private GraphQLOutputType tripType = new GraphQLTypeReference("Trip");
 
@@ -463,8 +244,9 @@ public class TransmodelIndexGraphQLSchema {
     }
 
     @SuppressWarnings("unchecked")
-    public TransmodelIndexGraphQLSchema(Graph graph) {
-        RoutingRequest defaultRoutingRequest = getDefaultRoutingRequest();
+    public TransmodelIndexGraphQLSchema(Graph graph, RoutingRequest defaultRequest) {
+        this.routing = new DefaultRoutingRequest(defaultRequest);
+
         String fixedAgencyIdPropValue = System.getProperty("transmodel.graphql.api.agency.id");
         if (!StringUtils.isEmpty(fixedAgencyIdPropValue)) {
             fixedAgencyId = fixedAgencyIdPropValue;
@@ -552,7 +334,6 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> null)
                         .build())
                 .build();
-
 
         /*
         brandingType = GraphQLObjectType.newObject()
@@ -713,24 +494,24 @@ public class TransmodelIndexGraphQLSchema {
                 .name("accessMode")
                 .description("The mode used to get from the origin to the access stops in the transit "
                     + "network the transit network (first-mile).")
-                .type(streetModeEnum)
+                .type(STREET_MODE)
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("egressMode")
                 .description("The mode used to get from the egress stops in the transit network to"
                     + "the destination (last-mile).")
-                .type(streetModeEnum)
+                .type(STREET_MODE)
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("directMode")
                 .description("The mode used to get from the origin to the destination directly, "
                     + "without using the transit network.")
-                .type(streetModeEnum)
+                .type(STREET_MODE)
                 .build())
             .field(GraphQLInputObjectField.newInputObjectField()
                 .name("transportMode")
                 .description("The allowed modes for the transit part of the trip.")
-                .type(new GraphQLList(transportModeEnum))
+                .type(new GraphQLList(TRANSPORT_MODE))
                 .build())
             .build();
 
@@ -801,7 +582,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("otherThanPreferredLinesPenalty")
                         .description("Penalty added for using a line that is not preferred if user has set any line as preferred. In number of seconds that user is willing to wait for preferred line.")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.otherThanPreferredRoutesPenalty)
+                        .defaultValue(routing.request.otherThanPreferredRoutesPenalty)
                         .build())
                 .build();
 
@@ -908,12 +689,12 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("transportMode")
                         .description("Set of ids for lines that should be used")
-                        .type(new GraphQLNonNull(transportModeEnum))
+                        .type(new GraphQLNonNull(TRANSPORT_MODE))
                         .build())
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("transportSubmodes")
                         .description("Set of transport submodes allowed for transport mode.")
-                        .type(new GraphQLNonNull(new GraphQLList(transportSubmode)))
+                        .type(new GraphQLNonNull(new GraphQLList(TRANSPORT_SUBMODE)))
                         .build())
                  .build();
 
@@ -946,12 +727,12 @@ public class TransmodelIndexGraphQLSchema {
                         .name("wheelchair")
                         .description("Whether the trip must be wheelchair accessible.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.wheelchairAccessible)
+                        .defaultValue(routing.request.wheelchairAccessible)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("numTripPatterns")
                         .description("The maximum number of trip patterns to return.")
-                        .defaultValue(defaultRoutingRequest.numItineraries)
+                        .defaultValue(routing.request.numItineraries)
                         .type(Scalars.GraphQLInt)
                         .build())
                 .argument(GraphQLArgument.newArgument()
@@ -959,38 +740,38 @@ public class TransmodelIndexGraphQLSchema {
                         .description("DEPRECATED - Use maxPreTransitWalkDistance/maxTransferWalkDistance instead. " +
                                 "The maximum distance (in meters) the user is willing to walk. Note that trip patterns with " +
                                 "longer walking distances will be penalized, but not altogether disallowed. Maximum allowed value is 15000 m")
-                        .defaultValue(defaultRoutingRequest.maxWalkDistance)
+                        .defaultValue(routing.request.maxWalkDistance)
                         .type(Scalars.GraphQLFloat)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("maxTransferWalkDistance")
                         .description("The maximum walk distance allowed for transfers.")
-                        .defaultValue(defaultRoutingRequest.maxTransferWalkDistance)
+                        .defaultValue(routing.request.maxTransferWalkDistance)
                         .type(Scalars.GraphQLFloat)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("walkSpeed")
                         .description("The maximum walk speed along streets, in meters per second")
                         .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.walkSpeed)
+                        .defaultValue(routing.request.walkSpeed)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("bikeSpeed")
                         .description("The maximum bike speed along streets, in meters per second")
                         .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.bikeSpeed)
+                        .defaultValue(routing.request.bikeSpeed)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("optimisationMethod")
-                        .description("The set of characteristics that the user wants to optimise for -- defaults to " + reverseMapEnumVal(optimisationMethodEnum, defaultRoutingRequest.optimize))
-                        .type(optimisationMethodEnum)
-                        .defaultValue(defaultRoutingRequest.optimize)
+                        .description("The set of characteristics that the user wants to optimise for -- defaults to " + reverseMapEnumVal(EnumTypes.OPTIMISATION_METHOD, routing.request.optimize))
+                        .type(EnumTypes.OPTIMISATION_METHOD)
+                        .defaultValue(routing.request.optimize)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("arriveBy")
                         .description("Whether the trip should depart at dateTime (false, the default), or arrive at dateTime.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.arriveBy)
+                        .defaultValue(routing.request.arriveBy)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("vias")
@@ -1023,13 +804,14 @@ public class TransmodelIndexGraphQLSchema {
                         .name("transferPenalty")
                         .description("An extra penalty added on transfers (i.e. all boardings except the first one). The transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimise for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers trip pattern is to wait until midnight, when the 4 train runs local the whole way. The actual fastest trip pattern is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimise for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than transferPenalty seconds, then that's what we'll return.")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.transferCost)
+                        .defaultValue(routing.request.transferCost)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("modes")
                         .description("The set of access/egress/direct/transit modes to be used for "
                             + "this search.")
                         .type(modesInputType)
+                        .defaultValue(routing.request.modes)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                          .name("transportSubmodes")
@@ -1041,43 +823,75 @@ public class TransmodelIndexGraphQLSchema {
                         .name("allowBikeRental")
                         .description("Is bike rental allowed?")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.bikeRental)
+                        .defaultValue(routing.request.bikeRental)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("minimumTransferTime")
-                        .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one public transport vehicle and boarding another. This time is in addition to time it might take to walk between stops.")
+                        .description("DEPRECATED - Use 'transferSlack/boardSlack/alightSlack' instead.  ")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.transferSlack)
+                        .defaultValue(routing.request.transferSlack)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("transferSlack")
+                        .description("An expected transfer time (in seconds) that specifies the amount of time that must pass between exiting one public transport vehicle and boarding another. This time is in addition to time it might take to walk between stops.")
+                        .type(Scalars.GraphQLInt)
+                        .defaultValue(routing.request.transferSlack)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("boardSlackDefault")
+                        .description(TransportModeSlack.boardSlackDescription("boardSlackList"))
+                        .type(Scalars.GraphQLInt)
+                        .defaultValue(routing.request.boardSlack)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("boardSlackList")
+                        .description(TransportModeSlack.slackByGroupDescription(
+                                "boardSlack", routing.request.boardSlackForMode
+                        ))
+                        .type(TransportModeSlack.SLACK_LIST_INPUT_TYPE)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("alightSlackDefault")
+                        .description(TransportModeSlack.alightSlackDescription("alightSlackList"))
+                        .type(Scalars.GraphQLInt)
+                        .defaultValue(routing.request.alightSlack)
+                        .build())
+                .argument(GraphQLArgument.newArgument()
+                        .name("alightSlackList")
+                        .description(TransportModeSlack.slackByGroupDescription(
+                                "alightSlack", routing.request.alightSlackForMode
+                        ))
+                        .type(TransportModeSlack.SLACK_LIST_INPUT_TYPE)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("maximumTransfers")
                         .description("Maximum number of transfers")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.maxTransfers)
+                        .defaultValue(routing.request.maxTransfers)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("ignoreRealtimeUpdates")
                         .description("When true, realtime updates are ignored during this search.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.ignoreRealtimeUpdates)
+                        .defaultValue(routing.request.ignoreRealtimeUpdates)
                         .build())
                 /*
                 .argument(GraphQLArgument.newArgument()
                         .name("includePlannedCancellations")
                         .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.includePlannedCancellations)
+                        .defaultValue(defaultRoutingRequest.defaults.includePlannedCancellations)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("ignoreInterchanges")
                         .description("DEPRECATED - For debugging only. Ignores interchanges defined in timetable data.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.ignoreInterchanges)
+                        .defaultValue(defaultRoutingRequest.defaults.ignoreInterchanges)
                         .build())
                  */
                 .argument(GraphQLArgument.newArgument()
                         .name("locale")
-                        .type(localeEnum)
+                        .type(EnumTypes.LOCALE)
                         .defaultValue("no")
                         .build())
                 .argument(GraphQLArgument.newArgument()
@@ -1096,14 +910,14 @@ public class TransmodelIndexGraphQLSchema {
                         .name("maxPreTransitTime")
                         .description("Maximum time for the ride part of \"kiss and ride\" and \"ride and kiss\".")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.maxPreTransitTime)
+                        .defaultValue(routing.request.maxPreTransitTime)
                         .build())
                 /*
                 .argument(GraphQLArgument.newArgument()
                         .name("preTransitReluctance")
                         .description("How much worse driving before and after transit is than riding on transit. Applies to ride and kiss, kiss and ride and park and ride.")
                         .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.preTransitReluctance)
+                        .defaultValue(defaultRoutingRequest.defaults.preTransitReluctance)
                         .build())
                 */
                 .argument(GraphQLArgument.newArgument()
@@ -1121,21 +935,21 @@ public class TransmodelIndexGraphQLSchema {
                         .name("banFirstServiceJourneysFromReuseNo")
                         .description("How many service journeys used in a tripPatterns should be banned from inclusion in successive tripPatterns. Counting from start of tripPattern.")
                         .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.banFirstTripsFromReuseNo)
+                        .defaultValue(defaultRoutingRequest.defaults.banFirstTripsFromReuseNo)
                         .build())
                  */
                 .argument(GraphQLArgument.newArgument()
                         .name("walkReluctance")
                         .description("Walk cost is multiplied by this value. This is the main parameter to use for limiting walking.")
                         .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.walkReluctance)
+                        .defaultValue(routing.request.walkReluctance)
                         .build())
                 /*
                 .argument(GraphQLArgument.newArgument()
                         .name("ignoreMinimumBookingPeriod")
                         .description("Ignore the MinimumBookingPeriod defined on the ServiceJourney and allow itineraries to start immediately after the current time.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.ignoreDrtAdvanceBookMin)
+                        .defaultValue(defaultRoutingRequest.defaults.ignoreDrtAdvanceBookMin)
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("transitDistanceReluctance")
@@ -1144,14 +958,14 @@ public class TransmodelIndexGraphQLSchema {
                                 "fare prices and you want to avoid situations where you take detours or travel back again even if it is\n" +
                                 "technically faster. Setting this value to 0 turns off the feature altogether.")
                         .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.transitDistanceReluctance)
+                        .defaultValue(defaultRoutingRequest.defaults.transitDistanceReluctance)
                         .build())
                 */
                 .argument(GraphQLArgument.newArgument()
                         .name("debugItineraryFilter")
                         .description("Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but NOT delete them when this is enabled.")
                         .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.debugItineraryFilter)
+                        .defaultValue(routing.request.debugItineraryFilter)
                         .build())
 
                 .dataFetcher(environment -> new TransmodelGraphQLPlanner(mappingUtil).plan(environment))
@@ -1401,7 +1215,7 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("reportType")
-                    .type(reportTypeEnum)
+                    .type(EnumTypes.REPORT_TYPE)
                     .description("ReportType of this situation")
                     .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertType)
                     .build())
@@ -1513,12 +1327,12 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("wheelchairBoarding")
                         .description("Whether this stop place is suitable for wheelchair boarding.")
-                        .type(wheelchairBoardingEnum)
+                        .type(EnumTypes.WHEELCHAIR_BOARDING)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("weighting")
                         .description("Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED")
-                        .type(interchangeWeightingEnum)
+                        .type(EnumTypes.INTERCHANGE_WEIGHTING)
                         .dataFetcher(environment -> 0)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -1530,13 +1344,13 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
                         .description("The transport mode serviced by this stop place.  NOT IMPLEMENTED")
-                        .type(transportModeEnum)
+                        .type(TRANSPORT_MODE)
                         .dataFetcher(environment -> "unknown")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
                         .description("The transport submode serviced by this stop place. NOT IMPLEMENTED")
-                        .type(transportSubmode)
+                        .type(TRANSPORT_SUBMODE)
                         .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
                         .build())
                 /*
@@ -1716,7 +1530,7 @@ public class TransmodelIndexGraphQLSchema {
                     .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("wheelchairAccessible")
-                        .type(wheelchairBoardingEnum)
+                        .type(EnumTypes.WHEELCHAIR_BOARDING)
                         .description("Whether this quay is suitable for wheelchair boarding.")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2050,7 +1864,7 @@ public class TransmodelIndexGraphQLSchema {
                  */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtimeState")
-                        .type(realtimeStateEnum)
+                        .type(EnumTypes.REALTIME_STATE)
                         .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtimeState)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2178,7 +1992,7 @@ public class TransmodelIndexGraphQLSchema {
 
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
-                        .type(transportSubmode)
+                        .type(TRANSPORT_SUBMODE)
                         .description("The transport submode of the journey, if different from lines transport submode. NOT IMPLEMENTED")
                         .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
                         .build())
@@ -2211,17 +2025,17 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("directionType")
-                        .type(directionTypeEnum)
+                        .type(EnumTypes.DIRECTION_TYPE)
                         .dataFetcher(environment -> directIdStringToInt(((Trip) environment.getSource()).getDirectionId()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("wheelchairAccessible")
-                        .type(wheelchairBoardingEnum)
+                        .type(EnumTypes.WHEELCHAIR_BOARDING)
                         .description("Whether service journey is accessible with wheelchair.")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikesAllowed")
-                        .type(bikesAllowedEnum)
+                        .type(EnumTypes.BIKES_ALLOWED)
                         .description("Whether bikes are allowed on service journey.")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2329,7 +2143,7 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("directionType")
-                        .type(directionTypeEnum)
+                        .type(EnumTypes.DIRECTION_TYPE)
                         .dataFetcher(environment -> ((TripPattern) environment.getSource()).directionId)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2454,13 +2268,13 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
-                        .type(transportModeEnum)
+                        .type(TRANSPORT_MODE)
                         .dataFetcher(environment -> GtfsLibrary.getTransitMode(
                                 environment.getSource()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
-                        .type(transportSubmode)
+                        .type(EnumTypes.TRANSPORT_SUBMODE)
                         .description("NOT IMPLEMENTED")
                         .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
                         .build())
@@ -2480,7 +2294,7 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikesAllowed")
-                        .type(bikesAllowedEnum)
+                        .type(EnumTypes.BIKES_ALLOWED)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("journeyPatterns")
@@ -2914,7 +2728,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("multiModalMode")
-                                .type(multiModalModeEnum)
+                                .type(EnumTypes.MULTI_MODAL_MODE)
                                 .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
                                                      " Does not affect mono modal stop places that do not belong to a multi modal stop place.")
                                 .defaultValue("parent")
@@ -3315,7 +3129,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("transportModes")
-                                .type(new GraphQLList(transportModeEnum))
+                                .type(new GraphQLList(TRANSPORT_MODE))
                                 .build())
                         .argument(GraphQLArgument.newArgument()
                                 .name("authorities")
@@ -3525,8 +3339,8 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("routingParameters")
                         .description("Get default routing parameters.")
-                        .type(routingParametersType)
-                        .dataFetcher(environment -> getDefaultRoutingRequest())
+                        .type(this.routing.graphQLType)
+                        .dataFetcher(environment -> routing.request)
                         .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3548,7 +3362,7 @@ public class TransmodelIndexGraphQLSchema {
                         .argument(GraphQLArgument.newArgument()
                                 .name("severities")
                                 .description("Filter by severity.")
-                                .type(new GraphQLList(severityEnum))
+                                .type(new GraphQLList(EnumTypes.SEVERITY))
                                 .build())
                         .dataFetcher(environment -> {
                             Collection<AlertPatch> alerts = getRoutingService(environment).getSiriAlertPatchService().getAllAlertPatches();
@@ -3709,11 +3523,6 @@ public class TransmodelIndexGraphQLSchema {
     }
      */
 
-
-    private RoutingRequest getDefaultRoutingRequest() {
-        return new RoutingRequest();
-    }
-
     private List<FeedScopedId> toIdList(List<String> ids) {
         if (ids == null) return Collections.emptyList();
         return ids.stream().map(id -> mappingUtil.fromIdString(id)).collect(Collectors.toList());
@@ -3732,7 +3541,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("vertexType")
                         .description("Type of vertex. (Normal, Bike sharing station, Bike P+R, Transit quay) Mostly used for better localization of bike sharing and P+R station names")
-                        .type(vertexTypeEnum)
+                        .type(EnumTypes.VERTEX_TYPE)
                         .dataFetcher(environment -> ((Place) environment.getSource()).vertexType)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3811,7 +3620,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("relativeDirection")
                         .description("The relative direction of this step.")
-                        .type(relativeDirectionEnum)
+                        .type(EnumTypes.RELATIVE_DIRECTION)
                         .dataFetcher(environment -> ((WalkStep) environment.getSource()).relativeDirection)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3823,7 +3632,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("heading")
                         .description("The absolute direction of this step.")
-                        .type(absoluteDirectionEnum)
+                        .type(EnumTypes.ABSOLUTE_DIRECTION)
                         .dataFetcher(environment -> ((WalkStep) environment.getSource()).absoluteDirection)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -3927,13 +3736,13 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("mode")
                         .description("The mode of transport or access (e.g., foot) used when traversing this leg.")
-                        .type(modeEnum)
+                        .type(EnumTypes.MODE)
                         .dataFetcher(environment -> ((Leg) environment.getSource()).mode)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
                         .description("The transport sub mode (e.g., localBus or expressBus) used when traversing this leg. Null if leg is not a ride")
-                        .type(transportSubmode)
+                        .type(EnumTypes.TRANSPORT_SUBMODE)
                         .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -4188,343 +3997,6 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        routingParametersType = GraphQLObjectType.newObject()
-                .name("RoutingParameters")
-                .description("The default parameters used in travel searches.")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("walkSpeed")
-                        .description("Max walk speed along streets, in meters per second")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).walkSpeed)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeSpeed")
-                        .description("Max bike speed along streets, in meters per second")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeSpeed)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carSpeed")
-                        .description("Max car speed along streets, in meters per second")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).carSpeed)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("maxWalkDistance")
-                        .description("The maximum distance (in meters) the user is willing to walk for access/egress legs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).maxWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("maxTransferWalkDistance")
-                        .description("The maximum distance (in meters) the user is willing to walk for transfer legs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).maxTransferWalkDistance)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("maxPreTransitTime")
-                        .description("The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and ride or kiss and ride).")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).maxPreTransitTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("wheelChairAccessible")
-                        .description("Whether the trip must be wheelchair accessible.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).wheelchairAccessible)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("numItineraries")
-                        .description("The maximum number of itineraries to return.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).numItineraries)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("maxSlope")
-                        .description("The maximum slope of streets for wheelchair trips.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).maxWheelchairSlope)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("showIntermediateStops")
-                        .description("Whether the planner should return intermediate stops lists for transit legs.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).showIntermediateStops)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("transferPenalty")
-                        .description("An extra penalty added on transfers (i.e. all boardings except the first one).")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).transferCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("walkReluctance")
-                        .description("A multiplier for how bad walking is, compared to being in transit for equal lengths of time.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).walkReluctance)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("stairsReluctance")
-                        .description("Used instead of walkReluctance for stairs.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).stairsReluctance)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("turnReluctance")
-                        .description("Multiplicative factor on expected turning time.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).turnReluctance)
-                        .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("walkOnStreetReluctance")
-                        .description("How much more reluctant is the user to walk on streets with car traffic allowed.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).walkOnStreetReluctance)
-                        .build())
-                 */
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("elevatorBoardTime")
-                        .description("How long does it take to get on an elevator, on average.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).elevatorBoardTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("elevatorBoardCost")
-                        .description("What is the cost of boarding a elevator?")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).elevatorBoardCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("elevatorHopTime")
-                        .description("How long does it take to advance one floor on an elevator?")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).elevatorHopTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("elevatorHopCost")
-                        .description("What is the cost of travelling one floor on an elevator?")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).elevatorHopCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalPickupTime")
-                        .description("Time to rent a bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRentalPickupTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalPickupCost")
-                        .description("Cost to rent a bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRentalPickupCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalDropOffTime")
-                        .description("Time to drop-off a rented bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRentalDropoffTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalDropOffCost")
-                        .description("Cost to drop-off a rented bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRentalDropoffCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeParkTime")
-                        .description("Time to park a bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeParkTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeParkCost")
-                        .description("Cost to park a bike.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeParkCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carDropOffTime")
-                        .description("Time to park a car in a park and ride, w/o taking into account driving and walking cost.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).carDropoffTime)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("waitReluctance")
-                        .description("How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).waitReluctance)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("waitAtBeginningFactor")
-                        .description("How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding).")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).waitAtBeginningFactor)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("walkBoardCost")
-                        .description("This prevents unnecessary transfers by adding a cost for boarding a vehicle.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).walkBoardCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeBoardCost")
-                        .description("Separate cost for boarding a vehicle with a bicycle, which is more difficult than on foot.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeBoardCost)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("otherThanPreferredRoutesPenalty")
-                        .description("Penalty added for using every route that is not preferred if user set any route as preferred. We return number of seconds that we are willing to wait for preferred route.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).otherThanPreferredRoutesPenalty)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("transferSlack")
-                        .description("A global minimum transfer time (in seconds) that specifies the minimum amount of time that must pass between exiting one transit vehicle and boarding another.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).transferSlack)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("maxTransfers")
-                        .description("Maximum number of transfers returned in a trip plan.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).maxTransfers)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("reverseOptimizeOnTheFly")
-                        .description("DEPRECATED - NOT IN USE IN OTP2.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(e -> false)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("compactLegsByReversedSearch")
-                        .description("DEPRECATED - NOT IN USE IN OTP2.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(e -> false)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carDecelerationSpeed")
-                        .description("The deceleration speed of an automobile, in meters per second per second.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).carDecelerationSpeed)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carAccelerationSpeed")
-                        .description("The acceleration speed of an automobile, in meters per second per second.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).carAccelerationSpeed)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("ignoreRealTimeUpdates")
-                        .description("When true, realtime updates are ignored during this search.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).ignoreRealtimeUpdates)
-                        .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("includedPlannedCancellations")
-                        .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).includePlannedCancellations)
-                        .build())
-                 */
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("disableRemainingWeightHeuristic")
-                        .description("If true, the remaining weight heuristic is disabled.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).disableRemainingWeightHeuristic)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("allowBikeRental")
-                        .description("")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeRental)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeParkAndRide")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).bikeParkAndRide)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("parkAndRide")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).parkAndRide)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("kissAndRide")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).kissAndRide)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("debugItineraryFilter")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).debugItineraryFilter)
-                        .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("rideAndKiss")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).rideAndKiss)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("useTraffic")
-                        .description("Should traffic congestion be considered when driving?")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).useTraffic)
-                        .build())
-                 */
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("onlyTransitTrips")
-                        .description("Accept only paths that use transit (no street-only paths).")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).onlyTransitTrips)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("disableAlertFiltering")
-                        .description("Option to disable the default filtering of GTFS-RT alerts by time.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).disableAlertFiltering)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("geoIdElevation")
-                        .description("Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).geoidElevation)
-                        .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("preferredInterchangePenalty")
-                        .description("Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).preferredInterchangePenalty)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("recommendedInterchangePenalty")
-                        .description("Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).recommendedInterchangePenalty)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("interchangeAllowedPenalty")
-                        .description("Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).interchangeAllowedPenalty)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("noInterchangePenalty")
-                        .description("Whether to apply the ellipsoid->geoid offset to all elevations in the response.")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).noInterchangePenalty)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("preTransitReluctance")
-                        .description("How much worse driving before and after transit is than riding on transit. Applies to ride and kiss, kiss and ride and park and ride.")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((RoutingRequest) environment.getSource()).preTransitReluctance)
-                        .build())
-                 */
-                .build();
 
         tripMetadataType = GraphQLObjectType.newObject()
                 .name("TripSearchData")

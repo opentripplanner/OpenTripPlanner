@@ -14,6 +14,7 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -93,7 +94,7 @@ public class GraphStats {
 
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
-        graph = Graph.load(graphFile);
+        graph = SerializedGraphObject.load(graphFile);
 
         /* open output stream (same for all commands) */
         if (outPath != null) {

@@ -4,8 +4,7 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.model.GenericLocation;
-import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
@@ -40,6 +39,7 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 import java.util.TimeZone;
 
@@ -494,12 +494,36 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int boardSlack = 0;
 
     /**
+     * Has information how much time boarding a vehicle takes. Can be significant eg in airplanes
+     * or ferries.
+     * <p>
+     * If set, the board-slack-for-mode override the more general {@link #boardSlack}. This
+     * enables configuring the board-slack for airplane boarding to be 30 minutes and a slack
+     * for bus of 2 minutes.
+     * <p>
+     * Unit is seconds. Default value is not-set(empty map).
+     */
+    public Map<TraverseMode, Integer> boardSlackForMode = new HashMap<>();
+
+    /**
      * The number of seconds to add after alighting a transit leg. It is recommended to use the
      * `alightTimes` in the `router-config.json` to set this for each mode.
      * <p>
      * Unit is seconds. Default value is 0.
      */
     public int alightSlack = 0;
+
+    /**
+     * Has information how much time alighting a vehicle takes. Can be significant eg in airplanes
+     * or ferries.
+     * <p>
+     * If set, the alight-slack-for-mode override the more general {@link #alightSlack}. This
+     * enables configuring the alight-slack for train alighting to be 4 minutes and a bus alight
+     * slack to be 0 minutes.
+     * <p>
+     * Unit is seconds. Default value is not-set(empty map).
+     */
+    public Map<TraverseMode, Integer> alightSlackForMode = new HashMap<>();
 
     /**
      * Ideally maxTransfers should be set in the router config, not here. Instead the client should
@@ -964,13 +988,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeWalkingOptions.bikeTriangleTimeFactor = bikeTriangleTimeFactor;
     }
 
-    public NamedPlace getFromPlace() {
-        return new NamedPlace(this.from);
-    }
-
-    public NamedPlace getToPlace() {
-        return new NamedPlace(this.to);
-    }
 
     /* INSTANCE METHODS */
 

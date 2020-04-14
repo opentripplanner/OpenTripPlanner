@@ -3,8 +3,8 @@ package org.opentripplanner.graph_builder.linking;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;

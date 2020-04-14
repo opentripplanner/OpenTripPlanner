@@ -62,6 +62,12 @@ public class ValueObjectToStringBuilderTest {
     }
 
     @Test
+    public void addLbl() {
+        assertEquals("abba", subject().addLbl("ab").addLbl("ba").toString());
+        assertEquals("a_2_b", subject().addLbl("a_").addNum(2).addLbl("_b").toString());
+    }
+
+    @Test
     public void addEnum() {
         assertEquals("A", subject().addEnum(AEnum.A).toString());
         assertEquals("null", subject().addEnum(null).toString());
@@ -91,15 +97,15 @@ public class ValueObjectToStringBuilderTest {
     public void addSecondsPastMidnight() {
         assertEquals(
                 "00:00:35",
-                subject().addSecondsPastMidnight(35).toString()
+                subject().addServiceTime(35).toString()
         );
         assertEquals(
                 "26:50:45",
-                subject().addSecondsPastMidnight((26 * 60 + 50) * 60 + 45).toString()
+                subject().addServiceTime((26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
                 "-00:00:01",
-                subject().addSecondsPastMidnight(-1).toString()
+                subject().addServiceTime(-1).toString()
         );
     }
 

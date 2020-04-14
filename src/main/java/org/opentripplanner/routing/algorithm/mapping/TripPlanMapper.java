@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.mapping;
 
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;

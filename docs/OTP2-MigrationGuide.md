@@ -5,10 +5,14 @@
 These properties changed names from:
  - `htmlAnnotations` to `dataImportReport`
  - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`
+ - `boardTimes` to `routingDefaults.boardSlackByMode`
+ - `alightTimes` to `routingDefaults.alightSlackByMode`
  
  ## Command line
- TODO OTP2
- 
+ The command line parameters are changed. Use the `--help` option to get the current documentation,
+  and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
+  possibility to build the graph in 2 steps is new in OTP2.  
+   
  ## REST API
  
  A lot of the parameters in the REST API is ignored/deprecated look at the `RoutingRequest` class 
@@ -20,15 +24,19 @@ These properties changed names from:
  `metadata` returned by the rout call.
  
  ### RoutingRequest changes
- See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. Her is a short list of new filed:
+ See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. 
+ Her is a short list of new fields:
  
  - `searchWindow` Limit the departure window or arrival window for the routing search.
+ - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
+ - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
   
  ### Response changes
 
- - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
-    - `searchWindowUsed`
-    - `nextDateTime`
-    - `prevDateTime`
-
- 
+- `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
+  - `searchWindowUsed`
+  - `nextDateTime`
+  - `prevDateTime`
+   
+   
+   

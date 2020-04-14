@@ -1,7 +1,6 @@
-package org.opentripplanner.common.model;
+package org.opentripplanner.model;
 
 import org.locationtech.jts.geom.Coordinate;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 /**
