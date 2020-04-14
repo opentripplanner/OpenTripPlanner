@@ -1,9 +1,7 @@
-package org.opentripplanner.index.model;
+package org.opentripplanner.api.model;
 
 import com.beust.jcommander.internal.Lists;
-import org.opentripplanner.api.model.ApiPatternShort;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.util.Collection;
 
 public class ApiPatternDetail extends ApiPatternShort {

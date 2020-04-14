@@ -2,7 +2,7 @@ package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiRoute;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.index.model.ApiRouteShort;
+import org.opentripplanner.api.model.ApiRouteShort;
 import org.opentripplanner.model.Route;
 
 import java.util.Collection;

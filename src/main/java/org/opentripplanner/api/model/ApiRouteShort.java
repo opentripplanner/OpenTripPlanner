@@ -1,4 +1,4 @@
-package org.opentripplanner.index.model;
+package org.opentripplanner.api.model;
 
 public class ApiRouteShort {
     public String id;

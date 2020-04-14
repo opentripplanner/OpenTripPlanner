@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiStop;
-import org.opentripplanner.index.model.ApiStopShort;
+import org.opentripplanner.api.model.ApiStopShort;
 import org.opentripplanner.model.Stop;
 
 import java.util.Collection;

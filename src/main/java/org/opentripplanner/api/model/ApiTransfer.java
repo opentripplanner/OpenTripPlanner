@@ -1,4 +1,4 @@
-package org.opentripplanner.index.model;
+package org.opentripplanner.api.model;
 
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.model.SimpleTransfer;

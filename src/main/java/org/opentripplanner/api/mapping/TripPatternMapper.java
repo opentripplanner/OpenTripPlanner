@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiPatternShort;
-import org.opentripplanner.index.model.ApiPatternDetail;
+import org.opentripplanner.api.model.ApiPatternDetail;
 import org.opentripplanner.model.TripPattern;
 
 import java.util.Collection;

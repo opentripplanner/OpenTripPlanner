@@ -1,4 +1,4 @@
-package org.opentripplanner.index.model;
+package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.annotation.JsonInclude.Include;
