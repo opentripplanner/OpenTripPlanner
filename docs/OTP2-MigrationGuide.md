@@ -30,6 +30,9 @@ These properties changed names from:
  - `searchWindow` Limit the departure window or arrival window for the routing search.
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
+ - `modes` You now have to specify access/egress/direct/transit modes separately. This gives more
+ fine-grained control of the results. The REST api is unchanged, but is mapped into this structure.
+ The sandbox Transmodel API allows you to specify the structure directly.
   
  ### Response changes
 
