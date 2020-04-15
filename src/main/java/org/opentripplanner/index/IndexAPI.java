@@ -11,6 +11,7 @@ import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.api.mapping.RouteMapper;
 import org.opentripplanner.api.mapping.StopMapper;
 import org.opentripplanner.api.mapping.StopTimesInPatternMapper;
+import org.opentripplanner.api.mapping.TransferMapper;
 import org.opentripplanner.api.mapping.TripMapper;
 import org.opentripplanner.api.mapping.TripPatternMapper;
 import org.opentripplanner.api.model.ApiStop;
@@ -309,7 +310,7 @@ public class IndexAPI {
             // get the transfers for the stop
             Collection<SimpleTransfer> transfers = routingService.getTransfersByStop().get(stop);
             
-            Collection<ApiTransfer> out = Collections2.transform(transfers, ApiTransfer::new);
+            Collection<ApiTransfer> out = Collections2.transform(transfers, TransferMapper::mapToApi);
             
             return Response.status(Status.OK).entity(out).build();
         } else {
