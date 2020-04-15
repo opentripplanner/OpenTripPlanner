@@ -91,12 +91,21 @@ public class PathwayNodeMapperTest {
     assertNotNull(result.getId());
     assertNull(result.getCode());
     assertNull(result.getDescription());
-    assertEquals(0d, result.getLat(), 0.0001);
-    assertEquals(0d, result.getLon(), 0.0001);
     assertNull(result.getName());
     assertNull(result.getParentStation());
     assertNull(result.getCode());
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
+  }
+
+  @Test(expected = NullPointerException.class)
+  public void testThrowsNPEWhenCoordinateUnset() {
+    Stop input = new Stop();
+    input.setLocationType(Stop.LOCATION_TYPE_NODE);
+    input.setId(AGENCY_AND_ID);
+
+    org.opentripplanner.model.PathwayNode result = subject.map(input);
+
+    result.getLat();
   }
 
   /** Mapping the same object twice, should return the the same instance. */
