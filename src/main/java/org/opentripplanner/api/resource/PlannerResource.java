@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -31,10 +32,17 @@ import java.time.ZoneId;
  * In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
  * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
  */
-@Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
+@Path("routers/{ignoreRouterId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class PlannerResource extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
+
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     // We inject info about the incoming request so we can include the incoming query
     // parameters in the outgoing response. This is a TriMet requirement.
@@ -60,7 +68,7 @@ public class PlannerResource extends RoutingResource {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
-            router = otpServer.getRouter(null);
+            router = otpServer.getRouter();
             request.setRoutingContext(router.graph);
 
             // Route
@@ -84,10 +92,8 @@ public class PlannerResource extends RoutingResource {
             }
             response.setError(error);
         } finally {
-            if (request != null) {
-                if (request.rctx != null) {
-                    response.debugOutput = request.rctx.debugOutput;
-                }
+            if (request != null && request.rctx != null) {
+                response.debugOutput = request.rctx.debugOutput;
             }
         }
 

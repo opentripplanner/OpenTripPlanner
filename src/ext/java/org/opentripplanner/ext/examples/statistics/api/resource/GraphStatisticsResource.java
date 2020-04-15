@@ -8,11 +8,9 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
-import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -22,7 +20,7 @@ import java.util.Map;
 import static org.opentripplanner.util.HttpToGraphQLMapper.mapExecutionResultToHttpResponse;
 import static org.opentripplanner.util.HttpToGraphQLMapper.mapHttpQuerryParamsToQLParams;
 
-@Path("/routers/{routerId}/statistics")
+@Path("/routers/statistics")
 @Produces(MediaType.APPLICATION_JSON)
 public class GraphStatisticsResource {
 
@@ -30,8 +28,8 @@ public class GraphStatisticsResource {
     private GraphQL graphQL;
 
     @SuppressWarnings("unused")
-    public GraphStatisticsResource(@Context OTPServer server, @PathParam("routerId") String routerId) {
-        this(new RoutingService(server.getRouter(routerId).graph));
+    public GraphStatisticsResource(@Context OTPServer server) {
+        this(new RoutingService(server.getRouter().graph));
     }
 
     GraphStatisticsResource(RoutingService routingService) {

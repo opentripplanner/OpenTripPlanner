@@ -60,7 +60,7 @@ import java.util.stream.Collectors;
 
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/index")    // It would be nice to get rid of the final /index.
+@Path("/routers/{ignoreRouterId}/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class IndexAPI {
 
@@ -68,17 +68,25 @@ public class IndexAPI {
     private static final String MSG_404 = "FOUR ZERO FOUR";
     private static final String MSG_400 = "FOUR HUNDRED";
 
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
+
     /** Choose short or long form of results. */
     @QueryParam("detail") private boolean detail = false;
 
     /** Include GTFS entities referenced by ID in the result. */
     @QueryParam("refs") private boolean refs = false;
 
+
     private final Graph graph;
     private final StreetVertexIndex streetIndex;
 
-    public IndexAPI (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        Router router = otpServer.getRouter(routerId);
+    public IndexAPI (@Context OTPServer otpServer) {
+        Router router = otpServer.getRouter();
         graph = router.graph;
         streetIndex = router.graph.streetIndex;
     }

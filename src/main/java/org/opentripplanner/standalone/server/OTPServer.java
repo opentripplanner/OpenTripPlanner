@@ -37,8 +37,7 @@ public class OTPServer {
         DeferredAuthorityFactory.exit();
     }
 
-    public Router getRouter(String routerId) {
-        // TODO OTP2 eventually remove the routerId entirely. For now we just always return the same router.
+    public Router getRouter() {
         return router;
     }
 

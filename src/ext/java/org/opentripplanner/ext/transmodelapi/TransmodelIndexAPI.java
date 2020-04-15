@@ -29,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/transmodel/index")    // It would be nice to get rid of the final /index.
+@Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class TransmodelIndexAPI {
     @SuppressWarnings("unused")
@@ -39,8 +39,15 @@ public class TransmodelIndexAPI {
     private final TransmodelGraphIndex index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
-    public TransmodelIndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        this.router = otpServer.getRouter(routerId);
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
+
+    public TransmodelIndexAPI(@Context OTPServer otpServer) {
+        this.router = otpServer.getRouter();
         index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
     }
 

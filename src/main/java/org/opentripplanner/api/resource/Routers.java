@@ -37,9 +37,9 @@ public class Routers {
      * Return the "default" router information.
      */
     @GET
-    @Path("{routerId}")
+    @Path("{ignoreRouterId}")
     @Produces(MediaType.APPLICATION_JSON)
-    public ApiRouterInfo getGraphId(@PathParam("routerId") String routerId) {
+    public ApiRouterInfo getGraphId(@PathParam("ignoreRouterId") String ignore) {
         return getRouterInfo();
     }
 
@@ -59,7 +59,7 @@ public class Routers {
 
     private ApiRouterInfo getRouterInfo() {
         try {
-            Router router = otpServer.getRouter(null);
+            Router router = otpServer.getRouter();
             return new ApiRouterInfo("default", router.graph);
         }
         catch (GraphNotFoundException e) {

@@ -44,7 +44,7 @@ import java.io.ByteArrayOutputStream;
  * @author laurent
  * 
  */
-@Path("/routers/{routerId}/inspector")
+@Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource extends RoutingResource {
 
     @Context
@@ -59,8 +59,12 @@ public class GraphInspectorTileResource extends RoutingResource {
     @PathParam("z")
     int z;
 
-    @PathParam("routerId")
-    String routerId;
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     @PathParam("layer")
     String layer;
@@ -76,7 +80,7 @@ public class GraphInspectorTileResource extends RoutingResource {
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
         TileRequest tileRequest = new TileRequest(env, 256, 256);
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
@@ -98,7 +102,7 @@ public class GraphInspectorTileResource extends RoutingResource {
     @Produces(MediaType.APPLICATION_JSON)
     public InspectorLayersList getLayers() {
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
         return layersList;
     }

@@ -19,8 +19,14 @@ import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
 
-@Path("/routers/{routerId}/bike_rental")
+@Path("/routers/{ignoreRouterId}/bike_rental")
 public class BikeRental {
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     @Context
     OTPServer otpServer;
@@ -30,10 +36,9 @@ public class BikeRental {
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @PathParam("routerId") String routerId,
             @QueryParam("locale") String locale_param) {
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         if (router == null) return null;
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         Locale locale;
