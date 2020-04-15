@@ -9,33 +9,20 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
 
   protected FeedScopedId id;
 
-  /**
-   * Name of the station element if provided.
-   */
   private String name;
 
-  /**
-   * Public facing stop code (short text or number).
-   */
   private String code;
 
-  /**
-   * Additional information about the station element (if needed).
-   */
   private String description;
 
-  /** Center point/location for the station element. */
   protected WgsCoordinate coordinate;
 
   private WheelChairBoarding wheelchairBoarding;
 
-  /** Level name for elevator descriptions */
   private String levelName;
 
-  /** Level index for hop counts in elevators */
   private double levelIndex;
 
-  /** Parent station for the station element*/
   private Station parentStation;
 
   @Override public FeedScopedId getId() {
@@ -46,6 +33,9 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.id = id;
   }
 
+  /**
+   * Name of the station element if provided.
+   */
   public String getName() {
       return name;
   }
@@ -54,6 +44,9 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.name = name;
   }
 
+  /**
+   * Public facing stop code (short text or number).
+   */
   public String getCode() {
       return code;
   }
@@ -62,6 +55,9 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.code = code;
   }
 
+  /**
+   * Additional information about the station element (if needed).
+   */
   public String getDescription() {
       return description;
   }
@@ -70,6 +66,10 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.description = description;
   }
 
+  /**
+   * Center point/location for the station element. Returns the coordinate of the parent station,
+   * if the coordinate is not defined for this station element.
+   */
   public WgsCoordinate getCoordinate() {
     return coordinate != null ? coordinate : parentStation.getCoordinate();
   }
@@ -86,6 +86,9 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
     return getCoordinate().longitude();
   }
 
+  /**
+   * Returns whether this station element is accessible for wheelchair users.
+   * */
   public WheelChairBoarding getWheelchairBoarding() {
       return wheelchairBoarding;
   }
@@ -94,6 +97,7 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.wheelchairBoarding = wheelchairBoarding;
   }
 
+  /** Level name for elevator descriptions */
   public String getLevelName() {
       return levelName;
   }
@@ -102,6 +106,7 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
       this.levelName = levelName;
   }
 
+  /** Level index for hop counts in elevators */
   public double getLevelIndex() {
       return levelIndex;
   }
@@ -110,6 +115,7 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
     this.levelIndex = levelIndex;
   }
 
+  /** Parent station for the station element */
   public Station getParentStation() {
     return parentStation;
   }

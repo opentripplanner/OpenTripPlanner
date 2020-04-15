@@ -48,8 +48,8 @@ public class AddTransitModelEntitiesToGraph {
 
     private final OtpTransitService transitService;
 
-    // Map of all gtfs stops and their vertices in the graph
     private Map<TransitEntity<FeedScopedId>, Vertex> stopNodes = new HashMap<>();
+    // Map of all station elements and their vertices in the graph
 
     private final int subwayAccessTime;
 
@@ -119,7 +119,6 @@ public class AddTransitModelEntitiesToGraph {
             }
 
             // Add stops to internal index for Pathways to be created from this map
-            // TODO rename
             stopNodes.put(stop, stopVertex);
         }
     }
@@ -227,8 +226,8 @@ public class AddTransitModelEntitiesToGraph {
     }
 
     /**
-     * Create elevator edges from GTFS pathways. As GTFS elevators are not vertices, but edges in
-     * the GTFS pathway model, we have to model each possible movement as an onboard-offboard pair,
+     * Create elevator edges from pathways. As pathway based elevators are not vertices, but edges
+     * in the pathway model, we have to model each possible movement as an onboard-offboard pair,
      * instead of having only one set of vertices per level and edges between them.
      */
     private void createElevatorEdgesAndAddThemToGraph(

@@ -10,10 +10,17 @@ public final class BoardingArea extends StationElement {
 
   private Stop parentStop;
 
+  /**
+   * Center point/location for the boarding area. Returns the coordinate of the parent stop,
+   * if the coordinate is not defined for this boarding area.
+   */
   public WgsCoordinate getCoordinate() {
     return coordinate != null ? coordinate : parentStop.getCoordinate();
   }
 
+  /**
+   * Returns the parent stop whis boarding area belongs to.
+   */
   public Stop getParentStop() {
     return parentStop;
   }
