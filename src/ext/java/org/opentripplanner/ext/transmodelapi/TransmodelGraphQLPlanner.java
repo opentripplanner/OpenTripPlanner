@@ -241,10 +241,10 @@ public class TransmodelGraphQLPlanner {
         }
 
         if (hasArgument(environment, "modes")) {
-            AtomicReference<StreetMode> accessMode = new AtomicReference<>();
-            AtomicReference<StreetMode> egressMode = new AtomicReference<>();
-            AtomicReference<StreetMode> directMode = new AtomicReference<>();
-            AtomicReference<ArrayList<TransitMode>> transitModes = new AtomicReference<>();
+            ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
+            ElementWrapper<ArrayList<TransitMode>> transitModes = new ElementWrapper<>();
             callWith.argument("modes.accessMode", accessMode::set);
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
@@ -342,5 +342,20 @@ public class TransmodelGraphQLPlanner {
 
     public static <T> boolean hasArgument(Map<String, T> m, String name) {
         return m.containsKey(name) && m.get(name) != null;
+    }
+
+    /**
+     * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.
+     */
+    private static class ElementWrapper<T> {
+        private T element;
+
+        void set(T element) {
+            this.element = element;
+        }
+
+        T get() {
+            return this.element;
+        }
     }
 }
