@@ -47,7 +47,7 @@ public class PathwayEdge extends Edge {
         this.wheelchairAccessible = wheelchairAccessible;
         if (name != null) {
             this.name = name;
-        } else {
+        } else if (tov.getName() != null) {
             this.name = tov.getName();
         }
     }
