@@ -5,7 +5,6 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
@@ -15,7 +14,6 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Transfer;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -48,8 +46,8 @@ public class AddTransitModelEntitiesToGraph {
 
     private final OtpTransitService transitService;
 
-    private Map<TransitEntity<FeedScopedId>, Vertex> stopNodes = new HashMap<>();
     // Map of all station elements and their vertices in the graph
+    private Map<StationElement, Vertex> stationElementNodes = new HashMap<>();
 
     private final int subwayAccessTime;
 
@@ -119,7 +117,7 @@ public class AddTransitModelEntitiesToGraph {
             }
 
             // Add stops to internal index for Pathways to be created from this map
-            stopNodes.put(stop, stopVertex);
+            stationElementNodes.put(stop, stopVertex);
         }
     }
 
@@ -144,30 +142,30 @@ public class AddTransitModelEntitiesToGraph {
     private void addEntrancesToGraph(Graph graph) {
         for (Entrance entrance : transitService.getAllEntrances()) {
             TransitEntranceVertex entranceVertex = new TransitEntranceVertex(graph, entrance);
-            stopNodes.put(entrance, entranceVertex);
+            stationElementNodes.put(entrance, entranceVertex);
         }
     }
 
     private void addPathwayNodesToGraph(Graph graph) {
         for (PathwayNode node : transitService.getAllPathwayNodes()) {
             TransitPathwayNodeVertex nodeVertex = new TransitPathwayNodeVertex(graph, node);
-            stopNodes.put(node, nodeVertex);
+            stationElementNodes.put(node, nodeVertex);
         }
     }
 
     private void addBoardingAreasToGraph(Graph graph) {
         for (BoardingArea boardingArea : transitService.getAllBoardingAreas()) {
             TransitBoardingAreaVertex boardingAreaVertex = new TransitBoardingAreaVertex(graph, boardingArea);
-            stopNodes.put(boardingArea, boardingAreaVertex);
+            stationElementNodes.put(boardingArea, boardingAreaVertex);
             if (boardingArea.getParentStop() != null) {
                 new PathwayEdge(
                     boardingAreaVertex,
-                    stopNodes.get(boardingArea.getParentStop()),
+                    stationElementNodes.get(boardingArea.getParentStop()),
                     boardingArea.getName()
                 );
 
                 new PathwayEdge(
-                    stopNodes.get(boardingArea.getParentStop()),
+                    stationElementNodes.get(boardingArea.getParentStop()),
                     boardingAreaVertex,
                     boardingArea.getName()
                 );
@@ -177,8 +175,8 @@ public class AddTransitModelEntitiesToGraph {
 
     private void createPathwayEdgesAndAddThemToGraph(Graph graph) {
         for (Pathway pathway : transitService.getAllPathways()) {
-            Vertex fromVertex = stopNodes.get(pathway.getFromStop());
-            Vertex toVertex = stopNodes.get(pathway.getToStop());
+            Vertex fromVertex = stationElementNodes.get(pathway.getFromStop());
+            Vertex toVertex = stationElementNodes.get(pathway.getToStop());
 
             if (fromVertex != null && toVertex != null) {
                 // Elevator
