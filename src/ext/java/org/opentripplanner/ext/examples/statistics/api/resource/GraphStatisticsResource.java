@@ -29,7 +29,7 @@ public class GraphStatisticsResource {
 
     @SuppressWarnings("unused")
     public GraphStatisticsResource(@Context OTPServer server) {
-        this(new RoutingService(server.getRouter().graph));
+        this(server.createRoutingRequestService());
     }
 
     GraphStatisticsResource(RoutingService routingService) {
