@@ -3,6 +3,7 @@ package org.opentripplanner.api.model;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.ApiAlert;
+import org.opentripplanner.api.parameter.ApiRequestMode;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
@@ -73,7 +74,7 @@ public class ApiLeg {
      */
     @XmlAttribute
     @JsonSerialize
-    public String mode = "WALK";
+    public String mode = ApiRequestMode.WALK.toString();
 
     /**
      * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
