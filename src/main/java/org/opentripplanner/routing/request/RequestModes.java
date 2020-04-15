@@ -16,8 +16,8 @@ public class RequestModes {
       StreetMode directMode,
       Set<TransitMode> transitModes
   ) {
-    this.accessMode = accessMode.access ? accessMode : StreetMode.WALK;
-    this.egressMode = egressMode.egress ? egressMode : StreetMode.WALK;
+    this.accessMode = accessMode == null || accessMode.access ? accessMode : StreetMode.WALK;
+    this.egressMode = egressMode == null || egressMode.egress ? egressMode : StreetMode.WALK;
     this.directMode = directMode;
     this.transitModes = transitModes;
   }

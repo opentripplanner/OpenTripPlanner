@@ -139,6 +139,8 @@ public class RaptorPathToItineraryMapper {
     ) {
         AccessEgress accessPath = accessPaths.get(accessPathLeg.toStop());
 
+        if (accessPath.durationInSeconds() == 0) { return; }
+
         GraphPath graphPath = new GraphPath(accessPath.getLastState(), false);
 
         Itinerary subItinerary = GraphPathToItineraryMapper
@@ -253,6 +255,8 @@ public class RaptorPathToItineraryMapper {
             Map<Integer, AccessEgress> egressPaths
     ) {
         AccessEgress egressPath = egressPaths.get(egressPathLeg.fromStop());
+
+        if (egressPath.durationInSeconds() == 0) { return; }
 
         GraphPath graphPath = new GraphPath(egressPath.getLastState(), false);
 

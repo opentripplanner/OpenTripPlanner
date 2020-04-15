@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
@@ -123,16 +124,16 @@ public class EnumTypes {
 
     public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType.newEnum()
             .name("TransportMode")
-            .value("air", TraverseMode.AIRPLANE)
-            .value("bus", TraverseMode.BUS)
-            .value("cableway", TraverseMode.CABLE_CAR)
-            .value("water", TraverseMode.FERRY)
-            .value("funicular", TraverseMode.FUNICULAR)
-            .value("lift", TraverseMode.GONDOLA)
-            .value("rail", TraverseMode.RAIL)
-            .value("metro", TraverseMode.SUBWAY)
-            .value("tram", TraverseMode.TRAM)
-            .value("coach", TraverseMode.BUS).description("NOT IMPLEMENTED")
+            .value("air", TransitMode.AIRPLANE)
+            .value("bus", TransitMode.BUS)
+            .value("cableway", TransitMode.CABLE_CAR)
+            .value("water", TransitMode.FERRY)
+            .value("funicular", TransitMode.FUNICULAR)
+            .value("lift", TransitMode.GONDOLA)
+            .value("rail", TransitMode.RAIL)
+            .value("metro", TransitMode.SUBWAY)
+            .value("tram", TransitMode.TRAM)
+            .value("coach", TransitMode.BUS).description("NOT IMPLEMENTED")
             .value("unknown", "unknown")
             .build();
 

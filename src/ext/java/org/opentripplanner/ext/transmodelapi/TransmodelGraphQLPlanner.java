@@ -249,16 +249,18 @@ public class TransmodelGraphQLPlanner {
             callWith.argument("modes.egressMode", egressMode::set);
             callWith.argument("modes.directMode", directMode::set);
             callWith.argument("modes.transportMode", transitModes::set);
+
+            if (transitModes.get() == null) {
+                // Default to all transport modes if transport modes not specified
+                transitModes.set(new ArrayList<>(Arrays.asList(TransitMode.values())));
+            }
+
             request.modes = new RequestModes(
                 accessMode.get(),
                 egressMode.get(),
                 directMode.get(),
                 new HashSet<>(transitModes.get())
             );
-        }
-
-        if (request.modes.transitModes.isEmpty()) {
-            request.modes.transitModes = new HashSet<>(Arrays.asList(TransitMode.values()));
         }
 
         /*

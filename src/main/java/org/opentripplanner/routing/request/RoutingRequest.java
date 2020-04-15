@@ -994,40 +994,42 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
         RoutingRequest streetRequest = this.clone();
         streetRequest.streetSubRequestModes = new TraverseModeSet();
-        
-        switch (streetMode) {
-            case WALK:
-                streetRequest.streetSubRequestModes.setWalk(true);
-                break;
-            case BIKE:
-                streetRequest.streetSubRequestModes.setBicycle(true);
-                break;
-            case BIKE_TO_PARK:
-                streetRequest.streetSubRequestModes.setBicycle(true);
-                streetRequest.streetSubRequestModes.setWalk(true);
-                streetRequest.bikeParkAndRide = true;
-                break;
-            case BIKE_RENTAL:
-                streetRequest.streetSubRequestModes.setBicycle(true);
-                streetRequest.streetSubRequestModes.setWalk(true);
-                streetRequest.bikeRental = true;
-                break;
-            case CAR:
-                streetRequest.streetSubRequestModes.setCar(true);
-                break;
-            case CAR_TO_PARK:
-                streetRequest.streetSubRequestModes.setCar(true);
-                streetRequest.streetSubRequestModes.setWalk(true);
-                streetRequest.parkAndRide = true;
-                break;
-            case TAXI:
-                streetRequest.streetSubRequestModes.setCar(true);
-                streetRequest.streetSubRequestModes.setWalk(true);
-                streetRequest.kissAndRide = true;
-                break;
-            case CAR_RENTAL:
-                streetRequest.streetSubRequestModes.setCar(true);
-                streetRequest.streetSubRequestModes.setWalk(true);
+
+        if (streetMode != null) {
+            switch (streetMode) {
+                case WALK:
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    break;
+                case BIKE:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    break;
+                case BIKE_TO_PARK:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.bikeParkAndRide = true;
+                    break;
+                case BIKE_RENTAL:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.bikeRental = true;
+                    break;
+                case CAR:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    break;
+                case CAR_TO_PARK:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.parkAndRide = true;
+                    break;
+                case TAXI:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.kissAndRide = true;
+                    break;
+                case CAR_RENTAL:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+            }
         }
 
         streetRequest.resetRoutingContext();

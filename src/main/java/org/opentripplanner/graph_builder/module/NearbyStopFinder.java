@@ -173,7 +173,7 @@ public class NearbyStopFinder {
                         0,
                         Collections.emptyList(),
                         null,
-                        null
+                        new State(vertex, routingRequest)
                     ));
             }
         }

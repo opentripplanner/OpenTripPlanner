@@ -7,6 +7,7 @@ import org.opentripplanner.routing.request.RequestModes;
 import org.opentripplanner.routing.request.StreetMode;
 
 import java.io.Serializable;
+import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -42,6 +43,8 @@ public class QualifiedModeSet implements Serializable {
         // Set transit modes
         for (QualifiedMode qMode : qModes) {
              switch (qMode.mode) {
+                 case TRANSIT:
+                     requestModes.transitModes.addAll(Arrays.asList(TransitMode.values()));
                  case RAIL:
                      requestModes.transitModes.add(TransitMode.RAIL);
                      break;
