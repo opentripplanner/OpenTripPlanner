@@ -53,6 +53,12 @@ public interface OtpTransitService {
 
     Collection<Stop> getAllStops();
 
+    Collection<Entrance> getAllEntrances();
+
+    Collection<PathwayNode> getAllPathwayNodes();
+
+    Collection<BoardingArea> getAllBoardingAreas();
+
     /**
      * @return the list of {@link StopTime} objects associated with the trip,
      * sorted by {@link StopTime#getStopSequence()}

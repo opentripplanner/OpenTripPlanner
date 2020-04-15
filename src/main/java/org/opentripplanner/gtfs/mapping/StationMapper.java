@@ -28,6 +28,12 @@ class StationMapper {
     }
 
     private Station doMap(org.onebusaway.gtfs.model.Stop rhs) {
+        if (rhs.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION) {
+            throw new IllegalArgumentException(
+                "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STATION
+                    + ", but got " + rhs.getLocationType());
+        }
+
         Station otpStation = new Station();
 
         otpStation.setId(mapAgencyAndId(rhs.getId()));
