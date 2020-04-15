@@ -8,7 +8,6 @@ import org.opentripplanner.routing.request.StreetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashSet;
 
