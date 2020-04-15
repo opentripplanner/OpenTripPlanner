@@ -2,7 +2,6 @@ package org.opentripplanner.api.model;
 
 import org.opentripplanner.api.model.alertpatch.ApiAlert;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Calendar;
@@ -67,7 +66,10 @@ public class ApiLeg {
     /**
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.
      */
-    public String mode = TraverseMode.WALK.toString();
+    public String mode;
+
+     /** Whether this leg is a transit leg or not. */
+    public Boolean transitLeg;
 
     /**
      * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
@@ -189,18 +191,6 @@ public class ApiLeg {
     public String alightRule;
 
     public Boolean rentedBike;
-
-    /**
-     * Whether this leg is a transit leg or not.
-     * @return Boolean true if the leg is a transit leg
-     */
-    public Boolean isTransitLeg() {
-        if (mode == null) return null;
-        else if (mode.equals(TraverseMode.WALK.toString())) return false;
-        else if (mode.equals(TraverseMode.CAR.toString())) return false;
-        else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-        else return true;
-    }
 
     /**
      * The leg's duration in seconds

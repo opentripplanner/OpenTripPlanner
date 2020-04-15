@@ -1,6 +1,7 @@
 package org.opentripplanner.api.parameter;
 
 import com.google.common.collect.Sets;
+import org.opentripplanner.api.mapping.TraverseModeMapper;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -17,7 +18,7 @@ public class QualifiedMode implements Serializable {
     public QualifiedMode(String qMode) {
         try {
             String[] elements = qMode.split("_");
-            mode = TraverseMode.valueOf(elements[0].trim());
+            mode = TraverseModeMapper.mapToDomain(elements[0].trim());
             for (int i = 1; i < elements.length; i++) {
                 Qualifier q = Qualifier.valueOf(elements[i].trim());
                 qualifiers.add(q);

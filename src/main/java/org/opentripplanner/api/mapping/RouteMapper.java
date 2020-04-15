@@ -1,7 +1,6 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiRoute;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.api.model.ApiRouteShort;
 import org.opentripplanner.model.Route;
 
@@ -24,6 +23,7 @@ public class RouteMapper {
         api.agency = AgencyMapper.mapToApi(domain.getAgency());
         api.shortName = domain.getShortName();
         api.longName = domain.getLongName();
+        api.mode = TraverseModeMapper.mapToApi(domain.getMode());
         api.type = domain.getType();
         api.desc = domain.getDesc();
         api.url = domain.getUrl();
@@ -48,7 +48,7 @@ public class RouteMapper {
         api.id = FeedScopedIdMapper.mapToApi(domain.getId());
         api.shortName = domain.getShortName();
         api.longName = domain.getLongName();
-        api.mode = GtfsLibrary.getTraverseMode(domain).toString();
+        api.mode = TraverseModeMapper.mapToApi(domain.getMode());
         api.color = domain.getColor();
         api.agencyName = domain.getAgency().getName();
 

@@ -39,7 +39,7 @@ public class BikeRental {
             @QueryParam("locale") String locale_param) {
 
         Router router = otpServer.getRouter();
-        if (router == null) return null;
+
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);

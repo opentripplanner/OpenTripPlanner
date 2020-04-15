@@ -3,16 +3,15 @@ package org.opentripplanner.api.model;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
+import org.opentripplanner.api.mapping.TraverseModeMapper;
 import org.opentripplanner.common.geometry.GeometrySerializer;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.TravelOption;
 import org.opentripplanner.util.TravelOptionsMaker;
 import org.opentripplanner.util.WorldEnvelope;
 
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
 
@@ -29,7 +28,7 @@ public class ApiRouterInfo {
 
     public long transitServiceEnds;
 
-    public HashSet<TraverseMode> transitModes;
+    public List<String> transitModes;
 
     private WorldEnvelope envelope;
 
@@ -56,7 +55,7 @@ public class ApiRouterInfo {
         this.buildTime = graph.buildTime;
         this.transitServiceStarts = graph.getTransitServiceStarts();
         this.transitServiceEnds = graph.getTransitServiceEnds();
-        this.transitModes = graph.getTransitModes();
+        this.transitModes = TraverseModeMapper.mapToApi(graph.getTransitModes());
         this.envelope = graph.getEnvelope();
         this.hasParkRide = graph.hasParkRide;
         this.hasBikeSharing = mapHasBikeSharing(service);

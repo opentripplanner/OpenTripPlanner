@@ -21,7 +21,6 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -76,11 +75,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public int directionId = -1;
 
     /**
-     * The traverse mode for all trips in this pattern.
-     */
-    public final TraverseMode mode;
-
-    /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
@@ -121,6 +115,13 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     @Override
     public void setId(FeedScopedId id) { this.id = id; }
+
+    /**
+     * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
+     */
+    public final TraverseMode getMode() {
+        return route.getMode();
+    }
 
     public LineString getHopGeometry(int stopIndex) {
         if (hopGeometries != null) {
@@ -204,7 +205,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public TripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
-        this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
         setStopsFromStopPattern(stopPattern);
     }

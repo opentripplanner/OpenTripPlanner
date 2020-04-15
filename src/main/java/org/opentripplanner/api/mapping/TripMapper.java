@@ -15,7 +15,7 @@ public class TripMapper {
 
         ApiTrip api = new ApiTrip();
         api.id = FeedScopedIdMapper.mapToApi(obj.getId());
-        api.routeId = FeedScopedIdMapper.mapToApi(obj.getRoute());
+        api.routeId = FeedScopedIdMapper.mapIdToApi(obj.getRoute());
         api.serviceId = FeedScopedIdMapper.mapToApi(obj.getServiceId());
         api.tripShortName = obj.getTripShortName();
         api.tripHeadsign = obj.getTripHeadsign();

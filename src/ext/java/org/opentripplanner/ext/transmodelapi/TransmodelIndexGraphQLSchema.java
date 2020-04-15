@@ -37,7 +37,6 @@ import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory
 import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Notice;
@@ -2218,13 +2217,12 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> (((Route) environment.getSource()).getLongName()))
+                        .dataFetcher(environment -> ((Route) environment.getSource()).getLongName())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
                         .type(TRANSPORT_MODE)
-                        .dataFetcher(environment -> GtfsLibrary.getTraverseMode(
-                                environment.getSource()))
+                        .dataFetcher(environment -> ((Route)environment.getSource()).getMode())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
@@ -3123,8 +3121,7 @@ public class TransmodelIndexGraphQLSchema {
                                         .filter(TraverseMode::isTransit)
                                         .collect(Collectors.toSet());
                                 stream = stream
-                                        .filter(route ->
-                                                modes.contains(GtfsLibrary.getTraverseMode(route)));
+                                        .filter(route -> modes.contains(route.getMode()));
                             }
                             if ((environment.getArgument("authorities") instanceof Collection)) {
                                 Collection<String> authorityIds = environment.getArgument("authorities");

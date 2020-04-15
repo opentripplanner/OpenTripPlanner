@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -8,8 +7,8 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -203,7 +202,8 @@ public class SiriFuzzyTripMatcher {
                         mappedTripsCache.put(currentTripId, initialSet);
                     }
 
-                if (tripPattern != null && (tripPattern.mode.equals(TraverseMode.RAIL) /*||
+                if (tripPattern != null &&
+                        (tripPattern.getMode().equals(TraverseMode.RAIL) /*||
                                                     (trip.getTransportSubmode() != null &&
                                                             trip.getTransportSubmode().equals(TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS))*/)) {
                     // TODO - SIRI: Add support for submode
@@ -344,7 +344,7 @@ public class SiriFuzzyTripMatcher {
 
         List<FeedScopedId> matches = new ArrayList<>();
         for (Trip trip : cachedTripsBySiriId) {
-            if (GtfsLibrary.getTraverseMode(trip.getRoute()).equals(traverseMode)
+            if (trip.getRoute().getMode().equals(traverseMode)
                 /*|| trip.getTransportSubmode().equals(transportSubmode)*/) {
                 Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
 

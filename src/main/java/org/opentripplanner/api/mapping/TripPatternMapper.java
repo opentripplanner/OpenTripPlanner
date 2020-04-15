@@ -25,7 +25,7 @@ public class TripPatternMapper {
         if(domain == null) {
             return null;
         }
-        return mapBaseToApi(domain, ApiPatternShort::new);
+        return mapToApiShort(domain, ApiPatternShort::new);
     }
 
     public static ApiPatternDetail mapToApiDetailed(TripPattern domain) {
@@ -33,17 +33,17 @@ public class TripPatternMapper {
             return null;
         }
 
-        ApiPatternDetail api = mapBaseToApi(domain, ApiPatternDetail::new);
-        api.routeId = FeedScopedIdMapper.mapToApi(domain.route);
+        ApiPatternDetail api = mapToApiShort(domain, ApiPatternDetail::new);
         api.stops = StopMapper.mapToApiShort(domain.getStops());
         api.trips = TripMapper.mapToApiShort(domain.getTrips());
         return api;
     }
 
-    private static <T extends ApiPatternShort> T mapBaseToApi(TripPattern domain, Supplier<T> create) {
+    private static <T extends ApiPatternShort> T mapToApiShort(TripPattern domain, Supplier<T> create) {
         T api = create.get();
         api.id = FeedScopedIdMapper.mapToApi(domain.getId());
         api.desc = domain.name;
+        api.routeId = FeedScopedIdMapper.mapIdToApi(domain.route);
         return api;
     }
 }

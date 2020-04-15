@@ -33,7 +33,7 @@ public class StopMapper {
             api.zoneId = domain.getZone();
             api.url = domain.getUrl();
             api.locationType = 0;
-            api.stationId = FeedScopedIdMapper.mapToApi(domain.getParentStation());
+            api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
             api.parentStation = domain.getParentStation().getId().getId();
             //api.stopTimezone = stop.getTimezone();
             api.wheelchairBoarding = WheelchairBoardingMapper.mapToApi(
@@ -54,7 +54,7 @@ public class StopMapper {
         api.lat = domain.getLat();
         api.lon = domain.getLon();
         api.url = domain.getUrl();
-        api.stationId = FeedScopedIdMapper.mapToApi(domain.getParentStation());
+        api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
         // parentStation may be missing on the stop returning null.
         // TODO harmonize these names, maybe use "station" everywhere
         api.cluster = domain.getParentStation() == null

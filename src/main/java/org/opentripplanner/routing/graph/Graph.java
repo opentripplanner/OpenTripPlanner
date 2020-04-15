@@ -168,7 +168,7 @@ public class Graph implements Serializable {
     public Preferences preferences = null;
 
     /** List of transit modes that are availible in GTFS data used in this graph**/
-    private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
+    private HashSet<TraverseMode> transitModes = new HashSet<>();
 
     public boolean hasBikeSharing = false;
 

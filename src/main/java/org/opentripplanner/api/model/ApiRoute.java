@@ -1,7 +1,6 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.api.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 
@@ -12,6 +11,7 @@ public final class ApiRoute implements Serializable {
     public ApiAgency agency;
     public String shortName;
     public String longName;
+    public String mode;
     public int type;
     public String desc;
     public String url;

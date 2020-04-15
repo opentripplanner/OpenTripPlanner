@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 public final class Route extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
@@ -18,6 +20,8 @@ public final class Route extends TransitEntity<FeedScopedId> {
     private String longName;
 
     private int type;
+
+    private TraverseMode mode;
 
     private String desc;
 
@@ -100,6 +104,14 @@ public final class Route extends TransitEntity<FeedScopedId> {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public TraverseMode getMode() {
+        return mode;
+    }
+
+    public void setMode(TraverseMode mode) {
+        this.mode = mode;
     }
 
     public String getUrl() {
