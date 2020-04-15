@@ -26,16 +26,29 @@ class StopMapper {
     }
 
     private Stop doMap(org.onebusaway.gtfs.model.Stop gtfsStop) {
+        if (gtfsStop.getLocationType() != org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP) {
+            throw new IllegalArgumentException(
+                "Expected type " + org.onebusaway.gtfs.model.Stop.LOCATION_TYPE_STOP + ", but got "
+                    + gtfsStop.getLocationType());
+        }
+
         Stop otpStop = new Stop();
 
         otpStop.setId(mapAgencyAndId(gtfsStop.getId()));
         otpStop.setName(gtfsStop.getName());
-        otpStop.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+        if (gtfsStop.isLatSet() && gtfsStop.isLonSet()) {
+          otpStop.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
+        }
         otpStop.setCode(gtfsStop.getCode());
         otpStop.setDescription(gtfsStop.getDesc());
         otpStop.setZone(gtfsStop.getZoneId());
         otpStop.setUrl(gtfsStop.getUrl());
         otpStop.setWheelchairBoarding(WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding()));
+        var level = gtfsStop.getLevel();
+        if (level != null) {
+            otpStop.setLevelIndex(level.getIndex());
+            otpStop.setLevelName(level.getName());
+        }
 
         return otpStop;
     }

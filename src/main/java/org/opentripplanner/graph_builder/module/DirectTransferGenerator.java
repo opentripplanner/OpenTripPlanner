@@ -72,10 +72,6 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         // This could be multi-threaded, in which case we'd need to be careful about the lifecycle of NearbyStopFinder instances.
         for (TransitStopVertex ts0 : stops) {
-
-            /* Skip stops that are entrances to stations or whose entrances are coded separately */
-            if (!ts0.isStreetLinkable()) continue;
-
             LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
 
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */

@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -214,6 +215,11 @@ public abstract class Vertex implements Serializable, Cloneable {
      * @param locale wanted localization */
     public String getName(Locale locale) {
         return this.name.toString(locale);
+    }
+
+    /** Get the corresponding StationElement if this is a transit vertex */
+    public StationElement getStationElement() {
+        return null;
     }
 
     /* FIELD ACCESSOR METHODS : READ ONLY */

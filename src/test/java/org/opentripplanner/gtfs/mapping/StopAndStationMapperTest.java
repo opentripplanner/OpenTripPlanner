@@ -26,8 +26,6 @@ public class StopAndStationMapperTest {
 
     private static final double LON = 45.0d;
 
-    private static final int LOCATION_TYPE = 1;
-
     private static final String NAME = "Name";
 
     private static final String PARENT = "Parent";
@@ -55,7 +53,6 @@ public class StopAndStationMapperTest {
         STOP.setDirection(DIRECTION);
         STOP.setLat(LAT);
         STOP.setLon(LON);
-        STOP.setLocationType(LOCATION_TYPE);
         STOP.setName(NAME);
         STOP.setParentStation(PARENT);
         STOP.setPlatformCode(PLATFORM_CODE);
@@ -100,14 +97,22 @@ public class StopAndStationMapperTest {
         assertNotNull(result.getId());
         assertNull(result.getCode());
         assertNull(result.getDescription());
-        assertEquals(0d, result.getLat(), 0.0001);
-        assertEquals(0d, result.getLon(), 0.0001);
         assertNull(result.getName());
         assertNull(result.getParentStation());
         assertNull(result.getCode());
         assertNull(result.getUrl());
         assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
         assertNull(result.getZone());
+    }
+
+    @Test(expected = NullPointerException.class)
+    public void testThrowsNPEWhenCoordinateUnset() {
+        Stop input = new Stop();
+        input.setId(AGENCY_AND_ID);
+
+        org.opentripplanner.model.Stop result = subject.map(input);
+
+        result.getLat();
     }
 
     /** Mapping the same object twice, should return the the same instance. */
