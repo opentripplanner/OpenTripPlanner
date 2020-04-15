@@ -33,22 +33,22 @@ public class ReversePathMapperTest {
 
         // Then:
         PathLeg<?> leg = path.accessLeg();
-        assertEquals("Access 10:00 10:03 3m -> Stop 1", leg.toString());
+        assertEquals("Access 10:00-10:03(3m) -> Stop 1", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T1 10:05 10:35 30m -> Stop 2", leg.toString());
+        assertEquals("T1 10:05-10:35(30m) -> Stop 2", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("Walk 10:36 10:39 3m -> Stop 3", leg.toString());
+        assertEquals("Walk 10:36-10:39(3m) -> Stop 3", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T2 11:00 11:23 23m -> Stop 4", leg.toString());
+        assertEquals("T2 11:00-11:23(23m) -> Stop 4", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T3 11:40 11:52 12m -> Stop 5", leg.toString());
+        assertEquals("T3 11:40-11:52(12m) -> Stop 5", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("Egress 11:53 12:00 7m", leg.toString());
+        assertEquals("Egress 11:53-12:00(7m)", leg.toString());
 
         // Assert some of the most important information
         assertEquals(2, path.numberOfTransfers());

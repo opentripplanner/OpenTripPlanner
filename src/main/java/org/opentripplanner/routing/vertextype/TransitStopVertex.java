@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.routing.RoutingService;
@@ -26,8 +27,6 @@ public class TransitStopVertex extends Vertex {
 
     private boolean wheelchairEntrance;
 
-    private boolean isEntrance;
-
     private Stop stop;
 
     /**
@@ -47,7 +46,6 @@ public class TransitStopVertex extends Vertex {
         this.stop = stop;
         this.modes = modes != null ? modes : new TraverseModeSet();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;
-        isEntrance = false; // Entrance not supported in current otp model
         //Adds this vertex into graph envelope so that we don't need to loop over all vertices
         graph.expandToInclude(stop.getLon(), stop.getLat());
     }
@@ -56,11 +54,7 @@ public class TransitStopVertex extends Vertex {
         return wheelchairEntrance;
     }
 
-    public boolean isEntrance() {
-        return isEntrance;
-    }
-
-    public boolean hasEntrances() {
+    public boolean hasPathways() {
         for (Edge e : this.getOutgoing()) {
             if (e instanceof PathwayEdge) {
                 return true;
@@ -90,12 +84,13 @@ public class TransitStopVertex extends Vertex {
     public void addMode(TraverseMode mode) {
         modes.setMode(mode, true);
     }
-    
-    public boolean isStreetLinkable() {
-        return isEntrance() || !hasEntrances();
-    }
 
     public Stop getStop() {
             return this.stop;
+    }
+
+    @Override
+    public StationElement getStationElement() {
+        return this.stop;
     }
 }

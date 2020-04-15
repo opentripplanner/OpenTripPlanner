@@ -59,34 +59,40 @@ public final class NoWaitTransitWorker<T extends RaptorTripSchedule> implements 
         // attempt to alight if we're on board, done above the board search so that we don't check for alighting
         // when boarding
         if (onTripIndex != NOT_SET) {
-            state.transitToStop(
-                    stop,
-                    stopArrivalTime(onTrip, stopPositionInPattern),
-                    onTripBoardStop,
-                    onTripBoardTime,
-                    onTrip
-            );
+            if (pattern.alightingPossibleAt(stopPositionInPattern)) {
+                state.transitToStop(
+                        stop,
+                        stopArrivalTime(onTrip, stopPositionInPattern),
+                        onTripBoardStop,
+                        onTripBoardTime,
+                        onTrip
+                );
+            }
         }
 
         // Don't attempt to board if this stop was not reached in the last round.
         // Allow to reboard the same pattern - a pattern may loop and visit the same stop twice
         if (state.isStopReachedInPreviousRound(stop)) {
-            int earliestBoardTime = calculator.plusDuration(
-                    state.bestTimePreviousRound(stop),
-                    slackProvider.boardSlack()
-            );
+            if (pattern.boardingPossibleAt(stopPositionInPattern)) {
+                int earliestBoardTime = calculator.plusDuration(state.bestTimePreviousRound(stop),
+                        slackProvider.boardSlack()
+                );
 
-            // check if we can back up to an earlier trip due to this stop being reached earlier
-            boolean found = tripSearch.search(earliestBoardTime, stopPositionInPattern, onTripIndex);
+                // check if we can back up to an earlier trip due to this stop being reached earlier
+                boolean found = tripSearch.search(earliestBoardTime,
+                        stopPositionInPattern,
+                        onTripIndex
+                );
 
-            if (found) {
-                onTripIndex = tripSearch.getCandidateTripIndex();
-                onTrip = tripSearch.getCandidateTrip();
-                onTripBoardTime = earliestBoardTime;
-                onTripBoardStop = stop;
-                // Calculate the time-shift, the time-shift will be a positive duration in a
-                // forward-search, and a negative value in case of a reverse-search.
-                onTripTimeShift = tripSearch.getCandidateTripTime() - earliestBoardTime;
+                if (found) {
+                    onTripIndex = tripSearch.getCandidateTripIndex();
+                    onTrip = tripSearch.getCandidateTrip();
+                    onTripBoardTime = earliestBoardTime;
+                    onTripBoardStop = stop;
+                    // Calculate the time-shift, the time-shift will be a positive duration in a
+                    // forward-search, and a negative value in case of a reverse-search.
+                    onTripTimeShift = tripSearch.getCandidateTripTime() - earliestBoardTime;
+                }
             }
         }
     }

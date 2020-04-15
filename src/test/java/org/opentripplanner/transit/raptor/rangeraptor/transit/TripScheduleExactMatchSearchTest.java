@@ -20,8 +20,7 @@ public class TripScheduleExactMatchSearchTest {
     private static final boolean REVERSE = false;
     private static final TestRaptorTripSchedule TRIP_SCHEDULE = TestRaptorTripSchedule
             .create("T1")
-            .withArrivalTimes(TRIP_TIME)
-            .withDepartureDelay(0)
+            .withBoardAndAlightTimes(TRIP_TIME)
             .build();
     private static final RaptorTimeTable<TestRaptorTripSchedule> TIME_TABLE = new TestRoute(TRIP_SCHEDULE);
 

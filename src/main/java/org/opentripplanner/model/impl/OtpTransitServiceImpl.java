@@ -4,6 +4,8 @@ package org.opentripplanner.model.impl;
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.BoardingArea;
+import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -14,6 +16,7 @@ import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
+import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -25,16 +28,12 @@ import org.opentripplanner.model.TripPattern;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.AbstractMap;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-
-import static java.util.stream.Collectors.groupingBy;
 
 /**
  * A in-memory implementation of {@link OtpTransitService}. It's super fast for most
@@ -77,6 +76,12 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Map<FeedScopedId, Stop> stopsById;
 
+    private final Map<FeedScopedId, Entrance> entrancesById;
+
+    private final Map<FeedScopedId, PathwayNode> pathwayNodesById;
+
+    private final Map<FeedScopedId, BoardingArea> boardingAreasById;
+
     private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
     private final Collection<Transfer> transfers;
@@ -102,6 +107,9 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.shapePointsByShapeId = mapShapePoints(builder.getShapePoints());
         this.stationsById = builder.getStations().asImmutableMap();
         this.stopsById = builder.getStops().asImmutableMap();
+        this.entrancesById = builder.getEntrances().asImmutableMap();
+        this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
+        this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
@@ -185,6 +193,21 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<Stop> getAllStops() {
         return immutableList(stopsById.values());
+    }
+
+    @Override
+    public Collection<Entrance> getAllEntrances() {
+        return immutableList(entrancesById.values());
+    }
+
+    @Override
+    public Collection<PathwayNode> getAllPathwayNodes() {
+        return immutableList(pathwayNodesById.values());
+    }
+
+    @Override
+    public Collection<BoardingArea> getAllBoardingAreas() {
+        return immutableList(boardingAreasById.values());
     }
 
     @Override

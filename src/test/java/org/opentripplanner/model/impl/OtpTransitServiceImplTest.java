@@ -95,7 +95,7 @@ public class OtpTransitServiceImplTest {
     public void testGetAllPathways() {
         Collection<Pathway> pathways = subject.getAllPathways();
 
-        assertEquals(4, pathways.size());
+        assertEquals(3, pathways.size());
         assertEquals("<Pathway Z:pathways_1_1>", first(pathways).toString());
     }
 

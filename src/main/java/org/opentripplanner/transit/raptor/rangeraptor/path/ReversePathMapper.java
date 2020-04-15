@@ -12,8 +12,6 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.getTripTimes;
-
 
 /**
  * Build a path from a destination arrival - this maps between the domain of routing
@@ -75,13 +73,11 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         // Map stops and times into a forward search context
         int fromStop = fromStopArrival.stop();
         int toStop = toStopArrival.stop();
-        int departureTime = fromStopArrival.arrivalTime();
         int arrivalTime = toStopArrival.departureTime();
 
-        TripTimesSearch.Result r = getTripTimes(
+        TripTimesSearch.Result r = TripTimesSearch.searchBeforeLAT(
                 tripSchedule,
                 fromStop,
-                departureTime,
                 toStop,
                 arrivalTime
         );
