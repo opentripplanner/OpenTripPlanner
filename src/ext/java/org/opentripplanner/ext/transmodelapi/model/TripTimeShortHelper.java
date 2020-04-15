@@ -136,7 +136,7 @@ public class TripTimeShortHelper {
         boolean foundMatch = quayId.equals(candidate);
         if (!foundMatch) {
             //Check parentStops
-            Stop stop = routingService.getStopForId().get(quayId);
+            Stop stop = routingService.getStopForId(quayId);
             if (stop != null && stop.getParentStation() != null) {
                 Station parentStation = stop.getParentStation();
                 for (Stop childStop : parentStation.getChildStops()) {

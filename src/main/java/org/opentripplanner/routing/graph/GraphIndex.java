@@ -30,7 +30,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -40,7 +39,7 @@ public class GraphIndex {
   private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
 
   // TODO: consistently key on model object or id string
-  private final Map<String, Map<String, Agency>> agenciesForFeedId = Maps.newHashMap();
+  private final Multimap<String, Agency> agenciesForFeedId = ArrayListMultimap.create();
   private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
   private final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
   private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
@@ -50,7 +49,7 @@ public class GraphIndex {
   private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
   private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
   private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-  private final Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+  private final Multimap<Stop, TripPattern> patternsForStopId = ArrayListMultimap.create();
   private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
   private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
   private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
@@ -60,12 +59,7 @@ public class GraphIndex {
         CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
 
     for (String feedId : graph.getFeedIds()) {
-      for (Agency agency : graph.getAgencies(feedId)) {
-        Map<String, Agency> agencyForId = agenciesForFeedId.getOrDefault(feedId, new HashMap<>());
-        agencyForId.put(agency.getId(), agency);
-        this.agenciesForFeedId.put(feedId, agencyForId);
-      }
-      this.feedInfoForId.put(feedId, graph.getFeedInfo(feedId));
+      this.agenciesForFeedId.putAll(feedId, graph.getAgencies(feedId));
     }
 
     for (Operator operator : graph.getOperators()) {
@@ -94,7 +88,7 @@ public class GraphIndex {
         tripForId.put(trip.getId(), trip);
       }
       for (Stop stop: pattern.getStops()) {
-        patternsForStop.put(stop, pattern);
+        patternsForStopId.put(stop, pattern);
       }
     }
     for (Route route : patternsForRoute.asMap().keySet()) {
@@ -111,29 +105,67 @@ public class GraphIndex {
         LOG.info("GraphIndex init complete.");
     }
 
-  public Map<String, Map<String, Agency>> getAgenciesForFeedId() {
-    return agenciesForFeedId;
+  public Collection<Agency> getAgenciesForFeedId(String feedId) {
+    return agenciesForFeedId.get(feedId);
+  }
+
+  public Agency getAgency(String feedId, String agencyId) {
+    for (Agency agency : agenciesForFeedId.get(feedId)) {
+      if(agency.getId().equals(agencyId)) {
+        return agency;
+      }
+    }
+    return null;
+  }
+
+  /**
+   * Construct a set of all Agencies in this graph, spanning across all feed IDs. I am creating this
+   * method only to allow merging pull request #2032 which adds GraphQL. This should probably be
+   * done some other way, see javadoc on getAgencyWithoutFeedId.
+   */
+  public Collection<Agency> getAllAgencies() {
+    return agenciesForFeedId.values();
   }
 
   public Map<FeedScopedId, Operator> getOperatorForId() {
     return operatorForId;
   }
 
+  /**
+   * Get a list of all operators spanning across all feeds.
+   */
+  public Collection<Operator> getAllOperators() {
+    return getOperatorForId().values();
+  }
+
   public Map<String, FeedInfo> getFeedInfoForId() {
     return feedInfoForId;
   }
 
-  public Map<FeedScopedId, Stop> getStopForId() {
-    return stopForId;
+  public Stop getStopForId(FeedScopedId id) {
+    return stopForId.get(id);
+  }
+
+  public Collection<Stop> getAllStops() {
+    return stopForId.values();
   }
 
   public Map<FeedScopedId, Trip> getTripForId() {
     return tripForId;
   }
 
-  public Map<FeedScopedId, Route> getRouteForId() {
-    return routeForId;
+  public Route getRouteForId(FeedScopedId id) {
+    return routeForId.get(id);
   }
+
+  public Collection<Route> getAllRoutes() {
+    return routeForId.values();
+  }
+
+  public void addRoutes(Route route) {
+    routeForId.put(route.getId(), route);
+  }
+
 
   public Map<Stop, TransitStopVertex> getStopVertexForStop() {
     return stopVertexForStop;
@@ -151,8 +183,8 @@ public class GraphIndex {
     return patternsForRoute;
   }
 
-  public Multimap<Stop, TripPattern> getPatternsForStop() {
-    return patternsForStop;
+  public Collection<TripPattern> getPatternsForStop(Stop stop) {
+    return patternsForStopId.get(stop);
   }
 
   public Map<Station, MultiModalStation> getMultiModalStationForStations() {
@@ -170,7 +202,7 @@ public class GraphIndex {
   /** Dynamically generate the set of Routes passing though a Stop on demand. */
   public Set<Route> getRoutesForStop(Stop stop) {
     Set<Route> routes = Sets.newHashSet();
-    for (TripPattern p : getPatternsForStop().get(stop)) {
+    for (TripPattern p : getPatternsForStop(stop)) {
       routes.add(p.route);
     }
     return routes;
@@ -181,7 +213,7 @@ public class GraphIndex {
    * added by realtime updates are added to the collection.
    */
   public Collection<TripPattern> getPatternsForStop(Stop stop, TimetableSnapshot timetableSnapshot) {
-    List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop().get(stop));
+    List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop(stop));
 
     if (timetableSnapshot != null) {
       tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));
@@ -202,9 +234,9 @@ public class GraphIndex {
    */
   public Agency getAgencyWithoutFeedId(String agencyId) {
     // Iterate over the agency map for each feed.
-    for (Map<String, Agency> agencyForId : agenciesForFeedId.values()) {
-      Agency agency = agencyForId.get(agencyId);
-      if (agency != null) {
+
+    for (Agency agency : agenciesForFeedId.values()) {
+      if (agency != null && agency.getId().equals(agencyId)) {
         return agency;
       }
     }
@@ -246,25 +278,5 @@ public class GraphIndex {
           serviceCodesRunning
       );
     }
-  }
-
-  /**
-   * Construct a set of all Agencies in this graph, spanning across all feed IDs. I am creating this
-   * method only to allow merging pull request #2032 which adds GraphQL. This should probably be
-   * done some other way, see javadoc on getAgencyWithoutFeedId.
-   */
-  public Set<Agency> getAllAgencies() {
-    Set<Agency> allAgencies = new HashSet<>();
-    for (Map<String, Agency> agencyForId : getAgenciesForFeedId().values()) {
-      allAgencies.addAll(agencyForId.values());
-    }
-    return allAgencies;
-  }
-
-  /**
-   * Get a list of all operators spanning across all feeds.
-   */
-  public Collection<Operator> getAllOperators() {
-    return getOperatorForId().values();
   }
 }

@@ -91,7 +91,7 @@ public class SiriFuzzyTripMatcher {
     Trip findTripByDatedVehicleJourneyRef(EstimatedVehicleJourney journey) {
         String serviceJourneyId = resolveDatedVehicleJourneyRef(journey);
         if (serviceJourneyId != null) {
-            for (String feedId : routingService.getAgenciesForFeedId().keySet()) {
+            for (String feedId : routingService.getFeedIds()) {
                 Trip trip = routingService
                     .getTripForId().get(new FeedScopedId(feedId, serviceJourneyId));
                 if (trip != null) {
@@ -155,8 +155,8 @@ public class SiriFuzzyTripMatcher {
 
         if (trips == null || trips.isEmpty()) {
             //SIRI-data may report other platform, but still on the same Parent-stop
-            String agencyId = routingService.getAgenciesForFeedId().keySet().iterator().next();
-            Stop stop = routingService.getStopForId().get(new FeedScopedId(agencyId, lastStopPoint));
+            String agencyId = routingService.getFeedIds().iterator().next();
+            Stop stop = routingService.getStopForId(new FeedScopedId(agencyId, lastStopPoint));
             if (stop != null && stop.getParentStation() != null) {
                 // TODO OTP2 resolve stop-station split
                 Collection<Stop> allQuays = stop.getParentStation().getChildStops();
@@ -273,7 +273,7 @@ public class SiriFuzzyTripMatcher {
     }
 
     public Set<Route> getRoutesForStop(FeedScopedId siriStopId) {
-        Stop stop = routingService.getStopForId().get(siriStopId);
+        Stop stop = routingService.getStopForId(siriStopId);
         return routingService.getRoutesForStop(stop);
     }
 
@@ -287,9 +287,9 @@ public class SiriFuzzyTripMatcher {
 
         //First, assume same agency
 
-        Stop firstStop = routingService.getStopForId().values().stream().findFirst().get();
+        Stop firstStop = routingService.getAllStops().stream().findFirst().get();
         FeedScopedId id = new FeedScopedId(firstStop.getId().getFeedId(), siriStopId);
-        if (routingService.getStopForId().containsKey(id)) {
+        if (routingService.getStopForId(id) != null) {
             return id;
         }
         else if (routingService.getStationById(id) != null) {
@@ -297,7 +297,7 @@ public class SiriFuzzyTripMatcher {
         }
 
         //Not same agency - loop through all stops/Stations
-        Collection<Stop> stops = routingService.getStopForId().values();
+        Collection<Stop> stops = routingService.getAllStops();
         for (Stop stop : stops) {
             if (stop.getId().getId().equals(siriStopId)) {
                 return stop.getId();
@@ -324,7 +324,7 @@ public class SiriFuzzyTripMatcher {
             return trip.getId();
         }
         //Fallback to handle extrajourneys
-        for (String feedId : routingService.getAgenciesForFeedId().keySet()) {
+        for (String feedId : routingService.getFeedIds()) {
             trip = routingService.getTripForId().get(new FeedScopedId(feedId, vehicleJourney));
             if (trip != null) {
                 vehicleJourneyTripCache.put(vehicleJourney, trip);

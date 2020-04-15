@@ -100,7 +100,7 @@ public class NearbyStopFinder {
             TransitStopVertex ts1 = stopAtDistance.tstop;
             if (!ts1.isStreetLinkable()) continue;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.getPatternsForStop().get(ts1.getStop())) {
+            for (TripPattern pattern : graph.index.getPatternsForStop(ts1.getStop())) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);
             }
         }
