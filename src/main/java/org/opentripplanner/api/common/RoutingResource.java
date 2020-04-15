@@ -759,7 +759,7 @@ public abstract class RoutingResource {
             request.setOptimize(optimize);
 
         /* Temporary code to get bike/car parking and renting working. */
-        if (modes != null) {
+        if (modes != null && !modes.qModes.isEmpty()) {
             request.modes = modes.getRequestModes();
         }
 

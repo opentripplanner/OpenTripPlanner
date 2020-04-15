@@ -7,8 +7,6 @@ import org.opentripplanner.routing.request.RequestModes;
 import org.opentripplanner.routing.request.StreetMode;
 
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.Set;
 
@@ -38,10 +36,8 @@ public class QualifiedModeSet implements Serializable {
             StreetMode.WALK,
             StreetMode.WALK,
             StreetMode.WALK,
-            Collections.emptySet()
+            new HashSet<>()
         );
-
-        if (qModes.isEmpty()) return requestModes;
 
         // Set transit modes
         for (QualifiedMode qMode : qModes) {
@@ -66,6 +62,7 @@ public class QualifiedModeSet implements Serializable {
                      break;
                  case "CABLE_CAR":
                      requestModes.transitModes.add(TransitMode.CABLE_CAR);
+                     break;
                  case "GONDOLA":
                      requestModes.transitModes.add(TransitMode.GONDOLA);
                      break;
@@ -73,10 +70,6 @@ public class QualifiedModeSet implements Serializable {
                      requestModes.transitModes.add(TransitMode.FUNICULAR);
                      break;
              }
-        }
-
-        if (requestModes.transitModes.isEmpty()) {
-            requestModes.transitModes = new HashSet<>(Arrays.asList(TransitMode.values()));
         }
 
         //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
