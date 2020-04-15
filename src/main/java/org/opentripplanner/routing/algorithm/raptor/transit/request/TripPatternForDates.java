@@ -54,6 +54,16 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
         return tripPattern.stopIndex(stopPositionInPattern);
     }
 
+    @Override
+    public boolean boardingPossibleAt(int stopPositionInPattern) {
+        return tripPattern.getPattern().canBoard(stopPositionInPattern);
+    }
+
+    @Override
+    public boolean alightingPossibleAt(int stopPositionInPattern) {
+        return tripPattern.getPattern().canAlight(stopPositionInPattern);
+    }
+
     @Override public int numberOfStopsInPattern() {
         return tripPattern.getStopIndexes().length;
     }

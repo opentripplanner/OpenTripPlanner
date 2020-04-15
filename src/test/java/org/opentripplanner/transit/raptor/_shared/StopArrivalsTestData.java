@@ -83,21 +83,19 @@ public class StopArrivalsTestData {
 
     private static final TestRaptorTripSchedule TRIP_1 = TestRaptorTripSchedule
             .create("T1")
-            .withDepartureTimes(T1_START, T1_END)
-            .withDepartureDelay(0)
+            .withBoardAndAlightTimes(T1_START, T1_END)
             .withStopIndexes(STOP_1, STOP_2)
             .build();
     private static final TestRaptorTripSchedule TRIP_2 = TestRaptorTripSchedule
             .create("T2")
-            .withDepartureTimes(T2_START, T2_END)
-            .withDepartureDelay(0)
+            .withBoardAndAlightTimes(T2_START, T2_END)
             .withStopIndexes(STOP_3, STOP_4)
             .build();
     private static final TestRaptorTripSchedule TRIP_3 = TestRaptorTripSchedule
             .create("T3")
             // The early arrival and late departure should not have any effect on tests
-            .withArrivalTimes(VERY_EARLY, T3_END)
-            .withDepartureTimes(T3_START, VERY_LATE)
+            .withAlightTimes(VERY_EARLY, T3_END)
+            .withBoardTimes(T3_START, VERY_LATE)
             .withStopIndexes(STOP_4, STOP_5)
             .build();
 

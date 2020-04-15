@@ -54,15 +54,15 @@ public class TripScheduleAlightSearchTest {
     // Trips in service
     private TestRaptorTripSchedule tripA = TestRaptorTripSchedule
             .create("T-A")
-            .withArrivalTimes(TIME_A1, TIME_A2)
+            .withAlightTimes(TIME_A1, TIME_A2)
             .build();
     private TestRaptorTripSchedule tripB = TestRaptorTripSchedule
             .create("T-B")
-            .withArrivalTimes(TIME_B1, TIME_B2)
+            .withAlightTimes(TIME_B1, TIME_B2)
             .build();
     private TestRaptorTripSchedule tripC = TestRaptorTripSchedule
             .create("T-C")
-            .withArrivalTimes(TIME_C1, TIME_C2)
+            .withAlightTimes(TIME_C1, TIME_C2)
             .build();
 
     // Trip pattern with trip A and B.
@@ -154,7 +154,7 @@ public class TripScheduleAlightSearchTest {
 
         for (int i = 0; i < N; ++i, arrivalTime += dT) {
             tripSchedules.add(
-                    TestRaptorTripSchedule.create("T-" + i+1).withArrivalTimes(arrivalTime).build()
+                    TestRaptorTripSchedule.create("T-" + i+1).withAlightTimes(arrivalTime).build()
             );
         }
         useTripPattern(new TestRoute(tripSchedules));

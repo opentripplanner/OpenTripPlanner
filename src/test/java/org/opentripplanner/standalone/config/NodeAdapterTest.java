@@ -131,7 +131,7 @@ public class NodeAdapterTest {
 
         // Assert unknown parameter is logged at warning level and with full pathname
         Logger log = Mockito.mock(Logger.class);
-        subject.logUnusedParameters(log);
+        subject.logAllUnusedParameters(log);
         Mockito.verify(log)
                 .warn(
                         Mockito.anyString(),

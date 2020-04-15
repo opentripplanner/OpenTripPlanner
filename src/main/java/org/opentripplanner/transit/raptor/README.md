@@ -140,14 +140,17 @@ the _Wait_ parts you will get the exact same result.
 Some important notes to the diagram above:
 
 - The _Stop Arrival_ (or _Stop Arrival Time_) is the decisions points of the algorithm. This is 
-were a path is ACCEPTED, REJECTED or DROPPED, based on the existing _Stop Arrival State_. The `1` 
-and `1'` represent the same _stop arrival_ at **stop 1** for the same path, but at times are 
-different. 
-- The _Transfer_ is optional and only added to the path, if you need to walk from one stop to 
-another. If the transfer is removed from the diagram, _Stop Arrival 2_ and _Stop Arrival 3'_ then 
-represent the same stop arrival at the same stop. 
+were a path is ACCEPTED, REJECTED or DROPPED, based on the existing _Stop Arrival State_. The 
+`Stop Arrivaal 1` and `Stop Arrival 1'` represent the same _stop arrival_ at **stop 1** for the
+same path, but at times are different. A _Forward Raptor Search_ will _time-shift_ the trip to the
+left, while a _Reverse Raptor Search_ wil time-shift the trip to the right.
+- The _Transfer (walk)_ is calculated by Raptor only if you need to walk from one stop to another. 
+If a transfer between two routes take place in the same location/stop, then Raptor uses the 
+calculated transit arrival, instead of calculating a new transit arrival. In the diagram you can 
+remove the transit arrow and `Stop Arrival 3` and `2'`. The _Stop Arrival 2_ and _Stop Arrival 3'_ 
+then represent the same stop arrival at the same stop. 
 - There is no important timing point between the _transfer-slack_ and the _board-slack_, so the 
-order do not matter. In the algorithm the _transfer-slack_ is eliminated and it is left to the 
+order does not matter. In the algorithm the _transfer-slack_ is eliminated and it is left to the 
 internal Raptor `SlackProvider` to include the _transfer-slack_ in the _bord-slack_(forward search)
 or in the _alight_slack_(reverse-search).
 - It might look odd that the _board-slack_ comes before the _wait_ part, but this is just a small 
