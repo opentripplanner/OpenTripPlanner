@@ -1,24 +1,24 @@
 package org.opentripplanner.graph_builder.issues;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
-import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StationElement;
 
 public class ParentStationNotFound implements DataImportIssue {
 
-    public static final String FMT = "Parent station %s not found. Stop %s will not be linked to a "
-            + "parent station.";
+    public static final String FMT = "Parent station %s not found. Station element %s will not be "
+        + "linked to a parent station.";
 
     final String parentStop;
 
-    final Stop stop;
+    final StationElement stationElement;
 
-    public ParentStationNotFound(Stop stop, String parentStop){
-    	this.stop = stop;
+    public ParentStationNotFound(StationElement stationElement, String parentStop){
+    	this.stationElement = stationElement;
     	this.parentStop = parentStop;
     }
-    
+
     @Override
     public String getMessage() {
-        return String.format(FMT, parentStop, stop);
+        return String.format(FMT, parentStop, stationElement);
     }
 }
