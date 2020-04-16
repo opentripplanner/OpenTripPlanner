@@ -89,7 +89,7 @@ public class RoutingWorker {
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
-        if (!request.streetSubRequestModes.isTransit()) { return Collections.emptyList(); }
+        if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
 
         long startTime = System.currentTimeMillis();
 
