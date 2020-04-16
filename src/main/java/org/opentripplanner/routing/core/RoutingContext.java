@@ -5,7 +5,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -23,7 +22,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashSet;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -173,7 +171,7 @@ public class RoutingContext implements Cloneable {
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
 
         if (graph.index != null) {
-            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getRouteForId().values());
+            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getAllRoutes());
         } else {
             this.bannedRoutes = Collections.emptySet();
         }

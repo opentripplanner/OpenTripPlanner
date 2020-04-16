@@ -7,7 +7,6 @@ import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Set;
 
-@XmlType(name="TraverseMode")  
 public enum TraverseMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,

@@ -3,6 +3,7 @@ package org.opentripplanner.standalone.server;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -37,9 +38,18 @@ public class OTPServer {
         DeferredAuthorityFactory.exit();
     }
 
-    public Router getRouter(String routerId) {
-        // TODO OTP2 eventually remove the routerId entirely. For now we just always return the same router.
+    public Router getRouter() {
         return router;
+    }
+
+    /**
+     * This method is used to create a {@link RoutingService} valid for one request. It grantees
+     * that the data and services used are consistent and operate on the same transit snapshot.
+     * Any realtime update that happens during the request will not affect the returned service and
+     * will not be visible to the request.
+     */
+    public RoutingService createRoutingRequestService() {
+        return new RoutingService(router.graph);
     }
 
     /**

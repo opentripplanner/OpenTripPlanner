@@ -2,6 +2,7 @@ package org.opentripplanner.model.calendar;
 
 import org.junit.Test;
 
+import java.text.ParseException;
 import java.time.LocalDate;
 
 import static org.junit.Assert.*;
@@ -104,4 +105,76 @@ public class ServiceDateTest {
         }
     }
 
+    @Test
+    public void parse() throws ParseException {
+        ServiceDate subject;
+
+        subject = ServiceDate.parseString("20201231");
+        assertEquals(2020, subject.getYear());
+        assertEquals(12, subject.getMonth());
+        assertEquals(31, subject.getDay());
+
+        subject = ServiceDate.parseString("2020-03-12");
+        assertEquals(2020, subject.getYear());
+        assertEquals(3, subject.getMonth());
+        assertEquals(12, subject.getDay());
+
+        try {
+            // Even though this is a valid date, we only support parsing of dates with
+            // 4 digits in the year
+            ServiceDate.parseString("0-03-12");
+            fail("Expected ParseException");
+        }
+        catch (ParseException e) {
+            assertEquals("error parsing date: 0-03-12", e.getMessage());
+        }
+    }
+
+    @Test
+    public void minMax() throws ParseException {
+        ServiceDate d1 = ServiceDate.parseString("2020-12-30");
+        ServiceDate d2 = ServiceDate.parseString("2020-12-31");
+
+
+        assertSame(d1, d1.min(d2));
+        assertSame(d1, d2.min(d1));
+        assertSame(d2, d1.max(d2));
+        assertSame(d2, d2.max(d1));
+
+        // Test isMinMax
+        assertFalse(d1.isMinMax());
+        assertTrue(ServiceDate.MIN_DATE.isMinMax());
+        assertTrue(ServiceDate.MAX_DATE.isMinMax());
+    }
+
+    @Test
+    public void shift() {
+        ServiceDate subject = new ServiceDate(2020, 3, 12);
+        assertEquals("2020-03-11", subject.previous().asISO8601());
+        assertEquals("2020-03-13", subject.next().asISO8601());
+        assertEquals("2020-02-29", subject.shift(-12).asISO8601());
+        assertEquals("2020-04-01", subject.shift(20).asISO8601());
+        assertEquals("2021-03-12", subject.shift(365).asISO8601());
+    }
+
+    @Test
+    public void asCompactString() {
+        assertEquals("99991231", ServiceDate.MAX_DATE.asCompactString());
+        assertEquals("00000101", ServiceDate.MIN_DATE.asCompactString());
+        assertEquals("20200312", new ServiceDate(2020, 3, 12).asCompactString());
+    }
+
+    @Test
+    public void asISO8601() {
+        assertEquals("9999-12-31", ServiceDate.MAX_DATE.asISO8601());
+        assertEquals("0-01-01", ServiceDate.MIN_DATE.asISO8601());
+        assertEquals("2020-03-12", new ServiceDate(2020, 3, 12).asISO8601());
+    }
+
+    @Test
+    public void testToString() {
+        assertEquals("MAX", ServiceDate.MAX_DATE.toString());
+        assertEquals("MIN", ServiceDate.MIN_DATE.toString());
+        assertEquals("2020-03-12", new ServiceDate(2020, 3, 12).asISO8601());
+    }
 }

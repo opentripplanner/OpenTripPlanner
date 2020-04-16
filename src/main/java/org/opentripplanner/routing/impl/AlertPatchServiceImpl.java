@@ -52,13 +52,13 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     }
 
     @Override
-    public Collection<AlertPatch> getStopPatches(FeedScopedId stop) {
-        Set<AlertPatch> result = patchesByStop.get(stop);
+    public Collection<AlertPatch> getStopPatches(FeedScopedId stopId) {
+        Set<AlertPatch> result = patchesByStop.get(stopId);
         if (result == null || result.isEmpty()) {
             result = new HashSet<>();
             // Search for alerts on parent-stop
             if (graph != null && graph.index != null) {
-                Stop quay = graph.index.getStopForId().get(stop);
+                Stop quay = graph.index.getStopForId(stopId);
                 if (quay != null) {
                     
                     // TODO - SIRI: Add alerts from parent- and multimodal-stops

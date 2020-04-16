@@ -51,9 +51,8 @@ public class LegMapper {
         api.headway = domain.headway;
         api.distance = domain.distanceMeters;
         api.pathway = domain.pathway;
-
-        // TODO OTP2 - This is fragile - what happen if we rename the domain modes?
-        api.mode = domain.mode.name();
+        api.mode = TraverseModeMapper.mapToApi(domain.mode);
+        api.transitLeg = domain.mode == null ? null : domain.mode.isTransit();
         api.route = domain.route;
         api.agencyName = domain.agencyName;
         api.agencyUrl = domain.agencyUrl;
@@ -73,13 +72,14 @@ public class LegMapper {
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;
-        api.walkSteps = walkStepMapper.mapWalkSteps(domain.walkSteps);
-        api.alerts = alertMapper.mapAlerts(domain.alerts);
+        api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
+        api.alerts = alertMapper.mapToApi(domain.alerts);
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
         api.rentedBike = domain.rentedBike;
+
         return api;
     }
 

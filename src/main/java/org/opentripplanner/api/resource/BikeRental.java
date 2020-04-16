@@ -1,11 +1,12 @@
 package org.opentripplanner.api.resource;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
+import org.locationtech.jts.geom.Envelope;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.ResourceBundleSingleton;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Locale;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
@@ -13,33 +14,32 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlRootElement;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Locale;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
-
-import org.locationtech.jts.geom.Envelope;
-import org.opentripplanner.util.ResourceBundleSingleton;
-
-@Path("/routers/{routerId}/bike_rental")
-@XmlRootElement
+@Path("/routers/{ignoreRouterId}/bike_rental")
 public class BikeRental {
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     @Context
     OTPServer otpServer;
 
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces(MediaType.APPLICATION_JSON)
     public BikeRentalStationList getBikeRentalStations(
             @QueryParam("lowerLeft") String lowerLeft,
             @QueryParam("upperRight") String upperRight,
-            @PathParam("routerId") String routerId,
             @QueryParam("locale") String locale_param) {
 
-        Router router = otpServer.getRouter(routerId);
-        if (router == null) return null;
+        Router router = otpServer.getRouter();
+
         BikeRentalStationService bikeRentalService = router.graph.getService(BikeRentalStationService.class);
         Locale locale;
         locale = ResourceBundleSingleton.INSTANCE.getLocale(locale_param);

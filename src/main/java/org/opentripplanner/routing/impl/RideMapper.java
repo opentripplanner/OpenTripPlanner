@@ -61,7 +61,7 @@ public class RideMapper {
         ride.startTime = transitPathLeg.fromTime();
         ride.endTime  = transitPathLeg.toTime();
         // In the default fare service, we classify rides by mode.
-        ride.classifier = tripPattern.mode;
+        ride.classifier = tripPattern.getMode();
         return ride;
     }
 

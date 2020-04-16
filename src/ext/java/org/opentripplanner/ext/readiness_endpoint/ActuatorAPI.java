@@ -21,7 +21,7 @@ public class ActuatorAPI {
     private final Router router;
 
     public ActuatorAPI(@Context OTPServer otpServer) {
-        this.router = otpServer.getRouter(null);
+        this.router = otpServer.getRouter();
     }
 
     /**

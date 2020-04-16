@@ -17,7 +17,6 @@ import com.google.common.collect.Lists;
  * finishedCalculating and finishedRendering are all called in PlanGenerator.generate().
  * finishedPrecalculating and foundPaths are called in the SPTService implementations.
  */
-@XmlRootElement
 public class DebugOutput {
 
     private static final Logger LOG = LoggerFactory.getLogger(DebugOutput.class);

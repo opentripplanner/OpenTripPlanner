@@ -1,6 +1,7 @@
 # Changelog
 
 ## 2.0 (in progress)
+See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 - Sandbox for experimental features (#2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
@@ -29,6 +30,7 @@
 - Copy geometries from previous TripPattern when realtime updates result in a TripPattern being replaced (#2987)
 - Support for the Norwegian language.
 - Update pathways support to official GTFS specification (#2923)
+- Support for XML (de-)serialization is REMOVED from the REST API (#3031)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

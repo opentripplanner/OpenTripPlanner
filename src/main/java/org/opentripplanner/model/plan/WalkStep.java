@@ -5,7 +5,6 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Collection;
@@ -97,14 +96,6 @@ public class WalkStep {
     public final Set<Alert> alerts = new HashSet<>();
 
     public double angle;
-
-    /**
-     * The walkStep's mode; only populated if this is the first step of that mode in the leg.
-     * Used only in generating the streetEdges array in StreetSegment; not serialized.
-     *
-     * TODO OTP2 - This is not used ?
-     */
-    public TraverseMode newMode;
 
     /**
      * The street edges that make up this walkStep.

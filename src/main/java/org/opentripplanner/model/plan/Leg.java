@@ -149,6 +149,8 @@ public class Leg {
     * For transit legs, the service date of the trip.
     * For non-transit legs, null.
     */
+   // TODO OTP2 - This should not be a String? What is this used for? Is it the actual date or the
+   //           - Service date?
    public String serviceDate = null;
 
     /**

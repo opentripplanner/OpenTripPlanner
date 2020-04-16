@@ -229,18 +229,6 @@ public class OtpTransitServiceBuilder {
     }
 
     /**
-     * For entities with mutable ids the internal map becomes invalid after the ids are changed.
-     * Calling this method fixes this problem by reindexing the maps.
-     */
-    public void regenerateIndexes() {
-        this.agenciesById.reindex();
-        this.tripsById.reindex();
-        this.stopsById.reindex();
-        this.routesById.reindex();
-        this.stopTimesByTrip.reindex();
-    }
-
-    /**
      * Limit the transit service to a time period removing calendar dates and services
      * outside the period. If a service is start before and/or ends after the period
      * then the service is modified to match the period.

@@ -10,6 +10,7 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class ServiceCalendarDateMapperTest {
@@ -33,24 +34,24 @@ public class ServiceCalendarDateMapperTest {
     private ServiceCalendarDateMapper subject = new ServiceCalendarDateMapper();
 
     @Test
-    public void testMapCollection() throws Exception {
+    public void testMapCollection() {
         assertNull(null, subject.map((Collection<ServiceCalendarDate>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(SERVICE_DATE)).size());
     }
 
     @Test
-    public void testMap() throws Exception {
+    public void testMap() {
         org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(SERVICE_DATE);
 
-        assertEquals(DATE.getAsString(), result.getDate().getAsString());
+        assertEquals(DATE.getAsString(), result.getDate().asCompactString());
         assertEquals(EXCEPTION_TYPE, result.getExceptionType());
         assertEquals("A:1", result.getServiceId().toString());
 
     }
 
     @Test
-    public void testMapWithNulls() throws Exception {
+    public void testMapWithNulls() {
         ServiceCalendarDate input = new ServiceCalendarDate();
         org.opentripplanner.model.calendar.ServiceCalendarDate result = subject.map(input);
 
@@ -61,10 +62,10 @@ public class ServiceCalendarDateMapperTest {
 
     /** Mapping the same object twice, should return the the same instance. */
     @Test
-    public void testMapCache() throws Exception {
+    public void testMapCache() {
         org.opentripplanner.model.calendar.ServiceCalendarDate result1 = subject.map(SERVICE_DATE);
         org.opentripplanner.model.calendar.ServiceCalendarDate result2 = subject.map(SERVICE_DATE);
 
-        assertTrue(result1 == result2);
+        assertSame(result1, result2);
     }
 }

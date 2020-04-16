@@ -480,11 +480,11 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         Route replacedRoute = null;
         if (externalLineRef != null) {
-            replacedRoute = graph.index.getRouteForId().get(new FeedScopedId(feedId, externalLineRef));
+            replacedRoute = graph.index.getRouteForId(new FeedScopedId(feedId, externalLineRef));
         }
 
         FeedScopedId routeId = new FeedScopedId(feedId, lineRef);
-        Route route = graph.index.getRouteForId().get(routeId);
+        Route route = graph.index.getRouteForId(routeId);
 
         if (route == null) { // Route is unknown - create new
             route = new Route();
@@ -494,7 +494,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
             // TODO - SIRI: Is there a better way to find authority/Agency?
             // Finding first Route with same Operator, and using same Authority
-            Agency agency = graph.index.getRouteForId().values().stream()
+            Agency agency = graph.index.getAllRoutes().stream()
 //                    .filter(route1 -> route1 != null &&
 //                            route1.getOperator() != null &&
 //                            route1.getOperator().equals(operator))
@@ -505,7 +505,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 route.setShortName("" + estimatedVehicleJourney.getPublishedLineNames().get(0).getValue());
             }
             LOG.info("Adding route {} to graph.", routeId);
-            graph.index.getRouteForId().put(routeId, route);
+            graph.index.addRoutes(route);
         }
 
         Trip trip = new Trip();
@@ -1023,16 +1023,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                 boolean lastStopIsMatch = lastStop.getId().getId().equals(siriDestinationRef);
 
                 if (!firstStopIsMatch && firstStop.getParentStation() != null) {
-                    Stop otherFirstStop = routingService
-                        .getStopForId()
-                        .get(new FeedScopedId(firstStop.getId().getFeedId(), siriOriginRef));
+                    Stop otherFirstStop = routingService.getStopForId(
+                            new FeedScopedId(firstStop.getId().getFeedId(), siriOriginRef)
+                    );
                     firstStopIsMatch = (otherFirstStop != null && otherFirstStop.getParentStation() != null && otherFirstStop.getParentStation().equals(firstStop.getParentStation()));
                 }
 
                 if (!lastStopIsMatch && lastStop.getParentStation() != null) {
                     Stop otherLastStop = routingService
-                        .getStopForId()
-                        .get(new FeedScopedId(lastStop.getId().getFeedId(), siriDestinationRef));
+                        .getStopForId(
+                                new FeedScopedId(lastStop.getId().getFeedId(), siriDestinationRef)
+                        );
                     lastStopIsMatch = (otherLastStop != null && otherLastStop.getParentStation() != null && otherLastStop.getParentStation().equals(lastStop.getParentStation()));
                 }
 
@@ -1114,15 +1115,17 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
                 if (!firstStopIsMatch && firstStop.getParentStation() != null) {
                     Stop otherFirstStop = routingService
-                        .getStopForId()
-                        .get(new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId));
+                        .getStopForId(
+                                new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId)
+                        );
                     firstStopIsMatch = (otherFirstStop != null && otherFirstStop.getParentStation() != null && otherFirstStop.getParentStation().equals(firstStop.getParentStation()));
                 }
 
                 if (!lastStopIsMatch && lastStop.getParentStation() != null) {
                     Stop otherLastStop = routingService
-                        .getStopForId()
-                        .get(new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId));
+                        .getStopForId(
+                                new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId)
+                        );
                     lastStopIsMatch = (otherLastStop != null && otherLastStop.getParentStation() != null && otherLastStop.getParentStation().equals(lastStop.getParentStation()));
                 }
 
@@ -1243,8 +1246,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                         String agencyId = stop.getId().getFeedId();
                         if (stop.getParentStation() != null) {
                             Stop alternativeStop = routingService
-                                .getStopForId()
-                                .get(new FeedScopedId(agencyId, firstStopId));
+                                .getStopForId(new FeedScopedId(agencyId, firstStopId));
                             if (alternativeStop != null &&
                                     stop.getParentStation().equals(alternativeStop.getParentStation())) {
                                 firstReportedStopIsFound = true;
@@ -1271,8 +1273,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
     }
 
-
-
     /**
      * Retrieve route given a route id without an agency
      *
@@ -1281,8 +1281,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = routingService.getRouteForId().get(new FeedScopedId(feedId, routeId));
-        return route;
+        return routingService.getRouteForId(new FeedScopedId(feedId, routeId));
     }
 
     /**
@@ -1305,8 +1304,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = routingService.getStopForId().get(new FeedScopedId(feedId, stopId));
-        return stop;
+        return routingService.getStopForId(new FeedScopedId(feedId, stopId));
     }
-
 }
