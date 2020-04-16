@@ -1,12 +1,14 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 public final class Stop extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
-
+    @JsonIgnore
     private FeedScopedId id;
 
     private String name;
@@ -15,26 +17,37 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     private double lon;
 
+    @JsonIgnore
     private String code;
 
+    @JsonIgnore
     private String desc;
 
+    @JsonIgnore
     private String zoneId;
 
+    @JsonIgnore
     private String url;
 
+    @JsonIgnore
     private int locationType = 0;
 
+    @JsonIgnore
     private String parentStation;
 
+    @JsonIgnore
     private int wheelchairBoarding = 0;
 
+    @JsonIgnore
     private String direction;
 
+    @JsonIgnore
     private String timezone;
 
+    @JsonIgnore
     private int vehicleType = MISSING_VALUE;
 
+    @JsonIgnore
     private String platformCode;
 
     public Stop() {
@@ -168,6 +181,7 @@ public final class Stop extends IdentityBean<FeedScopedId> {
         this.timezone = timezone;
     }
 
+    @JsonIgnore
     public boolean isVehicleTypeSet() {
         return vehicleType != MISSING_VALUE;
     }

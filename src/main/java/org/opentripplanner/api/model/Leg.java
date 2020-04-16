@@ -8,6 +8,7 @@ import java.util.TimeZone;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
@@ -75,6 +76,13 @@ public class Leg {
      */
     @JsonSerialize
     public String mode = TraverseMode.WALK.toString();
+
+     /**
+      * List of all intermediate stops used when traversing this leg.
+      */
+     @JsonSerialize
+     public List<Stop> intermediateTransitStops = null;
+
 
     /**
      * For transit legs, the route of the bus or train being used. For non-transit legs, the name of

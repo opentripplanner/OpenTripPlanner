@@ -33,6 +33,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * A library class with only static methods used in converting internal GraphPaths to TripPlans, which are
@@ -383,6 +384,16 @@ public abstract class GraphPathToTripPlanConverter {
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
+
+            List<PatternHop> stopEdges = Arrays.stream(legsStates[i]).map(State::getBackEdge).filter(e -> e instanceof PatternHop).map(e -> (PatternHop) e).collect(Collectors.toList());
+
+            //There are some transit stops
+            if (!stopEdges.isEmpty()) {
+                List<Stop> intermediateStops = stopEdges.stream().map(PatternHop::getBeginStop).collect(Collectors.toList());
+                intermediateStops.add(stopEdges.get(stopEdges.size() - 1).getEndStop());
+                legs.get(i).intermediateTransitStops = intermediateStops;
+            }
+
             String legMode = legs.get(i).mode;
             if (legMode != lastMode && !walkSteps.isEmpty()) {
                 walkSteps.get(0).newMode = legMode;
