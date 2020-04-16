@@ -1,7 +1,7 @@
 package org.opentripplanner.openstreetmap;
 
-import crosby.binary.BinaryParser;
-import crosby.binary.Osmformat;
+import org.openstreetmap.osmosis.osmbinary.BinaryParser;
+import org.openstreetmap.osmosis.osmbinary.Osmformat;
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMNodeRef;
