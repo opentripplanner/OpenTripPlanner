@@ -5,19 +5,27 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = -2404871423254094109L;
 
-    private static final int MISSING_VALUE = -999;
-
     private FeedScopedId id;
 
-    private int pathwayType;
+    private int pathwayMode;
 
-    private Stop fromStop;
+    private StationElement fromStop;
 
-    private Stop toStop;
+    private StationElement toStop;
+
+    private String name;
+
+    private String reversedName;
 
     private int traversalTime;
 
-    private int wheelchairTraversalTime = MISSING_VALUE;
+    private double length;
+
+    private int stairCount;
+
+    private double slope;
+
+    private boolean isBidirectional;
 
     @Override
     public FeedScopedId getId() {
@@ -29,28 +37,44 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
         this.id = id;
     }
 
-    public void setPathwayType(int pathwayType) {
-        this.pathwayType = pathwayType;
+    public void setPathwayMode(int pathwayMode) {
+        this.pathwayMode = pathwayMode;
     }
 
-    public int getPathwayType() {
-        return pathwayType;
+    public int getPathwayMode() {
+        return pathwayMode;
     }
 
-    public void setFromStop(Stop fromStop) {
+    public void setFromStop(StationElement fromStop) {
         this.fromStop = fromStop;
     }
 
-    public Stop getFromStop() {
+    public StationElement getFromStop() {
         return fromStop;
     }
 
-    public void setToStop(Stop toStop) {
+    public void setToStop(StationElement toStop) {
         this.toStop = toStop;
     }
 
-    public Stop getToStop() {
+    public StationElement getToStop() {
         return toStop;
+    }
+
+    public String getName() {
+        return name;
+    }
+
+    public void setName(String name) {
+        this.name = name;
+    }
+
+    public String getReversedName() {
+        return reversedName;
+    }
+
+    public void setReversedName(String reversedName) {
+        this.reversedName = reversedName;
     }
 
     public void setTraversalTime(int traversalTime) {
@@ -61,24 +85,44 @@ public final class Pathway extends TransitEntity<FeedScopedId> {
         return traversalTime;
     }
 
-    public void setWheelchairTraversalTime(int wheelchairTraversalTime) {
-        this.wheelchairTraversalTime = wheelchairTraversalTime;
+    public double getLength() {
+        return length;
     }
 
-    public int getWheelchairTraversalTime() {
-        return wheelchairTraversalTime;
+    public void setLength(double length) {
+        this.length = length;
     }
 
-    public boolean isWheelchairTraversalTimeSet() {
-        return wheelchairTraversalTime != MISSING_VALUE;
+    public boolean isBidirectional() {
+        return isBidirectional;
     }
 
-    public void clearWheelchairTraversalTime() {
-        this.wheelchairTraversalTime = MISSING_VALUE;
+    public void setBidirectional(boolean bidirectional) {
+        isBidirectional = bidirectional;
+    }
+
+    public int getStairCount() {
+        return stairCount;
+    }
+
+    public void setStairCount(int stairCount) {
+        this.stairCount = stairCount;
+    }
+
+    public double getSlope() {
+        return slope;
+    }
+
+    public void setSlope(double slope) {
+        this.slope = slope;
     }
 
     @Override
     public String toString() {
         return "<Pathway " + this.id + ">";
+    }
+
+    public boolean isPathwayModeWheelchairAccessible() {
+        return getPathwayMode() != 2 && getPathwayMode() != 4;
     }
 }
