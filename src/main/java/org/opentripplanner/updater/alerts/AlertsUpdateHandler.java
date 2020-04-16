@@ -135,7 +135,7 @@ public class AlertsUpdateHandler {
                 patch.setStop(new FeedScopedId(feedId, stopId));
             }
             if (agencyId != null && routeId == null && tripId == null && stopId == null) {
-                patch.setAgencyId(agencyId);
+                patch.setAgency(new FeedScopedId(feedId, agencyId));
             }
             patch.setTimePeriods(periods);
             patch.setAlert(alertText);

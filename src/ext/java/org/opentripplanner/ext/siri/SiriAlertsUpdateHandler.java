@@ -36,6 +36,12 @@ public class SiriAlertsUpdateHandler {
 
     private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
+    private String feedId;
+
+    public SiriAlertsUpdateHandler(String feedId) {
+        this.feedId = feedId;
+    }
+
     public void update(ServiceDelivery delivery) {
         for (SituationExchangeDeliveryStructure sxDelivery : delivery.getSituationExchangeDeliveries()) {
             SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
@@ -142,7 +148,7 @@ public class SiriAlertsUpdateHandler {
                         idsToExpire.add(id);
                     } else {
                         AlertPatch alertPatch = new AlertPatch();
-                        alertPatch.setAgencyId(agencyId);
+                        alertPatch.setAgency(new FeedScopedId(feedId, agencyId));
                         alertPatch.setTimePeriods(periods);
                         alertPatch.setAlert(alert);
                         alertPatch.setId(id);

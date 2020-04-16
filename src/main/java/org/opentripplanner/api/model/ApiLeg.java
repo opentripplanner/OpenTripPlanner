@@ -134,7 +134,7 @@ public class ApiLeg {
      * For transit legs, the ID of the transit agency that operates the service used for this leg.
      * For non-transit legs, null.
      */
-    public String agencyId = null;
+    public FeedScopedId agencyId = null;
 
     /**
      * For transit legs, the ID of the trip.

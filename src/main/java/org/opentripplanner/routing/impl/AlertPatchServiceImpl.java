@@ -34,7 +34,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
     private Map<StopAndRouteOrTripKey, Set<AlertPatch>> patchesByStopAndRoute = new ConcurrentHashMap<>();
     private Map<StopAndRouteOrTripKey, Set<AlertPatch>> patchesByStopAndTrip = new ConcurrentHashMap<>();
     private Map<FeedScopedId, Set<AlertPatch>> patchesByTrip = new ConcurrentHashMap<>();
-    private Map<String, Set<AlertPatch>> patchesByAgency = new ConcurrentHashMap<>();
+    private Map<FeedScopedId, Set<AlertPatch>> patchesByAgency = new ConcurrentHashMap<>();
     private Map<String, Set<AlertPatch>> patchesByTripPattern = new ConcurrentHashMap<>();
 
     public AlertPatchServiceImpl(Graph graph) {
@@ -99,7 +99,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
 
 
     @Override
-    public Collection<AlertPatch> getAgencyPatches(String agency) {
+    public Collection<AlertPatch> getAgencyPatches(FeedScopedId agency) {
         Set<AlertPatch> result = new HashSet<>();
         if (patchesByAgency.containsKey(agency)) {
             result.addAll(patchesByAgency.get(agency));
@@ -186,9 +186,9 @@ public class AlertPatchServiceImpl implements AlertPatchService {
             }
         }
 
-        String agency = alertPatch.getAgency();
-        if (agency != null && !agency.isEmpty()) {
-            Set<AlertPatch> set = (Set) patchesByAgency.getOrDefault(agency, new HashSet());
+        FeedScopedId agency = alertPatch.getAgency();
+        if (agency != null) {
+            Set<AlertPatch> set = patchesByAgency.getOrDefault(agency, new HashSet());
             set.add(alertPatch);
             patchesByAgency.put(agency, set);
         }
@@ -231,6 +231,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
         FeedScopedId stop = alertPatch.getStop();
         FeedScopedId route = alertPatch.getRoute();
         FeedScopedId trip = alertPatch.getTrip();
+        FeedScopedId agency = alertPatch.getAgency();
 
         if (stop != null) {
             removeAlertPatch(patchesByStop.get(stop), alertPatch);
@@ -252,7 +253,6 @@ public class AlertPatchServiceImpl implements AlertPatchService {
             removeAlertPatch(patchesByStopAndTrip.get(new StopAndRouteOrTripKey(stop, trip)), alertPatch);
         }
 
-        String agency = alertPatch.getAgency();
         if (agency != null) {
             removeAlertPatch(patchesByAgency.get(agency), alertPatch);
         }

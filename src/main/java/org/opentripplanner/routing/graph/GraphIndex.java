@@ -39,7 +39,7 @@ public class GraphIndex {
     private static final Logger LOG = LoggerFactory.getLogger(GraphIndex.class);
 
     // TODO: consistently key on model object or id string
-    private final Multimap<String, Agency> agenciesForFeedId = ArrayListMultimap.create();
+    private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
     private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
     private final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
@@ -58,8 +58,8 @@ public class GraphIndex {
         LOG.info("GraphIndex init...");
         CompactElevationProfile.setDistanceBetweenSamplesM(graph.getDistanceBetweenElevationSamples());
 
-        for (String feedId : graph.getFeedIds()) {
-            this.agenciesForFeedId.putAll(feedId, graph.getAgencies(feedId));
+        for (Agency agency : graph.getAgencies()) {
+            this.agencyForId.put(agency.getId(), agency);
         }
 
         for (Operator operator : graph.getOperators()) {
@@ -140,17 +140,8 @@ public class GraphIndex {
         }
     }
 
-    public Collection<Agency> getAgenciesForFeedId(String feedId) {
-        return agenciesForFeedId.get(feedId);
-    }
-
-    public Agency getAgency(String feedId, String agencyId) {
-        for (Agency agency : agenciesForFeedId.get(feedId)) {
-            if (agency.getId().equals(agencyId)) {
-                return agency;
-            }
-        }
-        return null;
+    public Agency getAgencyForId(FeedScopedId id) {
+        return agencyForId.get(id);
     }
 
     public Stop getStopForId(FeedScopedId id) {
@@ -197,36 +188,6 @@ public class GraphIndex {
         }
 
         return tripPatterns;
-    }
-
-    /**
-     * Fetch an agency by its string ID, ignoring the fact that this ID should be scoped by a
-     * feedId. This is a stopgap (i.e. hack) method for fetching agencies where no feed scope is
-     * available. I am creating this method only to allow merging pull request #2032 which adds
-     * GraphQL. Note that if the same agency ID is defined in several feeds, this will return one of
-     * them at random. That is obviously not the right behavior. The problem is that agencies are
-     * not currently keyed on an FeedScopedId object, but on separate feedId and id Strings. A real
-     * fix will involve replacing or heavily modifying the OBA GTFS loader, which is now possible
-     * since we have forked it.
-     */
-    public Agency getAgencyWithoutFeedId(String agencyId) {
-        // Iterate over the agency map for each feed.
-
-        for (Agency agency : agenciesForFeedId.values()) {
-            if (agency != null && agency.getId().equals(agencyId)) {
-                return agency;
-            }
-        }
-        return null;
-    }
-
-    /**
-     * Construct a set of all Agencies in this graph, spanning across all feed IDs. I am creating
-     * this method only to allow merging pull request #2032 which adds GraphQL. This should probably
-     * be done some other way, see javadoc on getAgencyWithoutFeedId.
-     */
-    public Collection<Agency> getAllAgencies() {
-        return agenciesForFeedId.values();
     }
 
     /**

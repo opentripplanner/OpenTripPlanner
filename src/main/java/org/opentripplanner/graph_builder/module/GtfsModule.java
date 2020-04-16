@@ -126,6 +126,7 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitServiceBuilder builder =  mapGtfsDaoToInternalTransitServiceBuilder(
                         loadBundle(gtfsBundle),
+                        gtfsBundle.getFeedId().getId(),
                         issueStore
                 );
 

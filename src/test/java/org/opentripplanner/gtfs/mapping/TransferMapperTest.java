@@ -16,7 +16,9 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TransferMapperTest {
-    private static final RouteMapper ROUTE_MAPPER = new RouteMapper(new AgencyMapper());
+    private static final String FEED_ID = "FEED";
+
+    private static final RouteMapper ROUTE_MAPPER = new RouteMapper(new AgencyMapper(FEED_ID));
 
     private static final TripMapper TRIP_MAPPER = new TripMapper(ROUTE_MAPPER);
 

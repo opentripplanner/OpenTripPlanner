@@ -11,7 +11,7 @@ import java.util.Set;
  */
 public class Ride {
 
-    String agency; // route agency
+    FeedScopedId agency; // route agency
 
     FeedScopedId route;
 

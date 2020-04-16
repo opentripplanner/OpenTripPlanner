@@ -41,10 +41,10 @@ public class RoutingServiceTest extends GtfsTest {
         /* Agencies */
         String feedId = graph.getFeedIds().iterator().next();
         Agency agency;
-        agency = graph.index.getAgency(feedId, "azerty");
+        agency = graph.index.getAgencyForId(new FeedScopedId(feedId, "azerty"));
         assertNull(agency);
-        agency = graph.index.getAgency(feedId, "agency");
-        assertEquals(agency.getId(), "agency");
+        agency = graph.index.getAgencyForId(new FeedScopedId(feedId, "agency"));
+        assertEquals(agency.getId().toString(), feedId + ":" + "agency");
         assertEquals(agency.getName(), "Fake Agency");
 
         /* Stops */

@@ -95,8 +95,7 @@ public class AlertToLegMapper {
         }
 
         if (leg.agencyId != null) {
-            String agencId = graph.index.getAgencyWithoutFeedId(leg.agencyId).getId();
-            Collection<AlertPatch> patches = alertPatchService(graph).getAgencyPatches(agencId);
+            Collection<AlertPatch> patches = alertPatchService(graph).getAgencyPatches(leg.agencyId);
             addAlertPatchesToLeg(leg, patches, requestedLocale, legStartTime, legEndTime);
         }
 

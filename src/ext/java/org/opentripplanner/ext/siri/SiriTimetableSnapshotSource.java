@@ -114,8 +114,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private final RoutingService routingService;
 
-    private final Agency dummyAgency;
-
     public SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
     private TransitLayer realtimeTransitLayer;
@@ -127,12 +125,6 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         routingService = new RoutingService(graph);
         realtimeTransitLayer = graph.getRealtimeTransitLayer();
         transitLayerUpdater = graph.transitLayerUpdater;
-
-        // Create dummy agency for added trips
-        Agency dummy = new Agency();
-        dummy.setId("");
-        dummy.setName("");
-        dummyAgency = dummy;
 
         siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(routingService);
     }

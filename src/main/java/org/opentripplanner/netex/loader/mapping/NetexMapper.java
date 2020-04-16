@@ -110,7 +110,7 @@ public class NetexMapper {
     }
 
     private void mapAuthorities(NetexImportDataIndexReadOnlyView netexIndex) {
-        AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(netexIndex.getTimeZone());
+        AuthorityToAgencyMapper agencyMapper = new AuthorityToAgencyMapper(idFactory, netexIndex.getTimeZone());
         for (Authority authority : netexIndex.getAuthoritiesById().localValues()) {
             Agency agency = agencyMapper.mapAuthorityToAgency(authority);
             transitBuilder.getAgenciesById().add(agency);

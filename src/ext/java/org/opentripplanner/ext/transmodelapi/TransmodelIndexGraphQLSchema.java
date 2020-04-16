@@ -229,8 +229,8 @@ public class TransmodelIndexGraphQLSchema {
             }
             ).build();
 
-    private Agency getAgency(String agencyId, RoutingService routingService) {
-        return routingService.getAgencyWithoutFeedId(agencyId);
+    private Agency getAgency(FeedScopedId agencyId, RoutingService routingService) {
+        return routingService.getAgencyForId(agencyId);
     }
 
     @SuppressWarnings("unchecked")
@@ -1243,7 +1243,7 @@ public class TransmodelIndexGraphQLSchema {
                         .type(authorityType)
                         .description("Authority that reported this situation")
                         .deprecate("Not yet officially supported. May be removed or renamed.")
-                        .dataFetcher(environment -> getAgency(((AlertPatch) environment.getSource()).getFeedId(), getRoutingService(environment)))
+                        .dataFetcher(environment -> getAgency(((AlertPatch) environment.getSource()).getAgency(), getRoutingService(environment)))
                         .build())
                 .build();
 
@@ -3040,13 +3040,15 @@ public class TransmodelIndexGraphQLSchema {
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                                 .build())
                         .dataFetcher(environment ->
-                                getRoutingService(environment).getAgencyWithoutFeedId(environment.getArgument("id")))
+                            getRoutingService(environment).getAgencyForId(
+                                mappingUtil.fromIdString(environment.getArgument("id"))
+                            ))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("authorities")
                         .description("Get all authorities")
                         .type(new GraphQLNonNull(new GraphQLList(authorityType)))
-                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAllAgencies()))
+                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAgencies()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("operator")
@@ -3076,13 +3078,15 @@ public class TransmodelIndexGraphQLSchema {
                                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                                 .build())
                         .dataFetcher(environment ->
-                                getRoutingService(environment).getAgencyWithoutFeedId(environment.getArgument("id")))
+                                getRoutingService(environment).getAgencyForId(
+                                        mappingUtil.fromIdString(environment.getArgument("id"))
+                                ))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("organisations")
                         .deprecate("Use 'authorities' instead.")
                         .type(new GraphQLNonNull(new GraphQLList(organisationType)))
-                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAllAgencies()))
+                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAgencies()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("line")

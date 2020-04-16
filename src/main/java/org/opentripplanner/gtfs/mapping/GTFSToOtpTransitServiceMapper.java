@@ -16,7 +16,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
  * reusable for other import modules.
  */
 public class GTFSToOtpTransitServiceMapper {
-    private final AgencyMapper agencyMapper = new AgencyMapper();
+    private final AgencyMapper agencyMapper;
 
     private final StationMapper stationMapper = new StationMapper();
 
@@ -45,36 +45,42 @@ public class GTFSToOtpTransitServiceMapper {
         boardingAreaMapper
     );
 
-    private final RouteMapper routeMapper = new RouteMapper(agencyMapper);
+    private final RouteMapper routeMapper;
 
-    private final TripMapper tripMapper = new TripMapper(routeMapper);
+    private final TripMapper tripMapper;
 
-    private final StopTimeMapper stopTimeMapper = new StopTimeMapper(stopMapper, tripMapper);
+    private final StopTimeMapper stopTimeMapper;
 
-    private final FrequencyMapper frequencyMapper = new FrequencyMapper(tripMapper);
+    private final FrequencyMapper frequencyMapper;
 
-    private final TransferMapper transferMapper = new TransferMapper(
-            routeMapper, stationMapper, stopMapper, tripMapper
-    );
+    private final TransferMapper transferMapper;
 
-    private final FareRuleMapper fareRuleMapper = new FareRuleMapper(
-            routeMapper, fareAttributeMapper
-    );
+    private final FareRuleMapper fareRuleMapper;
 
     private final DataImportIssueStore issueStore;
 
-    GTFSToOtpTransitServiceMapper(DataImportIssueStore issueStore) {
+    GTFSToOtpTransitServiceMapper(DataImportIssueStore issueStore, String feedId) {
         this.issueStore = issueStore;
+        agencyMapper = new AgencyMapper(feedId);
+        routeMapper = new RouteMapper(agencyMapper);
+        tripMapper = new TripMapper(routeMapper);
+        stopTimeMapper = new StopTimeMapper(stopMapper, tripMapper);
+        frequencyMapper = new FrequencyMapper(tripMapper);
+        transferMapper = new TransferMapper(
+            routeMapper, stationMapper, stopMapper, tripMapper
+        );
+        fareRuleMapper = new FareRuleMapper(
+            routeMapper, fareAttributeMapper
+        );
     }
 
     /**
      * Map from GTFS data to the internal OTP model
      */
     public static OtpTransitServiceBuilder mapGtfsDaoToInternalTransitServiceBuilder(
-            GtfsRelationalDao data,
-            DataImportIssueStore issueStore
+        GtfsRelationalDao data, String feedId, DataImportIssueStore issueStore
     ) {
-        return new GTFSToOtpTransitServiceMapper(issueStore).map(data);
+        return new GTFSToOtpTransitServiceMapper(issueStore, feedId).map(data);
     }
 
     private OtpTransitServiceBuilder map(GtfsRelationalDao data) {

@@ -18,7 +18,7 @@ public class CalendarServiceData implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    private Map<String, TimeZone> timeZonesByAgencyId = new HashMap<>();
+    private Map<FeedScopedId, TimeZone> timeZonesByAgencyId = new HashMap<>();
 
     private Map<FeedScopedId, List<ServiceDate>> serviceDatesByServiceId = new HashMap<>();
 
@@ -28,15 +28,15 @@ public class CalendarServiceData implements Serializable {
      * @return the time zone for the specified agencyId, or null if the agency was
      *         not found
      */
-    public TimeZone getTimeZoneForAgencyId(String agencyId) {
+    public TimeZone getTimeZoneForAgencyId(FeedScopedId agencyId) {
         return timeZonesByAgencyId.get(agencyId);
     }
 
-    public void putTimeZoneForAgencyId(String agencyId, TimeZone timeZone) {
+    public void putTimeZoneForAgencyId(FeedScopedId agencyId, TimeZone timeZone) {
         timeZonesByAgencyId.put(agencyId, timeZone);
     }
 
-    public Set<String> getAgencyIds() {
+    public Set<FeedScopedId> getAgencyIds() {
         return Collections.unmodifiableSet(timeZonesByAgencyId.keySet());
     }
 
@@ -62,7 +62,7 @@ public class CalendarServiceData implements Serializable {
     }
 
     public void add(CalendarServiceData other) {
-        for (String agencyId : other.getAgencyIds()) {
+        for (FeedScopedId agencyId : other.getAgencyIds()) {
             putTimeZoneForAgencyId(agencyId, other.getTimeZoneForAgencyId(agencyId));
         }
         for (FeedScopedId serviceId : other.serviceDatesByServiceId.keySet()) {

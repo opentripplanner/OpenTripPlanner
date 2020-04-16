@@ -37,5 +37,5 @@ public interface CalendarService {
      * @return the time zone for the specified agency, or null if the agency was
      * not found
      */
-    TimeZone getTimeZoneForAgencyId(String agencyId);
+    TimeZone getTimeZoneForAgencyId(FeedScopedId agencyId);
 }

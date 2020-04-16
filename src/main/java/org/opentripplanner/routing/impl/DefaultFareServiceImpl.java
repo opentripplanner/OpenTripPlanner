@@ -231,7 +231,6 @@ public class DefaultFareServiceImpl implements FareService {
             Collection<FareRuleSet> fareRules) {
         Set<String> zones = new HashSet<>();
         Set<FeedScopedId> routes = new HashSet<>();
-        Set<String> agencies = new HashSet<>();
         Set<FeedScopedId> trips = new HashSet<>();
         int transfersUsed = -1;
         
@@ -251,7 +250,6 @@ public class DefaultFareServiceImpl implements FareService {
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
             endZone = ride.endZone;
-            agencies.add(ride.agency);
             routes.add(ride.route);
             zones.addAll(ride.zones);
             trips.add(ride.trip);
@@ -268,10 +266,10 @@ public class DefaultFareServiceImpl implements FareService {
             FareAttribute attribute = ruleSet.getFareAttribute();
             // fares also don't really have an agency id, they will have the per-feed default id
             // check only if the fare is not mapped to an agency
-            if (!ruleSet.hasAgencyDefined() && !attribute.getId().getFeedId().equals(feedId))
+            if (!attribute.getId().getFeedId().equals(feedId))
                 continue;
             
-            if (ruleSet.matches(agencies, startZone, endZone, zones, routes, trips)) {
+            if (ruleSet.matches(startZone, endZone, zones, routes, trips)) {
                 // TODO Maybe move the code below in FareRuleSet::matches() ?
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;

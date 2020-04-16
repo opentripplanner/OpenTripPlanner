@@ -399,12 +399,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Do not use certain named agencies
      */
-    public HashSet<String> bannedAgencies = new HashSet<String>();
+    public HashSet<FeedScopedId> bannedAgencies = new HashSet<>();
 
     /**
      * Only use certain named agencies
      */
-    public HashSet<String> whiteListedAgencies = new HashSet<String>();
+    public HashSet<FeedScopedId> whiteListedAgencies = new HashSet<>();
 
 
     /**
@@ -413,13 +413,13 @@ public class RoutingRequest implements Cloneable, Serializable {
      * @deprecated TODO OTP2: Needs to be implemented
      */
     @Deprecated
-    public HashSet<String> preferredAgencies = new HashSet<String>();
+    public HashSet<FeedScopedId> preferredAgencies = new HashSet<>();
 
     /**
      * Set of unpreferred agencies for given user.
      */
     @Deprecated
-    public HashSet<String> unpreferredAgencies = new HashSet<String>();
+    public HashSet<FeedScopedId> unpreferredAgencies = new HashSet<>();
 
     /**
      * Do not use certain named routes.
@@ -820,7 +820,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
             preferredAgencies = new HashSet<>();
-            Collections.addAll(preferredAgencies, s.split(","));
+            Collections.addAll(
+                preferredAgencies,
+                Arrays.stream(s.split(","))
+                    .map(FeedScopedId::convertFromString)
+                    .toArray(FeedScopedId[]::new)
+            );
         }
     }
 
@@ -841,7 +846,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setUnpreferredAgencies(String s) {
         if (!s.isEmpty()) {
             unpreferredAgencies = new HashSet<>();
-            Collections.addAll(unpreferredAgencies, s.split(","));
+            Collections.addAll(
+                unpreferredAgencies,
+                Arrays.stream(s.split(","))
+                    .map(FeedScopedId::convertFromString)
+                    .toArray(FeedScopedId[]::new)
+            );
         }
     }
 
@@ -875,14 +885,21 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setBannedAgencies(String s) {
         if (!s.isEmpty()) {
             bannedAgencies = new HashSet<>();
-            Collections.addAll(bannedAgencies, s.split(","));
+            Collections.addAll(
+                bannedAgencies,
+                Arrays.stream(s.split(","))
+                    .map(FeedScopedId::convertFromString)
+                    .toArray(FeedScopedId[]::new));
         }
     }
 
     public void setWhiteListedAgencies(String s) {
         if (!s.isEmpty()) {
             whiteListedAgencies = new HashSet<>();
-            Collections.addAll(whiteListedAgencies, s.split(","));
+            Collections.addAll(whiteListedAgencies,
+                Arrays.stream(s.split(","))
+                    .map(FeedScopedId::convertFromString)
+                    .toArray(FeedScopedId[]::new));
         }
     }
 
@@ -1057,9 +1074,9 @@ public class RoutingRequest implements Cloneable, Serializable {
             clone.streetSubRequestModes = streetSubRequestModes.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
-            clone.whiteListedAgencies = (HashSet<String>) whiteListedAgencies.clone();
+            clone.whiteListedAgencies = (HashSet<FeedScopedId>) whiteListedAgencies.clone();
             clone.whiteListedRoutes = whiteListedRoutes.clone();
-            clone.preferredAgencies = (HashSet<String>) preferredAgencies.clone();
+            clone.preferredAgencies = (HashSet<FeedScopedId>) preferredAgencies.clone();
             clone.preferredRoutes = preferredRoutes.clone();
             if (this.bikeWalkingOptions != this)
                 clone.bikeWalkingOptions = this.bikeWalkingOptions.clone();
@@ -1275,7 +1292,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Check if route is preferred according to this request. */
     public long preferencesPenaltyForRoute(Route route) {
         long preferences_penalty = 0;
-        String agencyID = route.getAgency().getId();
+        FeedScopedId agencyID = route.getAgency().getId();
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
                 (preferredAgencies != null && !preferredAgencies.isEmpty())) {
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);

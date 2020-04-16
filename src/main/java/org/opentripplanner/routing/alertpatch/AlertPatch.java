@@ -37,7 +37,7 @@ public class AlertPatch implements Serializable {
 
     private List<TimePeriod> timePeriods = new ArrayList<>();
 
-    private String agency;
+    private FeedScopedId agency;
 
     private FeedScopedId operatorId;
 
@@ -100,10 +100,7 @@ public class AlertPatch implements Serializable {
     }
 
     public void apply(Graph graph) {
-        Agency agency = null;
-        if (feedId != null) {
-            agency = graph.index.getAgency(feedId, this.agency);
-        }
+        Agency agency = this.agency != null ? graph.index.getAgencyForId(this.agency) : null;
         Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
         Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
@@ -145,7 +142,7 @@ public class AlertPatch implements Serializable {
     }
 
     public void remove(Graph graph) {
-        Agency agency = graph.index.getAgency(feedId, this.agency);
+        Agency agency = this.agency != null ? graph.index.getAgencyForId(this.agency) : null;
         Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
         Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
@@ -201,7 +198,7 @@ public class AlertPatch implements Serializable {
         timePeriods = periods;
     }
 
-    public String getAgency() {
+    public FeedScopedId getAgency() {
         return agency;
     }
 
@@ -217,7 +214,7 @@ public class AlertPatch implements Serializable {
         return stop;
     }
 
-    public void setAgencyId(String agency) {
+    public void setAgency(FeedScopedId agency) {
         this.agency = agency;
     }
 

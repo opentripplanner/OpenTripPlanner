@@ -105,7 +105,11 @@ public class IndexAPI {
     @GET
     @Path("/agencies/{feedId}")
     public Collection<ApiAgency> getAgencies(@PathParam("feedId") String feedId) {
-        Collection<Agency> agencies = createRoutingService().getAgencies(feedId);
+        Collection<Agency> agencies = createRoutingService()
+            .getAgencies()
+            .stream()
+            .filter(agency -> agency.getId().getFeedId().equals(feedId))
+            .collect(Collectors.toList());
         validateExist("Agency", agencies, "feedId", feedId);
         return AgencyMapper.mapToApi(agencies);
     }
@@ -525,7 +529,7 @@ public class IndexAPI {
     }
 
     private static Agency getAgency(RoutingService routingService, String feedId, String agencyId) {
-        Agency agency = routingService.getAgency(feedId, agencyId);
+        Agency agency = routingService.getAgencyForId(new FeedScopedId(feedId, agencyId));
         if(agency == null) {
             throw notFoundException("Agency", "feedId: " + feedId + ", agencyId: " + agencyId);
         }

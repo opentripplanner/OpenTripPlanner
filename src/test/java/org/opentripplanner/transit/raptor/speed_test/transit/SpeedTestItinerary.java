@@ -41,7 +41,7 @@ public class SpeedTestItinerary extends Itinerary {
             if (leg.isTransitLeg()) {
                 if (leg.distance > distanceLimit) {
                     //modes.add(leg.mode);
-                    agencies.add(leg.agencyId);
+                    agencies.add(leg.agencyId.getId());
                 }
             }
         }

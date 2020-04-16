@@ -25,7 +25,7 @@ public class ServiceDay implements Serializable {
     protected ServiceDate serviceDate;
     protected BitSet serviceIdsRunning;
 
-    public ServiceDay(Map<FeedScopedId, Integer> serviceCodes, ServiceDate serviceDate, CalendarService cs, String agencyId) {
+    public ServiceDay(Map<FeedScopedId, Integer> serviceCodes, ServiceDate serviceDate, CalendarService cs, FeedScopedId agencyId) {
         TimeZone timeZone = cs.getTimeZoneForAgencyId(agencyId);
         this.serviceDate = serviceDate;
 

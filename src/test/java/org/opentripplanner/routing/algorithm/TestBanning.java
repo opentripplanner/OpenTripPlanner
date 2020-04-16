@@ -23,7 +23,7 @@ public class TestBanning {
         RoutingRequest routingRequest = new RoutingRequest();
 
         routingRequest.setBannedRoutes("RB__RUT:Route:1");
-        routingRequest.setBannedAgencies("RUT:Agency:2");
+        routingRequest.setBannedAgencies("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
             routingRequest.getBannedRoutes(routes);
@@ -40,7 +40,7 @@ public class TestBanning {
         RoutingRequest routingRequest = new RoutingRequest();
 
         routingRequest.setWhiteListedRoutes("RB__RUT:Route:1");
-        routingRequest.setWhiteListedAgencies("RUT:Agency:2");
+        routingRequest.setWhiteListedAgencies("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
             routingRequest.getBannedRoutes(routes);
@@ -61,9 +61,9 @@ public class TestBanning {
         route3.setLongName("");
 
         Agency agency1 = new Agency();
-        agency1.setId("RUT:Agency:1");
+        agency1.setId(new FeedScopedId("RB", "RUT:Agency:1"));
         Agency agency2 = new Agency();
-        agency2.setId("RUT:Agency:2");
+        agency2.setId(new FeedScopedId("RB", "RUT:Agency:2"));
 
         route1.setAgency(agency1);
         route2.setAgency(agency1);
