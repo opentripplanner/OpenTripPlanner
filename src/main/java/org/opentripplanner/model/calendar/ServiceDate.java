@@ -25,7 +25,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
 
     private static final long serialVersionUID = 1L;
 
-    private static final Pattern PATTERN = Pattern.compile("^(\\d{4})(\\d{2})(\\d{2})$");
+    private static final Pattern PATTERN = Pattern.compile("^(\\d{4})-?(\\d{2})-?(\\d{2})$");
 
     private static final NumberFormat YEAR_FORMAT = new DecimalFormat("0000");
 
@@ -190,11 +190,15 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     /**
      * @return a string in "YYYYMMDD" format
      */
-    public String getAsString() {
+    public String asCompactString() {
         String year = YEAR_FORMAT.format(this.year);
         String month = MONTH_AND_DAY_FORMAT.format(this.month);
         String day = MONTH_AND_DAY_FORMAT.format(this.day);
         return year + month + day;
+    }
+
+    public String asISO8601() {
+        return String.format("%d-%02d-%02d", year, month, day);
     }
 
     /**
@@ -236,6 +240,15 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
                 / (24 * 60 * 60 * 1000);
     }
 
+    /**
+     * The service date is either the minimum or maximum allowed value.
+     * In practice this means unbounded.
+     * */
+    public boolean isMinMax() {
+        return equals(MIN_DATE) || equals(MAX_DATE);
+    }
+
+
     public boolean isBefore(ServiceDate other) {
         return sequenceNumber < other.sequenceNumber;
     }
@@ -269,7 +282,7 @@ public final class ServiceDate implements Serializable, Comparable<ServiceDate> 
     public String toString() {
         if(MAX_DATE.equals(this)) { return "MAX"; }
         if(MIN_DATE.equals(this)) { return "MIN"; }
-        return String.format("%d-%02d-%02d", year, month, day);
+        return asISO8601();
     }
 
     @Override

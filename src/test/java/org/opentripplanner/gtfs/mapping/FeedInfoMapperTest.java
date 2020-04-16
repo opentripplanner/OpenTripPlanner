@@ -53,8 +53,8 @@ public class FeedInfoMapperTest {
         org.opentripplanner.model.FeedInfo result = subject.map(FEED_INFO);
 
         assertEquals(ID, result.getId());
-        assertEquals("20161005", result.getStartDate().getAsString());
-        assertEquals("20171207", result.getEndDate().getAsString());
+        assertEquals("2016-10-05", result.getStartDate().asISO8601());
+        assertEquals("2017-12-07", result.getEndDate().asISO8601());
         assertEquals(LANG, result.getLang());
         assertEquals(PUBLISHER_NAME, result.getPublisherName());
         assertEquals(PUBLISHER_URL, result.getPublisherUrl());

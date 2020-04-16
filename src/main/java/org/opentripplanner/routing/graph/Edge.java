@@ -213,7 +213,6 @@ public abstract class Edge implements Serializable {
     private static final ValidVertexTypes VALID_VERTEX_TYPES = new ValidVertexTypes(Vertex.class,
             Vertex.class);
 
-    @XmlTransient
     public ValidVertexTypes getValidVertexTypes() {
         return VALID_VERTEX_TYPES;
     }

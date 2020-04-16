@@ -98,7 +98,7 @@ public class NearbyStopFinder {
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
             TransitStopVertex ts1 = stopAtDistance.tstop;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.getPatternsForStop().get(ts1.getStop())) {
+            for (TripPattern pattern : graph.index.getPatternsForStop(ts1.getStop())) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);
             }
         }

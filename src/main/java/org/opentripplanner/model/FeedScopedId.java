@@ -1,9 +1,10 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 
-public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
+public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     /**
      * One Bus Away uses the underscore as a scope separator between Agency and ID. In OTP we use
@@ -14,15 +15,13 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private String feedId;
+    private final String feedId;
 
-    private String id;
+    private final String id;
 
-    public FeedScopedId() {
+    public FeedScopedId(@NotNull String feedId, @NotNull String id) {
+        if(feedId == null || id == null) { throw new IllegalArgumentException(); }
 
-    }
-
-    public FeedScopedId(String feedId, String id) {
         this.feedId = feedId;
         this.id = id;
     }
@@ -31,43 +30,16 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
         return feedId;
     }
 
-    public void setFeedId(String feedId) {
-        this.feedId = feedId;
-    }
-
     public String getId() {
         return id;
     }
 
-    public void setId(String id) {
-        this.id = id;
-    }
-
-    public boolean hasValues() {
-        return this.feedId != null && this.id != null;
-    }
-
     public int compareTo(FeedScopedId o) {
         int c = this.feedId.compareTo(o.feedId);
-        if (c == 0)
+        if (c == 0) {
             c = this.id.compareTo(o.id);
-        return c;
-    }
-
-    /**
-     * Given an id of the form "agencyId_entityId", parses into a
-     * {@link FeedScopedId} id object.
-     *
-     * @param value id of the form "agencyId_entityId"
-     * @return an id object
-     */
-    public static FeedScopedId convertFromString(String value, char separator) {
-        int index = value.indexOf(separator);
-        if (index == -1) {
-            throw new IllegalStateException("invalid agency-and-id: " + value);
-        } else {
-            return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
         }
+        return c;
     }
 
     @Override
@@ -77,23 +49,17 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
-            return true;
-        if (obj == null)
-            return false;
-        if (!(obj instanceof FeedScopedId))
-            return false;
+        if (this == obj) { return true; }
+        if (obj == null) { return false; }
+        if (!(obj instanceof FeedScopedId)) { return false; }
+
         FeedScopedId other = (FeedScopedId) obj;
-        if (!feedId.equals(other.feedId))
-            return false;
-        if (!id.equals(other.id))
-            return false;
-        return true;
+        return feedId.equals(other.feedId) && id.equals(other.id);
     }
 
     @Override
     public String toString() {
-        return convertToString(this);
+        return concatenateId(feedId, id);
     }
 
     /**
@@ -127,15 +93,16 @@ public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
      * @return a string representation of the form "agencyId_entityId"
      */
     public static String convertToString(FeedScopedId aid) {
-        if (aid == null)
+        if (aid == null) {
             return null;
-        return concatenateId(aid.getFeedId(), aid.getId());
+        }
+        return concatenateId(aid.feedId, aid.id);
     }
 
     /**
      * Concatenate agencyId and id into a string.
      */
-    public static String concatenateId(String agencyId, String id) {
-        return agencyId + ID_SEPARATOR + id;
+    public static String concatenateId(String feedId, String id) {
+        return feedId + ID_SEPARATOR + id;
     }
 }

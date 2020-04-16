@@ -97,10 +97,8 @@ public class GenerateTripPatternsOperation {
 
     private void buildTripPatternForTrip(Trip trip) {
         // TODO: move to a validator module
-        try {
-            // Check that the mode is supported
-            GtfsLibrary.getTraverseMode(trip.getRoute());
-        } catch (IllegalArgumentException e) {
+        // Check that the mode is supported
+        if(trip.getRoute().getMode() == null) {
             issueStore.add(new GTFSModeNotSupported(trip, Integer.toString(trip.getRoute().getType())));
             return;
         }

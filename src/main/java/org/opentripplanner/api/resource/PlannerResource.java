@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -22,8 +23,6 @@ import javax.ws.rs.core.UriInfo;
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-
-import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 /**
  * This is the primary entry point for the trip planning web service.
@@ -33,17 +32,24 @@ import static org.opentripplanner.api.resource.ServerInfo.Q;
  * In order for inheritance to work, the REST resources are request-scoped (constructed at each request)
  * rather than singleton-scoped (a single instance existing for the lifetime of the OTP server).
  */
-@Path("routers/{routerId}/plan") // final element needed here rather than on method to distinguish from routers API
+@Path("routers/{ignoreRouterId}/plan") // final element needed here rather than on method to distinguish from routers API
 public class PlannerResource extends RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(PlannerResource.class);
+
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     // We inject info about the incoming request so we can include the incoming query
     // parameters in the outgoing response. This is a TriMet requirement.
     // Jersey uses @Context to inject internal types and @InjectParam or @Resource for DI objects.
     @GET
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    public Response plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
+    @Produces(MediaType.APPLICATION_JSON)
+    public TripPlannerResponse plan(@Context UriInfo uriInfo, @Context Request grizzlyRequest) {
 
         /*
          * TODO: add Lang / Locale parameter, and thus get localized content (Messages & more...)
@@ -54,7 +60,7 @@ public class PlannerResource extends RoutingResource {
          */
 
         // Create response object, containing a copy of all request parameters. Maybe they should be in the debug section of the response.
-        Response response = new Response(uriInfo);
+        TripPlannerResponse response = new TripPlannerResponse(uriInfo);
         RoutingRequest request = null;
         Router router = null;
         RoutingResponse res = null;
@@ -62,7 +68,7 @@ public class PlannerResource extends RoutingResource {
 
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
-            router = otpServer.getRouter(null);
+            router = otpServer.getRouter();
             request.setRoutingContext(router.graph);
 
             // Route
@@ -86,10 +92,8 @@ public class PlannerResource extends RoutingResource {
             }
             response.setError(error);
         } finally {
-            if (request != null) {
-                if (request.rctx != null) {
-                    response.debugOutput = request.rctx.debugOutput;
-                }
+            if (request != null && request.rctx != null) {
+                response.debugOutput = request.rctx.debugOutput;
             }
         }
 

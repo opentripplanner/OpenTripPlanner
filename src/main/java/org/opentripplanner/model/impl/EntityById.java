@@ -3,7 +3,6 @@ package org.opentripplanner.model.impl;
 import org.opentripplanner.model.TransitEntity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
@@ -86,16 +85,4 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
         return Collections.unmodifiableMap(new HashMap<>(map));
     }
 
-    /**
-     * For Entities with mutable ids the internal map becomes invalid after the ids are changed.
-     * So to fix this, this method allows the caller to reindex the internal map.
-     */
-    void reindex() {
-        // Copying the values are necessary, since the collection returned by 'map.values()'
-        // is backed by the map and cleared on the next line.
-        Collection<E> temp = new ArrayList<>(map.values());
-        map.clear();
-
-        addAll(temp);
-    }
 }

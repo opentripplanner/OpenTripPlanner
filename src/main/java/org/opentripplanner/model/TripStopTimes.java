@@ -79,14 +79,6 @@ public class TripStopTimes {
         return map.keySet();
     }
 
-    /**
-     * The Trip is mutable (the id may change). If the #hashCode changes the map must be
-     * reindex to work properly.
-     */
-    public void reindex() {
-        map = new HashMap<>(map);
-    }
-
 
     /* private methods */
 
