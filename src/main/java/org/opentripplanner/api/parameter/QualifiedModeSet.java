@@ -33,44 +33,42 @@ public class QualifiedModeSet implements Serializable {
     }
 
     public RequestModes getRequestModes() {
-        RequestModes requestModes = new RequestModes(
-            StreetMode.WALK,
-            StreetMode.WALK,
-            StreetMode.WALK,
-            new HashSet<>()
-        );
+        StreetMode accessMode = null;
+        StreetMode egressMode = null;
+        StreetMode directMode = null;
+        Set<TransitMode> transitModes = new HashSet<>();
 
         // Set transit modes
         for (QualifiedMode qMode : qModes) {
              switch (qMode.mode) {
                  case TRANSIT:
-                     requestModes.transitModes.addAll(Arrays.asList(TransitMode.values()));
+                     transitModes.addAll(Arrays.asList(TransitMode.values()));
                  case RAIL:
-                     requestModes.transitModes.add(TransitMode.RAIL);
+                     transitModes.add(TransitMode.RAIL);
                      break;
                  case SUBWAY:
-                     requestModes.transitModes.add(TransitMode.SUBWAY);
+                     transitModes.add(TransitMode.SUBWAY);
                      break;
                  case BUS:
-                     requestModes.transitModes.add(TransitMode.BUS);
+                     transitModes.add(TransitMode.BUS);
                      break;
                  case TRAM:
-                     requestModes.transitModes.add(TransitMode.TRAM);
+                     transitModes.add(TransitMode.TRAM);
                      break;
                  case FERRY:
-                     requestModes.transitModes.add(TransitMode.FERRY);
+                     transitModes.add(TransitMode.FERRY);
                      break;
                  case AIRPLANE:
-                     requestModes.transitModes.add(TransitMode.AIRPLANE);
+                     transitModes.add(TransitMode.AIRPLANE);
                      break;
                  case CABLE_CAR:
-                     requestModes.transitModes.add(TransitMode.CABLE_CAR);
+                     transitModes.add(TransitMode.CABLE_CAR);
                      break;
                  case GONDOLA:
-                     requestModes.transitModes.add(TransitMode.GONDOLA);
+                     transitModes.add(TransitMode.GONDOLA);
                      break;
                  case FUNICULAR:
-                     requestModes.transitModes.add(TransitMode.FUNICULAR);
+                     transitModes.add(TransitMode.FUNICULAR);
                      break;
              }
         }
@@ -84,46 +82,53 @@ public class QualifiedModeSet implements Serializable {
         for (QualifiedMode qMode : qModes) {
             switch (qMode.mode) {
                 case WALK:
-                    requestModes.accessMode = StreetMode.WALK;
-                    requestModes.egressMode = StreetMode.WALK;
-                    requestModes.directMode = StreetMode.WALK;
+                    accessMode = StreetMode.WALK;
+                    egressMode = StreetMode.WALK;
+                    directMode = StreetMode.WALK;
                     break;
                 case BICYCLE:
                     if (qMode.qualifiers.contains(Qualifier.RENT)) {
-                        requestModes.accessMode = StreetMode.BIKE_RENTAL;
-                        requestModes.egressMode = StreetMode.BIKE_RENTAL;
-                        requestModes.directMode = StreetMode.BIKE_RENTAL;
+                        accessMode = StreetMode.BIKE_RENTAL;
+                        egressMode = StreetMode.BIKE_RENTAL;
+                        directMode = StreetMode.BIKE_RENTAL;
                     }
                     else if (qMode.qualifiers.contains(Qualifier.PARK)) {
-                        requestModes.accessMode = StreetMode.BIKE_TO_PARK;
-                        requestModes.egressMode = StreetMode.WALK;
-                        requestModes.directMode = StreetMode.BIKE_TO_PARK;
+                        accessMode = StreetMode.BIKE_TO_PARK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.BIKE_TO_PARK;
                     }
                     else {
-                        requestModes.accessMode = StreetMode.BIKE;
-                        requestModes.egressMode = StreetMode.BIKE;
-                        requestModes.directMode = StreetMode.BIKE;
+                        accessMode = StreetMode.BIKE;
+                        egressMode = StreetMode.BIKE;
+                        directMode = StreetMode.BIKE;
                     }
                     break;
                 case CAR:
                     if (qMode.qualifiers.contains(Qualifier.RENT)) {
-                        requestModes.accessMode = StreetMode.CAR_RENTAL;
-                        requestModes.egressMode = StreetMode.CAR_RENTAL;
-                        requestModes.directMode = StreetMode.CAR_RENTAL;
+                        accessMode = StreetMode.CAR_RENTAL;
+                        egressMode = StreetMode.CAR_RENTAL;
+                        directMode = StreetMode.CAR_RENTAL;
                     }
                     else if (qMode.qualifiers.contains(Qualifier.PARK)) {
-                        requestModes.accessMode = StreetMode.CAR_TO_PARK;
-                        requestModes.egressMode = StreetMode.WALK;
-                        requestModes.directMode = StreetMode.CAR_TO_PARK;
+                        accessMode = StreetMode.CAR_TO_PARK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.CAR_TO_PARK;
                     }
                     else {
-                        requestModes.accessMode = StreetMode.WALK;
-                        requestModes.egressMode = StreetMode.WALK;
-                        requestModes.directMode = StreetMode.CAR;
+                        accessMode = StreetMode.WALK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.CAR;
                     }
                     break;
             }
         }
+
+        RequestModes requestModes = new RequestModes(
+            accessMode,
+            egressMode,
+            directMode,
+            transitModes
+        );
 
         return requestModes;
     }
