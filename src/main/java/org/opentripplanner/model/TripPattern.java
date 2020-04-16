@@ -20,8 +20,6 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -76,11 +74,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public int directionId = -1;
 
     /**
-     * The traverse mode for all trips in this pattern.
-     */
-    public final TransitMode mode;
-
-    /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
@@ -111,6 +104,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     private byte[][] hopGeometries = null;
 
+    /**
+     * The unique identifier for this trip pattern. For GTFS feeds this is generally
+     * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
+     * NeTEx the JourneyPattern id is used.
+     */
     @Override
     public FeedScopedId getId() { return id; }
 
@@ -118,12 +116,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public void setId(FeedScopedId id) { this.id = id; }
 
     /**
-     * The short unique identifier for this trip pattern,
-     * generally in the format Agency:RouteId:DirectionId:PatternNumber (GTFS)
-     * or if the id is set, then {@code id.getId()} (Netex).
+     * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
      */
-    public String getCode() {
-        return id.getId();
+    public final TransitMode getMode() {
+        return route.getMode();
     }
 
     public LineString getHopGeometry(int stopIndex) {
@@ -197,7 +193,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    @XmlElement int[] perStopFlags;
+    int[] perStopFlags;
 
     /**
      * A set of serviceIds with at least one trip in this pattern.
@@ -208,7 +204,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public TripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
-        this.mode = GtfsLibrary.getTransitMode(this.route);
         this.stopPattern = stopPattern;
         setStopsFromStopPattern(stopPattern);
     }
@@ -249,7 +244,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return trips.get(tripIndex);
     }
 
-    @XmlTransient
     public List<Trip> getTrips() {
         return trips;
     }
@@ -557,7 +551,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     public String toString () {
-        return String.format("<TripPattern %s>", this.getCode());
+        return String.format("<TripPattern %s>", this.getId());
     }
 
 	public Trip getExemplar() {

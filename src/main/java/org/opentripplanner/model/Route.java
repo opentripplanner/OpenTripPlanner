@@ -1,6 +1,8 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 public final class Route extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
@@ -18,6 +20,8 @@ public final class Route extends TransitEntity<FeedScopedId> {
     private String longName;
 
     private int type;
+
+    private TransitMode mode;
 
     private String desc;
 
@@ -47,8 +51,9 @@ public final class Route extends TransitEntity<FeedScopedId> {
     }
 
     /**
-     * The 'agency' property represent a GTFS Agency and NeTEx the Authority. Note that Agency does NOT map
-     * 1-1 to Authority, it is rather a mix between Authority and Operator.
+     * The 'agency' property represent a GTFS Agency and NeTEx the Authority.
+     * Note that Agency does NOT map 1-1 to Authority, it is rather a mix
+     * between Authority and Operator.
      */
     public Agency getAgency() {
         return agency;
@@ -99,6 +104,14 @@ public final class Route extends TransitEntity<FeedScopedId> {
 
     public void setType(int type) {
         this.type = type;
+    }
+
+    public TransitMode getMode() {
+        return mode;
+    }
+
+    public void setMode(TransitMode mode) {
+        this.mode = mode;
     }
 
     public String getUrl() {

@@ -48,7 +48,7 @@ public class GtfsRealtimeFuzzyTripMatcher {
         } catch (ParseException e) {
             return trip;
         }
-        Route route = routingService.getRouteForId().get(routeId);
+        Route route = routingService.getRouteForId(routeId);
         if (route == null) {
             return trip;
         }

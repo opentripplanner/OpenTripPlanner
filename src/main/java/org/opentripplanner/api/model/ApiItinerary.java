@@ -2,8 +2,6 @@ package org.opentripplanner.api.model;
 
 import org.opentripplanner.routing.core.Fare;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
@@ -77,8 +75,6 @@ public class ApiItinerary {
      * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
      * 6, then walks to their destination, has four legs.
      */
-    @XmlElementWrapper(name = "legs")
-    @XmlElement(name = "leg")
     public List<ApiLeg> legs = new ArrayList<>();
 
     /**

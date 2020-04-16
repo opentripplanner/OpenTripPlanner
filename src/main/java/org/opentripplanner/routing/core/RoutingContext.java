@@ -172,7 +172,7 @@ public class RoutingContext implements Cloneable {
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
 
         if (graph.index != null) {
-            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getRouteForId().values());
+            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getAllRoutes());
         } else {
             this.bannedRoutes = Collections.emptySet();
         }

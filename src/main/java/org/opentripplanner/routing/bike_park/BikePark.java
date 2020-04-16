@@ -1,11 +1,10 @@
 package org.opentripplanner.routing.bike_park;
 
-import java.io.Serializable;
-import java.util.Locale;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 import javax.xml.bind.annotation.XmlAttribute;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.io.Serializable;
+import java.util.Locale;
 
 public class BikePark implements Serializable {
     private static final long serialVersionUID = 8311460609708089384L;

@@ -11,7 +11,6 @@ import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -40,19 +39,6 @@ import java.util.TimeZone;
 public abstract class RoutingResource { 
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
-
-    /**
-     * The routerId selects between several graphs on the same server. The routerId is pulled from
-     * the path, not the query parameters. However, the class RoutingResource is not annotated with
-     * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
-     * path parameter should be included in the path annotations of all its subclasses.
-     *
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated
-    @PathParam("routerId") 
-    public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
@@ -613,7 +599,7 @@ public abstract class RoutingResource {
      * @throws ParameterException when there is a problem interpreting a query parameter
      */
     protected RoutingRequest buildRequest() throws ParameterException {
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON

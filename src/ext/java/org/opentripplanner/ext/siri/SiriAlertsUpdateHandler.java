@@ -453,7 +453,7 @@ public class SiriAlertsUpdateHandler {
                                             continue;
                                         }
                                         // Creating unique, deterministic id for the alert
-                                        String id = paddedSituationNumber + tripId.getId() + "-" + new ServiceDate(effectiveStartDate).getAsString() + "-" + stop.getId();
+                                        String id = paddedSituationNumber + tripId.getId() + "-" + new ServiceDate(effectiveStartDate).asCompactString() + "-" + stop.getId();
                                         if (expireSituation) {
                                             idsToExpire.add(id);
                                         } else {

@@ -338,7 +338,6 @@ public abstract class GraphPathToItineraryMapper {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
             TraverseMode legMode = legs.get(i).mode;
             if(legMode != lastMode && !walkSteps.isEmpty()) {
-                walkSteps.get(0).newMode = legMode;
                 lastMode = legMode;
             }
 

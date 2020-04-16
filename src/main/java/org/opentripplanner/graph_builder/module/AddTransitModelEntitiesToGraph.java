@@ -101,7 +101,7 @@ public class AddTransitModelEntitiesToGraph {
         Map<Stop, Set<TransitMode>> stopModeMap = new HashMap<>();
 
         for (TripPattern pattern : transitService.getTripPatterns()) {
-            TransitMode mode = pattern.mode;
+            TransitMode mode = pattern.getMode();
             graph.addTransitMode(mode);
             for (Stop stop : pattern.getStops()) {
                 Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());

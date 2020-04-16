@@ -158,7 +158,7 @@ public class ItineraryMapper {
                 leg.agencyId = routeInfo.getAgency().getId();
                 leg.routeShortName = routeInfo.getShortName()   ;
                 leg.routeLongName = routeInfo.getLongName();
-                leg.mode = TraverseMode.fromTransitMode(tripSchedule.getOriginalTripPattern().mode);
+                leg.mode = TraverseMode.fromTransitMode(tripSchedule.getOriginalTripPattern().getMode());
 
                 leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
                 leg.endTime = createCalendar(request.getDepartureDate(), it.toTime());

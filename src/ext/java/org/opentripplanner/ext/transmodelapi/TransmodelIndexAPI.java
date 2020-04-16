@@ -6,6 +6,7 @@ import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -28,7 +29,7 @@ import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/transmodel/index")    // It would be nice to get rid of the final /index.
+@Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class TransmodelIndexAPI {
     @SuppressWarnings("unused")
@@ -38,8 +39,15 @@ public class TransmodelIndexAPI {
     private final TransmodelGraphIndex index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
-    public TransmodelIndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        this.router = otpServer.getRouter(routerId);
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
+
+    public TransmodelIndexAPI(@Context OTPServer otpServer) {
+        this.router = otpServer.getRouter();
         index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
     }
 
@@ -58,7 +66,7 @@ public class TransmodelIndexAPI {
     public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
         if (queryParameters==null || !queryParameters.containsKey("query")) {
             LOG.debug("No query found in body");
-            return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("No query found in body").build();
+            throw new BadRequestException("No query found in body");
         }
 
         String query = (String) queryParameters.get("query");
@@ -71,7 +79,7 @@ public class TransmodelIndexAPI {
             try {
                 variables = deserializer.readValue((String) queryVariables, Map.class);
             } catch (IOException e) {
-                return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                throw new BadRequestException("Variables must be a valid json object");
             }
         } else {
             variables = new HashMap<>();
@@ -101,7 +109,7 @@ public class TransmodelIndexAPI {
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
-                    return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                    throw new BadRequestException("Variables must be a valid json object");
                 }
             } else {
                 variables = null;

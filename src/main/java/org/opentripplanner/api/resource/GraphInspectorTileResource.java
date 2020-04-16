@@ -1,7 +1,13 @@
 package org.opentripplanner.api.resource;
 
-import java.awt.image.BufferedImage;
-import java.io.ByteArrayOutputStream;
+import org.geotools.geometry.Envelope2D;
+import org.opentripplanner.analyst.core.SlippyTile;
+import org.opentripplanner.analyst.request.TileRequest;
+import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.parameter.MIMEImageFormat;
+import org.opentripplanner.inspector.TileRenderer;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 
 import javax.imageio.ImageIO;
 import javax.ws.rs.GET;
@@ -12,18 +18,8 @@ import javax.ws.rs.core.CacheControl;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-
-import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.core.SlippyTile;
-import org.opentripplanner.analyst.request.TileRequest;
-import org.opentripplanner.api.common.RoutingResource;
-import org.opentripplanner.api.parameter.MIMEImageFormat;
-
-import static org.opentripplanner.api.resource.ServerInfo.Q;
-
-import org.opentripplanner.inspector.TileRenderer;
-import org.opentripplanner.standalone.server.OTPServer;
-import org.opentripplanner.standalone.server.Router;
+import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 
 /**
  * Slippy map tile API for rendering various graph information for inspection/debugging purpose
@@ -48,7 +44,7 @@ import org.opentripplanner.standalone.server.Router;
  * @author laurent
  * 
  */
-@Path("/routers/{routerId}/inspector")
+@Path("/routers/{ignoreRouterId}/inspector")
 public class GraphInspectorTileResource extends RoutingResource {
 
     @Context
@@ -63,8 +59,12 @@ public class GraphInspectorTileResource extends RoutingResource {
     @PathParam("z")
     int z;
 
-    @PathParam("routerId")
-    String routerId;
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
 
     @PathParam("layer")
     String layer;
@@ -80,7 +80,7 @@ public class GraphInspectorTileResource extends RoutingResource {
         Envelope2D env = SlippyTile.tile2Envelope(x, y, z);
         TileRequest tileRequest = new TileRequest(env, 256, 256);
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         BufferedImage image = router.tileRendererManager.renderTile(tileRequest, layer);
 
         MIMEImageFormat format = new MIMEImageFormat("image/" + ext);
@@ -99,10 +99,10 @@ public class GraphInspectorTileResource extends RoutingResource {
      * @return 
      */
     @GET @Path("layers")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
+    @Produces(MediaType.APPLICATION_JSON)
     public InspectorLayersList getLayers() {
 
-        Router router = otpServer.getRouter(routerId);
+        Router router = otpServer.getRouter();
         InspectorLayersList layersList = new InspectorLayersList(router.tileRendererManager.getRenderers());
         return layersList;
     }

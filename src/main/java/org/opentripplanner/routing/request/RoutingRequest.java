@@ -92,7 +92,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * not transit searches in Raptor.
      *
      * @deprecated TODO OTP2 - This looks like an A Star implementation detail. Should be moved to
-*                               an A Star specific request class
+     *                       - an A Star specific request class
      */
     @Deprecated
     public boolean oneToMany = false;

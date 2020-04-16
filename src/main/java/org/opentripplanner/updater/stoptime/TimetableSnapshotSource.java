@@ -13,11 +13,13 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -578,7 +580,9 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             }
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
-            route.setType(3); // Bus. Used for short- and long-distance bus routes.
+            // Bus. Used for short- and long-distance bus routes.
+            route.setType(3);
+            route.setMode(TransitMode.BUS);
             // Create route name
             route.setLongName(tripId);
         }
@@ -954,8 +958,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return route or null if route can't be found in graph index
      */
     private Route getRouteForRouteId(String feedId, String routeId) {
-        Route route = routingService.getRouteForId().get(new FeedScopedId(feedId, routeId));
-        return route;
+        return routingService.getRouteForId(new FeedScopedId(feedId, routeId));
     }
 
     /**
@@ -966,8 +969,7 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return trip or null if trip can't be found in graph index
      */
     private Trip getTripForTripId(String feedId, String tripId) {
-        Trip trip = routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
-        return trip;
+        return routingService.getTripForId().get(new FeedScopedId(feedId, tripId));
     }
 
     /**
@@ -978,7 +980,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
      * @return stop or null if stop doesn't exist
      */
     private Stop getStopForStopId(String feedId, String stopId) {
-        Stop stop = routingService.getStopForId().get(new FeedScopedId(feedId, stopId));
-        return stop;
+        return routingService.getStopForId(new FeedScopedId(feedId, stopId));
     }
 }

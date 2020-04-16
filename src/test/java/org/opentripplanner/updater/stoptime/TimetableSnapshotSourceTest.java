@@ -53,9 +53,13 @@ public class TimetableSnapshotSourceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        // The ".turnOnSetAgencyToFeedIdForAllElements()" is commented out so it can be
+        // removed from the code, it in no longer in use. It is not deleted here to better
+        // allow the reader of the test understand how the test once worked. There should
+        // be new test to replace this one.
+
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withIssueStoreAndDeduplicator(graph)
-                .turnOnSetAgencyToFeedIdForAllElements()
                 .build();
 
         feedId = context.getFeedId().getId();
@@ -193,7 +197,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(addedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -264,7 +268,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.getStopForId().get(new FeedScopedId(feedId, "A"));
+        Stop stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
         // Get trip pattern of last (most recently added) outgoing edge
         // FIXME create a new test to see that add-trip realtime updates work
         TripPattern tripPattern = null;
@@ -300,7 +304,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(modifiedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -455,7 +459,7 @@ public class TimetableSnapshotSourceTest {
 
         tripDescriptorBuilder.setTripId("1.1");
         tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-        tripDescriptorBuilder.setStartDate(previously.getAsString());
+        tripDescriptorBuilder.setStartDate(previously.asCompactString());
 
         final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 

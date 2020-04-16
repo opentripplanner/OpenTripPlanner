@@ -11,6 +11,8 @@ import java.util.List;
  * from a set.
  * @author novalis
  *
+ *
+ * TODO OTP2 - Replace this with the use of a EnumSet
  */
 public class TraverseModeSet implements Cloneable, Serializable {
 

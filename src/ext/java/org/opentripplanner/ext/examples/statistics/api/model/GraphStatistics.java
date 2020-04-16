@@ -10,7 +10,7 @@ public class GraphStatistics {
 
 
     GraphStatistics(RoutingService index) {
-        this.stops = index.getStopForId().size();
+        this.stops = index.getAllStops().size();
     }
 
     /**

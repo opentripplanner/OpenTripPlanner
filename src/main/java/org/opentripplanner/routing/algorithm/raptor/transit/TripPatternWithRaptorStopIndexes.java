@@ -23,7 +23,7 @@ public class TripPatternWithRaptorStopIndexes {
     public FeedScopedId getId() { return pattern.getId(); }
 
     public TransitMode getTransitMode() {
-        return pattern.mode;
+        return pattern.getMode();
     }
 
     public int[] getStopIndexes() {
@@ -58,7 +58,7 @@ public class TripPatternWithRaptorStopIndexes {
     public String toString() {
         return "TripPattern{" +
                 "id=" + getId() +
-                ", transitMode=" + pattern.mode +
+                ", transitMode=" + pattern.getMode() +
                 '}';
     }
 }

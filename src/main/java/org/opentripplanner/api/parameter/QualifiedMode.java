@@ -1,7 +1,7 @@
 package org.opentripplanner.api.parameter;
 
 import com.google.common.collect.Sets;
-
+import javax.ws.rs.BadRequestException;
 import java.io.Serializable;
 import java.util.Set;
 
@@ -12,11 +12,18 @@ public class QualifiedMode implements Serializable {
     public final Set<Qualifier> qualifiers = Sets.newHashSet();
 
     public QualifiedMode(String qMode) {
-        String[] elements = qMode.split("_");
-        mode = ApiRequestMode.valueOf(elements[0].trim());
-        for (int i = 1; i < elements.length; i++) {
-            Qualifier q = Qualifier.valueOf(elements[i].trim());
-            qualifiers.add(q);
+        try {
+            String[] elements = qMode.split("_");
+            mode = ApiRequestMode.valueOf(elements[0].trim());
+            for (int i = 1; i < elements.length; i++) {
+                Qualifier q = Qualifier.valueOf(elements[i].trim());
+                qualifiers.add(q);
+            }
+        }
+        catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            throw new BadRequestException(
+                    "Qualified mode is not valid: '" + qMode + "', details: " + e.getMessage()
+            );
         }
     }
     

@@ -175,12 +175,10 @@ public abstract class Vertex implements Serializable, Cloneable {
         return Arrays.asList(incoming);
     }
 
-    @XmlTransient
     public int getDegreeOut() {
         return outgoing.length;
     }
 
-    @XmlTransient
     public int getDegreeIn() {
         return incoming.length;
     }
@@ -231,7 +229,6 @@ public abstract class Vertex implements Serializable, Cloneable {
         return label;
     }
 
-    @XmlTransient
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
@@ -261,7 +258,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
-    @XmlTransient
     public List<Edge> getOutgoingStreetEdges() {
         List<Edge> result = new ArrayList<Edge>();
         for (Edge out : this.getOutgoing()) {

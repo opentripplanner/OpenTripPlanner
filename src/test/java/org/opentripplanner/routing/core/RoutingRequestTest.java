@@ -55,7 +55,7 @@ public class RoutingRequestTest {
 
     @Test
     public void testPreferencesPenaltyForRoute() {
-        FeedScopedId id = new FeedScopedId();
+        FeedScopedId id = new FeedScopedId("feedId", "1");
         Agency agency = new Agency();
         Route route = new Route();
         Trip trip = new Trip();

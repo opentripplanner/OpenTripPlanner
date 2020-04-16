@@ -1,13 +1,8 @@
 package org.opentripplanner.api.parameter;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.GregorianCalendar;
-
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.ext.Provider;
+import java.util.GregorianCalendar;
 
 @SuppressWarnings("rawtypes")
 @Provider
@@ -21,14 +16,7 @@ public class IsoTimeParameter {
         try {
             cal = javax.xml.datatype.DatatypeFactory.newInstance().newXMLGregorianCalendar(param).toGregorianCalendar();
         } catch (Exception e) {
-            throw new WebApplicationException(fail(param, e));
+            throw new BadRequestException("parsing time " + param + ": " + e.getMessage(), e);
         }
     }
-
-    protected Response fail(String param, Exception e) {
-        return Response.status(Status.BAD_REQUEST)
-                       .entity("parsing time " + param + ": " + e.getMessage())
-                       .build();
-    }
-
 }

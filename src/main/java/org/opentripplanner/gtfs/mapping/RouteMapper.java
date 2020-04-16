@@ -34,6 +34,7 @@ class RouteMapper {
         lhs.setShortName(rhs.getShortName());
         lhs.setLongName(rhs.getLongName());
         lhs.setType(rhs.getType());
+        lhs.setMode(TransitModeMapper.mapMode(rhs.getType()));
         lhs.setDesc(rhs.getDesc());
         lhs.setUrl(rhs.getUrl());
         lhs.setColor(rhs.getColor());

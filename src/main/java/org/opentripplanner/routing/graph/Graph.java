@@ -19,6 +19,8 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
@@ -38,6 +40,7 @@ import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -227,7 +230,7 @@ public class Graph implements Serializable {
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
      * vertices/edges anymore.
      */
-    public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+    public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
@@ -743,6 +746,7 @@ public class Graph implements Serializable {
         return feedIds;
     }
 
+    /** @return the agencies to which the specified feedId is mapped, or null if no mapping exist */
     public Collection<Agency> getAgencies(String feedId) {
         return agenciesForFeedId.get(feedId);
     }
@@ -954,7 +958,7 @@ public class Graph implements Serializable {
             return station.getChildStops();
         }
         // Single stop
-        Stop stop = index.getStopForId().get(id);
+        Stop stop = index.getStopForId(id);
         if (stop != null) {
             return Collections.singleton(stop);
         }
@@ -997,7 +1001,7 @@ public class Graph implements Serializable {
         return res == null ? Collections.emptyList() : res;
     }
 
-    public TripPattern getTripPatternForId(String id) {
+    public TripPattern getTripPatternForId(FeedScopedId id) {
         return tripPatternForId.get(id);
     }
 
@@ -1009,12 +1013,26 @@ public class Graph implements Serializable {
         return getNoticesByElement().values();
     }
 
-    public Collection<Stop> getStopsByBoundingBox(Envelope envelope) {
+    /** Get all stops within a given bounding box. */
+    public Collection<Stop> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+        Envelope envelope = new Envelope(
+                new Coordinate(minLon, minLat),
+                new Coordinate(maxLon, maxLat)
+        );
         return streetIndex
             .getTransitStopForEnvelope(envelope)
             .stream()
             .map(TransitStopVertex::getStop)
             .collect(Collectors.toList());
+    }
+
+    /** Get all stops within a given radius. Unit: meters. */
+    public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
+        Coordinate coord = new Coordinate(center.longitude(), center.latitude());
+        return streetIndex.getNearbyTransitStops(coord, radius).stream()
+                .map(v -> new T2<>(v.getStop(), SphericalDistanceLibrary.fastDistance(v.getCoordinate(), coord)))
+                .filter(t -> t.second < radius)
+                .collect(Collectors.toList());
     }
 
     public Station getStationById(FeedScopedId id) {
@@ -1033,7 +1051,7 @@ public class Graph implements Serializable {
         return serviceCodes;
     }
 
-    public Multimap<Stop, SimpleTransfer> getTransfersByStop() {
-        return transfersByStop;
+    public Collection<SimpleTransfer> getTransfersByStop(Stop stop) {
+        return transfersByStop.get(stop);
     }
 }
