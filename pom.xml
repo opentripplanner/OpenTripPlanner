@@ -509,11 +509,6 @@
             <url>http://maven.geo-solutions.it/</url>
         </repository>
         <repository>
-            <id>conveyal</id>
-            <name>Conveyal Maven Repository</name>
-            <url>https://maven.conveyal.com/</url>
-        </repository>
-        <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
             <url>http://nexus.onebusaway.org/nexus/content/repositories/releases/</url>
@@ -752,7 +747,7 @@
         <dependency>
             <groupId>com.google.protobuf</groupId>
             <artifactId>protobuf-java</artifactId>
-            <version>2.6.1</version>
+            <version>3.11.4</version>
             <type>jar</type>
             <scope>compile</scope>
         </dependency>
@@ -775,11 +770,11 @@
             <artifactId>jets3t</artifactId>
             <version>0.8.1</version>
         </dependency>
-        <!-- OpenStreetMap protobuf (PBF) definitions -->
+        <!-- OpenStreetMap protobuf (PBF) definitions and parser -->
         <dependency>
-            <groupId>crosby.binary</groupId>
-            <artifactId>osmpbf</artifactId>
-            <version>1.3.4-SNAPSHOT</version>
+            <groupId>org.openstreetmap.osmosis</groupId>
+            <artifactId>osmosis-osm-binary</artifactId>
+            <version>0.47.3</version>
         </dependency>
         <!-- Command line parameter parsing -->
         <dependency>
