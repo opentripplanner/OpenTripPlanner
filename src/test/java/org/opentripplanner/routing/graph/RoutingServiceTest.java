@@ -41,14 +41,14 @@ public class RoutingServiceTest extends GtfsTest {
         /* Agencies */
         String feedId = graph.getFeedIds().iterator().next();
         Agency agency;
-        agency = graph.index.getAgenciesForFeedId().get(feedId).get("azerty");
+        agency = graph.index.getAgency(feedId, "azerty");
         assertNull(agency);
-        agency = graph.index.getAgenciesForFeedId().get(feedId).get("agency");
+        agency = graph.index.getAgency(feedId, "agency");
         assertEquals(agency.getId(), "agency");
         assertEquals(agency.getName(), "Fake Agency");
 
         /* Stops */
-        graph.index.getStopForId().get(new FeedScopedId("X", "Y"));
+        graph.index.getStopForId(new FeedScopedId("X", "Y"));
 
         /* Trips */
 //        graph.index.tripForId;
@@ -64,13 +64,13 @@ public class RoutingServiceTest extends GtfsTest {
             assertTrue(pattern.getTrips().contains(trip));
         }
         /* This one depends on a feed where each TripPattern appears on only one route. */
-        for (Route route : graph.index.getRouteForId().values()) {
+        for (Route route : graph.index.getAllRoutes()) {
             for (TripPattern pattern : graph.index.getPatternsForRoute().get(route)) {
                 assertEquals(pattern.route, route);
             }
         }
-        for (Stop stop : graph.index.getStopForId().values()) {
-            for (TripPattern pattern : graph.index.getPatternsForStop().get(stop)) {
+        for (Stop stop : graph.index.getAllStops()) {
+            for (TripPattern pattern : graph.index.getPatternsForStop(stop)) {
                 assertTrue(pattern.stopPattern.containsStop(stop.getId().toString()));
             }
         }
@@ -78,9 +78,9 @@ public class RoutingServiceTest extends GtfsTest {
 
     public void testSpatialIndex() {
         String feedId = graph.getFeedIds().iterator().next();
-        Stop stopJ = graph.index.getStopForId().get(new FeedScopedId(feedId, "J"));
-        Stop stopL = graph.index.getStopForId().get(new FeedScopedId(feedId, "L"));
-        Stop stopM = graph.index.getStopForId().get(new FeedScopedId(feedId, "M"));
+        Stop stopJ = graph.index.getStopForId(new FeedScopedId(feedId, "J"));
+        Stop stopL = graph.index.getStopForId(new FeedScopedId(feedId, "L"));
+        Stop stopM = graph.index.getStopForId(new FeedScopedId(feedId, "M"));
         TransitStopVertex stopvJ = graph.index.getStopVertexForStop().get(stopJ);
         TransitStopVertex stopvL = graph.index.getStopVertexForStop().get(stopL);
         TransitStopVertex stopvM = graph.index.getStopVertexForStop().get(stopM);

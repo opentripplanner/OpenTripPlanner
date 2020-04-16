@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.api.model.RouterInfo;
-import org.opentripplanner.api.model.RouterList;
+import org.opentripplanner.api.model.ApiRouterInfo;
+import org.opentripplanner.api.model.ApiRouterList;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -13,8 +13,6 @@ import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-
-import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 /**
  * This REST API endpoint returns some meta-info about a router. OTP2 does no longer support
@@ -39,9 +37,9 @@ public class Routers {
      * Return the "default" router information.
      */
     @GET
-    @Path("{routerId}")
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
-    public RouterInfo getGraphId(@PathParam("routerId") String routerId) {
+    @Path("{ignoreRouterId}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ApiRouterInfo getGraphId(@PathParam("ignoreRouterId") String ignore) {
         return getRouterInfo();
     }
 
@@ -52,17 +50,17 @@ public class Routers {
      * on the Accept header in the HTTP request.
      */
     @GET
-    @Produces({MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q})
-    public RouterList getRouterIds() {
-        RouterList routerList = new RouterList();
+    @Produces(MediaType.APPLICATION_JSON)
+    public ApiRouterList getRouterIds() {
+        ApiRouterList routerList = new ApiRouterList();
         routerList.routerInfo.add(getRouterInfo());
         return routerList;
     }
 
-    private RouterInfo getRouterInfo() {
+    private ApiRouterInfo getRouterInfo() {
         try {
-            Router router = otpServer.getRouter(null);
-            return new RouterInfo("default", router.graph);
+            Router router = otpServer.getRouter();
+            return new ApiRouterInfo("default", router.graph);
         }
         catch (GraphNotFoundException e) {
             return null;

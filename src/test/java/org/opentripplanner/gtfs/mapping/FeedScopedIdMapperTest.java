@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNull;
 import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 public class FeedScopedIdMapperTest {
@@ -21,13 +20,8 @@ public class FeedScopedIdMapperTest {
         assertEquals("1", mappedId.getId());
     }
 
-    @Test
+    @Test(expected = IllegalArgumentException.class)
     public void testMapAgencyAndIdWithNulls() throws Exception {
-        org.onebusaway.gtfs.model.AgencyAndId inputId = new org.onebusaway.gtfs.model.AgencyAndId();
-
-        FeedScopedId mappedId = mapAgencyAndId(inputId);
-
-        assertNull(mappedId.getFeedId());
-        assertNull(mappedId.getId());
+        mapAgencyAndId(new org.onebusaway.gtfs.model.AgencyAndId());
     }
 }

@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.alertpatch;
 
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+
 import javax.xml.bind.annotation.XmlAttribute;
 import javax.xml.bind.annotation.XmlType;
-
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
 /**
  * Represents a period of time, in terms of seconds in [start, end)
@@ -12,6 +12,10 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
  */
 @XmlType
 public class TimePeriod {
+    // TODO OTP2 - This class is used both for internal and external API representation,
+    //           - a external API version should be created to decouple the internal model
+    //           - from any API usage.
+
     public TimePeriod(long start, long end) {
         this.startTime = start;
         this.endTime = end;

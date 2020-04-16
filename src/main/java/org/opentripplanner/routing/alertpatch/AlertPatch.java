@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -103,11 +102,10 @@ public class AlertPatch implements Serializable {
     public void apply(Graph graph) {
         Agency agency = null;
         if (feedId != null) {
-            Map<String, Agency> agencies = graph.index.getAgenciesForFeedId().get(feedId);
-            agency = this.agency != null ? agencies.get(this.agency) : null;
+            agency = graph.index.getAgency(feedId, this.agency);
         }
-        Route route = this.route != null ? graph.index.getRouteForId().get(this.route) : null;
-        Stop stop = this.stop != null ? graph.index.getStopForId().get(this.stop) : null;
+        Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
+        Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {
@@ -147,13 +145,9 @@ public class AlertPatch implements Serializable {
     }
 
     public void remove(Graph graph) {
-        Agency agency = null;
-        if (feedId != null) {
-            Map<String, Agency> agencies = graph.index.getAgenciesForFeedId().get(feedId);
-            agency = this.agency != null ? agencies.get(this.agency) : null;
-        }
-        Route route = this.route != null ? graph.index.getRouteForId().get(this.route) : null;
-        Stop stop = this.stop != null ? graph.index.getStopForId().get(this.stop) : null;
+        Agency agency = graph.index.getAgency(feedId, this.agency);
+        Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
+        Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
         Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {

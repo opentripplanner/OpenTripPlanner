@@ -5,6 +5,7 @@ import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.ArrayList;
@@ -158,8 +159,9 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
                         ).withBytes(bArray)
                 );
             }
-        } catch (Exception ex) {
-            ex.printStackTrace();
+        }
+        catch (IOException e) {
+            throw new RuntimeException(e.getMessage(), e);
         }
     }
 }

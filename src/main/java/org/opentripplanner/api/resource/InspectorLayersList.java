@@ -1,24 +1,17 @@
 package org.opentripplanner.api.resource;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.inspector.TileRenderer;
+
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElements;
-import javax.xml.bind.annotation.XmlRootElement;
-import org.opentripplanner.inspector.TileRenderer;
 
 /**
  *
  * @author mabu
  */
-@XmlRootElement(name="InspectorLayersList")
 public class InspectorLayersList {
-    
-    @XmlElements(value = {@XmlElement(name="layer") })
+
     public List<InspectorLayer> layers;
 
     InspectorLayersList(Map<String, TileRenderer> renderers) {
@@ -31,12 +24,7 @@ public class InspectorLayersList {
     }
 
     private static class InspectorLayer {
-        
-        @XmlAttribute
-        @JsonSerialize
         String key;
-        @XmlAttribute
-        @JsonSerialize
         String name;
 
         private InspectorLayer(String layer_key, String layer_name) {
@@ -44,6 +32,4 @@ public class InspectorLayersList {
             this.name = layer_name;
         }
     }
-
-   
 }

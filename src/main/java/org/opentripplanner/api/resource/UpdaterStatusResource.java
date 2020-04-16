@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 /**
  * Report the status of the graph updaters via a web service.
  */
-@Path("/routers/{routerId}/updaters")
+@Path("/routers/{ignoreRouterId}/updaters")
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
@@ -24,10 +24,16 @@ public class UpdaterStatusResource {
     /** Choose short or long form of results. */
     @QueryParam("detail") private boolean detail = false;
 
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
     Router router;
 
-    public UpdaterStatusResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-        router = otpServer.getRouter(routerId);
+    public UpdaterStatusResource (@Context OTPServer otpServer) {
+        router = otpServer.getRouter();
     }
 
     /** Return a list of all agencies in the graph. */
