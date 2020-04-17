@@ -107,6 +107,7 @@ public class StreetTransitLink extends Edge {
             return null;
         }
 
+        // TODO AdamWiktor this causes failure of test `InitialStopsTest#testInitialStopBikeSpeedIncrease`
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if ((s0.getNonTransitMode() == TraverseMode.CAR || s0.getNonTransitMode() == TraverseMode.BICYCLE)
