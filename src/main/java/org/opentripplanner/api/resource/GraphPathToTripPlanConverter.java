@@ -16,6 +16,7 @@ import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
@@ -82,7 +83,6 @@ public abstract class GraphPathToTripPlanConverter {
             if (itinerary.transitTime == 0 && itinerary.walkTime < bestNonTransitTime) {
                 bestNonTransitTime = itinerary.walkTime;
             }
-            itinerary.prepareItineraryType();
             itineraries.add(itinerary);
         }
 
@@ -184,8 +184,31 @@ public abstract class GraphPathToTripPlanConverter {
         if (itinerary.transfers > 0 && !(states[0].getVertex() instanceof OnboardDepartVertex)) {
             itinerary.transfers--;
         }
-
+        itinerary.itineraryType = generateItineraryType(itinerary.legs);
         return itinerary;
+    }
+
+    private static String generateItineraryType(List<Leg> legs) {
+        List<String> types = new ArrayList<>();
+
+        if (legs.stream().anyMatch(leg -> leg.mode == TraverseMode.WALK)) {
+            types.add(TraverseMode.WALK.toString());
+        }
+
+        types.addAll(legs.stream()
+                .map(leg -> leg.vehicleDescription)
+                .filter(Objects::nonNull)
+                .map(VehicleDescription::getVehicleType)
+                .map(Objects::toString)
+                .distinct()
+                .sorted()
+                .collect(Collectors.toList()));
+
+        if (legs.stream().anyMatch(leg -> leg.mode.isTransit())) {
+            types.add(TraverseMode.TRANSIT.toString());
+        }
+
+        return String.join("+", types);
     }
 
     private static Calendar makeCalendar(State state) {
@@ -378,7 +401,7 @@ public abstract class GraphPathToTripPlanConverter {
     private static void addWalkSteps(Graph graph, List<Leg> legs, State[][] legsStates, Locale requestedLocale) {
         WalkStep previousStep = null;
 
-        String lastMode = null;
+        TraverseMode lastMode = null;
 
         BikeRentalStationVertex onVertex = null, offVertex = null;
 
@@ -394,9 +417,9 @@ public abstract class GraphPathToTripPlanConverter {
                 legs.get(i).intermediateTransitStops = intermediateStops;
             }
 
-            String legMode = legs.get(i).mode;
+            TraverseMode legMode = legs.get(i).mode;
             if (legMode != lastMode && !walkSteps.isEmpty()) {
-                walkSteps.get(0).newMode = legMode;
+                walkSteps.get(0).newMode = legMode.toString();
                 lastMode = legMode;
             }
 
@@ -554,7 +577,7 @@ public abstract class GraphPathToTripPlanConverter {
             Edge edge = state.getBackEdge();
 
             if (mode != null) {
-                leg.mode = mode.toString();
+                leg.mode = mode;
             }
 
             if (alerts != null) {

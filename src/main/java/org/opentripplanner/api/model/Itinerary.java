@@ -150,34 +150,4 @@ public class Itinerary {
             endTime = calendar;
         }
     }
-
-    public void prepareItineraryType() {
-        itineraryType = "";
-        boolean isTransit = false;
-        for (TraverseMode traverseMode : TraverseMode.values()) {
-            for (Leg leg : legs) {
-                if (traverseMode.toString().equals(leg.mode)) {
-                    if (!traverseMode.isTransit()) {
-                        if (itineraryType.equals("")) {
-                            itineraryType = traverseMode.toString();
-                        } else {
-                            itineraryType = itineraryType + "+" + traverseMode.toString();
-                        }
-                        break;
-                    } else {
-                        isTransit = true;
-                    }
-                }
-
-            }
-        }
-        if (isTransit) {
-            if (itineraryType.equals("")) {
-                itineraryType = "TRANSIT";
-            } else {
-                itineraryType = itineraryType + "+TRANSIT";
-            }
-        }
-
-    }
 }
