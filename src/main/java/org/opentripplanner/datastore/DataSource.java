@@ -100,7 +100,10 @@ public interface DataSource {
             return IOUtils.toByteArray(asInputStream());
         }
         catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(
+                    "Failed to read " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
         }
     }
 

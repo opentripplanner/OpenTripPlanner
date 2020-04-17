@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipException;
 import java.util.zip.ZipInputStream;
 
 
@@ -159,9 +160,17 @@ public class ZipStreamDataSourceDecorator implements CompositeDataSource {
                         ).withBytes(bArray)
                 );
             }
+        } catch (ZipException ex) {
+            throw new RuntimeException(
+                    "Can not read zip file " + path() + ": " + ex.getLocalizedMessage(),
+                    ex
+            );
         }
-        catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+        catch (IOException ie) {
+            throw new RuntimeException(
+                    "Failed to load " + path() + ": " + ie.getLocalizedMessage(),
+                    ie
+            );
         }
     }
 }
