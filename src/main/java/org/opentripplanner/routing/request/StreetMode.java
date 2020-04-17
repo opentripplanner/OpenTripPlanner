@@ -8,9 +8,10 @@ public enum StreetMode {
   /**
    * Bike only
    *
-   * Direct mode only. Bike on transit is not yet supported.
+   * This can be used as access/egress, but transfers will still be walk only.
+   * // TODO OTP2 Implement bicycle transfers
    */
-  BIKE(false, false),
+  BIKE(true, true),
   /**
    * Bike to a bike parking area, then walk the rest of the way.
    *
