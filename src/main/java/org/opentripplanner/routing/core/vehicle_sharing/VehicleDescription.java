@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.TraverseMode;
 
@@ -64,12 +65,21 @@ public abstract class VehicleDescription {
         return provider;
     }
 
+    @JsonSerialize
+    public int getProviderId() {
+        return Provider.toId(provider);
+    }
+
+    @JsonIgnore
     public abstract double getMaxSpeedInMetersPerSecond();
 
+    @JsonIgnore
     public abstract TraverseMode getTraverseMode();
 
+    @JsonIgnore
     public abstract int getRentTimeInSeconds();
 
+    @JsonIgnore
     public abstract int getDropoffTimeInSeconds();
 
     @JsonSerialize

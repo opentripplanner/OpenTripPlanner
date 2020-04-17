@@ -5,10 +5,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.vehicle_sharing.FuelType;
-import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
-import org.opentripplanner.routing.core.vehicle_sharing.Provider;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleDetailsSet;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -213,6 +210,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("providersAllowed")
     protected List<Provider> providersAllowed;
+
+    /**
+     * Allows filtering vehicles for renting by vehicle types. By default we accept renting all vehicles.
+     */
+    @QueryParam("vehicleTypesAllowed")
+    protected List<VehicleType> vehicleTypesAllowed;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -647,8 +650,10 @@ public abstract class RoutingResource {
             request.rentingAllowed = rentingAllowed;
         }
 
-        if (!fuelTypesAllowed.isEmpty() || !gearboxesAllowed.isEmpty() || !providersAllowed.isEmpty()) {
-           request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed);
+        if (!fuelTypesAllowed.isEmpty() || !gearboxesAllowed.isEmpty() || !providersAllowed.isEmpty() ||
+                !vehicleTypesAllowed.isEmpty()) {
+            request.vehiclesAllowedToRent =
+                    new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed, vehicleTypesAllowed);
         }
 
         if (request.allowBikeRental && bikeSpeed == null) {
