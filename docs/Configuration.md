@@ -105,7 +105,7 @@ config key | description | value type | value default | notes
 `elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
 `readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`elevationModuleParallelism` | Set the number of processors to use during elevation calculations. | int | 1 | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 `fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
 `osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
 `osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
@@ -309,16 +309,14 @@ In graph builds, the elevation module will attempt to read the `cached_elevation
 
 The cached data is a lookup table where the coordinate sequences of respective street edges are used as keys for calculated data. It is assumed that all of the other input data except for the OpenStreetMap data remains the same between graph builds. Therefore, if the underlying elevation data is changed, or different configuration values for `elevationUnitMultiplier` or `includeEllipsoidToGeoidDifference` are used, then this data becomes invalid and all elevation data should be recalculated. Over time, various edits to OpenStreetMap will cause this cached data to become stale and not include new OSM ways. Therefore, periodic update of this cached data is recommended.
 
-#### Configuring the number of processors during elevation calculations
+#### Configuring multi-threading during elevation calculations
 
-For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single processor. For this reason, it is possible to define the parallelism or number of processors used during elevation calculations. It may be helpful to run experiments with different values to determine the optimal amount given the elevation data being used.
-
-By default, only 1 processor will be used. The maximum amount of processors is capped according to the maximum number of processors that java detects on the current machine. To set a custom amount of processors, add the following to the `build-config.json` file:
+For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single processor. For this reason, multi-threading of elevation calculations is only done if `multiThreadElevationCalculations` is set to true. To enable multi-threading in the elevation module, add the following to the `build-config.json` file:
                                                                
 ```JSON
 // build-config.json
 {  
-  "elevationModuleParallelism": 2
+  "multiThreadElevationCalculations": true
 }
 ```
 

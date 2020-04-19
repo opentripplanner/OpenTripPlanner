@@ -195,7 +195,7 @@ public class GraphBuilder implements Runnable {
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
                     false,
-                   1
+                   true
             );
             graphBuilder.addModule(elevationBuilder);
         } else if (config.fetchElevationUS) {
@@ -210,7 +210,7 @@ public class GraphBuilder implements Runnable {
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
                     false,
-                    1
+                    true
                 );
             graphBuilder.addModule(elevationBuilder);
         } else if (dataSources.has(DEM)) {
@@ -225,7 +225,7 @@ public class GraphBuilder implements Runnable {
                         config.elevationUnitMultiplier,
                         config.distanceBetweenElevationSamples,
                         false,
-                        1
+                        true
                 );
                 graphBuilder.addModule(elevationBuilder);
             }

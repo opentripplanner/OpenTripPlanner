@@ -1,8 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.Interpolator2D;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.geotools.geometry.DirectPosition2D;
@@ -29,7 +27,6 @@ import org.opentripplanner.util.PolylineEncoder;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.media.jai.InterpolationBilinear;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -43,16 +40,13 @@ import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentHashMap;
-import java.util.concurrent.ForkJoinPool;
-import java.util.concurrent.ForkJoinWorkerThread;
-import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static org.opentripplanner.util.ElevationUtils.computeEllipsoidToGeoidDifference;
 
 /**
  * THIS CLASS IS MULTI-THREADED
- * (When configured to do so, it uses a ForkJoinPool to distribute elevation calculation tasks for edges.)
+ * (When configured to do so, it uses parallel streams to distribute elevation calculation tasks for edges.)
  *
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that applies elevation data to street
  * data that has already been loaded into a (@link Graph}, creating elevation profiles for each Street encountered
@@ -76,11 +70,10 @@ public class ElevationModule implements GraphBuilderModule {
     /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
     /*
-     * The parallelism to use when processing edges. For unknown reasons that seem to depend on data and machine
-     * settings, it might be faster to use a single processor. If the parallelism is set to 1, then this module will not
-     * do any multi-threading and instead do all calculations in the OTP thread.
+     * Whether or not to use multi-threading when calculating the elevations. For unknown reasons that seem to depend on
+     * data and machine settings, it might be faster to use a single processor.
      */
-    private final int parallelism;
+    private final boolean multiThreadElevationCalculations;
 
     private DataImportIssueStore issueStore;
 
@@ -121,6 +114,8 @@ public class ElevationModule implements GraphBuilderModule {
     /** Used only when the ElevationModule is requested to be ran with a single thread */
     private Coverage singleThreadedCoverageInterpolator;
 
+    private ThreadLocal<Coverage> coverageInterpolatorThreadLocal = new ThreadLocal<>();
+
     /** used only for testing purposes */
     public ElevationModule(ElevationGridCoverageFactory factory) {
         this(
@@ -131,7 +126,7 @@ public class ElevationModule implements GraphBuilderModule {
             1,
             10,
             true,
-            1
+            false
         );
     }
 
@@ -143,7 +138,7 @@ public class ElevationModule implements GraphBuilderModule {
         double elevationUnitMultiplier,
         double distanceBetweenSamplesM,
         boolean includeEllipsoidToGeoidDifference,
-        int parallelism
+        boolean multiThreadElevationCalculations
     ) {
         gridCoverageFactory = factory;
         cachedElevationsFile = cacheDirectory != null ? new File(cacheDirectory, "cached_elevations.obj") : null;
@@ -151,8 +146,8 @@ public class ElevationModule implements GraphBuilderModule {
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
+        this.multiThreadElevationCalculations = multiThreadElevationCalculations;
         this.distanceBetweenSamplesM = distanceBetweenSamplesM;
-        this.parallelism = parallelism;
     }
 
     /**
@@ -192,22 +187,13 @@ public class ElevationModule implements GraphBuilderModule {
         }
         log.info("Setting street elevation profiles from digital elevation model...");
 
-        ForkJoinPool forkJoinPool = null;
-        if (parallelism > 1) {
-            // Create a thread factory for multi-threaded elevation calculations
-            ForkJoinPool.ForkJoinWorkerThreadFactory forkJoinWorkerThreadFactory = pool -> new ElevationWorkerThread(
-                pool);
-
-            forkJoinPool = new ForkJoinPool(parallelism, forkJoinWorkerThreadFactory, null, false);
-        }
-
         // At first, set the totalElevationEdges to the total number of edges in the graph.
         totalElevationEdges = graph.countEdges();
         List<StreetWithElevationEdge> streetsWithElevationEdges = new LinkedList<>();
         for (Vertex gv : graph.getVertices()) {
             for (Edge ee : gv.getOutgoing()) {
                 if (ee instanceof StreetWithElevationEdge) {
-                    if (parallelism > 1) {
+                    if (multiThreadElevationCalculations) {
                         // Multi-threaded execution requested, check and prepare a few things that are used only during
                         // multi-threaded runs.
                         if (examplarCoordinate == null) {
@@ -215,7 +201,6 @@ public class ElevationModule implements GraphBuilderModule {
                             // instances
                             examplarCoordinate = ee.getGeometry().getCoordinates()[0];
                         }
-                        forkJoinPool.submit(new ProcessEdgeTask((StreetWithElevationEdge) ee));
                     }
                     streetsWithElevationEdges.add((StreetWithElevationEdge) ee);
                 }
@@ -224,21 +209,13 @@ public class ElevationModule implements GraphBuilderModule {
         // update this value to the now-known amount of edges that are StreetWithElevation edges
         totalElevationEdges = streetsWithElevationEdges.size();
 
-        if (parallelism == 1) {
+        if (multiThreadElevationCalculations) {
+            // Multi-threaded execution
+            streetsWithElevationEdges.parallelStream().forEach(ee -> processEdgeWithProgress(ee));
+        } else {
             // If using just a single thread, process each edge inline
             for (StreetWithElevationEdge ee : streetsWithElevationEdges) {
                 processEdgeWithProgress(ee);
-            }
-        } else {
-            // Multi-threaded execution
-            // shutdown the forkJoinPool and wait until all tasks are finished. If this takes longer than 1 day, give up.
-            forkJoinPool.shutdown();
-            try {
-                forkJoinPool.awaitTermination(1, TimeUnit.DAYS);
-            } catch (InterruptedException ex) {
-                log.error("Multi-threaded elevation calculations timed-out!");
-                Thread.currentThread().interrupt();
-                throw new RuntimeException(ex);
             }
         }
 
@@ -254,8 +231,7 @@ public class ElevationModule implements GraphBuilderModule {
                 "If it is unprojected, perhaps the axes are not in (longitude, latitude) order.");
         }
 
-        // iterate again to find edges that had elevation calculated. This is done here instead of in the forkJoinPool
-        // to avoid thread locking for writes to a synchronized list
+        // Iterate again to find edges that had elevation calculated.
         LinkedList<StreetEdge> edgesWithCalculatedElevations = new LinkedList<>();
         for (StreetWithElevationEdge edgeWithElevation : streetsWithElevationEdges) {
             if (edgeWithElevation.hasPackedElevationProfile() && !edgeWithElevation.isElevationFlattened()) {
@@ -283,75 +259,6 @@ public class ElevationModule implements GraphBuilderModule {
         @SuppressWarnings("unchecked")
         HashMap<Vertex, Double> extraElevation = (HashMap<Vertex, Double>) extra.get(ElevationPoint.class);
         assignMissingElevations(graph, edgesWithCalculatedElevations, extraElevation);
-    }
-
-    /**
-     * A special extension of the Thread class so that a thread-specific coverage instance can be stored for each
-     * thread.
-     */
-    private class ElevationWorkerThread extends ForkJoinWorkerThread {
-        private Coverage threadSpecificCoverageInterpolator;
-
-        /**
-         * Creates a ForkJoinWorkerThread operating in the given pool.
-         *
-         * @param pool the pool this thread works in
-         * @throws NullPointerException if pool is null
-         */
-        protected ElevationWorkerThread(ForkJoinPool pool) {
-            super(pool);
-        }
-
-        /**
-         * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly
-         * used Interpolator2D class. Therefore, it is critical to use a dedicated Coverage interpolator instance for
-         * each thread to avoid other threads waiting for a lock to be released on the Coverage interpolator instance.
-         * This method will get/lazy-create a thread-specific Coverage interpolator instance.
-         *
-         * @return A thread-specific coverage interpolator instance.
-         */
-        public Coverage getThreadSpecificCoverageInterpolator() {
-            if (threadSpecificCoverageInterpolator == null) {
-                // Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that
-                // could arise from downstream classes that have synchronized methods.
-                threadSpecificCoverageInterpolator = createThreadSpecificCoverageInterpolator();
-            }
-            return threadSpecificCoverageInterpolator;
-        }
-
-        /**
-         * Synchronize the creation of the Thread-specific Coverage instances to avoid potential locks that could arise
-         * from downstream classes that have synchronized methods.
-         */
-        private Coverage createThreadSpecificCoverageInterpolator() {
-            Coverage coverage;
-            synchronized (gridCoverageFactory) {
-                coverage = createNewCoverageInterpolator();
-                // The Coverage instance relies on some synchronized static methods shared across all threads that
-                // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
-                // point on the edge to initialize these other items.
-                double[] dummy = new double[1];
-                coverage.evaluate(new DirectPosition2D(GeometryUtils.WGS84_XY, examplarCoordinate.x, examplarCoordinate.y),
-                    dummy
-                );
-            }
-            return coverage;
-        }
-    }
-
-    /**
-     * A runnable that contains the relevant info for executing a process edge operation in a particular thread.
-     */
-    private class ProcessEdgeTask implements Runnable {
-        private final StreetWithElevationEdge swee;
-
-        public ProcessEdgeTask(StreetWithElevationEdge swee) {
-            this.swee = swee;
-        }
-
-        @Override public void run() {
-            processEdgeWithProgress(swee);
-        }
     }
 
     class ElevationRepairState {
@@ -678,31 +585,40 @@ public class ElevationModule implements GraphBuilderModule {
     /**
      * Gets a coverage interpolator instance specific to the current thread. If using multiple threads, get the coverage
      * interpolator instance associated with the ElevationWorkerThread. Otherwise, use a class field.
+     *
+     * For unknown reasons, the interpolation of heights at coordinates is a synchronized method in the commonly used
+     * Interpolator2D class. Therefore, it is critical to use a dedicated Coverage interpolator instance for each thread
+     * to avoid other threads waiting for a lock to be released on the Coverage interpolator instance.
+     *
+     * This method will get/lazy-create a thread-specific Coverage interpolator instance. Since these interpolator
+     * instances take some time to create, they are lazy-created instead of created upfront because it could lock all
+     * other threads even if other threads don't need an interpolator right away if they happen to process a lot of
+     * cached data initially.
      */
     private Coverage getThreadSpecificCoverageInterpolator() {
-        if (parallelism == 1) {
+        if (multiThreadElevationCalculations) {
+            Coverage coverage = coverageInterpolatorThreadLocal.get();
+            if (coverage == null) {
+                synchronized (gridCoverageFactory) {
+                    coverage = gridCoverageFactory.getGridCoverage();
+                    // The Coverage instance relies on some synchronized static methods shared across all threads that
+                    // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
+                    // point on the edge to initialize these other items.
+                    double[] dummy = new double[1];
+                    coverage.evaluate(
+                        new DirectPosition2D(GeometryUtils.WGS84_XY, examplarCoordinate.x, examplarCoordinate.y),
+                        dummy
+                    );
+                    coverageInterpolatorThreadLocal.set(coverage);
+                }
+            }
+            return coverage;
+        } else {
             if (singleThreadedCoverageInterpolator == null) {
                 singleThreadedCoverageInterpolator = gridCoverageFactory.getGridCoverage();
             }
             return singleThreadedCoverageInterpolator;
-        } else {
-            return ((ElevationWorkerThread) Thread.currentThread()).getThreadSpecificCoverageInterpolator();
         }
-    }
-
-    /**
-     * Create a new coverage interpolator instance.
-     */
-    private Coverage createNewCoverageInterpolator() {
-        // If the grid coverage factory is the NEDGridCoverageFactoryImpl, then get the grid coverage from that factory.
-        // Otherwise, apply a bilinear interpolator.
-        // (note: UnifiedGridCoverages created by NEDGridCoverageFactoryImpl handle interpolation internally)
-        return gridCoverageFactory instanceof NEDGridCoverageFactoryImpl
-            ? gridCoverageFactory.getGridCoverage()
-            : Interpolator2D.create(
-                (GridCoverage2D) gridCoverageFactory.getGridCoverage(),
-                new InterpolationBilinear()
-            );
     }
 
     private void setEdgeElevationProfile(StreetWithElevationEdge ee, PackedCoordinateSequence elevPCS, Graph graph) {
