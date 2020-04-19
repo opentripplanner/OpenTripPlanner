@@ -199,7 +199,7 @@ public class RaptorPathToItineraryMapper {
         leg.routeId = route.getId();
         leg.agencyName = route.getAgency().getName();
         leg.routeColor = route.getColor();
-        leg.tripShortName = route.getShortName();
+        leg.tripShortName = trip.getTripShortName();
         leg.agencyId = route.getAgency().getId();
         leg.routeShortName = route.getShortName();
         leg.routeLongName = route.getLongName();
