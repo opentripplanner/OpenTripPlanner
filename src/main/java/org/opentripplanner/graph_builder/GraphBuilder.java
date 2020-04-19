@@ -294,7 +294,7 @@ public class GraphBuilder implements Runnable {
                     builderParams.writeCachedElevations,
                     builderParams.elevationUnitMultiplier,
                     builderParams.includeEllipsoidToGeoidDifference,
-                    builderParams.elevationModuleParallelism
+                    builderParams.multiThreadElevationCalculations
                 )
             );
         }

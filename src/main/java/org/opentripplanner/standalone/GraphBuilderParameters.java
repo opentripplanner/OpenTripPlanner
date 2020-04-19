@@ -210,12 +210,11 @@ public class GraphBuilderParameters {
     public boolean includeEllipsoidToGeoidDifference;
 
     /**
-     * A customizable level of parallelism with which to process elevation data for street edges. The default is set to
-     * the 1 processor. For unknown reasons that seem to depend on data and machine settings, it might be faster to use
-     * a single processors. The maximum amount of processors is capped according to the maximum number of processors
-     * that java detects on the current machine.
+     * Whether or not to multi-thread the elevation calculations in the elevation module. The default is set to false.
+     * For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single
+     * processor. If multi-threading is activated, parallel streams will be used to calculate the elevations.
      */
-    public int elevationModuleParallelism;
+    public boolean multiThreadElevationCalculations;
 
     /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
@@ -256,7 +255,7 @@ public class GraphBuilderParameters {
         readCachedElevations = config.path("readCachedElevations").asBoolean(true);
         writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
         includeEllipsoidToGeoidDifference = config.path("includeEllipsoidToGeoidDifference").asBoolean(false);
-        elevationModuleParallelism = ElevationModule.fromConfig(config.path("elevationModuleParallelism"));
+        multiThreadElevationCalculations = config.path("multiThreadElevationCalculations").asBoolean(false);
     }
 
 
