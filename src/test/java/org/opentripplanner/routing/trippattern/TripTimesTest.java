@@ -1,26 +1,26 @@
 package org.opentripplanner.routing.trippattern;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.junit.Test;
+import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SimpleConcreteVertex;
 import org.opentripplanner.routing.graph.Vertex;
+
+import java.util.Arrays;
+import java.util.LinkedList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 
 public class TripTimesTest {
     private static final FeedScopedId tripId = new FeedScopedId("agency", "testtrip");
@@ -48,8 +48,7 @@ public class TripTimesTest {
         for(int i =  0; i < stops.length; ++i) {
             StopTime stopTime = new StopTime();
 
-            Stop stop = new Stop();
-            stop.setId(stops[i]);
+            Stop stop = Stop.stopForTest(stops[i].getId(), 0.0, 0.0);
             stopTime.setStop(stop);
             stopTime.setArrivalTime(i * 60);
             stopTime.setDepartureTime(i * 60);
@@ -161,13 +160,9 @@ public class TripTimesTest {
         StopTime stopTime1 = new StopTime();
         StopTime stopTime2 = new StopTime();
 
-        Stop stop0 = new Stop();
-        Stop stop1 = new Stop();
-        Stop stop2 = new Stop();
-
-        stop0.setId(stops[0]);
-        stop1.setId(stops[1]);
-        stop2.setId(stops[2]);
+        Stop stop0 = Stop.stopForTest(stops[0].getId(), 0.0, 0.0);
+        Stop stop1 = Stop.stopForTest(stops[1].getId(), 0.0, 0.0);
+        Stop stop2 = Stop.stopForTest(stops[2].getId(), 0.0, 0.0);
 
         stopTime0.setStop(stop0);
         stopTime0.setDepartureTime(0);

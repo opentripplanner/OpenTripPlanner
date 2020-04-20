@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 
 import org.junit.Test;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 
@@ -12,11 +11,11 @@ import static org.junit.Assert.assertEquals;
 
 public class StopIndexForRaptorTest {
 
-    private static Stop STOP_0 = createStop(1);
-    private static Stop STOP_1 = createStop(2);
-    private static Stop STOP_2 = createStop(3);
-    private static Stop STOP_3 = createStop(4);
-    private static Stop STOP_4 = createStop(5);
+    private static Stop STOP_0 = Stop.stopForTest("ID-" + 1, 0.0, 0.0);
+    private static Stop STOP_1 = Stop.stopForTest("ID-" + 2, 0.0, 0.0);
+    private static Stop STOP_2 = Stop.stopForTest("ID-" + 3, 0.0, 0.0);
+    private static Stop STOP_3 = Stop.stopForTest("ID-" + 4, 0.0, 0.0);
+    private static Stop STOP_4 = Stop.stopForTest("ID-" + 5, 0.0, 0.0);
 
     private static List<Stop> STOPS = Arrays.asList(
             STOP_0,
@@ -52,10 +51,4 @@ public class StopIndexForRaptorTest {
 
     /* private methods */
 
-    private static Stop createStop(int id) {
-        Stop stop = new Stop();
-        stop.setId(new FeedScopedId("agency", "ID-" + id));
-        stop.setName("Stop " + id);
-        return stop;
-    }
 }

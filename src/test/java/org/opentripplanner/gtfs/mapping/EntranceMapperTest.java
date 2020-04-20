@@ -97,14 +97,15 @@ public class EntranceMapperTest  {
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testThrowsNPEWhenCoordinateUnset() {
+  @Test(expected = IllegalStateException.class)
+  public void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_ENTRANCE_EXIT);
     input.setId(AGENCY_AND_ID);
 
     org.opentripplanner.model.Entrance result = subject.map(input);
 
+    // Exception expected because the entrence and the parent do not have a coordinate
     result.getLat();
   }
 

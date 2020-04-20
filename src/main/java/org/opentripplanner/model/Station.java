@@ -11,109 +11,104 @@ import java.util.TimeZone;
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
 public class Station extends TransitEntity<FeedScopedId> implements StopCollection {
-        private static final long serialVersionUID = 1L;
 
-        private FeedScopedId id;
+  private static final long serialVersionUID = 1L;
 
-        private String name;
+  private final FeedScopedId id;
 
-        private WgsCoordinate coordinate;
+  private final String name;
 
-        /**
-         * Public facing station code (short text or number)
-         */
-        private String code;
+  /**
+   * Public facing station code (short text or number)
+   */
+  private final String code;
 
-        /**
-         * Additional information about the station (if needed)
-         */
-        private String description;
+  /**
+   * Additional information about the station (if needed)
+   */
+  private final String description;
 
-        /**
-         * URL to a web page containing information about this particular station
-         */
-        private String url;
+  private final WgsCoordinate coordinate;
 
-        private TimeZone timezone;
+  /**
+   * URL to a web page containing information about this particular station
+   */
+  private final String url;
 
-        private Set<Stop> childStops = new HashSet<>();
+  private final TimeZone timezone;
 
-        public Station() {}
+  private final Set<Stop> childStops = new HashSet<>();
 
-        @Override public FeedScopedId getId() {
-                return id;
-        }
+  public Station(
+      FeedScopedId id,
+      String name,
+      WgsCoordinate coordinate,
+      String code,
+      String description,
+      String url,
+      TimeZone timezone
+  ) {
+    this.id = id;
+    this.name = name;
+    this.coordinate = coordinate;
+    this.code = code;
+    this.description = description;
+    this.url = url;
+    this.timezone = timezone;
+  }
 
-        @Override public void setId(FeedScopedId id) {
-                this.id = id;
-        }
+  public void addChildStop(Stop stop) {
+    this.childStops.add(stop);
+  }
 
-        public String getName() {
-                return name;
-        }
+  @Override
+  public String toString() {
+    return "<Station " + this.id + ">";
+  }
 
-        public void setName(String name) {
-                this.name = name;
-        }
+  @Override
+  public FeedScopedId getId() {
+    return id;
+  }
 
-        public double getLat() {
-                return coordinate.latitude();
-        }
+  @Override
+  public final void setId(FeedScopedId id) {
+    super.setId(id);
+  }
 
-        public WgsCoordinate getCoordinate() {
-                return coordinate;
-        }
+  public String getName() {
+    return name;
+  }
 
-        public void setCoordinate(WgsCoordinate coordinate) {
-                this.coordinate = coordinate;
-        }
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
+  }
 
-        public double getLon() {
-                return coordinate.longitude();
-        }
+  public String getCode() {
+    return code;
+  }
 
-        public String getCode() {
-                return code;
-        }
+  public String getDescription() {
+    return description;
+  }
 
-        public void setCode(String code) {
-                this.code = code;
-        }
+  public String getUrl() {
+    return url;
+  }
 
-        public String getDescription() {
-                return description;
-        }
+  public TimeZone getTimezone() {
+    return timezone;
+  }
 
-        public void setDescription(String description) {
-                this.description = description;
-        }
+  public Collection<Stop> getChildStops() {
+    return childStops;
+  }
 
-        public String getUrl() {
-                return url;
-        }
+  public double getLat() {
+    return coordinate.latitude();
+  }
 
-        public void setUrl(String url) {
-                this.url = url;
-        }
-
-        public TimeZone getTimezone() {
-                return timezone;
-        }
-
-        public void setTimezone(TimeZone timezone) {
-                this.timezone = timezone;
-        }
-
-        public Collection<Stop> getChildStops() {
-                return childStops;
-        }
-
-        public void addChildStop(Stop stop) {
-                this.childStops.add(stop);
-        }
-
-        @Override
-        public String toString() {
-                return "<Station " + this.id + ">";
-        }
+  public double getLon() {
+    return coordinate.longitude();
+  }
 }

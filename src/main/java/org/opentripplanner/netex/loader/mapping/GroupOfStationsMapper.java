@@ -15,8 +15,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-import static org.opentripplanner.netex.loader.mapping.PointMapper.mapCoordinate;
-
 class GroupOfStationsMapper {
 
     private static final Logger LOG = LoggerFactory.getLogger(GroupOfStationsMapper.class);
@@ -43,7 +41,7 @@ class GroupOfStationsMapper {
         groupOfStations.setId(
                 idFactory.createId(groupOfStopPlaces.getId()));
         groupOfStations.setName(groupOfStopPlaces.getName().getValue());
-        WgsCoordinate coordinate = mapCoordinate(groupOfStopPlaces.getCentroid());
+        WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
 
         if (coordinate == null) {
             // TODO OTP2 - This should be an data import issue

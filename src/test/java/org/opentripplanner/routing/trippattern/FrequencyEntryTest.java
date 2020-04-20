@@ -27,8 +27,7 @@ public class FrequencyEntryTest {
         for(int i = 0; i < STOP_NUM; ++i) {
             FeedScopedId id = new FeedScopedId("agency", i+"");
 
-            Stop stop= new Stop();
-            stop.setId(id);
+            Stop stop= Stop.stopForTest(id.getId(), 0.0, 0.0);
 
             StopTime stopTime = new StopTime();
             stopTime.setStop(stop);

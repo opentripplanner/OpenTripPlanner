@@ -1,81 +1,76 @@
 package org.opentripplanner.model;
 
 /**
- * Acts as the supertype for all entities, except stations, created from the GTFS stops table.
- * Most of the fileds are shared between the types, and eg. in pathways the namespace any of them
- * can be used as from and to.
- * */
-public abstract class StationElement extends TransitEntity<FeedScopedId>  {
+ * Acts as the supertype for all entities, except stations, created from the GTFS stops table. Most
+ * of the fileds are shared between the types, and eg. in pathways the namespace any of them can be
+ * used as from and to.
+ */
+public abstract class StationElement extends TransitEntity<FeedScopedId> {
 
-  protected FeedScopedId id;
+  protected final FeedScopedId id;
 
-  private String name;
+  private final String name;
 
-  private String code;
+  private final String code;
 
-  private String description;
+  private final String description;
 
-  protected WgsCoordinate coordinate;
+  private final WgsCoordinate coordinate;
 
-  private WheelChairBoarding wheelchairBoarding;
+  private final WheelChairBoarding wheelchairBoarding;
 
-  private String levelName;
-
-  private double levelIndex;
+  private final StopLevel level;
 
   private Station parentStation;
 
-  @Override public FeedScopedId getId() {
-      return id;
+  public StationElement(
+      FeedScopedId id,
+      String name,
+      String code,
+      String description,
+      WgsCoordinate coordinate,
+      WheelChairBoarding wheelchairBoarding,
+      StopLevel level
+  ) {
+    this.id = id;
+    this.name = name;
+    this.code = code;
+    this.description = description;
+    this.coordinate = coordinate;
+    this.wheelchairBoarding = wheelchairBoarding;
+    this.level = level;
   }
 
-  @Override public void setId(FeedScopedId id) {
-      this.id = id;
+  @Override
+  public FeedScopedId getId() {
+    return id;
+  }
+
+  /** @throws UnsupportedOperationException */
+  @Override
+  public final void setId(FeedScopedId id) {
+    super.setId(id);
   }
 
   /**
    * Name of the station element if provided.
    */
   public String getName() {
-      return name;
-  }
-
-  public void setName(String name) {
-      this.name = name;
+    return name;
   }
 
   /**
    * Public facing stop code (short text or number).
    */
   public String getCode() {
-      return code;
-  }
-
-  public void setCode(String code) {
-      this.code = code;
+    return code;
   }
 
   /**
    * Additional information about the station element (if needed).
    */
   public String getDescription() {
-      return description;
-  }
-
-  public void setDescription(String description) {
-      this.description = description;
-  }
-
-  /**
-   * Center point/location for the station element. Returns the coordinate of the parent station,
-   * if the coordinate is not defined for this station element.
-   */
-  public WgsCoordinate getCoordinate() {
-    return coordinate != null ? coordinate : parentStation.getCoordinate();
-  }
-
-  public void setCoordinate(WgsCoordinate coordinate) {
-    this.coordinate = coordinate;
+    return description;
   }
 
   public double getLat() {
@@ -87,32 +82,44 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
   }
 
   /**
-   * Returns whether this station element is accessible for wheelchair users.
-   * */
-  public WheelChairBoarding getWheelchairBoarding() {
-      return wheelchairBoarding;
+   * Center point/location for the station element. Returns the coordinate of the parent station, if
+   * the coordinate is not defined for this station element.
+   */
+  public WgsCoordinate getCoordinate() {
+    if (coordinate != null) {
+      return coordinate;
+    }
+    if (parentStation != null) {
+      return parentStation.getCoordinate();
+    }
+    throw new IllegalStateException("Coordinate not set for: " + toString());
   }
 
-  public void setWheelchairBoarding(WheelChairBoarding wheelchairBoarding) {
-      this.wheelchairBoarding = wheelchairBoarding;
+  /**
+   * The coordinate for the given stop element exist. The {@link #getCoordinate()}
+   * will use the parent station coordinate if not set, but this method will return
+   * based on this instance; Hence the {@link #getCoordinate()} might return a coordinate,
+   * while this method return {@code false}.
+   */
+  boolean isCoordinateSet() {
+    return coordinate != null;
+  }
+
+  /**
+   * Returns whether this station element is accessible for wheelchair users.
+   */
+  public WheelChairBoarding getWheelchairBoarding() {
+    return wheelchairBoarding;
   }
 
   /** Level name for elevator descriptions */
   public String getLevelName() {
-      return levelName;
+    return level == null ? null : level.getName();
   }
 
-  public void setLevelName(String levelName) {
-      this.levelName = levelName;
-  }
-
-  /** Level index for hop counts in elevators */
-  public double getLevelIndex() {
-      return levelIndex;
-  }
-
-  public void setLevelIndex(double levelIndex) {
-    this.levelIndex = levelIndex;
+  /** Level index for hop counts in elevators. Is {@code null} if not set. */
+  public Double getLevelIndex() {
+    return level == null ? null : level.getIndex();
   }
 
   /** Parent station for the station element */

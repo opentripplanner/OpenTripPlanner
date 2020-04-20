@@ -1,15 +1,11 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.PathwayNode;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
 
 /** Responsible for mapping GTFS Node into the OTP model. */
 class PathwayNodeMapper {
@@ -31,24 +27,16 @@ class PathwayNodeMapper {
                     + gtfsStop.getLocationType());
         }
 
-        PathwayNode otpPathwayNode = new PathwayNode();
+        StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-        otpPathwayNode.setId(mapAgencyAndId(gtfsStop.getId()));
-        otpPathwayNode.setName(gtfsStop.getName());
-        if (gtfsStop.isLatSet() && gtfsStop.isLonSet()) {
-            otpPathwayNode.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
-        }
-        otpPathwayNode.setCode(gtfsStop.getCode());
-        otpPathwayNode.setDescription(gtfsStop.getDesc());
-        otpPathwayNode.setWheelchairBoarding(
-            WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding())
+        return new PathwayNode(
+            base.getId(),
+            base.getName(),
+            base.getCode(),
+            base.getDescription(),
+            base.getCoordinate(),
+            base.getWheelchairBoarding(),
+            base.getLevel()
         );
-        var level = gtfsStop.getLevel();
-        if (level != null) {
-            otpPathwayNode.setLevelIndex(level.getIndex());
-            otpPathwayNode.setLevelName(level.getName());
-        }
-
-        return otpPathwayNode;
     }
 }

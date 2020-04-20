@@ -11,6 +11,7 @@ import java.util.Collections;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class BoardingAreaMapperTest  {
@@ -34,9 +35,7 @@ public class BoardingAreaMapperTest  {
 
   private static final int VEHICLE_TYPE = 5;
 
-  private static final int WHEELCHAIR_BOARDING = 1;
-
-  private static final WheelChairBoarding WHEELCHAIR_BOARDING_ENUM = WheelChairBoarding.POSSIBLE;
+  private static final WheelChairBoarding WHEELCHAIR_BOARDING = WheelChairBoarding.POSSIBLE;
 
   private static final String ZONE_ID = "Zone Id";
 
@@ -54,21 +53,21 @@ public class BoardingAreaMapperTest  {
     STOP.setParentStation(PARENT);
     STOP.setTimezone(TIMEZONE);
     STOP.setVehicleType(VEHICLE_TYPE);
-    STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING);
+    STOP.setWheelchairBoarding(WHEELCHAIR_BOARDING.gtfsCode);
     STOP.setZoneId(ZONE_ID);
   }
 
   private BoardingAreaMapper subject = new BoardingAreaMapper();
 
   @Test
-  public void testMapCollection() throws Exception {
+  public void testMapCollection() {
     assertNull(null, subject.map((Collection<Stop>) null));
     assertTrue(subject.map(Collections.emptyList()).isEmpty());
     assertEquals(1, subject.map(Collections.singleton(STOP)).size());
   }
 
   @Test
-  public void testMap() throws Exception {
+  public void testMap() {
     org.opentripplanner.model.BoardingArea result = subject.map(STOP);
 
     assertEquals("A:B1", result.getId().toString());
@@ -77,11 +76,11 @@ public class BoardingAreaMapperTest  {
     assertEquals(LAT, result.getLat(), 0.0001d);
     assertEquals(LON, result.getLon(), 0.0001d);
     assertEquals(NAME, result.getName());
-    assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
+    assertEquals(WHEELCHAIR_BOARDING, result.getWheelchairBoarding());
   }
 
   @Test
-  public void testMapWithNulls() throws Exception {
+  public void testMapWithNulls() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_BOARDING_AREA);
     input.setId(AGENCY_AND_ID);
@@ -110,10 +109,10 @@ public class BoardingAreaMapperTest  {
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
-  public void testMapCache() throws Exception {
+  public void testMapCache() {
     org.opentripplanner.model.BoardingArea result1 = subject.map(STOP);
     org.opentripplanner.model.BoardingArea result2 = subject.map(STOP);
 
-    assertTrue(result1 == result2);
+    assertSame(result1, result2);
   }
 }

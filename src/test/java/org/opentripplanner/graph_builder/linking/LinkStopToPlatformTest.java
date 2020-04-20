@@ -8,9 +8,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.edgetype.AreaEdge;
 import org.opentripplanner.routing.edgetype.AreaEdgeList;
@@ -62,9 +60,7 @@ public class LinkStopToPlatformTest {
         edges.add(createAreaEdge(vertices.get(4), vertices.get(3), areaEdgeList, "edge 9"));
         edges.add(createAreaEdge(vertices.get(0), vertices.get(4), areaEdgeList, "edge 10"));
 
-        Stop stop = new Stop();
-        stop.setId(new FeedScopedId("TestAgency", "TestStop"));
-        stop.setCoordinate(new WgsCoordinate(59.13545, 10.22213));
+        Stop stop = Stop.stopForTest("TestStop",59.13545, 10.22213);
 
         TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, null);
     }
