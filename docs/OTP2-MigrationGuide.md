@@ -38,12 +38,15 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
  - `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. This means not all combinations of non-transit modes that was available in OTP1 is available in OTP2.
+ - `preferredAgencies`, `unpreferredAgencies`, `bannedAgencies` and `whiteListedAgencies` use feed-
+ scoped ids. If you are using the ids directly from the Index API, no changes are needed.
   
 #### Response changes
 - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
   - `searchWindowUsed`
   - `nextDateTime`
   - `prevDateTime`
+- `agencyId` in the `leg` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
 
 ### Changes to the Index API
 - Error handling is improved, this is now consistently applied and uses build in framework support. 
@@ -70,3 +73,5 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
 - `StopShort`
   - The new `stationId` is a feed-scoped-id to the parent station. It should be used instead of the
     deprecated ~~cluster~~.
+- `Agency`
+  - The `id` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
