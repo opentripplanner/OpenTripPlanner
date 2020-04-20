@@ -35,7 +35,12 @@ public class AccessEgressRouter {
         int distanceMeters,
         StopIndexForRaptor stopIndex
     ) {
-        Set<Vertex> vertices = fromTarget ? rr.rctx.toVertices : rr.rctx.fromVertices;
+        // TODO OTP2 This has to be done because we have not separated the main RoutingRequest from
+        //      the subrequest for street searches. From/to vertices are already set based on the main
+        //      request being arriveBy or not, but here we are actually setting arriveBy based on
+        //      whether we are doing an access or egress search, regardless of the direction of the
+        //      main request.
+        Set<Vertex> vertices = fromTarget ^ rr.arriveBy ? rr.rctx.toVertices : rr.rctx.fromVertices;
 
         RoutingRequest nonTransitRoutingRequest = rr.getStreetSearchRequest(
             fromTarget ? rr.modes.egressMode : rr.modes.accessMode

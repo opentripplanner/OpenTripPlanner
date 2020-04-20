@@ -142,8 +142,12 @@ public class NearbyStopFinder {
             boolean removeTempEdges,
             RoutingRequest routingRequest
     ) {
-        routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
+        if (!reverseDirection) {
+            routingRequest.setRoutingContext(graph, originVertices, null);
+        } else {
+            routingRequest.setRoutingContext(graph, null, originVertices);
+        }
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
