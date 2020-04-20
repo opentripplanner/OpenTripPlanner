@@ -285,7 +285,9 @@ public class RaptorPathToItineraryMapper {
                 legs.add(leg);
             }
         } else {
-            StateEditor se = new StateEditor(request, edges.get(0).getFromVertex());
+            RoutingRequest traverseRequest = request.clone();
+            traverseRequest.arriveBy = false;
+            StateEditor se = new StateEditor(traverseRequest, edges.get(0).getFromVertex());
             se.setTimeSeconds(startOfTime.plusSeconds(pathLeg.fromTime()).toEpochSecond());
             //se.setNonTransitOptionsFromState(states[0]);
             State s = se.makeState();
