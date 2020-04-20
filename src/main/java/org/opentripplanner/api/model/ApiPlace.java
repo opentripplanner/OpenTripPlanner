@@ -1,11 +1,7 @@
 package org.opentripplanner.api.model;
 
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlElement;
 import java.util.Calendar;
 
 /** 
@@ -21,7 +17,7 @@ public class ApiPlace {
     /** 
      * The ID of the stop. This is often something that users don't care about.
      */
-    public FeedScopedId stopId = null;
+    public String stopId = null;
 
     /** 
      * The "code" of the stop. Depending on the transit agency, this is often
