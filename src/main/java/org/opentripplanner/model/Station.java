@@ -13,22 +13,19 @@ import java.util.TimeZone;
 public class Station extends TransitEntity<FeedScopedId> implements StopCollection {
 
   private static final long serialVersionUID = 1L;
+  public static final TransferCostPriority DEFAULT_COST_PRIORITY = TransferCostPriority.ALLOWED;
 
   private final FeedScopedId id;
 
   private final String name;
 
-  /**
-   * Public facing station code (short text or number)
-   */
   private final String code;
 
-  /**
-   * Additional information about the station (if needed)
-   */
   private final String description;
 
   private final WgsCoordinate coordinate;
+
+  private final TransferCostPriority costPriority;
 
   /**
    * URL to a web page containing information about this particular station
@@ -46,7 +43,8 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
       String code,
       String description,
       String url,
-      TimeZone timezone
+      TimeZone timezone,
+      TransferCostPriority costPriority
   ) {
     this.id = id;
     this.name = name;
@@ -55,6 +53,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
     this.description = description;
     this.url = url;
     this.timezone = timezone;
+    this.costPriority = costPriority == null ? DEFAULT_COST_PRIORITY : costPriority;
   }
 
   public void addChildStop(Stop stop) {
@@ -71,6 +70,7 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
     return id;
   }
 
+  /** @throws UnsupportedOperationException */
   @Override
   public final void setId(FeedScopedId id) {
     super.setId(id);
@@ -84,16 +84,31 @@ public class Station extends TransitEntity<FeedScopedId> implements StopCollecti
     return coordinate;
   }
 
+  /** Public facing station code (short text or number) */
   public String getCode() {
     return code;
   }
 
+  /** Additional information about the station (if needed) */
   public String getDescription() {
     return description;
   }
 
   public String getUrl() {
     return url;
+  }
+
+  /**
+   * The generalized cost priority associated with the stop independently of trips, routes
+   * and/or other stops. This is supported in NeTEx, but not in GTFS. This should work by
+   * adding adjusting the cost for all board-/alight- events in the routing search.
+   * <p/>
+   * To not interfere with request parameters this must be implemented in a neutral way. This mean
+   * that the {@link TransferCostPriority#ALLOWED} (witch is default) should a nett-effect of
+   * adding 0 - zero cost.
+   */
+  public TransferCostPriority getCostPriority() {
+    return costPriority;
   }
 
   public TimeZone getTimezone() {

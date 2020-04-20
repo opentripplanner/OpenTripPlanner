@@ -41,7 +41,9 @@ class StationMapper {
         rhs.getCode(),
         rhs.getDesc(),
         rhs.getUrl(),
-        rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone())
+        rhs.getTimezone() == null ? null : TimeZone.getTimeZone(rhs.getTimezone()),
+        // Use default cost priority
+        null
     );
   }
 }

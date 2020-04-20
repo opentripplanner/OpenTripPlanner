@@ -23,7 +23,8 @@ class StationMapper {
         null,
         null,
         null,
-        null
+        null,
+        TransferCostPriorityMapper.mapToDomain(stopPlace.getWeighting())
     );
 
     if (station.getCoordinate() == null) {
