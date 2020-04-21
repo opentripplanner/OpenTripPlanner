@@ -7,6 +7,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.StopTime;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceCalendar;
@@ -92,7 +93,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         // Add Route
         route.setId(newId());
         route.setType(3);
-        route.setMode(TraverseMode.BUS);
+        route.setMode(TransitMode.BUS);
         subject.getRoutes().add(route);
 
         // Add trips; one for each day and calendar

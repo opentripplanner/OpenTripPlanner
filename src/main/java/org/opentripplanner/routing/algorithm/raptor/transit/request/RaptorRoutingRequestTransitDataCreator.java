@@ -5,8 +5,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.model.TransitMode;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -49,7 +49,7 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(
-      int dayRange, TraverseModeSet transitModes, Set<FeedScopedId> bannedRoutes
+      int dayRange, Set<TransitMode> transitModes , Set<FeedScopedId> bannedRoutes
   ) {
 
     List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
@@ -64,7 +64,7 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   private List<Map<FeedScopedId, TripPatternForDate>> getTripPatternsForDateRange(
-      int dayRange, TraverseModeSet transitModes, Set<FeedScopedId> bannedRoutes
+      int dayRange, Set<TransitMode> transitModes, Set<FeedScopedId> bannedRoutes
   ) {
     List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
 
@@ -141,7 +141,7 @@ class RaptorRoutingRequestTransitDataCreator {
   private static Map<FeedScopedId, TripPatternForDate> filterActiveTripPatterns(
       TransitLayer transitLayer,
       LocalDate date,
-      TraverseModeSet transitModes,
+      Set<TransitMode> transitModes,
       Set<FeedScopedId> bannedRoutes
   ) {
 

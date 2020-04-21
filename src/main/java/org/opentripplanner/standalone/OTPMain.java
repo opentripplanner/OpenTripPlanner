@@ -33,6 +33,7 @@ public class OTPMain {
      */
     public static void main(String[] args) {
         try {
+            OtpStartupInfo.logInfo();
             CommandLineParameters params = parseAndValidateCmdLine(args);
             startOTPServer(params);
         }

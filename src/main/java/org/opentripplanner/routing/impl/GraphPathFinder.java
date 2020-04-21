@@ -7,7 +7,7 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -68,7 +68,7 @@ public class GraphPathFinder {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
-        if (options.modes.isTransit()) {
+        if (options.streetSubRequestModes.isTransit()) {
             throw new UnsupportedOperationException("Transit search not supported");
         }
 

@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.core;
 
+import org.opentripplanner.routing.request.RoutingRequest;
+
 import java.util.Set;
 
 /**
@@ -18,6 +20,8 @@ public class StateData implements Cloneable {
 
     protected boolean bikeParked;
 
+    protected boolean hasUsedRentedBike;
+
     protected RoutingRequest opt;
 
     protected TraverseMode nonTransitMode;
@@ -35,7 +39,7 @@ public class StateData implements Cloneable {
     protected boolean enteredNoThroughTrafficArea;
 
     public StateData(RoutingRequest options) {
-        TraverseModeSet modes = options.modes;
+        TraverseModeSet modes = options.streetSubRequestModes;
         if (modes.getCar())
             nonTransitMode = TraverseMode.CAR;
         else if (modes.getWalk())

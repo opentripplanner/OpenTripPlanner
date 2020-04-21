@@ -1,13 +1,20 @@
-package org.opentripplanner.routing.core;
+package org.opentripplanner.routing.request;
 
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RouteMatcher;
+import org.opentripplanner.routing.core.RoutingContext;
+import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -15,7 +22,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.DurationComparator;
 import org.opentripplanner.routing.impl.PathComparator;
-import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -26,6 +32,7 @@ import org.slf4j.LoggerFactory;
 import java.io.Serializable;
 import java.time.Duration;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -173,9 +180,23 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean useRequestedDateTimeInMaxHours = false;
 
     /**
-     * The set of TraverseModes that a user is willing to use. Defaults to WALK | TRANSIT.
+     * The access/egress/direct/transit modes allowed for this main request. The parameter
+     * "streetSubRequestModes" below is used for a single A Star sub request.
+     *
+     * // TODO OTP2 Street routing requests should eventually be split into its own request class.
      */
-    public TraverseModeSet modes = new TraverseModeSet("TRANSIT,WALK"); // defaults in constructor overwrite this
+    public RequestModes modes = new RequestModes(
+        StreetMode.WALK,
+        StreetMode.WALK,
+        StreetMode.WALK,
+        Collections.emptySet()
+    );
+
+    /**
+     * The set of TraverseModes allowed when doing creating sub requests and doing street routing.
+     * // TODO OTP2 Street routing requests should eventually be split into its own request class.
+     */
+    public TraverseModeSet streetSubRequestModes = new TraverseModeSet(TraverseMode.WALK); // defaults in constructor overwrite this
 
     /**
      * The set of characteristics that the user wants to optimize for -- defaults to QUICK, or
@@ -612,7 +633,7 @@ public class RoutingRequest implements Cloneable, Serializable {
       Additional flags affecting mode transitions.
       This is a temporary solution, as it only covers parking and rental at the beginning of the trip.
     */
-    public boolean allowBikeRental = false;
+    public boolean bikeRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
     public boolean kissAndRide  = false;
@@ -653,7 +674,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
-    private StreetEdge splitEdge = null;
+    public StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -664,7 +685,9 @@ public class RoutingRequest implements Cloneable, Serializable {
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
         // http://en.wikipedia.org/wiki/Speed_limit
         carSpeed = 40; // 40 m/s, 144 km/h, above the maximum (finite) driving speed limit worldwide
-        setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.TRANSIT));
+        // Default to walk for access/egress/direct modes and all transit modes
+        this.modes = new RequestModes(StreetMode.WALK, StreetMode.WALK, StreetMode.WALK, new HashSet<>(
+            Arrays.asList(TransitMode.values())));
         bikeWalkingOptions = this;
 
         // So that they are never null.
@@ -672,24 +695,14 @@ public class RoutingRequest implements Cloneable, Serializable {
         to = new GenericLocation(null, null);
     }
 
-    public RoutingRequest(TraverseModeSet modes) {
+    public RoutingRequest(TraverseModeSet streetSubRequestModes) {
         this();
-        this.setModes(modes);
-    }
-
-    public RoutingRequest(QualifiedModeSet qmodes) {
-        this();
-        qmodes.applyToRoutingRequest(this);
-    }
-
-    public RoutingRequest(String qmodes) {
-        this();
-        new QualifiedModeSet(qmodes).applyToRoutingRequest(this);
+        this.setStreetSubRequestModes(streetSubRequestModes);
     }
 
     public RoutingRequest(TraverseMode mode) {
         this();
-        this.setModes(new TraverseModeSet(mode));
+        this.setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
     public RoutingRequest(TraverseMode mode, OptimizeType optimize) {
@@ -699,13 +712,13 @@ public class RoutingRequest implements Cloneable, Serializable {
     public RoutingRequest(TraverseModeSet modeSet, OptimizeType optimize) {
         this();
         this.optimize = optimize;
-        this.setModes(modeSet);
+        this.setStreetSubRequestModes(modeSet);
     }
 
     /* ACCESSOR/SETTER METHODS */
 
     public boolean transitAllowed() {
-        return modes.isTransit();
+        return streetSubRequestModes.isTransit();
     }
 
     public long getSecondsSinceEpoch() {
@@ -720,12 +733,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMode(TraverseMode mode) {
-        setModes(new TraverseModeSet(mode));
+        setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
-    public void setModes(TraverseModeSet modes) {
-        this.modes = modes;
-        if (modes.getBicycle()) {
+    public void setStreetSubRequestModes(TraverseModeSet streetSubRequestModes) {
+        this.streetSubRequestModes = streetSubRequestModes;
+        if (streetSubRequestModes.getBicycle()) {
             // This alternate routing request is used when we get off a bike to take a shortcut and are
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
@@ -735,21 +748,21 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
             bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
-            bikeWalkingOptions.modes = modes.clone();
-            bikeWalkingOptions.modes.setBicycle(false);
-            bikeWalkingOptions.modes.setWalk(true);
+            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
+            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
+            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
             bikeWalkingOptions.walkingBike = true;
             bikeWalkingOptions.bikeSwitchTime = bikeSwitchTime;
             bikeWalkingOptions.bikeSwitchCost = bikeSwitchCost;
             bikeWalkingOptions.stairsReluctance = stairsReluctance * 5; // carrying bikes on stairs is awful
-        } else if (modes.getCar()) {
+        } else if (streetSubRequestModes.getCar()) {
             bikeWalkingOptions = new RoutingRequest();
             bikeWalkingOptions.setArriveBy(this.arriveBy);
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
-            bikeWalkingOptions.modes = modes.clone();
-            bikeWalkingOptions.modes.setBicycle(false);
-            bikeWalkingOptions.modes.setWalk(true);
+            bikeWalkingOptions.streetSubRequestModes = streetSubRequestModes.clone();
+            bikeWalkingOptions.streetSubRequestModes.setBicycle(false);
+            bikeWalkingOptions.streetSubRequestModes.setWalk(true);
         }
     }
 
@@ -779,7 +792,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
     public double getMaxWalkDistance() {
-        if (modes.isTransit()) {
+        if (streetSubRequestModes.isTransit()) {
             return maxWalkDistance;
         } else {
             return Double.MAX_VALUE;
@@ -884,26 +897,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     /**
-     * Clear the allowed modes.
-     */
-    public void clearModes() {
-        modes.clear();
-    }
-
-    /**
      * Add a TraverseMode to the set of allowed modes.
      */
     public void addMode(TraverseMode mode) {
-        modes.setMode(mode, true);
-    }
-
-    /**
-     * Add multiple modes to the set of allowed modes.
-     */
-    public void addMode(List<TraverseMode> mList) {
-        for (TraverseMode m : mList) {
-            addMode(m);
-        }
+        streetSubRequestModes.setMode(mode, true);
     }
 
     public Date getDateTime() {
@@ -920,7 +917,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public int getNumItineraries() {
-        if (modes.isTransit()) {
+        if (streetSubRequestModes.isTransit()) {
             return numItineraries;
         } else {
             // If transit is not to be used, only search for one itinerary.
@@ -938,12 +935,12 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + arriveBy + sep + optimize + sep + modes.getAsStr() + sep
+                + arriveBy + sep + optimize + sep + streetSubRequestModes.getAsStr() + sep
                 + getNumItineraries();
     }
 
     public void removeMode(TraverseMode mode) {
-        modes.setMode(mode, false);
+        streetSubRequestModes.setMode(mode, false);
     }
 
     /**
@@ -998,12 +995,66 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /* INSTANCE METHODS */
 
+    public RoutingRequest getStreetSearchRequest(StreetMode streetMode) {
+        RoutingRequest streetRequest = this.clone();
+        streetRequest.streetSubRequestModes = new TraverseModeSet();
+
+        if (streetMode != null) {
+            switch (streetMode) {
+                case WALK:
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    break;
+                case BIKE:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    break;
+                case BIKE_TO_PARK:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.bikeParkAndRide = true;
+                    break;
+                case BIKE_RENTAL:
+                    streetRequest.streetSubRequestModes.setBicycle(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.bikeRental = true;
+                    break;
+                case CAR:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    break;
+                case CAR_TO_PARK:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.parkAndRide = true;
+                    break;
+                case TAXI:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+                    streetRequest.kissAndRide = true;
+                    break;
+                case CAR_RENTAL:
+                    streetRequest.streetSubRequestModes.setCar(true);
+                    streetRequest.streetSubRequestModes.setWalk(true);
+            }
+        }
+
+        streetRequest.resetRoutingContext();
+
+        return streetRequest;
+    }
+
+    // TODO OTP2 This is needed in order to find the correct from/to vertices for the mode
+    private void resetRoutingContext() {
+        Graph graph = rctx.graph;
+        rctx = null;
+        splitEdge = null;
+        setRoutingContext(graph);
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     public RoutingRequest clone() {
         try {
             RoutingRequest clone = (RoutingRequest) super.clone();
-            clone.modes = modes.clone();
+            clone.streetSubRequestModes = streetSubRequestModes.clone();
             clone.bannedRoutes = bannedRoutes.clone();
             clone.bannedTrips = (HashMap<FeedScopedId, BannedStopSet>) bannedTrips.clone();
             clone.whiteListedAgencies = (HashSet<String>) whiteListedAgencies.clone();
@@ -1123,43 +1174,11 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** @return The highest speed for all possible road-modes. */
     public double getStreetSpeedUpperBound() {
         // Assume carSpeed > bikeSpeed > walkSpeed
-        if (modes.getCar())
+        if (streetSubRequestModes.getCar())
             return carSpeed;
-        if (modes.getBicycle())
+        if (streetSubRequestModes.getBicycle())
             return bikeSpeed;
         return walkSpeed;
-    }
-
-    /**
-     * @param mode
-     * @return The board cost for a specific traverse mode.
-     */
-    public int getBoardCost(TraverseMode mode) {
-        if (mode == TraverseMode.BICYCLE)
-            return bikeBoardCost;
-        // I assume you can't bring your car in the bus
-        return walkBoardCost;
-    }
-
-    /** @return The lower boarding cost for all possible road-modes. */
-    public int getBoardCostLowerBound() {
-        // Assume walkBoardCost < bikeBoardCost
-        if (modes.getWalk())
-            return walkBoardCost;
-        return bikeBoardCost;
-    }
-
-    private String getRouteOrAgencyStr(HashSet<String> strings) {
-        StringBuilder builder = new StringBuilder();
-        for (String agency : strings) {
-            builder.append(agency);
-            builder.append(",");
-        }
-        if (builder.length() > 0) {
-            // trim trailing comma
-            builder.setLength(builder.length() - 1);
-        }
-        return builder.toString();
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
@@ -1193,10 +1212,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (waitAtBeginningFactor > 0) {
             this.waitAtBeginningFactor = waitAtBeginningFactor;
         }
-    }
-
-    public void banTrip(FeedScopedId trip) {
-        bannedTrips.put(trip, BannedStopSet.ALL);
     }
 
     public Set<FeedScopedId> getBannedRoutes(Collection<Route> routes) {
@@ -1278,21 +1293,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferences_penalty += useUnpreferredRoutesPenalty;
         }
         return preferences_penalty;
-    }
-
-    /**
-     * Get the maximum expected speed over all transit modes.
-     * TODO derive actual speeds from GTFS feeds. On the other hand, that's what the bidirectional heuristic does on the fly.
-     */
-    public double getTransitSpeedUpperBound() {
-        if (modes.contains(TraverseMode.RAIL)) {
-            return 84; // 300kph typical peak speed of a TGV
-        }
-        if (modes.contains(TraverseMode.CAR)) {
-            return 40; // 130kph max speed of a car on a highway
-        }
-        // Considering that buses can travel on highways, return the same max speed for all other transit.
-        return 40; // TODO find accurate max speeds
     }
 
     /**

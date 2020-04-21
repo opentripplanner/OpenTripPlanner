@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.spt;
 
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
@@ -41,6 +41,10 @@ public abstract class DominanceFunction implements Serializable {
 
         // Does one state represent riding a rented bike and the other represent walking before/after rental?
         if (a.isBikeRenting() != b.isBikeRenting()) {
+            return false;
+        }
+
+        if (a.hasUsedRentedBike() != b.hasUsedRentedBike()) {
             return false;
         }
 

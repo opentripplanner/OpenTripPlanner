@@ -17,7 +17,6 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -25,6 +24,7 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.vertextype.ElevatorOffboardVertex;
 import org.opentripplanner.routing.vertextype.ElevatorOnboardVertex;
 import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
@@ -36,7 +36,9 @@ import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
+import java.util.Set;
 
 public class AddTransitModelEntitiesToGraph {
     private static final Logger LOG = LoggerFactory.getLogger(AddTransitModelEntitiesToGraph.class);
@@ -96,21 +98,21 @@ public class AddTransitModelEntitiesToGraph {
 
     private void addStopsToGraphAndGenerateStopVertexes(Graph graph) {
         // Compute the set of modes for each stop based on all the TripPatterns it is part of
-        Map<Stop, TraverseModeSet> stopModeMap = new HashMap<>();
+        Map<Stop, Set<TransitMode>> stopModeMap = new HashMap<>();
 
         for (TripPattern pattern : transitService.getTripPatterns()) {
-            TraverseMode mode = pattern.getMode();
+            TransitMode mode = pattern.getMode();
             graph.addTransitMode(mode);
             for (Stop stop : pattern.getStops()) {
-                TraverseModeSet set = stopModeMap.computeIfAbsent(stop, s -> new TraverseModeSet());
-                set.setMode(mode, true);
+                Set<TransitMode> set = stopModeMap.computeIfAbsent(stop, s -> new HashSet<>());
+                set.add(mode);
             }
         }
 
         // Add a vertex representing the stop.
         // It is now possible for these vertices to not be connected to any edges.
         for (Stop stop : transitService.getAllStops()) {
-            TraverseModeSet modes = stopModeMap.get(stop);
+            Set<TransitMode> modes = stopModeMap.get(stop);
             TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, modes);
             if (modes != null && modes.contains(TraverseMode.SUBWAY)) {
                 stopVertex.setStreetToStopTime(subwayAccessTime);
