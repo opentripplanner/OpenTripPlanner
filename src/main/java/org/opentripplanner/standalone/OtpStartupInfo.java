@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class OtpStartupInfo {
+public class OtpStartupInfo {
     private static final Logger LOG = LoggerFactory.getLogger(OtpStartupInfo.class);
     private static final String NEW_LINE = "\n";
     public static final List<String> HEADER = List.of(
@@ -39,7 +39,7 @@ class OtpStartupInfo {
         : "";
     }
 
-    static void logInfo() {
+    public static void logInfo() {
         LOG.info(NEW_LINE + INFO);
     }
 

@@ -8,6 +8,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayer
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.standalone.OtpStartupInfo;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
@@ -81,6 +82,7 @@ public class SpeedTest {
 
     public static void main(String[] args) throws Exception {
         try {
+            OtpStartupInfo.logInfo();
             // Given the following setup
             AvgTimer.enableTimers(true);
             SpeedTestCmdLineOpts opts = new SpeedTestCmdLineOpts(args);
