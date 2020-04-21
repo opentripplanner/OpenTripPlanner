@@ -5,6 +5,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.StopNotLinkedForTransfers;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -72,20 +73,21 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
         // This could be multi-threaded, in which case we'd need to be careful about the lifecycle of NearbyStopFinder instances.
         for (TransitStopVertex ts0 : stops) {
-            LOG.debug("Linking stop '{}' {}", ts0.getStop(), ts0);
+            Stop stop = ts0.getStop();
+            LOG.debug("Linking stop '{}' {}", stop, ts0);
 
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
             int n = 0;
             for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
-                if (sd.tstop == ts0) continue;
+                if (sd.tstop == stop) continue;
                 graph.transfersByStop.put(
-                    ts0.getStop(),
-                    new SimpleTransfer(ts0.getStop(), sd.tstop.getStop(), sd.distance, sd.edges)
+                    stop,
+                    new SimpleTransfer(stop, sd.tstop, sd.distance, sd.edges)
                 );
                 n += 1;
             }
-            LOG.debug("Linked stop {} to {} nearby stops on other patterns.", ts0.getStop(), n);
+            LOG.debug("Linked stop {} to {} nearby stops on other patterns.", stop, n);
             if (n == 0) {
                 issueStore.add(new StopNotLinkedForTransfers(ts0));
             }

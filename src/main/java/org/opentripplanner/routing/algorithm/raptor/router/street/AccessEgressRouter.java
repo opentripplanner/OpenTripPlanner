@@ -61,7 +61,7 @@ public class AccessEgressRouter {
         for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
             result.add(
                 new AccessEgress(
-                    stopIndex.indexByStop.get(stopAtDistance.tstop.getStop()),
+                    stopIndex.indexByStop.get(stopAtDistance.tstop),
                     (int)stopAtDistance.state.getElapsedTimeSeconds(),
                     fromTarget ? stopAtDistance.state.reverse() : stopAtDistance.state
                 )

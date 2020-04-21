@@ -10,6 +10,7 @@ import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -97,9 +98,9 @@ public class NearbyStopFinder {
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
-            TransitStopVertex ts1 = stopAtDistance.tstop;
+            Stop ts1 = stopAtDistance.tstop;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.getPatternsForStop(ts1.getStop())) {
+            for (TripPattern pattern : graph.index.getPatternsForStop(ts1)) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);
             }
         }
@@ -236,7 +237,7 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public final TransitStopVertex tstop;
+        public final Stop tstop;
         public final double distance;
         public final LineString geometry;
         public final List<Edge>  edges;
@@ -249,7 +250,7 @@ public class NearbyStopFinder {
             LineString geometry,
             State state
         ) {
-            this.tstop = tstop;
+            this.tstop = tstop.getStop();
             this.distance = distance;
             this.edges = edges;
             this.geometry = geometry;

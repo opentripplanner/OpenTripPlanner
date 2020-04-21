@@ -2,8 +2,6 @@ package org.opentripplanner.ext.transferanalyzer.annotations;
 
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 /**
  * Represents two stops that are close to each other where no route is found between them using OSM data
@@ -18,11 +16,11 @@ public class TransferCouldNotBeRouted implements DataImportIssue {
             "<a href=\"http://www.openstreetmap.org/?mlat=%s&mlon=%s\">\"%s\" (%s)</a> could not be routed. " +
             "Euclidean distance is %.0f.";
 
-    private final TransitStopVertex origin;
-    private final TransitStopVertex destination;
+    private final Stop origin;
+    private final Stop destination;
     private final double directDistance;
 
-    public TransferCouldNotBeRouted(TransitStopVertex origin, TransitStopVertex destination, double directDistance) {
+    public TransferCouldNotBeRouted(Stop origin, Stop destination, double directDistance) {
         this.origin = origin;
         this.destination = destination;
         this.directDistance = directDistance;
@@ -35,17 +33,9 @@ public class TransferCouldNotBeRouted implements DataImportIssue {
 
     @Override
     public String getHTMLMessage() {
-        Stop o = origin.getStop();
-        Stop d = destination.getStop();
-
-        return String.format(HTMLFMT, origin.getStop().getLat(), origin.getStop().getLon(),
-                o.getName(), o.getId(), d.getLat(),
-                d.getLon(), d.getName(), d.getId(),
+        return String.format(HTMLFMT, origin.getLat(), origin.getLon(),
+                origin.getName(), origin.getId(), destination.getLat(),
+                destination.getLon(), destination.getName(), destination.getId(),
                 directDistance);
-    }
-
-    @Override
-    public Vertex getReferencedVertex() {
-        return this.origin;
     }
 }
