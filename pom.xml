@@ -506,7 +506,7 @@
         <repository>
             <id>geosolutions</id>
             <name>GeoSolutions Repository</name>
-            <url>http://maven.geo-solutions.it/</url>
+            <url>https://maven.geo-solutions.it/</url>
         </repository>
         <repository>
             <id>onebusaway-releases</id>
