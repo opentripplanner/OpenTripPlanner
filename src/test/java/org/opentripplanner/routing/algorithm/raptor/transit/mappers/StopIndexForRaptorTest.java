@@ -47,8 +47,4 @@ public class StopIndexForRaptorTest {
 
         assertEquals("[0, 2, 4]", Arrays.toString(result));
     }
-
-
-    /* private methods */
-
 }
