@@ -37,4 +37,14 @@ public enum Provider {
             return null;
         }
     }
+
+    public static int toId(Provider provider) {
+        for (int i = 0; i < PROVIDERS.length; i++) {
+            if (provider == PROVIDERS[i]) {
+                return i;
+            }
+        }
+        // This should never happen
+        return 0;
+    }
 }

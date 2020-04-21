@@ -1,20 +1,15 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
 import org.opentripplanner.routing.core.TraverseMode;
 
 public class MotorbikeDescription extends VehicleDescription {
 
-    @JsonIgnore
     private static final double MAX_SPEED_IN_METERS_PER_SECOND = 12;
 
-    @JsonIgnore
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.CAR;
 
-    @JsonIgnore
     private static final int RENT_TIME_IN_SECONDS = 60;
 
-    @JsonIgnore
     private static final int DROPOFF_TIME_IN_SECONDS = 60;
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;

@@ -80,7 +80,7 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.FOSSIL), emptyList(), emptyList());
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.FOSSIL), emptyList(), emptyList(), emptyList());
         // when
         State traversed = edge.traverse(s);
 
@@ -97,7 +97,7 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.ELECTRIC), singletonList(Gearbox.MANUAL), emptyList());
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.ELECTRIC), singletonList(Gearbox.MANUAL), emptyList(), emptyList());
         // when
         State traversed = edge.traverse(s);
 
