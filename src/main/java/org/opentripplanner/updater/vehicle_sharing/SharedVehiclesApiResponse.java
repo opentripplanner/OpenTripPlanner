@@ -29,20 +29,20 @@ public class SharedVehiclesApiResponse {
 
     public static class Vehicle {
 
-        private long id;
+        private String providerVehicleId;
         private double longitude;
         private double latitude;
         private String fuelType;
         private String gearbox;
         private String type;
-        private int providerId;
+        private VehicleProvider provider;
 
-        public long getId() {
-            return id;
+        public String getProviderVehicleId() {
+            return providerVehicleId;
         }
 
-        public void setId(long id) {
-            this.id = id;
+        public void setProviderVehicleId(String providerVehicleId) {
+            this.providerVehicleId = providerVehicleId;
         }
 
         public double getLongitude() {
@@ -85,12 +85,34 @@ public class SharedVehiclesApiResponse {
             this.type = type;
         }
 
-        public int getProviderId() {
-            return providerId;
+        public VehicleProvider getProvider() {
+            return provider;
         }
 
-        public void setProviderId(int providerId) {
-            this.providerId = providerId;
+        public void setProvider(VehicleProvider provider) {
+            this.provider = provider;
+        }
+    }
+
+    public static class VehicleProvider {
+
+        private int id;
+        private String name;
+
+        public int getId() {
+            return id;
+        }
+
+        public void setId(int id) {
+            this.id = id;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public void setName(String name) {
+            this.name = name;
         }
     }
 }

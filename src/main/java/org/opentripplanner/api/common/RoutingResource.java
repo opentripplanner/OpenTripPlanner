@@ -5,7 +5,10 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.vehicle_sharing.*;
+import org.opentripplanner.routing.core.vehicle_sharing.FuelType;
+import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDetailsSet;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -197,25 +200,25 @@ public abstract class RoutingResource {
      * Allows filtering vehicles for renting by fuel types. By default we accept renting all vehicles.
      */
     @QueryParam("fuelTypesAllowed")
-    protected List<FuelType> fuelTypesAllowed;
+    protected Set<FuelType> fuelTypesAllowed;
 
     /**
      * Allows filtering vehicles for renting by Gearbox. By default we accept renting all vehicles.
      */
     @QueryParam("gearboxesAllowed")
-    protected List<Gearbox> gearboxesAllowed;
+    protected Set<Gearbox> gearboxesAllowed;
 
     /**
      * Allows filtering vehicles for renting by providers. By default we accept renting all vehicles.
      */
     @QueryParam("providersAllowed")
-    protected List<Provider> providersAllowed;
+    protected Set<Integer> providersAllowed;
 
     /**
      * Allows filtering vehicles for renting by vehicle types. By default we accept renting all vehicles.
      */
     @QueryParam("vehicleTypesAllowed")
-    protected List<VehicleType> vehicleTypesAllowed;
+    protected Set<VehicleType> vehicleTypesAllowed;
 
     /** The minimum time, in seconds, between successive trips on different vehicles.
      *  This is designed to allow for imperfect schedule adherence.  This is a minimum;
@@ -650,11 +653,7 @@ public abstract class RoutingResource {
             request.rentingAllowed = rentingAllowed;
         }
 
-        if (!fuelTypesAllowed.isEmpty() || !gearboxesAllowed.isEmpty() || !providersAllowed.isEmpty() ||
-                !vehicleTypesAllowed.isEmpty()) {
-            request.vehiclesAllowedToRent =
-                    new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed, vehicleTypesAllowed);
-        }
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed, vehicleTypesAllowed);
 
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.

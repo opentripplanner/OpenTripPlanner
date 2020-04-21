@@ -64,7 +64,7 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         }
 
 //        One vehicle appeared.
-        List<VehicleDescription> appeared = singletonList(new CarDescription(1, vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY));
+        List<VehicleDescription> appeared = singletonList(new CarDescription("1", vehLong1, vehLat1, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK")));
 
         List<Pair<Vertex, VehicleDescription>> coordsToVertex = sharedVehiclesUpdater.coordsToVertex(appeared);
         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);
@@ -73,7 +73,7 @@ public class SharedVehiclesUpdaterTest extends TestCase {
         assertEquals(car2, appearedEdges.get(0).getKey());
 
 
-        appeared = singletonList(new CarDescription(1, vehLong2, vehLat2, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY));
+        appeared = singletonList(new CarDescription("2", vehLong2, vehLat2, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK")));
 
         coordsToVertex = sharedVehiclesUpdater.coordsToVertex(appeared);
         appearedEdges = sharedVehiclesUpdater.prepareAppearedEdge(coordsToVertex);

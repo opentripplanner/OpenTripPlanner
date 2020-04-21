@@ -22,19 +22,23 @@ public class VehiclePositionsDiff {
     }
 
     private VehicleDescription mapper(SharedVehiclesApiResponse.Vehicle vehicle) {
-        long id = vehicle.getId();
+        if (vehicle.getProvider() == null) {
+            LOG.warn("Omitting vehicle {} because of lack of provider", vehicle.getProviderVehicleId());
+            return null;
+        }
+        String providerVehicleId = vehicle.getProviderVehicleId();
         double longitude = vehicle.getLongitude();
         double latitude = vehicle.getLatitude();
         FuelType fuelType = FuelType.fromString(vehicle.getFuelType());
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
-        Provider provider = Provider.fromId(vehicle.getProviderId());
+        Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
         switch (vehicle.getType()) {
             case CAR:
-                return new CarDescription(id, longitude, latitude, fuelType, gearbox, provider);
+                return new CarDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
             case MOTORBIKE:
-                return new MotorbikeDescription(id, longitude, latitude, fuelType, gearbox, provider);
+                return new MotorbikeDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
             default: // TODO (AdamWiktor) Add support for kickscooter
-                LOG.warn("Omitting vehicle {} because of unsupported type {}", id, vehicle.getType());
+                LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
                 return null;
         }
     }
