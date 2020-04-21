@@ -14,23 +14,20 @@ These properties changed names from:
   possibility to build the graph in 2 steps is new in OTP2.  
    
 ## REST API
- 
- A lot of the query parameters in the REST API is ignored/deprecated look at the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
- and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
- class for documentation on what is currently supported - we are adding features one by on. The 
- plan is to go over the API documentation before the release - we do not prioritize to keep 
- the documentation up to date, exept for this document.
- 
+  
+### Trip Planning 
+
 Support for XML as a request/response format is removed. The only supported format is JSON.
- 
-### Planning query parameter changes
- A lot of the query parameters in the REST API is ignored/deprecated look at the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
+
+#### Query parameter changes
+
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
  and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
- class for documentation on what is currently supported - we are adding back features one by on. 
- The plan is to go over the API documentation before the release - we do not prioritize to keep 
- the documentation up to date, except for this document.
- 
- #### Paging
+ class for documentation on what is currently supported - we are adding features one by one. The 
+ plan is to go over the API documentation before the release - we do not prioritize keeping 
+ the documentation up to date, except for this migration guide document.
+  
+#### Paging
  In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
  in something like the `last-depature-time` + 1 minute to the next request, to get trips to add to 
  the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
@@ -41,7 +38,7 @@ Support for XML as a request/response format is removed. The only supported form
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
   
-### Response changes
+#### Response changes
 - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
   - `searchWindowUsed`
   - `nextDateTime`
