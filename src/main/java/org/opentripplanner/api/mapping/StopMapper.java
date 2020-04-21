@@ -2,6 +2,7 @@ package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiStop;
 import org.opentripplanner.api.model.ApiStopShort;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 
 import java.util.Collection;
@@ -34,7 +35,7 @@ public class StopMapper {
             api.url = domain.getUrl();
             api.locationType = 0;
             api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
-            api.parentStation = domain.getParentStation().getId().getId();
+            api.parentStation = mapToParentStationOldId(domain);
             //api.stopTimezone = stop.getTimezone();
             api.wheelchairBoarding = WheelchairBoardingMapper.mapToApi(
                     domain.getWheelchairBoarding()
@@ -57,8 +58,7 @@ public class StopMapper {
         api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
         // parentStation may be missing on the stop returning null.
         // TODO harmonize these names, maybe use "station" everywhere
-        api.cluster = domain.getParentStation() == null
-                ? null : domain.getParentStation().getId().getId();
+        api.cluster = mapToParentStationOldId(domain);
 
         return api;
     }
@@ -78,4 +78,11 @@ public class StopMapper {
         return domain.stream().map(StopMapper::mapToApiShort).collect(Collectors.toList());
     }
 
+    /**
+     * Get the parent station id (without feed-scope) for the given station element,
+     * this method should only be used to fetch old ids for beeing backward compatible.
+     */
+    private static String mapToParentStationOldId(StationElement stop) {
+        return stop.isPartOfStation() ? stop.getParentStation().getId().getId() : null;
+    }
 }
