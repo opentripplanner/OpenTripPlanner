@@ -50,11 +50,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -168,7 +168,7 @@ public class Graph implements Serializable {
     public Preferences preferences = null;
 
     /** List of transit modes that are availible in GTFS data used in this graph**/
-    private HashSet<TraverseMode> transitModes = new HashSet<>();
+    private HashSet<TransitMode> transitModes = new HashSet<>();
 
     public boolean hasBikeSharing = false;
 
@@ -656,11 +656,11 @@ public class Graph implements Serializable {
      * Adds mode of transport to transit modes in graph
      * @param mode
      */
-    public void addTransitMode(TraverseMode mode) {
+    public void addTransitMode(TransitMode mode) {
         transitModes.add(mode);
     }
 
-    public HashSet<TraverseMode> getTransitModes() {
+    public HashSet<TransitMode> getTransitModes() {
         return transitModes;
     }
 

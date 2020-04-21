@@ -2,7 +2,7 @@ package org.opentripplanner.routing.spt;
 
 import com.google.common.collect.HashMultiset;
 import com.google.common.collect.Multiset;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;

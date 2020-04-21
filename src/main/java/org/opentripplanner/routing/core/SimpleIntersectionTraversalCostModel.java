@@ -3,6 +3,7 @@ package org.opentripplanner.routing.core;
 import java.io.Serializable;
 
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTraversalCostModel implements Serializable {

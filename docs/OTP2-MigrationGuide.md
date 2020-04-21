@@ -37,6 +37,7 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  - `searchWindow` Limit the departure window or arrival window for the routing search.
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
+ - `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. This means not all combinations of non-transit modes that was available in OTP1 is available in OTP2.
   
 #### Response changes
 - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:

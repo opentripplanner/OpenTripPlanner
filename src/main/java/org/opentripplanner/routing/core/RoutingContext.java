@@ -15,6 +15,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -219,7 +220,7 @@ public class RoutingContext implements Cloneable {
 
     /* INSTANCE METHODS */
 
-    void checkIfVerticesFound() {
+    public void checkIfVerticesFound() {
         ArrayList<String> notFound = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search

@@ -3,7 +3,7 @@ package org.opentripplanner.api.common;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -745,12 +745,11 @@ public abstract class RoutingResource {
             request.setOptimize(optimize);
 
         /* Temporary code to get bike/car parking and renting working. */
-        if (modes != null) {
-            modes.applyToRoutingRequest(request);
-            request.setModes(request.modes);
+        if (modes != null && !modes.qModes.isEmpty()) {
+            request.modes = modes.getRequestModes();
         }
 
-        if (request.allowBikeRental && bikeSpeed == null) {
+        if (request.bikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
