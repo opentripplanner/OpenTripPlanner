@@ -494,7 +494,7 @@
         <repository>
             <id>osgeo</id>
             <name>Open Source Geospatial Foundation Repository</name>
-            <url>https://repo.osgeo.org/repository/geotools-releases/</url>
+            <url>https://repo.osgeo.org/repository/release/</url>
         </repository>
         <repository>
             <id>geosolutions</id>
