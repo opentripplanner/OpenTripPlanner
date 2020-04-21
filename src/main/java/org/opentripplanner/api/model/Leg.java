@@ -75,7 +75,7 @@ public class Leg {
      * The mode (e.g., <code>Walk</code>) used when traversing this leg.
      */
     @JsonSerialize
-    public String mode = TraverseMode.WALK.toString();
+    public TraverseMode mode = TraverseMode.WALK;
 
      /**
       * List of all intermediate stops used when traversing this leg.
@@ -280,12 +280,8 @@ public class Leg {
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
      */
-    public Boolean isTransitLeg() {
-        if (mode == null) return null;
-        else if (mode.equals(TraverseMode.WALK.toString())) return false;
-        else if (mode.equals(TraverseMode.CAR.toString())) return false;
-        else if (mode.equals(TraverseMode.BICYCLE.toString())) return false;
-        else return true;
+    public boolean isTransitLeg() {
+        return mode.isTransit();
     }
     
     /** 

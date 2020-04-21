@@ -133,7 +133,7 @@ public class GraphPathToTripPlanConverterTest {
         Itinerary itinerary = GraphPathToTripPlanConverter.generateItinerary(graphPath, false, false, locale);
 
         assertEquals(1, itinerary.legs.size());
-        assertEquals("WALK", itinerary.legs.get(0).mode);
+        assertEquals(TraverseMode.WALK, itinerary.legs.get(0).mode);
     }
 
     /**
@@ -1010,7 +1010,7 @@ public class GraphPathToTripPlanConverterTest {
             assertNull(legs[0].boardRule);
             assertNull(legs[0].alightRule);
             assertFalse(legs[0].pathway);
-            assertEquals("WALK", legs[0].mode);
+            assertEquals(TraverseMode.WALK, legs[0].mode);
             assertEquals(7.0, legs[0].getDuration(), 0.0);
             assertEquals(0, legs[0].departureDelay);
             assertEquals(0, legs[0].arrivalDelay);
@@ -1060,7 +1060,7 @@ public class GraphPathToTripPlanConverterTest {
         }
         assertNull(legs[1].alightRule);
         assertFalse(legs[1].pathway);
-        assertEquals("RAIL", legs[1].mode);
+        assertEquals(TraverseMode.RAIL, legs[1].mode);
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(10000L, legs[1].startTime.getTimeInMillis());
             assertEquals(6.0, legs[1].getDuration(), 0.0);
@@ -1102,7 +1102,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[2].boardRule);
         assertEquals("mustPhone", legs[2].alightRule);
         assertFalse(legs[2].pathway);
-        assertEquals("RAIL", legs[2].mode);
+        assertEquals(TraverseMode.RAIL, legs[2].mode);
 
         assertEquals(4.0, legs[2].getDuration(), 0.0);
         assertEquals(0, legs[2].departureDelay);
@@ -1135,7 +1135,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[3].boardRule);
         assertNull(legs[3].alightRule);
         assertFalse(legs[3].pathway);
-        assertEquals("WALK", legs[3].mode);
+        assertEquals(TraverseMode.WALK, legs[3].mode);
         if (type == Type.FORWARD) {
             assertEquals(24000L, legs[3].startTime.getTimeInMillis());
             assertEquals(32000L, legs[3].endTime.getTimeInMillis());
@@ -1179,7 +1179,7 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals("mustPhone", legs[4].boardRule);
         assertEquals("coordinateWithDriver", legs[4].alightRule);
         assertFalse(legs[4].pathway);
-        assertEquals("FERRY", legs[4].mode);
+        assertEquals(TraverseMode.FERRY, legs[4].mode);
         assertEquals(40000L, legs[4].startTime.getTimeInMillis());
         assertEquals(43000L, legs[4].endTime.getTimeInMillis());
         assertEquals(3.0, legs[4].getDuration(), 0.0);
@@ -1213,7 +1213,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[5].boardRule);
         assertNull(legs[5].alightRule);
         assertFalse(legs[5].pathway);
-        assertEquals("WALK", legs[5].mode);
+        assertEquals(TraverseMode.WALK, legs[5].mode);
         assertEquals(15.0, legs[5].getDuration(), 0.0);
         assertEquals(0, legs[5].departureDelay);
         assertEquals(0, legs[5].arrivalDelay);
@@ -1252,7 +1252,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[6].boardRule);
         assertNull(legs[6].alightRule);
         assertFalse(legs[6].pathway);
-        assertEquals("BICYCLE", legs[6].mode);
+        assertEquals(TraverseMode.BICYCLE, legs[6].mode);
         assertEquals(2.0, legs[6].getDuration(), 0.0);
         assertEquals(0, legs[6].departureDelay);
         assertEquals(0, legs[6].arrivalDelay);
@@ -1292,7 +1292,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[7].boardRule);
         assertNull(legs[7].alightRule);
         assertFalse(legs[7].pathway);
-        assertEquals("BICYCLE", legs[7].mode);
+        assertEquals(TraverseMode.BICYCLE, legs[7].mode);
         assertEquals(2.0, legs[7].getDuration(), 0.0);
         assertEquals(0, legs[7].departureDelay);
         assertEquals(0, legs[7].arrivalDelay);
@@ -1331,7 +1331,7 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(legs[8].boardRule);
         assertNull(legs[8].alightRule);
         assertFalse(legs[8].pathway);
-        assertEquals("WALK", legs[8].mode);
+        assertEquals(TraverseMode.WALK, legs[8].mode);
         assertEquals(3.0, legs[8].getDuration(), 0.0);
         assertEquals(0, legs[8].departureDelay);
         assertEquals(0, legs[8].arrivalDelay);
