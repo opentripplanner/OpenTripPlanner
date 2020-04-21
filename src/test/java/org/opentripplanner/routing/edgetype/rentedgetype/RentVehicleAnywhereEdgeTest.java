@@ -10,14 +10,14 @@ import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-import static java.util.Collections.emptyList;
-import static java.util.Collections.singletonList;
+import static java.util.Collections.emptySet;
+import static java.util.Collections.singleton;
 import static org.junit.Assert.*;
 
 public class RentVehicleAnywhereEdgeTest {
 
-    private static final CarDescription CAR_1 = new CarDescription(1, 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY);
-    private static final CarDescription CAR_2 = new CarDescription(2, 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, Provider.PANEK);
+    private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK"));
+    private static final CarDescription CAR_2 = new CarDescription("2", 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, new Provider(2, "PANEK"));
 
     private RentVehicleAnywhereEdge edge;
     private RoutingRequest request;
@@ -80,7 +80,7 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.FOSSIL), emptyList(), emptyList(), emptyList());
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(singleton(FuelType.FOSSIL), emptySet(), emptySet(), emptySet());
         // when
         State traversed = edge.traverse(s);
 
@@ -97,7 +97,7 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singletonList(FuelType.ELECTRIC), singletonList(Gearbox.MANUAL), emptyList(), emptyList());
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(singleton(FuelType.ELECTRIC), singleton(Gearbox.MANUAL), emptySet(), emptySet());
         // when
         State traversed = edge.traverse(s);
 

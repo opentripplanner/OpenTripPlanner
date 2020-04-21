@@ -73,7 +73,7 @@ public class TestCarRental extends TestCase {
         assertNull(path);
 
         // we add a car
-        car2.getAvailableVehicles().add(new CarDescription(1, v2.getLon(), v2.getLat(), FuelType.ELECTRIC, Gearbox.AUTOMATIC, Provider.INNOGY));
+        car2.getAvailableVehicles().add(new CarDescription("1", v2.getLon(), v2.getLat(), FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK")));
 
         // but we can't park a car at v3, so we still fail
         options = new RoutingRequest();

@@ -14,8 +14,9 @@ public class MotorbikeDescription extends VehicleDescription {
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;
 
-    public MotorbikeDescription(long id, double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
-        super(id, longitude, latitude, fuelType, gearbox, provider);
+    public MotorbikeDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                                Gearbox gearbox, Provider provider) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
     }
 
     @Override

@@ -7,7 +7,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 
 public abstract class VehicleDescription {
 
-    private final long id;
+    private final String providerVehicleId;
     private final double longitude;
     private final double latitude;
 
@@ -17,11 +17,12 @@ public abstract class VehicleDescription {
     @JsonSerialize
     private final Gearbox gearbox;
 
-    @JsonSerialize
+    @JsonIgnore
     private final Provider provider;
 
-    public VehicleDescription(long id, double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
-        this.id = id;
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                              Gearbox gearbox, Provider provider) {
+        this.providerVehicleId = providerVehicleId;
         this.longitude = longitude;
         this.latitude = latitude;
         this.fuelType = fuelType;
@@ -32,17 +33,14 @@ public abstract class VehicleDescription {
     @Override
     public String toString() {
         return "VehicleDescription{" +
-                "id=" + id +
+                "providerVehicleId=" + providerVehicleId +
                 ", longitude=" + longitude +
                 ", latitude=" + latitude +
                 ", fuelType=" + fuelType +
                 ", gearbox=" + gearbox +
-                ", provider=" + provider +
+                ", providerId=" + provider.getId() +
+                ", providerName=" + provider.getName() +
                 '}';
-    }
-
-    public long getId() {
-        return id;
     }
 
     public double getLongitude() {
@@ -51,6 +49,10 @@ public abstract class VehicleDescription {
 
     public double getLatitude() {
         return latitude;
+    }
+
+    public String getProviderVehicleId() {
+        return providerVehicleId;
     }
 
     FuelType getFuelType() {
@@ -67,7 +69,12 @@ public abstract class VehicleDescription {
 
     @JsonSerialize
     public int getProviderId() {
-        return Provider.toId(provider);
+        return provider.getId();
+    }
+
+    @JsonSerialize
+    public String getProviderName() {
+        return provider.getName();
     }
 
     @JsonIgnore

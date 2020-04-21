@@ -23,13 +23,16 @@ public class VehiclePositionsGetter {
                     "    }\\n" +
                     "      \\n" +
                     "  }) {\\n" +
-                    "    id\\n" +
+                    "    providerVehicleId\\n" +
                     "    latitude\\n" +
                     "    longitude\\n" +
                     "    fuelType\\n" +
                     "    gearbox\\n" +
-                    "    providerId\\n" +
                     "    type\\n" +
+                    "    provider {\\n" +
+                    "      id\\n" +
+                    "      name\\n" +
+                    "    }\\n" +
                     "  }\\n" +
                     "}\",";
 

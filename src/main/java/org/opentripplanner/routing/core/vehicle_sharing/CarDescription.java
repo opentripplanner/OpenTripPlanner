@@ -14,8 +14,9 @@ public class CarDescription extends VehicleDescription {
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
 
-    public CarDescription(long id, double longitude, double latitude, FuelType fuelType, Gearbox gearbox, Provider provider) {
-        super(id, longitude, latitude, fuelType, gearbox, provider);
+    public CarDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                          Gearbox gearbox, Provider provider) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
     }
 
     @Override

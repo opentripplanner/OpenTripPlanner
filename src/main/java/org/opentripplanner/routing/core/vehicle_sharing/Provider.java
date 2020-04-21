@@ -1,50 +1,20 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
-public enum Provider {
+public class Provider {
+    private final int id;
 
-    __EMPTY,
-    TRAFICAR,
-    PANEK,
-    JEDEN_SLAD,
-    VOZILLA,
-    CLICK2GO,
-    TAURON,
-    NEXTBIKE,
-    BLINKEE,
-    HIVE,
-    ECOSHARE,
-    __PUBLIC_TRANSPORT_WARSAW,
-    EASYSHARE,
-    INNOGY,
-    LIME,
-    BIRD,
-    __PUBLIC_TRANSPORT_WROCLAW,
-    __PUBLIC_TRANSPORT_GDANSK,
-    HOPCITY,
-    __PUBLIC_TRANSPORT_STOPS_WARSAW,
-    ITAXI,
-    MIIMOVE,
-    _4MOBILITY,
-    VOLT,
-    CITYBEE;
+    private final String name;
 
-    private static final Provider[] PROVIDERS = Provider.values();
-
-    public static Provider fromId(int id) {
-        try {
-            return PROVIDERS[id];
-        } catch (ArrayIndexOutOfBoundsException e) {
-            return null;
-        }
+    public Provider(int id, String name) {
+        this.id = id;
+        this.name = name;
     }
 
-    public static int toId(Provider provider) {
-        for (int i = 0; i < PROVIDERS.length; i++) {
-            if (provider == PROVIDERS[i]) {
-                return i;
-            }
-        }
-        // This should never happen
-        return 0;
+    public int getId() {
+        return id;
+    }
+
+    public String getName() {
+        return name;
     }
 }
