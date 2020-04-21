@@ -111,7 +111,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean rentingAllowed = false;
 
-    public VehicleDetailsSet vehiclesAllowedToRent;
+    public VehicleDetailsSet vehiclesAllowedToRent = VehicleDetailsSet.allowingAll;
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;

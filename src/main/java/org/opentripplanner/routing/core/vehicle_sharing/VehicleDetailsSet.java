@@ -3,6 +3,8 @@ package org.opentripplanner.routing.core.vehicle_sharing;
 import java.util.Objects;
 import java.util.Set;
 
+import static java.util.Collections.emptySet;
+
 public class VehicleDetailsSet {
 
     private final Set<FuelType> fuelTypes;
@@ -13,7 +15,11 @@ public class VehicleDetailsSet {
 
     private final Set<VehicleType> vehicleTypes;
 
-    public VehicleDetailsSet(Set<FuelType> fuelTypes, Set<Gearbox> gearboxes, Set<Integer> providers, Set<VehicleType> vehicleTypes) {
+    public static final VehicleDetailsSet allowingAll = new VehicleDetailsSet(emptySet(), emptySet(), emptySet(),
+            emptySet());
+
+    public VehicleDetailsSet(Set<FuelType> fuelTypes, Set<Gearbox> gearboxes, Set<Integer> providers,
+                             Set<VehicleType> vehicleTypes) {
         this.fuelTypes = fuelTypes;
         this.gearboxes = gearboxes;
         this.providers = providers;
