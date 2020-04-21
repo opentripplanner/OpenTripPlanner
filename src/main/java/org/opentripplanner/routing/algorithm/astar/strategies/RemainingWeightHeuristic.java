@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.algorithm.astar.strategies;
 
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 
 import java.io.Serializable;

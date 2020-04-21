@@ -8,7 +8,7 @@ import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -108,7 +108,7 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
             sb.append(' ');
-            sb.append(request.modes.getAsStr());
+            sb.append(request.streetSubRequestModes.getAsStr());
             sb.append(' ');
             sb.append(request.from.lat);
             sb.append(' ');

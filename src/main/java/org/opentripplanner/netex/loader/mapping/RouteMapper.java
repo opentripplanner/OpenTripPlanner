@@ -1,6 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.gtfs.mapping.TraverseModeMapper;
+import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Operator;
@@ -58,7 +58,7 @@ class RouteMapper {
                 line.getTransportSubmode()
         );
         otpRoute.setType(transportType);
-        otpRoute.setMode(TraverseModeMapper.mapMode(transportType));
+        otpRoute.setMode(TransitModeMapper.mapMode(transportType));
 
         if (line.getPresentation() != null) {
             PresentationStructure presentation = line.getPresentation();

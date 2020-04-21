@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 
 public class DefaultRoutingRequest {
     public final RoutingRequest request;
@@ -339,7 +339,7 @@ public class DefaultRoutingRequest {
                         .name("allowBikeRental")
                         .description("")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.allowBikeRental)
+                        .dataFetcher(env -> request.bikeRental)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()

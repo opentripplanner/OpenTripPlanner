@@ -1,11 +1,13 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
 import graphql.schema.GraphQLEnumType;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.request.StreetMode;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 
 import java.util.Arrays;
@@ -86,6 +88,18 @@ public class EnumTypes {
             .build();
     */
 
+    public static GraphQLEnumType STREET_MODE = GraphQLEnumType.newEnum()
+        .name("StreetMode")
+        .value("foot", StreetMode.WALK)
+        .value("bicycle", StreetMode.BIKE)
+        .value("bike_park", StreetMode.BIKE_TO_PARK)
+        .value("bike_rental", StreetMode.BIKE_RENTAL)
+        .value("car", StreetMode.CAR)
+        .value("car_park", StreetMode.CAR_TO_PARK)
+        .value("taxi", StreetMode.TAXI)
+        .value("car_rental", StreetMode.CAR_RENTAL)
+        .build();
+
     public static GraphQLEnumType MODE = GraphQLEnumType.newEnum()
             .name("Mode")
             .value("air", TraverseMode.AIRPLANE)
@@ -110,16 +124,16 @@ public class EnumTypes {
 
     public static GraphQLEnumType TRANSPORT_MODE = GraphQLEnumType.newEnum()
             .name("TransportMode")
-            .value("air", TraverseMode.AIRPLANE)
-            .value("bus", TraverseMode.BUS)
-            .value("cableway", TraverseMode.CABLE_CAR)
-            .value("water", TraverseMode.FERRY)
-            .value("funicular", TraverseMode.FUNICULAR)
-            .value("lift", TraverseMode.GONDOLA)
-            .value("rail", TraverseMode.RAIL)
-            .value("metro", TraverseMode.SUBWAY)
-            .value("tram", TraverseMode.TRAM)
-            .value("coach", TraverseMode.BUS).description("NOT IMPLEMENTED")
+            .value("air", TransitMode.AIRPLANE)
+            .value("bus", TransitMode.BUS)
+            .value("cableway", TransitMode.CABLE_CAR)
+            .value("water", TransitMode.FERRY)
+            .value("funicular", TransitMode.FUNICULAR)
+            .value("lift", TransitMode.GONDOLA)
+            .value("rail", TransitMode.RAIL)
+            .value("metro", TransitMode.SUBWAY)
+            .value("tram", TransitMode.TRAM)
+            .value("coach", TransitMode.BUS).description("NOT IMPLEMENTED")
             .value("unknown", "unknown")
             .build();
 

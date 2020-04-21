@@ -1,11 +1,8 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import com.google.common.base.Joiner;
 import graphql.schema.DataFetchingEnvironment;
-import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
@@ -14,15 +11,18 @@ import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.request.RequestModes;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -32,7 +32,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.Set;
+import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -223,7 +223,7 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
         //callWith.argument("banFirstServiceJourneysFromReuseNo", (Integer v) -> request.banFirstTripsFromReuseNo = v);
-        callWith.argument("allowBikeRental", (Boolean v) -> request.allowBikeRental = v);
+        callWith.argument("allowBikeRental", (Boolean v) -> request.bikeRental = v);
         callWith.argument("debugItineraryFilter", (Boolean v) -> request.debugItineraryFilter = v);
 
         callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
@@ -241,22 +241,26 @@ public class TransmodelGraphQLPlanner {
         }
 
         if (hasArgument(environment, "modes")) {
-            // Map modes to comma separated list in string first to be able to reuse logic in QualifiedModeSet
-            // Remove CABLE_CAR from collection because QualifiedModeSet does not support mapping (splits on '_')
-            Set<TraverseMode> modes = new HashSet<>(environment.getArgument("modes"));
-            boolean cableCar = modes.remove(TraverseMode.CABLE_CAR);
+            ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
+            ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
+            ElementWrapper<ArrayList<TransitMode>> transitModes = new ElementWrapper<>();
+            callWith.argument("modes.accessMode", accessMode::set);
+            callWith.argument("modes.egressMode", egressMode::set);
+            callWith.argument("modes.directMode", directMode::set);
+            callWith.argument("modes.transportMode", transitModes::set);
 
-            String modesAsString = modes.isEmpty() ? "" : Joiner.on(",").join(modes);
-            if (!StringUtils.isEmpty(modesAsString)) {
-                new QualifiedModeSet(modesAsString).applyToRoutingRequest(request);
-                request.setModes(request.modes);
-            } else if (cableCar) {
-                // Clear default modes in case only cable car is selected
-                request.clearModes();
+            if (transitModes.get() == null) {
+                // Default to all transport modes if transport modes not specified
+                transitModes.set(new ArrayList<>(Arrays.asList(TransitMode.values())));
             }
 
-            // Apply cable car setting 
-            request.modes.setCableCar(cableCar);
+            request.modes = new RequestModes(
+                accessMode.get(),
+                egressMode.get(),
+                directMode.get(),
+                new HashSet<>(transitModes.get())
+            );
         }
 
         /*
@@ -272,7 +276,7 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-        if (request.allowBikeRental && !hasArgument(environment, "bikeSpeed")) {
+        if (request.bikeRental && !hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -340,5 +344,20 @@ public class TransmodelGraphQLPlanner {
 
     public static <T> boolean hasArgument(Map<String, T> m, String name) {
         return m.containsKey(name) && m.get(name) != null;
+    }
+
+    /**
+     * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.
+     */
+    private static class ElementWrapper<T> {
+        private T element;
+
+        void set(T element) {
+            this.element = element;
+        }
+
+        T get() {
+            return this.element;
+        }
     }
 }
