@@ -511,7 +511,7 @@
         <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
-            <url>http://nexus.onebusaway.org/nexus/content/repositories/releases/</url>
+            <url>https://repo.camsys-apps.com/releases/</url>
         </repository>
     </repositories>
 
