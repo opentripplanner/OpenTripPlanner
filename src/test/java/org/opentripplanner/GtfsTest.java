@@ -13,7 +13,7 @@ import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
@@ -121,7 +121,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
         routingRequest.transferCost = (preferLeastTransfers ? 300 : 0);
-        routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
+        routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
             routingRequest.setBannedRoutes(feedId.getId() + "__" + excludedRoute);

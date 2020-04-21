@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm.astar.strategies;
 
 import com.google.common.collect.Iterables;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.graph.Edge;

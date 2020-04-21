@@ -2,10 +2,13 @@ package org.opentripplanner.api.parameter;
 
 import com.beust.jcommander.internal.Sets;
 
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.request.RequestModes;
+import org.opentripplanner.routing.request.StreetMode;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
 import java.util.Set;
 
 /**
@@ -29,32 +32,105 @@ public class QualifiedModeSet implements Serializable {
         }
     }
 
-    /**
-     * Modify an existing routing request, setting fields to reflect these qualified modes.
-     * This is intended as a temporary solution, and uses the current system of a single mode set,
-     * accompanied by some flags to help with routing.
-     */
-    public void applyToRoutingRequest(RoutingRequest req) {
+    public RequestModes getRequestModes() {
+        StreetMode accessMode = null;
+        StreetMode egressMode = null;
+        StreetMode directMode = null;
+        Set<TransitMode> transitModes = new HashSet<>();
 
-        if (qModes.isEmpty()) return;
-
-        /* Start with an empty mode set. */
-        TraverseModeSet modes = new TraverseModeSet();
-        req.setModes(modes);
-        
-        /* First, copy over all the unqualified modes and see if we are using transit. FIXME HACK */
+        // Set transit modes
         for (QualifiedMode qMode : qModes) {
-            modes.setMode(qMode.mode, true);
+             switch (qMode.mode) {
+                 case TRANSIT:
+                     transitModes.addAll(Arrays.asList(TransitMode.values()));
+                 case RAIL:
+                     transitModes.add(TransitMode.RAIL);
+                     break;
+                 case SUBWAY:
+                     transitModes.add(TransitMode.SUBWAY);
+                     break;
+                 case BUS:
+                     transitModes.add(TransitMode.BUS);
+                     break;
+                 case TRAM:
+                     transitModes.add(TransitMode.TRAM);
+                     break;
+                 case FERRY:
+                     transitModes.add(TransitMode.FERRY);
+                     break;
+                 case AIRPLANE:
+                     transitModes.add(TransitMode.AIRPLANE);
+                     break;
+                 case CABLE_CAR:
+                     transitModes.add(TransitMode.CABLE_CAR);
+                     break;
+                 case GONDOLA:
+                     transitModes.add(TransitMode.GONDOLA);
+                     break;
+                 case FUNICULAR:
+                     transitModes.add(TransitMode.FUNICULAR);
+                     break;
+             }
         }
-        boolean usingTransit = modes.isTransit();
-        
-        // We used to always set WALK to true, but this forced walking when someone wanted to use a bike.
-        // We also want it to be possible to force biking-only (e.g. this is done in some consistency tests).
-        // TODO clearly define mode semantics: does presence of mode mean it is allowable, preferred... ?
 
+        //  This is a best effort at mapping QualifiedModes to access/egress/direct StreetModes.
+        //  It was unclear what exactly each combination of QualifiedModes should mean.
+        //  TODO OTP2 This should either be updated with missing modes or the REST API should be
+        //   redesigned to better reflect the mode structure used in RequestModes.
+        //   Also, some StreetModes are implied by combination of QualifiedModes and are not covered
+        //   in this mapping.
         for (QualifiedMode qMode : qModes) {
-            qMode.applyToRoutingRequest(req, usingTransit);
+            switch (qMode.mode) {
+                case WALK:
+                    accessMode = StreetMode.WALK;
+                    egressMode = StreetMode.WALK;
+                    directMode = StreetMode.WALK;
+                    break;
+                case BICYCLE:
+                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                        accessMode = StreetMode.BIKE_RENTAL;
+                        egressMode = StreetMode.BIKE_RENTAL;
+                        directMode = StreetMode.BIKE_RENTAL;
+                    }
+                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                        accessMode = StreetMode.BIKE_TO_PARK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.BIKE_TO_PARK;
+                    }
+                    else {
+                        accessMode = StreetMode.BIKE;
+                        egressMode = StreetMode.BIKE;
+                        directMode = StreetMode.BIKE;
+                    }
+                    break;
+                case CAR:
+                    if (qMode.qualifiers.contains(Qualifier.RENT)) {
+                        accessMode = StreetMode.CAR_RENTAL;
+                        egressMode = StreetMode.CAR_RENTAL;
+                        directMode = StreetMode.CAR_RENTAL;
+                    }
+                    else if (qMode.qualifiers.contains(Qualifier.PARK)) {
+                        accessMode = StreetMode.CAR_TO_PARK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.CAR_TO_PARK;
+                    }
+                    else {
+                        accessMode = StreetMode.WALK;
+                        egressMode = StreetMode.WALK;
+                        directMode = StreetMode.CAR;
+                    }
+                    break;
+            }
         }
+
+        RequestModes requestModes = new RequestModes(
+            accessMode,
+            egressMode,
+            directMode,
+            transitModes
+        );
+
+        return requestModes;
     }
     
     public String toString() {

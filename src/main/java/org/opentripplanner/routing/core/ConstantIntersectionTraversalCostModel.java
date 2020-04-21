@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 /**

@@ -2,8 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Set;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -42,7 +41,7 @@ public abstract class RentABikeAbstractEdge extends Edge {
         /*
          * To rent a bike, we need to have BICYCLE in allowed modes.
          */
-        if (!options.modes.contains(TraverseMode.BICYCLE))
+        if (!options.streetSubRequestModes.contains(TraverseMode.BICYCLE))
             return null;
 
         BikeRentalStationVertex dropoff = (BikeRentalStationVertex) tov;

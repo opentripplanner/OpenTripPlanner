@@ -13,37 +13,44 @@ import java.util.zip.GZIPInputStream;
 
 public class FileDataSource extends AbstractFileDataSource {
 
-  /**
-   * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
-   * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
-   * zip-files {@link ZipFileDataSource} witch contain multiple files.
-   */
-  public FileDataSource(File file, FileType type) {
-    super(file, type);
-  }
+    /**
+     * Create a data source wrapper around a file. This wrapper handles GZIP(.gz) compressed files
+     * as well as normal files. It does not handle directories({@link DirectoryDataSource}) or
+     * zip-files {@link ZipFileDataSource} witch contain multiple files.
+     */
+    public FileDataSource(File file, FileType type) {
+        super(file, type);
+    }
 
-  @Override
-  public InputStream asInputStream() {
-    try {
-      // We support both gzip and unzipped files when reading.
-      if (file.getName().endsWith(".gz")) {
-        return new GZIPInputStream(new FileInputStream(file));
-      } else {
-        return new FileInputStream(file);
-      }
+    @Override
+    public InputStream asInputStream() {
+        try {
+            // We support both gzip and unzipped files when reading.
+            if (file.getName().endsWith(".gz")) {
+                return new GZIPInputStream(new FileInputStream(file));
+            }
+            else {
+                return new FileInputStream(file);
+            }
+        }
+        catch (IOException e) {
+            throw new RuntimeException(
+                    "Failed to load " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
+        }
     }
-    catch (IOException e) {
-      throw new IllegalStateException(e.getLocalizedMessage(), e);
-    }
-  }
 
-  @Override
-  public OutputStream asOutputStream() {
-    try {
-      return new FileOutputStream(file);
+    @Override
+    public OutputStream asOutputStream() {
+        try {
+            return new FileOutputStream(file);
+        }
+        catch (FileNotFoundException e) {
+            throw new RuntimeException(
+                    "File not found " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
+        }
     }
-    catch (FileNotFoundException e) {
-      throw new IllegalStateException(e.getLocalizedMessage(), e);
-    }
-  }
 }

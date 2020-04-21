@@ -24,8 +24,8 @@ public class InspectorLayersList {
     }
 
     private static class InspectorLayer {
-        String key;
-        String name;
+        public String key;
+        public String name;
 
         private InspectorLayer(String layer_key, String layer_name) {
             this.key = layer_key;

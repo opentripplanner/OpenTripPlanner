@@ -52,7 +52,10 @@ public class ZipFileEntryDataSource implements DataSource {
             return dataSource.zipFile().getInputStream(entry);
         }
         catch (IOException e) {
-            throw new RuntimeException(e.getLocalizedMessage(), e);
+            throw new RuntimeException(
+                    "Failed to read " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
         }
     }
 

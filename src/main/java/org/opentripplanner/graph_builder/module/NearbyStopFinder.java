@@ -14,7 +14,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -23,6 +23,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -139,16 +140,20 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsViaStreets (
             Set<Vertex> originVertices,
             boolean reverseDirection,
-            boolean removeTempEdges
+            boolean removeTempEdges,
+            RoutingRequest routingRequest
     ) {
-
-        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
+        if (!reverseDirection) {
+            routingRequest.setRoutingContext(graph, originVertices, null);
+        } else {
+            routingRequest.setRoutingContext(graph, null, originVertices);
+        }
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
@@ -157,7 +162,7 @@ public class NearbyStopFinder {
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (originVertices.contains(targetVertex)) continue;
-                if (targetVertex instanceof TransitStopVertex) {
+                if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
                     stopsFound.add(stopAtDistanceForState(state));
                 }
             }
@@ -170,7 +175,8 @@ public class NearbyStopFinder {
                         (TransitStopVertex) vertex,
                         0,
                         Collections.emptyList(),
-                        null
+                        null,
+                        new State(vertex, routingRequest)
                     ));
             }
         }
@@ -179,6 +185,20 @@ public class NearbyStopFinder {
         }
         return stopsFound;
 
+    }
+
+    public List<StopAtDistance> findNearbyStopsViaStreets (
+        Set<Vertex> originVertices,
+        boolean reverseDirection,
+        boolean removeTempEdges
+    ) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        return findNearbyStopsViaStreets(
+            originVertices,
+            reverseDirection,
+            removeTempEdges,
+            routingRequest
+        );
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
@@ -203,7 +223,8 @@ public class NearbyStopFinder {
                 StopAtDistance sd = new StopAtDistance(
                     ts1, distance,
                     null,
-                    geometryFactory.createLineString(coordinates)
+                    geometryFactory.createLineString(coordinates),
+                    null
                 );
                 stopsFound.add(sd);
             }
@@ -220,17 +241,20 @@ public class NearbyStopFinder {
         public final double distance;
         public final LineString geometry;
         public final List<Edge>  edges;
+        public final State state;
 
         public StopAtDistance(
             TransitStopVertex tstop,
             double distance,
             List<Edge> edges,
-            LineString geometry
+            LineString geometry,
+            State state
         ) {
             this.tstop = tstop.getStop();
             this.distance = distance;
             this.edges = edges;
             this.geometry = geometry;
+            this.state = state;
         }
 
         @Override
@@ -283,7 +307,8 @@ public class NearbyStopFinder {
                 (TransitStopVertex) state.getVertex(),
                 effectiveWalkDistance, edges,
                 geometryFactory.createLineString(
-                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())));
+                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
+                state);
     }
 
 

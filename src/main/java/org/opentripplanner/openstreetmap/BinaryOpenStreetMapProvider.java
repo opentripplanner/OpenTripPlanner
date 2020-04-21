@@ -1,6 +1,6 @@
 package org.opentripplanner.openstreetmap;
 
-import crosby.binary.file.BlockInputStream;
+import org.openstreetmap.osmosis.osmbinary.file.BlockInputStream;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
 import org.opentripplanner.datastore.file.FileDataSource;
