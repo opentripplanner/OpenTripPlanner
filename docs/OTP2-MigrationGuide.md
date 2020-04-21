@@ -14,26 +14,32 @@ These properties changed names from:
   possibility to build the graph in 2 steps is new in OTP2.  
    
 ## REST API
- 
- A lot of the parameters in the REST API is ignored/deprecated look at the `RoutingRequest` class 
- for documentation.
- 
+  
+### Trip Planning 
+
+Support for XML as a request/response format is removed. The only supported format is JSON.
+
+#### Query parameter changes
+
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+ class for documentation on what is currently supported - we are adding features one by one. The 
+ plan is to go over the API documentation before the release - we do not prioritize keeping 
+ the documentation up to date, except for this migration guide document.
+  
+#### Paging
  In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
  in something like the `last-depature-time` + 1 minute to the next request, to get trips to add to 
  the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
- `metadata` returned by the rout call.
- 
- Support for XML as a request/response format is removed. The only supported format is JSON.
- 
-### RoutingRequest changes
- See JavaDoc on the RoutingRequest for full documentation of deprecated fields and doc on new fields. 
- Her is a short list of new fields:
- 
+ `metadata` returned by the router call.
+
+#### New query parameters in the plan request
  - `searchWindow` Limit the departure window or arrival window for the routing search.
  - `boardSlackByMode` How much time boarding a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
+ - `modes` The REST API is unchanged, but is mapped into a new structure in the RoutingRequest. This means not all combinations of non-transit modes that was available in OTP1 is available in OTP2.
   
-### Response changes
+#### Response changes
 - `metadata` is added to `TripPlan`. The `TripSearchMetadata` has three fields:
   - `searchWindowUsed`
   - `nextDateTime`

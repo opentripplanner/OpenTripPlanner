@@ -28,5 +28,4 @@ public class GtfsLibrary {
             return route.getShortName();
         return route.getLongName();
     }
-
 }

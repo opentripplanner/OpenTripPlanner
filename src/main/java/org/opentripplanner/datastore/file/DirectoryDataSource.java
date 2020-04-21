@@ -55,7 +55,10 @@ public class DirectoryDataSource extends AbstractFileDataSource implements Compo
             }
         }
         catch (IOException e) {
-            throw new IllegalStateException(e.getLocalizedMessage(), e);
+            throw new RuntimeException(
+                    "Failed to delete " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
         }
     }
 

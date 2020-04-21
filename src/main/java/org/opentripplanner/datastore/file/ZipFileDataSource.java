@@ -87,7 +87,10 @@ public class ZipFileDataSource extends AbstractFileDataSource implements Composi
             }
         }
         catch (IOException e) {
-            throw new RuntimeException(e.getLocalizedMessage(), e);
+            throw new RuntimeException(
+                    "Failed to load " + path() + ": " + e.getLocalizedMessage(),
+                    e
+            );
         }
     }
 }

@@ -21,7 +21,7 @@ public final class Route extends TransitEntity<FeedScopedId> {
 
     private int type;
 
-    private TraverseMode mode;
+    private TransitMode mode;
 
     private String desc;
 
@@ -106,11 +106,11 @@ public final class Route extends TransitEntity<FeedScopedId> {
         this.type = type;
     }
 
-    public TraverseMode getMode() {
+    public TransitMode getMode() {
         return mode;
     }
 
-    public void setMode(TraverseMode mode) {
+    public void setMode(TransitMode mode) {
         this.mode = mode;
     }
 

@@ -15,7 +15,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -119,7 +118,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     /**
      * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
      */
-    public final TraverseMode getMode() {
+    public final TransitMode getMode() {
         return route.getMode();
     }
 
