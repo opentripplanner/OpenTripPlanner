@@ -85,15 +85,14 @@ public abstract class DominanceFunction implements Serializable {
             return false;
         }
 
-        // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
-        if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
-            if (!a.getOptions().getRoutingContext().graph.getTurnRestrictions(a.backEdge).isEmpty()) {
-                return false;
-            }
-        }
-
         if (a.getCurrentVehicle() != null && b.getCurrentVehicle() != null) {
             if (a.getCurrentVehicle().getVehicleType() != b.getCurrentVehicle().getVehicleType())
+                return false;
+        }
+
+        // Are the two states arriving at a vertex from two different directions where turn restrictions apply?
+        if (a.backEdge != b.getBackEdge() && (a.backEdge instanceof StreetEdge)) {
+            if (!((StreetEdge) a.backEdge).getTurnRestrictions().isEmpty())
                 return false;
         }
 
