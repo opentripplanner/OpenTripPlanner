@@ -125,7 +125,12 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         // Calculate wait time before and after the transit leg
         int waitTime = (boardTime - prevStopArrivalTime) + alightSlack;
 
-        int cost = costCalculator.transitArrivalCost(waitTime, alightTime - boardTime);
+        int cost = costCalculator.transitArrivalCost(
+            waitTime,
+            alightTime - boardTime,
+            previousStopArrival.stop(),
+            stop
+        );
 
         int totalTravelTime = previousStopArrival.travelDuration()
                 + (stopArrivalTime - prevStopArrivalTime);

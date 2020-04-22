@@ -46,8 +46,7 @@ public class TransitLayer {
   }
 
   public TransitLayer(
-      Map<LocalDate,
-      List<TripPatternForDate>> tripPatternsForDate,
+      Map<LocalDate, List<TripPatternForDate>> tripPatternsForDate,
       List<List<Transfer>> transferByStopIndex,
       StopIndexForRaptor stopIndex,
       ZoneId transitDataZoneId

@@ -374,8 +374,7 @@ config key | description | value type | value default | notes
 `routingDefaults` | Default routing parameters, which will be applied to every request | object |  | see [routing defaults](#routing-defaults)
 `streetRoutingTimeout` | maximum time limit for street route queries | double | null | units: seconds; see [timeout](#timeout)
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
-`boardTimes` | change boarding times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
-`alightTimes` | change alighting times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
+`transit` | Transit tuning parameters | `TransitRoutingConfig` |  | see [Tuning transit routing](#Tuning-transit-routing)
 `updaters` | configure real-time updaters, such as GTFS-realtime feeds | object | null | see [configuring real-time updaters](#configuring-real-time-updaters)
 
 ## Routing defaults
@@ -549,6 +548,99 @@ The fields are separated by whitespace and are (in order):
 
 Finally, for each itinerary returned to the user, there is a travel duration in seconds and the number of transit vehicles used in that itinerary.
 
+
+## Tuning transit routing
+
+Some of these parameters for tuning transit routing is only available through configuration and cannot be set in the routing request. These parameters work together with the default routing request and the actual routing request.
+
+### transit.maxNumberOfTransfers
+This parameter is used to allocate enough memory space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network.
+
+**Type:** `int`  **Default value:** 12
+
+### transit.scheduledTripBinarySearchThreshold
+The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent.
+
+**Type:** `int`  **Default value:** 50
+
+### transit.iterationDepartureStepInSeconds
+Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds.
+
+**Type:** `int`  **Default value:** 60
+
+### transit.searchThreadPoolSize
+Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread.
+
+**Type:** `int`  **Default value:** 0
+
+### transit.dynamicSearchWindow
+The dynamic search window coefficients are used to calculate EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
+
+#### transit.dynamicSearchWindow.minTripTimeCoefficient
+The coefficient to multiply with minimum travel time found using a heuristic search. This 
+ value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give 
+ ok results.
+
+**Type:** `double`  **Default value:** 0.3
+
+
+#### transit.dynamicSearchWindow.minWinTimeMinutes
+The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment.
+**Type:** `int`  **Default value:** 40
+
+#### transit.dynamicSearchWindow.maxWinTimeMinutes
+Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time.
+
+**Type:** `int`  **Default value:** 180 (3 timer) 
+
+#### transit.dynamicSearchWindow.stepMinutes
+he search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.
+
+**Type:** `int`  **Default value:** 10 
+
+
+### transit.stopTransferCost.<TransferCostPriority>
+Use this to set a stop transfer cost for the given `TransferCostPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
+
+This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
+
+If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+
+**Key type:** DISCOURAGED, ALLOWED, RECOMMENDED or PREFERRED 
+
+**Value Type:**  `int` 
+
+**Value Unit:** Scalar, equvivalent to one second of transit. 
+
+**Value Range:** `[0 .. 100,000]`
+
+**All key/value pairs are required if specified.** 
+
+
+### Transit example section from router-config.json
+```
+{
+    transit: {
+        maxNumberOfTransfers: 12,
+        scheduledTripBinarySearchThreshold: 50,
+        iterationDepartureStepInSeconds: 60,
+        searchThreadPoolSize: 0,
+        dynamicSearchWindow: {
+            minTripTimeCoefficient: 0.4,
+            minTripTimeCoefficient: 0.3,
+            minTimeMinutes: 30,
+            maxLengthMinutes : 360,
+            stepMinutes: 10
+        },
+        stopTransferCost: {
+            DISCOURAGED: 72000,
+            ALLOWED:       150,
+            RECOMMENDED:    60,
+            PREFERRED:       0
+        }
+    }
+}
+```
 
 ## Real-time data
 

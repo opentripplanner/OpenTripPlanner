@@ -15,7 +15,7 @@ public class TransferCostPriorityMapperTest {
     assertNull(TransferCostPriorityMapper.mapToDomain(null));
 
     assertEquals(
-        TransferCostPriority.FORBIDDEN,
+        TransferCostPriority.DISCOURAGED,
         TransferCostPriorityMapper.mapToDomain(InterchangeWeightingEnumeration.NO_INTERCHANGE)
     );
     assertEquals(

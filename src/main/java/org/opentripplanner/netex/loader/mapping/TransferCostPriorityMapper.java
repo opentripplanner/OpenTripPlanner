@@ -9,7 +9,7 @@ public class TransferCostPriorityMapper {
         if(value == null) { return null; }
 
         switch (value) {
-            case NO_INTERCHANGE: return TransferCostPriority.FORBIDDEN;
+            case NO_INTERCHANGE: return TransferCostPriority.DISCOURAGED;
             case INTERCHANGE_ALLOWED: return TransferCostPriority.ALLOWED;
             case PREFERRED_INTERCHANGE: return TransferCostPriority.PREFERRED;
             case RECOMMENDED_INTERCHANGE: return TransferCostPriority.RECOMMENDED;

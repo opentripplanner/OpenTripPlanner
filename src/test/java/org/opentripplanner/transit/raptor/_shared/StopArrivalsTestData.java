@@ -7,6 +7,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.DefaultCostCalculator;
@@ -43,7 +44,11 @@ public class StopArrivalsTestData {
 
     /** Provide a Cost Calculator for tests that dont care to much avout testing the cost */
     public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
-            0, 2.0, 1.0, new LifeCycleSubscriptions()
+        new int[] { 0, 0, 0, 0, 0},
+        0,
+        2.0,
+        1.0,
+        new LifeCycleSubscriptions()
     );
 
     // We use 2 minutes slack distributed by (in seconds):
@@ -161,7 +166,7 @@ public class StopArrivalsTestData {
                 STOP_1, A_START, A_END, leg2.asTransitLeg()
         );
 
-        return new Path<>(leg1, COST_CALCULATOR.toOtpDomainCost(6_000));
+        return new Path<>(leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }
 
     public static List<Integer> basicTripStops() {

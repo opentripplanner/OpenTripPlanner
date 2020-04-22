@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -17,6 +18,7 @@ public class CostCalculatorTest {
 
 
     private CostCalculator subject = new DefaultCostCalculator(
+            new int[] { 0, 25 },
             BOARD_COST,
             WALK_RELUCTANCE_FACTOR,
             WAIT_RELUCTANCE_FACTOR,
@@ -26,16 +28,16 @@ public class CostCalculatorTest {
     @Test
     public void transitArrivalCost() {
         LifeCycleEventPublisher lifeCycle = new LifeCycleEventPublisher(lifeCycleSubscriptions);
-        assertEquals("Board cost", 500, subject.transitArrivalCost(0, 0));
-        assertEquals("Transit + board cost", 600, subject.transitArrivalCost(0, 1));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(0, 0, 0, 0));
+        assertEquals("Transit + board cost", 600, subject.transitArrivalCost(0, 1, 0, 0));
         // There is no wait cost for the first transit leg
-        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 0));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 0, 0, 0));
 
         // Simulate round 2
         lifeCycle.prepareForNextRound(2);
         // There is a small cost (2-1) * 0.5 * 100 = 50 added for the second transit leg
-        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(1, 0));
-        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(1, 2));
+        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(1, 0, 0, 0));
+        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(1, 2, 0, 0));
     }
 
     @Test
@@ -58,10 +60,13 @@ public class CostCalculatorTest {
 
     @Test
     public void testConvertBetweenRaptorAndMainOtpDomainModel() {
-        assertEquals(0, subject.toOtpDomainCost(49));
-        assertEquals(1, subject.toOtpDomainCost(50));
-        assertEquals(300, subject.toOtpDomainCost(30_000));
-        assertEquals(BOARD_COST, subject.toOtpDomainCost(subject.calculateMinCost(0,0)));
-        assertEquals(3 + BOARD_COST, subject.toOtpDomainCost(subject.calculateMinCost(3,0)));
+        assertEquals(
+            BOARD_COST,
+            RaptorCostConverter.toOtpDomainCost(subject.calculateMinCost(0,0))
+        );
+        assertEquals(
+            3 + BOARD_COST,
+            RaptorCostConverter.toOtpDomainCost(subject.calculateMinCost(3,0))
+        );
     }
 }

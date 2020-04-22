@@ -22,9 +22,7 @@ public class ForwardPathMapperTest {
                 egress.additionalCost()
         );
 
-        PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(
-                SLACK_PROVIDER, StopArrivalsTestData.COST_CALCULATOR
-        );
+        PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(SLACK_PROVIDER);
 
         Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
 

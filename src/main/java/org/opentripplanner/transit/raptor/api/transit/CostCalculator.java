@@ -10,7 +10,7 @@ public interface CostCalculator {
     /**
      * Calculate the value when arriving by transit.
      */
-    int transitArrivalCost(int waitTime, int transitTime);
+    int transitArrivalCost(int waitTime, int transitTime, int fromStop, int toStop);
 
     /**
      * Calculate the value when arriving by transfer.
@@ -25,11 +25,4 @@ public interface CostCalculator {
      * <em>real value</em> would be correct and a good choose.
      */
     int calculateMinCost(int minTravelTime, int minNumTransfers);
-
-    /**
-     * Convert Raptor internal cost to OTP domain model cost. Inside Raptor the 1 cost unit
-     * is 1/100 of a "transit second", while in the OTP domain is 1 "transit second". Cost in
-     * raptor is calculated using integers ot be fast.
-     */
-    int toOtpDomainCost(int raptorCost);
 }

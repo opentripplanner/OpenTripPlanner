@@ -55,7 +55,7 @@ public class Router {
     public Router(Graph graph, RouterConfig routerConfig) {
         this.graph = graph;
         this.routerConfig = routerConfig;
-        this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters);
+        this.raptorConfig = new RaptorConfig<>(routerConfig.raptorTuningParameters());
     }
 
     /*
@@ -69,11 +69,11 @@ public class Router {
      */
     public void startup() {
         this.tileRendererManager = new TileRendererManager(this.graph);
-        this.defaultRoutingRequest = routerConfig.routingRequestDefaults;
+        this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
-        if (routerConfig.requestLogFile != null) {
-            this.requestLogger = createLogger(routerConfig.requestLogFile);
-            LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile);
+        if (routerConfig.requestLogFile() != null) {
+            this.requestLogger = createLogger(routerConfig.requestLogFile());
+            LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile());
         } else {
             LOG.info("Incoming requests will not be logged.");
         }
@@ -82,7 +82,7 @@ public class Router {
         /* Realtime updates can be mapped similarly by a recurring operation in a GraphUpdater below. */
         LOG.info("Creating transit layer for Raptor routing.");
         if (graph.hasTransit && graph.index != null) {
-            graph.setTransitLayer(TransitLayerMapper.map(graph));
+            graph.setTransitLayer(TransitLayerMapper.map(routerConfig.transitTuningParameters(), graph));
             graph.setRealtimeTransitLayer(new TransitLayer(graph.getTransitLayer()));
             graph.transitLayerUpdater = new TransitLayerUpdater(
                 graph,
@@ -135,6 +135,6 @@ public class Router {
     }
 
     public double streetRoutingTimeoutSeconds() {
-        return  routerConfig.streetRoutingTimeoutSeconds;
+        return  routerConfig.streetRoutingTimeoutSeconds();
     }
 }

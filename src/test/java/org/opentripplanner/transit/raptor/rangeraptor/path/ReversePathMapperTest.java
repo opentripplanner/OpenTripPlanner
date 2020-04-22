@@ -22,7 +22,7 @@ public class ReversePathMapperTest {
                 egress.additionalCost()
         );
         PathMapper<TestRaptorTripSchedule> mapper = new ReversePathMapper<>(
-                StopArrivalsTestData.SLACK_PROVIDER, StopArrivalsTestData.COST_CALCULATOR
+                StopArrivalsTestData.SLACK_PROVIDER
         );
 
         //When:

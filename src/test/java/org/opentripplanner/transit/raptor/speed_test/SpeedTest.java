@@ -74,10 +74,10 @@ public class SpeedTest {
         this.opts = opts;
         this.config = SpeedTestConfig.config(opts.rootDir());
         this.graph = loadGraph(opts.rootDir());
-        this.transitLayer = TransitLayerMapper.map(graph);
+        this.transitLayer = TransitLayerMapper.map(config.transitRoutingParams, graph);
         this.streetRouter = new EgressAccessRouter(graph, transitLayer);
         this.nAdditionalTransfers = opts.numOfExtraTransfers();
-        this.service = new RaptorService<>(new RaptorConfig<>(config.tuningParameters));
+        this.service = new RaptorService<>(new RaptorConfig<>(config.transitRoutingParams));
     }
 
     public static void main(String[] args) throws Exception {

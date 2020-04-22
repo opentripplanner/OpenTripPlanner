@@ -1,37 +1,55 @@
 package org.opentripplanner.standalone.config;
 
+import org.opentripplanner.model.TransferCostPriority;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
+import java.util.Map;
 
 /**
  * @see RaptorTuningParameters for documentaion of tuning parameters.
  */
-public final class TransitRoutingConfig implements RaptorTuningParameters {
+public final class TransitRoutingConfig
+    implements
+        RaptorTuningParameters,
+        TransitTuningParameters
+{
 
     private final int maxNumberOfTransfers;
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
     private final int searchThreadPoolSize;
+    private final Map<TransferCostPriority, Integer> stopTransferCost;
     private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
     public TransitRoutingConfig(NodeAdapter c) {
         RaptorTuningParameters dft = new RaptorTuningParameters() {};
 
-        this.maxNumberOfTransfers = c.asInt("maxNumberOfTransfers", dft.maxNumberOfTransfers());
+        this.maxNumberOfTransfers = c.asInt(
+            "maxNumberOfTransfers",
+            dft.maxNumberOfTransfers()
+        );
         this.scheduledTripBinarySearchThreshold = c.asInt(
-                "scheduledTripBinarySearchThreshold", dft.scheduledTripBinarySearchThreshold()
+            "scheduledTripBinarySearchThreshold",
+            dft.scheduledTripBinarySearchThreshold()
         );
         this.iterationDepartureStepInSeconds = c.asInt(
-                "iterationDepartureStepInSeconds", dft.iterationDepartureStepInSeconds()
+            "iterationDepartureStepInSeconds",
+            dft.iterationDepartureStepInSeconds()
         );
         this.searchThreadPoolSize = c.asInt(
-                "searchThreadPoolSize", dft.searchThreadPoolSize()
+            "searchThreadPoolSize",
+            dft.searchThreadPoolSize()
         );
         // Dynamic Search Window
-        dynamicSearchWindowCoefficients = new DynamicSearchWindowCoefficientsImpl(
-                c.path("dynamicSearchWindow")
+        this.dynamicSearchWindowCoefficients = new DynamicSearchWindowCoefficientsImpl(
+            c.path("dynamicSearchWindow")
+        );
+        this.stopTransferCost = c.asEnumMapAllKeysRequired(
+            "stopTransferCost",
+            TransferCostPriority.class,
+            NodeAdapter::asInt
         );
     }
 
@@ -58,6 +76,16 @@ public final class TransitRoutingConfig implements RaptorTuningParameters {
     @Override
     public DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients() {
         return dynamicSearchWindowCoefficients;
+    }
+
+    @Override
+    public boolean enableStopTransferPriority() {
+        return stopTransferCost == null;
+    }
+
+    @Override
+    public Integer stopTransferCost(TransferCostPriority key) {
+        return stopTransferCost.get(key);
     }
 
     private static class DynamicSearchWindowCoefficientsImpl

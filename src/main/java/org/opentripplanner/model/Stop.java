@@ -1,6 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
@@ -82,5 +83,14 @@ public final class Stop extends StationElement {
 
   public Collection<BoardingArea> getBoardingAreas() {
     return boardingAreas != null ? boardingAreas : Collections.emptySet();
+  }
+
+  /**
+   * Get the transfer cost priority for Stop. This will fetch the value from the parent
+   * [if parent exist] or return the default value.
+   */
+  @NotNull
+  public TransferCostPriority getCostPriority() {
+    return isPartOfStation() ? getParentStation().getCostPriority() : TransferCostPriority.ALLOWED;
   }
 }

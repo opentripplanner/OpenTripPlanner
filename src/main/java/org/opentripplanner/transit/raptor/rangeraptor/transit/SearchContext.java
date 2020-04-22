@@ -65,9 +65,17 @@ public class SearchContext<T extends RaptorTripSchedule> {
         this.transit = transit;
         // Note that it is the "new" request that is passed in.
         this.calculator = createCalculator(this.request, tuningParameters);
-        this.costCalculator = createCostCalculator(request.multiCriteriaCostFactors(), lifeCycle());
-        this.roundTracker = new RoundTracker(nRounds(), request.searchParams().numberOfAdditionalTransfers(), lifeCycle());
-        this.pathMapper = createPathMapper(request, this.costCalculator);
+        this.costCalculator = createCostCalculator(
+            transit.stopBoarAlightCost(),
+            request.multiCriteriaCostFactors(),
+            lifeCycle()
+        );
+        this.roundTracker = new RoundTracker(
+            nRounds(),
+            request.searchParams().numberOfAdditionalTransfers(),
+            lifeCycle()
+        );
+        this.pathMapper = createPathMapper(request);
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -215,15 +223,16 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-            RaptorRequest<S> request, CostCalculator costCalculator
+            RaptorRequest<S> request
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider(), costCalculator)
-                : new ReversePathMapper<>(request.slackProvider(), costCalculator);
+                ? new ForwardPathMapper<>(request.slackProvider())
+                : new ReversePathMapper<>(request.slackProvider());
     }
 
-    private static CostCalculator createCostCalculator(McCostParams f, WorkerLifeCycle lifeCycle) {
+    private static CostCalculator createCostCalculator(int[] stopVisitCost, McCostParams f, WorkerLifeCycle lifeCycle) {
         return new DefaultCostCalculator(
+                stopVisitCost,
                 f.boardCost(),
                 f.walkReluctanceFactor(),
                 f.waitReluctanceFactor(),
