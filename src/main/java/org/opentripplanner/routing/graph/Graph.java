@@ -33,7 +33,6 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
@@ -81,8 +80,6 @@ public class Graph implements Serializable {
     public String routerId;
 
     private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
-
-    private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
@@ -264,7 +261,6 @@ public class Graph implements Serializable {
                 alertPatches.remove(e);     // method isn't thread-safe anyway, but it is consistent
             }
 
-            turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
             edgeById.remove(e.getId());
 
@@ -272,15 +268,11 @@ public class Graph implements Serializable {
 
             if (e.fromv != null) {
                 e.fromv.removeOutgoing(e);
-
-                for (Edge otherEdge : e.fromv.getIncoming()) {
-                    for (TurnRestriction turnRestriction : getTurnRestrictions(otherEdge)) {
-                        if (turnRestriction.to == e) {
-                            removeTurnRestriction(otherEdge, turnRestriction);
-                        }
-                    }
-                }
-
+                e.fromv.getOutgoing().stream()
+                        .filter(StreetEdge.class::isInstance)
+                        .map(StreetEdge.class::cast)
+                        .map(StreetEdge::getTurnRestrictions)
+                        .forEach(trs -> trs.removeIf(turnRestriction -> turnRestriction.to == e));
                 e.fromv = null;
             }
 
@@ -400,57 +392,6 @@ public class Graph implements Serializable {
             }
         }
         return new AlertPatch[0];
-    }
-
-    /**
-     * Add a {@link TurnRestriction} to the {@link TurnRestriction} {@link List} belonging to an
-     * {@link Edge}. This method is not thread-safe.
-     * @param edge
-     * @param turnRestriction
-     */
-    public void addTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions == null) {
-            turnRestrictions = Lists.newArrayList();
-            this.turnRestrictions.put(edge, turnRestrictions);
-        }
-        turnRestrictions.add(turnRestriction);
-    }
-
-    /**
-     * Remove a {@link TurnRestriction} from the {@link TurnRestriction} {@link List} belonging to
-     * an {@link Edge}. This method is not thread-safe.
-     * @param edge
-     * @param turnRestriction
-     */
-    public void removeTurnRestriction(Edge edge, TurnRestriction turnRestriction) {
-        if (edge == null || turnRestriction == null) return;
-        List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-        if (turnRestrictions != null && turnRestrictions.contains(turnRestriction)) {
-            if (turnRestrictions.size() < 2) {
-                this.turnRestrictions.remove(edge);
-            } else {
-                turnRestrictions.remove(turnRestriction);
-            }
-        }
-    }
-
-    /**
-     * Get the {@link TurnRestriction} {@link List} that belongs to an {@link Edge} and return an
-     * immutable copy. This method is thread-safe when used by itself, but not if addTurnRestriction
-     * or removeTurnRestriction is called concurrently.
-     * @param edge
-     * @return The {@link TurnRestriction} {@link List} that belongs to the {@link Edge}
-     */
-    public List<TurnRestriction> getTurnRestrictions(Edge edge) {
-        if (edge != null) {
-            List<TurnRestriction> turnRestrictions = this.turnRestrictions.get(edge);
-            if (turnRestrictions != null) {
-                return ImmutableList.copyOf(turnRestrictions);
-            }
-        }
-        return Collections.emptyList();
     }
 
     /**

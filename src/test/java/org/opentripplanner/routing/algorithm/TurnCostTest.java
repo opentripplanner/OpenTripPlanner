@@ -237,7 +237,7 @@ public class TurnCostTest {
         TurnRestrictionType rType = TurnRestrictionType.NO_TURN;
         TraverseModeSet restrictedModes = new TraverseModeSet(TraverseMode.CAR);
         TurnRestriction restrict = new TurnRestriction(from, to, rType, restrictedModes);
-        graph.addTurnRestriction(from, restrict);
+        from.getTurnRestrictions().add(restrict);
     }
 
 }

@@ -96,8 +96,8 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
      * Have the turn restrictions of  their parent.
      */
     @Override
-    protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
-        return graph.getTurnRestrictions(parentEdge);
+    public List<TurnRestriction> getTurnRestrictions() {
+        return parentEdge.getTurnRestrictions();
     }
 
     /**
