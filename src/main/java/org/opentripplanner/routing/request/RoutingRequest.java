@@ -819,13 +819,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            preferredAgencies = new HashSet<>();
-            Collections.addAll(
-                preferredAgencies,
-                Arrays.stream(s.split(","))
-                    .map(FeedScopedId::convertFromString)
-                    .toArray(FeedScopedId[]::new)
-            );
+            preferredAgencies = FeedScopedId.convertFromConcatenatedString(s);
         }
     }
 
@@ -845,13 +839,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setUnpreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            unpreferredAgencies = new HashSet<>();
-            Collections.addAll(
-                unpreferredAgencies,
-                Arrays.stream(s.split(","))
-                    .map(FeedScopedId::convertFromString)
-                    .toArray(FeedScopedId[]::new)
-            );
+            unpreferredAgencies = FeedScopedId.convertFromConcatenatedString(s);
         }
     }
 
@@ -884,22 +872,13 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setBannedAgencies(String s) {
         if (!s.isEmpty()) {
-            bannedAgencies = new HashSet<>();
-            Collections.addAll(
-                bannedAgencies,
-                Arrays.stream(s.split(","))
-                    .map(FeedScopedId::convertFromString)
-                    .toArray(FeedScopedId[]::new));
+            bannedAgencies = FeedScopedId.convertFromConcatenatedString(s);
         }
     }
 
     public void setWhiteListedAgencies(String s) {
         if (!s.isEmpty()) {
-            whiteListedAgencies = new HashSet<>();
-            Collections.addAll(whiteListedAgencies,
-                Arrays.stream(s.split(","))
-                    .map(FeedScopedId::convertFromString)
-                    .toArray(FeedScopedId[]::new));
+            whiteListedAgencies = FeedScopedId.convertFromConcatenatedString(s);
         }
     }
 

@@ -3,6 +3,9 @@ package org.opentripplanner.model;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
@@ -104,5 +107,15 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
      */
     public static String concatenateId(String feedId, String id) {
         return feedId + ID_SEPARATOR + id;
+    }
+
+    /**
+     * Converts a string consisting of concatenated FeedScopedIds to a Set
+     */
+    public static HashSet<FeedScopedId> convertFromConcatenatedString(String s) {
+        return Arrays
+            .stream(s.split(","))
+            .map(FeedScopedId::convertFromString)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 }
