@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
@@ -13,8 +14,16 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 public final class AccessStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
     private final int accessDurationInSeconds;
     private final TransitCalculator calculator;
+    private final RaptorTransfer access;
 
-    public AccessStopArrival(int stop, int departureTime, int accessDurationInSeconds, int cost, TransitCalculator calculator) {
+    public AccessStopArrival(
+        RaptorTransfer access,
+        int stop,
+        int departureTime,
+        int accessDurationInSeconds,
+        int cost,
+        TransitCalculator calculator
+    ) {
         super(
                 stop,
                 departureTime,
@@ -22,8 +31,14 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
                 accessDurationInSeconds,
                 cost
         );
+        this.access = access;
         this.calculator = calculator;
         this.accessDurationInSeconds = accessDurationInSeconds;
+    }
+
+    @Override
+    public RaptorTransfer accessEgress() {
+        return access;
     }
 
     public boolean arrivedByAccessLeg() {

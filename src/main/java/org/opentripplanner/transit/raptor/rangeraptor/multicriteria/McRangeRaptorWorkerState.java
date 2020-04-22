@@ -78,6 +78,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     public void setInitialTimeForIteration(RaptorTransfer accessLeg, int iterationDepartureTime) {
         addStopArrival(
                 new AccessStopArrival<>(
+                        accessLeg,
                         accessLeg.stop(),
                         iterationDepartureTime,
                         accessLeg.durationInSeconds(),

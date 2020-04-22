@@ -52,7 +52,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
         int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
 
-        DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
+        DestinationArrival<T> destArrival = new DestinationArrival<>(egressLeg, egressStopArrival, arrivalTime, additionalCost);
 
         if (calculator.exceedsTimeLimit(arrivalTime)) {
             debugRejectByTimeLimitOptimization(destArrival);

@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.view;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.stoparrivals.StopArrivalState;
@@ -22,6 +23,11 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
     @Override
     public int stop() {
         return stop;
+    }
+
+    @Override
+    public RaptorTransfer accessEgress() {
+        return null; //TODO throw?
     }
 
     @Override

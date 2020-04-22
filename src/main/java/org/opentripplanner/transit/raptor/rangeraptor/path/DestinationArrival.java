@@ -1,5 +1,6 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
@@ -27,14 +28,16 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
 
     private final ArrivalView<T> previous;
+    private final RaptorTransfer egress;
     private final int departureTime;
     private final int arrivalTime;
     private final int numberOfTransfers;
     private final int cost;
 
 
-    DestinationArrival(ArrivalView<T> previous, int arrivalTime, int additionalCost) {
+    DestinationArrival(RaptorTransfer egress, ArrivalView<T> previous, int arrivalTime, int additionalCost) {
         this.previous = previous;
+        this.egress = egress;
         this.departureTime = previous.arrivalTime();
         this.arrivalTime = arrivalTime;
         this.numberOfTransfers = previous.round() - 1;
@@ -48,6 +51,11 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     @Override
     public int stop() {
         throw new UnsupportedOperationException();
+    }
+
+    @Override
+    public RaptorTransfer accessEgress() {
+        return egress;
     }
 
     @Override
