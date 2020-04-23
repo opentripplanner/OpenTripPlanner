@@ -66,10 +66,10 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Given an id of the form "agencyId_entityId", parses into a
+     * Given an id of the form "feedId:entityId", parses into a
      * {@link FeedScopedId} id object.
      *
-     * @param value id of the form "agencyId_entityId"
+     * @param value id of the form "feedId:entityId"
      * @return an id object
      * @throws IllegalArgumentException if the id cannot be parsed
      */
@@ -78,7 +78,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
             return null;
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
-            throw new IllegalArgumentException("invalid agency-and-id: " + value);
+            throw new IllegalArgumentException("invalid feed-scoped-id: " + value);
         } else {
             return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
         }
@@ -89,7 +89,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Concatenate agencyId and id into a string.
+     * Concatenate feedId and id into a string.
      */
     public static String concatenateId(String feedId, String id) {
         return feedId + ID_SEPARATOR + id;
