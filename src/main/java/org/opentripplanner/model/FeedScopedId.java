@@ -73,7 +73,7 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
      * @return an id object
      * @throws IllegalArgumentException if the id cannot be parsed
      */
-    public static FeedScopedId convertFromString(String value) throws IllegalArgumentException {
+    public static FeedScopedId parseId(String value) throws IllegalArgumentException {
         if (value == null || value.isEmpty())
             return null;
         int index = value.indexOf(ID_SEPARATOR);
@@ -89,20 +89,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Given an {@link FeedScopedId} object, creates a string representation of the
-     * form "agencyId_entityId"
-     *
-     * @param aid an id object
-     * @return a string representation of the form "agencyId_entityId"
-     */
-    public static String convertToString(FeedScopedId aid) {
-        if (aid == null) {
-            return null;
-        }
-        return concatenateId(aid.feedId, aid.id);
-    }
-
-    /**
      * Concatenate agencyId and id into a string.
      */
     public static String concatenateId(String feedId, String id) {
@@ -110,12 +96,12 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Converts a string consisting of concatenated FeedScopedIds to a Set
+     * Parses a string consisting of concatenated FeedScopedIds to a Set
      */
-    public static HashSet<FeedScopedId> convertFromConcatenatedString(String s) {
+    public static HashSet<FeedScopedId> parseListOfIds(String s) {
         return Arrays
             .stream(s.split(","))
-            .map(FeedScopedId::convertFromString)
+            .map(FeedScopedId::parseId)
             .collect(Collectors.toCollection(HashSet::new));
     }
 }

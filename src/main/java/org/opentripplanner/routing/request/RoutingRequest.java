@@ -819,7 +819,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            preferredAgencies = FeedScopedId.convertFromConcatenatedString(s);
+            preferredAgencies = FeedScopedId.parseListOfIds(s);
         }
     }
 
@@ -839,7 +839,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setUnpreferredAgencies(String s) {
         if (!s.isEmpty()) {
-            unpreferredAgencies = FeedScopedId.convertFromConcatenatedString(s);
+            unpreferredAgencies = FeedScopedId.parseListOfIds(s);
         }
     }
 
@@ -872,13 +872,13 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public void setBannedAgencies(String s) {
         if (!s.isEmpty()) {
-            bannedAgencies = FeedScopedId.convertFromConcatenatedString(s);
+            bannedAgencies = FeedScopedId.parseListOfIds(s);
         }
     }
 
     public void setWhiteListedAgencies(String s) {
         if (!s.isEmpty()) {
-            whiteListedAgencies = FeedScopedId.convertFromConcatenatedString(s);
+            whiteListedAgencies = FeedScopedId.parseListOfIds(s);
         }
     }
 
