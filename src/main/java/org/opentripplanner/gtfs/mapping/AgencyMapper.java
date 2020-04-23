@@ -1,6 +1,7 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
@@ -11,6 +12,12 @@ import java.util.Map;
 class AgencyMapper {
 
     private final Map<org.onebusaway.gtfs.model.Agency, Agency> mappedAgencies = new HashMap<>();
+
+    private String feedId;
+
+    public AgencyMapper(String feedId) {
+        this.feedId = feedId;
+    }
 
     Collection<Agency> map(Collection<org.onebusaway.gtfs.model.Agency> agencies) {
         return MapUtils.mapToList(agencies, this::map);
@@ -24,7 +31,7 @@ class AgencyMapper {
     private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {
         Agency lhs = new Agency();
 
-        lhs.setId(rhs.getId());
+        lhs.setId(new FeedScopedId(feedId, rhs.getId()));
         lhs.setName(rhs.getName());
         lhs.setUrl(rhs.getUrl());
         lhs.setTimezone(rhs.getTimezone());

@@ -23,7 +23,7 @@ public class AgencyMapper {
         }
         ApiAgency api = new ApiAgency();
 
-        api.id = domain.getId();
+        api.id = FeedScopedIdMapper.mapToApi(domain.getId());
         api.name = domain.getName();
         api.url = domain.getUrl();
         api.timezone = domain.getTimezone();

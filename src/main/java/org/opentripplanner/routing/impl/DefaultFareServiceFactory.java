@@ -41,10 +41,10 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     @Override
     public void processGtfs(OtpTransitService transitService) {
-        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
+        fillFareRules(transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
-    protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
+    protected void fillFareRules(Collection<FareAttribute> fareAttributes,
             Collection<FareRule> fareRules, Map<FeedScopedId, FareRuleSet> fareRuleSet) {
         /*
          * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
@@ -56,10 +56,6 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             if (fareRule == null) {
                 fareRule = new FareRuleSet(fare);
                 fareRuleSet.put(id, fareRule);
-                if (agencyId != null) {
-                    // TODO With the new GTFS lib, use fareAttribute.agency_id directly
-                    fareRule.setAgency(agencyId);
-                }
             }
         }
 

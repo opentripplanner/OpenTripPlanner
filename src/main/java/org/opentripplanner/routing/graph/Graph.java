@@ -145,7 +145,7 @@ public class Graph implements Serializable {
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
-    private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
+    private Collection<Agency> agencies = new ArrayList<>();
 
     private Collection<Operator> operators = new ArrayList<>();
 
@@ -746,9 +746,8 @@ public class Graph implements Serializable {
         return feedIds;
     }
 
-    /** @return the agencies to which the specified feedId is mapped, or null if no mapping exist */
-    public Collection<Agency> getAgencies(String feedId) {
-        return agenciesForFeedId.get(feedId);
+    public Collection<Agency> getAgencies() {
+        return agencies;
     }
 
     public FeedInfo getFeedInfo(String feedId) {
@@ -756,9 +755,7 @@ public class Graph implements Serializable {
     }
 
     public void addAgency(String feedId, Agency agency) {
-        Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
-        this.agenciesForFeedId.put(feedId, agencies);
         this.feedIds.add(feedId);
     }
 
@@ -774,10 +771,6 @@ public class Graph implements Serializable {
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
-            Collection<Agency> agencies = null;
-            if (agenciesForFeedId.entrySet().size() > 0) {
-                agencies = agenciesForFeedId.entrySet().iterator().next().getValue();
-            }
             if (agencies == null || agencies.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
                 LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");

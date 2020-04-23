@@ -3,6 +3,9 @@ package org.opentripplanner.model;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.stream.Collectors;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
@@ -63,19 +66,19 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Given an id of the form "agencyId_entityId", parses into a
+     * Given an id of the form "feedId:entityId", parses into a
      * {@link FeedScopedId} id object.
      *
-     * @param value id of the form "agencyId_entityId"
+     * @param value id of the form "feedId:entityId"
      * @return an id object
      * @throws IllegalArgumentException if the id cannot be parsed
      */
-    public static FeedScopedId convertFromString(String value) throws IllegalArgumentException {
+    public static FeedScopedId parseId(String value) throws IllegalArgumentException {
         if (value == null || value.isEmpty())
             return null;
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
-            throw new IllegalArgumentException("invalid agency-and-id: " + value);
+            throw new IllegalArgumentException("invalid feed-scoped-id: " + value);
         } else {
             return new FeedScopedId(value.substring(0, index), value.substring(index + 1));
         }
@@ -86,23 +89,19 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     }
 
     /**
-     * Given an {@link FeedScopedId} object, creates a string representation of the
-     * form "agencyId_entityId"
-     *
-     * @param aid an id object
-     * @return a string representation of the form "agencyId_entityId"
-     */
-    public static String convertToString(FeedScopedId aid) {
-        if (aid == null) {
-            return null;
-        }
-        return concatenateId(aid.feedId, aid.id);
-    }
-
-    /**
-     * Concatenate agencyId and id into a string.
+     * Concatenate feedId and id into a string.
      */
     public static String concatenateId(String feedId, String id) {
         return feedId + ID_SEPARATOR + id;
+    }
+
+    /**
+     * Parses a string consisting of concatenated FeedScopedIds to a Set
+     */
+    public static HashSet<FeedScopedId> parseListOfIds(String s) {
+        return Arrays
+            .stream(s.split(","))
+            .map(FeedScopedId::parseId)
+            .collect(Collectors.toCollection(HashSet::new));
     }
 }

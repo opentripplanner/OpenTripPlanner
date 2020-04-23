@@ -250,7 +250,7 @@ public class NodeAdapter {
 
     public FeedScopedId asFeedScopedId(String paramName, FeedScopedId defaultValue) {
         if(!exist(paramName)) { return defaultValue; }
-        return FeedScopedId.convertFromString(asText(paramName));
+        return FeedScopedId.parseId(asText(paramName));
     }
 
     public Locale asLocale(String paramName, Locale defaultValue) {

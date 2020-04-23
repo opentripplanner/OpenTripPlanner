@@ -16,6 +16,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class StopTimesMapperTest {
+    private static final String FEED_ID = "FEED";
+
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
     private static final Integer ID = 45;
@@ -66,7 +68,7 @@ public class StopTimesMapperTest {
     }
 
     private StopTimeMapper subject = new StopTimeMapper(
-            new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper()))
+            new StopMapper(), new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)))
     );
 
     @Test

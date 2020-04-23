@@ -51,7 +51,7 @@ import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExis
 public class OtpTransitServiceBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
 
-    private final EntityById<String, Agency> agenciesById = new EntityById<>();
+    private final EntityById<FeedScopedId, Agency> agenciesById = new EntityById<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
@@ -104,7 +104,7 @@ public class OtpTransitServiceBuilder {
 
     /* Accessors */
 
-    public EntityById<String, Agency> getAgenciesById() {
+    public EntityById<FeedScopedId, Agency> getAgenciesById() {
         return agenciesById;
     }
 

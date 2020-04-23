@@ -1,7 +1,6 @@
 package org.opentripplanner.api.model;
 
 import org.opentripplanner.api.model.alertpatch.ApiAlert;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Calendar;
@@ -102,7 +101,7 @@ public class ApiLeg {
      * For transit legs, the ID of the route.
      * For non-transit legs, null.
      */
-    public FeedScopedId routeId = null;
+    public String routeId = null;
 
     /**
      * For transit leg, the route's text color (if one exists). For non-transit legs, null.
@@ -140,7 +139,7 @@ public class ApiLeg {
      * For transit legs, the ID of the trip.
      * For non-transit legs, null.
      */
-    public FeedScopedId tripId = null;
+    public String tripId = null;
 
     /**
      * For transit legs, the service date of the trip.

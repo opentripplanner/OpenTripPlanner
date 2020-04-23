@@ -27,7 +27,7 @@ public class PlaceMapper {
         ApiPlace api = new ApiPlace();
 
         api.name = domain.name;
-        api.stopId = domain.stopId;
+        api.stopId = FeedScopedIdMapper.mapToApi(domain.stopId);
         api.stopCode = domain.stopCode;
         api.platformCode = domain.platformCode;
         if(domain.coordinate != null) {
