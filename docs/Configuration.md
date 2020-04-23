@@ -599,8 +599,8 @@ he search window is rounded of to the closest multiplication of N minutes. If N=
 **Type:** `int`  **Default value:** 10 
 
 
-### transit.stopTransferCost.<TransferCostPriority>
-Use this to set a stop transfer cost for the given `TransferCostPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
+### transit.stopTransferCost.<TransferPriority>
+Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
 
 This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
 

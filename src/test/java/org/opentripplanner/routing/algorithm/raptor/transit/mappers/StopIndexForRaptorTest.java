@@ -4,7 +4,7 @@ import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransferCostPriority;
+import org.opentripplanner.model.TransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 
@@ -53,10 +53,10 @@ public class StopIndexForRaptorTest {
     }
 
     @Test public void stopBoardAlightCosts() {
-        STOP_1.setParentStation(createStation("A", TransferCostPriority.DISCOURAGED));
-        STOP_2.setParentStation(createStation("B", TransferCostPriority.ALLOWED));
-        STOP_3.setParentStation(createStation("C", TransferCostPriority.RECOMMENDED));
-        STOP_4.setParentStation(createStation("D", TransferCostPriority.PREFERRED));
+        STOP_1.setParentStation(createStation("A", TransferPriority.DISCOURAGED));
+        STOP_2.setParentStation(createStation("B", TransferPriority.ALLOWED));
+        STOP_3.setParentStation(createStation("C", TransferPriority.RECOMMENDED));
+        STOP_4.setParentStation(createStation("D", TransferPriority.PREFERRED));
 
         StopIndexForRaptor stopIndex = new StopIndexForRaptor(STOPS, TransitTuningParameters.FOR_TEST);
 
@@ -66,7 +66,7 @@ public class StopIndexForRaptorTest {
         assertEquals("[6000, 360000, 6000, 2000, 0]", Arrays.toString(result));
     }
 
-    Station createStation(String name, TransferCostPriority pri) {
+    Station createStation(String name, TransferPriority pri) {
         return new Station(new FeedScopedId("F", name), name, null, null, null, null, null, pri);
     }
 }

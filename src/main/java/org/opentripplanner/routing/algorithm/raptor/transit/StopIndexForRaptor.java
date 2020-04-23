@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TransferCostPriority;
+import org.opentripplanner.model.TransferPriority;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 import java.util.ArrayList;
@@ -72,7 +72,7 @@ public class StopIndexForRaptor {
         int[] stopVisitCosts = new int[stops.size()];
 
         for (int i=0; i<stops.size(); ++i) {
-            TransferCostPriority priority = stops.get(i).getCostPriority();
+            TransferPriority priority = stops.get(i).getCostPriority();
             int domainCost = tuningParams.stopTransferCost(priority);
             stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
         }

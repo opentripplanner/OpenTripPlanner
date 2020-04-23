@@ -90,7 +90,7 @@ public final class Stop extends StationElement {
    * [if parent exist] or return the default value.
    */
   @NotNull
-  public TransferCostPriority getCostPriority() {
-    return isPartOfStation() ? getParentStation().getCostPriority() : TransferCostPriority.ALLOWED;
+  public TransferPriority getCostPriority() {
+    return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
   }
 }

@@ -1,6 +1,6 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.model.TransferCostPriority;
+import org.opentripplanner.model.TransferPriority;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.DynamicSearchWindowCoefficients;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -20,7 +20,7 @@ public final class TransitRoutingConfig
     private final int scheduledTripBinarySearchThreshold;
     private final int iterationDepartureStepInSeconds;
     private final int searchThreadPoolSize;
-    private final Map<TransferCostPriority, Integer> stopTransferCost;
+    private final Map<TransferPriority, Integer> stopTransferCost;
     private final DynamicSearchWindowCoefficients dynamicSearchWindowCoefficients;
 
     public TransitRoutingConfig(NodeAdapter c) {
@@ -48,7 +48,7 @@ public final class TransitRoutingConfig
         );
         this.stopTransferCost = c.asEnumMapAllKeysRequired(
             "stopTransferCost",
-            TransferCostPriority.class,
+            TransferPriority.class,
             NodeAdapter::asInt
         );
     }
@@ -84,7 +84,7 @@ public final class TransitRoutingConfig
     }
 
     @Override
-    public Integer stopTransferCost(TransferCostPriority key) {
+    public Integer stopTransferCost(TransferPriority key) {
         return stopTransferCost.get(key);
     }
 
