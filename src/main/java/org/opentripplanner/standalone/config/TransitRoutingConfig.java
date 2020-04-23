@@ -80,7 +80,7 @@ public final class TransitRoutingConfig
 
     @Override
     public boolean enableStopTransferPriority() {
-        return stopTransferCost == null;
+        return stopTransferCost != null;
     }
 
     @Override
