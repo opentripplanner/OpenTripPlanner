@@ -120,6 +120,19 @@ public abstract class StationElement extends TransitEntity<FeedScopedId>  {
     return parentStation;
   }
 
+  /** Return {@code true} if this stop (element) is part of a station, have a parent station. */
+  public boolean isPartOfStation() {
+    return parentStation != null;
+  }
+
+  /**
+   * Return {@code true} if this stop (element) has the same parent station as the other stop
+   * (element).
+   */
+  public boolean isPartOfSameStationAs(StationElement other) {
+    return isPartOfStation() && parentStation.equals(other.parentStation);
+  }
+
   public void setParentStation(Station parentStation) {
     this.parentStation = parentStation;
   }
