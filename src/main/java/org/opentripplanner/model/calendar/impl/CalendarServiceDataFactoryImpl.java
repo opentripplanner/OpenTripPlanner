@@ -80,7 +80,12 @@ public class CalendarServiceDataFactoryImpl {
 
             LOG.debug("serviceId=" + serviceId + " (" + index + "/" + serviceIds.size() + ")");
 
-            TimeZone serviceIdTimeZone = data.getTimeZoneForAgencyId(serviceId.getFeedId());
+            TimeZone serviceIdTimeZone = data.getTimeZoneForAgencyId(data
+                .getAgencyIds()
+                .stream()
+                .filter(agency -> agency.getFeedId().equals(serviceId.getFeedId()))
+                .findAny()
+                .orElse(null));
             if (serviceIdTimeZone == null) {
                 serviceIdTimeZone = TimeZone.getDefault();
             }

@@ -26,14 +26,14 @@ class RouteMapper {
     private final TransportModeMapper transportModeMapper = new TransportModeMapper();
 
     private final FeedScopedIdFactory idFactory;
-    private final EntityById<String, Agency> agenciesById;
+    private final EntityById<FeedScopedId, Agency> agenciesById;
     private final EntityById<FeedScopedId, Operator> operatorsById;
     private final NetexImportDataIndexReadOnlyView netexIndex;
     private final AuthorityToAgencyMapper authorityMapper;
 
     RouteMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<String, Agency> agenciesById,
+            EntityById<FeedScopedId, Agency> agenciesById,
             EntityById<FeedScopedId, Operator> operatorsById,
             NetexImportDataIndexReadOnlyView netexIndex,
             String timeZone
@@ -42,7 +42,7 @@ class RouteMapper {
         this.agenciesById = agenciesById;
         this.operatorsById = operatorsById;
         this.netexIndex = netexIndex;
-        this.authorityMapper = new AuthorityToAgencyMapper(timeZone);
+        this.authorityMapper = new AuthorityToAgencyMapper(idFactory, timeZone);
     }
 
     org.opentripplanner.model.Route mapRoute(Line line){
@@ -85,7 +85,7 @@ class RouteMapper {
 
         if(network != null) {
             String orgRef = network.getTransportOrganisationRef().getValue().getRef();
-            Agency agency = agenciesById.get(orgRef);
+            Agency agency = agenciesById.get(idFactory.createId(orgRef));
             if(agency != null) return agency;
         }
         // No authority found in Network or GroupOfLines.
@@ -96,7 +96,7 @@ class RouteMapper {
     private Agency createOrGetDummyAgency(Line line) {
         LOG.warn("No authority found for " + line.getId());
 
-        Agency agency = agenciesById.get(authorityMapper.dummyAgencyId());
+        Agency agency = agenciesById.get(idFactory.createId(authorityMapper.dummyAgencyId()));
 
         if (agency == null) {
             agency = authorityMapper.createDummyAgency();

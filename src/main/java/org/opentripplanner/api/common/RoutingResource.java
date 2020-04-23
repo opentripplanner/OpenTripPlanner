@@ -782,10 +782,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
+            request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = FeedScopedId.convertFromString(startTransitTripId);
+            request.startingTransitTripId = FeedScopedId.parseId(startTransitTripId);
 
         if (ignoreRealtimeUpdates != null)
             request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;

@@ -32,6 +32,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Update pathways support to official GTFS specification (#2923)
 - Support for XML (de-)serialization is REMOVED from the REST API (#3031)
 - Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
+- Make agency id feed scoped (#3035)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

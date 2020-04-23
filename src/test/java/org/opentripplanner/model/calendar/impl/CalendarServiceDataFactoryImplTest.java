@@ -91,7 +91,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     @Test
     public void testDataGetTimeZoneForAgencyId() throws IOException {
-        assertEquals("America/New_York", data.getTimeZoneForAgencyId(AGENCY).getID());
+        assertEquals("America/New_York", data.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY)).getID());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     @Test
     public void testServiceGetTimeZoneForAgencyId() throws IOException {
-        TimeZone result = calendarService.getTimeZoneForAgencyId(AGENCY);
+        TimeZone result = calendarService.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY));
         assertEquals("America/New_York", result.getID());
     }
 
@@ -156,7 +156,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     private static FareAttribute createFareAttribute(Agency agency) {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(FEED_ID, "FA"));
         return fa;
     }
 

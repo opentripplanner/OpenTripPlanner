@@ -76,7 +76,7 @@ public class RouteMapperTest {
 
         Route route = routeMapper.mapRoute(line);
 
-        assertEquals(AUTHORITY_ID, route.getAgency().getId());
+        assertEquals(AUTHORITY_ID, route.getAgency().getId().getId());
     }
 
     @Test
@@ -116,7 +116,7 @@ public class RouteMapperTest {
 
     private Agency createAgency() {
         Agency agency = new Agency();
-        agency.setId(AUTHORITY_ID);
+        agency.setId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID));
         agency.setTimezone(TIME_ZONE);
         agency.setName("Ruter");
         return agency;

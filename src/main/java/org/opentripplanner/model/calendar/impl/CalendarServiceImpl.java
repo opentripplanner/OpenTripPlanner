@@ -47,7 +47,7 @@ public class CalendarServiceImpl implements CalendarService {
     }
 
     @Override
-    public TimeZone getTimeZoneForAgencyId(String agencyId) {
+    public TimeZone getTimeZoneForAgencyId(FeedScopedId agencyId) {
         return data.getTimeZoneForAgencyId(agencyId);
     }
 }

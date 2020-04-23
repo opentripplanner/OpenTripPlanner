@@ -69,7 +69,7 @@ public abstract class GtfsTest extends TestCase {
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
-        agencyId = graph.getAgencies(feedId.getId()).iterator().next().getId();
+        agencyId = graph.getAgencies().iterator().next().getId().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index();
         timetableSnapshotSource = new TimetableSnapshotSource(graph);

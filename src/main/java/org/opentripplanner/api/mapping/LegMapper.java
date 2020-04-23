@@ -60,14 +60,14 @@ public class LegMapper {
         api.agencyTimeZoneOffset = domain.agencyTimeZoneOffset;
         api.routeColor = domain.routeColor;
         api.routeType = domain.routeType;
-        api.routeId = domain.routeId;
+        api.routeId = FeedScopedIdMapper.mapToApi(domain.routeId);
         api.routeTextColor = domain.routeTextColor;
         api.interlineWithPreviousLeg = domain.interlineWithPreviousLeg;
         api.tripShortName = domain.tripShortName;
         api.tripBlockId = domain.tripBlockId;
         api.headsign = domain.headsign;
-        api.agencyId = domain.agencyId;
-        api.tripId = domain.tripId;
+        api.agencyId = FeedScopedIdMapper.mapToApi(domain.agencyId);
+        api.tripId = FeedScopedIdMapper.mapToApi(domain.tripId);
         api.serviceDate = domain.serviceDate;
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);

@@ -101,8 +101,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private final RoutingService routingService;
 
-    private final Agency dummyAgency;
-
     public GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     private TransitLayer realtimeTransitLayer;
@@ -114,11 +112,6 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
         routingService = new RoutingService(graph);
         realtimeTransitLayer = graph.getRealtimeTransitLayer();
         transitLayerUpdater = graph.transitLayerUpdater;
-
-        // Create dummy agency for added trips
-        dummyAgency = new Agency();
-        dummyAgency.setId("");
-        dummyAgency.setName("");
     }
 
     /**
@@ -578,6 +571,10 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
             } else {
                 route.setId(new FeedScopedId(feedId, tripId));
             }
+            // Create dummy agency for added trips
+            Agency dummyAgency = new Agency();
+            dummyAgency.setId(new FeedScopedId(feedId, ""));
+            dummyAgency.setName("");
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
             // Bus. Used for short- and long-distance bus routes.

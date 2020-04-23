@@ -137,7 +137,7 @@ public class Leg {
     * For transit legs, the ID of the transit agency that operates the service used for this leg.
     * For non-transit legs, null.
     */
-   public String agencyId = null;
+   public FeedScopedId agencyId = null;
 
    /**
     * For transit legs, the ID of the trip.
@@ -285,7 +285,7 @@ public class Leg {
                 .addStr("tripShortName", tripShortName)
                 .addStr("tripBlockId", tripBlockId)
                 .addStr("headsign", headsign)
-                .addStr("agencyId", agencyId)
+                .addObj("agencyId", agencyId)
                 .addObj("tripId", tripId)
                 .addStr("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)

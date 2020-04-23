@@ -11,6 +11,8 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptiona
  * authority can be created if input data is missing an authority.
  */
 class AuthorityToAgencyMapper {
+
+    private FeedScopedIdFactory idFactory;
     private final String timeZone;
 
     /**
@@ -20,7 +22,8 @@ class AuthorityToAgencyMapper {
     private final String dummyAgencyId;
 
 
-    AuthorityToAgencyMapper(String timeZone) {
+    AuthorityToAgencyMapper(FeedScopedIdFactory idFactory, String timeZone) {
+        this.idFactory = idFactory;
         this.timeZone = timeZone;
         this.dummyAgencyId = "Dummy-" + timeZone;
     }
@@ -31,7 +34,7 @@ class AuthorityToAgencyMapper {
     Agency mapAuthorityToAgency(Authority source){
         Agency target = new Agency();
 
-        target.setId(source.getId());
+        target.setId(idFactory.createId(source.getId()));
         target.setName(source.getName().getValue());
         target.setTimezone(timeZone);
 
@@ -48,7 +51,7 @@ class AuthorityToAgencyMapper {
      */
     Agency createDummyAgency(){
         Agency agency = new Agency();
-        agency.setId(dummyAgencyId);
+        agency.setId(idFactory.createId(dummyAgencyId));
         agency.setName("N/A");
         agency.setTimezone(timeZone);
         agency.setUrl("N/A");

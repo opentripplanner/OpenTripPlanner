@@ -82,7 +82,7 @@ public class NetexLoaderSmokeTest {
     private void assertAgencies(Collection<Agency> agencies) {
         assertEquals(1, agencies.size());
         Agency a = list(agencies).get(0);
-        assertEquals("RUT:Authority:RUT", a.getId());
+        assertEquals("RUT:Authority:RUT", a.getId().getId());
         assertEquals("RUT", a.getName());
         assertNull( a.getUrl());
         assertEquals("Europe/Oslo", a.getTimezone());
@@ -191,8 +191,8 @@ public class NetexLoaderSmokeTest {
     }
 
     private void assetServiceCalendar(CalendarServiceData cal) {
-        assertEquals("[RUT:Authority:RUT]", cal.getAgencyIds().toString());
-        assertEquals("Europe/Oslo", cal.getTimeZoneForAgencyId("RUT:Authority:RUT").toZoneId().toString());
+        assertEquals("[RB:RUT:Authority:RUT]", cal.getAgencyIds().toString());
+        assertEquals("Europe/Oslo", cal.getTimeZoneForAgencyId(new FeedScopedId("RB", "RUT:Authority:RUT")).toZoneId().toString());
         assertEquals(
                 "[RUT:DayType:0-105025+RUT:DayType:0-105026+RUT:DayType:6-101468, RUT:DayType:6-101468]",
                 cal.getServiceIds().stream().map(FeedScopedId::getId).sorted().collect(Collectors.toList()).toString()

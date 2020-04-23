@@ -13,6 +13,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class AgencyMapperTest {
+    private static final String FEED_ID = "FEED";
+
     private static final Agency AGENCY = new Agency();
 
     private static final String ID = "ID";
@@ -42,7 +44,7 @@ public class AgencyMapperTest {
         AGENCY.setBrandingUrl(BRANDING_URL);
     }
 
-    private AgencyMapper subject = new AgencyMapper();
+    private AgencyMapper subject = new AgencyMapper(FEED_ID);
 
     @Test
     public void testMapCollection() throws Exception {
@@ -55,7 +57,7 @@ public class AgencyMapperTest {
     public void testMap() throws Exception {
         org.opentripplanner.model.Agency result = subject.map(AGENCY);
 
-        assertEquals(ID, result.getId());
+        assertEquals("FEED:ID", result.getId().toString());
         assertEquals(NAME, result.getName());
         assertEquals(LANG, result.getLang());
         assertEquals(PHONE, result.getPhone());
