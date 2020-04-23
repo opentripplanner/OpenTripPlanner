@@ -506,12 +506,12 @@
         <repository>
             <id>geosolutions</id>
             <name>GeoSolutions Repository</name>
-            <url>http://maven.geo-solutions.it/</url>
+            <url>https://maven.geo-solutions.it/</url>
         </repository>
         <repository>
             <id>onebusaway-releases</id>
             <name>Onebusaway Releases Repo</name>
-            <url>http://nexus.onebusaway.org/nexus/content/repositories/releases/</url>
+            <url>https://repo.camsys-apps.com/releases/</url>
         </repository>
     </repositories>
 

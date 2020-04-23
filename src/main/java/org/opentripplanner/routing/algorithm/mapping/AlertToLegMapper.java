@@ -123,7 +123,7 @@ public class AlertToLegMapper {
             if (alertsForStopAndRoute == null) {
                 alertsForStopAndRoute = new HashSet<>();
             }
-            if (stop.getParentStation() != null) {
+            if (stop.isPartOfStation()) {
                 //Also check parent
                 Collection<AlertPatch> alerts = graph.getSiriAlertPatchService().getStopAndRoutePatches(stop.getParentStation().getId(), routeId);
                 if (alerts != null) {
@@ -161,7 +161,7 @@ public class AlertToLegMapper {
             if (alertsForStopAndTrip == null) {
                 alertsForStopAndTrip = new HashSet<>();
             }
-            if  (stop.getParentStation() != null) {
+            if  (stop.isPartOfStation()) {
                 // Also check parent
                 Collection<AlertPatch> alerts = graph.getSiriAlertPatchService().getStopAndTripPatches(stop.getParentStation().getId(), tripId);
                 if (alerts != null) {
@@ -197,7 +197,7 @@ public class AlertToLegMapper {
                 alertsForStop = new HashSet<>();
             }
 
-            if  (stop.getParentStation() != null) {
+            if  (stop.isPartOfStation()) {
                 // Also check parent
                 Collection<AlertPatch> parentStopAlerts = graph.getSiriAlertPatchService().getStopPatches(stop.getParentStation().getId());
                 if (parentStopAlerts != null) {

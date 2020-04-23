@@ -63,7 +63,7 @@ public class AlertPatchServiceImpl implements AlertPatchService {
                     
                     // TODO - SIRI: Add alerts from parent- and multimodal-stops
                     /*
-                    if ( quay.getParentStation() != null) {
+                    if ( quay.isPartOfStation()) {
                         // Add alerts for parent-station
                         result.addAll(patchesByStop.getOrDefault(quay.getParentStationFeedScopedId(), Collections.emptySet()));
                     }

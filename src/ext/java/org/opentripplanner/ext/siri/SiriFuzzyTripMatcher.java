@@ -156,7 +156,7 @@ public class SiriFuzzyTripMatcher {
             //SIRI-data may report other platform, but still on the same Parent-stop
             String feedId = routingService.getFeedIds().iterator().next();
             Stop stop = routingService.getStopForId(new FeedScopedId(feedId, lastStopPoint));
-            if (stop != null && stop.getParentStation() != null) {
+            if (stop != null && stop.isPartOfStation()) {
                 // TODO OTP2 resolve stop-station split
                 Collection<Stop> allQuays = stop.getParentStation().getChildStops();
                 for (Stop quay : allQuays) {
