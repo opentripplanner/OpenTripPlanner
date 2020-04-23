@@ -191,23 +191,30 @@ public class NodeAdapter {
      * @param <E> The enum type
      * @param <T> The map value type.
      * @param mapper The function to use to map a node in the JSON tree into a value of type T.
-     *               The secon argument to the function is the enum NAME(String).
+     *               The second argument to the function is the enum NAME(String).
+     * @return a map of listed enum values as keys with value, or an empty map if not set.
      */
     public <T, E extends Enum<E>> Map<E, T> asEnumMap(
-            String paramName, Class<E> enumClass, BiFunction<NodeAdapter, String, T> mapper
+            String paramName,
+            Class<E> enumClass,
+            BiFunction<NodeAdapter, String, T> mapper
     ) {
-        NodeAdapter node = path(paramName);
+        return localAsEnumMap(paramName, enumClass, mapper, false);
+    }
 
-        if(node.isEmpty()) { return Map.of(); }
-
-        Map<E, T> result = new HashMap<>();
-
-        for (E v : enumClass.getEnumConstants()) {
-            if(node.exist(v.name())) {
-                result.put(v, mapper.apply(node, v.name()));
-            }
-        }
-        return result;
+    /**
+     * Get a map of enum values listed in the config like the
+     * {@link #asEnumMap(String, Class, BiFunction)}, but verify that all enum keys
+     * are listed. This can be used for settings where there is appropriate no default
+     * value. Note! This method return {@code null} if the given parameter is not present.
+     */
+    public <T, E extends Enum<E>> Map<E, T> asEnumMapAllKeysRequired(
+        String paramName,
+        Class<E> enumClass,
+        BiFunction<NodeAdapter, String, T> mapper
+    ) {
+        Map<E, T> map = localAsEnumMap(paramName, enumClass, mapper, true);
+        return map.isEmpty() ? null : map;
     }
 
     public <T extends Enum<T>> Set<T> asEnumSet(String paramName, Class<T> enumClass) {
@@ -346,9 +353,11 @@ public class NodeAdapter {
     }
 
     private String fullPath(String paramName) {
-        return contextPath == null
-                ? paramName
-                : contextPath + "." + paramName;
+        return contextPath == null ? paramName : concatPath(contextPath, paramName);
+    }
+
+    private String concatPath(String a, String b) {
+        return a + "." + b;
     }
 
     private URI uriFromString(String paramName, String text) {
@@ -393,4 +402,27 @@ public class NodeAdapter {
             );
         }
     }
+
+    private <T, E extends Enum<E>> Map<E, T> localAsEnumMap(
+        String paramName, Class<E> enumClass,
+        BiFunction<NodeAdapter, String, T> mapper,
+        boolean requireAllValues
+    ) {
+        NodeAdapter node = path(paramName);
+
+        if(node.isEmpty()) { return Map.of(); }
+
+        Map<E, T> result = new HashMap<>();
+
+        for (E v : enumClass.getEnumConstants()) {
+            if(node.exist(v.name())) {
+                result.put(v, mapper.apply(node, v.name()));
+            }
+            else if(requireAllValues) {
+                throw requiredFieldMissingException(concatPath(paramName, v.name()));
+            }
+        }
+        return result;
+    }
+
 }

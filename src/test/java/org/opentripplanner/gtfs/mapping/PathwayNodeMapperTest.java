@@ -97,8 +97,8 @@ public class PathwayNodeMapperTest {
     assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
   }
 
-  @Test(expected = NullPointerException.class)
-  public void testThrowsNPEWhenCoordinateUnset() {
+  @Test(expected = IllegalStateException.class)
+  public void verifyMissingCoordinateThrowsException() {
     Stop input = new Stop();
     input.setLocationType(Stop.LOCATION_TYPE_NODE);
     input.setId(AGENCY_AND_ID);
@@ -110,7 +110,7 @@ public class PathwayNodeMapperTest {
 
   /** Mapping the same object twice, should return the the same instance. */
   @Test
-  public void testMapCache() throws Exception {
+  public void testMapCache() {
     org.opentripplanner.model.PathwayNode result1 = subject.map(STOP);
     org.opentripplanner.model.PathwayNode result2 = subject.map(STOP);
 

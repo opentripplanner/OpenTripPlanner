@@ -5,7 +5,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
 /**

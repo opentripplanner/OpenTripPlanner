@@ -6,6 +6,26 @@ package org.opentripplanner.model;
  */
 public final class Entrance extends StationElement {
 
+  public Entrance(
+      FeedScopedId id,
+      String name,
+      String code,
+      String description,
+      WgsCoordinate coordinate,
+      WheelChairBoarding wheelchairBoarding,
+      StopLevel level
+  ) {
+    super(
+            id,
+            name,
+            code,
+            description,
+            coordinate,
+            wheelchairBoarding,
+            level
+    );
+  }
+
   @Override
   public String toString() {
     return "<Entrance " + this.id + ">";

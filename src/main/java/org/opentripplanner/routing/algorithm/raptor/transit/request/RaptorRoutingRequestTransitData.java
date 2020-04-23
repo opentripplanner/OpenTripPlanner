@@ -90,6 +90,11 @@ public class RaptorRoutingRequestTransitData implements RaptorTransitDataProvide
     return transitLayer.getStopCount();
   }
 
+  @Override
+  public int[] stopBoarAlightCost() {
+    return transitLayer.getStopIndex().stopBoardAlightCosts;
+  }
+
   public ZonedDateTime getStartOfTime() {
     return startOfTime;
   }

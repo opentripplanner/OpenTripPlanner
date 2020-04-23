@@ -4,8 +4,6 @@ import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
@@ -70,12 +68,7 @@ public class FakeGraph {
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
                 String id = "" + count++;
-                FeedScopedId aid = new FeedScopedId("TEST", id);
-                Stop stop = new Stop();
-                stop.setCoordinate(new WgsCoordinate(lat, lon));
-                stop.setName(id);
-                stop.setCode(id);
-                stop.setId(aid);
+                Stop stop = Stop.stopForTest(id, lat, lon);
 
                 new TransitStopVertex(g, stop, null);
                 count++;
@@ -89,12 +82,7 @@ public class FakeGraph {
         double lon = -83;
         for (double lat = 40; lat < 40.01; lat += 0.005) {
             String id = "EXTRA_" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setCoordinate(new WgsCoordinate(lat, lon));
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -105,12 +93,7 @@ public class FakeGraph {
 
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setCoordinate(new WgsCoordinate(lat, lon));
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -121,12 +104,7 @@ public class FakeGraph {
 
         for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setCoordinate(new WgsCoordinate(lat, lon));
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -138,5 +116,4 @@ public class FakeGraph {
         SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
         linker.link();
     }
-
 }

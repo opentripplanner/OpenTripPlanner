@@ -10,12 +10,32 @@ public final class BoardingArea extends StationElement {
 
   private Stop parentStop;
 
+  public BoardingArea(
+          FeedScopedId id,
+          String name,
+          String code,
+          String description,
+          WgsCoordinate coordinate,
+          WheelChairBoarding wheelchairBoarding,
+          StopLevel level
+  ) {
+    super(
+            id,
+            name,
+            code,
+            description,
+            coordinate,
+            wheelchairBoarding,
+            level
+    );
+  }
+
   /**
    * Center point/location for the boarding area. Returns the coordinate of the parent stop,
    * if the coordinate is not defined for this boarding area.
    */
   public WgsCoordinate getCoordinate() {
-    return coordinate != null ? coordinate : parentStop.getCoordinate();
+    return isCoordinateSet() ? super.getCoordinate() : parentStop.getCoordinate();
   }
 
   /**
@@ -31,6 +51,6 @@ public final class BoardingArea extends StationElement {
 
   @Override
   public String toString() {
-    return "<Entrance " + this.id + ">";
+    return "<BoardingArea " + this.id + ">";
   }
 }

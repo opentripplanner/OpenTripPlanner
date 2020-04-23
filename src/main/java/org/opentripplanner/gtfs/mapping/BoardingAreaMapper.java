@@ -1,18 +1,15 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.BoardingArea;
-import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.model.WheelChairBoarding;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
 
-import static org.opentripplanner.gtfs.mapping.AgencyAndIdMapper.mapAgencyAndId;
-
 /** Responsible for mapping GTFS Boarding areas into the OTP model. */
 class BoardingAreaMapper {
+
   private Map<org.onebusaway.gtfs.model.Stop, BoardingArea> mappedBoardingAreas = new HashMap<>();
 
   Collection<BoardingArea> map(Collection<org.onebusaway.gtfs.model.Stop> allBoardingAreas) {
@@ -31,22 +28,16 @@ class BoardingAreaMapper {
               + ", but got " + gtfsStop.getLocationType());
     }
 
-    BoardingArea otpBoardingArea = new BoardingArea();
+    StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
-    otpBoardingArea.setId(mapAgencyAndId(gtfsStop.getId()));
-    otpBoardingArea.setName(gtfsStop.getName());
-    if (gtfsStop.isLatSet() && gtfsStop.isLonSet()) {
-      otpBoardingArea.setCoordinate(new WgsCoordinate(gtfsStop.getLat(), gtfsStop.getLon()));
-    }
-    otpBoardingArea.setCode(gtfsStop.getCode());
-    otpBoardingArea.setDescription(gtfsStop.getDesc());
-    otpBoardingArea.setWheelchairBoarding(WheelChairBoarding.valueOfGtfsCode(gtfsStop.getWheelchairBoarding()));
-    var level = gtfsStop.getLevel();
-    if (level != null) {
-      otpBoardingArea.setLevelIndex(level.getIndex());
-      otpBoardingArea.setLevelName(level.getName());
-    }
-
-    return otpBoardingArea;
+    return new BoardingArea(
+        base.getId(),
+        base.getName(),
+        base.getCode(),
+        base.getDescription(),
+        base.getCoordinate(),
+        base.getWheelchairBoarding(),
+        base.getLevel()
+    );
   }
 }

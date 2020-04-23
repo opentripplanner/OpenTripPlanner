@@ -1,15 +1,13 @@
 package org.opentripplanner.netex.loader.mapping;
 
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.StopPlace;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Collection;
-
-import static org.opentripplanner.netex.loader.mapping.PointMapper.mapCoordinate;
 
 class MultiModalStationMapper {
 
@@ -34,7 +32,7 @@ class MultiModalStationMapper {
             multiModalStation.setName("N/A");
         }
 
-        WgsCoordinate coordinate = mapCoordinate(stopPlace.getCentroid());
+        WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(stopPlace.getCentroid());
 
         if (coordinate == null) {
             LOG.warn(

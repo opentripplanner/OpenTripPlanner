@@ -66,14 +66,14 @@ public class StopAndStationMapperTest {
     private StopMapper subject = new StopMapper();
 
     @Test
-    public void testMapCollection() throws Exception {
+    public void testMapCollection() {
         assertNull(null, subject.map((Collection<Stop>) null));
         assertTrue(subject.map(Collections.emptyList()).isEmpty());
         assertEquals(1, subject.map(Collections.singleton(STOP)).size());
     }
 
     @Test
-    public void testMap() throws Exception {
+    public void testMap() {
         org.opentripplanner.model.Stop result = subject.map(STOP);
 
         assertEquals("A:1", result.getId().toString());
@@ -88,7 +88,7 @@ public class StopAndStationMapperTest {
     }
 
     @Test
-    public void testMapWithNulls() throws Exception {
+    public void testMapWithNulls() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
 
@@ -101,23 +101,27 @@ public class StopAndStationMapperTest {
         assertNull(result.getParentStation());
         assertNull(result.getCode());
         assertNull(result.getUrl());
+        // Skip getting coordinate, it will throw an exception
         assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
         assertNull(result.getZone());
     }
 
-    @Test(expected = NullPointerException.class)
-    public void testThrowsNPEWhenCoordinateUnset() {
+
+    @Test(expected = IllegalStateException.class)
+    public void verifyMissingCoordinateThrowsException() {
         Stop input = new Stop();
         input.setId(AGENCY_AND_ID);
 
         org.opentripplanner.model.Stop result = subject.map(input);
 
-        result.getLat();
+        // Getting the coordinate will throw an IllegalArgumentException if not set,
+        // this is considered to be a implementation error
+        result.getCoordinate();
     }
 
     /** Mapping the same object twice, should return the the same instance. */
     @Test
-    public void testMapCache() throws Exception {
+    public void testMapCache() {
         org.opentripplanner.model.Stop result1 = subject.map(STOP);
         org.opentripplanner.model.Stop result2 = subject.map(STOP);
 

@@ -6,6 +6,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternForDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripPatternWithRaptorStopIndexes;
 import org.opentripplanner.routing.graph.Graph;
@@ -48,18 +49,18 @@ public class TransitLayerMapper {
         this.graph = graph;
     }
 
-    public static TransitLayer map(Graph graph) {
-        return new TransitLayerMapper(graph).map();
+    public static TransitLayer map(TransitTuningParameters tuningParameters, Graph graph) {
+        return new TransitLayerMapper(graph).map(tuningParameters);
     }
 
-    private TransitLayer map() {
+    private TransitLayer map(TransitTuningParameters tuningParameters) {
         StopIndexForRaptor stopIndex;
         HashMap<LocalDate, List<TripPatternForDate>> tripPatternsByStopByDate;
         List<List<Transfer>> transferByStopIndex;
 
         LOG.info("Mapping transitLayer from Graph...");
 
-        stopIndex =  new StopIndexForRaptor(graph.index.getAllStops());
+        stopIndex =  new StopIndexForRaptor(graph.index.getAllStops(), tuningParameters);
         tripPatternsByStopByDate = mapTripPatterns(stopIndex);
         transferByStopIndex = mapTransfers(stopIndex, graph.transfersByStop);
 

@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm.raptor.transit;
 
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransferPriority;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -19,16 +21,21 @@ import java.util.Map;
  * stops, it does not need to. The returned itineraries from Raptor contain stop indexes, not
  * references to stops, so OTP must maintain the stop index.
  * <p>
+ * The index also holds a pre-calculated board/alight cost for each stop used by Raptor during
+ * routing.
+ * <p>
  * The scope of instances of this class is limited to the mapping process, the final state is
  * stored in the {@link TransitLayer}.
  */
 public class StopIndexForRaptor {
     public final List<Stop> stopsByIndex;
     public final Map<Stop, Integer> indexByStop = new HashMap<>();
+    public final int[] stopBoardAlightCosts;
 
-    public StopIndexForRaptor(Collection<Stop> stops) {
+    public StopIndexForRaptor(Collection<Stop> stops, TransitTuningParameters tuningParameters) {
         this.stopsByIndex = new ArrayList<>(stops);
         initializeIndexByStop();
+        this.stopBoardAlightCosts = createStopBoardAlightCosts(stopsByIndex, tuningParameters);
     }
 
     /**
@@ -50,5 +57,25 @@ public class StopIndexForRaptor {
             stopIndex[i] = indexByStop.get(stops[i]);
         }
         return stopIndex;
+    }
+
+    /**
+     * Create static board/alight cost for Raptor to include for each stop.
+     */
+    private static int[] createStopBoardAlightCosts(
+        List<Stop> stops,
+        TransitTuningParameters tuningParams
+    ) {
+        if(!tuningParams.enableStopTransferPriority()) {
+            return null;
+        }
+        int[] stopVisitCosts = new int[stops.size()];
+
+        for (int i=0; i<stops.size(); ++i) {
+            TransferPriority priority = stops.get(i).getCostPriority();
+            int domainCost = tuningParams.stopTransferCost(priority);
+            stopVisitCosts[i] = RaptorCostConverter.toRaptorCost(domainCost);
+        }
+        return stopVisitCosts;
     }
 }

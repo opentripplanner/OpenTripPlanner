@@ -2,9 +2,8 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.request.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -29,19 +28,11 @@ public class RouterConfig implements Serializable {
      * The raw JsonNode three kept for reference and (de)serialization.
      */
     public final JsonNode rawJson;
-    public final String requestLogFile;
 
-    /**
-     * The preferred way to limit the search is to limit the distance for
-     * each street mode(WALK, BIKE, CAR). So the default timeout for a
-     * street search is set quite high. This is used to abort the search
-     * if the max distance is not reached within the timeout.
-     */
-    public final double streetRoutingTimeoutSeconds;
-
-
-    public final RoutingRequest routingRequestDefaults;
-    public final RaptorTuningParameters raptorTuningParameters;
+    private final String requestLogFile;
+    private final double streetRoutingTimeoutSeconds;
+    private final RoutingRequest routingRequestDefaults;
+    private final TransitRoutingConfig transitConfig;
 
     public RouterConfig(JsonNode node, String source) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -50,11 +41,35 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-
-        this.raptorTuningParameters = new TransitRoutingConfig(adapter.path("transit"));
+        this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-
         adapter.logAllUnusedParameters(LOG);
+    }
+
+    public String requestLogFile() {
+        return requestLogFile;
+    }
+
+    /**
+     * The preferred way to limit the search is to limit the distance for
+     * each street mode(WALK, BIKE, CAR). So the default timeout for a
+     * street search is set quite high. This is used to abort the search
+     * if the max distance is not reached within the timeout.
+     */
+    public double streetRoutingTimeoutSeconds() {
+        return streetRoutingTimeoutSeconds;
+    }
+
+    public RoutingRequest routingRequestDefaults() {
+        return routingRequestDefaults;
+    }
+
+    public RaptorTuningParameters raptorTuningParameters() {
+        return transitConfig;
+    }
+
+    public TransitTuningParameters transitTuningParameters() {
+        return transitConfig;
     }
 
     /**

@@ -69,4 +69,10 @@ public interface RaptorTransitDataProvider<T extends RaptorTripSchedule> {
      * from 0 to {@code numberOfStops()-1}.
      */
     int numberOfStops();
+
+
+    /**
+     * Return a the cost of boarding and alighting a trip at a particular stop.
+     */
+    int[] stopBoarAlightCost();
 }

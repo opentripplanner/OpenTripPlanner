@@ -18,7 +18,7 @@ public final class Path<T extends RaptorTripSchedule> {
     private final int startTime;
     private final int endTime;
     private final int numberOfTransfers;
-    private final int cost;
+    private final int generalizedCost;
     private final AccessPathLeg<T> accessLeg;
     private final EgressPathLeg<T> egressPathLeg;
 
@@ -34,22 +34,22 @@ public final class Path<T extends RaptorTripSchedule> {
     }
 
     /** @see #dummyPath(int, int, int, int) */
-    private Path(int startTime, int endTime, int numberOfTransfers, int cost) {
+    private Path(int startTime, int endTime, int numberOfTransfers, int generalizedCost) {
         this.startTime = startTime;
         this.endTime = endTime;
         this.numberOfTransfers = numberOfTransfers;
-        this.cost = cost;
+        this.generalizedCost = generalizedCost;
         this.accessLeg = null;
         this.egressPathLeg = null;
     }
 
-    public Path(AccessPathLeg<T> accessLeg, int cost) {
+    public Path(AccessPathLeg<T> accessLeg, int generalizedCost) {
         this.accessLeg = accessLeg;
         this.egressPathLeg = findEgressLeg(accessLeg);
         this.startTime = accessLeg.fromTime();
         this.endTime = egressPathLeg.toTime();
         this.numberOfTransfers = countNumberOfTransfers(accessLeg);
-        this.cost = cost;
+        this.generalizedCost = generalizedCost;
     }
 
     /**
@@ -84,7 +84,7 @@ public final class Path<T extends RaptorTripSchedule> {
      * The total cost computed for this path. This is for debugging and filtering purposes.
      */
     public int cost() {
-        return cost;
+        return generalizedCost;
     }
 
     /**
@@ -145,7 +145,7 @@ public final class Path<T extends RaptorTripSchedule> {
                 " [" + TimeUtils.timeToStrLong(startTime) +
                 " " + TimeUtils.timeToStrLong(endTime) +
                 " " + TimeUtils.durationToStr(endTime-startTime) +
-                (cost <= 0 ? "" : ", cost: " + cost) + "]";
+                (generalizedCost <= 0 ? "" : ", cost: " + (int)generalizedCost) + "]";
     }
 
     @Override

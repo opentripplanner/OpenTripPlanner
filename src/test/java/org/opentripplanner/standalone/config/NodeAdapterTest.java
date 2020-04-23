@@ -118,6 +118,7 @@ public class NodeAdapterTest {
 
     @Test
     public void asEnumMap() {
+        // With optional enum values in map
         NodeAdapter subject  = newNodeAdapterForTest("{ key : { A: true, B: false } }");
         assertEquals(Map.of(AnEnum.A, true, AnEnum.B, false), subject.asEnumMap("key", AnEnum.class, NodeAdapter::asBoolean));
         assertEquals(Collections.<AnEnum, Boolean>emptyMap(), subject.asEnumMap("missing-key", AnEnum.class, NodeAdapter::asBoolean));
@@ -125,7 +126,6 @@ public class NodeAdapterTest {
 
     @Test
     public void asEnumMapWithUnknownValue() {
-
         NodeAdapter subject  = newNodeAdapterForTest("{ key : { unknown : 7 } }");
         assertEquals(Map.<AnEnum, Double>of(), subject.asEnumMap("key", AnEnum.class, NodeAdapter::asDouble));
 
@@ -133,11 +133,29 @@ public class NodeAdapterTest {
         Logger log = Mockito.mock(Logger.class);
         subject.logAllUnusedParameters(log);
         Mockito.verify(log)
-                .warn(
-                        Mockito.anyString(),
-                        Mockito.eq("key.unknown"),
-                        Mockito.eq("Test")
-                );
+            .warn(
+                Mockito.anyString(),
+                Mockito.eq("key.unknown"),
+                Mockito.eq("Test")
+            );
+    }
+
+    @Test
+    public void asEnumMapAllKeysRequired() {
+        // Require all enum values to exist (if param exist)
+        NodeAdapter subject  = newNodeAdapterForTest("{ key : { A: true, B: false, C: true } }");
+        assertEquals(
+            Map.of(AnEnum.A, true, AnEnum.B, false, AnEnum.C, true),
+            subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean)
+        );
+        assertNull(subject.asEnumMapAllKeysRequired("missing-key", AnEnum.class, NodeAdapter::asText));
+    }
+
+    @Test(expected = OtpAppException.class)
+    public void asEnumMapWithRequiredMissingValue() {
+        // A value for C is missing in map
+        NodeAdapter subject = newNodeAdapterForTest("{ key : { A: true, B: false } }");
+        subject.asEnumMapAllKeysRequired("key", AnEnum.class, NodeAdapter::asBoolean);
     }
 
     @Test

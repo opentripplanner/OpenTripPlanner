@@ -10,10 +10,8 @@ import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.request.RoutingRequest;
@@ -106,15 +104,9 @@ public class TestHalfEdges {
         rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
                 "rightBack", 1500, StreetTraversalPermission.ALL, true);
 
-        Stop s1 = new Stop();
-        s1.setName("transitVertex 1");
-        s1.setCoordinate(new WgsCoordinate(40.0099999, -74.005));
-        s1.setId(new FeedScopedId("A", "fleem station"));
+        Stop s1 = Stop.stopForTest("fleem station", 40.0099999, -74.005);
 
-        Stop s2 = new Stop();
-        s2.setName("transitVertex 2");
-        s2.setCoordinate(new WgsCoordinate(40.0099999, -74.002));
-        s2.setId(new FeedScopedId("A", "morx station"));
+        Stop s2 = Stop.stopForTest("morx station", 40.0099999, -74.002);
 
         station1 = new TransitStopVertex(graph, s1, null);
         station2 = new TransitStopVertex(graph, s2, null);
@@ -471,6 +463,6 @@ public class TestHalfEdges {
 
         Vertex station2point = edge.getToVertex();
         assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);
-
     }
+
 }

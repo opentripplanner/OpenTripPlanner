@@ -7,52 +7,45 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.stream.Collectors;
 
-class OtpStartupInfo {
+public class OtpStartupInfo {
     private static final Logger LOG = LoggerFactory.getLogger(OtpStartupInfo.class);
     private static final String NEW_LINE = "\n";
     public static final List<String> HEADER = List.of(
-            "  ___                   _____    _        ___ _   ",
-            " / _ \\ _ __  ___ _ _   |_   _| _(_)_ __  | _ \\ |__ _ _ _  _ _  ___ _ _",
-            "| (_) | '_ \\/ -_) ' \\    | || '_| | '_ \\ |  _/ / _` | ' \\| ' \\/ -_) '_|",
-            " \\___/| .__/\\___|_||_|   |_||_| |_| .__/ |_| |_\\__,_|_||_|_||_\\___|_|",
-            "      |_|                         |_|                       "
+             "  ___                 _____     _       ____  _                             ",
+             " / _ \\ _ __   ___ _ _|_   _| __(_)_ __ |  _ \\| | __ _ _ __  _ __   ___ _ __ ",
+             "| | | | '_ \\ / _ \\ '_ \\| || '__| | '_ \\| |_) | |/ _` | '_ \\| '_ \\ / _ \\ '__|",
+             "| |_| | |_) |  __/ | | | || |  | | |_) |  __/| | (_| | | | | | | |  __/ |   ",
+             " \\___/| .__/ \\___|_| |_|_||_|  |_| .__/|_|   |_|\\__,_|_| |_|_| |_|\\___|_| ",
+             "      |_|                        |_| "
     );
 
     private static final String INFO;
 
     static {
-        final int width = HEADER.stream().mapToInt(String::length).max().orElse(0);
-        String line = " --" + pad("", '-', width) + "--" + NEW_LINE;
-        INFO = line
-                + HEADER.stream().map(txt -> line(txt, width)).collect(Collectors.joining())
-                + line(" Version:  " + MavenVersion.VERSION.version, width)
-                + line(" Commit:   " + MavenVersion.VERSION.commit, width)
-                + line(" Branch:   " + MavenVersion.VERSION.branch, width)
-                + line(" Build:    " + MavenVersion.VERSION.buildTime, width)
-                + dirtyLineIfDirty(width)
-                + line;
+        INFO = ""
+                + HEADER.stream().map(OtpStartupInfo::line).collect(Collectors.joining())
+                + line("Version:  " + MavenVersion.VERSION.version)
+                + line("Commit:   " + MavenVersion.VERSION.commit)
+                + line("Branch:   " + MavenVersion.VERSION.branch)
+                + line("Build:    " + MavenVersion.VERSION.buildTime)
+                + dirtyLineIfDirty();
     }
 
-    private static String dirtyLineIfDirty(int width) {
+    private static String dirtyLineIfDirty() {
         return MavenVersion.VERSION.dirty
-        ? line(" Dirty:    Local modification exist!", width)
+        ? line("Dirty:    Local modification exist!")
         : "";
     }
 
-    static void logInfo() {
+    public static void logInfo() {
         LOG.info(NEW_LINE + INFO);
     }
 
-    private static String line(String text, int length) {
-        return "|  " + pad(text, ' ', length) + "  |" + NEW_LINE;
+    private static String line(String text) {
+        return text + NEW_LINE;
     }
 
-    public static String pad(String text, char ch, int length) {
-        StringBuilder buf = new StringBuilder(text);
-        while (buf.length() < length) { buf.append(ch); }
-        return buf.toString();
-    }
-
+    /** Use this to do a manual test */
     public static void main(String[] args) {
         System.out.println(INFO);
     }

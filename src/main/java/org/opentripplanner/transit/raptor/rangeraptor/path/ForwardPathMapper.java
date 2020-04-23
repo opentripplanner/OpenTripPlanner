@@ -6,10 +6,10 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
@@ -24,6 +24,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
      * submitted by the transit layer.
      */
     private final RaptorSlackProvider transitLayerSlackProvider;
+
 
     public ForwardPathMapper(RaptorSlackProvider slackProvider) {
         this.transitLayerSlackProvider = slackProvider;
@@ -82,7 +83,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         AccessPathLeg<T> accessLeg = createAccessPathLeg(from, transitLeg);
 
-        return new Path<>(accessLeg, CostCalculator.toOtpDomainCost(destinationArrival.cost()));
+        return new Path<>(accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
     }
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {

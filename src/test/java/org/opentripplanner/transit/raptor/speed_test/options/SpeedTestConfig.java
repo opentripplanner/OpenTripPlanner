@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonParser;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.TransitRoutingConfig;
@@ -31,7 +32,7 @@ public class SpeedTestConfig {
 
     public final int maxWalkDistanceMeters;
     public final double walkSpeedMeterPrSecond;
-    public final RaptorTuningParameters tuningParameters;
+    public final TransitRoutingConfig transitRoutingParams;
     public final RoutingRequest request;
 
     public SpeedTestConfig(JsonNode node) {
@@ -40,13 +41,21 @@ public class SpeedTestConfig {
         testDate = adapter.asDateOrRelativePeriod("testDate", "PT0D");
         maxWalkDistanceMeters = adapter.asInt("maxWalkDistanceMeters", 1000);
         walkSpeedMeterPrSecond = adapter.asDouble("walkSpeedMeterPrSecond", 1.4);
-        tuningParameters = new TransitRoutingConfig(adapter.path("tuningParameters"));
+        transitRoutingParams = new TransitRoutingConfig(adapter.path("tuningParameters"));
         request = mapRoutingRequest(adapter.path("routingDefaults"));
     }
 
     @Override
     public String toString() {
         return rawNode.toPrettyString();
+    }
+
+    public RaptorTuningParameters raptorTuningParameters() {
+        return transitRoutingParams;
+    }
+
+    public TransitTuningParameters transitTuningParameters() {
+        return transitRoutingParams;
     }
 
     public static SpeedTestConfig config(File dir) {
@@ -71,7 +80,7 @@ public class SpeedTestConfig {
             return config;
         }
         catch (IOException e) {
-            throw new RuntimeException(e.getMessage(), e);
+            throw new RuntimeException(e.getLocalizedMessage(), e);
         }
     }
 }

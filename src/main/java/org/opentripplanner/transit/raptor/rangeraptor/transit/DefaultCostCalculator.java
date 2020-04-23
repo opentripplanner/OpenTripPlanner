@@ -1,21 +1,21 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 /**
- * The responsibility for the cost calculator is to calculate the
- * multi-criteria cost.
+ * The responsibility for the cost calculator is to calculate the default  multi-criteria cost.
  * <P/>
  * This class is immutable and thread safe.
  */
-public class CostCalculator {
-    private static final int PRECISION = 100;
-    private final int minTransferCost;
+public class DefaultCostCalculator implements CostCalculator {
     private final int boardCost;
     private final int walkFactor;
     private final int waitFactor;
     private final int transitFactor;
+    private final int[] stopVisitCost;
 
     /**
      * We only apply the wait factor between transits, not between access and transit;
@@ -25,45 +25,43 @@ public class CostCalculator {
     private int waitFactorApplied = 0;
 
 
-    CostCalculator(
+    public DefaultCostCalculator(
+            int[] stopVisitCost,
             int boardCost,
-            int boardSlackInSeconds,
             double walkReluctanceFactor,
             double waitReluctanceFactor,
             WorkerLifeCycle lifeCycle
     ) {
-        this.boardCost = PRECISION * boardCost;
-        this.walkFactor = (int) (PRECISION * walkReluctanceFactor);
-        this.waitFactor = (int) (PRECISION * waitReluctanceFactor);
-        this.transitFactor = PRECISION;
-        this.minTransferCost = this.boardCost +  this.waitFactor * boardSlackInSeconds;
+        this.stopVisitCost = stopVisitCost;
+        this.boardCost = RaptorCostConverter.toRaptorCost(boardCost);
+        this.walkFactor = RaptorCostConverter.toRaptorCost(walkReluctanceFactor);
+        this.waitFactor = RaptorCostConverter.toRaptorCost(waitReluctanceFactor);
+        this.transitFactor = RaptorCostConverter.toRaptorCost(1.0);
         lifeCycle.onPrepareForNextRound(this::initWaitFactor);
     }
 
-    public int transitArrivalCost(int waitTime, int transitTime) {
-        return waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
+    @Override
+    public int transitArrivalCost(int waitTime, int transitTime, int fromStop, int toStop) {
+        int cost = waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
+        if(stopVisitCost != null) {
+            cost += stopVisitCost[fromStop] + stopVisitCost[toStop];
+        }
+        return cost;
     }
 
+    @Override
     public int walkCost(int walkTimeInSeconds) {
         return walkFactor * walkTimeInSeconds;
     }
 
+    @Override
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
-        return  minTransferCost * minNumTransfers + transitFactor * minTravelTime  + boardCost;
+        return  boardCost * (minNumTransfers + 1) + transitFactor * minTravelTime;
     }
 
     private void initWaitFactor(int round) {
         // For access(round 0) and the first transit round(1) skip adding a cost for waiting,
         // we assume we can time-shift the access leg.
         this.waitFactorApplied = round < 2 ? 0 : waitFactor;
-    }
-
-    /**
-     * Convert Raptor internal cost to OTP domain model cost. Inside Raptor the 1 cost unit
-     * is 1/100 of a "transit second", while in the OTP domain is 1 "transit second". Cost in
-     * raptor is calculated using integers ot be fast.
-     */
-    public static int toOtpDomainCost(int raptorCost) {
-        return (int) Math.round((double) raptorCost / PRECISION);
     }
 }

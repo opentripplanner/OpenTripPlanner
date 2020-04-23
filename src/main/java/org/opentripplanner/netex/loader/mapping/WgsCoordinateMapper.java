@@ -4,15 +4,7 @@ import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.LocationStructure;
 import org.rutebanken.netex.model.SimplePoint_VersionStructure;
 
-/**
- * Help mapping a location and verifying a correct input (prevent NPE).
- */
-class PointMapper {
-    /**
-     * This is a utility mapper with static methods, the constructor is private to prevent
-     * creating new instances of this class.
-     */
-    private PointMapper() {}
+class WgsCoordinateMapper {
 
     /**
      * This utility method check if the given {@code point} or one of its sub elements is
@@ -21,7 +13,7 @@ class PointMapper {
      * @return true if the handler is successfully invoked with a location, {@code false} if
      *         any of the required data elements are {@code null}.
      */
-    static WgsCoordinate mapCoordinate(SimplePoint_VersionStructure point) {
+    static WgsCoordinate mapToDomain(SimplePoint_VersionStructure point) {
         if(point == null || point.getLocation() == null) { return null; }
         LocationStructure loc = point.getLocation();
 

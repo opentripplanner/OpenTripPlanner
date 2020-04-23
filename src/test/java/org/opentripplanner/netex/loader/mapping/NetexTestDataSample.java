@@ -137,7 +137,7 @@ class NetexTestDataSample {
         // Setup stops
         for (int i = 0; i < NUM_OF_STOPS; i++) {
             String stopId = "NSR:Quay:" + (i + 1);
-            stopsById.add(newStop(stopId));
+            stopsById.add(Stop.stopForTest(stopId, 0.0, 0.0));
             quayIdByStopPointRef.add(pointsInLink.get(i).getId(), stopId);
         }
     }
@@ -184,12 +184,6 @@ class NetexTestDataSample {
 
 
     /* private static utility methods */
-
-    private static Stop newStop(String s) {
-        Stop stop1 = new Stop();
-        stop1.setId(ID_FACTORY.createId(s));
-        return stop1;
-    }
 
     private static TimetabledPassingTime createTimetablePassingTime(String id, int hh, int mm) {
         return new TimetabledPassingTime().withId(id).withDepartureTime(LocalTime.of(hh, mm));

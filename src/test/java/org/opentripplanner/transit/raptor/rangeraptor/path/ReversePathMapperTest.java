@@ -12,7 +12,6 @@ import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.ba
 import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrLong;
 
 public class ReversePathMapperTest {
-
     @Test
     public void mapToPathReverseSearch() {
         // Given:

@@ -10,7 +10,7 @@ import java.math.BigDecimal;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class PointMapperTest {
+public class WgsCoordinateMapperTest {
     private static final double DELTA = 0.01d;
 
     private static final double LONGITUDE_VALUE = 62.8;
@@ -30,7 +30,7 @@ public class PointMapperTest {
                 );
 
         // When map coordinates
-        WgsCoordinate c = PointMapper.mapCoordinate(point);
+        WgsCoordinate c = WgsCoordinateMapper.mapToDomain(point);
 
         // Then verify coordinate
         assertEquals(LONGITUDE_VALUE, c.longitude(), DELTA);
@@ -38,12 +38,12 @@ public class PointMapperTest {
     }
 
     @Test public void handleCoordinatesWithMissingPoint() {
-        assertNull(PointMapper.mapCoordinate(null));
+        assertNull(WgsCoordinateMapper.mapToDomain(null));
     }
 
     @Test public void handleCoordinatesWithMissingLocation() {
         SimplePoint_VersionStructure p = new SimplePoint_VersionStructure();
-        assertNull(PointMapper.mapCoordinate(p));
+        assertNull(WgsCoordinateMapper.mapToDomain(p));
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -52,7 +52,7 @@ public class PointMapperTest {
         p = new SimplePoint_VersionStructure().withLocation(
             new LocationStructure().withLongitude(LONGITUDE)
         );
-        PointMapper.mapCoordinate(p);
+        WgsCoordinateMapper.mapToDomain(p);
     }
 
     @Test(expected = IllegalArgumentException.class)
@@ -61,6 +61,6 @@ public class PointMapperTest {
         p = new SimplePoint_VersionStructure().withLocation(
                 new LocationStructure().withLatitude(LATITUDE)
         );
-        PointMapper.mapCoordinate(p);
+        WgsCoordinateMapper.mapToDomain(p);
     }
 }
