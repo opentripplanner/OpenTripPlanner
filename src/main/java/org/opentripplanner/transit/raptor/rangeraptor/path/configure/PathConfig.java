@@ -39,6 +39,7 @@ public class PathConfig<T extends RaptorTripSchedule> {
         return new DestinationArrivalPaths<>(
                 paretoComparator(includeCost),
                 ctx.calculator(),
+                ctx.costCalculator(),
                 ctx.pathMapper(),
                 ctx.debugFactory(),
                 ctx.lifeCycle()

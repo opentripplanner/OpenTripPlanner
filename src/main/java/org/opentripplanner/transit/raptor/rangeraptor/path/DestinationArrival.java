@@ -35,10 +35,10 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     private final int cost;
 
 
-    DestinationArrival(RaptorTransfer egress, ArrivalView<T> previous, int arrivalTime, int additionalCost) {
+    DestinationArrival(RaptorTransfer egress, ArrivalView<T> previous, int departureTime, int arrivalTime, int additionalCost) {
         this.previous = previous;
         this.egress = egress;
-        this.departureTime = previous.arrivalTime();
+        this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.numberOfTransfers = previous.round() - 1;
         this.cost = previous.cost() + additionalCost;

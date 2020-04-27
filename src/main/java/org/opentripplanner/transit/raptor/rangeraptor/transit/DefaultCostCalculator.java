@@ -55,6 +55,11 @@ public class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
+    public int waitCost(int waitTimeInSeconds) {
+        return waitFactor * waitTimeInSeconds;
+    }
+
+    @Override
     public int calculateMinCost(int minTravelTime, int minNumTransfers) {
         return  boardCost * (minNumTransfers + 1) + transitFactor * minTravelTime;
     }

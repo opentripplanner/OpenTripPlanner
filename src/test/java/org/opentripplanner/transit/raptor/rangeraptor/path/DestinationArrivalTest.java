@@ -56,6 +56,7 @@ public class DestinationArrivalTest {
     private DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
             null,
             TRANSIT_ARRIVAL,
+            TRANSIT_ALIGHT_TIME,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST
     );

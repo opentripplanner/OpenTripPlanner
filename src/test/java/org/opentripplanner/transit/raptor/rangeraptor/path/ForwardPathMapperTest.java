@@ -19,6 +19,7 @@ public class ForwardPathMapperTest {
         DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
                 null,
                 egress.previous(),
+                egress.previous().arrivalTime(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
