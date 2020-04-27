@@ -9,7 +9,6 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.SLACK_PROVIDER;
 
 public class ForwardPathMapperTest {
 
@@ -22,7 +21,9 @@ public class ForwardPathMapperTest {
                 egress.additionalCost()
         );
 
-        PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(SLACK_PROVIDER);
+        PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(
+            StopArrivalsTestData.SLACK_PROVIDER
+        );
 
         Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
 
@@ -52,8 +53,8 @@ public class ForwardPathMapperTest {
         assertEquals(60, path.cost());
 
         assertEquals(
-                "Walk 3m - 1 - Transit 10:05 10:35 - 2 - Walk 3m - 3 - "
-                        + "Transit 11:00 11:23 - 4 - Transit 11:40 11:52 - 5 - Walk 7m "
+                "Walk 3m ~ 1 ~ Transit 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
+                        + "Transit 11:00 11:23 ~ 4 ~ Transit 11:40 11:52 ~ 5 ~ Walk 7m "
                         + "[10:00:00 12:00:00 2h, cost: 60]",
                 path.toString()
         );

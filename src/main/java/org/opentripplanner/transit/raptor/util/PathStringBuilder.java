@@ -4,10 +4,18 @@ package org.opentripplanner.transit.raptor.util;
  * Create a path like: {@code Walk 5m - 101 - Transit 10:07 10:35 - 2111 - Walk 4m }
  */
 public class PathStringBuilder {
-    private StringBuilder buf = new StringBuilder();
+    private final StringBuilder buf = new StringBuilder();
+    private final boolean padDuration;
+
+    public PathStringBuilder() {
+        this(false);
+    }
+    public PathStringBuilder(boolean padDuration) {
+        this.padDuration = padDuration;
+    }
 
     public PathStringBuilder sep() {
-        return append(" - ");
+        return append(" ~ ");
     }
 
     public PathStringBuilder stop(int stop) {
@@ -30,11 +38,14 @@ public class PathStringBuilder {
     /* private helpers */
 
     private PathStringBuilder duration(int duration) {
-        return append(TimeUtils.durationToStr(duration));
+        String durationStr = TimeUtils.durationToStr(duration);
+        return append(padDuration ? String.format("%5s", durationStr) : durationStr);
     }
 
     private PathStringBuilder time(int from, int to) {
-        return append(TimeUtils.timeToStrShort(from)).append(" ").append(TimeUtils.timeToStrShort(to));
+        return append(TimeUtils.timeToStrCompact(from))
+                .append(" ")
+                .append(TimeUtils.timeToStrCompact(to));
     }
 
     private PathStringBuilder append(String text) {

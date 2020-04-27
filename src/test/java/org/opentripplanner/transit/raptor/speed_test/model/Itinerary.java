@@ -1,10 +1,8 @@
-package org.opentripplanner.transit.raptor.speed_test.api.model;
+package org.opentripplanner.transit.raptor.speed_test.model;
 
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -23,19 +21,17 @@ public class Itinerary {
      * Time that the trip departs.
      */
     public int startTime = NOT_SET;
+
     /**
      * Time that the trip arrives.
      */
     public int endTime = NOT_SET;
 
     /**
-     * How much time is spent walking, in seconds.
-     */
-    public long walkTime = NOT_SET;
-    /**
      * How much time is spent on transit, in seconds.
      */
     public long transitTime = NOT_SET;
+
     /**
      * How much time is spent waiting for transit to arrive, in seconds.
      */
@@ -63,20 +59,9 @@ public class Itinerary {
      * trip on a particular vehicle. So a trip where the use walks to the Q train, transfers to the
      * 6, then walks to their destination, has four legs.
      */
-    @XmlElementWrapper(name = "legs")
-    @XmlElement(name = "leg")
     public List<Leg> legs = new ArrayList<Leg>();
 
-    /**
-     * This itinerary has a greater slope than the user requested (but there are no possible 
-     * itineraries with a good slope). 
-     */
-    public boolean tooSloped = false;
-
-    /** 
-     * adds leg to array list
-     * @param leg
-     */
+    /** adds leg to array list */
     public void addLeg(Leg leg) {
         if(leg != null) {
             if(leg.isWalkLeg()) {
@@ -86,15 +71,32 @@ public class Itinerary {
         }
     }
 
-    public String durationAsStr() {
-        return TimeUtils.durationToStr(duration);
+    @Override
+    public String toString() {
+        return details();
     }
 
-    public String startTimeAsStr() {
-        return TimeUtils.timeToStrCompact(startTime, NOT_SET);
-    }
-
-    public String endTimeAsStr() {
-        return TimeUtils.timeToStrCompact(endTime, NOT_SET);
+    /**
+     * Create a compact representation of all legs in the itinerary.
+     * Example:
+     * <pre>
+     * WALK  7m12s ~ 3358 ~ NW180 09:30 10:20 ~ 3423 ~ WALK    10s ~ 8727 ~ NW130 10:30 10:40 ~ 3551 ~ WALK  3m10s
+     * </pre>
+     */
+    public String details() {
+        PathStringBuilder buf = new PathStringBuilder(true);
+        for (Leg it : legs) {
+            if(it.from != null && it.from.rrStopIndex != null) {
+                buf.sep().stop(it.from.rrStopIndex).sep();
+            }
+            if(it.isWalkLeg()) {
+                buf.walk(it.getDuration());
+            }
+            else if(it.isTransitLeg()) {
+                // buf.transit(it.mode.name(), it.startTime, it.endTime);
+                buf.transit(it.startTime, it.endTime);
+            }
+        }
+        return buf.toString();
     }
 }

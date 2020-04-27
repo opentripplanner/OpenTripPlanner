@@ -1,6 +1,6 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
+import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
 
 import java.util.ArrayList;
 import java.util.Collection;

@@ -1,8 +1,7 @@
-package org.opentripplanner.transit.raptor.speed_test.api.model;
+package org.opentripplanner.transit.raptor.speed_test.model;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.List;
 
@@ -43,11 +42,6 @@ public class Leg {
    public String agencyName;
 
    /**
-    * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
-    */
-   public String routeColor = null;
-
-   /**
     * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
     */
    public String tripShortName = null;
@@ -58,28 +52,15 @@ public class Leg {
     */
    public FeedScopedId agencyId = null;
 
-   /**
-    * For transit legs, the ID of the trip.
-    * For non-transit legs, null.
-    */
-   public FeedScopedId tripId = null;
-
     /**
     * The Place where the leg originates.
     */
-   public PlaceAPI from = null;
+   public Place from = null;
 
    /**
     * The Place where the leg begins.
     */
-   public PlaceAPI to = null;
-
-   /**
-    * For transit legs, intermediate stops between the Place where the leg originates and the Place where the leg ends.
-    * For non-transit legs, null.
-    * This field is optional i.e. it is always null unless "showIntermediateStops" parameter is set to "true" in the planner request.
-    */
-   public List<PlaceAPI> stop;
+   public Place to = null;
 
    public String routeShortName;
 
@@ -104,15 +85,7 @@ public class Leg {
    /**
     * The leg's duration in seconds
     */
-   public double getDuration() {
+   public int getDuration() {
        return endTime - startTime;
-   }
-
-   public String startTimeAsStr() {
-      return TimeUtils.timeToStrLong(startTime, NOT_SET);
-   }
-
-   public String endTimeAsStr() {
-      return TimeUtils.timeToStrLong(endTime, NOT_SET);
    }
 }

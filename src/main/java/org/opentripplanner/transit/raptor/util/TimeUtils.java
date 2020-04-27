@@ -42,6 +42,21 @@ public class TimeUtils {
         return hm2time(hh, mm);
     }
 
+    /** pares time of format hh:mm:ss. */
+    public static int parseTimeLong(String hhmmss, int defaultValue) {
+        String[] tokens = hhmmss.split(":");
+        if(tokens.length != 3) {
+            return defaultValue;
+        }
+
+        int hh = Integer.parseInt(tokens[0]);
+        int mm = Integer.parseInt(tokens[1]);
+        int ss = Integer.parseInt(tokens[2]);
+
+        return hms2time(hh, mm, ss);
+    }
+
+
     public static String timeToStrCompact(int time) {
         return timeToStrCompact(time, -1);
     }
