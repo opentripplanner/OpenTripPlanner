@@ -4,6 +4,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
@@ -88,6 +89,13 @@ public interface TransitCalculator {
      * search this should be Integer.MIN_VALUE.
      */
     int unreachedTime();
+
+    /**
+     * Selects the earliest or latest possible departure time depending on the direction.
+     * For forward search it will be the earliest possible departure time, while for reverse search
+     * it uses the latest arrival time.
+     */
+    int departureTime(RaptorTransfer transfer, int departureTime);
 
     /**
      * Return an iterator, iterating over the minutes in the RangeRaptor algorithm.

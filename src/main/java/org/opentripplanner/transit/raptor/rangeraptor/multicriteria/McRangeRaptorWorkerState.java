@@ -76,11 +76,17 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
 
     @Override
     public void setInitialTimeForIteration(RaptorTransfer accessLeg, int iterationDepartureTime) {
+        // Earliest possible departure time from the origin using this Access.
+        int departureTime = accessLeg.earliestDepartureTime(iterationDepartureTime);
+
+        // This access is not available after the iteration departure time
+        if (departureTime == -1) return;
+
         addStopArrival(
                 new AccessStopArrival<>(
                         accessLeg,
                         accessLeg.stop(),
-                        iterationDepartureTime,
+                        departureTime,
                         accessLeg.durationInSeconds(),
                         costCalculator.walkCost(accessLeg.durationInSeconds()),
                         transitCalculator
