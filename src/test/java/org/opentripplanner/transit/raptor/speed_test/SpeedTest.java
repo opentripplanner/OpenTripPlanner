@@ -290,7 +290,7 @@ public class SpeedTest {
             int sample,
             int nSamples
     ) {
-        System.out.println("Set up test");
+        System.err.println("Set up test");
         if (opts.compareHeuristics()) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];

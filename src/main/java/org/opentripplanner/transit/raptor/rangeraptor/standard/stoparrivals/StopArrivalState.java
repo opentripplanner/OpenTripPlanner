@@ -121,7 +121,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         if(arrivedByAccess()) {
             return String.format("Access Arrival { time: %s, duration: %s }",
                     TimeUtils.timeToStrLong(bestArrivalTime),
-                    TimeUtils.timeToStrCompact(accessOrTransferDuration)
+                    TimeUtils.durationToStr(accessOrTransferDuration)
             );
         }
         return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
@@ -131,7 +131,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-                TimeUtils.timeToStrCompact(accessOrTransferDuration, NOT_SET)
+                TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
         );
     }
 }

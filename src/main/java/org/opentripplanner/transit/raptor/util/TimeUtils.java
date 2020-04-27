@@ -46,14 +46,6 @@ public class TimeUtils {
         return timeToStrCompact(time, -1);
     }
 
-    public static String durationToStr(Duration duration) {
-        return durationToStr((int)duration.toSeconds());
-    }
-
-    public static String durationToStr(int timeSeconds) {
-        return timeStr(timeSeconds, NOT_SET, FormatType.DURATION);
-    }
-
     public static String timeToStrCompact(int time, int notSetValue) {
         return timeStr(time, notSetValue, FormatType.COMPACT);
     }
@@ -62,7 +54,19 @@ public class TimeUtils {
         return timeStr(time, FormatType.COMPACT);
     }
 
-    public static String timeMsToStrInSec(long timeMs) {
+    public static String durationToStr(Duration duration) {
+        return durationToStr((int)duration.toSeconds());
+    }
+
+    public static String durationToStr(int timeSeconds) {
+        return durationToStr(timeSeconds, NOT_SET);
+    }
+
+    public static String durationToStr(int timeSeconds, int notSetValue) {
+        return timeStr(timeSeconds, notSetValue, FormatType.DURATION);
+    }
+
+    public static String msToSecondsStr(long timeMs) {
         if(timeMs == 0) { return "0 seconds"; }
         if(timeMs == 1000) { return "1 second"; }
         if(timeMs < 100) { return String.format ("%.3f seconds",  timeMs/1000.0); }
@@ -148,8 +152,8 @@ public class TimeUtils {
     }
 
     private static String timeStrCompact(int hour, int min, int sec) {
-        return hour == 0
-                ? String.format("%d:%02d", min, sec)
+        return sec == 0
+                ? String.format("%d:%02d", hour, min)
                 : String.format("%d:%02d:%02d", hour, min, sec);
     }
 

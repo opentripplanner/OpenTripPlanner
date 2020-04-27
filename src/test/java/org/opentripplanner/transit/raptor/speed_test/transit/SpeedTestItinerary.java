@@ -20,9 +20,9 @@ public class SpeedTestItinerary extends Itinerary {
     private int agenciesHash;
 
     void initParetoVector() {
-        durationSeconds = this.duration.intValue();
+        durationSeconds = this.duration;
         walkDistanceMeters = this.walkDistance.intValue();
-        endTimeSeconds = (int) (this.endTime.getTimeInMillis() / 1000);
+        endTimeSeconds = this.endTime;
 
         //Set<String> modes = new HashSet<>();
         Set<String> agencies = new HashSet<>();
@@ -64,7 +64,7 @@ public class SpeedTestItinerary extends Itinerary {
         return String.format(
                 "Tr: %d, duration: %s, walkDist: %5.0f, start: %s, end: %s, Details: %s",
                 transfers,
-                TimeUtils.timeToStrCompact(duration.intValue()),
+                TimeUtils.timeToStrCompact(duration),
                 walkDistance,
                 TimeUtils.timeToStrLong(startTime),
                 TimeUtils.timeToStrLong(endTime),

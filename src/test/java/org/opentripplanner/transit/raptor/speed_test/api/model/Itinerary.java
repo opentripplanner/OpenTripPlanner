@@ -1,43 +1,45 @@
 package org.opentripplanner.transit.raptor.speed_test.api.model;
 
 
+import org.opentripplanner.transit.raptor.util.TimeUtils;
+
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlElementWrapper;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.List;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
  */
 public class Itinerary {
+    private static final int NOT_SET = -1;
 
     /**
      * Duration of the trip on this itinerary, in seconds.
      */
-    public Long duration = 0L;
+    public int duration = NOT_SET;
 
     /**
      * Time that the trip departs.
      */
-    public Calendar startTime = null;
+    public int startTime = NOT_SET;
     /**
      * Time that the trip arrives.
      */
-    public Calendar endTime = null;
+    public int endTime = NOT_SET;
 
     /**
      * How much time is spent walking, in seconds.
      */
-    public long walkTime = 0;
+    public long walkTime = NOT_SET;
     /**
      * How much time is spent on transit, in seconds.
      */
-    public long transitTime = 0;
+    public long transitTime = NOT_SET;
     /**
      * How much time is spent waiting for transit to arrive, in seconds.
      */
-    public long waitingTime = 0;
+    public long waitingTime = NOT_SET;
 
     /**
      * How far the user has to walk, in meters.
@@ -47,14 +49,14 @@ public class Itinerary {
     /**
      * The number of transfers this trip has.
      */
-    public Integer transfers = 0;
+    public Integer transfers = NOT_SET;
 
 
     /**
      * Weight of the itinerary, used for debugging
      */
 
-    public double weight = 0;
+    public double weight = NOT_SET;
 
     /**
      * A list of Legs. Each Leg is either a walking (cycling, car) portion of the trip, or a transit
@@ -82,5 +84,17 @@ public class Itinerary {
             }
             legs.add(leg);
         }
+    }
+
+    public String durationAsStr() {
+        return TimeUtils.durationToStr(duration);
+    }
+
+    public String startTimeAsStr() {
+        return TimeUtils.timeToStrCompact(startTime, NOT_SET);
+    }
+
+    public String endTimeAsStr() {
+        return TimeUtils.timeToStrCompact(endTime, NOT_SET);
     }
 }

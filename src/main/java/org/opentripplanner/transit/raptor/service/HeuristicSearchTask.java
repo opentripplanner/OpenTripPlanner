@@ -121,7 +121,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
             throw new DestinationNotReachedException();
         }
         if(LOG.isDebugEnabled()) {
-            String time = TimeUtils.timeMsToStrInSec(System.currentTimeMillis() - start);
+            String time = TimeUtils.msToSecondsStr(System.currentTimeMillis() - start);
             LOG.debug("RangeRaptor - {} heuristic search performed in {}.", name, time);
         }
     }

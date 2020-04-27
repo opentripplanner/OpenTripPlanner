@@ -113,7 +113,7 @@ public class StopArrivalStateParetoSetTest {
     }
 
     private static AccessStopArrival<RaptorTripSchedule> newAccessStopState(int stop, int accessDurationInSeconds) {
-        return new AccessStopArrival<>(stop, A_TIME, accessDurationInSeconds, ANY, CALCULATOR);
+        return new AccessStopArrival<>(stop, A_TIME, accessDurationInSeconds, ANY);
     }
 
     private static TransitStopArrival<RaptorTripSchedule> newMcTransitStopState(int round, int stop, int arrivalTime) {

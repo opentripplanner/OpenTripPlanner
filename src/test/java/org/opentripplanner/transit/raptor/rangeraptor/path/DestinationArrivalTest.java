@@ -38,8 +38,7 @@ public class DestinationArrivalTest {
             ACCESS_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION_TIME,
-            ACCESS_COST,
-            TRANSIT_CALCULATOR
+            ACCESS_COST
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -85,6 +84,6 @@ public class DestinationArrivalTest {
 
     @Test
     public void testToString() {
-        assertEquals("DestinationArrival { From stop: 101, Time: 8:14:50 (8:14:00), Cost: 1120 }", subject.toString());
+        assertEquals("DestinationArrival { From stop: 101, Time: 8:14:50 (8:14), Cost: 1120 }", subject.toString());
     }
 }

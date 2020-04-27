@@ -2,8 +2,8 @@ package org.opentripplanner.transit.raptor.speed_test.api.model;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.transit.raptor.util.TimeUtils;
 
-import java.util.Calendar;
 import java.util.List;
 
 /**
@@ -12,16 +12,17 @@ import java.util.List;
 */
 
 public class Leg {
+   private static final int NOT_SET = -1;
 
    /**
     * The date and time this leg begins.
     */
-   public Calendar startTime = null;
+   public int startTime = NOT_SET;
 
    /**
-    * The date and time this leg ends.
+    * The time this leg ends.
     */
-   public Calendar endTime = null;
+   public int endTime = NOT_SET;
 
    /**
     * The distance traveled while traversing the leg in meters.
@@ -47,27 +48,9 @@ public class Leg {
    public String routeColor = null;
 
    /**
-    * For transit legs, the type of the route. Non transit -1
-    * When 0-7: 0 Tram, 1 Subway, 2 Train, 3 Bus, 4 Ferry, 5 Cable Car, 6 Gondola, 7 Funicular
-    * When equal or highter than 100, it is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
-    * Also see http://groups.google.com/group/gtfs-changes/msg/ed917a69cf8c5bef
-    */
-   public Integer routeType = null;
-
-   /**
     * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
     */
    public String tripShortName = null;
-
-   /**
-    * For transit leg, the trip's block ID (if one exists). For non-transit legs, null.
-    */
-   public String tripBlockId = null;
-
-   /**
-    * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
-    */
-   public String headsign = null;
 
    /**
     * For transit legs, the ID of the transit agency that operates the service used for this leg.
@@ -80,12 +63,6 @@ public class Leg {
     * For non-transit legs, null.
     */
    public FeedScopedId tripId = null;
-
-   /**
-    * For transit legs, the service date of the trip.
-    * For non-transit legs, null.
-    */
-   public String serviceDate = null;
 
     /**
     * The Place where the leg originates.
@@ -123,10 +100,19 @@ public class Leg {
    public boolean isWalkLeg() {
       return mode.isWalking();
    }
+
    /**
     * The leg's duration in seconds
     */
    public double getDuration() {
-       return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis())/1000.0;
+       return endTime - startTime;
+   }
+
+   public String startTimeAsStr() {
+      return TimeUtils.timeToStrLong(startTime, NOT_SET);
+   }
+
+   public String endTimeAsStr() {
+      return TimeUtils.timeToStrLong(endTime, NOT_SET);
    }
 }

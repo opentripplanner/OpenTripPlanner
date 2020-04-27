@@ -81,8 +81,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
                         accessLeg.stop(),
                         iterationDepartureTime,
                         accessLeg.durationInSeconds(),
-                        costCalculator.walkCost(accessLeg.durationInSeconds()),
-                        transitCalculator
+                        costCalculator.walkCost(accessLeg.durationInSeconds())
                 )
         );
     }

@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
 import org.opentripplanner.transit.raptor.speed_test.api.model.Leg;
-import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.Collection;
 import java.util.HashMap;
@@ -47,11 +46,11 @@ class ItineraryResultMapper {
         Result result = new Result(
                 testCaseId,
                 itinerary.transfers,
-                itinerary.duration.intValue(),
+                itinerary.duration,
                 (int)itinerary.weight,
                 itinerary.walkDistance.intValue(),
-                TimeUtils.timeToStrLong(itinerary.startTime),
-                TimeUtils.timeToStrLong(itinerary.endTime),
+                itinerary.startTimeAsStr(),
+                itinerary.endTimeAsStr(),
                 legsAsCompactString(itinerary)
         );
 

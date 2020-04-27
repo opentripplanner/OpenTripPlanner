@@ -81,8 +81,8 @@ public class ItineraryMapper {
         Leg leg = new Leg();
         AccessPathLeg<TripSchedule> accessLeg = path.accessLeg();
 
-        leg.startTime = createCalendar(request.getDepartureDate(), accessLeg.fromTime());
-        leg.endTime = createCalendar(request.getDepartureDate(), accessLeg.toTime());
+        leg.startTime = accessLeg.fromTime();
+        leg.endTime = accessLeg.toTime();
         leg.from = new PlaceAPI(request.tc().fromPlace);
         leg.to = new PlaceAPI(request.tc().toPlace);
         leg.mode = WALK;
@@ -115,8 +115,8 @@ public class ItineraryMapper {
                         .map(t -> new Coordinate(transferPath.getEdge(t).getGeometry().getCoordinate().x, transferPath
                                 .getEdge(t).getGeometry().getCoordinate().y)).collect(Collectors.toList());
                 */
-                leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
-                leg.endTime = createCalendar(request.getDepartureDate(), previousArrivalTime);
+                leg.startTime = it.fromTime();
+                leg.endTime = previousArrivalTime;
                 leg.mode = WALK;
                 leg.from = new PlaceAPI(fromStop.locLat(), fromStop.locLon(), fromStop.name());
                 leg.to = new PlaceAPI(toStop.locLat(), toStop.locLon(), toStop.name());
@@ -160,8 +160,8 @@ public class ItineraryMapper {
                 leg.routeLongName = routeInfo.getLongName();
                 leg.mode = TraverseMode.fromTransitMode(tripSchedule.getOriginalTripPattern().getMode());
 
-                leg.startTime = createCalendar(request.getDepartureDate(), it.fromTime());
-                leg.endTime = createCalendar(request.getDepartureDate(), it.toTime());
+                leg.startTime = it.fromTime();
+                leg.endTime = it.toTime();
             }
             itinerary.addLeg(leg);
             pathLeg = pathLeg.nextLeg();
@@ -172,8 +172,8 @@ public class ItineraryMapper {
         EgressPathLeg<TripSchedule> egressLeg = pathLeg.asEgressLeg();
 
         Stop lastStop = stop(egressLeg.fromStop());
-        leg.startTime = createCalendar(request.getDepartureDate(), egressLeg.fromTime());
-        leg.endTime = createCalendar(request.getDepartureDate(), egressLeg.toTime());
+        leg.startTime = egressLeg.fromTime();
+        leg.endTime = egressLeg.toTime();
         leg.from = new PlaceAPI(lastStop.locLat(), lastStop.locLon(), lastStop.name());
         leg.from.stopIndex = egressLeg.fromStop();
         leg.from.stopId = new FeedScopedId("RB", lastStop.id());
@@ -188,7 +188,7 @@ public class ItineraryMapper {
 
         itinerary.startTime = itinerary.legs.get(0).startTime;
         itinerary.endTime = leg.endTime;
-        itinerary.duration = (itinerary.endTime.getTimeInMillis() - itinerary.startTime.getTimeInMillis())/1000;
+        itinerary.duration = itinerary.endTime - itinerary.startTime;
 
         // The number of transfers is the number of transits minus one, we can NOT count the number of Transfers
         // in the path or itinerary, because transfers at the same stop does not produce a transfer object, just two
@@ -202,14 +202,6 @@ public class ItineraryMapper {
 
     private Stop stop(int stopIndex) {
         return new Stop(transitLayer.getStopByIndex(stopIndex));
-    }
-
-    private Calendar createCalendar(LocalDate date, int timeinSeconds) {
-        Calendar calendar = Calendar.getInstance(TimeZone.getTimeZone("Europe/Oslo"));
-        calendar.set(date.getYear(), date.getMonth().getValue(), date.getDayOfMonth()
-                , 0, 0, 0);
-        calendar.add(Calendar.SECOND, timeinSeconds);
-        return calendar;
     }
 
     /**

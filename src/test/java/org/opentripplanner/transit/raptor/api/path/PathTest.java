@@ -29,7 +29,7 @@ public class PathTest {
 
     @Test
     public void totalTravelDurationInSeconds() {
-        Assert.assertEquals("2:00:00", TimeUtils.timeToStrCompact(subject.travelDurationInSeconds()));
+        Assert.assertEquals("2:00", TimeUtils.timeToStrCompact(subject.travelDurationInSeconds()));
     }
 
     @Test

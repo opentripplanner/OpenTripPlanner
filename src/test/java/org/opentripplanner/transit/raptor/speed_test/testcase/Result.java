@@ -109,7 +109,7 @@ class Result implements Comparable<Result> {
         return String.format(
                 "%d %s %d %dm %s %s -- %s",
                 transfers,
-                TimeUtils.timeToStrCompact(duration),
+                TimeUtils.durationToStr(duration),
                 cost,
                 walkDistance,
                 startTime,
