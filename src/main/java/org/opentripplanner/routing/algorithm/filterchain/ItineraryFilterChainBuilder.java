@@ -99,7 +99,7 @@ public class ItineraryFilterChainBuilder {
         filters.add(new SortOnWalkingArrivalAndDeparture());
 
         // Remove itineraries if max limit is exceeded
-        if (maxLimit > minLimit) {
+        if (maxLimit >= minLimit) {
             filters.add(new MaxLimitFilter("MAX", maxLimit));
         }
 
