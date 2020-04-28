@@ -59,4 +59,14 @@ public class ItineraryFilterChainBuilderTest {
         assertTrue(i2.hasSystemNotices());
         assertEquals("transit-walking-filter", i2.systemNotices.get(0).tag);
     }
+
+    @Test
+    public void testFilterChainWithMaxItinerariesFilterSet() {
+        // Given a default chain
+        builder.setMaxLimit(1);
+        builder.setApproximateMinLimit(1);
+        ItineraryFilter chain = builder.build();
+
+        assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
+    }
 }
