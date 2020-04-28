@@ -60,7 +60,7 @@ public class RoutingRequestMapper {
         request.elevatorHopTime = c.asInt("elevatorHopTime", dft.elevatorHopTime);
         request.geoidElevation = c.asBoolean("geoidElevation", dft.geoidElevation);
         request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
-        request.kissAndRide = c.asBoolean("kissAndRide", dft.kissAndRide);
+        request.taxi = c.asBoolean("kissAndRide", dft.taxi);
         request.locale = c.asLocale("locale", dft.locale);
         request.maxHours = c.asDouble("maxHours", dft.maxHours);
         request.maxPreTransitTime = c.asInt("maxPreTransitTime", dft.maxPreTransitTime);

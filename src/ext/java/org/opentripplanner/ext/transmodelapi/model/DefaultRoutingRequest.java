@@ -357,7 +357,7 @@ public class DefaultRoutingRequest {
                         .newFieldDefinition()
                         .name("kissAndRide")
                         .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(env -> request.kissAndRide)
+                        .dataFetcher(env -> request.taxi)
                         .build())
                 .field(GraphQLFieldDefinition
                         .newFieldDefinition()

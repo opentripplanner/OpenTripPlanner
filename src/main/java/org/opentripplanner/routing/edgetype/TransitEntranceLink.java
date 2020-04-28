@@ -3,6 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.routing.core.TaxiState;
 import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -90,8 +91,8 @@ public class TransitEntranceLink extends Edge {
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (req.kissAndRide && !s0.isCarParked()) {
-                s1.setCarParked(true);
+            if (req.taxi && s0.getTaxiState().equals(TaxiState.IN_TAXI)) {
+                s1.setTaxiState(TaxiState.WALK_FROM_DROP_OFF);
             } else {
                 return null;
             }

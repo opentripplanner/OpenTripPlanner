@@ -636,7 +636,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean bikeRental = false;
     public boolean bikeParkAndRide = false;
     public boolean parkAndRide  = false;
-    public boolean kissAndRide  = false;
+    public boolean taxi = false;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
@@ -1024,7 +1024,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 case TAXI:
                     streetRequest.streetSubRequestModes.setCar(true);
                     streetRequest.streetSubRequestModes.setWalk(true);
-                    streetRequest.kissAndRide = true;
+                    streetRequest.taxi = true;
                     break;
                 case CAR_RENTAL:
                     streetRequest.streetSubRequestModes.setCar(true);
