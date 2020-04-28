@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
-import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McRangeRaptorWorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.McTransitWorker;
@@ -37,7 +37,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
      */
     public Worker<T> createWorker(
             Heuristics heuristics,
-            BiFunction<WorkerState<T>, TransitRoutingStrategy<T>, Worker<T>> createWorker
+            BiFunction<WorkerState<T>, RoutingStrategy<T>, Worker<T>> createWorker
     ) {
         McRangeRaptorWorkerState<T> state = createState(heuristics);
         return createWorker.apply(state, createTransitWorkerStrategy(state));
@@ -46,7 +46,7 @@ public class McRangeRaptorConfig<T extends RaptorTripSchedule> {
 
     /* private factory methods */
 
-    private TransitRoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
+    private RoutingStrategy<T> createTransitWorkerStrategy(McRangeRaptorWorkerState<T> state) {
         return new McTransitWorker<>(
                 state,
                 context.slackProvider(),

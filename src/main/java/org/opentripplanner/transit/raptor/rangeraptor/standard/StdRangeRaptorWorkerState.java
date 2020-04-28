@@ -71,17 +71,9 @@ public final class StdRangeRaptorWorkerState<T
     }
 
     @Override
-    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int iterationDepartureTime) {
+    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int departureTime) {
         int durationInSeconds = accessEgressLeg.durationInSeconds();
         int stop = accessEgressLeg.stop();
-
-        // Earliest possible departure time from the origin, or latest possible arrival time at the
-        // destination if searching backwards, using this AccessEgress.
-        // TODO: Should this be done only in McRangeRaptor?
-        int departureTime = calculator.departureTime(accessEgressLeg, iterationDepartureTime);
-
-        // This access is not available after the iteration departure time
-        if (departureTime == -1) return;
 
         // The time of arrival at the given stop for the current iteration
         // (or departure time at the last stop if we search backwards).
