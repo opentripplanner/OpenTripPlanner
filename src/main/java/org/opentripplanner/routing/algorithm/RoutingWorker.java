@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
+import java.util.Comparator;
+import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.model.routing.TripSearchMetadata;
@@ -112,8 +114,8 @@ public class RoutingWorker {
 
         double startTimeAccessEgress = System.currentTimeMillis();
 
-        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
-        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
+        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, maxTransferDistance(request.maxWalkDistance), transitLayer.getStopIndex());
+        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, maxTransferDistance(request.maxWalkDistance), transitLayer.getStopIndex());
 
         LOG.debug("Access/egress routing took {} ms",
                 System.currentTimeMillis() - startTimeAccessEgress
@@ -164,7 +166,12 @@ public class RoutingWorker {
             }
             itineraries.add(itinerary);
         }
-
+        itineraries = itineraries
+            .stream()
+            .filter(it -> isEffectiveItineraryForNonTransitMode(it, request))
+            .sorted(Comparator.comparing(i -> i.endTime()))
+            .limit(request.numItineraries)
+            .collect(Collectors.toList());
         setResponseMetadata(requestTransitDataProvider, transitResponse);
 
         // Filter itineraries away that depart after the latest-departure-time for depart after
@@ -234,5 +241,21 @@ public class RoutingWorker {
         if(!egressExist) { missingPlaces.add("to"); }
 
         throw new VertexNotFoundException(missingPlaces);
+    }
+
+    /**
+     * Check whether itinerary is effective under transit mode.
+     */
+    private boolean isEffectiveItineraryForNonTransitMode(Itinerary itinerary, RoutingRequest request) {
+        return !(itinerary.nonTransitLimitExceeded && !request.modes.transitModes.isEmpty());
+    }
+
+    private int maxTransferDistance(double maxWalkDistance) {
+        if (Double.compare(maxWalkDistance, Double.MAX_VALUE) == 0) {
+            // No idea where 2000 comes from ...
+            return 2000;
+        }else{
+            return Double.valueOf(maxWalkDistance).intValue();
+        }
     }
 }
