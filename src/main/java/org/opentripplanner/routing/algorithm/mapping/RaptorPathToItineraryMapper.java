@@ -195,8 +195,8 @@ public class RaptorPathToItineraryMapper {
         leg.endTime = createCalendar(pathLeg.toTime());
         leg.mode = TraverseMode.fromTransitMode(tripPattern.getMode());
         leg.tripId = trip.getId();
-        leg.from = mapStopToPlace(boardStop);
-        leg.to = mapStopToPlace(alightStop);
+        leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern);
+        leg.to = mapStopToPlace(alightStop, alightStopIndexInPattern);
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
         leg.legGeometry = PolylineEncoder.createEncodings(transitLegCoordinates);
         leg.distanceMeters = getDistanceFromCoordinates(transitLegCoordinates);
@@ -244,8 +244,8 @@ public class RaptorPathToItineraryMapper {
         Stop transferToStop = transitLayer.getStopByIndex(pathLeg.toStop());
         Transfer transfer = transitLayer.getTransferByStopIndex().get(pathLeg.fromStop()).stream().filter(t -> t.getToStop() == pathLeg.toStop()).findFirst().get();
 
-        Place from = mapStopToPlace(transferFromStop);
-        Place to = mapStopToPlace(transferToStop);
+        Place from = mapStopToPlace(transferFromStop, null);
+        Place to = mapStopToPlace(transferToStop, null);
         mapNonTransitLeg(legs, pathLeg, transfer, from, to, false);
     }
 
@@ -358,13 +358,14 @@ public class RaptorPathToItineraryMapper {
     }
 
     private Place mapTransitVertexToPlace(TransitStopVertex vertex) {
-        return mapStopToPlace(vertex.getStop());
+        return mapStopToPlace(vertex.getStop(), null);
     }
 
-    private Place mapStopToPlace(Stop stop) {
+    private Place mapStopToPlace(Stop stop, Integer stopIndex) {
         Place place = new Place(stop.getLat(), stop.getLon(), stop.getName());
         place.stopId = stop.getId();
         place.stopCode = stop.getCode();
+        place.stopIndex = stopIndex;
         place.platformCode = stop.getCode();
         place.zoneId = stop.getZone();
         place.vertexType = VertexType.TRANSIT;
@@ -390,8 +391,7 @@ public class RaptorPathToItineraryMapper {
             }
             if (boarded) {
                 Stop stop = tripPattern.stopPattern.stops[j];
-                Place place = mapStopToPlace(stop);
-                place.stopIndex = j;
+                Place place = mapStopToPlace(stop, j);
                 // TODO: fill out stopSequence
                 StopArrival visit = new StopArrival(
                         place,
