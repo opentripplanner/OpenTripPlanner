@@ -4,6 +4,7 @@ import org.apache.commons.io.FileUtils;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.configure.OTPConfiguration;
@@ -54,6 +55,7 @@ public class OtpDataStoreTest {
 
     @Before
     public void setUp() throws IOException {
+        ComponentAnnotationConfigurator.getInstance().fromConfig(null);
         // Create a base path for this test - correspond to OTP BASE_PATH
         baseDir = Files.createTempDirectory("OtpDataStoreTest-").toFile();
     }

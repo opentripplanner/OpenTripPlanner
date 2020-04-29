@@ -2,6 +2,7 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
@@ -90,6 +91,7 @@ public class OTPMain {
         Graph graph = null;
         GraphService service = null;
         OTPAppConstruction app = new OTPAppConstruction(params);
+        ComponentAnnotationConfigurator.getInstance().fromConfig(app.config().buildConfig().getRawJson());
 
         // Validate data sources, command line arguments and config before loading and
         // processing input data to fail early

@@ -2,7 +2,6 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
-import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -269,7 +268,6 @@ public class BuildConfig {
     public BuildConfig(JsonNode node, String source) {
         NodeAdapter c = new NodeAdapter(node, source);
         rawJson = node;
-        ComponentAnnotationConfigurator.getInstance().fromConfig(node);
         dataImportReport = c.asBoolean("dataImportReport", false);
         transit = c.asBoolean("transit", true);
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
@@ -320,6 +318,10 @@ public class BuildConfig {
 
     public String toJson() {
         return rawJson.isMissingNode() ? "" : rawJson.toString();
+    }
+
+    public JsonNode getRawJson(){
+        return rawJson;
     }
 
     public ServiceDateInterval getTransitServicePeriod() {
