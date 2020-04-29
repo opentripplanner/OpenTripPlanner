@@ -4,6 +4,7 @@ import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.routing.impl.GraphLoader;
 import org.opentripplanner.standalone.configure.OTPAppConstruction;
 import org.opentripplanner.standalone.server.Router;
@@ -20,6 +21,7 @@ public class GraphService {
 
   public GraphService(OTPAppConstruction app) {
     this.app = app;
+    ComponentAnnotationConfigurator.getInstance().fromConfig(app.config().buildConfig().getRawJson());
     if (app.config().getCli().autoReload) {
       lastModified.set(app.store().getGraph().lastModified());
       scanner.scheduleWithFixedDelay(() -> this.scan(), 60, 10, TimeUnit.SECONDS);
