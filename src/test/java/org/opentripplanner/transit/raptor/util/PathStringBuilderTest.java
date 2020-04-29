@@ -5,6 +5,7 @@ import org.junit.Test;
 import static org.junit.Assert.assertEquals;
 
 public class PathStringBuilderTest {
+    private static final String MODE = "BUS";
     private static final int T_10_46_05 = time(10, 46, 5);
     private static final int T_10_55 = time(10, 55, 0);
     private static final int D_5_12 = time(0, 5, 12);
@@ -19,7 +20,7 @@ public class PathStringBuilderTest {
 
     @Test
     public void transit() {
-        assertEquals("Transit 10:46:05 10:55", new PathStringBuilder().transit(T_10_46_05, T_10_55).toString());
+        assertEquals("BUS 10:46:05 10:55", new PathStringBuilder().transit(MODE, T_10_46_05, T_10_55).toString());
     }
 
     @Test
@@ -35,10 +36,10 @@ public class PathStringBuilderTest {
     @Test
     public void path() {
         assertEquals(
-            "Walk 37s ~ 227 ~ Transit 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s",
+            "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s",
             new PathStringBuilder()
                         .walk(37).sep().stop(227).sep()
-                        .transit(T_10_46_05, T_10_55).sep().stop(112).sep()
+                        .transit(MODE, T_10_46_05, T_10_55).sep().stop(112).sep()
                         .walk(3600 + 37 * 60 + 7).toString()
         );
     }

@@ -131,7 +131,14 @@ public final class Path<T extends RaptorTripSchedule> {
         while (!leg.isEgressLeg()) {
             buf.sep();
             if(leg.isTransitLeg()) {
-                buf.stop(leg.asTransitLeg().fromStop()).sep().transit(leg.fromTime(), leg.toTime());
+                TransitPathLeg<T> transitLeg = leg.asTransitLeg();
+                buf.stop(transitLeg.fromStop())
+                    .sep()
+                    .transit(
+                        transitLeg.trip().pattern().modeInfo(),
+                        transitLeg.fromTime(),
+                        transitLeg.toTime()
+                    );
             }
             // Transfer
             else {
