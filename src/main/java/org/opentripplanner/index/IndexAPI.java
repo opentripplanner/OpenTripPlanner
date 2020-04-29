@@ -32,7 +32,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;

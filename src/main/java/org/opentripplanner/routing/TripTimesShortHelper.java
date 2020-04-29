@@ -6,7 +6,6 @@ import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 

@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.server;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

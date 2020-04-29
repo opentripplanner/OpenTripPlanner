@@ -7,7 +7,7 @@ import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.schema.GraphQLSchema;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.Router;

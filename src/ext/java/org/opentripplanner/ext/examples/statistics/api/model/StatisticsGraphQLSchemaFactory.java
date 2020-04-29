@@ -9,7 +9,7 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLTypeReference;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 
 public class StatisticsGraphQLSchemaFactory {
 

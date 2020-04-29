@@ -3,7 +3,7 @@ package org.opentripplanner.updater.alerts;
 import java.io.InputStream;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;

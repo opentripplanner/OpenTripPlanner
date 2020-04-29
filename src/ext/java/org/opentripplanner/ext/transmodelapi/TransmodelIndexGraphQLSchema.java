@@ -59,7 +59,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;

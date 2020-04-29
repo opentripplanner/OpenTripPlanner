@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.examples.statistics.api.model;
 
-import org.opentripplanner.routing.api.request.RoutingService;
+import org.opentripplanner.routing.RoutingService;
 
 /**
  * Simple POJO to define the returned 'key numbers'.
