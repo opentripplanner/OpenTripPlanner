@@ -2,7 +2,6 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
@@ -18,6 +17,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorReques
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.error.NoStopsInRangeException;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -68,41 +68,22 @@ public class RoutingWorker {
         List<Itinerary> itineraries = new ArrayList<>();
         List<RoutingError> routingErrors = new ArrayList<>();
 
+        // Direct street routing
         try {
-            // Direct street routing
             itineraries.addAll(DirectStreetRouter.route(router, request));
-        } catch (Exception e) {
-            routingErrors.add(
-                new RoutingError(
-                    RoutingErrorCode.SYSTEM_ERROR,
-                    "An error occurred during direct street routing.",
-                    null)
-            );
+        } catch (RoutingValidationException e) {
+            routingErrors.add(e.getRoutingError());
         }
 
+        // Transit routing
         try {
-            // Transit routing
             itineraries.addAll(routeTransit(router));
-        } catch (NoStopsInRangeException e) {
-            for (String missing : e.getMissing()) {
-                routingErrors.add(
-                    new RoutingError(
-                        RoutingErrorCode.NO_STOPS_IN_RANGE,
-                        "Unable to find any stops in range of the location.",
-                        missing)
-                );
-            }
-        } catch (Exception e) {
-            routingErrors.add(
-                new RoutingError(
-                    RoutingErrorCode.SYSTEM_ERROR,
-                    "An error occurred during transit routing.",
-                    null)
-            );
+        } catch (RoutingValidationException e) {
+            routingErrors.add(e.getRoutingError());
         }
 
-        long startTimeFiltering = System.currentTimeMillis();
         // Filter itineraries
+        long startTimeFiltering = System.currentTimeMillis();
         itineraries = filterChain().filter(itineraries);
         LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
