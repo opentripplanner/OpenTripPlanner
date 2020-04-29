@@ -85,8 +85,9 @@ public class Itinerary {
      */
     public String details() {
         PathStringBuilder buf = new PathStringBuilder(true);
+
         for (Leg it : legs) {
-            if(it.from != null && it.from.rrStopIndex != null) {
+            if(it.from != null && it.from.rrStopIndex >= 0) {
                 buf.sep().stop(it.from.rrStopIndex).sep();
             }
             if(it.isWalkLeg()) {

@@ -15,7 +15,7 @@ public class Place {
     public final WgsCoordinate coordinate;
 
     /** This is the stop index in the RaptorTransitData */
-    public final Integer rrStopIndex;
+    public final int rrStopIndex;
 
     public Place(org.opentripplanner.model.Stop stop, int rrStopIndex) {
         this(stop.getName(), stop.getId(), stop.getCoordinate(), rrStopIndex);
