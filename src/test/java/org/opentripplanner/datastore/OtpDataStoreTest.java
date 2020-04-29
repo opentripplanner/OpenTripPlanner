@@ -172,7 +172,7 @@ public class OtpDataStoreTest {
         // added to the same temp-data-dir.
         assertEquals(
                 "CONFIG base:build-config.json, "
-                + "GRAPH data:graph.obj, "
+                + "GRAPH data:Graph.obj, "
                 + "GTFS data:gtfs.zip, "
                 + "OSM data:osm.pbf, "
                 + "REPORT data:report, "
