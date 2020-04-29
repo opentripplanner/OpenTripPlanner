@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -104,7 +105,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
         this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }

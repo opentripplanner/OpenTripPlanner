@@ -15,6 +15,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FareRuleMapperTest {
+    private static final String FEED_ID = "FEED";
+
     private static final org.onebusaway.gtfs.model.FareRule FARE_RULE = new org.onebusaway.gtfs.model.FareRule();
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
@@ -43,7 +45,7 @@ public class FareRuleMapperTest {
         FARE_RULE.setRoute(ROUTE);
     }
 
-    private FareRuleMapper subject = new FareRuleMapper(new RouteMapper(new AgencyMapper()),
+    private FareRuleMapper subject = new FareRuleMapper(new RouteMapper(new AgencyMapper(FEED_ID)),
             new FareAttributeMapper());
 
     @Test

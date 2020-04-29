@@ -8,6 +8,7 @@ import org.rutebanken.netex.model.MultilingualString;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+import static org.opentripplanner.netex.loader.mapping.MappingSupport.ID_FACTORY;
 
 public class AuthorityToAgencyMapperTest {
     private static final String ID = "ID";
@@ -17,7 +18,7 @@ public class AuthorityToAgencyMapperTest {
     private static final String TIME_ZONE = "CEST";
     private static final String N_A = "N/A";
 
-    private AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(TIME_ZONE);
+    private AuthorityToAgencyMapper mapper = new AuthorityToAgencyMapper(ID_FACTORY, TIME_ZONE);
 
     @Test public void mapAgency() {
         // Given
@@ -27,7 +28,7 @@ public class AuthorityToAgencyMapperTest {
         Agency a = mapper.mapAuthorityToAgency(authority);
 
         // Then expect
-        assertEquals(ID, a.getId());
+        assertEquals(ID, a.getId().getId());
         assertEquals(NAME, a.getName());
         assertEquals(TIME_ZONE, a.getTimezone());
         assertEquals(URL, a.getUrl());
@@ -51,7 +52,7 @@ public class AuthorityToAgencyMapperTest {
         Agency a = mapper.createDummyAgency();
 
         // Then expect
-        assertEquals("Dummy-" + a.getTimezone(), a.getId());
+        assertEquals("Dummy-" + a.getTimezone(), a.getId().getId());
         assertEquals(N_A, a.getName());
         assertEquals(TIME_ZONE, a.getTimezone());
         assertEquals(N_A, a.getUrl());

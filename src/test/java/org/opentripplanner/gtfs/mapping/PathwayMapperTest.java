@@ -9,7 +9,6 @@ import java.util.Collection;
 import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
@@ -18,11 +17,9 @@ public class PathwayMapperTest {
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
-    private static final int PATHWAY_TYPE = 2;
+    private static final int PATHWAY_MODE = 2;
 
     private static final int TRAVERSAL_TIME = 3000;
-
-    private static final int WHEELCHAIR_TRAVERSAL_TIME = 3400;
 
     private static final Pathway PATHWAY = new Pathway();
 
@@ -37,12 +34,16 @@ public class PathwayMapperTest {
         PATHWAY.setId(AGENCY_AND_ID);
         PATHWAY.setFromStop(FROM_STOP);
         PATHWAY.setToStop(TO_STOP);
-        PATHWAY.setPathwayType(PATHWAY_TYPE);
+        PATHWAY.setPathwayMode(PATHWAY_MODE);
         PATHWAY.setTraversalTime(TRAVERSAL_TIME);
-        PATHWAY.setWheelchairTraversalTime(WHEELCHAIR_TRAVERSAL_TIME);
     }
 
-    private PathwayMapper subject = new PathwayMapper(new StopMapper());
+    private PathwayMapper subject = new PathwayMapper(
+        new StopMapper(),
+        new EntranceMapper(),
+        new PathwayNodeMapper(),
+        new BoardingAreaMapper()
+    );
 
     @Test
     public void testMapCollection() throws Exception {
@@ -58,9 +59,8 @@ public class PathwayMapperTest {
         assertEquals("A:1", result.getId().toString());
         assertNotNull(result.getFromStop());
         assertNotNull(result.getToStop());
-        assertEquals(PATHWAY_TYPE, result.getPathwayType());
+        assertEquals(PATHWAY_MODE, result.getPathwayMode());
         assertEquals(TRAVERSAL_TIME, result.getTraversalTime());
-        assertEquals(WHEELCHAIR_TRAVERSAL_TIME, result.getWheelchairTraversalTime());
     }
 
     @Test
@@ -73,9 +73,8 @@ public class PathwayMapperTest {
         assertNotNull(result.getId());
         assertNull(result.getFromStop());
         assertNull(result.getToStop());
-        assertEquals(0, result.getPathwayType());
+        assertEquals(0, result.getPathwayMode());
         assertEquals(0, result.getTraversalTime());
-        assertFalse(result.isWheelchairTraversalTimeSet());
     }
 
     /** Mapping the same object twice, should return the the same instance. */

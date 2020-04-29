@@ -1,19 +1,7 @@
 package org.opentripplanner.routing.impl;
 
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Currency;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import com.conveyal.r5.otp2.api.path.Path;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
@@ -24,8 +12,19 @@ import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Currency;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /** Holds information for doing the graph search on fares */
 class FareSearch {
@@ -73,7 +72,7 @@ class FareAndId {
  * See this thread on gtfs-changes explaining the proper interpretation of fares.txt:
  * http://groups.google.com/group/gtfs-changes/browse_thread/thread/8a4a48ae1e742517/4f81b826cb732f3b
  */
-public class DefaultFareServiceImpl implements FareService, Serializable {
+public class DefaultFareServiceImpl implements FareService {
 
     private static final long serialVersionUID = 20120229L;
 
@@ -231,10 +230,9 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
 
     private FareAndId getBestFareAndId(FareType fareType, List<Ride> rides,
             Collection<FareRuleSet> fareRules) {
-        Set<String> zones = new HashSet<String>();
-        Set<FeedScopedId> routes = new HashSet<FeedScopedId>();
-        Set<String> agencies = new HashSet<String>();
-        Set<FeedScopedId> trips = new HashSet<FeedScopedId>();
+        Set<String> zones = new HashSet<>();
+        Set<FeedScopedId> routes = new HashSet<>();
+        Set<FeedScopedId> trips = new HashSet<>();
         int transfersUsed = -1;
 
         Ride firstRide = rides.get(0);
@@ -253,7 +251,6 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             lastRideStartTime = ride.startTime;
             lastRideEndTime = ride.endTime;
             endZone = ride.endZone;
-            agencies.add(ride.agency);
             routes.add(ride.route);
             zones.addAll(ride.zones);
             trips.add(ride.trip);
@@ -270,10 +267,10 @@ public class DefaultFareServiceImpl implements FareService, Serializable {
             FareAttribute attribute = ruleSet.getFareAttribute();
             // fares also don't really have an agency id, they will have the per-feed default id
             // check only if the fare is not mapped to an agency
-            if (!ruleSet.hasAgencyDefined() && !attribute.getId().getFeedId().equals(feedId))
+            if (!attribute.getId().getFeedId().equals(feedId))
                 continue;
 
-            if (ruleSet.matches(agencies, startZone, endZone, zones, routes, trips)) {
+            if (ruleSet.matches(startZone, endZone, zones, routes, trips)) {
                 // TODO Maybe move the code below in FareRuleSet::matches() ?
                 if (attribute.isTransfersSet() && attribute.getTransfers() < transfersUsed) {
                     continue;

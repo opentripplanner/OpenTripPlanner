@@ -31,6 +31,11 @@ public class ExternalGraphUpdater implements GraphUpdater {
   }
 
   @Override
+  public String getName() {
+    return this.getClass().getName();
+  }
+
+  @Override
   public void configure(Graph graph, JsonNode jsonNode) throws Exception {
 
   }

@@ -28,23 +28,23 @@ New York City and one for Portland, Oregon:
 └── graphs
     ├── nyc
     │   ├── build-config.json
-    │   ├── Graph.obj
+    │   ├── graph.obj
     │   ├── long-island-rail-road_20140216_0114.zip
     │   ├── mta-new-york-city-transit_20130212_0419.zip
     │   ├── new-york-city.osm.pbf
     │   └── port-authority-of-new-york-new-jersey_20150217_0111.zip
     └── pdx
         ├── build-config.json
-        ├── Graph.obj
+        ├── graph.obj
         ├── gtfs.zip
         ├── portland_oregon.osm.pbf
         └── router-config.json
 ```
 
 You can see that each of these subdirectories contains one or more GTFS feeds (which are just zip files full of
-comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `Graph.obj`.
+comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `graph.obj`.
 On startup, OTP scans router directories for input and configuration files,
-and can optionally store the resulting combined representation of the transportation network as Graph.obj in the
+and can optionally store the resulting combined representation of the transportation network as `graph.obj` in the
 same directory to avoid re-processing the data the next time it starts up. The `cache` directory is where OTP will
 store its local copies of resources fetched from the internet, such as US elevation tiles.
 
@@ -117,8 +117,16 @@ config key | description | value type | value default | notes
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
 `maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | Date or Period (ISO 8601) | `-P1Y` | `2020-01-01`, `-P1M3D`, `-P3W`
+`transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | Date or Period (ISO 8601) | `P3Y` | `2022-12-31`, `P1Y6M10D`, `P12W`
 
-This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/GraphBuilderParameters.java#L186-L215) for `GraphBuilderParameters`.
+This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
+
+## Limit the transit service period
+
+The properties `transitServiceStart` and `transitServiceEnd` can be used to limit the service dates. This affects both GTFS service calendars and dates. The service calendar is reduced and dates outside the period are dropped. OTP2 will compute a transit schedule for every day for which it can find at least one trip running. On the other hand, OTP will waste resources if a service end date is *unbounded* or very large (`9999-12-31`). To avoid this, limit the OTP service period. Also, if you provide a service with multiple feeds they may have different service end dates. To avoid inconsistent results, the period can be limited, so all feeds have data for the entire period. The default is to use a period of 1 year before, and 3 years after the day the graph is built. Limiting the period will *not* improve the search performance, but OTP will build faster and load faster in most cases.
+
+The `transitServiceStart` and `transitServiceEnd` parameters are set using an absolute date like `2020-12-31` or a period like `P1Y6M5D` relative to the graph build date. Negative periods is used to specify dates in the past. The period is computed using the system time-zone, not the feed time-zone. Also, remember that the service day might be more than 24 hours. So be sure to include enough slack to account for the this. Setting the limits too wide have very little impact and is in general better than trying to be exact. The period and date format follow the ISO 8601 standard.
 
 ## Reaching a subway platform
 
@@ -250,11 +258,12 @@ it is possible to define a multiplier that converts the elevation values from so
 
 ## Fares configuration
 
-By default OTP will compute fares according to the GTFS specification if fare data is provided in your GTFS input.
-For more complex scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
-`fares` section in `build-config.json`. You can combine different fares (for example transit and bike-rental)
-by defining a `combinationStrategy` parameter, and a list of sub-fares to combine (all fields starting with `fare`
-are considered to be sub-fares).
+By default OTP will compute fares according to the GTFS specification if fare data is provided in
+your GTFS input. It is possible to turn off this by setting the fare to "off". For more complex 
+scenarios or to handle bike rental fares, it is necessary to manually configure fares using the
+`fares` section in `build-config.json`. You can combine different fares (for example transit and
+bike-rental) by defining a `combinationStrategy` parameter, and a list of sub-fares to combine 
+(all fields starting with `fare` are considered to be sub-fares).
 
 ```JSON
 // build-config.json
@@ -292,6 +301,15 @@ are considered to be sub-fares).
 }
 ```
 
+Turning the fare service _off_, this will ignore any fare data in the provided GTFS data.
+```JSON
+// build-config.json
+{
+  "fares": "off"
+}
+```
+
+
 The current list of custom fare type is:
 
 - `bike-rental-time-based` - accepting the following parameters:
@@ -300,6 +318,7 @@ The current list of custom fare type is:
 - `san-francisco` (no parameters)
 - `new-york` (no parameters)
 - `seattle` (no parameters)
+- `off` (no parameters)
 
 The current list of `combinationStrategy` is:
 
@@ -353,11 +372,9 @@ These options can be applied by the OTP server without rebuilding the graph.
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
 `routingDefaults` | Default routing parameters, which will be applied to every request | object |  | see [routing defaults](#routing-defaults)
-`timeout` | maximum time limit for route queries | double | null | units: seconds; see [timeouts](#timeouts)
-`timeouts` | when returning multiple itineraries, set different maximum time limits for the 1st, 2nd, etc. itinerary | array of doubles | `[5, 4, 2]` | units: seconds; see [timeouts](#timeouts)
+`streetRoutingTimeout` | maximum time limit for street route queries | double | null | units: seconds; see [timeout](#timeout)
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
-`boardTimes` | change boarding times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
-`alightTimes` | change alighting times by mode | object | null | see [boarding and alighting times](#boarding-and-alighting-times)
+`transit` | Transit tuning parameters | `TransitRoutingConfig` |  | see [Tuning transit routing](#Tuning-transit-routing)
 `updaters` | configure real-time updaters, such as GTFS-realtime feeds | object | null | see [configuring real-time updaters](#configuring-real-time-updaters)
 
 ## Routing defaults
@@ -479,42 +496,28 @@ seconds needed for the boarding and alighting processes in `router-config.json` 
 }
 ```
 
-## Timeouts
+## Timeout
 
-Path searches can sometimes take a long time to complete, especially certain problematic cases that have yet to be optimized.
-Often a first itinerary is found quickly, but it is time-consuming or impossible to find subsequent alternative itineraries
-and this delays the response. You can set timeouts to avoid tying up server resources on pointless searches and ensure that
-your users receive a timely response. When a search times out, a WARN level log entry is made with information that can
-help identify problematic searches and improve our routing methods. The simplest timeout option is:
+TODO OTP2 - Clean up this text - there is a timeout for the street search but not for the transit 
+search, it should be limited by the size of the search-window, not a timeout.
+
+Path searches can sometimes take a long time to complete, especially certain problematic cases that
+have yet to be optimized. Often the street part of the routing can take a long time if searching
+very long distances. You can set the street routing timeout to avoid tying up server resources on
+pointless searches and ensure that your users receive a timely response. You can also limit the max
+distance to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made
+with information that can help identify problematic searches and improve our routing methods. The
+simplest timeout option is:
 
 ```JSON
 // router-config.json
 {
-  "timeout": 5.5
+  "streetRoutingTimeout": 5.5
 }
 ```
 
 This specifies a single timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
-paths already found are returned to the client. This is equivalent to specifying a `timeouts` array with a single element.
-The alternative is:
-
-```JSON
-// router-config.json
-{
-  "timeouts": [5, 4, 3, 1]
-}
-```
-
-Here, the configuration key is `timeouts` (plural) and we specify an array of times in floating-point seconds. The Nth
-element in the array applies to the Nth itinerary search, and importantly all values are relative to the beginning of the
-search for the *first* itinerary. If OTP is configured to find more itineraries than there are elements in the timeouts
-array, the final element in the timeouts array will apply to all remaining unmatched searches.
-
-This allows you to keep overall response time down while ensuring that the end user will get at least one
-response, providing more only when it won't hurt response time. The timeout values will typically be decreasing to
-reflect the decreasing marginal value of alternative itineraries: everyone wants at least one response, it's nice to
-have two for comparison, but we only care about having three, four, or more options if completing those extra searches
-doesn't cause annoyingly long response times.
+paths already found are returned to the client. 
 
 ## Logging incoming requests
 
@@ -545,6 +548,99 @@ The fields are separated by whitespace and are (in order):
 
 Finally, for each itinerary returned to the user, there is a travel duration in seconds and the number of transit vehicles used in that itinerary.
 
+
+## Tuning transit routing
+
+Some of these parameters for tuning transit routing is only available through configuration and cannot be set in the routing request. These parameters work together with the default routing request and the actual routing request.
+
+### transit.maxNumberOfTransfers
+This parameter is used to allocate enough memory space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network.
+
+**Type:** `int`  **Default value:** 12
+
+### transit.scheduledTripBinarySearchThreshold
+The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent.
+
+**Type:** `int`  **Default value:** 50
+
+### transit.iterationDepartureStepInSeconds
+Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds.
+
+**Type:** `int`  **Default value:** 60
+
+### transit.searchThreadPoolSize
+Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread.
+
+**Type:** `int`  **Default value:** 0
+
+### transit.dynamicSearchWindow
+The dynamic search window coefficients are used to calculate EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
+
+#### transit.dynamicSearchWindow.minTripTimeCoefficient
+The coefficient to multiply with minimum travel time found using a heuristic search. This 
+ value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give 
+ ok results.
+
+**Type:** `double`  **Default value:** 0.3
+
+
+#### transit.dynamicSearchWindow.minWinTimeMinutes
+The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment.
+**Type:** `int`  **Default value:** 40
+
+#### transit.dynamicSearchWindow.maxWinTimeMinutes
+Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time.
+
+**Type:** `int`  **Default value:** 180 (3 timer) 
+
+#### transit.dynamicSearchWindow.stepMinutes
+he search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.
+
+**Type:** `int`  **Default value:** 10 
+
+
+### transit.stopTransferCost.<TransferPriority>
+Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
+
+This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
+
+If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+
+**Key type:** DISCOURAGED, ALLOWED, RECOMMENDED or PREFERRED 
+
+**Value Type:**  `int` 
+
+**Value Unit:** Scalar, equvivalent to one second of transit. 
+
+**Value Range:** `[0 .. 100,000]`
+
+**All key/value pairs are required if specified.** 
+
+
+### Transit example section from router-config.json
+```
+{
+    transit: {
+        maxNumberOfTransfers: 12,
+        scheduledTripBinarySearchThreshold: 50,
+        iterationDepartureStepInSeconds: 60,
+        searchThreadPoolSize: 0,
+        dynamicSearchWindow: {
+            minTripTimeCoefficient: 0.4,
+            minTripTimeCoefficient: 0.3,
+            minTimeMinutes: 30,
+            maxLengthMinutes : 360,
+            stepMinutes: 10
+        },
+        stopTransferCost: {
+            DISCOURAGED: 72000,
+            ALLOWED:       150,
+            RECOMMENDED:    60,
+            PREFERRED:       0
+        }
+    }
+}
+```
 
 ## Real-time data
 
@@ -608,7 +704,7 @@ connect to a network resource is the `url` field.
 // router-config.json
 {
     // Routing defaults are any public field or setter in the Java class
-    // org.opentripplanner.routing.core.RoutingRequest
+    // org.opentripplanner.routing.request.RoutingRequest
     "routingDefaults": {
         "numItineraries": 6,
         "walkSpeed": 2.0,

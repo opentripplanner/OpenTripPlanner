@@ -4,14 +4,13 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.opentripplanner.ext.examples.statistics.api.model.StatisticsGraphQLSchemaFactory;
-import org.opentripplanner.routing.graph.GraphIndex;
-import org.opentripplanner.standalone.OTPServer;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 
 import javax.ws.rs.Consumes;
 import javax.ws.rs.POST;
 import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
@@ -21,7 +20,7 @@ import java.util.Map;
 import static org.opentripplanner.util.HttpToGraphQLMapper.mapExecutionResultToHttpResponse;
 import static org.opentripplanner.util.HttpToGraphQLMapper.mapHttpQuerryParamsToQLParams;
 
-@Path("/routers/{routerId}/statistics")
+@Path("/routers/statistics")
 @Produces(MediaType.APPLICATION_JSON)
 public class GraphStatisticsResource {
 
@@ -29,12 +28,12 @@ public class GraphStatisticsResource {
     private GraphQL graphQL;
 
     @SuppressWarnings("unused")
-    public GraphStatisticsResource(@Context OTPServer server, @PathParam("routerId") String routerId) {
-        this(server.getRouter().graph.index);
+    public GraphStatisticsResource(@Context OTPServer server) {
+        this(server.createRoutingRequestService());
     }
 
-    GraphStatisticsResource(GraphIndex graphIndex) {
-        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(graphIndex));
+    GraphStatisticsResource(RoutingService routingService) {
+        this.graphQL = new GraphQL(StatisticsGraphQLSchemaFactory.createSchema(routingService));
     }
 
     @POST @Path("/graphql")
@@ -43,10 +42,6 @@ public class GraphStatisticsResource {
         HttpToGraphQLMapper.QlRequestParams req = mapHttpQuerryParamsToQLParams(
                 queryParameters, deserializer
         );
-
-        if(req.isFailed()) {
-            return req.getFailedResponse();
-        }
 
         ExecutionResult executionResult = graphQL.execute(
                 req.query, req.operationName, null, req.variables

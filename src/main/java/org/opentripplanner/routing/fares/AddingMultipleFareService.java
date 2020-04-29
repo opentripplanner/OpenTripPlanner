@@ -1,9 +1,5 @@
 package org.opentripplanner.routing.fares;
 
-import java.io.Serializable;
-import java.util.List;
-
-import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.Fare;
@@ -11,6 +7,10 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
+
+import java.io.Serializable;
+import java.util.List;
 
 public class AddingMultipleFareService implements FareService, Serializable {
 

@@ -18,7 +18,7 @@ public interface AlertPatchService {
 
     Collection<AlertPatch> getTripPatches(FeedScopedId trip);
 
-    Collection<AlertPatch> getAgencyPatches(String agency);
+    Collection<AlertPatch> getAgencyPatches(FeedScopedId agency);
 
     Collection<AlertPatch> getStopAndRoutePatches(FeedScopedId stop, FeedScopedId route);
 

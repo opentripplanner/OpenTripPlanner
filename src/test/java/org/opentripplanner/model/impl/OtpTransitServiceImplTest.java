@@ -60,7 +60,7 @@ public class OtpTransitServiceImplTest {
         Agency agency = first(agencies);
 
         assertEquals(1, agencies.size());
-        assertEquals("agency", agency.getId());
+        assertEquals("agency", agency.getId().getId());
         assertEquals("Fake Agency", agency.getName());
     }
 
@@ -69,7 +69,7 @@ public class OtpTransitServiceImplTest {
         Collection<FareAttribute> fareAttributes = subject.getAllFareAttributes();
 
         assertEquals(1, fareAttributes.size());
-        assertEquals("<FareAttribute agency:FA>", first(fareAttributes).toString());
+        assertEquals("<FareAttribute Z:FA>", first(fareAttributes).toString());
     }
 
     @Test
@@ -95,7 +95,7 @@ public class OtpTransitServiceImplTest {
     public void testGetAllPathways() {
         Collection<Pathway> pathways = subject.getAllPathways();
 
-        assertEquals(4, pathways.size());
+        assertEquals(3, pathways.size());
         assertEquals("<Pathway Z:pathways_1_1>", first(pathways).toString());
     }
 
@@ -179,7 +179,7 @@ public class OtpTransitServiceImplTest {
 
     private static FareRule createFareRule() {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(FEED_ID, "FA"));
         FareRule rule = new FareRule();
         rule.setOriginId("Zone A");
         rule.setContainsId("Zone B");

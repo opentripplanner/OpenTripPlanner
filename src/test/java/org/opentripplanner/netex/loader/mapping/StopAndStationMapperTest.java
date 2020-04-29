@@ -127,8 +127,8 @@ public class StopAndStationMapperTest {
             String version,
             Double lat,
             Double lon,
-            VehicleModeEnumeration transportMode)
-    {
+            VehicleModeEnumeration transportMode
+    ) {
         return new StopPlace()
             .withName(createMLString(name))
             .withVersion(version)

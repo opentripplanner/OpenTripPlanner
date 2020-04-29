@@ -2,13 +2,16 @@ package org.opentripplanner.updater;
 
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.opentripplanner.GtfsTest;
+import org.opentripplanner.routing.RoutingService;
+import org.rutebanken.netex.model.Routing;
 
 public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
     public void testMatch() throws Exception {
         String feedId = graph.getFeedIds().iterator().next();
 
-        GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+        GtfsRealtimeFuzzyTripMatcher matcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(
+            graph));
         TripDescriptor trip1 = TripDescriptor.newBuilder().setRouteId("1").setDirectionId(0).
                 setStartTime("06:47:00").setStartDate("20090915").build();
         assertEquals("10W1020", matcher.match(feedId, trip1).getTripId());

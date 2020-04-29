@@ -9,24 +9,17 @@ import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
-import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
 import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.TripStopTimes;
+import org.opentripplanner.model.calendar.ServiceCalendar;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 
 import java.io.IOException;
-import java.io.Serializable;
 import java.util.Collection;
-import java.util.List;
 
 import static java.util.Comparator.comparing;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 /**
@@ -41,16 +34,6 @@ public class OtpTransitServiceBuilderTest {
     @BeforeClass
     public static void setUpClass() throws IOException {
         subject = createBuilder();
-    }
-
-    @Test
-    public void regenerateIndexes(){
-        FeedScopedId fakeId = new FeedScopedId("fake", "id");
-        testRegenerateIndexForMap(subject.getAgenciesById(), "FakeId");
-        testRegenerateIndexForMap(subject.getTripsById(), fakeId);
-        testRegenerateIndexForMap(subject.getStops(), fakeId);
-        testRegenerateIndexForMap(subject.getRoutes(), fakeId);
-        testReindexForStopTimes(subject.getStopTimesSortedByTrip());
     }
 
     @Test
@@ -92,7 +75,7 @@ public class OtpTransitServiceBuilderTest {
 
     @Test
     public void testGetAllShapePoints() {
-        Collection<ShapePoint> shapePoints = subject.getShapePoints();
+        Collection<ShapePoint> shapePoints = subject.getShapePoints().values();
 
         assertEquals(9, shapePoints.size());
         assertEquals("<ShapePoint F:4 #1 (41.0,-75.0)>", first(shapePoints).toString());
@@ -100,36 +83,6 @@ public class OtpTransitServiceBuilderTest {
 
 
     /* private methods */
-
-    private <I extends Serializable, E extends TransitEntity<I>>
-    void testRegenerateIndexForMap(EntityById<I, E> map, I fakeId) {
-        E e = first(map.values());
-        I originalId = e.getId();
-
-        e.setId(fakeId);
-
-        subject.regenerateIndexes();
-        assertNotNull(map.get(fakeId));
-
-        // Cleanup
-        e.setId(originalId);
-    }
-
-    private void testReindexForStopTimes(TripStopTimes map) {
-        Trip trip = first(map.asImmutableMap().keySet());
-        List value = map.get(trip);
-        FeedScopedId originalId = trip.getId();
-        assertEquals(value, map.get(trip));
-
-        trip.setId(new FeedScopedId("fake", "id"));
-        assertTrue(map.get(trip).isEmpty());
-
-        subject.regenerateIndexes();
-        assertEquals(value, map.get(trip));
-
-        // Cleanup
-        trip.setId(originalId);
-    }
 
     private static OtpTransitServiceBuilder createBuilder() throws IOException {
         OtpTransitServiceBuilder builder = contextBuilder(FEED_ID, ConstantsForTests.FAKE_GTFS).getTransitBuilder();
@@ -150,16 +103,16 @@ public class OtpTransitServiceBuilderTest {
 
     private static FareAttribute createFareAttribute(Agency agency) {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(FEED_ID, "FA"));
         return fa;
     }
 
     private static ServiceCalendarDate createAServiceCalendarDateExclution(FeedScopedId serviceId) {
-        ServiceCalendarDate date = new ServiceCalendarDate();
-        date.setServiceId(serviceId);
-        date.setDate(new ServiceDate(2017, 8, 31));
-        date.setExceptionType(2);
-        return date;
+        return new ServiceCalendarDate(
+                serviceId,
+                new ServiceDate(2017, 8, 31),
+                2
+        );
     }
 
     private static <T> T first(Collection<? extends T> c) {

@@ -1,5 +1,6 @@
 package org.opentripplanner.netex.loader.mapping;
 
+import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
@@ -13,8 +14,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.List;
-
-import static org.opentripplanner.netex.loader.mapping.PointMapper.verifyPointAndProcessCoordinate;
 
 class GroupOfStationsMapper {
 
@@ -42,22 +41,17 @@ class GroupOfStationsMapper {
         groupOfStations.setId(
                 idFactory.createId(groupOfStopPlaces.getId()));
         groupOfStations.setName(groupOfStopPlaces.getName().getValue());
-        boolean locationOk = verifyPointAndProcessCoordinate(
-                groupOfStopPlaces.getCentroid(),
-                // This kind of awkward callback can be avoided if we add a
-                // Coordinate type the the OTP model, and return that instead.
-                coordinate -> {
-                    groupOfStations.setLon(coordinate.getLongitude().doubleValue());
-                    groupOfStations.setLat(coordinate.getLatitude().doubleValue());
-                }
-        );
+        WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
 
-        if (!locationOk) {
+        if (coordinate == null) {
             // TODO OTP2 - This should be an data import issue
             LOG.warn(
                     "MultiModal station {} does not contain any coordinates.",
                     groupOfStations.getId()
             );
+        }
+        else {
+            groupOfStations.setCoordinate(coordinate);
         }
 
         connectChildStation(groupOfStopPlaces, groupOfStations);

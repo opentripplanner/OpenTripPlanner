@@ -5,11 +5,11 @@ package org.opentripplanner.model;
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
  */
-public final class Agency extends TransitEntity<String> {
+public final class Agency extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private String id;
+    private FeedScopedId id;
 
     private String name;
 
@@ -39,11 +39,11 @@ public final class Agency extends TransitEntity<String> {
     }
 
     @Override
-    public String getId() {
+    public FeedScopedId getId() {
         return id;
     }
 
-    public void setId(String id) {
+    public void setId(FeedScopedId id) {
         this.id = id;
     }
 

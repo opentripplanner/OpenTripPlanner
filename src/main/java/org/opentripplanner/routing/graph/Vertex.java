@@ -3,6 +3,7 @@ package org.opentripplanner.routing.graph;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.DirectionUtils;
+import org.opentripplanner.model.StationElement;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -174,33 +175,31 @@ public abstract class Vertex implements Serializable, Cloneable {
         return Arrays.asList(incoming);
     }
 
-    @XmlTransient
     public int getDegreeOut() {
         return outgoing.length;
     }
 
-    @XmlTransient
     public int getDegreeIn() {
         return incoming.length;
     }
 
     /** Get the longitude of the vertex */
-    public double getX() {
-        return x;
+    public final double getX() {
+        return getLon();
     }
 
     /** Get the latitude of the vertex */
-    public double getY() {
-        return y;
+    public final double getY() {
+        return getLat();
     }
 
     /** Get the longitude of the vertex */
-    public double getLon() {
+    public final double getLon() {
         return x;
     }
 
     /** Get the latitude of the vertex */
-    public double getLat() {
+    public final double getLat() {
         return y;
     }
 
@@ -218,6 +217,11 @@ public abstract class Vertex implements Serializable, Cloneable {
         return this.name.toString(locale);
     }
 
+    /** Get the corresponding StationElement if this is a transit vertex */
+    public StationElement getStationElement() {
+        return null;
+    }
+
     /* FIELD ACCESSOR METHODS : READ ONLY */
 
     /** Every vertex has a label which is globally unique. */
@@ -225,7 +229,6 @@ public abstract class Vertex implements Serializable, Cloneable {
         return label;
     }
 
-    @XmlTransient
     public Coordinate getCoordinate() {
         return new Coordinate(getX(), getY());
     }
@@ -255,7 +258,6 @@ public abstract class Vertex implements Serializable, Cloneable {
 
     /* UTILITY METHODS FOR SEARCHING, GRAPH BUILDING, AND GENERATING WALKSTEPS */
 
-    @XmlTransient
     public List<Edge> getOutgoingStreetEdges() {
         List<Edge> result = new ArrayList<Edge>();
         for (Edge out : this.getOutgoing()) {

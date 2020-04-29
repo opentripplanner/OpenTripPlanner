@@ -1,7 +1,11 @@
 package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -48,21 +52,15 @@ public class TimetableSnapshot {
      * TODO shouldn't this be a static class?
      */
     protected class TripIdAndServiceDate {
-        private final String feedId;
-        private final String tripId;
+        private final FeedScopedId tripId;
         private final ServiceDate serviceDate;
         
-        public TripIdAndServiceDate(final String feedId, final String tripId, final ServiceDate serviceDate) {
-            this.feedId = feedId;
+        public TripIdAndServiceDate(final FeedScopedId tripId, final ServiceDate serviceDate) {
             this.tripId = tripId;
             this.serviceDate = serviceDate;
         }
 
-        public String getFeedId() {
-            return feedId;
-        }
-
-        public String getTripId() {
+        public FeedScopedId getTripId() {
             return tripId;
         }
 
@@ -73,7 +71,7 @@ public class TimetableSnapshot {
 
         @Override
         public int hashCode() {
-            int result = Objects.hash(tripId, serviceDate, feedId);
+            int result = Objects.hash(tripId, serviceDate);
             return result;
         }
 
@@ -87,8 +85,7 @@ public class TimetableSnapshot {
                 return false;
             TripIdAndServiceDate other = (TripIdAndServiceDate) obj;
             boolean result = Objects.equals(this.tripId, other.tripId) &&
-                    Objects.equals(this.serviceDate, other.serviceDate) &&
-                    Objects.equals(this.feedId, other.feedId);
+                    Objects.equals(this.serviceDate, other.serviceDate);
             return result;
         }
     }
@@ -109,7 +106,7 @@ public class TimetableSnapshot {
     /**
      * <p>
      * Map containing the last <b>added</b> trip pattern given a trip id (without agency) and a
-     * service date as a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)}
+     * service date as a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)}
      * with trip times of a trip that didn't exist yet in the trip pattern.
      * </p>
      * <p>
@@ -118,6 +115,14 @@ public class TimetableSnapshot {
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      */
     private HashMap<TripIdAndServiceDate, TripPattern> lastAddedTripPattern = new HashMap<>();
+
+    /**
+     * This maps contains all of the new TripPatterns added by realtime data indexed on stop. This
+     * has to be kept in order for them to be included in the stop times api call on a specific stop.
+     *
+     * TODO Find a generic way to keep all realtime indexes.
+     */
+    private Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
     
     /**
      * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
@@ -135,7 +140,7 @@ public class TimetableSnapshot {
      * A set of all timetables which have been modified and are waiting to be indexed. When
      * <code>dirty</code> is <code>null</code>, it indicates that the snapshot is read-only.
      */
-    private Set<Timetable> dirtyTimetables = new HashSet<Timetable>();
+    private Set<Timetable> dirtyTimetables = new HashSet<>();
 
     /**
      * Returns an updated timetable for the specified pattern if one is available in this snapshot,
@@ -157,17 +162,16 @@ public class TimetableSnapshot {
     
     /**
      * Get the last <b>added</b> trip pattern given a trip id (without agency) and a service date as
-     * a result of a call to {@link #update(String feedId, TripPattern, TripTimes, ServiceDate)} with trip times of
+     * a result of a call to {@link #update(TripPattern, TripTimes, ServiceDate)} with trip times of
      * a trip that didn't exist yet in the trip pattern.
      * TODO clarify what it means to say "last" added trip pattern. There can be more than one? What happens to the older ones?
      *
-     * @param feedId feed id the trip id belongs to
-     * @param tripId trip id (without agency)
+     * @param tripId trip id
      * @param serviceDate service date
      * @return last added trip pattern; null if trip never was added to a trip pattern
      */
-    public TripPattern getLastAddedTripPattern(String feedId, String tripId, ServiceDate serviceDate) {
-        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
+    public TripPattern getLastAddedTripPattern(FeedScopedId tripId, ServiceDate serviceDate) {
+        TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
         TripPattern pattern = lastAddedTripPattern.get(tripIdAndServiceDate);
         return pattern;
     }
@@ -181,7 +185,7 @@ public class TimetableSnapshot {
      * @param serviceDate service day for which this update is valid
      * @return whether or not the update was actually applied
      */
-    public boolean update(String feedId, TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
+    public boolean update(TripPattern pattern, TripTimes updatedTripTimes, ServiceDate serviceDate) {
         // Preconditions
         Preconditions.checkNotNull(pattern);
         Preconditions.checkNotNull(serviceDate);
@@ -198,10 +202,10 @@ public class TimetableSnapshot {
             tt = new Timetable(tt, serviceDate);
             SortedSet<Timetable> sortedTimetables = timetables.get(pattern);
             if(sortedTimetables == null) {
-                sortedTimetables = new TreeSet<Timetable>(new SortedTimetableComparator());
+                sortedTimetables = new TreeSet<>(new SortedTimetableComparator());
             } else {
                 SortedSet<Timetable> temp =
-                        new TreeSet<Timetable>(new SortedTimetableComparator());
+                    new TreeSet<>(new SortedTimetableComparator());
                 temp.addAll(sortedTimetables);
                 sortedTimetables = temp;
             }
@@ -220,13 +224,16 @@ public class TimetableSnapshot {
             // Trip not found, add it
             tt.addTripTimes(updatedTripTimes);
             // Remember this pattern for the added trip id and service date
-            String tripId = updatedTripTimes.trip.getId().getId();
-            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(feedId, tripId, serviceDate);
+            FeedScopedId tripId = updatedTripTimes.trip.getId();
+            TripIdAndServiceDate tripIdAndServiceDate = new TripIdAndServiceDate(tripId, serviceDate);
             lastAddedTripPattern.put(tripIdAndServiceDate, pattern);
         } else {
             // Set updated trip times of trip
             tt.setTripTimes(tripIndex, updatedTripTimes);
         }
+
+        // To make these trip patterns visible for departureRow searches.
+        addPatternToIndex(pattern);
         
         // The time tables are finished during the commit
         
@@ -244,11 +251,11 @@ public class TimetableSnapshot {
      * @return an immutable copy of this TimetableSnapshot with all updates applied
      */
     public TimetableSnapshot commit() {
-        return commit(false);
+        return commit(null, false);
     }
 
     @SuppressWarnings("unchecked")
-    public TimetableSnapshot commit(boolean force) {
+    public TimetableSnapshot commit(TransitLayerUpdater transitLayerUpdater, boolean force) {
         if (readOnly) {
             throw new ConcurrentModificationException("This TimetableSnapshot is read-only.");
         }
@@ -261,8 +268,15 @@ public class TimetableSnapshot {
         ret.timetables = (HashMap<TripPattern, SortedSet<Timetable>>) this.timetables.clone();
         ret.lastAddedTripPattern = (HashMap<TripIdAndServiceDate, TripPattern>)
                 this.lastAddedTripPattern.clone();
+
+        if (transitLayerUpdater != null) {
+            transitLayerUpdater.update(dirtyTimetables);
+        }
+
         this.dirtyTimetables.clear();
         this.dirty = false;
+
+        ret.setPatternsForStop(HashMultimap.create(this.patternsForStop));
 
         ret.readOnly = true; // mark the snapshot as henceforth immutable
         return ret;
@@ -304,7 +318,10 @@ public class TimetableSnapshot {
      * @return true if the lastAddedTripPattern changed as a result of the call
      */
     protected boolean clearLastAddedTripPattern(String feedId) {
-        return lastAddedTripPattern.keySet().removeIf(lastAddedTripPattern -> feedId.equals(lastAddedTripPattern.getFeedId()));
+        return lastAddedTripPattern.keySet().removeIf(
+            lastAddedTripPattern ->
+                feedId.equals(lastAddedTripPattern.getTripId().getFeedId())
+        );
     }
 
     /**
@@ -368,4 +385,17 @@ public class TimetableSnapshot {
         return timetables.keySet();
     }
 
+    private void addPatternToIndex(TripPattern tripPattern) {
+        for (Stop stop: tripPattern.getStops()) {
+            patternsForStop.put(stop, tripPattern);
+        }
+    }
+
+    public Collection<TripPattern> getPatternsForStop(Stop stop) {
+        return patternsForStop.get(stop);
+    }
+
+    public void setPatternsForStop(Multimap<Stop, TripPattern> patternsForStop) {
+        this.patternsForStop = patternsForStop;
+    }
 }

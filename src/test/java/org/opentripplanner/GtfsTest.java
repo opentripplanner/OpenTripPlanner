@@ -5,22 +5,23 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
 import org.opentripplanner.api.common.LocationStringParser;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
+import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
@@ -56,17 +57,19 @@ public abstract class GtfsTest extends TestCase {
         feedId = new GtfsFeedId.Builder().id("FEED").build();
         gtfsBundle.setFeedId(feedId);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
-        GtfsModule gtfsGraphBuilderImpl = new GtfsModule(gtfsBundleList);
-
+        GtfsModule gtfsGraphBuilderImpl = new GtfsModule(
+                gtfsBundleList,
+                ServiceDateInterval.unbounded()
+        );
 
         alertsUpdateHandler = new AlertsUpdateHandler();
         graph = new Graph();
-        router = new Router(graph);
+        router = new Router(graph, RouterConfig.DEFAULT);
 
         gtfsBundle.setTransfersTxtDefinesStationPaths(true);
         gtfsGraphBuilderImpl.buildGraph(graph, null);
         // Set the agency ID to be used for tests to the first one in the feed.
-        agencyId = graph.getAgencies(feedId.getId()).iterator().next().getId();
+        agencyId = graph.getAgencies().iterator().next().getId().getId();
         System.out.printf("Set the agency ID for this test to %s\n", agencyId);
         graph.index();
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
@@ -117,8 +120,8 @@ public abstract class GtfsTest extends TestCase {
         }
         routingRequest.setRoutingContext(graph);
         routingRequest.setWheelchairAccessible(wheelchairAccessible);
-        routingRequest.transferPenalty = (preferLeastTransfers ? 300 : 0);
-        routingRequest.setModes(new TraverseModeSet(TraverseMode.WALK, mode));
+        routingRequest.transferCost = (preferLeastTransfers ? 300 : 0);
+        routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
             routingRequest.setBannedRoutes(feedId.getId() + "__" + excludedRoute);
@@ -135,17 +138,25 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
-        TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
+        List<Itinerary> itineraries = GraphPathToItineraryMapper.mapItineraries(
+                paths, routingRequest
+        );
         // Stored in instance field for use in individual tests
-        itinerary = tripPlan.itinerary.get(0);
+        itinerary = itineraries.get(0);
 
         assertEquals(legCount, itinerary.legs.size());
 
         return itinerary.legs.toArray(new Leg[legCount]);
     }
 
-    public void validateLeg(Leg leg, long startTime, long endTime, String toStopId, String fromStopId,
-                     String alert) {
+    public void validateLeg(
+            Leg leg,
+            long startTime,
+            long endTime,
+            String toStopId,
+            String fromStopId,
+            String alert
+    ) {
         assertEquals(startTime, leg.startTime.getTimeInMillis());
         assertEquals(endTime, leg.endTime.getTimeInMillis());
         assertEquals(toStopId, leg.to.stopId.getId());
@@ -159,7 +170,7 @@ public abstract class GtfsTest extends TestCase {
         if (alert != null) {
             assertNotNull(leg.alerts);
             assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.get(0).getAlertHeaderText());
+            assertEquals(alert, leg.alerts.iterator().next().alertHeaderText.toString());
         } else {
             assertNull(leg.alerts);
         }

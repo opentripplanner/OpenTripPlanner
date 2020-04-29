@@ -5,7 +5,7 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.common.geometry.Subgraph;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.GraphConnectivity;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -14,6 +14,7 @@ import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.TransitEntranceLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -63,8 +64,10 @@ public class StreetUtils {
             State s0 = new State(gv, options);
             for (Edge e : gv.getOutgoing()) {
                 Vertex in = gv;
-                if (!(e instanceof StreetEdge || e instanceof StreetTransitLink || 
-                      e instanceof ElevatorEdge || e instanceof FreeEdge)) {
+                if (!(e instanceof StreetEdge || e instanceof StreetTransitLink ||
+                    e instanceof TransitEntranceLink || e instanceof ElevatorEdge ||
+                    e instanceof FreeEdge)
+                ) {
                     continue;
                 }
                 State s1 = e.traverse(s0);
@@ -173,7 +176,7 @@ public class StreetUtils {
             Collection<Edge> edges = new ArrayList<Edge>(v.getOutgoing());
             edges.addAll(v.getIncoming());
             for (Edge e : edges) {
-                if (e instanceof StreetTransitLink) {
+                if (e instanceof StreetTransitLink || e instanceof TransitEntranceLink) {
                     graph.removeEdge(e);
                 }
             }

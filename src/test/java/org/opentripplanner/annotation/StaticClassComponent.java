@@ -31,6 +31,16 @@ public abstract class StaticClassComponent implements GraphUpdater {
     }
 
     @Override
+    public boolean isPrimed() {
+      return false;
+    }
+
+    @Override
+    public String getName() {
+      return getClass().getName();
+    }
+
+    @Override
     public void configure(Graph graph, JsonNode jsonNode) throws Exception {
 
     }

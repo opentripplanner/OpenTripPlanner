@@ -2,12 +2,16 @@ package org.opentripplanner.standalone;
 
 import com.beust.jcommander.JCommander;
 import com.beust.jcommander.ParameterException;
-import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.GraphLoader;
-import org.opentripplanner.standalone.config.GraphConfig;
+import org.opentripplanner.routing.graph.SerializedGraphObject;
+import org.opentripplanner.standalone.config.CommandLineParameters;
+import org.opentripplanner.standalone.configure.OTPAppConstruction;
+import org.opentripplanner.standalone.server.GrizzlyServer;
+import org.opentripplanner.standalone.server.Router;
+import org.opentripplanner.util.OtpAppException;
 import org.opentripplanner.util.ThrowableUtils;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.Logger;
@@ -28,9 +32,17 @@ public class OTPMain {
      * ENTRY POINT: This is the main method that is called when running otp.jar from the command line.
      */
     public static void main(String[] args) {
-        CommandLineParameters params = parseAndValidateCmdLine(args);
-
-        if (!startOTPServer(params)) {
+        try {
+            OtpStartupInfo.logInfo();
+            CommandLineParameters params = parseAndValidateCmdLine(args);
+            startOTPServer(params);
+        }
+        catch (OtpAppException ae) {
+            LOG.error(ae.getMessage());
+            System.exit(100);
+        }
+        catch (Exception e) {
+            LOG.error("An uncaught error occurred inside OTP: {}", e.getLocalizedMessage(), e);
             System.exit(-1);
         }
     }
@@ -62,10 +74,6 @@ public class OTPMain {
             LOG.error("Parameter error: {}", pex.getMessage());
             System.exit(1);
         }
-        if ( ! (params.build || params.load || params.serve)) {
-            LOG.info("Nothing to do. Use --help to see available options.");
-            System.exit(-1);
-        }
         return params;
     }
 
@@ -74,68 +82,82 @@ public class OTPMain {
      * from web services or scripts, not just from the command line. If options cause an OTP API server to start up,
      * this method will return when the web server shuts down.
      *
-     * @return true if the OTPServer starts successfully; false if an error occurs while loading the graph.
+     * @throws RuntimeException if an error occurs while loading the graph.
      */
-    private static boolean startOTPServer(CommandLineParameters params) {
-        OTPAppConstruction appConstruction = new OTPAppConstruction(params);
-        Router router = null;
+    private static void startOTPServer(CommandLineParameters params) {
+        LOG.info("Searching for configuration and input files in {}", params.getBaseDirectory());
 
-        /* Start graph builder if requested. */
-        if (params.build) {
-            GraphBuilder graphBuilder = appConstruction.createDefaultGraphBuilder();
-            if (graphBuilder != null) {
-                graphBuilder.run();
-                /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
-                if (params.inMemory) {
-                    Graph graph = graphBuilder.getGraph();
-                    graph.index();
-                    // FIXME: This router config retrieval is too complex.
-                    router = new Router(graph);
-                    router.startup(appConstruction.configuration().getGraphConfig(params.getGraphDirectory()).routerConfig());
-                } else {
-                    LOG.info("Done building graph. Exiting.");
-                    return true;
-                }
-            } else {
-                LOG.error("An error occurred while building the graph.");
-                return false;
-            }
-        }
+        Graph graph = null;
+        OTPAppConstruction app = new OTPAppConstruction(params);
+
+        // Validate data sources, command line arguments and config before loading and
+        // processing input data to fail early
+        app.validateConfigAndDataSources();
 
         /* Load graph from disk if one is not present from build. */
-        GraphService service = null;
-        if (params.load) {
-            GraphConfig graphConfig = appConstruction.configuration().getGraphConfig(params.getGraphDirectory());
-            ComponentAnnotationConfigurator.getInstance().fromConfig(graphConfig.builderConfig());
-            service= new GraphService(graphConfig,params.autoReload);
-            router = service.load();
+        if (params.doLoadGraph() || params.doLoadStreetGraph()) {
+            DataSource inputGraph = params.doLoadGraph()
+                    ? app.store().getGraph()
+                    : app.store().getStreetGraph();
+            SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
+            graph = obj.graph;
+            app.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
         }
 
-        /* Bail out if we have no router to work with. */
-        if (router == null) {
-            LOG.error("No router available for server or visualizer. Exiting.");
-            return false;
+        /* Start graph builder if requested. */
+        if (params.doBuildStreet() || params.doBuildTransit()) {
+            // Abort building a graph if the file can not be saved
+            SerializedGraphObject.verifyTheOutputGraphIsWritableIfDataSourceExist(
+                    app.graphOutputDataSource()
+            );
+
+            GraphBuilder graphBuilder = app.createGraphBuilder(graph);
+            if (graphBuilder != null) {
+                graphBuilder.run();
+                // Hand off the graph to the server as the default graph
+                graph = graphBuilder.getGraph();
+            } else {
+                throw new IllegalStateException("An error occurred while building the graph.");
+            }
+            // Store graph and config used to build it, also store router-config for easy deployment
+            // with using the embedded router config.
+            new SerializedGraphObject(graph, app.config().buildConfig(), app.config().routerConfig())
+                    .save(app.graphOutputDataSource());
         }
+
+        if(graph == null) {
+            LOG.error("Nothing to do, no graph loaded or build. Exiting.");
+            System.exit(101);
+        }
+
+        if(!params.doServe()) {
+            LOG.info("Done building graph. Exiting.");
+            return;
+        }
+
+        // Index graph for travel search
+        graph.index();
+
+        Router router = new Router(graph, app.config().routerConfig());
+        router.startup();
 
         /* Start visualizer if requested. */
         if (params.visualize) {
             router.graphVisualizer = new GraphVisualizer(router);
             router.graphVisualizer.run();
-            router.timeouts = new double[] {60}; // avoid timeouts due to search animation
         }
 
         /* Start web server if requested. */
         // We could start the server first so it can report build/load progress to a load balancer.
         // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
         // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
-        if (params.serve) {
-            appConstruction.setGraphService(service);
-            GrizzlyServer grizzlyServer = appConstruction.createGrizzlyServer();
+        if (params.doServe()) {
+            GrizzlyServer grizzlyServer = app.createGrizzlyServer(router);
             // Loop to restart server on uncaught fatal exceptions.
             while (true) {
                 try {
                     grizzlyServer.run();
-                    return true;
+                    return;
                 } catch (Throwable throwable) {
                     LOG.error(
                         "An uncaught error occurred inside OTP. Restarting server. Error was: {}",
@@ -144,7 +166,5 @@ public class OTPMain {
                 }
             }
         }
-        return true;
     }
-
 }

@@ -1,10 +1,13 @@
 package org.opentripplanner.netex.configure;
 
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.netex.NetexModule;
 import org.opentripplanner.netex.loader.NetexBundle;
-import org.opentripplanner.netex.loader.NetexZipFileHierarchy;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.NetexParameters;
+import org.opentripplanner.netex.loader.NetexDataSourceHierarchy;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -18,58 +21,61 @@ import java.util.List;
  * <p>
  * This class inject the build configuration. This way none of the other
  * classes in the `org.opentripplanner.netex` have dependencies to the
- * {@link GraphBuilderParameters}.
+ * {@link BuildConfig}.
  * <p>
  * The naming convention used is close to the defacto standard used by Spring.
  */
 public class NetexConfig {
 
-    private final GraphBuilderParameters builderParams;
+    private final BuildConfig buildParams;
 
-    private NetexConfig(GraphBuilderParameters builderParams) {
-        this.builderParams = builderParams;
-    }
-
-    public static NetexModule netexModule(GraphBuilderParameters builderParams, List<File> netexFiles) {
-        return new NetexConfig(builderParams).netexModule(netexFiles);
-    }
-
-    public static NetexBundle netexBundleForTest(GraphBuilderParameters builderParams, File netexZipFile) {
-        return new NetexConfig(builderParams).netexBundle(netexZipFile);
+    private NetexConfig(BuildConfig builderParams) {
+        this.buildParams = builderParams;
     }
 
 
-    private NetexModule netexModule(List<File> netexFiles) {
+    public static NetexModule netexModule(
+            BuildConfig buildParams,
+            Iterable<DataSource> netexSources
+    ) {
+        return new NetexConfig(buildParams).netexModule(netexSources);
+    }
+
+    public static NetexBundle netexBundleForTest(BuildConfig builderParams, File netexZipFile) {
+        return new NetexConfig(builderParams).netexBundle(new ZipFileDataSource(netexZipFile, FileType.NETEX));
+    }
+
+    private NetexModule netexModule(Iterable<DataSource> netexSources) {
         List<NetexBundle> netexBundles = new ArrayList<>();
 
-        for(File netexFile : netexFiles){
-            NetexBundle netexBundle = netexBundle(netexFile);
+        for(DataSource it : netexSources){
+            NetexBundle netexBundle = netexBundle((CompositeDataSource)it);
             netexBundles.add(netexBundle);
         }
 
         return new NetexModule(
-                builderParams.netex.netexFeedId,
-                builderParams.parentStopLinking,
-                builderParams.stationTransfers,
-                (int)(builderParams.subwayAccessTime * 60),
-                builderParams.maxInterlineDistance,
+                buildParams.netex.netexFeedId,
+                buildParams.parentStopLinking,
+                buildParams.stationTransfers,
+                buildParams.getSubwayAccessTimeSeconds(),
+                buildParams.maxInterlineDistance,
+                buildParams.getTransitServicePeriod(),
                 netexBundles
         );
     }
 
     /** public to enable testing */
-    private NetexBundle netexBundle(File netexFile) {
-        return new NetexBundle(builderParams.netex.netexFeedId, fileHierarchy(netexFile));
+    private NetexBundle netexBundle(CompositeDataSource source) {
+        return new NetexBundle(buildParams.netex.netexFeedId, source, hierarchy(source));
     }
 
-    private NetexZipFileHierarchy fileHierarchy(File netexFile){
-        NetexParameters c = builderParams.netex;
-        return new NetexZipFileHierarchy(
+    private NetexDataSourceHierarchy hierarchy(CompositeDataSource source){
+        org.opentripplanner.standalone.config.NetexConfig c = buildParams.netex;
+        return new NetexDataSourceHierarchy(source).prepare(
                 c.ignoreFilePattern,
                 c.sharedFilePattern,
                 c.sharedGroupFilePattern,
-                c.groupFilePattern,
-                netexFile
+                c.groupFilePattern
         );
     }
 }

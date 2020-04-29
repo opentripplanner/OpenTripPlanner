@@ -1,9 +1,9 @@
 package org.opentripplanner.routing.algorithm.raptor.transit.request;
 
-import com.conveyal.r5.otp2.api.transit.TransferLeg;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 
-public class TransferWithDuration implements TransferLeg {
+public class TransferWithDuration implements RaptorTransfer {
 
     private final int durationSeconds;
 

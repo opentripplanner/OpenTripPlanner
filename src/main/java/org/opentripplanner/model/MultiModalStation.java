@@ -21,9 +21,7 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
 
     private String name;
 
-    private double lat;
-
-    private double lon;
+    private WgsCoordinate coordinate;
 
     private String code;
 
@@ -53,19 +51,15 @@ public class MultiModalStation extends TransitEntity<FeedScopedId> implements St
     }
 
     public double getLat() {
-        return lat;
-    }
-
-    public void setLat(double lat) {
-        this.lat = lat;
+        return coordinate.latitude();
     }
 
     public double getLon() {
-        return lon;
+        return coordinate.longitude();
     }
 
-    public void setLon(double lon) {
-        this.lon = lon;
+    public void setCoordinate(WgsCoordinate coordinate) {
+        this.coordinate = coordinate;
     }
 
     /**

@@ -1,12 +1,11 @@
 package org.opentripplanner.geocoder.reverse;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
 import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
 import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
 
 /*import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;*/
@@ -32,14 +31,14 @@ public class MunicoderServer {
     }
 
     @GET
-    @Produces({MediaType.APPLICATION_JSON}) // APPLICATION_XML + "; charset=UTF-8", MediaType.APPLICATION_JSON + "; charset=UTF-8"})
+    @Produces(MediaType.APPLICATION_JSON)
     public String resolveLocation(
             @QueryParam("location") String location,
             @QueryParam("callback") String callback) {
         if (location == null) {
-            error("no location to resolve");
+            throw new BadRequestException("no 'location' to resolve");
         }
-        String arr[] = location.split(",");
+        String[] arr = location.split(",");
         //System.out.println("br="+boundaryResolver);
         //return arr[0];
         String result = boundaryResolver.resolve(Double.parseDouble(arr[1]), Double.parseDouble(arr[0]));
@@ -48,12 +47,5 @@ public class MunicoderServer {
             return callback+"("+result+");";
         }
         return result;
-    }
-
-    private void error(String message) {
-        throw new WebApplicationException(Response.status(400)
-                .entity(message)
-                .type("text/plain")
-                .build());
     }
 }

@@ -6,6 +6,7 @@ import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
@@ -110,7 +111,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         }
         this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
         if (config.path("fuzzyTripMatching").asBoolean(true)) {
-            this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+            this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         }
 
         blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
@@ -138,7 +139,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
             snapshotSource.purgeExpiredData = purgeExpiredData;
         }
         if (siriFuzzyTripMatcher != null) {
-            siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+            siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         }
     }
 

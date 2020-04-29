@@ -5,7 +5,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -82,11 +82,6 @@ public class StreetTransitLink extends Edge {
             return null;
         }
 
-        // Do not re-enter the street network following a transfer.
-        if (s0.backEdge instanceof SimpleTransfer) {
-            return null;
-        }
-
         RoutingRequest req = s0.getOptions();
         if (s0.getOptions().wheelchairAccessible && !wheelchairAccessible) {
             return null;
@@ -115,8 +110,10 @@ public class StreetTransitLink extends Edge {
                 return null;
             }
         }
-        s1.incrementTimeInSeconds(stopVertex.getStreetToStopTime() + STL_TRAVERSE_COST);
-        s1.incrementWeight(STL_TRAVERSE_COST + stopVertex.getStreetToStopTime());
+
+        int streetToStopTime = stopVertex.hasPathways() ? 0 : stopVertex.getStreetToStopTime();
+        s1.incrementTimeInSeconds(streetToStopTime + STL_TRAVERSE_COST);
+        s1.incrementWeight(STL_TRAVERSE_COST + streetToStopTime);
         s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }

@@ -12,7 +12,6 @@ public class FareRuleSet implements Serializable {
 
     private static final long serialVersionUID = 7218355718876553028L;
 
-    private String agency = null;
     private Set<FeedScopedId> routes;
     private Set<P2<String>> originDestinations;
     private Set<String> contains;
@@ -25,15 +24,6 @@ public class FareRuleSet implements Serializable {
         originDestinations= new HashSet<P2<String>>();
         contains = new HashSet<String>();
         trips = new HashSet<FeedScopedId>();
-    }
-
-    public void setAgency(String agency) {
-        // TODO With new GTFS lib, read value from fareAttribute directly?
-        this.agency = agency;
-    }
-    
-    public String getAgency() {
-    	return agency;
     }
 
     public void addOriginDestination(String origin, String destination) {
@@ -60,10 +50,6 @@ public class FareRuleSet implements Serializable {
         return fareAttribute;
     }
 
-    public boolean hasAgencyDefined() {
-        return agency != null;
-    }
-
     public void addTrip(FeedScopedId trip) {
     	trips.add(trip);
     }
@@ -72,14 +58,8 @@ public class FareRuleSet implements Serializable {
     	return trips;
     }
     
-    public boolean matches(Set<String> agencies, String startZone, String endZone, Set<String> zonesVisited,
+    public boolean matches(String startZone, String endZone, Set<String> zonesVisited,
                            Set<FeedScopedId> routesVisited, Set<FeedScopedId> tripsVisited) {
-        //check for matching agency
-        if (agency != null) {
-            if (agencies.size() != 1 || !agencies.contains(agency))
-                return false;
-        }
-
         //check for matching origin/destination, if this ruleset has any origin/destination restrictions
         if (originDestinations.size() > 0) {
             P2<String> od = new P2<String>(startZone, endZone);

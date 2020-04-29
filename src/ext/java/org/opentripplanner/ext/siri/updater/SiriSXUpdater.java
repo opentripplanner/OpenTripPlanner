@@ -7,6 +7,7 @@ import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -19,6 +20,8 @@ import uk.org.siri.siri20.Siri;
 
 import java.io.InputStream;
 import java.time.ZonedDateTime;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 @Component(key = "siri-sx-updater",type = ServiceType.GraphUpdater)
@@ -45,6 +48,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private int timeout;
 
+    private static Map<String, String> requestHeaders = new HashMap<>();
+
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -54,7 +59,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) throws Exception {
         if (updateHandler == null) {
-            updateHandler = new SiriAlertsUpdateHandler();
+            updateHandler = new SiriAlertsUpdateHandler(feedId);
         }
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setAlertPatchService(alertPatchService);
@@ -89,7 +94,9 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
         blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
 
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(graph.index);
+        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+
+        requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 
         LOG.info("Creating real-time alert updater (SIRI SX) running every {} seconds : {}", pollingPeriodSeconds, url);
     }
@@ -125,7 +132,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
             creating = System.currentTimeMillis()-t1;
             t1 = System.currentTimeMillis();
 
-            InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout);
+            InputStream is = SiriHttpUtils.postData(url, sxServiceRequest, timeout, requestHeaders);
 
             fetching = System.currentTimeMillis()-t1;
             t1 = System.currentTimeMillis();

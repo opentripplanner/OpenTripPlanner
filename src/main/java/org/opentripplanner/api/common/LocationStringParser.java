@@ -1,6 +1,6 @@
 package org.opentripplanner.api.common;
 
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.FeedScopedId;
 
 import java.util.regex.Matcher;
@@ -71,7 +71,7 @@ public class LocationStringParser {
                 lat = Double.parseDouble(matcher.group(1));
                 lon = Double.parseDouble(matcher.group(4));
             } else if (FeedScopedId.isValidString(place)) {
-                placeId = FeedScopedId.convertFromString(place);
+                placeId = FeedScopedId.parseId(place);
             }
             return new GenericLocation(label, placeId, lat, lon);
         }

@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.graph;
 
-import com.esotericsoftware.kryo.Kryo;
-import com.esotericsoftware.kryo.io.Input;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.BiMap;
 import com.google.common.collect.HashBiMap;
@@ -14,7 +12,6 @@ import com.google.common.collect.Multimap;
 import gnu.trove.list.TDoubleList;
 import gnu.trove.list.linked.TDoubleLinkedList;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
-import org.joda.time.DateTime;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -22,11 +19,12 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GraphBundle;
@@ -34,26 +32,33 @@ import org.opentripplanner.model.GroupOfStations;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.WgsCoordinate;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.routing.util.ConcurrentPublished;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -61,13 +66,12 @@ import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
+import java.util.BitSet;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Date;
@@ -82,6 +86,8 @@ import java.util.TimeZone;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Function;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -103,8 +109,9 @@ public class Graph implements Serializable {
     public final StreetNotesService streetNotesService = new StreetNotesService();
 
     /**
-     * Allows a notice element to be attached to an object in the OTP model by its id and then retrieved
-     * by the API when navigating from that object. The map key is entity id: {@link TransitEntity#getId()}.
+     * Allows a notice element to be attached to an object in the OTP model by its id and then
+     * retrieved by the API when navigating from that object. The map key is entity id:
+     * {@link TransitEntity#getId()}. The notice is part of the static transit data.
      */
     private final Multimap<TransitEntity<?>, Notice> noticesByElement = HashMultimap.create();
 
@@ -113,7 +120,7 @@ public class Graph implements Serializable {
 
     private long transitServiceEnds = 0;
 
-    private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
+    private Map<Class<?>, Serializable> services = new HashMap<>();
 
     private TransferTable transferTable = new TransferTable();
 
@@ -134,11 +141,11 @@ public class Graph implements Serializable {
      * Map from GTFS ServiceIds to integers close to 0. Allows using BitSets instead of {@code Set<Object>}.
      * An empty Map is created before the Graph is built to allow registering IDs from multiple feeds.   
      */
-    public final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
+    private final Map<FeedScopedId, Integer> serviceCodes = Maps.newHashMap();
 
     private transient TimetableSnapshotProvider timetableSnapshotProvider = null;
 
-    private Map<String, Collection<Agency>> agenciesForFeedId = new HashMap<>();
+    private Collection<Agency> agencies = new ArrayList<>();
 
     private Collection<Operator> operators = new ArrayList<>();
 
@@ -157,20 +164,11 @@ public class Graph implements Serializable {
     /** The density center of the graph for determining the initial geographic extent in the client. */
     private Coordinate center = null;
 
-    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
-    public String builderConfig = null;
-
-    /** Embed a router configuration inside the graph, for starting up with a single file. */
-    public String routerConfig = null;
-
     /* The preferences that were used for graph building. */
     public Preferences preferences = null;
 
-    /* The time at which the graph was built, for detecting changed inputs and triggering a rebuild. */
-    public DateTime buildTimeJoda = null; // FIXME record this info, null is just a placeholder
-
     /** List of transit modes that are availible in GTFS data used in this graph**/
-    private HashSet<TraverseMode> transitModes = new HashSet<TraverseMode>();
+    private HashSet<TransitMode> transitModes = new HashSet<>();
 
     public boolean hasBikeSharing = false;
 
@@ -209,18 +207,6 @@ public class Graph implements Serializable {
     public boolean hasScheduledService = false;
 
     /**
-     * Has information how much time boarding a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> boardTimes = Collections.EMPTY_MAP;
-
-    /**
-     * Has information how much time alighting a vehicle takes. Can be significant
-     * eg in airplanes or ferries.
-     */
-    public Map<TraverseMode, Integer> alightTimes = Collections.EMPTY_MAP;
-
-    /**
      * The difference in meters between the WGS84 ellipsoid height and geoid height
      * at the graph's center
      */
@@ -244,19 +230,25 @@ public class Graph implements Serializable {
      * TripPatterns used to be reached through hop edges, but we're not creating on-board transit
      * vertices/edges anymore.
      */
-    public Map<String, TripPattern> tripPatternForId = Maps.newHashMap();
+    public Map<FeedScopedId, TripPattern> tripPatternForId = Maps.newHashMap();
 
     /** Interlining relationships between trips. */
     public final BiMap<Trip,Trip> interlinedTrips = HashBiMap.create();
+
+    /** Pre-generated transfers between all stops. */
+    public final Multimap<Stop, SimpleTransfer> transfersByStop = HashMultimap.create();
 
     /** The distance between elevation samples used in CompactElevationProfile. */
     private double distanceBetweenElevationSamples;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer transitLayer;
+    private transient TransitLayer transitLayer;
 
     /** Data model for Raptor routing, with realtime updates applied (if any). */
-    public transient TransitLayer realtimeTransitLayer;
+    private transient ConcurrentPublished<TransitLayer> realtimeTransitLayer =
+        new ConcurrentPublished<>();
+
+    public transient TransitLayerUpdater transitLayerUpdater;
 
     private transient AlertPatchService alertPatchService;
 
@@ -276,9 +268,7 @@ public class Graph implements Serializable {
     }
 
     // Constructor for deserialization.
-    public Graph() {
-
-    }
+    public Graph() { }
 
     public TimetableSnapshot getTimetableSnapshot() {
         return timetableSnapshotProvider == null ? null : timetableSnapshotProvider.getTimetableSnapshot();
@@ -502,38 +492,60 @@ public class Graph implements Serializable {
     public Collection<StreetEdge> getStreetEdges() {
         Collection<Edge> allEdges = this.getEdges();
         return Lists.newArrayList(Iterables.filter(allEdges, StreetEdge.class));
-    }    
-    
+    }
+
+    public TransitLayer getTransitLayer() {
+        return transitLayer;
+    }
+
+    public void setTransitLayer(
+        TransitLayer transitLayer
+    ) {
+        this.transitLayer = transitLayer;
+    }
+
+    public TransitLayer getRealtimeTransitLayer() {
+        return realtimeTransitLayer.get();
+    }
+
+    public boolean hasRealtimeTransitLayer() {
+        return realtimeTransitLayer != null;
+    }
+
+    public void setRealtimeTransitLayer(
+        TransitLayer realtimeTransitLayer
+    ) {
+        this.realtimeTransitLayer.publish(realtimeTransitLayer);
+    }
+
     public boolean containsVertex(Vertex v) {
         return (v != null) && vertices.get(v.getLabel()) == v;
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T putService(Class<T> serviceType, T service) {
-        return (T) _services.put(serviceType, service);
+    public <T extends Serializable> T putService(Class<T> serviceType, T service) {
+        return (T) services.put(serviceType, service);
     }
 
-    public boolean hasService(Class<?> serviceType) {
-        return _services.containsKey(serviceType);
+    public boolean hasService(Class<? extends Serializable> serviceType) {
+        return services.containsKey(serviceType);
     }
 
     @SuppressWarnings("unchecked")
-    public <T> T getService(Class<T> serviceType) {
-        return (T) _services.get(serviceType);
+    public <T extends Serializable> T getService(Class<T> serviceType) {
+        return (T) services.get(serviceType);
     }
 
-    public <T> T getService(Class<T> serviceType, boolean autoCreate) {
-        @SuppressWarnings("unchecked")
-        T t = (T) _services.get(serviceType);
+    public <T extends Serializable> T getService(Class<T> serviceType, boolean autoCreate) {
+        T t = (T)services.get(serviceType);
         if (t == null && autoCreate) {
             try {
-                t = (T)serviceType.newInstance();
-            } catch (InstantiationException e) {
-                throw new RuntimeException(e);
-            } catch (IllegalAccessException e) {
+                t = serviceType.getDeclaredConstructor().newInstance();
+            }
+            catch (IllegalAccessException | InvocationTargetException | NoSuchMethodException | InstantiationException e) {
                 throw new RuntimeException(e);
             }
-            _services.put(serviceType, t);
+            services.put(serviceType, t);
         }
         return t;
     }
@@ -644,19 +656,12 @@ public class Graph implements Serializable {
      * Adds mode of transport to transit modes in graph
      * @param mode
      */
-    public void addTransitMode(TraverseMode mode) {
+    public void addTransitMode(TransitMode mode) {
         transitModes.add(mode);
     }
 
-    public HashSet<TraverseMode> getTransitModes() {
+    public HashSet<TransitMode> getTransitModes() {
         return transitModes;
-    }
-
-    /* (de) serialization */
-
-    public static Graph load(File file) throws IOException {
-        LOG.info("Reading graph " + file.getAbsolutePath() + " ...");
-        return load(new FileInputStream(file));
     }
 
     /**
@@ -667,8 +672,8 @@ public class Graph implements Serializable {
      * TODO: do we really need a factory for different street vertex indexes?
      */
     public void index () {
+        LOG.info("Index graph...");
         streetIndex = new StreetVertexIndex(this);
-        LOG.debug("street index built.");
         LOG.debug("Rebuilding edge and vertex indices.");
         for (TripPattern tp : tripPatternForId.values()) {
             // Skip frequency-based patterns which have no timetable (null)
@@ -676,24 +681,9 @@ public class Graph implements Serializable {
         }
         // TODO: Move this ^ stuff into the graph index
         this.index = new GraphIndex(this);
+        LOG.info("Index graph complete.");
     }
     
-    public static Graph load(InputStream in) {
-        // TODO store version information, halt load if versions mismatch
-        Input input = new Input(in);
-        Kryo kryo = SerializedGraphObject.makeKryo();
-        SerializedGraphObject serializedGraphObject = (SerializedGraphObject) kryo.readClassAndObject(input);
-        Graph graph = serializedGraphObject.graph;
-        LOG.debug("Graph read.");
-        if (graph.graphVersionMismatch()) {
-            throw new RuntimeException("Graph version mismatch detected.");
-        }
-        serializedGraphObject.reconstructEdgeLists();
-        LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
-        graph.index();
-        return graph;
-    }
-
     /**
      * Compares the OTP version number stored in the graph with that of the currently running instance. Logs warnings explaining that mismatched
      * versions can cause problems.
@@ -701,7 +691,7 @@ public class Graph implements Serializable {
      * @return false if Maven versions match (even if commit ids do not match), true if Maven version of graph does not match this version of OTP or
      *         graphs are otherwise obviously incompatible.
      */
-    private boolean graphVersionMismatch() {
+    boolean graphVersionMismatch() {
         MavenVersion v = MavenVersion.VERSION;
         MavenVersion gv = this.mavenVersion;
         LOG.info("Graph version: {}", gv);
@@ -725,12 +715,6 @@ public class Graph implements Serializable {
             LOG.info("This graph was built with the currently running version and commit of OTP.");
             return false;
         }
-    }
-
-    public void save(File file) throws IOException {
-        LOG.info("Main graph size: |V|={} |E|={}", this.countVertices(), this.countEdges());
-        LOG.info("Writing graph " + file.getAbsolutePath() + " ...");
-        new SerializedGraphObject(this).save(file);
     }
 
     public CalendarService getCalendarService() {
@@ -762,8 +746,8 @@ public class Graph implements Serializable {
         return feedIds;
     }
 
-    public Collection<Agency> getAgencies(String feedId) {
-        return agenciesForFeedId.get(feedId);
+    public Collection<Agency> getAgencies() {
+        return agencies;
     }
 
     public FeedInfo getFeedInfo(String feedId) {
@@ -771,9 +755,7 @@ public class Graph implements Serializable {
     }
 
     public void addAgency(String feedId, Agency agency) {
-        Collection<Agency> agencies = agenciesForFeedId.getOrDefault(feedId, new HashSet<>());
         agencies.add(agency);
-        this.agenciesForFeedId.put(feedId, agencies);
         this.feedIds.add(feedId);
     }
 
@@ -789,10 +771,6 @@ public class Graph implements Serializable {
      */
     public TimeZone getTimeZone() {
         if (timeZone == null) {
-            Collection<Agency> agencies = null;
-            if (agenciesForFeedId.entrySet().size() > 0) {
-                agencies = agenciesForFeedId.entrySet().iterator().next().getValue();
-            }
             if (agencies == null || agencies.size() == 0) {
                 timeZone = TimeZone.getTimeZone("GMT");
                 LOG.warn("graph contains no agencies (yet); API request times will be interpreted as GMT.");
@@ -953,4 +931,120 @@ public class Graph implements Serializable {
         return alertPatchService;
     }
 
+    private Collection<Stop> getStopsForId(FeedScopedId id) {
+
+        // GroupOfStations
+        GroupOfStations groupOfStations = groupOfStationsById.get(id);
+        if (groupOfStations != null) {
+            return groupOfStations.getChildStops();
+        }
+
+        // Multimodal station
+        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return multiModalStation.getChildStops();
+        }
+
+        // Station
+        Station station = stationById.get(id);
+        if (station != null) {
+            return station.getChildStops();
+        }
+        // Single stop
+        Stop stop = index.getStopForId(id);
+        if (stop != null) {
+            return Collections.singleton(stop);
+        }
+
+        return null;
+    }
+
+    /**
+     *
+     * @param id Id of Stop, Station, MultiModalStation or GroupOfStations
+     * @return The associated TransitStopVertex or all underlying TransitStopVertices
+     */
+    public Set<Vertex> getStopVerticesById(FeedScopedId id) {
+        Collection<Stop> stops = getStopsForId(id);
+
+        if (stops == null) {
+            return null;
+        }
+
+        return stops.stream().map(index.getStopVertexForStop()::get).collect(Collectors.toSet());
+    }
+
+    /** An OBA Service Date is a local date without timezone, only year month and day. */
+    public BitSet getServicesRunningForDate(ServiceDate date) {
+        BitSet services = new BitSet(calendarService.getServiceIds().size());
+        for (FeedScopedId serviceId : calendarService.getServiceIdsOnDate(date)) {
+            int n = serviceCodes.get(serviceId);
+            if (n < 0) continue;
+            services.set(n);
+        }
+        return services;
+    }
+
+    public BikeRentalStationService getBikerentalStationService() {
+        return getService(BikeRentalStationService.class);
+    }
+
+    public Collection<Notice> getNoticesByEntity(TransitEntity<?> entity) {
+        Collection<Notice> res = getNoticesByElement().get(entity);
+        return res == null ? Collections.emptyList() : res;
+    }
+
+    public TripPattern getTripPatternForId(FeedScopedId id) {
+        return tripPatternForId.get(id);
+    }
+
+    public Collection<TripPattern> getTripPatterns() {
+        return tripPatternForId.values();
+    }
+
+    public Collection<Notice> getNotices() {
+        return getNoticesByElement().values();
+    }
+
+    /** Get all stops within a given bounding box. */
+    public Collection<Stop> getStopsByBoundingBox(double minLat, double minLon, double maxLat, double maxLon) {
+        Envelope envelope = new Envelope(
+                new Coordinate(minLon, minLat),
+                new Coordinate(maxLon, maxLat)
+        );
+        return streetIndex
+            .getTransitStopForEnvelope(envelope)
+            .stream()
+            .map(TransitStopVertex::getStop)
+            .collect(Collectors.toList());
+    }
+
+    /** Get all stops within a given radius. Unit: meters. */
+    public List<T2<Stop, Double>> getStopsInRadius(WgsCoordinate center, double radius) {
+        Coordinate coord = new Coordinate(center.longitude(), center.latitude());
+        return streetIndex.getNearbyTransitStops(coord, radius).stream()
+                .map(v -> new T2<>(v.getStop(), SphericalDistanceLibrary.fastDistance(v.getCoordinate(), coord)))
+                .filter(t -> t.second < radius)
+                .collect(Collectors.toList());
+    }
+
+    public Station getStationById(FeedScopedId id) {
+        return stationById.get(id);
+    }
+
+    public Collection<Station> getStations() {
+        return stationById.values();
+    }
+
+    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
+        return multiModalStationById.get(feedScopedId);
+    }
+
+    public Map<FeedScopedId, Integer> getServiceCodes() {
+        return serviceCodes;
+    }
+
+    public Collection<SimpleTransfer> getTransfersByStop(Stop stop) {
+        return transfersByStop.get(stop);
+    }
 }

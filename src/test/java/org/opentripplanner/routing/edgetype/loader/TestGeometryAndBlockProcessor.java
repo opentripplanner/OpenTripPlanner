@@ -15,7 +15,8 @@ import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -237,7 +238,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         ShortestPathTree spt;
 
         RoutingRequest options = new RoutingRequest();
-        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA"));
+        options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRAM,TraverseMode.RAIL,TraverseMode.SUBWAY,TraverseMode.FUNICULAR,TraverseMode.GONDOLA));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 0, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
         spt = aStar.getShortestPathTree(options );
@@ -245,7 +246,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         //a to b is bus only
         assertNull(spt.getPath(stop_b, false));
         
-        options.setModes(new TraverseModeSet("TRAM,RAIL,SUBWAY,FUNICULAR,GONDOLA,CABLE_CAR,BUS"));
+        options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRAM,TraverseMode.RAIL,TraverseMode.SUBWAY,TraverseMode.FUNICULAR,TraverseMode.GONDOLA,TraverseMode.CABLE_CAR,TraverseMode.BUS));
         spt = aStar.getShortestPathTree(options);
 
         assertNotNull(spt.getPath(stop_b, false));
@@ -271,9 +272,9 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_d = graph.getVertex(feedId + ":D");
 
         RoutingRequest options = new RoutingRequest();
-        options.modes.setWalk(false);
-        options.modes.setBicycle(true);
-        options.modes.setTransit(true);
+        options.streetSubRequestModes.setWalk(false);
+        options.streetSubRequestModes.setBicycle(true);
+        options.streetSubRequestModes.setTransit(true);
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 18, 0, 0, 0);
         options.setRoutingContext(graph, stop_a, stop_b);
 
@@ -388,7 +389,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         GraphPath path;
 
         RoutingRequest options = new RoutingRequest();
-        options.setModes(new TraverseModeSet("TRANSIT"));
+        options.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.TRANSIT));
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 7, 0, 0, 0);
         options.setRoutingContext(graph, stop_u, stop_v);
         
@@ -440,7 +441,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         assertEquals(TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 20, 0), path.getEndTime());
         
         //when optimizing for fewest transfers, take the slow one-bus path
-        options.transferPenalty = 1800;
+        options.transferCost = 1800;
         spt = aStar.getShortestPathTree(options);
 
         path = spt.getPath(stop_d, false);

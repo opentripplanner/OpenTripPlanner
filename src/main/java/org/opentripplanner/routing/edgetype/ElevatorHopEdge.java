@@ -3,7 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
@@ -22,6 +22,17 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
     private StreetTraversalPermission permission;
 
     public boolean wheelchairAccessible = true;
+
+    private double levels = 1;
+    private int travelTime = 0;
+
+    public ElevatorHopEdge(
+        Vertex from, Vertex to, StreetTraversalPermission permission, double levels, int travelTime
+    ) {
+        this(from, to, permission);
+        this.levels = levels;
+        this.travelTime = travelTime;
+    }
 
     public ElevatorHopEdge(Vertex from, Vertex to, StreetTraversalPermission permission) {
         super(from, to);
@@ -55,8 +66,12 @@ public class ElevatorHopEdge extends Edge implements ElevatorEdge {
 
         StateEditor s1 = s0.edit(this);
         s1.setBackMode(TraverseMode.WALK);
-        s1.incrementWeight(options.elevatorHopCost);
-        s1.incrementTimeInSeconds(options.elevatorHopTime);
+        s1.incrementWeight(
+            this.travelTime > 0 ? this.travelTime : (options.elevatorHopCost * this.levels)
+        );
+        s1.incrementTimeInSeconds(
+            this.travelTime > 0 ? this.travelTime : (int) (options.elevatorHopTime * this.levels)
+        );
         return s1.makeState();
     }
 

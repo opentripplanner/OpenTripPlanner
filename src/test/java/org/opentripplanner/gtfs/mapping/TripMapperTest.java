@@ -14,6 +14,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class TripMapperTest {
+    private static final String FEED_ID = "FEED";
 
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
@@ -57,7 +58,7 @@ public class TripMapperTest {
         TRIP.setTripBikesAllowed(TRIP_BIKES_ALLOWED);
     }
 
-    private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper()));
+    private TripMapper subject = new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID)));
 
     @Test
     public void testMapCollection() throws Exception {

@@ -14,6 +14,7 @@ import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import org.apache.commons.io.IOUtils;
+
 import org.opentripplanner.graph_builder.module.osm.OSMDatabase;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMNodeRef;
@@ -34,7 +35,7 @@ public class BinaryOpenStreetMapParser implements OsmHandler {
     this.osmdb = osmdb;
   }
 
-  public void process(FileInputStream inputStream) throws OsmInputException {
+  public void process(InputStream inputStream) throws OsmInputException {
     this.inputStream = inputStream;
     PbfReader reader = new PbfReader(inputStream, true);
     reader.setHandler(this);

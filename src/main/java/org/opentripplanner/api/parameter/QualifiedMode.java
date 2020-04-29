@@ -1,32 +1,29 @@
 package org.opentripplanner.api.parameter;
 
 import com.google.common.collect.Sets;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-
+import javax.ws.rs.BadRequestException;
 import java.io.Serializable;
-import java.security.InvalidParameterException;
 import java.util.Set;
 
 public class QualifiedMode implements Serializable {
     private static final long serialVersionUID = 1L;
     
-    public final TraverseMode mode;
+    public final ApiRequestMode mode;
     public final Set<Qualifier> qualifiers = Sets.newHashSet();
 
     public QualifiedMode(String qMode) {
-        String[] elements = qMode.split("_");
-        mode = TraverseMode.valueOf(elements[0].trim());
-        if (mode == null) {
-            throw new InvalidParameterException();
-        }
-        for (int i = 1; i < elements.length; i++) {
-            Qualifier q = Qualifier.valueOf(elements[i].trim());
-            if (q == null) {
-                throw new InvalidParameterException();
-            } else {
+        try {
+            String[] elements = qMode.split("_");
+            mode = ApiRequestMode.valueOf(elements[0].trim());
+            for (int i = 1; i < elements.length; i++) {
+                Qualifier q = Qualifier.valueOf(elements[i].trim());
                 qualifiers.add(q);
             }
+        }
+        catch (IllegalArgumentException | IndexOutOfBoundsException e) {
+            throw new BadRequestException(
+                    "Qualified mode is not valid: '" + qMode + "', details: " + e.getMessage()
+            );
         }
     }
     
@@ -38,27 +35,6 @@ public class QualifiedMode implements Serializable {
             sb.append(qualifier);
         }
         return sb.toString();
-    }
-
-    public void applyToRoutingRequest (RoutingRequest req, boolean usingTransit) {
-        req.modes.setMode(this.mode, true);
-        if (this.mode == TraverseMode.BICYCLE) {
-            if (this.qualifiers.contains(Qualifier.RENT)) {
-                req.modes.setMode(TraverseMode.WALK, true); // turn on WALK for bike rental mode
-                req.allowBikeRental = true;
-            }
-            if (usingTransit) {
-                req.bikeParkAndRide = this.qualifiers.contains(Qualifier.PARK);
-            }
-        }
-        if (usingTransit && this.mode == TraverseMode.CAR) {
-            if (this.qualifiers.contains(Qualifier.PARK)) {
-                req.parkAndRide = true;
-            } else {
-                req.kissAndRide = true;
-            }
-            req.modes.setWalk(true); // need to walk after dropping the car off
-        }
     }
 
     @Override
@@ -75,8 +51,4 @@ public class QualifiedMode implements Serializable {
         return false;
     }
 
-}
-
-enum Qualifier {
-    RENT, HAVE, PARK, KEEP
 }

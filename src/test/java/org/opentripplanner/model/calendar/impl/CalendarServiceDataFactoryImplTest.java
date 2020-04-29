@@ -7,12 +7,12 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsContextBuilder;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.CalendarService;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.ServiceCalendarDate;
+import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -30,7 +30,7 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
-import static org.opentripplanner.model.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
+import static org.opentripplanner.model.calendar.ServiceCalendarDate.EXCEPTION_TYPE_REMOVE;
 import static org.opentripplanner.model.calendar.impl.CalendarServiceDataFactoryImpl.merge;
 
 /**
@@ -91,7 +91,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     @Test
     public void testDataGetTimeZoneForAgencyId() throws IOException {
-        assertEquals("America/New_York", data.getTimeZoneForAgencyId(AGENCY).getID());
+        assertEquals("America/New_York", data.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY)).getID());
     }
 
     @Test
@@ -115,7 +115,7 @@ public class CalendarServiceDataFactoryImplTest {
 
     @Test
     public void testServiceGetTimeZoneForAgencyId() throws IOException {
-        TimeZone result = calendarService.getTimeZoneForAgencyId(AGENCY);
+        TimeZone result = calendarService.getTimeZoneForAgencyId(new FeedScopedId(FEED_ID, AGENCY));
         assertEquals("America/New_York", result.getID());
     }
 
@@ -156,16 +156,16 @@ public class CalendarServiceDataFactoryImplTest {
 
     private static FareAttribute createFareAttribute(Agency agency) {
         FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(agency.getId(), "FA"));
+        fa.setId(new FeedScopedId(FEED_ID, "FA"));
         return fa;
     }
 
     private static ServiceCalendarDate removeMondayFromAlldays() {
-        ServiceCalendarDate date = new ServiceCalendarDate();
-        date.setServiceId(SERVICE_ALLDAYS_ID);
-        date.setDate(new ServiceDate(2009, 1, 5));
-        date.setExceptionType(EXCEPTION_TYPE_REMOVE);
-        return date;
+        return new ServiceCalendarDate(
+                SERVICE_ALLDAYS_ID,
+                new ServiceDate(2009, 1, 5),
+                EXCEPTION_TYPE_REMOVE
+        );
     }
 
     private static <T> List<T> sort(Collection<? extends T> c) {
@@ -181,6 +181,6 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static List<String> sevenFirstDays(List<ServiceDate> dates) {
-        return dates.stream().limit(7).map(ServiceDate::getAsString).collect(toList());
+        return dates.stream().limit(7).map(ServiceDate::asCompactString).collect(toList());
     }
 }

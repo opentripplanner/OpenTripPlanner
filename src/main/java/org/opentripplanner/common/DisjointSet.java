@@ -1,26 +1,31 @@
 package org.opentripplanner.common;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
+import gnu.trove.list.TIntList;
+import gnu.trove.list.array.TIntArrayList;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.TObjectIntMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.map.hash.TObjectIntHashMap;
 import org.opentripplanner.util.MapUtils;
 
-/** basic union-find data structure with path compression */
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+/** Basic union-find data structure with path compression */
 public class DisjointSet<T> {
 
-    ArrayList<Integer> sets = new ArrayList<Integer>();
-    HashMap<T, Integer> setMapping = new HashMap<T, Integer>();
-    
+    TIntList sets = new TIntArrayList();
+
+    TObjectIntMap<T> setMapping = new TObjectIntHashMap<>();
+
     public DisjointSet() {}
     
-    public int union(T element1, T element2) {
-        Integer p1 = find(element1);
-        Integer p2 = find(element2);
+    public int union (T element1, T element2) {
+        int p1 = find(element1);
+        int p2 = find(element2);
         
-        if (p1.equals(p2)) {
+        if (p1 == p2) {
             return p1;
         }
         
@@ -40,14 +45,15 @@ public class DisjointSet<T> {
         }
     }
     
-    public int find(T element) {
-        Integer i = setMapping.get(element);
-        if (i == null) {
+    public int find (T element) {
+        if (setMapping.containsKey(element)) {
+            int i = setMapping.get(element);
+            return compact(i);
+        } else {
             setMapping.put(element, sets.size());
             sets.add(-1);
             return sets.size() -1;
         }
-        return compact(i);
     }
 
     public boolean exists(T element) {
@@ -55,11 +61,12 @@ public class DisjointSet<T> {
     }
     
     public List<Set<T>> sets() {
-        HashMap<Integer, Set<T>> out = new HashMap<Integer, Set<T>>();
-        for (Map.Entry<T, Integer> entry : setMapping.entrySet()) {
-            MapUtils.addToMapSet(out, compact(entry.getValue()), entry.getKey());
-        }
-        return new ArrayList<Set<T>>(out.values());
+        TLongObjectMap<Set<T>> out = new TLongObjectHashMap<>();
+        setMapping.forEachEntry((k, v) -> {
+            MapUtils.addToMapSet(out, compact(v), k);
+            return true;
+        });
+        return new ArrayList<>(out.valueCollection());
     }
 
     private int compact(int i) {

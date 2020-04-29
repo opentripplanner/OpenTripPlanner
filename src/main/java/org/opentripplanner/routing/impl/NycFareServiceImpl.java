@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.impl;
 
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
@@ -12,10 +10,11 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Currency;
@@ -55,7 +54,7 @@ enum NycRideClassifier {
  * switching to typesafe enums, I fixed one bug where we were adding the enum value instead of the
  * fare to the total cost.
  */
-public class NycFareServiceImpl implements FareService, Serializable {
+public class NycFareServiceImpl implements FareService {
 
 	private static final Logger LOG = LoggerFactory.getLogger(NycFareServiceImpl.class);
 

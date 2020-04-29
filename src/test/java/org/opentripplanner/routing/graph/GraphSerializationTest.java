@@ -10,7 +10,11 @@ import org.locationtech.jts.geom.Polygon;
 import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.routing.trippattern.Deduplicator;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
 
 import java.io.File;
 import java.lang.ref.SoftReference;
@@ -116,16 +120,25 @@ public class GraphSerializationTest {
      * Tests that saving a Graph to disk and reloading it results in a separate but semantically identical Graph.
      */
     private void testRoundTrip (Graph originalGraph) throws Exception {
-        originalGraph.index();
         // The cached timezone in the graph is transient and lazy-initialized.
         // Previous tests may have caused a timezone to be cached.
         originalGraph.clearTimeZone();
         // Now round-trip the graph through serialization.
         File tempFile = TempFile.createTempFile("graph", "pdx");
-        originalGraph.save(tempFile);
-        Graph copiedGraph1 = Graph.load(tempFile);
+        SerializedGraphObject serializedObj = new SerializedGraphObject(
+                originalGraph,
+                BuildConfig.DEFAULT,
+                RouterConfig.DEFAULT
+        );
+        serializedObj.save(new FileDataSource(tempFile, FileType.GRAPH));
+        Graph copiedGraph1 = SerializedGraphObject.load(tempFile);
+        // Index both graph - we do no know if the original is indexed, because it is cached and
+        // might be indexed by other tests.
+        originalGraph.index();
+        copiedGraph1.index();
         assertNoDifferences(originalGraph, copiedGraph1);
-        Graph copiedGraph2 = Graph.load(tempFile);
+        Graph copiedGraph2 = SerializedGraphObject.load(tempFile);
+        copiedGraph2.index();
         assertNoDifferences(copiedGraph1, copiedGraph2);
     }
 
@@ -139,11 +152,15 @@ public class GraphSerializationTest {
         // Other structures contain Maps with keys that have identity equality - these also cannot be compared yet.
         // We would need to apply a key extractor function to such maps, copying them into new maps.
         objectDiffer.ignoreFields(
+                "calendarService",
                 "incoming",
                 "outgoing",
                 "buildTime",
+                "tripPatternForId",
                 "transitLayer",
-                "realtimeTransitLayer"
+                "realtimeTransitLayer",
+                "dateTime"
+
         );
         // Edges have very detailed String representation including lat/lon coordinates and OSM IDs. They should be unique.
         objectDiffer.setKeyExtractor("turnRestrictions", edge -> edge.toString());

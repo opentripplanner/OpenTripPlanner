@@ -35,6 +35,7 @@ import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -79,7 +80,11 @@ public class GeometryAndBlockProcessor {
     }
 
     public GeometryAndBlockProcessor (
+            // TODO OTP2 - Operate on the builder, not the transit service and move the executon of
+            //           - this to where the builder is in context.
             OtpTransitService transitService,
+            // TODO OTP2 - This does not belong here - Do geometry and blocks have anything with
+            //           - a FareService.
             FareServiceFactory fareServiceFactory,
             double maxStopToShapeSnapDistance,
             int maxInterlineDistance
@@ -90,11 +95,14 @@ public class GeometryAndBlockProcessor {
         this.maxInterlineDistance = maxInterlineDistance > 0 ? maxInterlineDistance : 200;
     }
 
+    // TODO OTP2 - Instead of exposing the graph (the entire world) to this class, this class should
+    //           - Create a datastructure and return it, then that should be injected into the graph.
     public void run(Graph graph) {
         run(graph, new DataImportIssueStore(false));
     }
 
     /** Generate the edges. Assumes that there are already vertices in the graph for the stops. */
+    @SuppressWarnings("Convert2MethodRef")
     public void run(Graph graph, DataImportIssueStore issueStore) {
         this.issueStore = issueStore;
 
@@ -103,25 +111,35 @@ public class GeometryAndBlockProcessor {
         /* Assign 0-based numeric codes to all GTFS service IDs. */
         for (FeedScopedId serviceId : transitService.getAllServiceIds()) {
             // TODO: FIX Service code collision for multiple feeds.
-            graph.serviceCodes.put(serviceId, graph.serviceCodes.size());
+            graph.getServiceCodes().put(serviceId, graph.getServiceCodes().size());
         }
 
         LOG.info("Processing geometries and blocks on graph...");
 
-        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving only the tripTimes
-        // (which don't have enough information to build a geometry). So we keep them here. In the current design, a
-        // trip pattern does not have a single geometry, but one per hop, so we store them in an array.
+        // Wwe have to build the hop geometries before we throw away the modified stopTimes, saving
+        // only the tripTimes (which don't have enough information to build a geometry). So we keep
+        // them here. In the current design, a trip pattern does not have a single geometry, but
+        // one per hop, so we store them in an array.
         Map<TripPattern, LineString[]> geometriesByTripPattern = Maps.newHashMap();
 
         Collection<TripPattern> tripPatterns = transitService.getTripPatterns();
 
         /* Generate unique short IDs for all the TableTripPatterns. */
-        TripPattern.generateUniqueIds(tripPatterns);
+        if (!TripPattern.idsAreUniqueAndNotNull(tripPatterns)) {
+            TripPattern.generateUniqueIds(tripPatterns);
+        }
 
         /* Generate unique human-readable names for all the TableTripPatterns. */
         TripPattern.generateUniqueNames(tripPatterns, issueStore);
 
         /* Loop over all new TripPatterns, creating edges, setting the service codes and geometries, etc. */
+        ProgressTracker progress = ProgressTracker.track(
+                "Generate TripPattern geometries",
+                100,
+                tripPatterns.size()
+        );
+        LOG.info(progress.startMessage());
+
         for (TripPattern tripPattern : tripPatterns) {
             for (Trip trip : tripPattern.getTrips()) {
                 // create geometries if they aren't already created
@@ -131,10 +149,13 @@ public class GeometryAndBlockProcessor {
                         && trip.getShapeId().getId() != null && !trip.getShapeId().getId().equals("")) {
                     // save the geometry to later be applied to the hops
                     geometriesByTripPattern.put(tripPattern,
-                            createGeometry(graph, trip, transitService.getStopTimesForTrip(trip)));
+                            createGeometry(trip.getShapeId(), transitService.getStopTimesForTrip(trip)));
                 }
             }
+            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            progress.step(m -> LOG.info(m));
         }
+        LOG.info(progress.completeMessage());
 
         /* Loop over all new TripPatterns setting the service codes and geometries, etc. */
         for (TripPattern tripPattern : tripPatterns) {
@@ -143,10 +164,10 @@ public class GeometryAndBlockProcessor {
                 // Make a single unified geometry, and also store the per-hop split geometries.
                 tripPattern.setHopGeometries(hopGeometries);
             }
-            tripPattern.setServiceCodes(graph.serviceCodes); // TODO this could be more elegant
+            tripPattern.setServiceCodes(graph.getServiceCodes()); // TODO this could be more elegant
 
             // Store the tripPattern in the Graph so it will be serialized and usable in routing.
-            graph.tripPatternForId.put(tripPattern.getCode(), tripPattern);
+            graph.tripPatternForId.put(tripPattern.getId(), tripPattern);
         }
 
         /* Identify interlined trips and create the necessary edges. */
@@ -249,111 +270,41 @@ public class GeometryAndBlockProcessor {
      * This geometry will in fact be used for an entire set of trips in a trip pattern. Technically one of the trips
      * with exactly the same sequence of stops could follow a different route on the streets, but that's very uncommon.
      */
-    private LineString[] createGeometry(Graph graph, Trip trip, List<StopTime> stopTimes) {
-        FeedScopedId shapeId = trip.getShapeId();
+    private LineString[] createGeometry(FeedScopedId shapeId, List<StopTime> stopTimes) {
 
-        // One less geometry than stoptime as array indexes represetn hops not stops (fencepost problem).
-        LineString[] geoms = new LineString[stopTimes.size() - 1];
-
-        // Detect presence or absence of shape_dist_traveled on a per-trip basis
-        StopTime st0 = stopTimes.get(0);
-        boolean hasShapeDist = st0.isShapeDistTraveledSet();
-        if (hasShapeDist) {
+        if (hasShapeDist(shapeId, stopTimes)) {
             // this trip has shape_dist in stop_times
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                geoms[i] = getHopGeometryViaShapeDistTraveled(graph, shapeId, st0, st1);
-            }
-            return geoms;
+            return getHopGeometriesViaShapeDistTravelled(stopTimes, shapeId);
         }
-        LineString shape = getLineStringForShapeId(shapeId);
-        if (shape == null) {
+
+        LineString shapeLineString = getLineStringForShapeId(shapeId);
+        if (shapeLineString == null) {
             // this trip has a shape_id, but no such shape exists, and no shape_dist in stop_times
             // create straight line segments between stops for each hop
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                geoms[i] = geometry;
-            }
-            return geoms;
-        }
-        // This trip does not have shape_dist in stop_times, but does have an associated shape.
-        ArrayList<IndexedLineSegment> segments = new ArrayList<IndexedLineSegment>();
-        for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
-            segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
-        }
-        // Find possible segment matches for each stop.
-        List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<List<IndexedLineSegment>>();
-        int minSegmentIndex = 0;
-        for (int i = 0; i < stopTimes.size() ; ++i) {
-            Stop stop = stopTimes.get(i).getStop();
-            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
-            List<IndexedLineSegment> stopSegments = new ArrayList<IndexedLineSegment>();
-            double bestDistance = Double.MAX_VALUE;
-            IndexedLineSegment bestSegment = null;
-            int maxSegmentIndex = -1;
-            int index = -1;
-            int minSegmentIndexForThisStop = -1;
-            for (IndexedLineSegment segment : segments) {
-                index++;
-                if (segment.index < minSegmentIndex) {
-                    continue;
-                }
-                double distance = segment.distance(coord);
-                if (distance < maxStopToShapeSnapDistance) {
-                    stopSegments.add(segment);
-                    maxSegmentIndex = index;
-                    if (minSegmentIndexForThisStop == -1)
-                        minSegmentIndexForThisStop = index;
-                } else if (distance < bestDistance) {
-                    bestDistance = distance;
-                    bestSegment = segment;
-                    if (maxSegmentIndex != -1) {
-                        maxSegmentIndex = index;
-                    }
-                }
-            }
-            if (stopSegments.size() == 0) {
-                //no segments within 150m
-                //fall back to nearest segment
-                stopSegments.add(bestSegment);
-                minSegmentIndex = bestSegment.index;
-            } else {
-                minSegmentIndex = minSegmentIndexForThisStop;
-                Collections.sort(stopSegments, new IndexedLineSegmentComparator(coord));
-            }
-
-            for (int j = i - 1; j >= 0; j --) {
-                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
-                    IndexedLineSegment segment = it.next();
-                    if (segment.index > maxSegmentIndex) {
-                        it.remove();
-                    }
-                }
-            }
-            possibleSegmentsForStop.add(stopSegments);
+            return createStraightLineHopeGeometries(stopTimes, shapeId);
         }
 
-        List<LinearLocation> locations = getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
-
+        List<LinearLocation> locations = getLinearLocations(stopTimes, shapeLineString);
         if (locations == null) {
             // this only happens on shape which have points very far from
             // their stop sequence. So we'll fall back to trivial stop-to-stop
             // linking, even though theoretically we could do better.
-
-            for (int i = 0; i < stopTimes.size() - 1; ++i) {
-                st0 = stopTimes.get(i);
-                StopTime st1 = stopTimes.get(i + 1);
-                LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
-                geoms[i] = geometry;
-                //this warning is not strictly correct, but will do
-                issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
-            }
-            return geoms;
+            return createStraightLineHopeGeometries(stopTimes, shapeId);
         }
 
+        return getGeometriesByShape(stopTimes, shapeId, shapeLineString, locations);
+    }
+
+    private boolean hasShapeDist(FeedScopedId shapeId, List<StopTime> stopTimes) {
+        StopTime st0 = stopTimes.get(0);
+        return st0.isShapeDistTraveledSet() && getDistanceForShapeId(shapeId) != null;
+    }
+
+    private LineString[] getGeometriesByShape(
+        List<StopTime> stopTimes, FeedScopedId shapeId, LineString shape,
+        List<LinearLocation> locations
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
         Iterator<LinearLocation> locationIt = locations.iterator();
         LinearLocation endLocation = locationIt.next();
         double distanceSoFar = 0;
@@ -400,7 +351,96 @@ public class GeometryAndBlockProcessor {
             }
             geoms[i] = geometry;
         }
+        return geoms;
+    }
 
+    private List<LinearLocation> getLinearLocations(List<StopTime> stopTimes, LineString shape) {
+        // This trip does not have shape_dist in stop_times, but does have an associated shape.
+        ArrayList<IndexedLineSegment> segments = new ArrayList<>();
+        for (int i = 0 ; i < shape.getNumPoints() - 1; ++i) {
+            segments.add(new IndexedLineSegment(i, shape.getCoordinateN(i), shape.getCoordinateN(i + 1)));
+        }
+        // Find possible segment matches for each stop.
+        List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<>();
+        int minSegmentIndex = 0;
+        for (int i = 0; i < stopTimes.size() ; ++i) {
+            Stop stop = stopTimes.get(i).getStop();
+            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
+            List<IndexedLineSegment> stopSegments = new ArrayList<>();
+            double bestDistance = Double.MAX_VALUE;
+            IndexedLineSegment bestSegment = null;
+            int maxSegmentIndex = -1;
+            int index = -1;
+            int minSegmentIndexForThisStop = -1;
+            for (IndexedLineSegment segment : segments) {
+                index++;
+                if (segment.index < minSegmentIndex) {
+                    continue;
+                }
+                double distance = segment.distance(coord);
+                if (distance < maxStopToShapeSnapDistance) {
+                    stopSegments.add(segment);
+                    maxSegmentIndex = index;
+                    if (minSegmentIndexForThisStop == -1)
+                        minSegmentIndexForThisStop = index;
+                } else if (distance < bestDistance) {
+                    bestDistance = distance;
+                    bestSegment = segment;
+                    if (maxSegmentIndex != -1) {
+                        maxSegmentIndex = index;
+                    }
+                }
+            }
+            if (stopSegments.size() == 0 && bestSegment != null) {
+                //no segments within 150m
+                //fall back to nearest segment
+                stopSegments.add(bestSegment);
+                minSegmentIndex = bestSegment.index;
+            } else {
+                minSegmentIndex = minSegmentIndexForThisStop;
+                stopSegments.sort(new IndexedLineSegmentComparator(coord));
+            }
+
+            for (int j = i - 1; j >= 0; j --) {
+                for (Iterator<IndexedLineSegment> it = possibleSegmentsForStop.get(j).iterator(); it.hasNext(); ) {
+                    IndexedLineSegment segment = it.next();
+                    if (segment.index > maxSegmentIndex) {
+                        it.remove();
+                    }
+                }
+            }
+            possibleSegmentsForStop.add(stopSegments);
+        }
+
+        return getStopLocations(possibleSegmentsForStop, stopTimes, 0, -1);
+    }
+
+    private LineString[] createStraightLineHopeGeometries(
+        List<StopTime> stopTimes, FeedScopedId shapeId
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
+        StopTime st0;
+        for (int i = 0; i < stopTimes.size() - 1; ++i) {
+            st0 = stopTimes.get(i);
+            StopTime st1 = stopTimes.get(i + 1);
+            LineString geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
+            geoms[i] = geometry;
+            //this warning is not strictly correct, but will do
+            issueStore.add(new BogusShapeGeometryCaught(shapeId, st0, st1));
+        }
+        return geoms;
+    }
+
+    private LineString[] getHopGeometriesViaShapeDistTravelled(
+        List<StopTime> stopTimes, FeedScopedId shapeId
+    ) {
+        LineString[] geoms = new LineString[stopTimes.size() - 1];
+        StopTime st0;
+        for (int i = 0; i < stopTimes.size() - 1; ++i) {
+            st0 = stopTimes.get(i);
+            StopTime st1 = stopTimes.get(i + 1);
+            geoms[i] = getHopGeometryViaShapeDistTraveled(shapeId, st0, st1);
+        }
         return geoms;
     }
 
@@ -412,7 +452,7 @@ public class GeometryAndBlockProcessor {
             List<StopTime> stopTimes, int index, int prevSegmentIndex) {
 
         if (index == stopTimes.size()) {
-            return new LinkedList<LinearLocation>();
+            return new LinkedList<>();
         }
 
         StopTime st = stopTimes.get(index);
@@ -435,7 +475,7 @@ public class GeometryAndBlockProcessor {
         return null;
     }
 
-    private LineString getHopGeometryViaShapeDistTraveled(Graph graph, FeedScopedId shapeId, StopTime st0, StopTime st1) {
+    private LineString getHopGeometryViaShapeDistTraveled(FeedScopedId shapeId, StopTime st0, StopTime st1) {
 
         double startDistance = st0.getShapeDistTraveled();
         double endDistance = st1.getShapeDistTraveled();
@@ -462,8 +502,9 @@ public class GeometryAndBlockProcessor {
             LineString line = getLineStringForShapeId(shapeId);
             LocationIndexedLine lol = new LocationIndexedLine(line);
 
-            geometry = getSegmentGeometry(graph, shapeId, lol, startIndex, endIndex, startDistance,
-                    endDistance, st0, st1);
+            geometry = getSegmentGeometry(
+                    shapeId, lol, startIndex, endIndex, startDistance, endDistance, st0, st1
+            );
 
             return geometry;
         }
@@ -513,7 +554,7 @@ public class GeometryAndBlockProcessor {
         return true;
     }
 
-    private LineString getSegmentGeometry(Graph graph, FeedScopedId shapeId,
+    private LineString getSegmentGeometry(FeedScopedId shapeId,
             LocationIndexedLine locationIndexedLine, LinearLocation startIndex,
             LinearLocation endIndex, double startDistance, double endDistance,
             StopTime st0, StopTime st1) {
@@ -535,7 +576,7 @@ public class GeometryAndBlockProcessor {
                 //fall back to trivial geometry
                 geometry = createSimpleGeometry(st0.getStop(), st1.getStop());
             }
-            geometriesByShapeSegmentKey.put(key, (LineString) geometry);
+            geometriesByShapeSegmentKey.put(key, geometry);
         }
 
         return geometry;
@@ -550,7 +591,7 @@ public class GeometryAndBlockProcessor {
      */
     private List<ShapePoint> getUniqueShapePointsForShapeId(FeedScopedId shapeId) {
         List<ShapePoint> points = transitService.getShapePointsForShapeId(shapeId);
-        ArrayList<ShapePoint> filtered = new ArrayList<ShapePoint>(points.size());
+        ArrayList<ShapePoint> filtered = new ArrayList<>(points.size());
         ShapePoint last = null;
         for (ShapePoint sp : points) {
             if (last == null || last.getSequence() != sp.getSequence()) {

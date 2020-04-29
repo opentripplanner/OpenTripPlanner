@@ -5,12 +5,13 @@ import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.api.resource.PlannerResource;
+import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
-import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
+import org.opentripplanner.index.IndexAPI;
 import org.opentripplanner.util.OTPFeature;
 
 import java.util.ArrayList;
@@ -24,9 +25,9 @@ import static org.opentripplanner.util.OTPFeature.APIExternalGeocoder;
 import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
+import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
 import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
-import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
 
 /**
  * Configure API resource endpoints.
@@ -37,6 +38,7 @@ public class APIEndpoints {
 
     private APIEndpoints() {
         // Add mandatory APIs
+        add(Routers.class);
         add(PlannerResource.class);
         add(IndexAPI.class);
 

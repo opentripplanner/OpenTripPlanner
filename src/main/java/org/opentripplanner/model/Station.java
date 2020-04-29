@@ -11,111 +11,119 @@ import java.util.TimeZone;
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
 public class Station extends TransitEntity<FeedScopedId> implements StopCollection {
-        private static final long serialVersionUID = 1L;
 
-        private FeedScopedId id;
+  private static final long serialVersionUID = 1L;
+  public static final TransferPriority DEFAULT_COST_PRIORITY = TransferPriority.ALLOWED;
 
-        private String name;
+  private final FeedScopedId id;
 
-        private double lat;
+  private final String name;
 
-        private double lon;
+  private final String code;
 
-        /**
-         * Public facing station code (short text or number)
-         */
-        private String code;
+  private final String description;
 
-        /**
-         * Additional information about the station (if needed)
-         */
-        private String description;
+  private final WgsCoordinate coordinate;
 
-        /**
-         * URL to a web page containing information about this particular station
-         */
-        private String url;
+  private final TransferPriority costPriority;
 
-        private TimeZone timezone;
+  /**
+   * URL to a web page containing information about this particular station
+   */
+  private final String url;
 
-        private Set<Stop> childStops = new HashSet<>();
+  private final TimeZone timezone;
 
-        public Station() {}
+  private final Set<Stop> childStops = new HashSet<>();
 
-        @Override public FeedScopedId getId() {
-                return id;
-        }
+  public Station(
+      FeedScopedId id,
+      String name,
+      WgsCoordinate coordinate,
+      String code,
+      String description,
+      String url,
+      TimeZone timezone,
+      TransferPriority costPriority
+  ) {
+    this.id = id;
+    this.name = name;
+    this.coordinate = coordinate;
+    this.code = code;
+    this.description = description;
+    this.url = url;
+    this.timezone = timezone;
+    this.costPriority = costPriority == null ? DEFAULT_COST_PRIORITY : costPriority;
+  }
 
-        @Override public void setId(FeedScopedId id) {
-                this.id = id;
-        }
+  public void addChildStop(Stop stop) {
+    this.childStops.add(stop);
+  }
 
-        public String getName() {
-                return name;
-        }
+  @Override
+  public String toString() {
+    return "<Station " + this.id + ">";
+  }
 
-        public void setName(String name) {
-                this.name = name;
-        }
+  @Override
+  public FeedScopedId getId() {
+    return id;
+  }
 
-        public double getLat() {
-                return lat;
-        }
+  /** @throws UnsupportedOperationException */
+  @Override
+  public final void setId(FeedScopedId id) {
+    super.setId(id);
+  }
 
-        public void setLat(double lat) {
-                this.lat = lat;
-        }
+  public String getName() {
+    return name;
+  }
 
-        public double getLon() {
-                return lon;
-        }
+  public WgsCoordinate getCoordinate() {
+    return coordinate;
+  }
 
-        public void setLon(double lon) {
-                this.lon = lon;
-        }
+  /** Public facing station code (short text or number) */
+  public String getCode() {
+    return code;
+  }
 
-        public String getCode() {
-                return code;
-        }
+  /** Additional information about the station (if needed) */
+  public String getDescription() {
+    return description;
+  }
 
-        public void setCode(String code) {
-                this.code = code;
-        }
+  public String getUrl() {
+    return url;
+  }
 
-        public String getDescription() {
-                return description;
-        }
+  /**
+   * The generalized cost priority associated with the stop independently of trips, routes
+   * and/or other stops. This is supported in NeTEx, but not in GTFS. This should work by
+   * adding adjusting the cost for all board-/alight- events in the routing search.
+   * <p/>
+   * To not interfere with request parameters this must be implemented in a neutral way. This mean
+   * that the {@link TransferPriority#ALLOWED} (witch is default) should a nett-effect of
+   * adding 0 - zero cost.
+   */
+  public TransferPriority getCostPriority() {
+    return costPriority;
+  }
 
-        public void setDescription(String description) {
-                this.description = description;
-        }
+  public TimeZone getTimezone() {
+    return timezone;
+  }
 
-        public String getUrl() {
-                return url;
-        }
+  public Collection<Stop> getChildStops() {
+    return childStops;
+  }
 
-        public void setUrl(String url) {
-                this.url = url;
-        }
+  public double getLat() {
+    return coordinate.latitude();
+  }
 
-        public TimeZone getTimezone() {
-                return timezone;
-        }
-
-        public void setTimezone(TimeZone timezone) {
-                this.timezone = timezone;
-        }
-
-        public Collection<Stop> getChildStops() {
-                return childStops;
-        }
-
-        public void addChildStop(Stop stop) {
-                this.childStops.add(stop);
-        }
-
-        @Override
-        public String toString() {
-                return "<Station " + this.id + ">";
-        }
+  public double getLon() {
+    return coordinate.longitude();
+  }
 }

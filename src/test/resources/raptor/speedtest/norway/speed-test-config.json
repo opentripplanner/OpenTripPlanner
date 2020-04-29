@@ -1,0 +1,37 @@
+{
+  // Run all test-cases on the given date
+  testDate: "2020-01-15",
+
+  accessEgressMaxWalkDistanceMeters: 1000,
+
+  // Default is 1.4 m/s = ~ 5.0 km/t
+  walkSpeedMeterPrSecond: 1.4,
+
+  tuningParameters: {
+    // Default is 12
+    // maxNumberOfTransfers: 12,
+
+    // Default is 50
+    // scheduledTripBinarySearchThreshold: 50,
+
+    // Default is 60
+    // iterationDepartureStepInSeconds: 60,
+
+    // Default is 0
+    searchThreadPoolSize: 8,
+
+    dynamicSearchWindow: {
+      // Default is 0.4
+      minTripTimeCoefficient: 0.3,
+
+      // Default is 30 minutes
+      minWinTimeMinutes: 40,
+
+      // Default is 180 minutes (3 hours)
+      maxWinTimeMinutes : 360,
+
+      // Default is 10 minutes
+      stepMinutes: 10
+    }
+  }
+}

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -55,7 +55,7 @@ public class StreetBikeRentalLink extends Edge {
 
     public State traverse(State s0) {
         // Do not even consider bike rental vertices unless bike rental is enabled.
-        if ( ! s0.getOptions().allowBikeRental) {
+        if ( ! s0.getOptions().bikeRental) {
             return null;
         }
         // Disallow traversing two StreetBikeRentalLinks in a row.
@@ -75,7 +75,7 @@ public class StreetBikeRentalLink extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        return options.modes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
+        return options.streetSubRequestModes.contains(TraverseMode.BICYCLE) ? 0 : Double.POSITIVE_INFINITY;
     }
 
     public Vertex getFromVertex() {

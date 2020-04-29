@@ -45,6 +45,7 @@ public class MockGtfs {
     public OtpTransitServiceBuilder read() throws IOException {
         return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsDelegate.read(),
+                "a0",
                 new DataImportIssueStore(false)
         );
     }
@@ -52,6 +53,7 @@ public class MockGtfs {
     public OtpTransitServiceBuilder read(org.onebusaway.gtfs.serialization.GtfsReader reader) throws IOException {
         return GTFSToOtpTransitServiceMapper.mapGtfsDaoToInternalTransitServiceBuilder(
                 gtfsDelegate.read(reader),
+                "a0",
                 new DataImportIssueStore(false)
         );
     }

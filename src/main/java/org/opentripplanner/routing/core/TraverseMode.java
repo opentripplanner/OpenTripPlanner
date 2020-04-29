@@ -1,36 +1,13 @@
 package org.opentripplanner.routing.core;
 
-import javax.xml.bind.annotation.XmlType;
+import org.opentripplanner.model.TransitMode;
 
-import java.util.Collections;
-import java.util.EnumSet;
-import java.util.HashMap;
-import java.util.Set;
-
-@XmlType(name="TraverseMode")  
 public enum TraverseMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
     CABLE_CAR, GONDOLA, FUNICULAR,
     TRANSIT, LEG_SWITCH,
     AIRPLANE;
-
-    private static HashMap <Set<TraverseMode>, Set<TraverseMode>> setMap = 
-            new HashMap <Set<TraverseMode>, Set<TraverseMode>>();
-
-    public static Set<TraverseMode> internSet (Set<TraverseMode> modeSet) {
-        if (modeSet == null)
-            return null;
-        Set<TraverseMode> ret = setMap.get(modeSet);
-        if (ret == null) {
-            EnumSet<TraverseMode> backingSet = EnumSet.noneOf(TraverseMode.class);
-            backingSet.addAll(modeSet);
-            Set<TraverseMode> unmodifiableSet = Collections.unmodifiableSet(backingSet);
-            setMap.put(unmodifiableSet, unmodifiableSet);
-            ret = unmodifiableSet;
-        }
-        return ret;
-    }
 
     public boolean isTransit() {
         return this == TRAM || this == SUBWAY || this == RAIL || this == BUS || this == FERRY
@@ -46,4 +23,33 @@ public enum TraverseMode {
         return this == CAR;
     }
 
+    public boolean isWalking() {
+        return this == WALK;
+    }
+
+    public static TraverseMode fromTransitMode(TransitMode transitMode) {
+        switch (transitMode) {
+            case RAIL:
+                return TraverseMode.RAIL;
+            case COACH:
+            case BUS:
+                return TraverseMode.BUS;
+            case SUBWAY:
+                return TraverseMode.SUBWAY;
+            case TRAM:
+                return TraverseMode.TRAM;
+            case FERRY:
+                return TraverseMode.FERRY;
+            case AIRPLANE:
+                return TraverseMode.AIRPLANE;
+            case CABLE_CAR:
+                return TraverseMode.CABLE_CAR;
+            case GONDOLA:
+                return TraverseMode.GONDOLA;
+            case FUNICULAR:
+                return TraverseMode.FUNICULAR;
+            default:
+                throw new IllegalArgumentException();
+        }
+    }
 }

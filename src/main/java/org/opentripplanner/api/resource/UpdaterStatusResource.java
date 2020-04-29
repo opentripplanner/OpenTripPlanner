@@ -1,7 +1,7 @@
 package org.opentripplanner.api.resource;
 
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.slf4j.Logger;
@@ -15,7 +15,7 @@ import javax.ws.rs.core.Response;
 /**
  * Report the status of the graph updaters via a web service.
  */
-@Path("/routers/{routerId}/updaters")
+@Path("/routers/{ignoreRouterId}/updaters")
 @Produces(MediaType.APPLICATION_JSON)
 public class UpdaterStatusResource {
 
@@ -24,9 +24,15 @@ public class UpdaterStatusResource {
     /** Choose short or long form of results. */
     @QueryParam("detail") private boolean detail = false;
 
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
     Router router;
 
-    public UpdaterStatusResource (@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+    public UpdaterStatusResource (@Context OTPServer otpServer) {
         router = otpServer.getRouter();
     }
 

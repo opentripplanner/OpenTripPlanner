@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.impl;
 
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
-import com.conveyal.r5.otp2.api.path.TransitPathLeg;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,7 +61,7 @@ public class RideMapper {
         ride.startTime = transitPathLeg.fromTime();
         ride.endTime  = transitPathLeg.toTime();
         // In the default fare service, we classify rides by mode.
-        ride.classifier = tripPattern.mode;
+        ride.classifier = tripPattern.getMode();
         return ride;
     }
 

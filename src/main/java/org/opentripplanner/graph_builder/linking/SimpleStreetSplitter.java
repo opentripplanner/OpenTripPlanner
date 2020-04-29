@@ -14,17 +14,19 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BikeParkUnlinked;
 import org.opentripplanner.graph_builder.issues.BikeRentalStationUnlinked;
+import org.opentripplanner.graph_builder.issues.EntranceUnlinked;
 import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -35,6 +37,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.TransitEntranceLink;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -47,10 +50,12 @@ import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
+import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -58,6 +63,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
+import java.util.function.Function;
 import java.util.stream.Collectors;
 
 /**
@@ -139,7 +145,7 @@ public class SimpleStreetSplitter {
      * active on a graph at any given time.
      *
      * SimpleStreetSplitter generates index on graph and splits destructively (used in transit splitter)
-     * @param graph
+
      */
     public SimpleStreetSplitter(Graph graph, DataImportIssueStore issueStore) {
         this(graph, null, null, true, issueStore);
@@ -151,21 +157,51 @@ public class SimpleStreetSplitter {
 
     /** Link all relevant vertices to the street network */
     public void link () {
-        for (Vertex v : graph.getVertices()) {
-            if (v instanceof TransitStopVertex || v instanceof BikeRentalStationVertex || v instanceof BikeParkVertex) {
-                boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
-                if (alreadyLinked) continue;
+        link(TransitStopVertex.class, StopUnlinked::new);
+        link(TransitEntranceVertex.class, EntranceUnlinked::new);
+        link(BikeRentalStationVertex.class, BikeRentalStationUnlinked::new);
+        link(BikeParkVertex.class, BikeParkUnlinked::new);
+    }
 
-                if (!link(v)) {
-                    if (v instanceof TransitStopVertex)
-                        issueStore.add(new StopUnlinked((TransitStopVertex) v));
-                    else if (v instanceof BikeRentalStationVertex)
-                        issueStore.add(new BikeRentalStationUnlinked((BikeRentalStationVertex) v));
-                    else if (v instanceof BikeParkVertex)
-                        issueStore.add(new BikeParkUnlinked((BikeParkVertex) v));
-                };
-            }
+    @SuppressWarnings("Convert2MethodRef")
+    public <T extends Vertex> void link(
+            Class<T> type,
+            Function<T, DataImportIssue> unlinkedIssueMapper
+    ) {
+        @SuppressWarnings("unchecked")
+        List<T> vertices = graph.getVertices()
+                .stream()
+                .filter(type::isInstance)
+                .map(it -> (T)it)
+                .collect(Collectors.toList());
+
+        String actionName = "Link " + type.getSimpleName();
+
+        if(vertices.isEmpty()) {
+            LOG.info("{} skiped. No such data exist.", actionName);
+            return;
         }
+
+        ProgressTracker progress = ProgressTracker.track(actionName, 500, vertices.size());
+        LOG.info(progress.startMessage());
+
+        for (T v : vertices) {
+            // Do not link vertices, which are already linked by TransitToTaggedStopsModule
+            boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
+            if (alreadyLinked) { continue; }
+
+            //Do not link stops connected by pathways
+            if (v instanceof TransitStopVertex && ((TransitStopVertex) v).hasPathways()) {
+                continue;
+            };
+
+            if (!link(v)) {
+                issueStore.add(unlinkedIssueMapper.apply(v));
+            };
+            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            progress.step(m -> LOG.info(m));
+        }
+        LOG.info(progress.completeMessage());
     }
 
     /** Link this vertex into the graph to the closest walkable edge */
@@ -436,6 +472,8 @@ public class SimpleStreetSplitter {
             makeTemporaryEdges((TemporaryStreetLocation) from, to);
         } else if (from instanceof TransitStopVertex) {
             makeTransitLinkEdges((TransitStopVertex) from, to);
+        } else if (from instanceof TransitEntranceVertex) {
+            makeTransitLinkEdges((TransitEntranceVertex) from, to);
         } else if (from instanceof BikeRentalStationVertex) {
             makeBikeRentalLinkEdges((BikeRentalStationVertex) from, to);
         } else if (from instanceof BikeParkVertex) {
@@ -490,6 +528,23 @@ public class SimpleStreetSplitter {
 
         new StreetTransitLink(tstop, v, tstop.hasWheelchairEntrance());
         new StreetTransitLink(v, tstop, tstop.hasWheelchairEntrance());
+    }
+
+    /**
+     * Make street transit link edges, unless they already exist.
+     */
+    private void makeTransitLinkEdges(TransitEntranceVertex entrance, StreetVertex v) {
+        if (!destructiveSplitting) {
+            throw new RuntimeException("Transitedges are created with non destructive splitting!");
+        }
+        // ensure that the requisite edges do not already exist
+        // this can happen if we link to duplicate ways that have the same start/end vertices.
+        for (TransitEntranceLink e : Iterables.filter(entrance.getOutgoing(), TransitEntranceLink.class)) {
+            if (e.getToVertex() == v) { return; }
+        }
+
+        new TransitEntranceLink(entrance, v, entrance.isWheelchairEntrance());
+        new TransitEntranceLink(v, entrance, entrance.isWheelchairEntrance());
     }
 
     /** Make link edges for bike rental */
@@ -575,7 +630,7 @@ public class SimpleStreetSplitter {
         TraverseMode nonTransitMode = TraverseMode.WALK;
         //It can be null in tests
         if (options != null) {
-            TraverseModeSet modes = options.modes;
+            TraverseModeSet modes = options.streetSubRequestModes;
             if (modes.getCar())
                 // for park and ride we will start in car mode and walk to the end vertex
                 if (endVertex && (options.parkAndRide || options.kissAndRide)) {

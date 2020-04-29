@@ -3,6 +3,8 @@ package org.opentripplanner.routing.graph;
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoException;
+import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
@@ -10,24 +12,36 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashBiMap;
 import com.google.common.collect.HashMultimap;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
+import de.javakaffee.kryoserializers.guava.HashMultimapSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.array.TIntArrayList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.kryo.BuildConfigSerializer;
 import org.opentripplanner.kryo.HashBiMapSerializer;
+import org.opentripplanner.kryo.RouterConfigSerializer;
+import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.util.OtpAppException;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.io.OutputStream;
 import java.io.Serializable;
 import java.util.BitSet;
 import java.util.Collection;
 
 /**
- * This is the class that get serialized/deserialized into/from the file <em>Graph.obj</em>.
+ * This is the class that get serialized/deserialized into/from the file <em>graph.obj</em>.
  * <p>
  * The Graph object does not contain a collection of edges. The set of edges is generated on demand
  * from the vertices. However, when serializing, we intentionally do not serialize the vertices'
@@ -44,9 +58,47 @@ public class SerializedGraphObject implements Serializable {
 
     private final Collection<Edge> edges;
 
-    public SerializedGraphObject(Graph graph) {
+    /** The config JSON used to build this graph. Allows checking whether the configuration has changed. */
+    public final BuildConfig buildConfig;
+
+    /** Embed a router configuration inside the graph, for starting up with a single file. */
+    public final RouterConfig routerConfig;
+
+    public SerializedGraphObject(Graph graph, BuildConfig buildConfig, RouterConfig routerConfig) {
         this.graph = graph;
         this.edges = graph.getEdges();
+        this.buildConfig = buildConfig;
+        this.routerConfig = routerConfig;
+    }
+
+    public static void verifyTheOutputGraphIsWritableIfDataSourceExist(DataSource graphOutput) {
+        if (graphOutput != null) {
+            // Abort building a graph if the file can not be saved
+            if (graphOutput.exists()) {
+                LOG.info("Graph already exists and will be overwritten at the end of the " + "build process. Graph: {}", graphOutput.path());
+            }
+            if (!graphOutput.isWritable()) {
+                throw new RuntimeException(
+                        "Cannot create or write to graph at: " + graphOutput.path());
+            }
+        }
+    }
+
+    public static SerializedGraphObject load(DataSource source) {
+        return load(source.asInputStream(), source.path());
+    }
+
+    public static Graph load(File file) {
+        try {
+            SerializedGraphObject serObj = load(
+                    new FileInputStream(file),
+                    file.getAbsolutePath()
+            );
+            return serObj == null ? null : serObj.graph;
+        } catch (FileNotFoundException e) {
+            LOG.error("Graph file not found: " + file, e);
+            throw new OtpAppException(e.getMessage());
+        }
     }
 
     /**
@@ -66,25 +118,31 @@ public class SerializedGraphObject implements Serializable {
         }
     }
 
-    public void save(File file) throws IOException {
+    /**
+     * Save this object to the target it the target data source is not {@code null}.
+     */
+    public void save(@Nullable DataSource target) {
+        if (target != null) {
+            save(target.asOutputStream(), target.name(), target.size());
+        } else {
+            LOG.info("Not saving graph to disk, as requested.");
+        }
+    }
+
+    /**
+     * This method is an alternative to {@link #save(DataSource)} for tests and other purposes,
+     * but should not be used within the main OTP application.
+     */
+    public void saveToFile(File file) throws IOException {
         try {
-            save(new FileOutputStream(file));
+            save(new FileOutputStream(file), file.getName(), file.length());
         } catch (Exception e) {
-            file.delete(); // remove half-written file
+            // remove half-written file
+            file.deleteOnExit();
             throw e;
         }
     }
 
-    public void save(OutputStream outputStream) {
-        Kryo kryo = SerializedGraphObject.makeKryo();
-        LOG.debug("Consolidating edges...");
-        Output output = new Output(outputStream);
-        kryo.writeClassAndObject(output, this);
-        output.close();
-        LOG.info("Graph written.");
-        // Summarize serialized classes and associated serializers to stdout:
-        // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
-    }
 
     /**
      * This method allows reproducibly creating Kryo (de)serializer instances with exactly the same configuration.
@@ -116,6 +174,12 @@ public class SerializedGraphObject implements Serializable {
         // It should be possible to reconstruct this like a standard Map. However, the HashBiMap constructor calls an
         // init method that creates the two internal maps. So we have to subclass the generic Map serializer.
         kryo.register(HashBiMap.class, new HashBiMapSerializer());
+        kryo.register(HashMultimap.class, new HashMultimapSerializer());
+
+        // Add serializers for "immutable" config classes
+        kryo.register(RouterConfig.class, new RouterConfigSerializer());
+        kryo.register(BuildConfig.class, new BuildConfigSerializer());
+
         // OBA uses unmodifiable collections, but those classes have package-private visibility. Workaround.
         // FIXME we're importing all the contributed kryo-serializers just for this one serializer
         try {
@@ -130,6 +194,61 @@ public class SerializedGraphObject implements Serializable {
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
+    }
+
+
+    /* private methods */
+
+    private static SerializedGraphObject load(InputStream inputStream, String sourceDescription) {
+        // TODO store version information, halt load if versions mismatch
+        try(inputStream) {
+            LOG.info("Reading graph from '{}'", sourceDescription);
+            Input input = new Input(inputStream);
+            Kryo kryo = makeKryo();
+            SerializedGraphObject serObj = (SerializedGraphObject) kryo.readClassAndObject(input);
+            Graph graph = serObj.graph;
+            LOG.debug("Graph read.");
+            if (graph.graphVersionMismatch()) {
+                throw new RuntimeException("Graph version mismatch detected.");
+            }
+            serObj.reconstructEdgeLists();
+            LOG.info("Graph read. |V|={} |E|={}", graph.countVertices(), graph.countEdges());
+            return serObj;
+        }
+        catch (IOException e) {
+            LOG.error("Exception while loading graph: {}", e.getLocalizedMessage(), e);
+            return null;
+        }
+        catch (KryoException ke) {
+            LOG.warn("Exception while loading graph: {}\n{}", sourceDescription, ke.getLocalizedMessage());
+            throw new OtpAppException("Unable to load graph. The deserialization failed. Is the "
+                    + "loaded graph build with the same OTP version as you are using to load it? "
+                    + "Graph: " + sourceDescription);
+        }
+    }
+
+    private void save(OutputStream outputStream, String graphName, long size) {
+        LOG.info("Writing graph " + graphName + " ...");
+        outputStream = wrapOutputStreamWithProgressTracker(outputStream, size);
+        Kryo kryo = makeKryo();
+        Output output = new Output(outputStream);
+        kryo.writeClassAndObject(output, this);
+        output.close();
+        LOG.info("Graph written: {}", graphName);
+        // Summarize serialized classes and associated serializers to stdout:
+        // ((InstanceCountingClassResolver) kryo.getClassResolver()).summarize();
+    }
+
+    @SuppressWarnings("Convert2MethodRef")
+    private static OutputStream wrapOutputStreamWithProgressTracker(OutputStream outputStream, long size) {
+        return ProgressTracker.track(
+                "Save graph",
+                500_000,
+                size,
+                outputStream,
+                // Keep this to get correct logging info for class and line number
+                msg -> LOG.info(msg)
+        );
     }
 
 }

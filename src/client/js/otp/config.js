@@ -17,15 +17,16 @@ otp.config = {
     //value is name of settings file for localization in locale subfolder
     //File should be loaded in index.html
     locales : {
-        'en': otp.locale.English,
+        'ca_ES': otp.locale.Catalan,
         'de': otp.locale.German,
-        'pl': otp.locale.Polish,
-        'sl': otp.locale.Slovenian,
+        'en': otp.locale.English,
+        'es': otp.locale.Spanish,
         'fr': otp.locale.French,
         'it': otp.locale.Italian,
-        'ca_ES': otp.locale.Catalan,
-	'es': otp.locale.Spanish,
-	'pt': otp.locale.Portuguese
+        'no': otp.locale.Norwegian,
+        'pl': otp.locale.Polish,
+        'pt': otp.locale.Portuguese,
+        'sl': otp.locale.Slovenian
     },
 
     languageChooser : function() {

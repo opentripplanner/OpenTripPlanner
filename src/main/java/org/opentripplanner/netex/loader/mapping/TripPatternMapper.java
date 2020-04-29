@@ -22,6 +22,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
 
 /**
  * Maps NeTEx JourneyPattern to OTP TripPattern. All ServiceJourneys in the same JourneyPattern contain the same
@@ -57,6 +58,7 @@ class TripPatternMapper {
             FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, Stop> stopsById,
             EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
@@ -68,7 +70,7 @@ class TripPatternMapper {
         this.routeById = routeById;
         this.serviceJourneyByPatternId = serviceJourneyByPatternId;
         this.otpRouteById = otpRouteById;
-        this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById);
+        this.tripMapper = new TripMapper(idFactory, otpRouteById, routeById, journeyPatternById, shapePointsIds);
         this.stopTimesMapper = new StopTimesMapper(idFactory, stopsById, destinationDisplayById, quayIdByStopPointRef);
         this.deduplicator = deduplicator;
     }
@@ -98,6 +100,10 @@ class TripPatternMapper {
                     trip,
                     serviceJourney.getPassingTimes().getTimetabledPassingTime()
             );
+
+            // Unable to map StopTimes, problem logged by the mapper above
+            if (stopTimes == null) continue;
+
             result.tripStopTimes.put(trip, stopTimes.stopTimes);
             result.stopTimeByNetexId.putAll(stopTimes.stopTimeByNetexId);
 

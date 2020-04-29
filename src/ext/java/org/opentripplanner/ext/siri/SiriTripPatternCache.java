@@ -1,16 +1,3 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (props, at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.ext.siri;
 
 import com.google.common.collect.ArrayListMultimap;
@@ -26,6 +13,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
@@ -56,8 +44,11 @@ public class SiriTripPatternCache {
      * @param serviceDate
      * @return cached or newly created trip pattern
      */
-    public synchronized TripPattern getOrCreateTripPattern(final StopPattern stopPattern,
-                                                           final Trip trip, final Graph graph, ServiceDate serviceDate) {
+    public synchronized TripPattern getOrCreateTripPattern(
+            @NotNull final StopPattern stopPattern,
+            @NotNull final Trip trip,
+            @NotNull final Graph graph,
+            @NotNull ServiceDate serviceDate) {
         // Check cache for trip pattern
         StopPatternServiceDateKey key = new StopPatternServiceDateKey(stopPattern, serviceDate);
         TripPattern tripPattern = cache.get(key);
@@ -71,7 +62,7 @@ public class SiriTripPatternCache {
             tripPattern.setId(new FeedScopedId(trip.getId().getFeedId(), generateUniqueTripPatternCode(tripPattern)));
             
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
-            tripPattern.setServiceCodes(graph.serviceCodes);
+            tripPattern.setServiceCodes(graph.getServiceCodes());
             
             // Finish scheduled time table
             tripPattern.scheduledTimetable.finish();
@@ -81,6 +72,14 @@ public class SiriTripPatternCache {
 //            tripPattern.makePatternVerticesAndEdges(graph, graph.index.stopVertexForStop);
             
             // TODO - SIRI: Add pattern to graph index?
+
+            TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
+
+            // Copy information from the TripPattern this is replacing
+            if (originalTripPattern != null) {
+                tripPattern.setId(originalTripPattern.getId());
+                tripPattern.setHopGeometriesFromPattern(originalTripPattern);
+            }
             
             // Add pattern to cache
             cache.put(key, tripPattern);
@@ -170,7 +169,7 @@ public class SiriTripPatternCache {
             counter++;
         }
         // OBA library uses underscore as separator, we're moving toward colon.
-        String code = String.format("%s:%s:%s:rt#%d", routeId.getFeedId(), routeId.getId(), direction, counter);
+        String code = String.format("%s:%s:rt#%d", routeId.getId(), direction, counter);
         return code;
     }
 

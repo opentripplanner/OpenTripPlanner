@@ -1,11 +1,13 @@
 # Changelog
 
 ## 2.0 (in progress)
+See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 - Sandbox for experimental features (#2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
 - Remove redundant LineStrings in order to save memory (#2795)
-- NeTEx import support (#2769).
+- NeTEx import support (#2769)
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
 - Added NeTEx notices (#2824)
 - Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
 - Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import (#2813)
@@ -15,6 +17,22 @@
 - Bugfix for graph building crashing on unsupported modes (#2899)
 - Add command line parameter for building partial graphs (#2583)
 - Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices (#2887) 
+- New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
+- Update only the relevant parts of the TransitLayer each time an update is applied (#2918)
+- Ability to switch off the fare service(#2912).
+- Limit the transit service period(#2925).
+- Removed unwanted cost added for wait time between access and transit with RangeRaptor (#2927)
+- Dynamic search parameters, calculate raptor search-window when needed. (#2931)
+- Support for next/previous paging trip search results (#2941)
+- Fix mismatch in duration for walk legs, resulting in negative wait times (#2955)
+- NeTEx import now supports ServiceLinks (#2951)
+- Also check TripPatterns added by realtime when showing stoptimes for stop (#2954)
+- Copy geometries from previous TripPattern when realtime updates result in a TripPattern being replaced (#2987)
+- Support for the Norwegian language.
+- Update pathways support to official GTFS specification (#2923)
+- Support for XML (de-)serialization is REMOVED from the REST API (#3031)
+- Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
+- Make agency id feed scoped (#3035)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

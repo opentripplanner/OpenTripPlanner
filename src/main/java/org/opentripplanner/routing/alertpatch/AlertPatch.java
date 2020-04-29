@@ -19,7 +19,6 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 
@@ -38,7 +37,7 @@ public class AlertPatch implements Serializable {
 
     private List<TimePeriod> timePeriods = new ArrayList<>();
 
-    private String agency;
+    private FeedScopedId agency;
 
     private FeedScopedId operatorId;
 
@@ -101,29 +100,25 @@ public class AlertPatch implements Serializable {
     }
 
     public void apply(Graph graph) {
-        Agency agency = null;
-        if (feedId != null) {
-            Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
-            agency = this.agency != null ? agencies.get(this.agency) : null;
-        }
-        Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
-        Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
-        Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
+        Agency agency = this.agency != null ? graph.index.getAgencyForId(this.agency) : null;
+        Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
+        Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
+        Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {
             Collection<TripPattern> tripPatterns = null;
 
             if (trip != null) {
                 tripPatterns = new LinkedList<>();
-                TripPattern tripPattern = graph.index.patternForTrip.get(trip);
+                TripPattern tripPattern = graph.index.getPatternForTrip().get(trip);
                 if (tripPattern != null) {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
+               tripPatterns = graph.index.getPatternsForRoute().get(route);
             } else {
                 // Find patterns for the feed.
-                tripPatterns = graph.index.patternsForFeedId.get(feedId);
+                tripPatterns = graph.index.getPatternsForFeedId().get(feedId);
             }
 
             if (tripPatterns != null) {
@@ -147,29 +142,25 @@ public class AlertPatch implements Serializable {
     }
 
     public void remove(Graph graph) {
-        Agency agency = null;
-        if (feedId != null) {
-            Map<String, Agency> agencies = graph.index.agenciesForFeedId.get(feedId);
-            agency = this.agency != null ? agencies.get(this.agency) : null;
-        }
-        Route route = this.route != null ? graph.index.routeForId.get(this.route) : null;
-        Stop stop = this.stop != null ? graph.index.stopForId.get(this.stop) : null;
-        Trip trip = this.trip != null ? graph.index.tripForId.get(this.trip) : null;
+        Agency agency = this.agency != null ? graph.index.getAgencyForId(this.agency) : null;
+        Route route = this.route != null ? graph.index.getRouteForId(this.route) : null;
+        Stop stop = this.stop != null ? graph.index.getStopForId(this.stop) : null;
+        Trip trip = this.trip != null ? graph.index.getTripForId().get(this.trip) : null;
 
         if (route != null || trip != null || agency != null) {
             Collection<TripPattern> tripPatterns = null;
 
             if(trip != null) {
                 tripPatterns = new LinkedList<TripPattern>();
-                TripPattern tripPattern = graph.index.patternForTrip.get(trip);
+                TripPattern tripPattern = graph.index.getPatternForTrip().get(trip);
                 if(tripPattern != null) {
                     tripPatterns.add(tripPattern);
                 }
             } else if (route != null) {
-               tripPatterns = graph.index.patternsForRoute.get(route);
+               tripPatterns = graph.index.getPatternsForRoute().get(route);
             } else {
                 // Find patterns for the feed.
-                tripPatterns = graph.index.patternsForFeedId.get(feedId);
+                tripPatterns = graph.index.getPatternsForFeedId().get(feedId);
             }
 
             if (tripPatterns != null) {
@@ -207,7 +198,7 @@ public class AlertPatch implements Serializable {
         timePeriods = periods;
     }
 
-    public String getAgency() {
+    public FeedScopedId getAgency() {
         return agency;
     }
 
@@ -223,7 +214,7 @@ public class AlertPatch implements Serializable {
         return stop;
     }
 
-    public void setAgencyId(String agency) {
+    public void setAgency(FeedScopedId agency) {
         this.agency = agency;
     }
 

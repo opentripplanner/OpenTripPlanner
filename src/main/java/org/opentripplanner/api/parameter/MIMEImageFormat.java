@@ -1,10 +1,8 @@
 package org.opentripplanner.api.parameter;
 
+import javax.ws.rs.BadRequestException;
 import java.util.Arrays;
 import java.util.Collection;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.Status;
 
 public class MIMEImageFormat {
     
@@ -19,16 +17,10 @@ public class MIMEImageFormat {
             if (acceptedTypes.contains(parts[1])) {
                 type = parts[1];
             } else {
-                throw new WebApplicationException(Response
-                        .status(Status.BAD_REQUEST)
-                        .entity("unsupported image format: " + parts[1])
-                        .build());
+                throw new BadRequestException("unsupported image format: " + parts[1]);
             }
         } else {
-            throw new WebApplicationException(Response
-                    .status(Status.BAD_REQUEST)
-                    .entity("malformed image format mime type: " + s)
-                    .build());
+            throw new BadRequestException("malformed image format mime type: " + s);
         }
     }
  

@@ -1,11 +1,12 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.ws.rs.BadRequestException;
 import javax.ws.rs.Consumes;
 import javax.ws.rs.DefaultValue;
 import javax.ws.rs.GET;
@@ -26,10 +27,9 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
-import java.util.stream.DoubleStream;
 // TODO move to org.opentripplanner.api.resource, this is a Jersey resource class
 
-@Path("/routers/{routerId}/transmodel/index")    // It would be nice to get rid of the final /index.
+@Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
 public class TransmodelIndexAPI {
     @SuppressWarnings("unused")
@@ -39,9 +39,16 @@ public class TransmodelIndexAPI {
     private final TransmodelGraphIndex index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
-    public TransmodelIndexAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+    /**
+     * @deprecated The support for multiple routers are removed from OTP2.
+     * See https://github.com/opentripplanner/OpenTripPlanner/issues/2760
+     */
+    @Deprecated @PathParam("ignoreRouterId")
+    private String ignoreRouterId;
+
+    public TransmodelIndexAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
-        index = new TransmodelGraphIndex(router.graph);
+        index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
     }
 
     /**
@@ -56,11 +63,10 @@ public class TransmodelIndexAPI {
     @POST
     @Path("/graphql")
     @Consumes(MediaType.APPLICATION_JSON)
-    public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
+    public Response getGraphQL(HashMap<String, Object> queryParameters, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
         if (queryParameters==null || !queryParameters.containsKey("query")) {
             LOG.debug("No query found in body");
-            return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("No query found in body").build();
+            throw new BadRequestException("No query found in body");
         }
 
         String query = (String) queryParameters.get("query");
@@ -73,27 +79,25 @@ public class TransmodelIndexAPI {
             try {
                 variables = deserializer.readValue((String) queryVariables, Map.class);
             } catch (IOException e) {
-                return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                throw new BadRequestException("Variables must be a valid json object");
             }
         } else {
             variables = new HashMap<>();
         }
-        return index.getGraphQLResponse(query, router, variables, operationName, finalTimeout, maxResolves);
+        return index.getGraphQLResponse(query, router, variables, operationName, maxResolves);
     }
 
     @POST
     @Path("/graphql")
     @Consumes("application/graphql")
-    public Response getGraphQL(String query, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
-        return index.getGraphQLResponse(query, router, null, null, finalTimeout, maxResolves);
+    public Response getGraphQL(String query, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
+        return index.getGraphQLResponse(query, router, null, null, maxResolves);
     }
 
     @POST
     @Path("/graphql/batch")
     @Consumes(MediaType.APPLICATION_JSON)
     public Response getGraphQLBatch(List<HashMap<String, Object>> queries, @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves) {
-        int finalTimeout = checkTimeout(timeout);
         List<Map<String, Object>> responses = new ArrayList<>();
         List<Callable<Map>> futures = new ArrayList();
 
@@ -105,7 +109,7 @@ public class TransmodelIndexAPI {
                 try {
                     variables = deserializer.readValue((String) query.get("variables"), Map.class);
                 } catch (IOException e) {
-                    return Response.status(Response.Status.BAD_REQUEST).type(MediaType.TEXT_PLAIN_TYPE).entity("Variables must be a valid json object").build();
+                    throw new BadRequestException("Variables must be a valid json object");
                 }
             } else {
                 variables = null;
@@ -113,7 +117,7 @@ public class TransmodelIndexAPI {
             String operationName = (String) query.getOrDefault("operationName", null);
 
             futures.add(() -> index.getGraphQLExecutionResult((String) query.get("query"), router,
-                    variables, operationName, finalTimeout, maxResolves));
+                    variables, operationName, maxResolves));
         }
 
         try {
@@ -130,16 +134,4 @@ public class TransmodelIndexAPI {
         }
         return Response.status(Response.Status.OK).entity(responses).build();
     }
-
-    private int checkTimeout(int timeout) {
-        if (router.timeouts.length > 0) {
-            int newTimeout = (int) Math.floor(DoubleStream.of(router.timeouts).sum() + 5) * 1000;
-            if (newTimeout > timeout) {
-                LOG.debug("Timeout set to sum of router config timeouts. Sum: {}. Old timeout: {}", newTimeout, timeout);
-                timeout = newTimeout;
-            }
-        }
-        return timeout;
-    }
-
 }

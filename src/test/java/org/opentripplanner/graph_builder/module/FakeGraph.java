@@ -4,8 +4,8 @@ import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.calendar.ServiceDateInterval;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -26,13 +26,12 @@ public class FakeGraph {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = getFileForResource("columbus.osm.pbf");
-        provider.setPath(file);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
         loader.setProvider(provider);
 
-        loader.buildGraph(gg, new HashMap<Class<?>, Object>());
+        loader.buildGraph(gg, new HashMap<>());
         return gg;
     }
 
@@ -45,7 +44,10 @@ public class FakeGraph {
      * Add many transit lines to a lot of stops. This is only used by InitialStopsTest.
      */
     public static void addTransitMultipleLines (Graph g) {
-        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))));
+        GtfsModule gtfs = new GtfsModule(
+                Arrays.asList(new GtfsBundle(getFileForResource("addTransitMultipleLines.gtfs.zip"))),
+                ServiceDateInterval.unbounded()
+        );
         gtfs.buildGraph(g, new HashMap<>());
     }
 
@@ -53,7 +55,10 @@ public class FakeGraph {
      * This introduces a 1MB test resource but is only used by TestIntermediatePlaces.
      */
     public static void addPerpendicularRoutes (Graph graph) {
-        GtfsModule gtfs = new GtfsModule(Arrays.asList(new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip"))));
+        GtfsModule gtfs = new GtfsModule(Arrays.asList(
+                new GtfsBundle(getFileForResource("addPerpendicularRoutes.gtfs.zip"))),
+                ServiceDateInterval.unbounded()
+        );
         gtfs.buildGraph(graph, new HashMap<>());
     }
 
@@ -63,13 +68,7 @@ public class FakeGraph {
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             for (double lon = -83.1341; lon < -82.8646; lon += 0.005) {
                 String id = "" + count++;
-                FeedScopedId aid = new FeedScopedId("TEST", id);
-                Stop stop = new Stop();
-                stop.setLat(lat);
-                stop.setLon(lon);
-                stop.setName(id);
-                stop.setCode(id);
-                stop.setId(aid);
+                Stop stop = Stop.stopForTest(id, lat, lon);
 
                 new TransitStopVertex(g, stop, null);
                 count++;
@@ -83,13 +82,7 @@ public class FakeGraph {
         double lon = -83;
         for (double lat = 40; lat < 40.01; lat += 0.005) {
             String id = "EXTRA_" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -100,13 +93,7 @@ public class FakeGraph {
 
         for (double lat = 39.9058; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -117,13 +104,7 @@ public class FakeGraph {
 
         for (double lat = 39.9059; lat < 40.0281; lat += 0.005) {
             String id = "" + count++;
-            FeedScopedId aid = new FeedScopedId("EXTRA", id);
-            Stop stop = new Stop();
-            stop.setLat(lat);
-            stop.setLon(lon);
-            stop.setName(id);
-            stop.setCode(id);
-            stop.setId(aid);
+            Stop stop = Stop.stopForTest(id, lat, lon);
 
             new TransitStopVertex(g, stop, null);
             count++;
@@ -135,5 +116,4 @@ public class FakeGraph {
         SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
         linker.link();
     }
-
 }

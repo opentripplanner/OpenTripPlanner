@@ -3,12 +3,13 @@ package org.opentripplanner.graph_builder.module.osm;
 import junit.framework.TestCase;
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.ConstantsForTests;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
@@ -18,7 +19,8 @@ import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.config.RouterConfig;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.LocalizedString;
 
 import java.io.File;
@@ -36,7 +38,7 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
     
     @Before
     public void setUp() {
-        extra = new HashMap<Class<?>, Object>();
+        extra = new HashMap<>();
     }
 
     @Test
@@ -46,11 +48,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("map.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(gg, extra);
@@ -104,11 +105,10 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, true);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(gg, extra);
@@ -159,19 +159,19 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.skipVisibility = skipVisibility;
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
         File file = new File(URLDecoder.decode(getClass().getResource("usf_area.osm.pbf").getFile(), "UTF-8"));
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(file, false);
 
-        provider.setPath(file);
         loader.setProvider(provider);
 
         loader.buildGraph(graph, extra);
         new StreetVertexIndex(graph);
 
-        Router router = ConstantsForTests.forTestGraph(graph);
+        Router router = new Router(graph, RouterConfig.DEFAULT);
+        router.startup();
 
-        RoutingRequest request = new RoutingRequest("WALK");
+        RoutingRequest request = new RoutingRequest(new TraverseModeSet(TraverseMode.WALK));
 
         //This are vertices that can be connected only over edges on area (with correct permissions)
         //It tests if it is possible to route over area without visibility calculations

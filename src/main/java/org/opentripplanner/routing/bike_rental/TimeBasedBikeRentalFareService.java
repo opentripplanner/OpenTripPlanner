@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.bike_rental;
 
-import com.conveyal.r5.otp2.api.path.Path;
-import com.conveyal.r5.otp2.api.path.PathLeg;
+import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -10,8 +9,7 @@ import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.services.FareService;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import org.opentripplanner.transit.raptor.api.path.PathLeg;
 
 import java.io.Serializable;
 import java.util.Currency;
@@ -23,8 +21,6 @@ import java.util.List;
 public class TimeBasedBikeRentalFareService implements FareService, Serializable {
 
     private static final long serialVersionUID = 5226621661906177942L;
-
-    private static Logger log = LoggerFactory.getLogger(TimeBasedBikeRentalFareService.class);
 
     // Each entry is <max time, cents at that time>; the list is sorted in
     // ascending time order

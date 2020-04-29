@@ -30,6 +30,15 @@ public class TestComponent implements org.opentripplanner.updater.GraphUpdater {
   }
 
   @Override
+  public String getName() {
+    return this.getClass().getName();
+  }
+
+  public boolean isPrimed() {
+    return false;
+  }
+
+  @Override
   public void configure(Graph graph, JsonNode jsonNode) throws Exception {
 
   }

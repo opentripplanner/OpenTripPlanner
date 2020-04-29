@@ -11,6 +11,8 @@ import java.util.List;
  * from a set.
  * @author novalis
  *
+ *
+ * TODO OTP2 - Replace this with the use of a EnumSet
  */
 public class TraverseModeSet implements Cloneable, Serializable {
 
@@ -46,17 +48,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
     private static final int MODE_ALL = MODE_TRANSIT | MODE_WALK | MODE_BICYCLE;
 
     private int modes = 0;
-
-    public TraverseModeSet(String modelist) {
-        modes = 0;
-        for (String modeStr : modelist.split(",")) {
-            if (modeStr.length() == 0) {
-                continue;
-            }
-            setMode(TraverseMode.valueOf(modeStr), true);
-        }
-
-    }
 
     public TraverseModeSet(TraverseMode... modes) {
         for (TraverseMode mode : modes) {
@@ -109,10 +100,6 @@ public class TraverseModeSet implements Cloneable, Serializable {
 
     public TraverseModeSet(Collection<TraverseMode> modeList) {
         this(modeList.toArray(new TraverseMode[0]));
-    }
-    
-    public int getMask() {
-        return modes;
     }
 
     public void setMode(TraverseMode mode, boolean value) {

@@ -9,13 +9,12 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -27,6 +26,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -104,22 +104,14 @@ public class TestHalfEdges {
         rightBack = new StreetEdge(tr, br, (LineString) right.getGeometry().reverse(),
                 "rightBack", 1500, StreetTraversalPermission.ALL, true);
 
-        Stop s1 = new Stop();
-        s1.setName("transitVertex 1");
-        s1.setLon(-74.005);
-        s1.setLat(40.0099999);
-        s1.setId(new FeedScopedId("A", "fleem station"));
+        Stop s1 = Stop.stopForTest("fleem station", 40.0099999, -74.005);
 
-        Stop s2 = new Stop();
-        s2.setName("transitVertex 2");
-        s2.setLon(-74.002);
-        s2.setLat(40.0099999);
-        s2.setId(new FeedScopedId("A", "morx station"));
+        Stop s2 = Stop.stopForTest("morx station", 40.0099999, -74.002);
 
         station1 = new TransitStopVertex(graph, s1, null);
         station2 = new TransitStopVertex(graph, s2, null);
-        station1.addMode(TraverseMode.RAIL);
-        station2.addMode(TraverseMode.RAIL);
+        station1.addMode(TransitMode.RAIL);
+        station2.addMode(TransitMode.RAIL);
         
         //Linkers aren't run otherwise in testNetworkLinker
         graph.hasStreets = true;
@@ -459,18 +451,18 @@ public class TestHalfEdges {
         int numVerticesAfter = graph.getVertices().size();
         assertEquals(4, numVerticesAfter - numVerticesBefore);
         Collection<Edge> outgoing = station1.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         Edge edge = outgoing.iterator().next();
 
         Vertex midpoint = edge.getToVertex();
         assertTrue(Math.abs(midpoint.getCoordinate().y - 40.01) < 0.00000001);
 
         outgoing = station2.getOutgoing();
-        assertTrue(outgoing.size() == 2);
+        assertEquals(2, outgoing.size());
         edge = outgoing.iterator().next();
 
         Vertex station2point = edge.getToVertex();
         assertTrue(Math.abs(station2point.getCoordinate().x - -74.002) < 0.00000001);
-
     }
+
 }

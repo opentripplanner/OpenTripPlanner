@@ -7,8 +7,9 @@ import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.OtpTransitService;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
@@ -32,8 +33,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     private static final Logger LOG = LoggerFactory.getLogger(DefaultFareServiceFactory.class);
 
-    protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<FeedScopedId, FareRuleSet>();
+    protected Map<FeedScopedId, FareRuleSet> regularFareRules = new HashMap<>();
 
+    @Override
     public FareService makeFareService() {
         DefaultFareServiceImpl fareService = new DefaultFareServiceImpl();
         fareService.addFareRules(StandardFareType.regular, regularFareRules.values());
@@ -42,10 +44,10 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
 
     @Override
     public void processGtfs(OtpTransitService transitService) {
-        fillFareRules(null, transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
+        fillFareRules(transitService.getAllFareAttributes(), transitService.getAllFareRules(), regularFareRules);
     }
 
-    protected void fillFareRules(String agencyId, Collection<FareAttribute> fareAttributes,
+    protected void fillFareRules(Collection<FareAttribute> fareAttributes,
             Collection<FareRule> fareRules, Map<FeedScopedId, FareRuleSet> fareRuleSet) {
         /*
          * Create an empty FareRuleSet for each FareAttribute, as some FareAttribute may have no
@@ -57,10 +59,6 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
             if (fareRule == null) {
                 fareRule = new FareRuleSet(fare);
                 fareRuleSet.put(id, fareRule);
-                if (agencyId != null) {
-                    // TODO With the new GTFS lib, use fareAttribute.agency_id directly
-                    fareRule.setAgency(agencyId);
-                }
             }
         }
 
@@ -96,6 +94,9 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
     public void configure(JsonNode config) {
         // No configuration for the moment
     }
+
+    @Override
+    public String toString() { return this.getClass().getSimpleName(); }
 
     /**
      * Build a specific FareServiceFactory given the config node, or fallback to the default if none
@@ -161,6 +162,4 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
                 String.format("Failed to initialize fare type: '%s'", type));
         }
     }
-
-    public String toString() { return this.getClass().getSimpleName(); }
 }

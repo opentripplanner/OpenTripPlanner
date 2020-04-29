@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.request;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 
 /**
  * This represents a single trip within a TripPattern, but with a time offset in seconds. This is used to represent
@@ -12,37 +13,44 @@ import org.opentripplanner.routing.trippattern.TripTimes;
 public class TripScheduleWithOffset implements TripSchedule {
 
     private final int secondsOffset;
+    private final TripPatternForDates pattern;
+    private final TripTimes tripTimes;
 
-    private final TripSchedule tripSchedule;
-
-    TripScheduleWithOffset(TripSchedule tripSchedule, int offset) {
-        this.tripSchedule = tripSchedule;
+    TripScheduleWithOffset(TripPatternForDates pattern, TripTimes tripTimes, int offset) {
+        this.pattern = pattern;
+        this.tripTimes = tripTimes;
         this.secondsOffset = offset;
     }
 
     @Override
     public int arrival(int stopPosInPattern) {
-        return this.tripSchedule.arrival(stopPosInPattern) + secondsOffset;
+        return this.tripTimes.getArrivalTime(stopPosInPattern) + secondsOffset;
     }
 
     @Override
     public int departure(int stopPosInPattern) {
-        return this.tripSchedule.departure(stopPosInPattern) + secondsOffset;
+        return this.tripTimes.getDepartureTime(stopPosInPattern) + secondsOffset;
     }
 
     @Override
     public String debugInfo() {
-        return null;
+        TripPattern pattern = this.pattern.getTripPattern().getPattern();
+        return pattern.getMode() + " " + pattern.route.getShortName();
+    }
+
+    @Override
+    public RaptorTripPattern pattern() {
+        return pattern;
     }
 
     @Override
     public TripTimes getOriginalTripTimes() {
-        return this.tripSchedule.getOriginalTripTimes();
+        return this.tripTimes;
     }
 
     @Override
     public TripPattern getOriginalTripPattern() {
-        return this.tripSchedule.getOriginalTripPattern();
+        return pattern.getTripPattern().getPattern();
     }
 
     public int getSecondsOffset() {

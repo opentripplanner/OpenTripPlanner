@@ -2,12 +2,15 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
+import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.PlaceType;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.RoutingService;
 
 import java.time.LocalDate;
 import java.util.Collection;
@@ -93,22 +96,10 @@ public class TransmodelMappingUtil {
         if (values == null) {
             return null;
         }
-        List<String> otpModelModes = values.stream().map(value -> mapElementFunction.apply(value)).collect(Collectors.toList());
+        List<String> otpModelModes = values.stream().map(mapElementFunction).collect(Collectors.toList());
 
         return Joiner.on(LIST_VALUE_SEPARATOR).join(otpModelModes);
     }
-
-    // Create a dummy route to be able to reuse GtfsLibrary functionality
-    public Object mapVehicleTypeToTraverseMode(int vehicleType) {
-        Route dummyRoute = new Route();
-        dummyRoute.setType(vehicleType);
-        try {
-            return GtfsLibrary.getTraverseMode(dummyRoute);
-        } catch (IllegalArgumentException iae) {
-            return "unknown";
-        }
-    }
-
 
     public Long serviceDateToSecondsSinceEpoch(ServiceDate serviceDate) {
         if (serviceDate == null) {
@@ -133,6 +124,22 @@ public class TransmodelMappingUtil {
         }
 
         return inputTypes.stream().map(pt -> mapPlaceType(pt)).distinct().collect(Collectors.toList());
+    }
+
+    public MonoOrMultiModalStation getMonoOrMultiModalStation(
+        String idString,
+        RoutingService routingService
+    ) {
+        FeedScopedId id = fromIdString(idString);
+        Station station = routingService.getStationById(id);
+        if (station != null) {
+            return new MonoOrMultiModalStation(station, routingService.getMultiModalStationForStations().get(station));
+        }
+        MultiModalStation multiModalStation = routingService.getMultiModalStationById(id);
+        if (multiModalStation != null) {
+            return new MonoOrMultiModalStation(multiModalStation);
+        }
+        return null;
     }
 
     private PlaceType mapPlaceType(TransmodelPlaceType transmodelType){

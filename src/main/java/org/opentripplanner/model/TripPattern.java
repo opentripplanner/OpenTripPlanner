@@ -15,14 +15,11 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -34,6 +31,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 /**
  * Represents a group of trips on a route, with the same direction id that all call at the same
@@ -44,9 +42,6 @@ import java.util.Set;
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
- *
- *  TODO OTP2 - Move this to package: org.opentripplanner.model
- *            - after ass Entur NeTEx PRs are merged.
  */
 public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
 
@@ -79,11 +74,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public int directionId = -1;
 
     /**
-     * The traverse mode for all trips in this pattern.
-     */
-    public final TraverseMode mode;
-
-    /**
      * All trips in this pattern call at this sequence of stops. This includes information about GTFS
      * pick-up and drop-off types.
      */
@@ -114,6 +104,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     private byte[][] hopGeometries = null;
 
+    /**
+     * The unique identifier for this trip pattern. For GTFS feeds this is generally
+     * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
+     * NeTEx the JourneyPattern id is used.
+     */
     @Override
     public FeedScopedId getId() { return id; }
 
@@ -121,12 +116,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     public void setId(FeedScopedId id) { this.id = id; }
 
     /**
-     * The short unique identifier for this trip pattern,
-     * generally in the format Agency:RouteId:DirectionId:PatternNumber (GTFS)
-     * or if the id is set, then {@code id.getId()} (Netex).
+     * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
      */
-    public String getCode() {
-        return id.getId();
+    public final TransitMode getMode() {
+        return route.getMode();
     }
 
     public LineString getHopGeometry(int stopIndex) {
@@ -157,6 +150,35 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         this.hopGeometries[i] = CompactLineString.compactLineString(hopGeometry,false);
     }
 
+    /**
+     * This will copy the geometry from another TripPattern to this one. It checks if each hop is
+     * between the same stops before copying that hop geometry. If the stops are different, a
+     * straight-line hop-geometry will be used instead.
+     *
+     * @param other TripPattern to copy geometry from
+     */
+    public void setHopGeometriesFromPattern(TripPattern other) {
+        this.hopGeometries = new byte[this.getStops().size() - 1][];
+        for (int i = 0; i < other.getStops().size() - 1; i++) {
+            if (other.getHopGeometry(i) != null
+                && other.getStop(i).equals(this.getStop(i))
+                && other.getStop(i + 1).equals(this.getStop(i + 1))) {
+                // Copy hop geometry from previous pattern
+                this.setHopGeometry(i, other.getHopGeometry(i));
+            } else {
+                // Create new straight-line geometry for hop
+                this.setHopGeometry(i,
+                    GeometryUtils.getGeometryFactory().createLineString(
+                        new Coordinate[]{
+                            coordinate(stopPattern.stops[i]),
+                            coordinate(stopPattern.stops[i + 1])
+                        }
+                    )
+                );
+            }
+        }
+    }
+
     public LineString getGeometry() {
         List<LineString> lineStrings = new ArrayList<>();
         for (int i = 0; i < hopGeometries.length - 1; i++) {
@@ -171,7 +193,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    @XmlElement int[] perStopFlags;
+    int[] perStopFlags;
 
     /**
      * A set of serviceIds with at least one trip in this pattern.
@@ -182,7 +204,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public TripPattern(Route route, StopPattern stopPattern) {
         this.route = route;
-        this.mode = GtfsLibrary.getTraverseMode(this.route);
         this.stopPattern = stopPattern;
         setStopsFromStopPattern(stopPattern);
     }
@@ -223,7 +244,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return trips.get(tripIndex);
     }
 
-    @XmlTransient
     public List<Trip> getTrips() {
         return trips;
     }
@@ -291,6 +311,20 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         scheduledTimetable.addFrequencyEntry(freq);
         if (this.route != freq.tripTimes.trip.getRoute()) {
             LOG.warn("The trip {} is on a different route than its stop pattern, which is on {}.", freq.tripTimes.trip, route);
+        }
+    }
+
+    /**
+     * Remove all trips matching the given predicate.
+     * @param removeTrip it the predicate returns true
+     */
+    public void removeTrips(Predicate<Trip> removeTrip) {
+        trips.removeIf(removeTrip);
+        if(trips.isEmpty()) {
+            scheduledTimetable.tripTimes.clear();
+        }
+        else {
+            scheduledTimetable.tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
         }
     }
 
@@ -454,7 +488,6 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
                 }
             }
         }
-
     }
 
     /**
@@ -467,10 +500,10 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         for (Trip trip : trips) {
             FeedScopedId serviceId = trip.getServiceId();
             if (serviceCodes.containsKey(serviceId)) {
-                services.set(serviceCodes.get(trip.getServiceId()));
+                services.set(serviceCodes.get(serviceId));
             }
             else {
-                LOG.warn("ServiceCode " + serviceCodes.toString() + " not found.");
+                LOG.warn("Service " + serviceId + " not found in service codes not found.");
             }
         }
         scheduledTimetable.setServiceCodes (serviceCodes);
@@ -494,6 +527,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return trips.get(0).getTripHeadsign();
     }
 
+    public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
+        Set<FeedScopedId> seen = new HashSet<>();
+        return tripPatterns.stream().map(t -> t.id).allMatch(t -> t != null && seen.add(t));
+    }
+
     /**
      * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, the direction and
      * an integer.
@@ -507,13 +545,13 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
             patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%s:%02d", routeId.getFeedId(), routeId.getId(), direction, count);
+            String id = String.format("%s:%s:%02d", routeId.getId(), direction, count);
             pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
         }
     }
 
     public String toString () {
-        return String.format("<TripPattern %s>", this.getCode());
+        return String.format("<TripPattern %s>", this.getId());
     }
 
 	public Trip getExemplar() {

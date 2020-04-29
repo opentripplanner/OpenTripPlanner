@@ -3,9 +3,10 @@ package org.opentripplanner.routing.core;
 import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.routing.request.RoutingRequest;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -23,14 +24,14 @@ public class RoutingRequestTest {
         RoutingRequest request = new RoutingRequest();
 
         request.addMode(CAR);
-        assertTrue(request.modes.getCar());
+        assertTrue(request.streetSubRequestModes.getCar());
         request.removeMode(CAR);
-        assertFalse(request.modes.getCar());
+        assertFalse(request.streetSubRequestModes.getCar());
 
-        request.setModes(new TraverseModeSet("BICYCLE,WALK"));
-        assertFalse(request.modes.getCar());
-        assertTrue(request.modes.getBicycle());
-        assertTrue(request.modes.getWalk());
+        request.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.BICYCLE,TraverseMode.WALK));
+        assertFalse(request.streetSubRequestModes.getCar());
+        assertTrue(request.streetSubRequestModes.getBicycle());
+        assertTrue(request.streetSubRequestModes.getWalk());
     }
 
     @Test
@@ -54,7 +55,7 @@ public class RoutingRequestTest {
 
     @Test
     public void testPreferencesPenaltyForRoute() {
-        FeedScopedId id = new FeedScopedId();
+        FeedScopedId id = new FeedScopedId("feedId", "1");
         Agency agency = new Agency();
         Route route = new Route();
         Trip trip = new Trip();

@@ -1,7 +1,10 @@
 package org.opentripplanner;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
+import org.opentripplanner.datastore.CompositeDataSource;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.ZipFileDataSource;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
@@ -14,20 +17,22 @@ import org.opentripplanner.netex.configure.NetexConfig;
 import org.opentripplanner.netex.loader.NetexBundle;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.config.OTPConfiguration;
+import org.opentripplanner.standalone.config.ConfigLoader;
+import org.opentripplanner.standalone.config.BuildConfig;
 
 import java.io.File;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 
 import static org.opentripplanner.gtfs.GtfsContextBuilder.contextBuilder;
 
 public class ConstantsForTests {
 
     public static final String CALTRAIN_GTFS = "src/test/resources/caltrain_gtfs.zip";
+
+    public static final String NETEX_MINIMAL = "src/test/resources/netex/netex_minimal.zip";
 
     private static final String PORTLAND_GTFS = "src/test/resources/google_transit.zip";
 
@@ -45,6 +50,10 @@ public class ConstantsForTests {
 
     private static final String NETEX_FILENAME = "netex_minimal.zip";
 
+    private static final CompositeDataSource NETEX_MINIMAL_DATA_SOURCE = new ZipFileDataSource(
+            new File(NETEX_DIR, NETEX_FILENAME),
+            FileType.NETEX
+    );
 
     private static ConstantsForTests instance = null;
 
@@ -99,8 +108,7 @@ public class ConstantsForTests {
             // Add street data from OSM
             {
                 File osmFile = new File(PORTLAND_CENTRAL_OSM);
-                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider();
-                osmProvider.setPath(osmFile);
+                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(portlandGraph, new HashMap<>());
@@ -137,18 +145,17 @@ public class ConstantsForTests {
             // Add street data from OSM
             {
                 File osmFile = new File(OSLO_EAST_OSM);
-                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider();
-                osmProvider.setPath(osmFile);
+
+                BinaryOpenStreetMapProvider osmProvider = new BinaryOpenStreetMapProvider(osmFile, false);
                 OpenStreetMapModule osmModule = new OpenStreetMapModule(Lists.newArrayList(osmProvider));
                 osmModule.skipVisibility = true;
                 osmModule.buildGraph(minNetexGraph, new HashMap<>());
             }
             // Add transit data from Netex
             {
-                GraphBuilderParameters builderParameters = createNetexBuilderParameters();
-                NetexModule module = NetexConfig.netexModule(builderParameters, Collections.singletonList(
-                        new File(ConstantsForTests.NETEX_DIR, ConstantsForTests.NETEX_FILENAME)
-                ));
+                BuildConfig buildParameters = createNetexBuilderParameters();
+                List<DataSource> dataSources = Collections.singletonList(NETEX_MINIMAL_DATA_SOURCE);
+                NetexModule module = NetexConfig.netexModule(buildParameters, dataSources);
                 module.buildGraph(minNetexGraph, null);
             }
             // Link transit stops to streets
@@ -182,26 +189,7 @@ public class ConstantsForTests {
     }
 
 
-    private static GraphBuilderParameters createNetexBuilderParameters() {
-        JsonNode buildConfig = new OTPConfiguration(null)
-                .getGraphConfig(new File(ConstantsForTests.NETEX_DIR))
-                .builderConfig();
-
-        return new GraphBuilderParameters(buildConfig);
+    private static BuildConfig createNetexBuilderParameters() {
+        return new ConfigLoader(new File(ConstantsForTests.NETEX_DIR)).loadBuildConfig();
     }
-
-    /**
-     * Convenience method for tests: make a router from a graph using embedded config.
-     * This is under src/test to prevent it from being available in non-test code.
-     */
-    public static Router forTestGraph(Graph graph) {
-        Router router = new Router(graph);
-        // GraphConfig contains all the methods for parsing config files, including embedded ones. But it seems to
-        // only be designed for the case where you're loading from a directory, not for in-memory testing graphs.
-        router.startup(
-                new OTPConfiguration(null).getGraphConfig(null).routerConfig(graph.routerConfig)
-        );
-        return router;
-    }
-
 }

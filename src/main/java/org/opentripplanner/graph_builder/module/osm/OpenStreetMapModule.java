@@ -1,6 +1,8 @@
 package org.opentripplanner.graph_builder.module.osm;
 
 import com.google.common.collect.Iterables;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -29,7 +31,7 @@ import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -62,6 +64,7 @@ import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 import org.opentripplanner.routing.vertextype.TransitStopStreetVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -129,9 +132,9 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public boolean staticBikeRental;
 
     /**
-     * Whether we should create car P+R stations from OSM data. The default value is true. In normal operation it is
-     * set by the JSON graph builder configuration, but it is also initialized to "true" here to provide the default
-     * behavior in tests.
+     * Whether we should create car P+R stations from OSM data. The default value is true. In normal
+     * operation it is set by the JSON graph build configuration, but it is also initialized to
+     * "true" here to provide the default behavior in tests.
      */
     public boolean staticParkAndRide = true;
 
@@ -253,7 +256,6 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         }
 
         public void buildGraph(HashMap<Class<?>, Object> extra) {
-
             if (staticBikeRental) {
                 processBikeRentalNodes();
             }
@@ -537,7 +539,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 return false;
             }
             if (!walkAccessibleIn || !carAccessibleOut) {
-                LOG.warn("P+R '{}' ({}) is not walk-accessible");
+                LOG.warn("P+R '{}' ({}) is not walk-accessible", creativeName, osmId);
                 // This does not prevent routing as we only use P+R for car dropoff,
                 // but this is an issue with OSM data.
             }
@@ -567,6 +569,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
             long wayCount = osmdb.getWays().size();
+            ProgressTracker progress = ProgressTracker.track("Build street graph", 5_000, wayCount);
+            LOG.info(progress.startMessage());
 
             WAY:
             for (OSMWay way : osmdb.getWays()) {
@@ -592,7 +596,8 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 long last = -1;
                 double lastLat = -1, lastLon = -1;
                 String lastLevel = null;
-                for (long nodeId : way.getNodeRefs()) {
+                for (TLongIterator iter = way.getNodeRefs().iterator(); iter.hasNext(); ) {
+                    long nodeId = iter.next();
                     OSMNode node = osmdb.getNode(nodeId);
                     if (node == null)
                         continue WAY;
@@ -707,7 +712,12 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     startNode = endNode;
                     osmStartNode = osmdb.getNode(startNode);
                 }
+
+                //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+                progress.step(m -> LOG.info(m));
             } // END loop over OSM ways
+
+            LOG.info(progress.completeMessage());
         }
 
         // TODO Set this to private once WalkableAreaBuilder is gone
@@ -950,14 +960,15 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         private void initIntersectionNodes() {
             Set<Long> possibleIntersectionNodes = new HashSet<Long>();
             for (OSMWay way : osmdb.getWays()) {
-                List<Long> nodes = way.getNodeRefs();
-                for (long node : nodes) {
+                TLongList nodes = way.getNodeRefs();
+                nodes.forEach(node -> {
                     if (possibleIntersectionNodes.contains(node)) {
                         intersectionNodes.put(node, null);
                     } else {
                         possibleIntersectionNodes.add(node);
                     }
-                }
+                    return true;
+                });
             }
             // Intersect ways at area boundaries if needed.
             for (Area area : Iterables.concat(osmdb.getWalkableAreas(), osmdb.getParkAndRideAreas())) {

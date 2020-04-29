@@ -2,12 +2,12 @@ package org.opentripplanner.routing.impl;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
@@ -16,7 +16,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -68,7 +68,7 @@ public class GraphPathFinder {
             LOG.error("PathService was passed a null routing request.");
             return null;
         }
-        if (options.modes.isTransit()) {
+        if (options.streetSubRequestModes.isTransit()) {
             throw new UnsupportedOperationException("Transit search not supported");
         }
 
@@ -109,11 +109,7 @@ public class GraphPathFinder {
         long searchBeginTime = System.currentTimeMillis();
         LOG.debug("BEGIN SEARCH");
 
-        int timeoutIndex = 0;
-        if (timeoutIndex >= router.timeouts.length) {
-            timeoutIndex = router.timeouts.length - 1;
-        }
-        double timeout = searchBeginTime + (router.timeouts[timeoutIndex] * 1000);
+        double timeout = searchBeginTime + router.streetRoutingTimeoutSeconds() * 1000;
         timeout -= System.currentTimeMillis(); // Convert from absolute to relative time
         timeout /= 1000; // Convert milliseconds to seconds
         if (timeout <= 0) {
@@ -142,7 +138,11 @@ public class GraphPathFinder {
         return paths;
     }
 
-    /* Try to find N paths through the Graph */
+    /**
+     *  Try to find N paths through the Graph
+     * @throws VertexNotFoundException
+     * @throws PathNotFoundException
+     */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
 
         // We used to perform a protective clone of the RoutingRequest here.

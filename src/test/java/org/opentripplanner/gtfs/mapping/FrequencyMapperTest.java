@@ -14,6 +14,8 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
 public class FrequencyMapperTest {
+    private static final String FEED_ID = "FEED";
+
     private static final AgencyAndId AGENCY_AND_ID = new AgencyAndId("A", "1");
 
     private static final Integer ID = 45;
@@ -45,7 +47,7 @@ public class FrequencyMapperTest {
     }
 
     private FrequencyMapper subject = new FrequencyMapper(
-            new TripMapper(new RouteMapper(new AgencyMapper())));
+            new TripMapper(new RouteMapper(new AgencyMapper(FEED_ID))));
 
     @Test
     public void testMapCollection() throws Exception {

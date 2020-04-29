@@ -1,20 +1,23 @@
 package org.opentripplanner.routing.impl;
 
-import java.util.Collection;
-import java.util.Currency;
-import java.util.List;
-
-import com.conveyal.r5.otp2.api.path.Path;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
-import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare;
+
+import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.FareType;
 import org.opentripplanner.routing.core.Money;
 import org.opentripplanner.routing.core.StandardFareType;
+import org.opentripplanner.transit.raptor.api.path.Path;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Currency;
+import java.util.List;
 
 public class DutchFareServiceImpl extends DefaultFareServiceImpl {
 
@@ -98,12 +101,12 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         }
     }
 
-    private UnitsFareZone getUnitsByZones(String agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
+    private UnitsFareZone getUnitsByZones(FeedScopedId agencyId, String startZone, String endZone, Collection<FareRuleSet> fareRules) {
         P2<String> od = new P2<String>(startZone, endZone);
 
         LOG.trace("Search " + startZone + " and " + endZone);
 
-        String fareIdStartsWith = agencyId + "::";
+        String fareIdStartsWith = agencyId.getId() + "::";
 
         for (FareRuleSet ruleSet : fareRules) {
             if (ruleSet.getFareAttribute().getId().getId().startsWith(fareIdStartsWith) &&
@@ -217,7 +220,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         boolean mustHaveCheckedOut = false;
         String startTariefEenheden = null;
         String endTariefEenheden = null;
-        String lastAgencyId = null;
+        FeedScopedId lastAgencyId = null;
         String lastFareZone = null;
 
         long alightedEasyTrip = 0;
@@ -226,7 +229,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         for (Ride ride : rides) {
             LOG.trace(String.format("%s %s %s %s %s %s", ride.startZone, ride.endZone, ride.firstStop, ride.lastStop, ride.route, ride.agency));
 
-            if (ride.agency.startsWith("IFF:")) {
+            if (ride.agency.getFeedId().equals("IFF")) {
                 LOG.trace("1. Trains");
 		        /* In Reizen op Saldo we will try to fares as long as possible. */
 

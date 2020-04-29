@@ -1,6 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -8,6 +9,8 @@ import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
@@ -27,6 +30,7 @@ public class TripPatternMapperTest {
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
                 sample.getOtpRouteByid(),
+                Collections.emptySet(),
                 sample.getRouteById(),
                 sample.getJourneyPatternById(),
                 sample.getQuayIdByStopPointRef(),

@@ -4,6 +4,7 @@ import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -45,6 +47,8 @@ public class RoutingContext implements Cloneable {
     public final Set<Vertex> fromVertices;
 
     public final Set<Vertex> toVertices;
+
+    public final Set<FeedScopedId> bannedRoutes;
     
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
@@ -167,6 +171,12 @@ public class RoutingContext implements Cloneable {
         this.fromVertices = routingRequest.arriveBy ? toVertices : fromVertices;
         this.toVertices = routingRequest.arriveBy ? fromVertices : toVertices;
 
+        if (graph.index != null) {
+            this.bannedRoutes = routingRequest.getBannedRoutes(graph.index.getAllRoutes());
+        } else {
+            this.bannedRoutes = Collections.emptySet();
+        }
+
         adjustForSameFromToEdge();
 
         remainingWeightHeuristic = new EuclideanRemainingWeightHeuristic();
@@ -210,7 +220,7 @@ public class RoutingContext implements Cloneable {
 
     /* INSTANCE METHODS */
 
-    void checkIfVerticesFound() {
+    public void checkIfVerticesFound() {
         ArrayList<String> notFound = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search

@@ -3,6 +3,12 @@ package org.opentripplanner.graph_builder.module.osm;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Iterables;
 import com.google.common.collect.Multimap;
+import gnu.trove.iterator.TLongIterator;
+import gnu.trove.list.TLongList;
+import gnu.trove.map.TLongObjectMap;
+import gnu.trove.map.hash.TLongObjectHashMap;
+import gnu.trove.set.TLongSet;
+import gnu.trove.set.hash.TLongHashSet;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -54,22 +60,22 @@ public class OSMDatabase {
     private DataImportIssueStore issueStore;
 
     /* Map of all nodes used in ways/areas keyed by their OSM ID */
-    private Map<Long, OSMNode> nodesById = new HashMap<Long, OSMNode>();
+    private TLongObjectMap<OSMNode> nodesById = new TLongObjectHashMap<>();
 
     /* Map of all bike-rental nodes, keyed by their OSM ID */
-    private Map<Long, OSMNode> bikeRentalNodes = new HashMap<Long, OSMNode>();
+    private TLongObjectMap<OSMNode> bikeRentalNodes = new TLongObjectHashMap<>();
 
     /* Map of all bike parking nodes, keyed by their OSM ID */
-    private Map<Long, OSMNode> bikeParkingNodes = new HashMap<Long, OSMNode>();
+    private TLongObjectMap<OSMNode> bikeParkingNodes = new TLongObjectHashMap<>();
 
     /* Map of all non-area ways keyed by their OSM ID */
-    private Map<Long, OSMWay> waysById = new HashMap<Long, OSMWay>();
+    private TLongObjectMap<OSMWay> waysById = new TLongObjectHashMap<>();
 
     /* Map of all area ways keyed by their OSM ID */
-    private Map<Long, OSMWay> areaWaysById = new HashMap<Long, OSMWay>();
+    private TLongObjectMap<OSMWay> areaWaysById = new TLongObjectHashMap<>();
 
     /* Map of all relations keyed by their OSM ID */
-    private Map<Long, OSMRelation> relationsById = new HashMap<Long, OSMRelation>();
+    private TLongObjectMap<OSMRelation> relationsById = new TLongObjectHashMap<>();
 
     /* All walkable areas */
     private List<Area> walkableAreas = new ArrayList<Area>();
@@ -81,7 +87,7 @@ public class OSMDatabase {
     private List<Area> bikeParkingAreas = new ArrayList<Area>();
 
     /* Map of all area OSMWay for a given node */
-    private Map<Long, Set<OSMWay>> areasForNode = new HashMap<Long, Set<OSMWay>>();
+    private TLongObjectMap<Set<OSMWay>> areasForNode = new TLongObjectHashMap<>();
 
     /* Map of all area OSMWay for a given node */
     private List<OSMWay> singleWayAreas = new ArrayList<OSMWay>();
@@ -89,13 +95,13 @@ public class OSMDatabase {
     private Set<OSMWithTags> processedAreas = new HashSet<OSMWithTags>();
 
     /* Set of area way IDs */
-    private Set<Long> areaWayIds = new HashSet<Long>();
+    private TLongSet areaWayIds = new TLongHashSet();
 
     /* Set of all node IDs of kept ways. Needed to mark which nodes to keep in stage 3. */
-    private Set<Long> waysNodeIds = new HashSet<Long>();
+    private TLongSet waysNodeIds = new TLongHashSet();
 
     /* Set of all node IDs of kept areas. Needed to mark which nodes to keep in stage 3. */
-    private Set<Long> areaNodeIds = new HashSet<Long>();
+    private TLongSet areaNodeIds = new TLongHashSet();
 
     /* Track which vertical level each OSM way belongs to, for building elevators etc. */
     private Map<OSMWithTags, OSMLevel> wayLevels = new HashMap<OSMWithTags, OSMLevel>();
@@ -138,7 +144,7 @@ public class OSMDatabase {
     }
 
     public Collection<OSMWay> getWays() {
-        return Collections.unmodifiableCollection(waysById.values());
+        return Collections.unmodifiableCollection(waysById.valueCollection());
     }
 
     public int nodeCount() {
@@ -150,11 +156,11 @@ public class OSMDatabase {
     }
 
     public Collection<OSMNode> getBikeRentalNodes() {
-        return Collections.unmodifiableCollection(bikeRentalNodes.values());
+        return Collections.unmodifiableCollection(bikeRentalNodes.valueCollection());
     }
 
     public Collection<OSMNode> getBikeParkingNodes() {
-        return Collections.unmodifiableCollection(bikeParkingNodes.values());
+        return Collections.unmodifiableCollection(bikeParkingNodes.valueCollection());
     }
 
     public Collection<Area> getWalkableAreas() {
@@ -250,9 +256,10 @@ public class OSMDatabase {
                 singleWayAreas.add(way);
                 areaWaysById.put(wayId, way);
                 areaWayIds.add(wayId);
-                for (Long node : way.getNodeRefs()) {
+                way.getNodeRefs().forEach(node -> {
                     MapUtils.addToMapSet(areasForNode, node, way);
-                }
+                    return true;
+                });
             }
             return;
         }
@@ -317,8 +324,8 @@ public class OSMDatabase {
         // only 2 steps -- ways+relations, followed by used nodes.
         // Ways can be tag-filtered in phase 1.
 
-        markNodesForKeeping(waysById.values(), waysNodeIds);
-        markNodesForKeeping(areaWaysById.values(), areaNodeIds);
+        markNodesForKeeping(waysById.valueCollection(), waysNodeIds);
+        markNodesForKeeping(areaWaysById.valueCollection(), areaNodeIds);
     }
 
     /**
@@ -367,7 +374,7 @@ public class OSMDatabase {
          * common nodes shared by different ways of different areas we only add them once, otherwise
          * we could end-up looping on creating new intersections.
          */
-        Set<P2<Long>> commonSegments = new HashSet<P2<Long>>();
+        Set<P2<Long>> commonSegments = new HashSet<>();
         HashGridSpatialIndex<RingSegment> spndx = new HashGridSpatialIndex<>();
         for (Area area : Iterables.concat(parkAndRideAreas, bikeParkingAreas)) {
             for (Ring ring : area.outermostRings) {
@@ -392,7 +399,7 @@ public class OSMDatabase {
 
         // For each way, intersect with areas
         int nCreatedNodes = 0;
-        for (OSMWay way : waysById.values()) {
+        for (OSMWay way : waysById.valueCollection()) {
             OSMLevel wayLevel = getLevelForWay(way);
 
             // For each segment of the way
@@ -438,9 +445,11 @@ public class OSMDatabase {
                          * This should never happen (intersection between two lines should be a
                          * point or a multi-point).
                          */
-                        LOG.error("Alien intersection type between {} ({}--{}) and {} ({}--{}): ",
+                        LOG.error(
+                                "Alien intersection type between {} ({}--{}) and {} ({}--{}): {}",
                                 way, nA, nB, ringSegment.area.parent, ringSegment.nA,
-                                ringSegment.nB, intersection);
+                                ringSegment.nB, intersection
+                        );
                         continue;
                     }
                     
@@ -463,7 +472,7 @@ public class OSMDatabase {
                         	// we would only add it the first time.
                         	continue;
                         
-                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nB, nA, epsilon))
+                        if (checkDistanceWithin(ringSegment.nA, nA, epsilon) || checkDistanceWithin(ringSegment.nB, nA, epsilon))
                                 LOG.info("Node {} in way {} is coincident but disconnected with area {}",
                                     	nA.getId(), way.getId(), ringSegment.area.parent.getId());
                     }
@@ -474,7 +483,7 @@ public class OSMDatabase {
                         if (ringSegment.ring.nodes.contains(splitNode))
                         	continue;
                         
-                        if (checkDistance(ringSegment.nA, nB, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                        if (checkDistanceWithin(ringSegment.nA, nB, epsilon) || checkDistanceWithin(ringSegment.nB, nB, epsilon))
                             LOG.info("Node {} in way {} is coincident but disconnected with area {}",
                                 	nB.getId(), way.getId(), ringSegment.area.parent.getId());
                     }
@@ -488,10 +497,17 @@ public class OSMDatabase {
                     	
                     	way.addNodeRef(ringSegment.nA.getId(), i + 1);
                     	
-                        if (checkDistance(ringSegment.nA, nA, epsilon) || checkDistance(ringSegment.nA, nB, epsilon))
-                            LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nA.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
+                        if (
+                                checkDistanceWithin(ringSegment.nA, nA, epsilon) ||
+                                checkDistanceWithin(ringSegment.nA, nB, epsilon)
+                        ) {
+                            LOG.info(
+                                    "Node {} in area {} is coincident but disconnected with way {}",
+                                    ringSegment.nA.getId(),
+                                    ringSegment.area.parent.getId(),
+                                    way.getId()
+                            );
+                        }
                     	// restart loop over way segments as we may have more intersections
                         // as we haven't modified the ring, there is no need to modify the spatial index, so breaking here is fine 
                     	i--;
@@ -505,10 +521,16 @@ public class OSMDatabase {
                     	
                     	way.addNodeRef(ringSegment.nB.getId(), i + 1);
                     	
-                        if (checkDistance(ringSegment.nB, nA, epsilon) || checkDistance(ringSegment.nB, nB, epsilon))
+                        if (
+                                checkDistanceWithin(ringSegment.nB, nA, epsilon) ||
+                                checkDistanceWithin(ringSegment.nB, nB, epsilon)
+                        ) {
                             LOG.info("Node {} in area {} is coincident but disconnected with way {}",
-                                	ringSegment.nB.getId(), way.getId(), ringSegment.area.parent.getId(), way.getId());
-                    	
+                                    ringSegment.nB.getId(),
+                                    ringSegment.area.parent.getId(),
+                                    way.getId()
+                            );
+                        }
                     	i--;
                     	break;
                     }
@@ -609,11 +631,11 @@ public class OSMDatabase {
         }
     }
 
-    private void markNodesForKeeping(Collection<OSMWay> osmWays, Set<Long> nodeSet) {
+    private void markNodesForKeeping(Collection<OSMWay> osmWays, TLongSet nodeSet) {
         for (Iterator<OSMWay> it = osmWays.iterator(); it.hasNext();) {
             OSMWay way = it.next();
             // Since the way is kept, update nodes-with-neighbors
-            List<Long> nodes = way.getNodeRefs();
+            TLongList nodes = way.getNodeRefs();
             if (nodes.size() > 1) {
                 nodeSet.addAll(nodes);
             }
@@ -628,13 +650,13 @@ public class OSMDatabase {
             if (processedAreas.contains(way)) {
                 continue;
             }
-            for (Long nodeRef : way.getNodeRefs()) {
-                if (!nodesById.containsKey(nodeRef)) {
-                    continue AREA;
-                }
+            TLongIterator longIterator = way.getNodeRefs().iterator();
+            while (longIterator.hasNext()) {
+                long nodeRef = longIterator.next();
+                if (!nodesById.containsKey(nodeRef)) continue AREA;
             }
             try {
-                newArea(new Area(way, Arrays.asList(way), Collections.<OSMWay> emptyList(), nodesById));
+                newArea(new Area(way, Arrays.asList(way), Collections.emptyList(), nodesById));
             } catch (Area.AreaConstructionException|Ring.RingConstructionException e) {
                 // this area cannot be constructed, but we already have all the
                 // necessary nodes to construct it. So, something must be wrong with
@@ -653,7 +675,7 @@ public class OSMDatabase {
      * the used ways.
      */
     private void processMultipolygonRelations() {
-        RELATION: for (OSMRelation relation : relationsById.values()) {
+        RELATION: for (OSMRelation relation : relationsById.valueCollection()) {
             if (processedAreas.contains(relation)) {
                 continue;
             }
@@ -671,13 +693,16 @@ public class OSMDatabase {
                     // relation includes way which does not exist in the data. Skip.
                     continue RELATION;
                 }
-                for (Long nodeId : way.getNodeRefs()) {
-                    if (!nodesById.containsKey(nodeId)) {
+                TLongIterator wayNodeIterator = way.getNodeRefs().iterator();
+                while (wayNodeIterator.hasNext()) {
+                    long nodeId = wayNodeIterator.next();
+                    if (nodesById.containsKey(nodeId)) {
+                        MapUtils.addToMapSet(areasForNode, nodeId, way);
+                    } else {
                         // this area is missing some nodes, perhaps because it is on
                         // the edge of the region, so we will simply not route on it.
                         continue RELATION;
                     }
-                    MapUtils.addToMapSet(areasForNode, nodeId, way);
                 }
                 if (role.equals("inner")) {
                     innerWays.add(way);
@@ -746,7 +771,7 @@ public class OSMDatabase {
     private void processRelations() {
         LOG.debug("Processing relations...");
 
-        for (OSMRelation relation : relationsById.values()) {
+        for (OSMRelation relation : relationsById.valueCollection()) {
             if (relation.isTag("type", "restriction")) {
                 processRestriction(relation);
             } else if (relation.isTag("type", "level_map")) {
@@ -958,7 +983,7 @@ public class OSMDatabase {
     /**
      * Check if two nodes are within an epsilon.
      */
-    private static boolean checkDistance(OSMNode a, OSMNode b, double epsilon) {
+    private static boolean checkDistanceWithin(OSMNode a, OSMNode b, double epsilon) {
     	return Math.abs(a.lat - b.lat) < epsilon && Math.abs(a.lon - b.lon) < epsilon;
 	}
 }

@@ -1,25 +1,4 @@
-/* This program is free software: you can redistribute it and/or
- modify it under the terms of the GNU Lesser General Public License
- as published by the Free Software Foundation, either version 3 of
- the License, or (at your option) any later version.
-
- This program is distributed in the hope that it will be useful,
- but WITHOUT ANY WARRANTY; without even the implied warranty of
- MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
- GNU General Public License for more details.
-
- You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>. */
-
 package org.opentripplanner.routing.trippattern;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
-
-import java.util.Arrays;
-import java.util.ArrayList;
-import java.util.List;
 
 import org.junit.Test;
 import org.opentripplanner.model.FeedScopedId;
@@ -27,6 +6,11 @@ import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
 
 public class FrequencyEntryTest {
 
@@ -43,8 +27,7 @@ public class FrequencyEntryTest {
         for(int i = 0; i < STOP_NUM; ++i) {
             FeedScopedId id = new FeedScopedId("agency", i+"");
 
-            Stop stop= new Stop();
-            stop.setId(id);
+            Stop stop= Stop.stopForTest(id.getId(), 0.0, 0.0);
 
             StopTime stopTime = new StopTime();
             stopTime.setStop(stop);

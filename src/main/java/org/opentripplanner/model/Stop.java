@@ -1,133 +1,96 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import javax.validation.constraints.NotNull;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+
 /**
- * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or
- * a platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
+ * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
+ * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class Stop extends TransitEntity<FeedScopedId> {
+public final class Stop extends StationElement {
 
-    private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 2L;
 
-    private FeedScopedId id;
+  /**
+   * Used for GTFS fare information.
+   */
+  private final String zone;
 
-    /**
-     * Name of the stop if provided. Usually only code is used.
-     */
-    private String name;
+  /**
+   * URL to a web page containing information about this particular stop.
+   */
+  private final String url;
 
-    private double lat;
+  private HashSet<BoardingArea> boardingAreas;
 
-    private double lon;
+  public Stop(
+      FeedScopedId id,
+      String name,
+      String code,
+      String description,
+      WgsCoordinate coordinate,
+      WheelChairBoarding wheelchairBoarding,
+      StopLevel level,
+      String zone,
+      String url
+  ) {
+    super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    this.zone = zone;
+    this.url = url;
+  }
 
-    /**
-     * Public facing stop code (short text or number).
-     */
-    private String code;
+  /**
+   * Create a minimal Stop object for unit-test use, where the test only care about id, name and
+   * coordinate. The feedId is static set to "TEST"
+   */
+  public static Stop stopForTest(String idAndName, double lat, double lon) {
+    return new Stop(
+        new FeedScopedId("TEST", idAndName),
+        idAndName,
+        idAndName,
+        null,
+        new WgsCoordinate(lat, lon),
+        null,
+        null,
+        null,
+        null
+    );
+  }
 
-    /**
-     * Additional information about the stop (if needed).
-     */
-    private String description;
 
-    /**
-     * Used for GTFS fare information.
-     */
-    private String zone;
-
-    /**
-     * URL to a web page containing information about this particular stop.
-     */
-    private String url;
-
-    private Station parentStation;
-
-    private WheelChairBoarding wheelchairBoarding;
-
-    public Stop() {}
-
-    @Override public FeedScopedId getId() {
-        return id;
+  public void addBoardingArea(BoardingArea boardingArea) {
+    if (boardingAreas == null) {
+      boardingAreas = new HashSet<>();
     }
+    boardingAreas.add(boardingArea);
+  }
 
-    @Override public void setId(FeedScopedId id) {
-        this.id = id;
-    }
+  @Override
+  public String toString() {
+    return "<Stop " + this.id + ">";
+  }
 
-    public String getName() {
-        return name;
-    }
+  public String getZone() {
+    return zone;
+  }
 
-    public void setName(String name) {
-        this.name = name;
-    }
+  public String getUrl() {
+    return url;
+  }
 
-    public double getLat() {
-        return lat;
-    }
+  public Collection<BoardingArea> getBoardingAreas() {
+    return boardingAreas != null ? boardingAreas : Collections.emptySet();
+  }
 
-    public void setLat(double lat) {
-        this.lat = lat;
-    }
-
-    public double getLon() {
-        return lon;
-    }
-
-    public void setLon(double lon) {
-        this.lon = lon;
-    }
-
-    public String getCode() {
-        return code;
-    }
-
-    public void setCode(String code) {
-        this.code = code;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public String getZone() {
-        return zone;
-    }
-
-    public void setZone(String zone) {
-        this.zone = zone;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
-    public Station getParentStation() {
-        return parentStation;
-    }
-
-    public void setParentStation(Station parentStation) {
-        this.parentStation = parentStation;
-    }
-
-    public WheelChairBoarding getWheelchairBoarding() {
-        return wheelchairBoarding;
-    }
-
-    public void setWheelchairBoarding(WheelChairBoarding wheelchairBoarding) {
-        this.wheelchairBoarding = wheelchairBoarding;
-    }
-
-    @Override
-    public String toString() {
-        return "<Stop " + this.id + ">";
-    }
+  /**
+   * Get the transfer cost priority for Stop. This will fetch the value from the parent
+   * [if parent exist] or return the default value.
+   */
+  @NotNull
+  public TransferPriority getCostPriority() {
+    return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
+  }
 }

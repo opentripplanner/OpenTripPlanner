@@ -3,11 +3,12 @@ package org.opentripplanner.model.impl;
 import org.opentripplanner.model.TransitEntity;
 
 import java.io.Serializable;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 /**
  * The purpose of this class is to provide a map from id to the corresponding entity.
@@ -43,13 +44,10 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
     }
 
     /**
-     * Return a copy of the internal map. Changes in the source are not reflected
-     * in the destination (returned Map), and visa versa.
-     * <p>
-     * The returned map is immutable.
+     * Returns the number of key-value mappings in this map.
      */
-    Map<I, E> asImmutableMap() {
-        return Collections.unmodifiableMap(new HashMap<>(map));
+    public int size() {
+        return map.size();
     }
 
     public boolean containsKey(I id) {
@@ -61,16 +59,30 @@ public class EntityById<I extends Serializable, E extends TransitEntity<I>> {
         return map.toString();
     }
 
-    /**
-     * For Entities with mutable ids the internal map becomes invalid after the ids are changed.
-     * So to fix this, this method allows the caller to reindex the internal map.
-     */
-    void reindex() {
-        // Copying the values are necessary, since the collection returned by 'map.values()'
-        // is backed by the map and cleared on the next line.
-        Collection<E> temp = new ArrayList<>(map.values());
-        map.clear();
+    int removeIf(Predicate<E> test) {
+        Collection<E> newSet = map
+                .values()
+                .stream()
+                .filter(Predicate.not(test))
+                .collect(Collectors.toList());
 
-        addAll(temp);
+        int size = map.size();
+        if(newSet.size() == size) {
+            return 0;
+        }
+        map.clear();
+        addAll(newSet);
+        return size - map.size();
     }
+
+    /**
+     * Return a copy of the internal map. Changes in the source are not reflected
+     * in the destination (returned Map), and visa versa.
+     * <p>
+     * The returned map is immutable.
+     */
+    Map<I, E> asImmutableMap() {
+        return Collections.unmodifiableMap(new HashMap<>(map));
+    }
+
 }

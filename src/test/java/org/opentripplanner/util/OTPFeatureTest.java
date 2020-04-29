@@ -1,13 +1,12 @@
 package org.opentripplanner.util;
 
 import com.fasterxml.jackson.core.JsonParser;
-import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.junit.After;
 import org.junit.Before;
 import org.junit.Test;
+import org.opentripplanner.standalone.configure.OTPConfiguration;
 
-import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -51,21 +50,22 @@ public class OTPFeatureTest {
         assertTrue(subject.isOff());
     }
 
-    @Test public void allowOTPFeaturesToBeConfigurableFromJSON() throws IOException {
+    @Test public void allowOTPFeaturesToBeConfigurableFromJSON() {
         // Use a mapper to create a JSON configuration
         ObjectMapper mapper = new ObjectMapper();
         mapper.enable(JsonParser.Feature.ALLOW_SINGLE_QUOTES);
         mapper.enable(JsonParser.Feature.ALLOW_UNQUOTED_FIELD_NAMES);
 
         // Given the following config
-        JsonNode config = mapper.readTree(
+        String json =
         "{\n"
-                + "  featuresEnabled : {\n"
+                + "  otpFeatures : {\n"
                 + "    APIAlertPatcher : true,\n"
                 + "    APIBikeRental : false\n"
                 + "  }\n"
-                + "}\n"
-        );
+                + "}\n";
+
+        OTPConfiguration config = OTPConfiguration.createForTest(json);
 
         // And features set with opposite value
         OTPFeature.APIAlertPatcher.set(false);
@@ -76,12 +76,11 @@ public class OTPFeatureTest {
         OTPFeature.APIGraphInspectorTile.set(false);
 
         // When
-        OTPFeature.configure(config);
+        OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
 
         // Then
         assertTrue(OTPFeature.APIAlertPatcher.isOn());
         assertTrue(OTPFeature.APIBikeRental.isOff());
         assertTrue(OTPFeature.APIExternalGeocoder.isOn());
-        assertTrue(OTPFeature.APIGraphInspectorTile.isOff());
     }
 }

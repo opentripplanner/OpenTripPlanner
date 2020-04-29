@@ -3,10 +3,13 @@ package org.opentripplanner.graph_builder.module.osm;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
+import org.opentripplanner.datastore.DataSource;
+import org.opentripplanner.datastore.FileType;
+import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;
@@ -18,6 +21,7 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 
 import java.io.File;
 import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.util.HashMap;
 
 import static org.junit.Assert.assertEquals;
@@ -34,18 +38,23 @@ public class TriangleInequalityTest {
     private Vertex end;
 
     @BeforeClass
-    public static void onlyOnce() throws Exception {
+    public static void onlyOnce() {
 
-        extra = new HashMap<Class<?>, Object>();
+        extra = new HashMap<>();
         graph = new Graph();
 
         OpenStreetMapModule loader = new OpenStreetMapModule();
         loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
-        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider();
 
-        File file = new File(URLDecoder.decode(TriangleInequalityTest.class.getResource("NYC_small.osm.pbf").getFile(), "UTF-8"));
+        File file = new File(
+                URLDecoder.decode(
+                        TriangleInequalityTest.class.getResource("NYC_small.osm.pbf").getFile(),
+                        StandardCharsets.UTF_8
+                )
+        );
+        DataSource source = new FileDataSource(file, FileType.OSM);
+        BinaryOpenStreetMapProvider provider = new BinaryOpenStreetMapProvider(source, true);
 
-        provider.setPath(file);
         loader.setProvider(provider);
         loader.buildGraph(graph, extra);
     }
@@ -88,7 +97,7 @@ public class TriangleInequalityTest {
 
         
         if (traverseModes != null) {
-            prototypeOptions.setModes(traverseModes);
+            prototypeOptions.setStreetSubRequestModes(traverseModes);
         }
         
         RoutingRequest options = prototypeOptions.clone();

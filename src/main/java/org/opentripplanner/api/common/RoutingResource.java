@@ -3,21 +3,21 @@ package org.opentripplanner.api.common;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.request.BannedStopSet;
-import org.opentripplanner.standalone.OTPServer;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.OTPServer;
+import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.util.ResourceBundleSingleton;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.ws.rs.PathParam;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.xml.datatype.DatatypeConfigurationException;
 import javax.xml.datatype.DatatypeConstants;
 import javax.xml.datatype.DatatypeFactory;
 import javax.xml.datatype.XMLGregorianCalendar;
+import java.time.Duration;
 import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
@@ -39,19 +39,6 @@ import java.util.TimeZone;
 public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
-
-    /**
-     * The routerId selects between several graphs on the same server. The routerId is pulled from
-     * the path, not the query parameters. However, the class RoutingResource is not annotated with
-     * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
-     * path parameter should be included in the path annotations of all its subclasses.
-     *
-     * @deprecated The support for multiple routers are removed from OTP2.
-     * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2760
-     */
-    @Deprecated
-    @PathParam("routerId")
-    public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
      *  label. For example, <code>40.714476,-74.005966</code> or
@@ -81,6 +68,26 @@ public abstract class RoutingResource {
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time")
     protected String time;
+
+    /**
+     * This is the time/duration in seconds from the earliest-departure-time(EDT) to
+     * latest-departure-time(LDT). In case of a reverse search it will be the time from earliest
+     * to latest arrival time (LAT minus EAT).
+     * <p>
+     * All optimal travels that depart within the search window is guarantied to be found.
+     * <p>
+     * This is sometimes referred to as the Range Raptor Search Window - but should apply to all
+     * scheduled/time dependent travels.
+     * <p>
+     * Optional - it is NOT recommended to set this value, unless you use the value returned by the
+     * previous search. Then it can be used to get the next/previous "page". The value is
+     * dynamically assigned a suitable value, if not set. In a small to medium size operation
+     * you may use a fixed value, like 60 minutes. If you have a mixture of high frequency cities
+     * routes and infrequent long distant journeys, the best option is normally to use the dynamic
+     * auto assignment.
+     */
+    @QueryParam("searchWindow")
+    protected Integer searchWindow;
 
     /**
      * Whether the trip should depart or arrive at the specified date and time.
@@ -556,6 +563,9 @@ public abstract class RoutingResource {
     @QueryParam("disableAlertFiltering")
     private Boolean disableAlertFiltering;
 
+    @QueryParam("debugItineraryFilter")
+    private Boolean debugItineraryFilter;
+
     /**
      * If true, the Graph's ellipsoidToGeoidDifference is applied to all elevations returned by this query.
      */
@@ -622,6 +632,10 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+        }
+
+        if(searchWindow != null) {
+            request.searchWindow = Duration.ofSeconds(searchWindow);
         }
 
         if (wheelchair != null)
@@ -721,22 +735,21 @@ public abstract class RoutingResource {
 
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
-        if (transferPenalty != null) request.transferPenalty = transferPenalty;
+        if (transferPenalty != null) request.transferCost = transferPenalty;
         if (optimize == OptimizeType.TRANSFERS) {
             optimize = OptimizeType.QUICK;
-            request.transferPenalty += 1800;
+            request.transferCost += 1800;
         }
 
         if (optimize != null)
             request.setOptimize(optimize);
 
         /* Temporary code to get bike/car parking and renting working. */
-        if (modes != null) {
-            modes.applyToRoutingRequest(request);
-            request.setModes(request.modes);
+        if (modes != null && !modes.qModes.isEmpty()) {
+            request.modes = modes.getRequestModes();
         }
 
-        if (request.allowBikeRental && bikeSpeed == null) {
+        if (request.bikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -747,16 +760,19 @@ public abstract class RoutingResource {
         if (alightSlack != null)
             request.alightSlack = alightSlack;
 
-        if (minTransferTime != null)
-            request.transferSlack = minTransferTime; // TODO rename field in routingrequest
+        if (minTransferTime != null) {
+            int alightAndBoardSlack = request.boardSlack + request.alightSlack;
+            if (alightAndBoardSlack > minTransferTime) {
+                throw new IllegalArgumentException(
+                        "Invalid parameters: 'minTransferTime' must be greater than or equal to board slack plus alight slack"
+                );
+            }
+            request.transferSlack = minTransferTime - alightAndBoardSlack;
+        }
 
         if (nonpreferredTransferPenalty != null)
-            request.nonpreferredTransferPenalty = nonpreferredTransferPenalty;
+            request.nonpreferredTransferCost = nonpreferredTransferPenalty;
 
-        if (request.boardSlack + request.alightSlack > request.transferSlack) {
-            throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
-        }
 
         if (maxTransfers != null)
             request.maxTransfers = maxTransfers;
@@ -766,10 +782,10 @@ public abstract class RoutingResource {
         request.useBikeRentalAvailabilityInformation = tripPlannedForNow; // TODO the same thing for GTFS-RT
 
         if (startTransitStopId != null && !startTransitStopId.isEmpty())
-            request.startingTransitStopId = FeedScopedId.convertFromString(startTransitStopId);
+            request.startingTransitStopId = FeedScopedId.parseId(startTransitStopId);
 
         if (startTransitTripId != null && !startTransitTripId.isEmpty())
-            request.startingTransitTripId = FeedScopedId.convertFromString(startTransitTripId);
+            request.startingTransitTripId = FeedScopedId.parseId(startTransitTripId);
 
         if (ignoreRealtimeUpdates != null)
             request.ignoreRealtimeUpdates = ignoreRealtimeUpdates;
@@ -791,6 +807,10 @@ public abstract class RoutingResource {
 
         if (pathComparator != null)
             request.pathComparator = pathComparator;
+
+        if(debugItineraryFilter != null ) {
+            request.debugItineraryFilter = debugItineraryFilter;
+        }
 
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);

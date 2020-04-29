@@ -112,7 +112,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 LOG.error("Could not connect to {}: {}", url, e.getCause().getMessage());
                 connectionSuccessful = false;
             } catch (Exception e) {
-                LOG.error("Unknown exception when trying to connect to {}:", url, e);
+                LOG.error("Unknown exception when trying to connect to {}.", url, e);
                 connectionSuccessful = false;
             }
 
@@ -183,5 +183,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 updaterManager.execute(runnable);
             }
         }
+    }
+
+    @Override
+    public String getName() {
+        return "WebsocketGtfsRealtimeUpdater";
     }
 }

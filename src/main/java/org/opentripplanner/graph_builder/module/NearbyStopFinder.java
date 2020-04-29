@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import java.util.HashSet;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -14,14 +15,16 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.core.RoutingRequest;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -46,7 +49,6 @@ import java.util.Set;
  */
 public class NearbyStopFinder {
 
-    private static Logger LOG = LoggerFactory.getLogger(NearbyStopFinder.class);
     private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
     public  final boolean useStreets;
@@ -99,12 +101,9 @@ public class NearbyStopFinder {
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (NearbyStopFinder.StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
-            /* Filter out destination stops that are already reachable via pathways or transfers. */
-            // FIXME why is the above comment relevant here? how does the next line achieve this?
-            TransitStopVertex ts1 = stopAtDistance.tstop;
-            if (!ts1.isStreetLinkable()) continue;
+            Stop ts1 = stopAtDistance.tstop;
             /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.patternsForStop.get(ts1.getStop())) {
+            for (TripPattern pattern : graph.index.getPatternsForStop(ts1)) {
                 closestStopForPattern.putMin(pattern, stopAtDistance);
             }
         }
@@ -144,76 +143,52 @@ public class NearbyStopFinder {
     public List<StopAtDistance> findNearbyStopsViaStreets (
             Set<Vertex> originVertices,
             boolean reverseDirection,
-            boolean removeTempEdges
+            boolean removeTempEdges,
+            RoutingRequest routingRequest
     ) {
-
-        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
-        routingRequest.setRoutingContext(graph, originVertices, null);
         routingRequest.arriveBy = reverseDirection;
+        if (!reverseDirection) {
+            routingRequest.setRoutingContext(graph, originVertices, null);
+        } else {
+            routingRequest.setRoutingContext(graph, null, originVertices);
+        }
         int walkTime = (int) (radiusMeters / new RoutingRequest().walkSpeed);
         routingRequest.worstTime = routingRequest.dateTime + (reverseDirection ? -walkTime : walkTime);
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
+        routingRequest.dominanceFunction = new DominanceFunction.MinimumWeight();
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
-        List<StopAtDistance> stopsFound = Lists.newArrayList();
+        HashMap<String,StopAtDistance> stopsFound = new HashMap();
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
                 Vertex targetVertex = state.getVertex();
                 if (originVertices.contains(targetVertex)) continue;
-                if (targetVertex instanceof TransitStopVertex) {
-                    stopsFound.add(stopAtDistanceForState(state));
+                if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
+                    stopsFound.putIfAbsent(
+                        ((TransitStopVertex) targetVertex).getStop().getId().toString(),
+                        stopAtDistanceForState(state));
                 }
             }
         }
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         for (Vertex vertex : originVertices) {
             if (vertex instanceof TransitStopVertex) {
-                stopsFound.add(
+                stopsFound.putIfAbsent(((TransitStopVertex) vertex).getStop().getId().toString(),
                     new StopAtDistance(
                         (TransitStopVertex) vertex,
                         0,
                         Collections.emptyList(),
-                        null
+                        null,
+                        new State(vertex, routingRequest)
                     ));
             }
         }
         if (removeTempEdges) {
             routingRequest.cleanup();
         }
-        return stopsFound;
-    }
-
-    public List<StopAtDistance> getStopAtDistances(Set<Vertex> originVertices, Collection<State> states) {
-        Map<String, StopAtDistance> stopsFound = new HashMap<>();
-        states.forEach(state -> {
-          Vertex targetVertex = state.getVertex();
-          if (targetVertex instanceof TransitStopVertex) {
-            stopsFound.putIfAbsent(stopAtDistanceForState(state).tstop.getStop().getId().toString(), stopAtDistanceForState(state));
-          }
-        });
-        /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
-        for (Vertex vertex : originVertices) {
-          if (vertex instanceof TransitStopVertex) {
-            stopsFound.putIfAbsent(((TransitStopVertex) vertex).getStop().getId().toString(), newStopAtDistance(vertex));
-          }
-        }
         return new ArrayList<>(stopsFound.values());
-    }
-
-    public Collection<State> findNearbyStatesViaStreet(Set<Vertex> originVertices,
-        boolean reverseDirection) {
-        ShortestPathTree spt = getShortestPathTree(originVertices, reverseDirection);
-        if(spt!=null){
-            return spt.getAllStates();
-        }else{
-            return Collections.emptyList();
-        }
-    }
-
-    private StopAtDistance newStopAtDistance(Vertex vertex) {
-      return new StopAtDistance((TransitStopVertex) vertex, 0, Collections.EMPTY_LIST, null);
     }
 
     private ShortestPathTree getShortestPathTree(Set<Vertex> originVertices,
@@ -226,6 +201,20 @@ public class NearbyStopFinder {
         routingRequest.disableRemainingWeightHeuristic = true;
         routingRequest.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
         return astar.getShortestPathTree(routingRequest);
+    }
+
+    public List<StopAtDistance> findNearbyStopsViaStreets (
+        Set<Vertex> originVertices,
+        boolean reverseDirection,
+        boolean removeTempEdges
+    ) {
+        RoutingRequest routingRequest = new RoutingRequest(TraverseMode.WALK);
+        return findNearbyStopsViaStreets(
+            originVertices,
+            reverseDirection,
+            removeTempEdges,
+            routingRequest
+        );
     }
 
     public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
@@ -250,7 +239,8 @@ public class NearbyStopFinder {
                 StopAtDistance sd = new StopAtDistance(
                     ts1, distance,
                     null,
-                    geometryFactory.createLineString(coordinates)
+                    geometryFactory.createLineString(coordinates),
+                    null
                 );
                 stopsFound.add(sd);
             }
@@ -263,21 +253,24 @@ public class NearbyStopFinder {
      */
     public static class StopAtDistance implements Comparable<StopAtDistance> {
 
-        public final TransitStopVertex tstop;
+        public final Stop tstop;
         public final double distance;
         public final LineString geometry;
         public final List<Edge>  edges;
+        public final State state;
 
         public StopAtDistance(
             TransitStopVertex tstop,
             double distance,
             List<Edge> edges,
-            LineString geometry
+            LineString geometry,
+            State state
         ) {
-            this.tstop = tstop;
+            this.tstop = tstop.getStop();
             this.distance = distance;
             this.edges = edges;
             this.geometry = geometry;
+            this.state = state;
         }
 
         @Override
@@ -313,6 +306,8 @@ public class NearbyStopFinder {
                     }
                 }
                 effectiveWalkDistance += edge.getEffectiveWalkDistance();
+            } else if (edge instanceof PathwayEdge) {
+                effectiveWalkDistance += edge.getDistanceMeters();
             }
             edges.add(edge);
         }
@@ -328,7 +323,8 @@ public class NearbyStopFinder {
                 (TransitStopVertex) state.getVertex(),
                 effectiveWalkDistance, edges,
                 geometryFactory.createLineString(
-                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())));
+                    new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
+                state);
     }
 
 

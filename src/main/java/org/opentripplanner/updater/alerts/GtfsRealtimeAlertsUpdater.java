@@ -5,6 +5,7 @@ import java.io.InputStream;
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
+import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
@@ -69,7 +70,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.earlyStart = config.path("earlyStartSec").asInt(0);
         this.feedId = config.path("feedId").asText();
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
         LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }

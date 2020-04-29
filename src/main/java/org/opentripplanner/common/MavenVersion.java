@@ -12,6 +12,7 @@ public class MavenVersion implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(MavenVersion.class);
     public static final MavenVersion VERSION = fromProperties();
     private static final long serialVersionUID = VERSION.getUID();
+    private static final String UNKNOWN = "UNKNOWN";
 
     /* Info derived from version string */
     public final String version; 
@@ -22,21 +23,27 @@ public class MavenVersion implements Serializable {
     
     /* Other info from git-commit-id-plugin via maven-version.properties */
     public final String commit;
+    public final String branch;
     public final String describe;
-    public final String commit_time;
-    public final String build_time;
-    
+    public final String commitTime;
+    public final String buildTime;
+    public final boolean dirty;
+
     private static MavenVersion fromProperties() {
         final String FILE = "maven-version.properties";
         try {
             Properties props = new java.util.Properties();
             InputStream in = MavenVersion.class.getClassLoader().getResourceAsStream(FILE);
             props.load(in);
-            MavenVersion version = new MavenVersion(props.getProperty("project.version"), 
-                                                    props.getProperty("git.commit.id"),
-                                                    props.getProperty("git.commit.id.describe"),
-                                                    props.getProperty("git.commit.time"),
-                                                    props.getProperty("git.build.time"));
+            MavenVersion version = new MavenVersion(
+                    props.getProperty("project.version"),
+                    props.getProperty("git.commit.id"),
+                    props.getProperty("git.commit.id.describe"),
+                    props.getProperty("git.commit.time"),
+                    props.getProperty("git.branch"),
+                    props.getProperty("git.build.time"),
+                    props.getProperty("git.dirty")
+            );
             LOG.debug("Parsed Maven artifact version: {}", version.toStringVerbose());
             return version;
         } catch (Exception e) {
@@ -56,10 +63,18 @@ public class MavenVersion implements Serializable {
         // situation, so I am providing a 0-arg constructor with a totally different role: 
         // generating a default version when OTP encounters a problem parsing the
         // maven-version.properties file.
-        this("0.0.0-ParseFailure", "UNKNOWN", "UNKNOWN", "UNKNOWN", "UNKNOWN");
+        this("0.0.0-ParseFailure", UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN, UNKNOWN);
     }
     
-    public MavenVersion (String version, String commit, String describe, String commit_time, String build_time) {
+    public MavenVersion (
+            String version,
+            String commit,
+            String describe,
+            String commitTime,
+            String branch,
+            String buildTime,
+            String dirty
+    ) {
         this.version = version;
         String [] fields = version.split("\\-");
         if (fields.length > 1)
@@ -79,12 +94,14 @@ public class MavenVersion implements Serializable {
             incremental = Integer.parseInt(fields[2]);
         else
             incremental = 0;
-        this.commit = commit;
-        this.describe = describe;
-        this.commit_time = commit_time;
-        this.build_time = build_time;
+        this.commit = normalize(commit);
+        this.describe = normalize(describe);
+        this.commitTime = normalize(commitTime);
+        this.branch = normalize(branch);
+        this.buildTime = normalize(buildTime);
+        this.dirty = "true".equalsIgnoreCase(dirty);
     }
-    
+
     public long getUID() {
         return (long) hashCode();
     }
@@ -120,5 +137,11 @@ public class MavenVersion implements Serializable {
                this.minor == that.minor &&
                this.incremental == that.incremental &&
                this.qualifier.equals(that.qualifier);
+    }
+
+    private static String normalize(String text) {
+        if(text == null || text.isBlank()) { return UNKNOWN; }
+        if(text.startsWith("${") && text.endsWith("}")) { return UNKNOWN; }
+        return text;
     }
 }

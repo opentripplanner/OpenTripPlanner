@@ -53,9 +53,13 @@ public class TimetableSnapshotSourceTest {
 
     @BeforeClass
     public static void setUpClass() throws Exception {
+        // The ".turnOnSetAgencyToFeedIdForAllElements()" is commented out so it can be
+        // removed from the code, it in no longer in use. It is not deleted here to better
+        // allow the reader of the test understand how the test once worked. There should
+        // be new test to replace this one.
+
         context = contextBuilder(ConstantsForTests.FAKE_GTFS)
                 .withIssueStoreAndDeduplicator(graph)
-                .turnOnSetAgencyToFeedIdForAllElements()
                 .build();
 
         feedId = context.getFeedId().getId();
@@ -105,8 +109,8 @@ public class TimetableSnapshotSourceTest {
     public void testHandleCanceledTrip() throws InvalidProtocolBufferException {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
@@ -131,8 +135,8 @@ public class TimetableSnapshotSourceTest {
     public void testHandleDelayedTrip() {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final FeedScopedId tripId2 = new FeedScopedId(feedId, "1.2");
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
         final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
         final int tripIndex2 = pattern.scheduledTimetable.getTripIndex(tripId2);
 
@@ -193,7 +197,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(addedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.ADDED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -264,7 +268,7 @@ public class TimetableSnapshotSourceTest {
 
         // THEN
         // Find new pattern in graph starting from stop A
-        Stop stopA = graph.index.stopForId.get(new FeedScopedId(feedId, "A"));
+        Stop stopA = graph.index.getStopForId(new FeedScopedId(feedId, "A"));
         // Get trip pattern of last (most recently added) outgoing edge
         // FIXME create a new test to see that add-trip realtime updates work
         TripPattern tripPattern = null;
@@ -300,7 +304,7 @@ public class TimetableSnapshotSourceTest {
 
             tripDescriptorBuilder.setTripId(modifiedTripId);
             tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.MODIFIED);
-            tripDescriptorBuilder.setStartDate(serviceDate.getAsString());
+            tripDescriptorBuilder.setStartDate(serviceDate.asCompactString());
 
             final Calendar calendar = serviceDate.getAsCalendar(graph.getTimeZone());
             final long midnightSecondsSinceEpoch = calendar.getTimeInMillis() / 1000;
@@ -397,8 +401,8 @@ public class TimetableSnapshotSourceTest {
         // Original trip pattern
         {
             final FeedScopedId tripId = new FeedScopedId(feedId, modifiedTripId);
-            final Trip trip = graph.index.tripForId.get(tripId);
-            final TripPattern originalTripPattern = graph.index.patternForTrip.get(trip);
+            final Trip trip = graph.index.getTripForId().get(tripId);
+            final TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
             final Timetable originalTimetableForToday = snapshot.resolve(originalTripPattern, serviceDate);
             final Timetable originalTimetableScheduled = snapshot.resolve(originalTripPattern, null);
@@ -420,7 +424,7 @@ public class TimetableSnapshotSourceTest {
 
         // New trip pattern
         {
-            final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(feedId, modifiedTripId, serviceDate);
+            final TripPattern newTripPattern = snapshot.getLastAddedTripPattern(new FeedScopedId(feedId, modifiedTripId), serviceDate);
             assertNotNull("New trip pattern should be found", newTripPattern);
 
             final Timetable newTimetableForToday = snapshot.resolve(newTripPattern, serviceDate);
@@ -440,8 +444,8 @@ public class TimetableSnapshotSourceTest {
     public void testPurgeExpiredData() throws InvalidProtocolBufferException {
         final FeedScopedId tripId = new FeedScopedId(feedId, "1.1");
         final ServiceDate previously = serviceDate.previous().previous(); // Just to be safe...
-        final Trip trip = graph.index.tripForId.get(tripId);
-        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final Trip trip = graph.index.getTripForId().get(tripId);
+        final TripPattern pattern = graph.index.getPatternForTrip().get(trip);
 
         updater.maxSnapshotFrequency = 0;
         updater.purgeExpiredData = false;
@@ -455,7 +459,7 @@ public class TimetableSnapshotSourceTest {
 
         tripDescriptorBuilder.setTripId("1.1");
         tripDescriptorBuilder.setScheduleRelationship(TripDescriptor.ScheduleRelationship.CANCELED);
-        tripDescriptorBuilder.setStartDate(previously.getAsString());
+        tripDescriptorBuilder.setStartDate(previously.asCompactString());
 
         final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
 

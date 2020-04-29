@@ -3,16 +3,8 @@ package org.opentripplanner.gtfs;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.model.CalendarService;
-import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.OtpTransitService;
-import org.opentripplanner.model.Pathway;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.ServiceCalendar;
-import org.opentripplanner.model.ServiceCalendarDate;
-import org.opentripplanner.model.ShapePoint;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
@@ -43,8 +35,6 @@ public class GtfsContextBuilder {
 
     private boolean repairStopTimesAndGenerateTripPatterns = true;
 
-    private boolean setAgencyToFeedIdForAllElements = false;
-
     public static GtfsContextBuilder contextBuilder(String path) throws IOException {
         return contextBuilder(null, path);
     }
@@ -53,8 +43,7 @@ public class GtfsContextBuilder {
         GtfsImport gtfsImport = gtfsImport(defaultFeedId, path);
         GtfsFeedId feedId = gtfsImport.getFeedId();
         OtpTransitServiceBuilder transitBuilder = mapGtfsDaoToInternalTransitServiceBuilder(
-                gtfsImport.getDao(),
-                new DataImportIssueStore(false)
+                gtfsImport.getDao(), feedId.getId(), new DataImportIssueStore(false)
         );
         return new GtfsContextBuilder(
                 feedId,
@@ -114,11 +103,6 @@ public class GtfsContextBuilder {
         return this;
     }
 
-    public GtfsContextBuilder turnOnSetAgencyToFeedIdForAllElements() {
-        this.setAgencyToFeedIdForAllElements = true;
-        return this;
-    }
-
     /**
      * This method will:
      * <ol>
@@ -130,9 +114,6 @@ public class GtfsContextBuilder {
     public GtfsContext build() {
         if(repairStopTimesAndGenerateTripPatterns) {
             repairStopTimesAndGenerateTripPatterns();
-        }
-        if (setAgencyToFeedIdForAllElements) {
-            setAgencyToFeedIdForAllElements();
         }
         return new GtfsContextImpl(feedId, transitBuilder);
     }
@@ -165,40 +146,6 @@ public class GtfsContextBuilder {
 
 
     /* private stuff */
-
-    private void setAgencyToFeedIdForAllElements() {
-
-        for (ShapePoint shapePoint : transitBuilder.getShapePoints()) {
-            shapePoint.getShapeId().setFeedId(this.feedId.getId());
-        }
-        for (Route route : transitBuilder.getRoutes().values()) {
-            route.getId().setFeedId(this.feedId.getId());
-        }
-        for (Stop stop : transitBuilder.getStops().values()) {
-            stop.getId().setFeedId(this.feedId.getId());
-        }
-
-        for (Trip trip : transitBuilder.getTripsById().values()) {
-            trip.getId().setFeedId(this.feedId.getId());
-        }
-
-        for (ServiceCalendar serviceCalendar : transitBuilder.getCalendars()) {
-            serviceCalendar.getServiceId().setFeedId(this.feedId.getId());
-        }
-        for (ServiceCalendarDate serviceCalendarDate : transitBuilder.getCalendarDates()) {
-            serviceCalendarDate.getServiceId().setFeedId(this.feedId.getId());
-        }
-
-        for (FareAttribute fareAttribute : transitBuilder.getFareAttributes()) {
-            fareAttribute.getId().setFeedId(this.feedId.getId());
-        }
-
-        for (Pathway pathway : transitBuilder.getPathways()) {
-            pathway.getId().setFeedId(this.feedId.getId());
-        }
-
-        transitBuilder.regenerateIndexes();
-    }
 
     private void repairStopTimesForEachTrip() {
         new RepairStopTimesForEachTripOperation(

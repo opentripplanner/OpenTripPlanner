@@ -7,8 +7,10 @@ import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.schema.GraphQLSchema;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.Router;
+import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,11 +32,11 @@ class TransmodelGraphIndex {
 
     final ExecutorService threadPool;
 
-    TransmodelGraphIndex(Graph graph) {
+    TransmodelGraphIndex(Graph graph, RoutingRequest defaultRoutingRequest) {
         threadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
         );
-        indexSchema = new TransmodelIndexGraphQLSchema(graph).indexSchema;
+        indexSchema = new TransmodelIndexGraphQLSchema(graph, defaultRoutingRequest).indexSchema;
     }
 
     HashMap<String, Object> getGraphQLExecutionResult(
@@ -42,7 +44,6 @@ class TransmodelGraphIndex {
             Router router,
             Map<String, Object> variables,
             String operationName,
-            int timeout,
             int maxResolves
     ) {
         MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(maxResolves);
@@ -52,10 +53,13 @@ class TransmodelGraphIndex {
             variables = new HashMap<>();
         }
 
+        TransmodelRequestContext transmodelRequestContext =
+            new TransmodelRequestContext(router, new RoutingService(router.graph));
+
         ExecutionInput executionInput = ExecutionInput.newExecutionInput()
                                                 .query(query)
                                                 .operationName(operationName)
-                                                .context(router)
+                                                .context(transmodelRequestContext)
                                                 .root(router)
                                                 .variables(variables)
                                                 .build();
@@ -76,10 +80,10 @@ class TransmodelGraphIndex {
         return content;
     }
 
-    Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int timeout, int maxResolves) {
+    Response getGraphQLResponse(String query, Router router, Map<String, Object> variables, String operationName, int maxResolves) {
         Response.ResponseBuilder res = Response.status(Response.Status.OK);
         HashMap<String, Object> content = getGraphQLExecutionResult(
-                query, router, variables, operationName, timeout, maxResolves
+                query, router, variables, operationName, maxResolves
         );
         return res.entity(content).build();
     }
