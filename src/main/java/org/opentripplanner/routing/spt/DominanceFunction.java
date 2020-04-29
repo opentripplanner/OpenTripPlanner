@@ -143,10 +143,8 @@ public abstract class DominanceFunction implements Serializable {
 
         @Override
         protected boolean betterOrEqual(State a, State b) {
-            return a.getDistanceTraversedInMode().getOrDefault(TraverseMode.WALK, (double) 0) <=
-                    b.getDistanceTraversedInMode().getOrDefault(TraverseMode.WALK, (double) 0);
+            return a.getDistanceInWalk() <= b.getDistanceInWalk();
         }
-
     }
 
     /**
@@ -167,7 +165,5 @@ public abstract class DominanceFunction implements Serializable {
                     && a.getWeight() <= (b.getWeight() + EPSILON));
 
         }
-
     }
-
 }

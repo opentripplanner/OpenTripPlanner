@@ -51,8 +51,7 @@ public class StateEditor {
         child = parent.clone();
         child.backState = parent;
         child.backEdge = e;
-        child.timeTraversedInMode = new HashMap<>(child.timeTraversedInMode);
-        child.distanceTraversedInMode = new HashMap<>(child.distanceTraversedInMode);
+        child.traversalStatistics = parent.traversalStatistics.copy();
         // We clear child.next here, since it could have already been set in the
         // parent
         child.next = null;
@@ -140,7 +139,7 @@ public class StateEditor {
         // Only apply limit in transit-only case, unless this is a one-to-many request with hard
         // walk limiting, in which case we want to cut off the search.
         if (options.modes.isTransit() || !options.softWalkLimiting && options.batch)
-            return child.getDistanceTraversedInMode().getOrDefault(TraverseMode.WALK,0D) >= options.maxWalkDistance;
+            return child.traversalStatistics.distanceInWalk >= options.maxWalkDistance;
 
         return false;
     }
@@ -194,10 +193,7 @@ public class StateEditor {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-
-        Double traversedAlready = child.distanceTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0D);
-        traversedAlready = traversedAlready + distance;
-        child.distanceTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
+        child.traversalStatistics.increaseDistance(child.stateData.currentTraverseMode, distance);
     }
 
     /**
@@ -209,9 +205,7 @@ public class StateEditor {
             LOG.warn("A state's traversed in mode is being incremented by a negative amount while traversing edge ");
             return;
         }
-        Integer traversedAlready = child.timeTraversedInMode.getOrDefault(child.stateData.currentTraverseMode, 0);
-        traversedAlready = traversedAlready + timeInSec;
-        child.timeTraversedInMode.put(child.stateData.currentTraverseMode, traversedAlready);
+        child.traversalStatistics.increaseTime(child.stateData.currentTraverseMode, timeInSec);
     }
 
     public void incrementWeight(double weight) {
