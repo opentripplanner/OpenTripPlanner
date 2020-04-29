@@ -88,6 +88,7 @@ public class OTPMain {
         LOG.info("Searching for configuration and input files in {}", params.getBaseDirectory());
 
         Graph graph = null;
+        GraphService service = null;
         OTPAppConstruction app = new OTPAppConstruction(params);
 
         // Validate data sources, command line arguments and config before loading and
@@ -96,12 +97,7 @@ public class OTPMain {
 
         /* Load graph from disk if one is not present from build. */
         if (params.doLoadGraph() || params.doLoadStreetGraph()) {
-            DataSource inputGraph = params.doLoadGraph()
-                    ? app.store().getGraph()
-                    : app.store().getStreetGraph();
-            SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
-            graph = obj.graph;
-            app.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
+            service = new GraphService(app);
         }
 
         /* Start graph builder if requested. */
@@ -135,11 +131,7 @@ public class OTPMain {
             return;
         }
 
-        // Index graph for travel search
-        graph.index();
-
-        Router router = new Router(graph, app.config().routerConfig());
-        router.startup();
+        Router router = service.load();
 
         /* Start visualizer if requested. */
         if (params.visualize) {
