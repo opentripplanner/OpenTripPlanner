@@ -121,11 +121,6 @@ public class OTPMain {
                     .save(app.graphOutputDataSource());
         }
 
-        if(graph == null) {
-            LOG.error("Nothing to do, no graph loaded or build. Exiting.");
-            System.exit(101);
-        }
-
         if(!params.doServe()) {
             LOG.info("Done building graph. Exiting.");
             return;
