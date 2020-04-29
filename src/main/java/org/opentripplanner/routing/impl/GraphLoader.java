@@ -28,6 +28,7 @@ public class GraphLoader {
         : app.store().getStreetGraph();
     SerializedGraphObject obj = SerializedGraphObject.load(inputGraph);
     Graph newGraph = obj.graph;
+    newGraph.index();
     app.config().updateConfigFromSerializedGraph(obj.buildConfig, obj.routerConfig);
 
     Router newRouter = new Router(newGraph, app.config().routerConfig());
