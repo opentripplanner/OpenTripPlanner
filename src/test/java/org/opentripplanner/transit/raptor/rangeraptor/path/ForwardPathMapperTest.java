@@ -22,7 +22,8 @@ public class ForwardPathMapperTest {
         );
 
         PathMapper<TestRaptorTripSchedule> mapper = new ForwardPathMapper<>(
-            StopArrivalsTestData.SLACK_PROVIDER
+            StopArrivalsTestData.SLACK_PROVIDER,
+            StopArrivalsTestData.WORKER_LIFE_CYCLE
         );
 
         Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);

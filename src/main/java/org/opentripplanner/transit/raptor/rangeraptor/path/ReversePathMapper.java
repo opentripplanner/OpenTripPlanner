@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
@@ -27,14 +28,21 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
  */
 public final class ReversePathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
 
+    private int iteration = -1;
+
     /**
      * Note! This is not the Raptor internal SlackProvider, but the slack-provider
      * submitted by the transit layer.
      */
     private final RaptorSlackProvider transitLayerSlackProvider;
 
-    public ReversePathMapper(RaptorSlackProvider slackProvider) {
+    public ReversePathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
         this.transitLayerSlackProvider = slackProvider;
+        lifeCycle.onSetupIteration(this::setRangeRaptorIteration);
+    }
+
+    private void setRangeRaptorIteration(int iteration) {
+        this.iteration = iteration;
     }
 
     @Override
@@ -48,6 +56,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         accessLeg = mapAccessLeg(destinationArrival, lastStopArrival);
 
         return new Path<>(
+                iteration,
                 accessLeg,
                 RaptorCostConverter.toOtpDomainCost(destinationArrival.cost())
         );

@@ -35,7 +35,7 @@ public class PathParetoSetComparators {
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetable() {
         return (l, r) ->
-                l.startTime() > r.startTime() ||
+                l.rangeRaptorIteration() > r.rangeRaptorIteration() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
                 l.travelDurationInSeconds() < r.travelDurationInSeconds();
@@ -43,7 +43,7 @@ public class PathParetoSetComparators {
 
     public static <T extends RaptorTripSchedule> ParetoComparator<Path<T>> comparatorWithTimetableAndCost() {
         return (l, r) ->
-                l.startTime() > r.startTime() ||
+                l.rangeRaptorIteration() > r.rangeRaptorIteration() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
                 l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
@@ -54,7 +54,7 @@ public class PathParetoSetComparators {
             double relaxCostAtDestinationArrival
     ) {
         return (l, r) ->
-                l.startTime() > r.startTime() ||
+                l.rangeRaptorIteration() > r.rangeRaptorIteration() ||
                 l.endTime() < r.endTime() ||
                 l.numberOfTransfers() < r.numberOfTransfers() ||
                 l.travelDurationInSeconds() < r.travelDurationInSeconds() ||
