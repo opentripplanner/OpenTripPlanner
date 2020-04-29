@@ -44,7 +44,7 @@ import static org.opentripplanner.datastore.FileType.UNKNOWN;
 public class OtpDataStore {
     public static final String BUILD_REPORT_DIR = "report";
     private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
-    private static final String GRAPH_FILENAME = "graph.obj";
+    private static final String GRAPH_FILENAME = "Graph.obj";
 
     private final OtpDataStoreConfig config;
     private final List<String> repositoryDescriptions = new ArrayList<>();
@@ -215,7 +215,7 @@ public class OtpDataStore {
         }
         return result;
     }
-   
+
     private <T> T findSourceUsingAllRepos(Function<DataSourceRepository, T> repoFindSource) {
         for (DataSourceRepository it : allRepositories) {
             T res = repoFindSource.apply(it);

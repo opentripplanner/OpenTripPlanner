@@ -43,7 +43,7 @@ public class OtpDataStoreTest {
     private static final String DEM_FILENAME = "dem.tif";
     private static final String NETEX_FILENAME = "netex.zip";
     private static final String GTFS_FILENAME = "gtfs.zip";
-    private static final String GRAPH_FILENAME = "graph.obj";
+    private static final String GRAPH_FILENAME = "Graph.obj";
     private static final String STREET_GRAPH_FILENAME = "streetGraph.obj";
     private static final String REPORT_FILENAME = "report";
     private static final String UTF_8 = "UTF-8";
