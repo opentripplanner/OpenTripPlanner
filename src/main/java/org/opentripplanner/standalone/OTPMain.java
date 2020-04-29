@@ -112,6 +112,7 @@ public class OTPMain {
                 graphBuilder.run();
                 // Hand off the graph to the server as the default graph
                 graph = graphBuilder.getGraph();
+                graph.index();
             } else {
                 throw new IllegalStateException("An error occurred while building the graph.");
             }
