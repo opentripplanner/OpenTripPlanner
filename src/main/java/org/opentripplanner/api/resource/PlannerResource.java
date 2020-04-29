@@ -2,6 +2,7 @@ package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -79,6 +80,10 @@ public class PlannerResource extends RoutingResource {
             TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
+            if (!res.getRoutingErrors().isEmpty()) {
+                // The api can only return one error message, so the first one is mapped
+                response.setError(PlannerErrorMapper.mapMessage(res.getRoutingErrors().get(0)));
+            }
 
             /* Populate up the elevation metadata */
             response.elevationMetadata = new ElevationMetadata();
