@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
@@ -15,7 +17,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.error.NoStopsInRangeException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -63,29 +65,53 @@ public class RoutingWorker {
     }
 
     public RoutingResponse route(Router router) {
+        List<Itinerary> itineraries = new ArrayList<>();
+        List<RoutingError> routingErrors = new ArrayList<>();
+
         try {
-            List<Itinerary> itineraries;
-
             // Direct street routing
-            itineraries = new ArrayList<>(DirectStreetRouter.route(router, request));
-
-            // Transit routing
-            itineraries.addAll(routeTransit(router));
-
-            long startTimeFiltering = System.currentTimeMillis();
-            // Filter itineraries
-            itineraries = filterChain().filter(itineraries);
-            LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
-
-            LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
-            return new RoutingResponse(
-                    TripPlanMapper.mapTripPlan(request, itineraries),
-                    responseMetadata
+            itineraries.addAll(DirectStreetRouter.route(router, request));
+        } catch (Exception e) {
+            routingErrors.add(
+                new RoutingError(
+                    RoutingErrorCode.SYSTEM_ERROR,
+                    "An error occurred during direct street routing.",
+                    null)
             );
         }
-        finally {
-            request.cleanup();
+
+        try {
+            // Transit routing
+            itineraries.addAll(routeTransit(router));
+        } catch (NoStopsInRangeException e) {
+            for (String missing : e.getMissing()) {
+                routingErrors.add(
+                    new RoutingError(
+                        RoutingErrorCode.NO_STOPS_IN_RANGE,
+                        "Unable to find any stops in range of the location.",
+                        missing)
+                );
+            }
+        } catch (Exception e) {
+            routingErrors.add(
+                new RoutingError(
+                    RoutingErrorCode.SYSTEM_ERROR,
+                    "An error occurred during transit routing.",
+                    null)
+            );
         }
+
+        long startTimeFiltering = System.currentTimeMillis();
+        // Filter itineraries
+        itineraries = filterChain().filter(itineraries);
+        LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
+        LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
+
+        return new RoutingResponse(
+                TripPlanMapper.mapTripPlan(request, itineraries),
+                responseMetadata,
+                routingErrors
+        );
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
@@ -233,6 +259,6 @@ public class RoutingWorker {
         if(!accessExist) { missingPlaces.add("from"); }
         if(!egressExist) { missingPlaces.add("to"); }
 
-        throw new VertexNotFoundException(missingPlaces);
+        throw new NoStopsInRangeException(missingPlaces);
     }
 }
