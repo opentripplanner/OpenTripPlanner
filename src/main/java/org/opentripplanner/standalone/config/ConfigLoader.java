@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.apache.commons.io.IOUtils;
+import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -101,6 +102,7 @@ public class ConfigLoader {
      */
     public BuildConfig loadBuildConfig() {
         JsonNode node = loadJsonByFilename(BUILD_CONFIG_FILENAME);
+        ComponentAnnotationConfigurator.getInstance().fromConfig(node);
         if(node.isMissingNode()) {
             return BuildConfig.DEFAULT;
         }

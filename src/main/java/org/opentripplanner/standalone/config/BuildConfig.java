@@ -320,10 +320,6 @@ public class BuildConfig {
         return rawJson.isMissingNode() ? "" : rawJson.toString();
     }
 
-    public JsonNode getRawJson(){
-        return rawJson;
-    }
-
     public ServiceDateInterval getTransitServicePeriod() {
         return new ServiceDateInterval(
                 new ServiceDate(transitServiceStart),
