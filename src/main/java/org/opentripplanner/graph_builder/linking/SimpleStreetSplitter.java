@@ -88,6 +88,10 @@ public class SimpleStreetSplitter {
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
     public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
 
+    private static final LocalizedString ORIGIN = new LocalizedString("origin", new String[]{});
+
+    private static final LocalizedString DESTINATION = new LocalizedString("destination", new String[]{});
+
     private Graph graph;
 
     private HashGridSpatialIndex<Edge> idx;
@@ -548,14 +552,13 @@ public class SimpleStreetSplitter {
             LOG.debug("Finding start vertex for {}", location);
         }
         Coordinate coord = location.getCoordinate();
-        //TODO: add nice name
         String name;
 
         if (location.name == null || location.name.isEmpty()) {
             if (endVertex) {
-                name = "Destination";
+                name = DESTINATION.toString(options.locale);
             } else {
-                name = "Origin";
+                name = ORIGIN.toString(options.locale);
             }
         } else {
             name = location.name;
