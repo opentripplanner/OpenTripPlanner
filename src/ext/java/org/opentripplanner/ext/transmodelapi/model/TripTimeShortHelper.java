@@ -6,7 +6,7 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.model.plan.Leg;
 
 import java.text.ParseException;

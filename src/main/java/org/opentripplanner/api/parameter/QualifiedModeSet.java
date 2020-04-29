@@ -3,8 +3,8 @@ package org.opentripplanner.api.parameter;
 import com.beust.jcommander.internal.Sets;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.request.RequestModes;
-import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.StreetMode;
 
 import java.io.Serializable;
 import java.util.Arrays;

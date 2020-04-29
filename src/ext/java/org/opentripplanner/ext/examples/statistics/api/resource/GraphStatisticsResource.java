@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import graphql.ExecutionResult;
 import graphql.GraphQL;
 import org.opentripplanner.ext.examples.statistics.api.model.StatisticsGraphQLSchemaFactory;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.util.HttpToGraphQLMapper;
 

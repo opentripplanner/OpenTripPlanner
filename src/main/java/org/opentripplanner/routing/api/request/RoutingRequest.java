@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.request;
+package org.opentripplanner.routing.api.request;
 
 import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;

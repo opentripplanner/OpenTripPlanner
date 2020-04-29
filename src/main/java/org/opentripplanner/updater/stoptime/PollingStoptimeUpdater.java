@@ -2,7 +2,7 @@ package org.opentripplanner.updater.stoptime;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;

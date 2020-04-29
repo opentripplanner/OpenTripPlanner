@@ -4,7 +4,7 @@ import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;

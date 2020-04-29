@@ -1,4 +1,4 @@
-package org.opentripplanner.routing;
+package org.opentripplanner.routing.api.request;
 
 import lombok.experimental.Delegate;
 import org.opentripplanner.model.Stop;
@@ -9,9 +9,11 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.StopTimesHelper;
+import org.opentripplanner.routing.TripTimesShortHelper;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.algorithm.RoutingWorker;
-import org.opentripplanner.routing.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.Router;

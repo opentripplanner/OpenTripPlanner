@@ -704,7 +704,7 @@ connect to a network resource is the `url` field.
 // router-config.json
 {
     // Routing defaults are any public field or setter in the Java class
-    // org.opentripplanner.routing.request.RoutingRequest
+    // org.opentripplanner.routing.api.request.RoutingRequest
     "routingDefaults": {
         "numItineraries": 6,
         "walkSpeed": 2.0,

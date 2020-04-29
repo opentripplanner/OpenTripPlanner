@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
-import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.api.request.RoutingService;
 import org.opentripplanner.standalone.server.Router;
 
 public class TransmodelRequestContext {

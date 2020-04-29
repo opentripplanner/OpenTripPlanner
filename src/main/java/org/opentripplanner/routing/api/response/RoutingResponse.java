@@ -1,4 +1,4 @@
-package org.opentripplanner.model.routing;
+package org.opentripplanner.routing.api.response;
 
 import org.opentripplanner.model.plan.TripPlan;
 
