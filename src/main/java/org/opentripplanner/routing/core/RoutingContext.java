@@ -249,7 +249,6 @@ public class RoutingContext implements Cloneable {
         if (notFound.size() > 0) {
             throw new RoutingValidationException(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND,
-                    "",
                     notFound)
             );
         }

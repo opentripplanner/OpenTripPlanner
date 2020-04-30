@@ -38,8 +38,6 @@ public class PlannerErrorMapper {
                 throw new IllegalArgumentException();
         }
 
-        api.msg = domain.message;
-
         return api;
     }
 }

@@ -17,7 +17,7 @@ public enum RoutingErrorCode {
   LOCATION_NOT_FOUND,
 
   /**
-   * The location was found, but no stops could be connected within the search radius.
+   * The location was found, but no stops could be found within the search radius.
    */
   NO_STOPS_IN_RANGE
 }

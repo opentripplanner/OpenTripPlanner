@@ -242,6 +242,6 @@ public class RoutingWorker {
         if(!egressExist) { missingPlaces.add(InputField.TO_PLACE); }
 
         throw new RoutingValidationException(
-            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, null, missingPlaces));
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, missingPlaces));
     }
 }
