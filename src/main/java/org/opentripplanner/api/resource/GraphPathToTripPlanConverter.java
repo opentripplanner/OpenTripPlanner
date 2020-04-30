@@ -176,8 +176,8 @@ public abstract class GraphPathToTripPlanConverter {
         calculateElevations(itinerary, edges);
 
         itinerary.traverseDistance = lastState.getTraverseDistanceInMeters();
-        itinerary.distanceTraversedInMode = lastState.getDistanceTraversedInMode();
-        itinerary.timeTraversedInMode = lastState.getTimeTraversedInMode();
+        itinerary.distanceTraversedInMode = lastState.createDistanceTraversedInModeMap();
+        itinerary.timeTraversedInMode = lastState.createTimeTraversedInModeMap();
 
 
         itinerary.transfers = lastState.getNumBoardings();

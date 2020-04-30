@@ -21,9 +21,7 @@ import org.slf4j.LoggerFactory;
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
 
-
-    protected Map<TraverseMode,Double> distanceTraversedInMode = new HashMap<>();
-    protected Map<TraverseMode,Integer> timeTraversedInMode = new HashMap<>();
+    protected TraversalStatistics traversalStatistics;
     
     // the current time at this state, in milliseconds
     protected long time;
@@ -125,6 +123,7 @@ public class State implements Cloneable {
         this.preTransitTime = 0;
         this.time = timeSeconds * 1000;
         stateData.routeSequence = new FeedScopedId[0];
+        this.traversalStatistics = new TraversalStatistics();
     }
 
     /**
@@ -851,10 +850,14 @@ public class State implements Cloneable {
         return stateData.currentVehicle;
     }
 
-    public Map<TraverseMode, Double> getDistanceTraversedInMode() {
-        return distanceTraversedInMode;
+    public double getDistanceInWalk() {
+        return traversalStatistics.distanceInWalk;
     }
-    public Map<TraverseMode, Integer> getTimeTraversedInMode() {
-        return timeTraversedInMode;
+
+    public Map<TraverseMode, Double> createDistanceTraversedInModeMap() {
+        return traversalStatistics.createDistanceTraversedInModeMap();
+    }
+    public Map<TraverseMode, Integer> createTimeTraversedInModeMap() {
+        return traversalStatistics.createTimeTraversedInModeMap();
     }
 }

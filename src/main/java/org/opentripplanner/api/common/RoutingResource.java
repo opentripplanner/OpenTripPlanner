@@ -211,8 +211,8 @@ public abstract class RoutingResource {
     /**
      * Allows filtering vehicles for renting by providers. By default we accept renting all vehicles.
      */
-    @QueryParam("providersAllowed")
-    protected Set<Integer> providersAllowed;
+    @QueryParam("providersDisallowed")
+    protected Set<String> providersDisallowed;
 
     /**
      * Allows filtering vehicles for renting by vehicle types. By default we accept renting all vehicles.
@@ -653,7 +653,7 @@ public abstract class RoutingResource {
             request.rentingAllowed = rentingAllowed;
         }
 
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersAllowed, vehicleTypesAllowed);
+        request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersDisallowed, vehicleTypesAllowed);
 
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
