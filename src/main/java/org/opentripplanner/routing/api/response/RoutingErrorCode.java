@@ -1,8 +1,6 @@
 package org.opentripplanner.routing.api.response;
 
 public enum RoutingErrorCode {
-  SYSTEM_ERROR,
-
   /**
    * Location was found, but it was located outside the street network.
    */
