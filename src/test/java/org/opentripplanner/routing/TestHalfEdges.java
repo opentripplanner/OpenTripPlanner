@@ -403,6 +403,8 @@ public class TestHalfEdges {
 
     @Test
     public void testStreetLocationFinder() {
+        RoutingRequest options = new RoutingRequest();
+
         StreetVertexIndexServiceImpl finder = new StreetVertexIndexServiceImpl(graph);
         // test that the local stop finder finds stops
         GenericLocation loc = new GenericLocation(40.01, -74.005000001);
@@ -410,12 +412,12 @@ public class TestHalfEdges {
 
         // test that the closest vertex finder returns the closest vertex
         TemporaryStreetLocation some = (TemporaryStreetLocation) finder.getVertexForLocation(
-                new GenericLocation(40.00, -74.00), null, true);
+                new GenericLocation(40.00, -74.00), options, true);
         assertNotNull(some);
 
         // test that the closest vertex finder correctly splits streets
         TemporaryStreetLocation start = (TemporaryStreetLocation) finder.getVertexForLocation(
-                new GenericLocation(40.004, -74.01), null, false);
+                new GenericLocation(40.004, -74.01), options, false);
         assertNotNull(start);
         assertTrue("wheelchair accessibility is correctly set (splitting)",
                 start.isWheelchairAccessible());
