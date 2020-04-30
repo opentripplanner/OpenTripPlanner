@@ -10,7 +10,7 @@ public class CarDescription extends VehicleDescription {
 
     private static final int RENT_TIME_IN_SECONDS = 90;
 
-    private static final int DROPOFF_TIME_IN_SECONDS = 90;
+    private static final int DROPOFF_TIME_IN_SECONDS = 60 * 4;
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
 
