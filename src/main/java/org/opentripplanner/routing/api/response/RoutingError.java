@@ -1,13 +1,16 @@
 package org.opentripplanner.routing.api.response;
 
+import java.util.List;
+
 public class RoutingError {
   public final RoutingErrorCode code;
   public final String message;
-  public final String paramValue;
+  public final List<InputField> inputFields;
 
-  public RoutingError( RoutingErrorCode code, String message, String paramValue) {
+  public RoutingError(RoutingErrorCode code, String message, List<InputField> inputFields) {
     this.code = code;
     this.message = message;
-    this.paramValue = paramValue;
+    this.inputFields = inputFields;
+
   }
 }

@@ -1,7 +1,9 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
@@ -16,7 +18,6 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.error.NoStopsInRangeException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
@@ -236,10 +237,11 @@ public class RoutingWorker {
 
         if(accessExist && egressExist) { return; }
 
-        List<String> missingPlaces = new ArrayList<>();
-        if(!accessExist) { missingPlaces.add("from"); }
-        if(!egressExist) { missingPlaces.add("to"); }
+        List<InputField> missingPlaces = new ArrayList<>();
+        if(!accessExist) { missingPlaces.add(InputField.FROM_PLACE); }
+        if(!egressExist) { missingPlaces.add(InputField.TO_PLACE); }
 
-        throw new NoStopsInRangeException(missingPlaces);
+        throw new RoutingValidationException(
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, null, missingPlaces));
     }
 }

@@ -12,7 +12,7 @@ public class RoutingValidationException extends RuntimeException {
    * An error with the input data which results in itineraries not being returned for a type of
    * search.
    */
-  RoutingValidationException(RoutingError routingError) {
+  public RoutingValidationException(RoutingError routingError) {
     this.routingError = routingError;
   }
 
