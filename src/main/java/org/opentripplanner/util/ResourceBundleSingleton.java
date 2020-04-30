@@ -13,7 +13,10 @@ import org.slf4j.LoggerFactory;
 public enum ResourceBundleSingleton {
     INSTANCE;
 
-    private final static Logger LOG = LoggerFactory.getLogger(ResourceBundleSingleton.class);
+    private static final String INTERNALS = "internals";
+    private static final String WAY_PROPERTIES = "WayProperties";
+
+    private static final Logger LOG = LoggerFactory.getLogger(ResourceBundleSingleton.class);
 
     //TODO: this is not the only place default is specified
     //It is also specified in RoutingResource and RoutingRequest
@@ -33,17 +36,12 @@ public enum ResourceBundleSingleton {
             locale = getDefaultLocale();
         }
         try {
-            ResourceBundle resourceBundle = null;
-            if (key.equals("corner") || key.equals("unnamedStreet")) {
-                resourceBundle = ResourceBundle.getBundle("internals", locale);
+            if (ResourceBundle.getBundle(INTERNALS, locale).containsKey(key)) {
+                return ResourceBundle.getBundle(INTERNALS, locale).getString(key);
             } else {
-                resourceBundle = ResourceBundle.getBundle("WayProperties", locale);
+                return ResourceBundle.getBundle(WAY_PROPERTIES, locale).getString(key);
             }
-            String retval = resourceBundle.getString(key);
-            //LOG.debug(String.format("Localized '%s' using '%s'", key, retval));
-            return retval;
         } catch (MissingResourceException e) {
-            //LOG.debug("Missing translation for key: " + key);
             return key;
         }
     }
@@ -65,11 +63,7 @@ public enum ResourceBundleSingleton {
         String[] localeSpecParts = localeSpec.split("_");
         switch (localeSpecParts.length) {
             case 1:
-                locale = new Locale(localeSpecParts[0]);
-                break;
             case 2:
-                locale = new Locale(localeSpecParts[0]);
-                break;
             case 3:
                 locale = new Locale(localeSpecParts[0]);
                 break;
