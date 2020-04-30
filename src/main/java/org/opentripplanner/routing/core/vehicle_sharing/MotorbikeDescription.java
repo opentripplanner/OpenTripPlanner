@@ -10,7 +10,7 @@ public class MotorbikeDescription extends VehicleDescription {
 
     private static final int RENT_TIME_IN_SECONDS = 60;
 
-    private static final int DROPOFF_TIME_IN_SECONDS = 60;
+    private static final int DROPOFF_TIME_IN_SECONDS = 60 * 2;
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;
 
