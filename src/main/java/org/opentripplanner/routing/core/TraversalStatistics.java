@@ -31,6 +31,9 @@ public class TraversalStatistics implements Cloneable {
     }
 
     protected void increaseDistance(TraverseMode mode, double value) {
+        if (mode == null) {
+            return;
+        }
         switch (mode) {
             case WALK:
                 distanceInWalk += value;
@@ -49,6 +52,9 @@ public class TraversalStatistics implements Cloneable {
     }
 
     protected void increaseTime(TraverseMode mode, int value) {
+        if (mode == null) {
+            return;
+        }
         switch (mode) {
             case WALK:
                 timeInWalk += value;
