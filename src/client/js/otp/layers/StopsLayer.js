@@ -108,10 +108,19 @@ otp.layers.StopsLayer =
         var to_stop_trans = _tr('To Stop');
         var routes_stop_trans = _tr('Routes Serving Stop');
 
-        // TriMet-specific code
-        if(stop.url && stop.url.indexOf("http://trimet.org") === 0) {
+        // Check if this is a TriMet deployment (based on hostname in stop URL).
+        var isTriMet = false;
+        try {
+            var stopUrl = new URL(stop.url);
+            isTriMet = stopUrl.hostname === "trimet.org"
+        } catch (_) {
+            // Nothing to do here. This will catch the failure to construct URL if invalid.
+        }
+        // TriMet-specific code that adds an additional link to the trimet.org website's stop page
+        // Note: this is different from the stop_url page.
+        if(isTriMet) {
             var stopId = stop.id.split(':')[1];
-            stop.titleLink = 'http://www.trimet.org/go/cgi-bin/cstops.pl?action=entry&resptype=U&lang=en&noCat=Landmark&Loc=' + stopId;
+            stop.titleLink = 'https://trimet.org/ride/stop.html?stop_id=' + stopId;
         }
         var context = _.clone(stop);
         context.agencyStopLinkText = otp.config.agencyStopLinkText || "Agency Stop URL";
