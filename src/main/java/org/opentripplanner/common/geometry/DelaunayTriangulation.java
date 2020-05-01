@@ -1,6 +1,6 @@
 package org.opentripplanner.common.geometry;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A DelaunayPoint is the geometrical point of a node of the triangulation.

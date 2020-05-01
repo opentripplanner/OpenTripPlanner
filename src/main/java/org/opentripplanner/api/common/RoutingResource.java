@@ -42,7 +42,7 @@ import java.util.TimeZone;
  *
  * @author abyrd
  */
-public abstract class RoutingResource { 
+public abstract class RoutingResource {
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingResource.class);
 
@@ -52,7 +52,7 @@ public abstract class RoutingResource {
      * a path because we don't want it to be instantiated as an endpoint. Instead, the {routerId}
      * path parameter should be included in the path annotations of all its subclasses.
      */
-    @PathParam("routerId") 
+    @PathParam("routerId")
     public String routerId;
 
     /** The start location -- either latitude, longitude pair in degrees or a Vertex
@@ -72,15 +72,15 @@ public abstract class RoutingResource {
     /** The date that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("date")
     protected String date;
-    
+
     /** The time that the trip should depart (or arrive, for requests where arriveBy is true). */
     @QueryParam("time")
     protected String time;
-    
+
     /** Whether the trip should depart or arrive at the specified date and time. */
     @QueryParam("arriveBy")
     protected Boolean arriveBy;
-    
+
     /** Whether the trip must be wheelchair accessible. */
     @QueryParam("wheelchair")
     protected Boolean wheelchair;
@@ -146,19 +146,19 @@ public abstract class RoutingResource {
     /** For bike triangle routing, how much safety matters (range 0-1). */
     @QueryParam("triangleSafetyFactor")
     protected Double triangleSafetyFactor;
-    
+
     /** For bike triangle routing, how much slope matters (range 0-1). */
     @QueryParam("triangleSlopeFactor")
     protected Double triangleSlopeFactor;
-    
-    /** For bike triangle routing, how much time matters (range 0-1). */            
+
+    /** For bike triangle routing, how much time matters (range 0-1). */
     @QueryParam("triangleTimeFactor")
     protected Double triangleTimeFactor;
 
     /** The set of characteristics that the user wants to optimize for. @See OptimizeType */
     @QueryParam("optimize")
     protected OptimizeType optimize;
-    
+
     /**
      * <p>The set of modes that a user is willing to use, with qualifiers stating whether vehicles should be parked, rented, etc.</p>
      * <p>The possible values of the comma-separated list are:</p>
@@ -214,18 +214,18 @@ public abstract class RoutingResource {
      * to wait for preferred route. */
     @QueryParam("otherThanPreferredRoutesPenalty")
     protected Integer otherThanPreferredRoutesPenalty;
-    
+
     /** The comma-separated list of preferred agencies. */
     @QueryParam("preferredAgencies")
     protected String preferredAgencies;
-    
+
     /**
      * The list of unpreferred routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42 (two
      * underscores, 42 is the route internal ID).
      */
     @QueryParam("unpreferredRoutes")
     protected String unpreferredRoutes;
-    
+
     /** The comma-separated list of unpreferred agencies. */
     @QueryParam("unpreferredAgencies")
     protected String unpreferredAgencies;
@@ -243,14 +243,14 @@ public abstract class RoutingResource {
      */
     @QueryParam("walkBoardCost")
     protected Integer walkBoardCost;
-    
+
     /**
      * Prevents unnecessary transfers by adding a cost for boarding a vehicle. This is the cost that
      * is used when boarding while cycling. This is usually higher that walkBoardCost.
      */
     @QueryParam("bikeBoardCost")
     protected Integer bikeBoardCost;
-    
+
     /**
      * The comma-separated list of banned routes. The format is agency_[routename][_routeid], so TriMet_100 (100 is route short name) or Trimet__42
      * (two underscores, 42 is the route internal ID).
@@ -263,7 +263,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("whiteListedRoutes")
     protected String whiteListedRoutes;
-    
+
     /** The comma-separated list of banned agencies. */
     @QueryParam("bannedAgencies")
     protected String bannedAgencies;
@@ -273,7 +273,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("whiteListedAgencies")
     protected String whiteListedAgencies;
-    
+
     /** The comma-separated list of banned trips.  The format is agency_trip[:stop*], so:
      * TriMet_24601 or TriMet_24601:0:1:2:17:18:19
      */
@@ -288,7 +288,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("bannedStops")
     protected String bannedStops;
-    
+
     /** A comma-separated list of banned stops. A stop is banned by ignoring its 
      * pre-board and pre-alight edges. This means the stop will be reachable via the
      * street network. It is not possible to travel through the stop.
@@ -298,7 +298,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("bannedStopsHard")
     protected String bannedStopsHard;
-    
+
     /**
      * An additional penalty added to boardings after the first.  The value is in OTP's
      * internal weight units, which are roughly equivalent to seconds.  Set this to a high
@@ -307,7 +307,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("transferPenalty")
     protected Integer transferPenalty;
-    
+
     /**
      * An additional penalty added to boardings after the first when the transfer is not
      * preferred. Preferred transfers also include timed transfers. The value is in OTP's
@@ -318,7 +318,7 @@ public abstract class RoutingResource {
      */
     @QueryParam("nonpreferredTransferPenalty")
     protected Integer nonpreferredTransferPenalty;
-    
+
     /** The maximum number of transfers (that is, one plus the maximum number of boardings)
      *  that a trip will be allowed.  Larger values will slow performance, but could give
      *  better routes.  This is limited on the server side by the MAX_TRANSFERS value in
@@ -361,10 +361,10 @@ public abstract class RoutingResource {
      */
     @QueryParam("reverseOptimizeOnTheFly")
     protected Boolean reverseOptimizeOnTheFly;
-        
+
     @QueryParam("boardSlack")
     private Integer boardSlack;
-    
+
     @QueryParam("alightSlack")
     private Integer alightSlack;
 
@@ -383,6 +383,36 @@ public abstract class RoutingResource {
      */
     @QueryParam("disableRemainingWeightHeuristic")
     protected Boolean disableRemainingWeightHeuristic;
+
+    /*
+     * Control the size of flag-stop buffer returned in API response. This parameter only applies
+     * to GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     */
+    @QueryParam("flexFlagStopBufferSize")
+    protected Double flexFlagStopBufferSize;
+
+    /**
+     * Whether to use reservation-based services
+     */
+    @QueryParam("flexUseReservationServices")
+    protected Boolean flexUseReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services
+     */
+    @QueryParam("flexUseEligibilityServices")
+    protected Boolean flexUseEligibilityServices = true;
+
+    /**
+     * Whether to ignore DRT time limits.
+     *
+     * According to the GTFS-flex spec, demand-response transit (DRT) service must be reserved
+     * at least `drt_advance_book_min` minutes in advance. OTP not allow DRT service to be used
+     * inside that time window, unless this parameter is set to true.
+     */
+    @QueryParam("flexIgnoreDrtAdvanceBookMin")
+    protected Boolean flexIgnoreDrtAdvanceBookMin;
 
     @QueryParam("maxHours")
     private Double maxHours;
@@ -471,8 +501,8 @@ public abstract class RoutingResource {
     @QueryParam("maximumMicromobilitySpeed")
     private Double maximumMicromobilitySpeed;
 
-    /* 
-     * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones. 
+    /*
+     * somewhat ugly bug fix: the graphService is only needed here for fetching per-graph time zones.
      * this should ideally be done when setting the routing context, but at present departure/
      * arrival time is stored in the request as an epoch time with the TZ already resolved, and other
      * code depends on this behavior. (AMB)
@@ -526,6 +556,8 @@ public abstract class RoutingResource {
             } else {
                 request.setDateTime(date, time, tz);
             }
+
+            request.resetClockTime();
         }
 
         if (wheelchair != null)
@@ -626,7 +658,7 @@ public abstract class RoutingResource {
             request.setWhiteListedAgencies(whiteListedAgencies);
 
         HashMap<FeedScopedId, BannedStopSet> bannedTripMap = makeBannedTripMap(bannedTrips);
-      
+
         if (bannedTripMap != null)
             request.bannedTrips = bannedTripMap;
 
@@ -635,7 +667,7 @@ public abstract class RoutingResource {
 
         if (bannedStopsHard != null)
             request.setBannedStopsHard(bannedStopsHard);
-        
+
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) request.transferPenalty = transferPenalty;
@@ -675,7 +707,7 @@ public abstract class RoutingResource {
 
         if (request.boardSlack + request.alightSlack > request.transferSlack) {
             throw new RuntimeException("Invalid parameters: " +
-                    "transfer slack must be greater than or equal to board slack plus alight slack");
+                "transfer slack must be greater than or equal to board slack plus alight slack");
         }
 
         if (maxTransfers != null)
@@ -705,6 +737,18 @@ public abstract class RoutingResource {
         if (disableRemainingWeightHeuristic != null)
             request.disableRemainingWeightHeuristic = disableRemainingWeightHeuristic;
 
+        if (flexFlagStopBufferSize != null)
+            request.flexFlagStopBufferSize = flexFlagStopBufferSize;
+
+        if (flexUseReservationServices != null)
+            request.flexUseReservationServices = flexUseReservationServices;
+
+        if (flexUseEligibilityServices != null)
+            request.flexUseEligibilityServices = flexUseEligibilityServices;
+
+        if (flexIgnoreDrtAdvanceBookMin != null)
+            request.flexIgnoreDrtAdvanceBookMin = flexIgnoreDrtAdvanceBookMin;
+
         if (maxHours != null)
             request.maxHours = maxHours;
 
@@ -733,7 +777,7 @@ public abstract class RoutingResource {
         // first TNC before transit.  (See StateEditor.boardHailedCar)
         if (this.modes != null && this.modes.qModes.contains(new QualifiedMode("CAR_HAIL"))) {
             if (companies == null) {
-                companies = "NOAPI";    
+                companies = "NOAPI";
             }
 
             request.companies = companies;
@@ -838,7 +882,7 @@ public abstract class RoutingResource {
         if (banned == null) {
             return null;
         }
-        
+
         HashMap<FeedScopedId, BannedStopSet> bannedTripMap = new HashMap<FeedScopedId, BannedStopSet>();
         String[] tripStrings = banned.split(",");
         for (String tripString : tripStrings) {

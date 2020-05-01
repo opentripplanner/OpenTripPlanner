@@ -2,7 +2,7 @@ package org.opentripplanner.geocoder;
 
 import java.util.Collection;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 
 
 public class GeocoderMultipleResultsStubImpl implements Geocoder {

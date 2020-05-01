@@ -1,6 +1,7 @@
 package org.opentripplanner.model.impl;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FlexArea;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
@@ -54,6 +55,8 @@ public class OtpTransitServiceBuilder {
 
     private final List<Trip> trips = new ArrayList<>();
 
+    private final List<FlexArea> flexAreas = new ArrayList<>();
+
     public OtpTransitServiceBuilder() {
     }
 
@@ -76,6 +79,7 @@ public class OtpTransitServiceBuilder {
         stopTimes.addAll(other.getAllStopTimes());
         transfers.addAll(other.getAllTransfers());
         trips.addAll(other.getAllTrips());
+        flexAreas.addAll(other.getAllAreas());
         return this;
     }
 
@@ -135,13 +139,17 @@ public class OtpTransitServiceBuilder {
         return trips;
     }
 
+    public List<FlexArea> getFlexAreas() {
+        return flexAreas;
+    }
+
     public OtpTransitService build() {
 
         createNoneExistentIds();
 
         return new OtpTransitServiceImpl(agencies, calendarDates, calendars, fareAttributes, fareRules,
                 feedInfos, frequencies, pathways, routes, shapePoints, stops, stopTimes, transfers,
-                trips);
+                trips, flexAreas);
     }
 
     private void createNoneExistentIds() {

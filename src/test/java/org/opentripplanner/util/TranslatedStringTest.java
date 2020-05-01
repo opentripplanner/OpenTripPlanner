@@ -7,6 +7,15 @@ import java.util.Locale;
 
 public class TranslatedStringTest extends TestCase {
 
+    public void testGetI18NStringIsEmpty() {
+        try {
+            TranslatedString.getI18NString(new HashMap<>());
+            fail("Expected an IllegalArgumentException to be thrown");
+        } catch (IllegalArgumentException illigalArgumentException) {
+            assertEquals(illigalArgumentException.getMessage(), "Map of languages and translations is empty.");
+        }
+    }
+
     public void testGetI18NString() throws Exception {
         HashMap<String, String> translations = new HashMap<>();
 

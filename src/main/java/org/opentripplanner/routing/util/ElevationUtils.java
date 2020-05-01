@@ -1,8 +1,9 @@
 package org.opentripplanner.routing.util;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.CoordinateSequence;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.routing.util.elevation.ToblersHikingFunction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -167,6 +168,18 @@ public class ElevationUtils {
         );
     }
 
+    /**
+     * If the calculated factor is more than this constant, we ignore the calculated factor and use this
+     * constant in stead. See ths table in {@link ToblersHikingFunction} for a mapping between the
+     * factor and angels(degree and percentage). A factor of 3 with take effect for slopes with a
+     * incline above 31.4% and a decline below 41.4%. The worlds steepest road ia about 35%, and the
+     * steepest climes in Tour De France is usually in the range 8-12%. Some walking paths may be quite
+     * steep, but a penalty of 3 is still a large penalty.
+     */
+    private static final double MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR = 3;
+
+    private static final ToblersHikingFunction toblerWalkingFunction = new ToblersHikingFunction(MAX_SLOPE_WALK_EFFECTIVE_LENGTH_FACTOR);
+
     private static double[] getLengthsFromElevation(CoordinateSequence elev) {
 
         double trueLength = 0;
@@ -186,7 +199,7 @@ public class ElevationUtils {
     }
 
     /**
-     * 
+     *
      * @param elev The elevation profile, where each (x, y) is (distance along edge, elevation)
      * @param slopeLimit Whether the slope should be limited to 0.35, which is the max slope for
      * streets that take cars.
@@ -199,6 +212,7 @@ public class ElevationUtils {
         double slopeSpeedEffectiveLength = 0;
         double slopeWorkCost = 0;
         double slopeSafetyCost = 0;
+        double effectiveWalkLength = 0;
         double[] lengths = getLengthsFromElevation(elev);
         double trueLength = lengths[0];
         double flatLength = lengths[1];
@@ -211,6 +225,7 @@ public class ElevationUtils {
                 0.0,
                 1.0,
                 false,
+                1.0,
                 new byte[]{0},
                 new short[]{(short) trueLength},
                 getDragResistiveForceComponent(0)
@@ -277,12 +292,13 @@ public class ElevationUtils {
                             * slope_or_zero * slope_or_zero);
             slopeWorkCost += energy;
             double slopeSpeedCoef = slopeSpeedCoefficient(slope, coordinates[i].y);
-            slopeSpeedEffectiveLength += hypotenuse / slopeSpeedCoef;
+            slopeSpeedEffectiveLength += run / slopeSpeedCoef;
             // assume that speed and safety are inverses
             double safetyCost = hypotenuse * (slopeSpeedCoef - 1) * 0.25;
             if (safetyCost > 0) {
                 slopeSafetyCost += safetyCost;
             }
+            effectiveWalkLength += calculateEffectiveWalkLength(run, rise);
         }
 
         // convert gradient info into arrays of primitives
@@ -310,6 +326,7 @@ public class ElevationUtils {
             maxSlope,
             lengthMultiplier,
             flattened,
+            effectiveWalkLength / flatLength,
             gradientsArr,
             gradientLengthsArr,
             maximumDragResistiveForceComponent
@@ -447,54 +464,19 @@ public class ElevationUtils {
     }
 
 
-    /** parameter A in the Rees (2004) slope-dependent walk cost model **/
-    private static double walkParA = 0.75;
-    /** parameter C in the Rees (2004) slope-dependent walk cost model **/
-    private static double walkParC = 14.6;
-
     /**
-     * The cost for walking in hilly/mountain terrain dependent on slope using an empirical function by
-     * WG Rees (Comp & Geosc, 2004), that overhauls the Naismith rule for mountaineering.<br>
-     * For a slope of 0 = 0 degree a cost is returned that approximates a speed of 1.333 m/sec = 4.8km/h<br>
-     * TODO: Not sure if it makes sense to use maxSlope as input and instead better use
-     * a lower estimate / average value. However, the DEM is most likely generalized/smoothed
-     * and hence maxSlope may be smaller than in the real world.
-     * @param verticalDistance the vertical distance of the line segment
-     * @param maxSlope the slope of the segment
-     * @return walk costs dependent on slope (in seconds)
+     * <p>
+     *     We use the Tobler function {@link ToblersHikingFunction} to calculate this.
+     * </p>
+     * <p>
+     *     When testing this we get good results in general, but for some edges
+     *     the elevation profile is not accurate. A (serpentine) road is usually
+     *     build with a constant slope, but the elevation profile in OTP is not
+     *     as smooth, resulting in an extra penalty for these roads.
+     * </p>
      */
-    public static double getWalkCostsForSlope(double verticalDistance, double maxSlope) {
-        /*
-        Naismith (1892):
-        "an hour for every three miles on the map, with an additional hour for
-        every 2,000 feet of ascent.'
-        -------
-        in S. Fritz and S. Carver (GISRUK 1998):
-        Naismith's Rule: 5 km/h plus 1 hour per 600m ascent; minus 10 minutes per 300 m
-        descent for slopes between 5 and 12 degrees; plus 10 minutes per 300m descent
-        for slopes greater than 12 degrees.
-        ...
-        In the case of a 50m grid resolution DEM for every m climbed, 6 seconds are added.
-        2 seconds are added in case of a ascent of more than 12 degrees and 2 seconds are
-        subtracted if the ascent is between 5-12 degrees.
-        -------
-        Naismith's rule was overhauled by W.G. Rees (2004), who developed a quadratic
-        function for speed estimation:
-                1/v = a + b*m + c*m^2
-        with a= 0.75 sec/m, b=0.09 s/m, c=14.6 s/m
-
-        As for b=0 there are no big differences the derived cost function is:
-                 k = a*d + c * (h*h) / d
-        with d= distance, and h = vertical separation
-
-        */
-        if (verticalDistance == 0){
-            return 0;
-        }
-        double costs = 0;
-        double h = maxSlope * verticalDistance;
-        costs = (walkParA * verticalDistance) + (  walkParC * (h * h) / verticalDistance); 
-        return  costs;
+    static double calculateEffectiveWalkLength(double run, double rise) {
+        return run * toblerWalkingFunction.calculateHorizontalWalkingDistanceMultiplier(run, rise);
     }
 
     public static PackedCoordinateSequence getPartialElevationProfile(
@@ -524,7 +506,7 @@ public class ElevationUtils {
                        //no need to interpolate as this is the first coordinate
                         continue;
                     }
-                    // interpolate start coordinate 
+                    // interpolate start coordinate
                     double run = coord.x - lastCoord.x;
                     if (run < 1) {
                         //tiny runs are likely to lead to errors, so we'll skip them
@@ -554,7 +536,7 @@ public class ElevationUtils {
         Coordinate coordArr[] = new Coordinate[coordList.size()];
         return new PackedCoordinateSequence.Float(coordList.toArray(coordArr), 2);
     }
-    
+
     /** checks for units (m/ft) in an OSM ele tag value, and returns the value in meters */
     public static Double parseEleTag(String ele) {
         ele = ele.toLowerCase();

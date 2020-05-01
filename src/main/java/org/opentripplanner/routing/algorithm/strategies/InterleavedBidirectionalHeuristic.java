@@ -345,7 +345,7 @@ public class InterleavedBidirectionalHeuristic implements RemainingWeightHeurist
                        target.getLat(),
                        target.getLon()
                    ) / remainingDistanceSpeed
-               )
+                 )
                  : 0;
     }
 

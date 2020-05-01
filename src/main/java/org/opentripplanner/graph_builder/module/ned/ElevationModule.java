@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
 import org.geotools.geometry.DirectPosition2D;
 import org.opengis.coverage.Coverage;
 import org.opengis.coverage.PointOutsideCoverageException;
@@ -67,6 +67,12 @@ public class ElevationModule implements GraphBuilderModule {
     private final File cachedElevationsFile;
     /* Whether or not to include geoid difference values in individual elevation calculations */
     private final boolean includeEllipsoidToGeoidDifference;
+    /**
+     * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+     * are defined in meters in the source data. If, for example, decimetres are used in the source data,
+     * this should be set to 0.1 in build-config.json.
+     */
+    private double elevationUnitMultiplier = 1;
 
     private HashMap<String, PackedCoordinateSequence> cachedElevations;
 
@@ -104,13 +110,15 @@ public class ElevationModule implements GraphBuilderModule {
         File cacheDirectory,
         boolean readCachedElevations,
         boolean writeCachedElevations,
-        boolean includeEllipsoidToGeoidDifference
+        boolean includeEllipsoidToGeoidDifference,
+        double elevationUnitMultiplier
     ) {
         gridCoverageFactory = factory;
         cachedElevationsFile = new File(cacheDirectory, "cached_elevations.obj");
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.includeEllipsoidToGeoidDifference = includeEllipsoidToGeoidDifference;
+        this.elevationUnitMultiplier = elevationUnitMultiplier;
     }
 
     public List<String> provides() {
@@ -290,7 +298,7 @@ public class ElevationModule implements GraphBuilderModule {
         public double initialElevation;
 
         public ElevationRepairState(StreetEdge backEdge, ElevationRepairState backState,
-                Vertex vertex, double distance, double initialElevation) {
+            Vertex vertex, double distance, double initialElevation) {
             this.backEdge = backEdge;
             this.backState = backState;
             this.vertex = vertex;
@@ -331,7 +339,7 @@ public class ElevationModule implements GraphBuilderModule {
             if (!elevations.containsKey(e.getFromVertex())) {
                 double firstElevation = profile.getOrdinate(0, 1);
                 ElevationRepairState state = new ElevationRepairState(null, null,
-                        e.getFromVertex(), 0, firstElevation);
+                    e.getFromVertex(), 0, firstElevation);
                 pq.insert(state, 0);
                 elevations.put(e.getFromVertex(), firstElevation);
             }
@@ -339,7 +347,7 @@ public class ElevationModule implements GraphBuilderModule {
             if (!elevations.containsKey(e.getToVertex())) {
                 double lastElevation = profile.getOrdinate(profile.size() - 1, 1);
                 ElevationRepairState state = new ElevationRepairState(null, null, e.getToVertex(),
-                        0, lastElevation);
+                    0, lastElevation);
                 pq.insert(state, 0);
                 elevations.put(e.getToVertex(), lastElevation);
             }
@@ -382,7 +390,7 @@ public class ElevationModule implements GraphBuilderModule {
                 } else {
                     // continue
                     ElevationRepairState newState = new ElevationRepairState(edge, state, tov,
-                            e.getDistance() + state.distance, state.initialElevation);
+                        e.getDistance() + state.distance, state.initialElevation);
                     pq.insert(newState, e.getDistance() + state.distance);
                 }
             } // end loop over outgoing edges
@@ -405,7 +413,7 @@ public class ElevationModule implements GraphBuilderModule {
                 } else {
                     // continue
                     ElevationRepairState newState = new ElevationRepairState(edge, state, fromv,
-                            e.getDistance() + state.distance, state.initialElevation);
+                        e.getDistance() + state.distance, state.initialElevation);
                     pq.insert(newState, e.getDistance() + state.distance);
                 }
             } // end loop over incoming edges
@@ -423,13 +431,13 @@ public class ElevationModule implements GraphBuilderModule {
                 double totalDistance = bestDistance + state.distance;
                 // trace backwards, setting states as we go
                 while (true) {
-                    // watch out for division by 0 here, which will propagate NaNs 
-                    // all the way out to edge lengths 
+                    // watch out for division by 0 here, which will propagate NaNs
+                    // all the way out to edge lengths
                     if (totalDistance == 0)
                         elevations.put(state.vertex, bestElevation);
                     else {
-                        double elevation = (bestElevation * state.distance + 
-                               state.initialElevation * bestDistance) / totalDistance;
+                        double elevation = (bestElevation * state.distance +
+                            state.initialElevation * bestDistance) / totalDistance;
                         elevations.put(state.vertex, elevation);
                     }
                     if (state.backState == null)
@@ -559,7 +567,7 @@ public class ElevationModule implements GraphBuilderModule {
             // construct the PCS
             Coordinate coordArr[] = new Coordinate[coordList.size()];
             PackedCoordinateSequence elevPCS = new PackedCoordinateSequence.Double(
-                    coordList.toArray(coordArr));
+                coordList.toArray(coordArr));
 
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (PointOutsideCoverageException | TransformException e) {
@@ -608,7 +616,9 @@ public class ElevationModule implements GraphBuilderModule {
             throw e;
         }
         nPointsEvaluated.incrementAndGet();
-        return values[0] - (includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0);
+        return values[0] * elevationUnitMultiplier - (
+            includeEllipsoidToGeoidDifference ? getApproximateEllipsoidToGeoidDifference(y, x) : 0
+        );
     }
 
     /**

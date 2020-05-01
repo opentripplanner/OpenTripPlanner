@@ -103,8 +103,15 @@ public abstract class GtfsTest extends TestCase {
     public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
                boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
                String excludedRoute, String excludedStop, int legCount) {
+        return plan(dateTime, fromVertex, toVertex, onTripId, wheelchairAccessible, preferLeastTransfers,
+                preferredMode, excludedRoute, excludedStop, legCount, null);
+    }
+
+    public Leg[] plan(long dateTime, String fromVertex, String toVertex, String onTripId,
+                      boolean wheelchairAccessible, boolean preferLeastTransfers, TraverseMode preferredMode,
+                      String excludedRoute, String excludedStop, int legCount, RoutingRequest opt) {
         final TraverseMode mode = preferredMode != null ? preferredMode : TraverseMode.TRANSIT;
-        RoutingRequest routingRequest = new RoutingRequest();
+        RoutingRequest routingRequest = opt == null ? new RoutingRequest() : opt;
         routingRequest.setNumItineraries(1);
         
         routingRequest.setArriveBy(dateTime < 0);
@@ -138,6 +145,8 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
+        if (paths.isEmpty())
+            return new Leg[] { null };
         TripPlan tripPlan = GraphPathToTripPlanConverter.generatePlan(paths, routingRequest);
         // Stored in instance field for use in individual tests
         itinerary = tripPlan.itinerary.get(0);

@@ -56,4 +56,6 @@ public interface OtpTransitService {
     List<String> getTripAgencyIdsReferencingServiceId(FeedScopedId serviceId);
 
     List<Stop> getStopsForStation(Stop station);
+
+    Collection<FlexArea> getAllAreas();
 }

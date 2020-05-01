@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Sets;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vehicle_rental.VehicleRentalStation;

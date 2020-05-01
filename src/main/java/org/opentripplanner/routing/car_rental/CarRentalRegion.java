@@ -14,7 +14,7 @@
 package org.opentripplanner.routing.car_rental;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
-import com.vividsolutions.jts.geom.Geometry;
+import org.locationtech.jts.geom.Geometry;
 
 import javax.xml.bind.annotation.XmlAttribute;
 import java.io.Serializable;

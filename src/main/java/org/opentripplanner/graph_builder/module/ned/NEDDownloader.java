@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.ned;
 
-import com.vividsolutions.jts.geom.Envelope;
+import org.locationtech.jts.geom.Envelope;
 import org.apache.axis.client.Call;
 import org.apache.axis.client.Service;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
