@@ -2,13 +2,18 @@ package org.opentripplanner;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URLDecoder;
 import java.util.HashMap;
 
 import org.opentripplanner.graph_builder.module.GraphBuilderModuleSummary;
 import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
+import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
+import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.openstreetmap.impl.AnyFileBasedOpenStreetMapProviderImpl;
 import org.opentripplanner.routing.edgetype.factory.PatternHopFactory;
 import org.opentripplanner.routing.edgetype.factory.TransferGraphLinker;
 import org.opentripplanner.routing.graph.Graph;
@@ -27,11 +32,17 @@ public class ConstantsForTests {
 
     public static final String FARE_COMPONENT_GTFS = "src/test/resources/farecomponent_gtfs.zip";
 
+    public static final String VERMONT_GTFS = "/vermont/ruralcommunity-flex-vt-us.zip";
+
+    public static final String VERMONT_OSM = "/vermont/vermont-rct.osm.pbf";
+
     private static ConstantsForTests instance = null;
 
     private Graph portlandGraph = null;
 
     private GtfsContext portlandContext = null;
+
+    private Graph vermontGraph = null;
 
     private ConstantsForTests() {
 
@@ -80,7 +91,57 @@ public class ConstantsForTests {
         StreetLinkerModule ttsnm = new StreetLinkerModule();
         ttsnm.buildGraph(portlandGraph, new GraphBuilderModuleSummary(ttsnm));
     }
-    
+
+    public Graph getVermontGraph() {
+        if (vermontGraph == null) {
+            vermontGraph = getGraph(VERMONT_OSM, VERMONT_GTFS);
+            vermontGraph.setUseFlexService(true);
+        }
+        return vermontGraph;
+    }
+
+    private Graph getGraph(String osmFile, String gtfsFile) {
+        try {
+            Graph g = new Graph();
+            OpenStreetMapModule loader = new OpenStreetMapModule();
+            loader.setDefaultWayPropertySetSource(new DefaultWayPropertySetSource());
+            AnyFileBasedOpenStreetMapProviderImpl provider = new AnyFileBasedOpenStreetMapProviderImpl();
+
+            File file = new File(
+                    URLDecoder.decode(this.getClass().getResource(osmFile).getFile(),
+                            "UTF-8"));
+
+            provider.setPath(file);
+            loader.setProvider(provider);
+
+            loader.buildGraph(g, new GraphBuilderModuleSummary(loader));
+
+            GtfsContext ctx = GtfsLibrary.readGtfs(new File(
+                    URLDecoder.decode(this.getClass().getResource(gtfsFile).getFile(),
+                            "UTF-8")));
+            PatternHopFactory factory = new PatternHopFactory(ctx);
+            factory.run(g);
+
+            CalendarServiceData csd =  createCalendarServiceData(ctx.getOtpTransitService());
+            g.putService(CalendarServiceData.class, csd);
+            g.updateTransitFeedValidity(csd);
+            g.hasTransit = true;
+
+            DirectTransferGenerator dtg = new DirectTransferGenerator(2000);
+            dtg.buildGraph(g, new GraphBuilderModuleSummary(dtg));
+
+            StreetLinkerModule slm = new StreetLinkerModule();
+            slm.buildGraph(g, new GraphBuilderModuleSummary(slm));
+
+            g.index(true);
+
+            return g;
+        } catch(Exception ex) {
+            ex.printStackTrace();
+        }
+        return null;
+    }
+
     public static Graph buildGraph(String path) {
         GtfsContext context;
         try {

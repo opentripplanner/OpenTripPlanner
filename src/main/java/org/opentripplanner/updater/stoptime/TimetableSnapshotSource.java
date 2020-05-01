@@ -155,14 +155,10 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
      * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-<<<<<<< HEAD
-     * 
-=======
      *
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      *
->>>>>>> 7296be8ffd532a13afb0bec263a9f436ab787022
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
@@ -682,7 +678,7 @@ public class TimetableSnapshotSource {
         // TODO: filter/interpolate stop times like in PatternHopFactory?
 
         // Create StopPattern
-        final StopPattern stopPattern = new StopPattern(stopTimes);
+        final StopPattern stopPattern = new StopPattern(stopTimes, graph.deduplicator);
 
         // Get cached trip pattern or create one if it doesn't exist yet
         final TripPattern pattern = tripPatternCache.getOrCreateTripPattern(stopPattern, trip.getRoute(), graph);

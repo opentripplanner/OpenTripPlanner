@@ -8,11 +8,12 @@ import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
 import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.StopPatternFlexFields;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.MavenVersion;
@@ -23,6 +24,7 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.flex.FlexPatternHop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
@@ -31,8 +33,6 @@ import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -140,7 +140,7 @@ public class TripPattern implements Cloneable, Serializable {
 
     /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
     // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    @XmlElement int[] perStopFlags;
+    int[] perStopFlags;
 
     /**
      * A set of serviceIds with at least one trip in this pattern.
@@ -217,7 +217,6 @@ public class TripPattern implements Cloneable, Serializable {
         return trips.get(tripIndex);
     }
 
-    @XmlTransient
     public List<Trip> getTrips() {
         return trips;
     }
@@ -508,7 +507,18 @@ public class TripPattern implements Cloneable, Serializable {
             }
             pav1 = new PatternArriveVertex(graph, this, stop + 1);
             arriveVertices[stop + 1] = pav1;
-            hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
+
+            if (stopPattern.hasFlexFields()) {
+                FlexPatternHop hop = new FlexPatternHop(pdv0, pav1, s0, s1, stop);
+                StopPatternFlexFields flexFields = stopPattern.getFlexFields();
+                hop.setRequestPickup(flexFields.continuousPickup[stop]);
+                hop.setRequestDropoff(flexFields.continuousDropOff[stop]);
+                hop.setServiceAreaRadius(flexFields.serviceAreaRadius[stop]);
+                hop.setServiceArea(flexFields.serviceAreas[stop]);
+                hopEdges[stop] = hop;
+            } else {
+                hopEdges[stop] = new PatternHop(pdv0, pav1, s0, s1, stop);
+            }
 
             /* Get the arrive and depart vertices for the current stop (not pattern stop). */
             TransitStopDepart stopDepart = ((TransitStop) transitStops.get(s0)).departVertex;
@@ -700,4 +710,7 @@ public class TripPattern implements Cloneable, Serializable {
         return route.getId().getAgencyId();
     }
 
+    public boolean hasFlexService() {
+        return Arrays.stream(patternHops).anyMatch(PatternHop::hasFlexService);
+    }
 }

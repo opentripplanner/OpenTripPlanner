@@ -1,6 +1,6 @@
 package org.opentripplanner.analyst.request;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 
 /**
  * A request for a sample grid (of a SPT).

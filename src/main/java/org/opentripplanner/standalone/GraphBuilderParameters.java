@@ -106,6 +106,13 @@ public class GraphBuilderParameters {
     public final S3BucketConfig elevationBucket;
 
     /**
+     * Unit conversion multiplier for elevation values. No conversion needed if the elevation values
+     * are defined in meters in the source data. If, for example, decimetres are used in the source data,
+     * this should be set to 0.1.
+    */
+    public final double elevationUnitMultiplier;
+
+    /**
      * A specific fares service to use.
      */
     public final FareServiceFactory fareServiceFactory;
@@ -237,6 +244,7 @@ public class GraphBuilderParameters {
         platformEntriesLinking = config.path("platformEntriesLinking").asBoolean(false);
         fetchElevationUS = config.path("fetchElevationUS").asBoolean(false);
         elevationBucket = S3BucketConfig.fromConfig(config.path("elevationBucket"));
+        elevationUnitMultiplier = config.path("elevationUnitMultiplier").asDouble(1);
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(config.path("fares"));
         customNamer = CustomNamer.CustomNamerFactory.fromConfig(config.path("osmNaming"));
         wayPropertySet = WayPropertySetSource.fromConfig(config.path("osmWayPropertySet").asText("default"));

@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.graph;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -187,6 +187,12 @@ public abstract class Edge implements Serializable {
 
     public LineString getGeometry() {
         return null;
+    }
+
+    // Allow subclasses to provide a special geometry for display purposes. Required for flag stop
+    // partial PatternHops, which have a buffer area to display.
+    public LineString getDisplayGeometry() {
+        return getGeometry();
     }
 
     /**

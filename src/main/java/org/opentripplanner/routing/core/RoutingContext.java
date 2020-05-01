@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -26,7 +26,6 @@ import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.services.OnBoardDepartService;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -34,11 +33,15 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collection;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TimeZone;
 
 /**
  * A RoutingContext holds information needed to carry out a search for a particular TraverseOptions, on a specific graph.
@@ -66,7 +69,7 @@ public class RoutingContext implements Cloneable {
 
     // target means "where this search will terminate" not "the end of the trip from the user's perspective"
     public final Vertex target;
-    
+
     // The back edge associated with the origin - i.e. continuing a previous search.
     // NOTE: not final so that it can be modified post-construction for testing.
     // TODO(flamholz): figure out a better way.
@@ -83,9 +86,6 @@ public class RoutingContext implements Cloneable {
 
     /** The timetableSnapshot is a {@link TimetableSnapshot} for looking up real-time updates. */
     public final TimetableSnapshot timetableSnapshot;
-
-    /** A snapshot of street speeds for looking up real-time or historical traffic data */
-    public final StreetSpeedSnapshot streetSpeedSnapshot;
 
     /**
      * Cache lists of which transit services run on which midnight-to-midnight periods. This ties a TraverseOptions to a particular start time for the
@@ -113,20 +113,36 @@ public class RoutingContext implements Cloneable {
     /** Indicates that a maximum slope constraint was specified but was removed during routing to produce a result. */
     public boolean slopeRestrictionRemoved = false;
 
+    /**
+     * Temporary vertices created during the request. This is needed for GTFS-Flex support. The other temporary vertices which are created have
+     * known locations (the endpoints of the search), but GTFS-Flex routing may require temporary vertices to be created at other places in the
+     * graph. Temporary vertices are request-specific need to be disposed of at the end-of-life of a request.
+     */
+    public Collection<Vertex> temporaryVertices = new ArrayList<>();
+
     /* CONSTRUCTORS */
 
     /**
      * Constructor that automatically computes origin/target from RoutingRequest.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph) {
-        this(routingRequest, graph, null, null, true);
+        this(routingRequest, graph, null, null, true, null);
+    }
+
+    /**
+     * Constructor that automatically computes origin/target from RoutingRequest, and sets the
+     * context's temporary vertices. This is needed for intermediate places, as a consequence of
+     * the check that temporary vertices are request-specific.
+     */
+    public RoutingContext(RoutingRequest routingRequest, Graph graph, Collection<Vertex> temporaryVertices) {
+        this(routingRequest, graph, null, null, true, temporaryVertices);
     }
 
     /**
      * Constructor that takes to/from vertices as input.
      */
     public RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to) {
-        this(routingRequest, graph, from, to, false);
+        this(routingRequest, graph, from, to, false, null);
     }
 
     /**
@@ -163,16 +179,16 @@ public class RoutingContext implements Cloneable {
      * Creates a PartialStreetEdge along the input StreetEdge iff its direction makes this possible.
      */
     private void makePartialEdgeAlong(StreetEdge streetEdge, TemporaryStreetLocation from,
-                                      TemporaryStreetLocation to) {
+        TemporaryStreetLocation to) {
         LineString parent = streetEdge.getGeometry();
         LineString head = GeometryUtils.getInteriorSegment(parent,
-                streetEdge.getFromVertex().getCoordinate(), from.getCoordinate());
+            streetEdge.getFromVertex().getCoordinate(), from.getCoordinate());
         LineString tail = GeometryUtils.getInteriorSegment(parent,
-                to.getCoordinate(), streetEdge.getToVertex().getCoordinate());
+            to.getCoordinate(), streetEdge.getToVertex().getCoordinate());
 
         if (parent.getLength() > head.getLength() + tail.getLength()) {
             LineString partial = GeometryUtils.getInteriorSegment(parent,
-                    from.getCoordinate(), to.getCoordinate());
+                from.getCoordinate(), to.getCoordinate());
 
             double lengthRatio = partial.getLength() / parent.getLength();
             double length = streetEdge.getDistance() * lengthRatio;
@@ -185,13 +201,14 @@ public class RoutingContext implements Cloneable {
 
     /**
      * Flexible constructor which may compute to/from vertices.
-     * 
+     *
      * TODO(flamholz): delete this flexible constructor and move the logic to constructors above appropriately.
-     * 
+     *
      * @param findPlaces if true, compute origin and target from RoutingRequest using spatial indices.
+     * @param temporaryVerticesParam if not null, use this collection to keep track of temporary vertices.
      */
     private RoutingContext(RoutingRequest routingRequest, Graph graph, Vertex from, Vertex to,
-            boolean findPlaces) {
+        boolean findPlaces, Collection<Vertex> temporaryVerticesParam) {
         if (graph == null) {
             throw new GraphNotFoundException();
         }
@@ -222,12 +239,6 @@ public class RoutingContext implements Cloneable {
             timetableSnapshot = null;
             calendarService = null;
         }
-
-        // do the same for traffic
-        if (graph.streetSpeedSource != null)
-            this.streetSpeedSnapshot = graph.streetSpeedSource.getSnapshot();
-        else
-            this.streetSpeedSnapshot = null;
 
         Edge fromBackEdge = null;
         Edge toBackEdge = null;
@@ -279,16 +290,24 @@ public class RoutingContext implements Cloneable {
         // TODO(flamholz): seems like this might be the wrong place for this code? Can't find a better one.
         //
         if (fromVertex instanceof TemporaryStreetLocation &&
-                toVertex instanceof TemporaryStreetLocation) {
+            toVertex instanceof TemporaryStreetLocation) {
             TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
             TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
             Set<StreetEdge> overlap = overlappingStreetEdges(fromStreetVertex,
-                    toStreetVertex);
+                toStreetVertex);
 
             for (StreetEdge pse : overlap) {
                 makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
             }
         }
+
+        // Add temporary subgraphs to the routing context. If `fromVertex` or `toVertex` are not
+        // tempoorary vertices, their subgraphs are empty, so this has no effect.
+        if (temporaryVerticesParam != null) {
+            temporaryVertices = temporaryVerticesParam;
+        }
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(fromVertex));
+        temporaryVertices.addAll(TemporaryVertex.findSubgraph(toVertex));
 
         if (opt.startingTransitStopId != null) {
             Stop stop = graph.index.stopForId.get(opt.startingTransitStopId);
@@ -355,20 +374,34 @@ public class RoutingContext implements Cloneable {
         final ServiceDate serviceDate = new ServiceDate(c);
         this.serviceDays = new ArrayList<ServiceDay>(3);
         if (calendarService == null && graph.getCalendarService() != null
-                && (opt.modes == null || opt.modes.contains(TraverseMode.TRANSIT))) {
+            && (opt.modes == null || opt.modes.contains(TraverseMode.TRANSIT))) {
             LOG.warn("RoutingContext has no CalendarService. Transit will never be boarded.");
             return;
         }
 
-        for (String feedId : graph.getFeedIds()) {
-            for (Agency agency : graph.getAgencies(feedId)) {
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.previous(),
-                        calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, agency.getId()));
-                addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate.next(),
-                        calendarService, agency.getId()));
+        // In general, there should be a set of service days (yesterday, today, tomorrow) for every
+        // timezone in the graph. The parameter `serviceDayLookout` allows more service days to be
+        // added to search for future service (or past, if arriveBy=true). The furthest back trips
+        // can begin is 1 service day (e.g. a trip which started yesterday is usable today.) This
+        // does not address the case where a trip started multiple days ago (e.g. a multi-day ferry
+        // trip will not be board-able after day 2).
+        for (TimeZone timeZone : graph.getAllTimeZones()) {
+            // Add today
+            addIfNotExists(this.serviceDays, new ServiceDay(graph, serviceDate, calendarService, timeZone));
+            // Add one day previous (previous in the direction of the transit search, so yesterday if
+            // arriveBy=false and tomorrow if arriveBy=true
+            addIfNotExists(this.serviceDays, new ServiceDay(graph,
+                opt.arriveBy ? serviceDate.next() : serviceDate.previous(),
+                calendarService, timeZone));
+            // Add one or more days in the "forward" direction
+            ServiceDate sd = serviceDate;
+            int lookout = Math.max(1, opt.serviceDayLookout);
+            for (int i = 0; i < lookout; i++) {
+                sd = opt.arriveBy ? sd.previous() : sd.next();
+                addIfNotExists(this.serviceDays, new ServiceDay(graph, sd, calendarService, timeZone));
             }
         }
+        serviceDays.sort(Comparator.comparing(ServiceDay::getServiceDate));
     }
 
     private static <T> void addIfNotExists(ArrayList<T> list, T item) {
@@ -403,7 +436,7 @@ public class RoutingContext implements Cloneable {
      * for garbage collection.
      */
     public void destroy() {
-        TemporaryVertex.dispose(fromVertex);
-        TemporaryVertex.dispose(toVertex);
+        TemporaryVertex.disposeAll(temporaryVertices);
+        temporaryVertices.clear();
     }
 }

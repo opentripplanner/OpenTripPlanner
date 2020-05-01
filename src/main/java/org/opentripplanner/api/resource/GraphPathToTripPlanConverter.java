@@ -1,8 +1,9 @@
 package org.opentripplanner.api.resource;
 
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.Geometry;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.model.BoardAlightType;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.Place;
@@ -43,6 +44,8 @@ import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
+import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
+import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -252,9 +255,13 @@ public abstract class GraphPathToTripPlanConverter {
 
     private static Calendar makeCalendar(State state) {
         RoutingContext rctx = state.getContext();
-        TimeZone timeZone = rctx.graph.getTimeZone(); 
+        TimeZone timeZone = rctx.graph.getTimeZone();
+        return makeCalendar(timeZone, state.getTimeInMillis());
+    }
+
+    private static Calendar makeCalendar(TimeZone timeZone, long timeMillis) {
         Calendar calendar = Calendar.getInstance(timeZone);
-        calendar.setTimeInMillis(state.getTimeInMillis());
+        calendar.setTimeInMillis(timeMillis);
         return calendar;
     }
 
@@ -264,11 +271,11 @@ public abstract class GraphPathToTripPlanConverter {
      * @param edges The array of input edges
      * @return The coordinates of the points on the edges
      */
-    private static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
+    public static CoordinateArrayListSequence makeCoordinates(Edge[] edges) {
         CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
 
         for (Edge edge : edges) {
-            LineString geometry = edge.getGeometry();
+            LineString geometry = edge.getDisplayGeometry();
 
             if (geometry != null) {
                 if (coordinates.size() == 0) {
@@ -461,7 +468,7 @@ public abstract class GraphPathToTripPlanConverter {
             // This avoids unnecessary/redundant API requests to TNC providers.
             Place from = leg.from;
             if (request.transportationNetworkCompanyEtaAtOrigin > -1 &&
-                    (i == 0 || (i == 1 && itinerary.legs.get(0).mode.equals("WALK")))) {
+                (i == 0 || (i == 1 && itinerary.legs.get(0).mode.equals("WALK")))) {
                 from = new Place(request.from.lng, request.from.lat, request.from.name);
                 tncLegsAreFromOrigin.add(true);
             } else {
@@ -687,18 +694,18 @@ public abstract class GraphPathToTripPlanConverter {
             if (state.getBackMode() == null) continue;
 
             switch (state.getBackMode()) {
-                default:
-                    itinerary.transitTime += state.getTimeDeltaSeconds();
-                    break;
+            default:
+                itinerary.transitTime += state.getTimeDeltaSeconds();
+                break;
 
-                case LEG_SWITCH:
-                    itinerary.waitingTime += state.getTimeDeltaSeconds();
-                    break;
+            case LEG_SWITCH:
+                itinerary.waitingTime += state.getTimeDeltaSeconds();
+                break;
 
-                case WALK:
-                case BICYCLE:
-                case CAR:
-                    itinerary.walkTime += state.getTimeDeltaSeconds();
+            case WALK:
+            case BICYCLE:
+            case CAR:
+                itinerary.walkTime += state.getTimeDeltaSeconds();
             }
         }
     }
@@ -801,6 +808,11 @@ public abstract class GraphPathToTripPlanConverter {
             leg.tripId = trip.getId();
             leg.tripShortName = trip.getTripShortName();
             leg.tripBlockId = trip.getBlockId();
+            leg.flexDrtAdvanceBookMin = trip.getDrtAdvanceBookMin();
+            leg.flexDrtPickupMessage = trip.getDrtPickupMessage();
+            leg.flexDrtDropOffMessage = trip.getDrtDropOffMessage();
+            leg.flexFlagStopPickupMessage = trip.getContinuousPickupMessage();
+            leg.flexFlagStopDropOffMessage = trip.getContinuousDropOffMessage();
 
             if (serviceDay != null) {
                 leg.serviceDate = serviceDay.getServiceDate().getAsString();
@@ -809,6 +821,30 @@ public abstract class GraphPathToTripPlanConverter {
             if (leg.headsign == null) {
                 leg.headsign = trip.getTripHeadsign();
             }
+
+            Edge edge = states[states.length - 1].backEdge;
+            if (edge instanceof TemporaryDirectPatternHop) {
+                leg.callAndRide = true;
+            }
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                int directTime = hop.getDirectVehicleTime();
+                TripTimes tt = states[states.length - 1].getTripTimes();
+                int maxTime = tt.getDemandResponseMaxTime(directTime);
+                int avgTime = tt.getDemandResponseAvgTime(directTime);
+                int delta = maxTime - avgTime;
+                if (directTime != 0 && delta > 0) {
+                    if (hop.isDeviatedRouteBoard()) {
+                        long maxStartTime = leg.startTime.getTimeInMillis() + (delta * 1000);
+                        leg.flexCallAndRideMaxStartTime = makeCalendar(leg.startTime.getTimeZone(), maxStartTime);
+                    }
+                    if (hop.isDeviatedRouteAlight()) {
+                        long minEndTime = leg.endTime.getTimeInMillis() - (delta * 1000);
+                        leg.flexCallAndRideMinEndTime = makeCalendar(leg.endTime.getTimeZone(), minEndTime);
+                    }
+                }
+            }
+
         }
     }
 
@@ -828,9 +864,9 @@ public abstract class GraphPathToTripPlanConverter {
         Vertex lastVertex = states[states.length - 1].getVertex();
 
         Stop firstStop = firstVertex instanceof TransitVertex ?
-                ((TransitVertex) firstVertex).getStop(): null;
+            ((TransitVertex) firstVertex).getStop(): null;
         Stop lastStop = lastVertex instanceof TransitVertex ?
-                ((TransitVertex) lastVertex).getStop(): null;
+            ((TransitVertex) lastVertex).getStop(): null;
         TripTimes tripTimes = states[states.length - 1].getTripTimes();
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
@@ -887,7 +923,7 @@ public abstract class GraphPathToTripPlanConverter {
             name = ((StreetVertex) vertex).getIntersectionName(requestedLocale).toString(requestedLocale);
         }
         Place place = new Place(vertex.getX(), vertex.getY(), name,
-                makeCalendar(state), makeCalendar(state));
+            makeCalendar(state), makeCalendar(state));
 
         if (endOfLeg) edge = state.getBackEdge();
 
@@ -904,6 +940,22 @@ public abstract class GraphPathToTripPlanConverter {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }
             place.vertexType = VertexType.TRANSIT;
+            place.boardAlightType = BoardAlightType.DEFAULT;
+            if (edge instanceof PartialPatternHop) {
+                PartialPatternHop hop = (PartialPatternHop) edge;
+                if (hop.hasBoardArea() && !endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getBoardArea());
+                }
+                if (hop.hasAlightArea() && endOfLeg) {
+                    place.flagStopArea = PolylineEncoder.createEncodings(hop.getAlightArea());
+                }
+                if ((endOfLeg && hop.isFlagStopAlight()) || (!endOfLeg && hop.isFlagStopBoard())) {
+                    place.boardAlightType = BoardAlightType.FLAG_STOP;
+                }
+                if ((endOfLeg && hop.isDeviatedRouteAlight()) || (!endOfLeg && hop.isDeviatedRouteBoard())) {
+                    place.boardAlightType = BoardAlightType.DEVIATED;
+                }
+            }
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
@@ -945,9 +997,9 @@ public abstract class GraphPathToTripPlanConverter {
 
     /**
      * Converts a list of street edges to a list of turn-by-turn directions.
-     * 
+     *
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
-     * 
+     *
      * @return
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
@@ -1049,9 +1101,9 @@ public abstract class GraphPathToTripPlanConverter {
                 // new step, set distance to length of first edge
                 distance = edge.getDistance();
             } else if (((step.streetName != null && !step.streetNameNoParens().equals(streetNameNoParens))
-                    && (!step.bogusName || !edge.hasBogusName())) ||
-                    edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
-                    isLink(edge) && !isLink(backState.getBackEdge())) {
+                && (!step.bogusName || !edge.hasBogusName())) ||
+                edge.isRoundabout() != (roundaboutExit > 0) || // went on to or off of a roundabout
+                isLink(edge) && !isLink(backState.getBackEdge())) {
                 // Street name has changed, or we've gone on to or off of a roundabout.
                 if (roundaboutExit > 0) {
                     // if we were just on a roundabout,
@@ -1084,7 +1136,7 @@ public abstract class GraphPathToTripPlanConverter {
                 /* street name has not changed */
                 double thisAngle = DirectionUtils.getFirstAngle(geom);
                 RelativeDirection direction = WalkStep.getRelativeDirection(lastAngle, thisAngle,
-                        edge.isRoundabout());
+                    edge.isRoundabout());
                 boolean optionsBefore = backState.multipleOptionsBefore();
                 if (edge.isRoundabout()) {
                     // we are on a roundabout, and have already traversed at least one edge of it.
@@ -1114,7 +1166,7 @@ public abstract class GraphPathToTripPlanConverter {
                                 continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
-                                    .getGeometry());
+                                .getGeometry());
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
                             if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
@@ -1128,7 +1180,7 @@ public abstract class GraphPathToTripPlanConverter {
                         Vertex backVertex = twoStatesBack.getVertex();
                         for (Edge alternative : backVertex.getOutgoingStreetEdges()) {
                             List<Edge> alternatives = alternative.getToVertex()
-                                    .getOutgoingStreetEdges();
+                                .getOutgoingStreetEdges();
                             if (alternatives.size() == 0) {
                                 continue; // this is not an alternative
                             }
@@ -1139,7 +1191,7 @@ public abstract class GraphPathToTripPlanConverter {
                                 continue;
                             }
                             double altAngle = DirectionUtils.getFirstAngle(alternative
-                                    .getGeometry());
+                                .getGeometry());
                             double altAngleDiff = getAbsoluteAngleDiff(altAngle, lastAngle);
                             if (angleDiff > Math.PI / 4 || altAngleDiff - angleDiff < Math.PI / 16) {
                                 shouldGenerateContinue = true;
@@ -1180,30 +1232,30 @@ public abstract class GraphPathToTripPlanConverter {
                     WalkStep lastStep = steps.get(last);
 
                     if (twoBack.distance < MAX_ZAG_DISTANCE
-                            && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-                        
-                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT || 
-                                lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
-                                (twoBack.relativeDirection == RelativeDirection.RIGHT ||
+                        && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
+
+                        if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
+                            lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
+                            (twoBack.relativeDirection == RelativeDirection.RIGHT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_RIGHT)) ||
-                                ((lastStep.relativeDirection == RelativeDirection.LEFT || 
+                            ((lastStep.relativeDirection == RelativeDirection.LEFT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
                                 (twoBack.relativeDirection == RelativeDirection.LEFT ||
-                                twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
+                                    twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
                             // in this case, we have two left turns or two right turns in quick 
                             // succession; this is probably a U-turn.
-                            
+
                             steps.remove(last - 1);
-                            
+
                             lastStep.distance += twoBack.distance;
-                            
+
                             // A U-turn to the left, typical in the US. 
-                            if (lastStep.relativeDirection == RelativeDirection.LEFT || 
-                                    lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
+                            if (lastStep.relativeDirection == RelativeDirection.LEFT ||
+                                lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
                                 lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
                             else
                                 lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
-                            
+
                             // in this case, we're definitely staying on the same street 
                             // (since it's zag removal, the street names are the same)
                             lastStep.stayOn = true;
@@ -1232,7 +1284,7 @@ public abstract class GraphPathToTripPlanConverter {
             } else {
                 if (!createdNewStep && step.elevation != null) {
                     List<P2<Double>> s = encodeElevationProfile(edge, distance,
-                            backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
+                        backState.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
                     if (step.elevation != null && step.elevation.size() > 0) {
                         step.elevation.addAll(s);
                     } else {
@@ -1253,12 +1305,12 @@ public abstract class GraphPathToTripPlanConverter {
 
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
+            steps.get(steps.size()-1).bikeRentalOnStation =
+                new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation = 
-                    new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
+            steps.get(0).bikeRentalOffStation =
+                new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
         }
 
         return steps;
@@ -1288,7 +1340,7 @@ public abstract class GraphPathToTripPlanConverter {
         step.lon = en.getFromVertex().getX();
         step.lat = en.getFromVertex().getY();
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
-                s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
+            s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
         step.addAlerts(graph.streetNotesService.getNotes(s), wantedLocale);
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());

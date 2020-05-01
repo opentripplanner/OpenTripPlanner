@@ -2,15 +2,13 @@ package org.opentripplanner.api.model;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.google.common.collect.Lists;
+
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.profile.BikeRentalStationInfo;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.graph.Edge;
 
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlTransient;
-import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -100,10 +98,8 @@ public class WalkStep {
      * The elevation profile as a comma-separated list of x,y values. x is the distance from the start of the step, y is the elevation at this
      * distance.
      */
-    @XmlTransient
     public List<P2<Double>> elevation;
 
-    @XmlElement
     @JsonSerialize
     public List<LocalizedAlert> alerts;
 
@@ -141,7 +137,7 @@ public class WalkStep {
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
-            boolean roundabout) {
+        boolean roundabout) {
 
         double angleDiff = thisAngle - lastAngle;
         if (angleDiff < 0) {
@@ -206,7 +202,6 @@ public class WalkStep {
         return streetName.substring(0, idx - 1);
     }
 
-    @XmlJavaTypeAdapter(ElevationAdapter.class)
     @JsonSerialize
     public List<P2<Double>> getElevation() {
         return elevation;

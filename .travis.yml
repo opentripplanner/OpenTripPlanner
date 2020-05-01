@@ -1,9 +1,9 @@
 dist: trusty # jdk 8 not available on xenial
 language: java
-# OpenTripPlanner requires Java 8 and Travis doesn't (yet) support OpenJDK 8
+
 jdk:
-  - oraclejdk8
-  
+  - openjdk8
+
 # Replace Travis's default Maven installation step with a no-op.
 # This avoids redundantly pre-running 'mvn install -DskipTests' every time.
 install: true
@@ -34,7 +34,7 @@ after_success:
 # Secure envs are OSSRH_JIRA_USERNAME, OSSRH_JIRA_PASSWORD, GPG_KEY_NAME, GPG_PASSPHRASE
 env:
   global:
-  - JAVA_OPTS=-Xmx2g
+    - JAVA_OPTS=-Xmx2g
 
 # If sudo is disabled, CI runs on container based infrastructure (allows caching &c.)
 sudo: false

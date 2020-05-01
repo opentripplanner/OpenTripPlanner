@@ -28,7 +28,7 @@ import java.util.Set;
 
 public class State implements Cloneable {
     /* Data which is likely to change at most traversals */
-    
+
     // the current time at this state, in milliseconds
     protected long time;
 
@@ -69,6 +69,8 @@ public class State implements Cloneable {
     // track the states of all path parsers -- probably changes frequently
     protected int[] pathParserStates;
 
+    int callAndRideTime = 0;
+
     private static final Logger LOG = LoggerFactory.getLogger(State.class);
 
     /* CONSTRUCTORS */
@@ -99,7 +101,7 @@ public class State implements Cloneable {
         // Since you explicitly specify, the vertex, we don't set the backEdge.
         this(vertex, null, timeSeconds, options);
     }
-    
+
     /**
      * Create an initial state, forcing vertex, back edge and time to the specified values. Useful for reusing 
      * a RoutingContext in TransitIndex, tests, etc.
@@ -107,7 +109,7 @@ public class State implements Cloneable {
     public State(Vertex vertex, Edge backEdge, long timeSeconds, RoutingRequest options) {
         this(vertex, backEdge, timeSeconds, timeSeconds, options);
     }
-    
+
     /**
      * Create an initial state, forcing vertex, back edge, time and start time to the specified values. Useful for
      * starting a multiple initial state search, for example when propagating profile results to the street network in
@@ -135,7 +137,7 @@ public class State implements Cloneable {
         } else if (options.bikeParkAndRide) {
             this.stateData.bikeParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.bikeParked ? TraverseMode.WALK
-                    : TraverseMode.BICYCLE;
+                : TraverseMode.BICYCLE;
         }
         // if allowed to hail a car, initialize state with CAR mode if the first seen StreetEdge allows cars and a TNC
         // stop would be allowed there
@@ -203,7 +205,7 @@ public class State implements Cloneable {
     /**
      * Create a state editor to produce a child of this state, which will be the result of
      * traversing the given edge.
-     * 
+     *
      * @param e
      * @return
      */
@@ -228,7 +230,7 @@ public class State implements Cloneable {
 
     /**
      * Retrieve a State extension based on its key.
-     * 
+     *
      * @param key - An Object that is a key in this State's extension map
      * @return - The extension value for the given key, or null if not present
      */
@@ -241,21 +243,21 @@ public class State implements Cloneable {
 
     public String toString() {
         return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
-                + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
-                + vertex + ">";
+            + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+            + vertex + ">";
     }
-    
+
     public String toStringVerbose() {
-        return "<State " + new Date(getTimeInMillis()) + 
-                " w=" + this.getWeight() + 
-                " t=" + this.getElapsedTimeSeconds() + 
-                " d=" + this.getWalkDistance() + 
-                " p=" + this.getPreTransitTime() +
-                " b=" + this.getNumBoardings() +
-                " br=" + this.isBikeRenting() +
-                " pr=" + this.isCarParked() + ">";
+        return "<State " + new Date(getTimeInMillis()) +
+            " w=" + this.getWeight() +
+            " t=" + this.getElapsedTimeSeconds() +
+            " d=" + this.getWalkDistance() +
+            " p=" + this.getPreTransitTime() +
+            " b=" + this.getNumBoardings() +
+            " br=" + this.isBikeRenting() +
+            " pr=" + this.isCarParked() + ">";
     }
-    
+
     /** Returns time in seconds since epoch */
     public long getTimeSeconds() {
         return time / 1000;
@@ -270,7 +272,7 @@ public class State implements Cloneable {
         return stateData.tripTimes;
     }
 
-    /** 
+    /**
      * Returns the length of the trip in seconds up to this time, not including the initial wait.
      * It subtracts out the initial wait, up to a clamp value specified in the request.
      * If the clamp value is set to -1, no clamping will occur.
@@ -285,7 +287,7 @@ public class State implements Cloneable {
 
         // only subtract up the clamp value
         if (clampInitialWait >= 0 && initialWait > clampInitialWait)
-            initialWait = clampInitialWait;            
+            initialWait = clampInitialWait;
 
         long activeTime = getElapsedTimeSeconds() - initialWait;
 
@@ -295,7 +297,7 @@ public class State implements Cloneable {
             activeTime = getElapsedTimeSeconds();
         }
 
-        return activeTime;            
+        return activeTime;
     }
 
     public FeedScopedId getTripId() {
@@ -305,7 +307,7 @@ public class State implements Cloneable {
     public Trip getPreviousTrip() {
         return stateData.previousTrip;
     }
-    
+
     public String getZone() {
         return stateData.zone;
     }
@@ -357,7 +359,7 @@ public class State implements Cloneable {
         boolean vehicleRentingOk;
         boolean tncOK = !stateData.opt.useTransportationNetworkCompany || (
             isEverBoarded() &&
-            (!isUsingHailedCar() || isTNCStopAllowed())
+                (!isUsingHailedCar() || isTNCStopAllowed())
         );
         if (stateData.opt.arriveBy) {
             bikeRentingOk = !isBikeRenting();
@@ -393,6 +395,10 @@ public class State implements Cloneable {
 
     public int getPreTransitTime() {
         return preTransitTime;
+    }
+
+    public int getCallAndRideTime() {
+        return callAndRideTime;
     }
 
     public Vertex getVertex() {
@@ -468,11 +474,11 @@ public class State implements Cloneable {
     public State getBackState() {
         return this.backState;
     }
-    
+
     public TraverseMode getBackMode () {
         return stateData.backMode;
     }
-    
+
     public boolean isBackWalkingBike () {
         return stateData.backWalkingBike;
     }
@@ -491,7 +497,7 @@ public class State implements Cloneable {
             return backEdge.getDirection();
         }
     }
-    
+
     /**
      * Get the back trip of the given state. For time dependent transit, State will find the
      * right thing to do.
@@ -519,7 +525,7 @@ public class State implements Cloneable {
 
     /**
      * Optional next result that allows {@link Edge} to return multiple results.
-     * 
+     *
      * @return the next additional result from an edge traversal, or null if no more results
      */
     public State getNextResult() {
@@ -529,18 +535,18 @@ public class State implements Cloneable {
     /**
      * Extend an exiting result chain by appending this result to the existing chain. The usage
      * model looks like this:
-     * 
+     *
      * <code>
      * TraverseResult result = null;
-     * 
+     *
      * for( ... ) {
      *   TraverseResult individualResult = ...;
      *   result = individualResult.addToExistingResultChain(result);
      * }
-     * 
+     *
      * return result;
      * </code>
-     * 
+     *
      * @param existingResultChain the tail of an existing result chain, or null if the chain has not
      *        been started
      * @return
@@ -565,11 +571,11 @@ public class State implements Cloneable {
     public RoutingRequest getOptions () {
         return stateData.opt;
     }
-    
+
     /**
      * This method is on State rather than RoutingRequest because we care whether the user is in
      * possession of a rented bike.
-     * 
+     *
      * @return BICYCLE if routing with an owned bicycle, or if at this state the user is holding on
      *         to a rented bicycle.
      */
@@ -726,7 +732,7 @@ public class State implements Cloneable {
         }
         return foundAlternatePaths;
     }
-    
+
     public String getPathParserStates() {
         StringBuilder sb = new StringBuilder();
         sb.append("( ");
@@ -740,6 +746,10 @@ public class State implements Cloneable {
     /** @return the last TripPattern used in this path (which is set when leaving the vehicle). */
     public TripPattern getLastPattern() {
         return stateData.lastPattern;
+    }
+
+    public boolean isLastBoardAlightDeviated() {
+        return stateData.isLastBoardAlightDeviated;
     }
 
     public ServiceDay getServiceDay() {
@@ -759,7 +769,7 @@ public class State implements Cloneable {
      * due to different weights on time-dependent (e.g. transit boarding) edges. If the optimize 
      * parameter is false, the path will be reversed but will have the same duration. This is the 
      * result of combining the functions from GraphPath optimize and reverse.
-     * 
+     *
      * @param optimize Should this path be optimized or just reversed?
      * @param forward Is this an on-the-fly reverse search in the midst of a forward search?
      * @returns a state at the other end (or this end, in the case of a forward search) 
@@ -775,21 +785,21 @@ public class State implements Cloneable {
 
         while (orig.getBackState() != null) {
             edge = orig.getBackEdge();
-            
+
             if (optimize) {
                 // first board/last alight: figure in wait time in on the fly optimization
                 if (edge instanceof TransitBoardAlight &&
-                        forward &&
-                        orig.getNumBoardings() == 1 &&
-                        (
-                                // boarding in a forward main search
-                                (((TransitBoardAlight) edge).boarding &&                         
-                                        !stateData.opt.arriveBy) ||
-                                // alighting in a reverse main search
-                                (!((TransitBoardAlight) edge).boarding &&
-                                        stateData.opt.arriveBy)
-                         )
-                    ) {
+                    forward &&
+                    orig.getNumBoardings() == 1 &&
+                    (
+                        // boarding in a forward main search
+                        (((TransitBoardAlight) edge).boarding &&
+                            !stateData.opt.arriveBy) ||
+                            // alighting in a reverse main search
+                            (!((TransitBoardAlight) edge).boarding &&
+                                stateData.opt.arriveBy)
+                    )
+                ) {
 
                     ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTimeSeconds());
                     newInitialWaitTime = ret.stateData.initialWaitTime;
@@ -798,16 +808,16 @@ public class State implements Cloneable {
                 }
 
                 if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
-                        ret.getBackMode() != orig.getBackMode()) {
+                    ret.getBackMode() != orig.getBackMode()) {
                     ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
 
                 if (ret == null) {
                     LOG.warn("Cannot reverse path at edge: " + edge + ", returning unoptimized "
-                            + "path. If this edge is a PatternInterlineDwell, or if there is a "
-                            + "time-dependent turn restriction here, or if there is no transit leg "
-                            + "in a K+R result, this is not totally unexpected. Otherwise, you "
-                            + "might want to look into it.");
+                        + "path. If this edge is a PatternInterlineDwell, or if there is a "
+                        + "time-dependent turn restriction here, or if there is no transit leg "
+                        + "in a K+R result, this is not totally unexpected. Otherwise, you "
+                        + "might want to look into it.");
 
                     if (forward)
                         return this;
@@ -878,7 +888,7 @@ public class State implements Cloneable {
                 //EdgeNarrative retNarrative = ret.getBackEdgeNarrative();
                 //copyExistingNarrativeToNewNarrativeAsAppropriate(origNarrative, retNarrative);
             }
-            
+
             orig = orig.getBackState();
         }
 
@@ -886,10 +896,10 @@ public class State implements Cloneable {
             State reversed = ret.reverse();
             if (getWeight() <= reversed.getWeight())
                 LOG.warn("Optimization did not decrease weight: before " + this.getWeight()
-                        + " after " + reversed.getWeight());
+                    + " after " + reversed.getWeight());
             if (getElapsedTimeSeconds() != reversed.getElapsedTimeSeconds())
                 LOG.warn("Optimization changed time: before " + this.getElapsedTimeSeconds() + " after "
-                        + reversed.getElapsedTimeSeconds());
+                    + reversed.getElapsedTimeSeconds());
             if (getActiveTime() <= reversed.getActiveTime())
                 // NOTE: this can happen and it isn't always bad (i.e. it doesn't always mean that
                 // reverse-opt got called when it shouldn't have). Imagine three lines A, B and C
@@ -901,8 +911,8 @@ public class State implements Cloneable {
                 // there is not another possible trip. The waiting time will get pushed towards the
                 // the beginning, but not all the way.
                 LOG.warn("Optimization did not decrease active time: before "
-                        + this.getActiveTime() + " after " + reversed.getActiveTime()
-                        + ", boardings: " + this.getNumBoardings());
+                    + this.getActiveTime() + " after " + reversed.getActiveTime()
+                    + ", boardings: " + this.getNumBoardings());
             if (reversed.getWeight() < this.getBackState().getWeight())
                 // This is possible; imagine a trip involving three lines, line A, line B and
                 // line C. Lines A and C run hourly while Line B runs every ten minute starting
@@ -916,23 +926,23 @@ public class State implements Cloneable {
                 // from a previous state to the beginning of the trip where it is significantly
                 // cheaper.
                 LOG.warn("Weight has been reduced enough to make it run backwards, now:"
-                        + reversed.getWeight() + " backState " + getBackState().getWeight() + ", "
-                        + "number of boardings: " + getNumBoardings());
+                    + reversed.getWeight() + " backState " + getBackState().getWeight() + ", "
+                    + "number of boardings: " + getNumBoardings());
             if (getTimeSeconds() != reversed.getTimeSeconds())
                 LOG.warn("Times do not match");
             if (Math.abs(getWeight() - reversed.getWeight()) > 1
-                    && newInitialWaitTime == stateData.initialWaitTime)
+                && newInitialWaitTime == stateData.initialWaitTime)
                 LOG.warn("Weight is changed (before: " + getWeight() + ", after: "
-                        + reversed.getWeight() + "), initial wait times " + "constant at "
-                        + newInitialWaitTime);
+                    + reversed.getWeight() + "), initial wait times " + "constant at "
+                    + newInitialWaitTime);
             if (newInitialWaitTime != reversed.stateData.initialWaitTime)
                 LOG.warn("Initial wait time not propagated: is "
-                        + reversed.stateData.initialWaitTime + ", should be " + newInitialWaitTime);
+                    + reversed.stateData.initialWaitTime + ", should be " + newInitialWaitTime);
 
             // copy the path parser states so this path is not thrown out going forward
-//            reversed.pathParserStates = 
-//                    Arrays.copyOf(this.pathParserStates, this.pathParserStates.length, newLength);
-            
+            //            reversed.pathParserStates =
+            //                    Arrays.copyOf(this.pathParserStates, this.pathParserStates.length, newLength);
+
             // copy things that didn't get copied
             reversed.initializeFieldsFrom(this);
             return reversed;
@@ -954,14 +964,14 @@ public class State implements Cloneable {
     public State reverse() {
         return optimizeOrReverse(false, false);
     }
-    
+
     /**
      * After reverse-optimizing, many things are not set. Set them from the unoptimized state.
      * @param o The other state to initialize things from.
      */
     private void initializeFieldsFrom (State o) {
         StateData currentStateData = this.stateData;
-        
+
         // easier to clone and copy back, plus more future proof
         this.stateData = o.stateData.clone();
         this.stateData.initialWaitTime = currentStateData.initialWaitTime;

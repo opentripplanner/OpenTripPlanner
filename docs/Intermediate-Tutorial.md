@@ -17,7 +17,7 @@ The above query makes a request to the locally running server `http://localhost:
 - **mode=TRANSIT,WALK**, transport modes to consider, in this case a combination of walking and transit
 - **maxWalkDistance=500**, the maximum distance in meters that you are willing to walk
 
-If you run this query as is you will very likely get a response saying that a trip has not been found. Try changing the fromPlace, toPlace, time and date parameters to match the location and time period of the data you loaded when you initially built the graph. More (optional) parameters for the planner resource are documented [here](http://otp-docs.ibi-transit.com/api/resource_PlannerResource.html). 
+If you run this query as is you will very likely get a response saying that a trip has not been found. Try changing the fromPlace, toPlace, time and date parameters to match the location and time period of the data you loaded when you initially built the graph. More (optional) parameters for the planner resource are documented [here](http://otp-docs.ibi-transit.com/api/resource_PlannerResource.html).
 
 
 ## Calculating travel time isochrones

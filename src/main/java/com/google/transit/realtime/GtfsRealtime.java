@@ -17,11 +17,13 @@ package com.google.transit.realtime;
  * </p>
  * <ul>
  * <li>Enum value TripDescriptor.ScheduleRelationship.MODIFIED = 5</li>
+ * <li>FeedMessage PARSER input.setSizeLimit(Integer.MAX_VALUE)</li>
  * </ul>
  * <p>
  * Version 2.5.0 of protoc.exe has been used to generate this file.
  * </p>
  */
+
 public final class GtfsRealtime {
   private GtfsRealtime() {}
   public static void registerAllExtensions(
@@ -221,6 +223,10 @@ public final class GtfsRealtime {
           com.google.protobuf.CodedInputStream input,
           com.google.protobuf.ExtensionRegistryLite extensionRegistry)
           throws com.google.protobuf.InvalidProtocolBufferException {
+        // Increase input stream size limit to 2G (instead of the 64M default).
+        // Mimics a change that was supposed to be released in protobuf 2.7.0,
+        // see https://git.io/fjfg5.
+        input.setSizeLimit(Integer.MAX_VALUE);
         return new FeedMessage(input, extensionRegistry);
       }
     };
