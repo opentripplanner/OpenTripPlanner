@@ -16,7 +16,7 @@ import org.opentripplanner.util.stats.DiscreteDistribution.NumberQuantifiable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 
 /**
  * Print statistics on geometry and edge/vertices data for a graph (number of geometry, average

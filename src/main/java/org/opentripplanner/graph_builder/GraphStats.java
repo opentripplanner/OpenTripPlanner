@@ -29,10 +29,10 @@ import com.beust.jcommander.Parameters;
 import com.csvreader.CsvWriter;
 import com.google.common.collect.Multiset;
 import com.google.common.collect.TreeMultiset;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
-import com.vividsolutions.jts.linearref.LinearLocation;
-import com.vividsolutions.jts.linearref.LocationIndexedLine;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.linearref.LinearLocation;
+import org.locationtech.jts.linearref.LocationIndexedLine;
 
 public class GraphStats {
 
@@ -95,7 +95,7 @@ public class GraphStats {
         /* open input graph (same for all commands) */
         File graphFile = new File(graphPath);
         try {
-            graph = Graph.load(graphFile, Graph.LoadLevel.FULL);
+            graph = Graph.load(graphFile);
         } catch (Exception e) {
             LOG.error("Exception while loading graph from " + graphFile);
             return;

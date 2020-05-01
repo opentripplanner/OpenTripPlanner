@@ -1,8 +1,8 @@
 package org.opentripplanner.routing.edgetype;
 
 import com.google.common.collect.Iterables;
-import com.vividsolutions.jts.geom.Coordinate;
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.CompactLineString;
@@ -27,7 +27,6 @@ import org.opentripplanner.routing.vertextype.SemiPermanentSplitterVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
-import org.opentripplanner.traffic.StreetSpeedSnapshot;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -621,18 +620,17 @@ public class StreetEdge extends Edge implements Cloneable {
             if (traverseMode.equals(TraverseMode.WALK)) {
                 // take slopes into account when walking
                 // FIXME: this causes steep stairs to be avoided. see #1297.
-                double costs = ElevationUtils.getWalkCostsForSlope(getDistance(), getMaxSlope());
-                // as the cost walkspeed is assumed to be for 4.8km/h (= 1.333 m/sec) we need to adjust
-                // for the walkspeed set by the user
-                double elevationUtilsSpeed = 4.0 / 3.0;
-                weight = costs * (elevationUtilsSpeed / speed);
+                double distance = getSlopeWalkSpeedEffectiveLength();
+                weight = distance / speed;
                 weight = weight * walkComfortScore;
                 time = weight; //treat cost as time, as in the current model it actually is the same (this can be checked for maxSlope == 0)
                 /*
                 // debug code
                 if(weight > 100){
-                    double timeflat = length / speed;
-                    System.out.format("line length: %.1f m, slope: %.3f ---> slope costs: %.1f , weight: %.1f , time (flat):  %.1f %n", length, elevationProfile.getMaxSlope(), costs, weight, timeflat);
+                    double timeflat = length_mm / speed;
+
+
+                    System.out.format("line length: %.1f m, slope: %.3f ---> distance: %.1f , weight: %.1f , time (flat):  %.1f %n", getDistance(), getMaxSlope(), distance, weight, timeflat);
                 }
                 */
             }
@@ -667,6 +665,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
         }
+
+        int roundedTime = (int) Math.ceil(time);
 
         /* Compute turn cost. */
         StreetEdge backPSE;
@@ -744,8 +744,8 @@ public class StreetEdge extends Edge implements Cloneable {
                 s1.incrementWalkDistance(realTurnCost / 100);  // just a tie-breaker
             }
 
-            long turnTime = (long) Math.ceil(realTurnCost);
-            time += turnTime;
+            int turnTime = (int) Math.ceil(realTurnCost);
+            roundedTime += turnTime;
             weight += options.turnReluctance * realTurnCost;
         }
         
@@ -783,7 +783,6 @@ public class StreetEdge extends Edge implements Cloneable {
         // either soft or hard.
         // We can safely assume no limit on driving after transit as most TNC companies will drive
         // outside of the pickup boundaries.
-        int roundedTime = (int) Math.ceil(time);
         if (
             options.kissAndRide ||
                 options.parkAndRide ||
@@ -874,18 +873,6 @@ public class StreetEdge extends Edge implements Cloneable {
             return Double.NaN;
         } else if (traverseMode.isDriving()) {
             // NOTE: Automobiles have variable speeds depending on the edge type
-            if (options.useTraffic) {
-                // the expected speed based on traffic
-                StreetSpeedSnapshot source = options.getRoutingContext().streetSpeedSnapshot;
-
-                if (source != null) {
-                    double congestedSpeed = source.getSpeed(this, traverseMode, timeMillis);
-
-                    if (!Double.isNaN(congestedSpeed))
-                        return congestedSpeed;
-                }
-            }
-
             return calculateCarSpeed(options);
         } else if (traverseMode == TraverseMode.MICROMOBILITY) {
             return Math.min(
@@ -1075,6 +1062,10 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     public double getSlopeWorkCostEffectiveLength() {
+        return getDistance();
+    }
+
+    public double getSlopeWalkSpeedEffectiveLength() {
         return getDistance();
     }
 
@@ -1290,18 +1281,18 @@ public class StreetEdge extends Edge implements Cloneable {
      * TODO change everything to clockwise from North
      */
 	public int getInAngle() {
-		return this.inAngle * 180 / 128;
+		return (int) Math.round(this.inAngle * 180 / 128.0);
 	}
 
     /** Return the azimuth of the last segment in this edge in integer degrees clockwise from South. */
 	public int getOutAngle() {
-		return this.outAngle * 180 / 128;
+		return (int) Math.round(this.outAngle * 180 / 128.0);
 	}
 
     protected List<TurnRestriction> getTurnRestrictions(Graph graph) {
         return graph.getTurnRestrictions(this);
     }
-    
+
     /** calculate the length of this street segement from its geometry */
     protected void calculateLengthFromGeometry () {
         double accumulatedMeters = 0;

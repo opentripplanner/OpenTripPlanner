@@ -1,10 +1,12 @@
 # Changelog
 
-## 1.5 (in progress)
+## 1.5.0 (in progress)
 
+- Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Add Way Property Set for the UK (#2818)
 - Fixes surefire test failure during build (#2816)
 - Improve documentation for `mode` routing parameter (#2809)
+- Disable linking from already linked stops (#2372)
 
 ## 1.4 (2019-07-30)
 
@@ -12,11 +14,28 @@
 - Improved configuration documentation
 - Update onebusaway-gtfs to latest version from OBA project (#2636)
 - Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
+- Allow OTP to search more service days for transit service (#2592)
 - Allow itineraries in response to be sorted by duration (#2593)
 - Add support for GTFS-flex services: flag stops, deviated-route service, and call-and-ride (#2603)
 - Fix reverse optimization bug (#2653, #2411)
 - Remove CarFreeAtoZ from list of deployments
 - Fix bike rented though no bikes/spaces are available (#2735)
+- increase GTFS-realtime feeds size limit from 64MB to 2G (#2738)
+- Fix XML response serialization (#2685)
+- Refactor InterleavedBidirectionalHeuristic (#2671)
+- Add "Accept" headers to GTFS-RT HTTP requests (#2796)
+- Fix minor test failure against BANO geocoder (#2798)
+- Fix frequency bounds checking (#2540)
+- Fix JTS coordinate order for Polygons/Polylines (#2784)
+- Add JAXB API to allow compilation under Java 11
+- Remove dependency on Conveyal jackson2-geojson
+- Changed calculation of slope costs (#2579)
+- Replace Java built in serialization with faster Kryo (#2681)
+- Support OSM highway=razed tag (#2660)
+- Memory leak fix (#2655)
+- Add bicimad bike rental updater (#2503)
+- Add Smoove citybikes updater (#2515)
+- Switched to single license file, removing all OTP and OBA file license headers
 
 ## 1.3 (2018-08-03)
 

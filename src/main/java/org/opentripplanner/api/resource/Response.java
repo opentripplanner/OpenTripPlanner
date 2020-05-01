@@ -5,18 +5,14 @@ import java.util.List;
 import java.util.Map.Entry;
 
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlElement;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
 
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
-@XmlRootElement
 public class Response {
 
     /** A dictionary of the parameters provided in the request that triggered this response. */
-    @XmlElement
     public HashMap<String, String> requestParameters;
     private TripPlan plan;
     private PlannerError error = null;
@@ -57,7 +53,6 @@ public class Response {
     }
 
     /** The error (if any) that this response raised. */
-    @XmlElement(required=false)
     public PlannerError getError() {
         return error;
     }

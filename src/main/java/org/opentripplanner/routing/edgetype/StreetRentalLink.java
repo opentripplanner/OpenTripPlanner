@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
-import com.vividsolutions.jts.geom.LineString;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.RentalStationVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;

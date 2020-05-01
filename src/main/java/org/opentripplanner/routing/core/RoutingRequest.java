@@ -157,14 +157,14 @@ public class RoutingRequest implements Cloneable, Serializable {
      * An extra penalty added on transfers (i.e. all boardings except the first one).
      * Not to be confused with bikeBoardCost and walkBoardCost, which are the cost of boarding a
      * vehicle with and without a bicycle. The boardCosts are used to model the 'usual' perceived
-     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even 
-     * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this 
-     * can lead to absurd results. Consider a trip in New York from Grand Army 
-     * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to 
-     * wait until midnight, when the 4 train runs local the whole way. The actual fastest route is 
+     * cost of using a transit vehicle, and the transferPenalty is used when a user requests even
+     * less transfers. In the latter case, we don't actually optimize for fewest transfers, as this
+     * can lead to absurd results. Consider a trip in New York from Grand Army
+     * Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers route is to
+     * wait until midnight, when the 4 train runs local the whole way. The actual fastest route is
      * the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour.
-     * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they 
-     * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. 
+     * Even someone optimizing for fewest transfers doesn't want to wait until midnight. Maybe they
+     * would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6.
      * If this takes less than optimize_transfer_penalty seconds, then that's what we'll return.
      */
     public int transferPenalty = 0;
@@ -177,7 +177,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
-    
+
     /** Multiplicative factor on expected turning time. */
     public double turnReluctance = 1.0;
 
@@ -307,14 +307,14 @@ public class RoutingRequest implements Cloneable, Serializable {
     public HashMap<FeedScopedId, BannedStopSet> bannedTrips = new HashMap<FeedScopedId, BannedStopSet>();
 
     /** Do not use certain stops. See for more information the bannedStops property in the RoutingResource class. */
-    public StopMatcher bannedStops = StopMatcher.emptyMatcher(); 
-    
+    public StopMatcher bannedStops = StopMatcher.emptyMatcher();
+
     /** Do not use certain stops. See for more information the bannedStopsHard property in the RoutingResource class. */
     public StopMatcher bannedStopsHard = StopMatcher.emptyMatcher();
-    
+
     /** Set of preferred routes by user. */
     public RouteMatcher preferredRoutes = RouteMatcher.emptyMatcher();
-    
+
     /** Set of preferred agencies by user. */
     public HashSet<String> preferredAgencies = new HashSet<String>();
 
@@ -326,7 +326,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** Set of unpreferred routes for given user. */
     public RouteMatcher unpreferredRoutes = RouteMatcher.emptyMatcher();
-    
+
     /** Set of unpreferred agencies for given user. */
     public HashSet<String> unpreferredAgencies = new HashSet<String>();
 
@@ -351,8 +351,8 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int maxTransfers = 2;
 
     /**
-     * Extensions to the trip planner will require additional traversal options beyond the default 
-     * set. We provide an extension point for adding arbitrary parameters with an 
+     * Extensions to the trip planner will require additional traversal options beyond the default
+     * set. We provide an extension point for adding arbitrary parameters with an
      * extension-specific key.
      */
     public Map<Object, Object> extensions = new HashMap<Object, Object>();
@@ -361,7 +361,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int nonpreferredTransferPenalty = 180;
 
     /**
-     * For the bike triangle, how important time is. 
+     * For the bike triangle, how important time is.
      * triangleTimeFactor+triangleSlopeFactor+triangleSafetyFactor == 1
      */
     public double triangleTimeFactor;
@@ -428,7 +428,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     // 2.9 m/s/s: 0 mph to 65 mph in 10 seconds
     public double carAccelerationSpeed = 2.9;
-    
+
     /**
      * When true, realtime updates are ignored during this search.
      */
@@ -441,12 +441,133 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean disableRemainingWeightHeuristic = false;
 
     /**
+     * Extra penalty added for flag-stop boarding/alighting. This parameter only applies to
+     * GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter
+     * in router-config.json.
+     *
+     * In GTFS-Flex, a flag stop is a point at which a vehicle is boarded or alighted which is not
+     * a defined stop, e.g. the bus is flagged down in between stops. This parameter is an
+     * additional cost added when a board/alight occurs at a flag stop. Increasing this parameter
+     * increases the cost of using a flag stop relative to a regular scheduled stop.
+     */
+    public int flexFlagStopExtraPenalty = 90;
+
+    /**
+     * Extra penalty added for deviated-route boarding/alighting. This parameter only applies to
+     * GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter
+     * in router-config.json.
+     *
+     * In GTFS-Flex, deviated-route service is when a vehicle can deviate a certain distance
+     * (or within a certain area) in order to drop off or pick up a passenger. This parameter is an
+     * additional cost added when a board/alight occurs before/after a deviation. Increasing this
+     * parameter increases the cost of using deviated-route service relative to fixed-route.
+     */
+    public int flexDeviatedRouteExtraPenalty = 180;
+
+    /**
+     * Reluctance for call-n-ride. This parameter only applies to GTFS-Flex routing, which must be
+     * explicitly turned on via the useFlexService parameter in router-config.json.
+     *
+     * Call-and-ride service is when a vehicle picks up and drops off a passenger at their origin
+     * and destination, without regard to a fixed route. In the GTFS-Flex data standard, call-and-
+     * ride service is defined analogously to deviated-route service, but with more permissive
+     * parameters. Depending on the particular origin and destination and the size of the area in
+     * which a route can deviate, a single route could be used for both deviated-route and call-
+     * and-ride service. This parameter is multiplied with the time on board call-and-ride in order to
+     * increase the cost of call-and-ride's use relative to normal transit.
+     */
+    public double flexCallAndRideReluctance = 2.0;
+
+    /**
+     * Total time which can be spent on a call-n-ride leg. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * "Trip-banning" as a method of obtaining different itinerary results does not work for call-
+     * and-ride service: the same trip can be used in different ways, for example to drop off a
+     * passenger at different transfer points. Thus, rather than trip-banning, after each itinerary
+     * is found, flexMaxCallAndRideSeconds is reduced in order to obtain different itineraries. The
+     * new value of the parameter to calculated according to the following formula:
+     * min(duration - options.flexReduceCallAndRideSeconds, duration * flexReduceCallAndRideRatio)
+     */
+    public int flexMaxCallAndRideSeconds = Integer.MAX_VALUE;
+
+    /**
+     * Control the reduction of call-and-ride time. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * Seconds to reduce flexMaxCallAndRideSeconds after a complete call-n-ride itinerary. The
+     * rationale for this parameter is given in the docs for flexMaxCallAndRideSeconds.
+     */
+    public int flexReduceCallAndRideSeconds = 15 * 60;
+
+    /**
+     * Control the reduction of call-and-ride time. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * Percentage to reduce flexMaxCallAndRideSeconds after a complete call-n-ride itinerary. The
+     * rationale for this parameter is given in the docs for flexMaxCallAndRideSeconds.
+     */
+    public double flexReduceCallAndRideRatio = 0.5;
+
+    /**
+     * Control the size of flag-stop buffer returned in API response. This parameter only applies
+     * to GTFS-Flex routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * This allows the UI to specify the length in meters of a segment around flag stops it wants
+     * to display, as an indication to the user that the vehicle may be flagged down anywhere on
+     * the segment. The backend will supply such a cropped geometry in its response
+     * (`Place.flagStopArea`). The segment will be up to flexFlagStopBufferSize meters ahead or
+     * behind the board/alight location. The actual length may be less if the board/alight location
+     * is near the beginning or end of a route.
+     */
+    public double flexFlagStopBufferSize;
+
+    /**
+     * Whether to use reservation-based services. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * In GTFS-Flex, some trips may be defined as "reservation services," which indicates that
+     * they require a reservation in order to be used. Such services will only be used if this
+     * parameter is true.
+     */
+    public boolean flexUseReservationServices = true;
+
+    /**
+     * Whether to use eligibility-based services. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in
+     * router-config.json.
+     *
+     * In GTFS-Flex, some trips may be defined as "eligibility services," which indicates that
+     * they require customers to meet a certain set of requirements in order to be used. Such
+     * services will only be used if this parameter is true.
+     */
+    public boolean flexUseEligibilityServices = true;
+
+    /**
+     * Whether to ignore DRT time limits. This parameter only applies to GTFS-Flex routing, which
+     * must be explicitly turned on via the useFlexService parameter in router-config.json.
+     *
+     * In GTFS-Flex, deviated-route and call-and-ride service can define a trip-level parameter
+     * `drt_advance_book_min`, which determines how far in advance the flexible segment must be
+     * scheduled. If `flexIgnoreDrtAdvanceBookMin = false`, OTP will only provide itineraries which
+     * are feasible based on that constraint. For example, if the current time is 1:00pm and a
+     * particular service must be scheduled one hour in advance, the earliest time the service
+     * is usable is 2:00pm.
+     */
+    public boolean flexIgnoreDrtAdvanceBookMin = false;
+
+    /**
      * The routing context used to actually carry out this search. It is important to build States from TraverseOptions
      * rather than RoutingContexts,and just keep a reference to the context in the TraverseOptions, rather than using
      * RoutingContexts for everything because in some testing and graph building situations we need to build a bunch of
      * initial states with different times and vertices from a single TraverseOptions, without setting all the transit
      * context or building temporary vertices (with all the exception-throwing checks that entails).
-     * 
+     *
      * While they are conceptually separate, TraverseOptions does maintain a reference to its accompanying
      * RoutingContext (and vice versa) so that both do not need to be passed/injected separately into tight inner loops
      * within routing algorithms. These references should be set to null when the request scope is torn down -- the
@@ -457,7 +578,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     /** A transit stop that this trip must start from */
     public FeedScopedId startingTransitStopId;
-    
+
     /** A trip where this trip must start from (depart-onboard routing) */
     public FeedScopedId startingTransitTripId;
 
@@ -490,7 +611,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public boolean longDistance = false;
 
     /** Should traffic congestion be considered when driving? */
-    public boolean useTraffic = true;
+    public boolean useTraffic = false;
 
     /** The function that compares paths converging on the same vertex to decide which ones continue to be explored. */
     public DominanceFunction dominanceFunction = new DominanceFunction.Pareto();
@@ -566,6 +687,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     // units are in milliseconds
     public long searchTimeout = -1;
 
+    /**
+     * How many extra ServiceDays to look in the future (or back, if arriveBy=true)
+     *
+     * This parameter allows the configuration of how far, in service days, OTP should look for
+     * transit service when evaluating the next departure (or arrival) at a stop. In some cases,
+     * for example for services which run weekly or monthly, it may make sense to increase this
+     * value. Larger values will increase the search time. This does not affect a case where a
+     * trip starts multiple service days in the past (e.g. a multiday ferry trip will not be
+     * board-able after the 2nd day in the current implementation).
+     */
+    public int serviceDayLookout = 1;
+
     /** Which path comparator to use */
     public String pathComparator = null;
 
@@ -590,11 +723,43 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public double weight = 105;
 
+    /**
+     * This parameter is used in GTFS-Flex routing. Preliminary searches before the main search
+     * need to be able to discover TransitStops in order to create call-and-ride legs which allow
+     * transfers to fixed-route services.
+     */
+    public boolean enterStationsWithCar = false;
+
+    /**
+     * Minimum length in meters of partial hop edges. This parameter only applies to GTFS-Flex
+     * routing, which must be explicitly turned on via the useFlexService parameter in router-
+     * config.json.
+     *
+     * Flag stop and deviated-route service require creating partial PatternHops from points along
+     * the route to a scheduled stop. This parameter provides a minimum length of such partial
+     * hops, in order to reduce the amount of hops created when they redundant with regular
+     * service.
+     */
+    public int flexMinPartialHopLength = 400;
+
     /** Saves split edge which can be split on origin/destination search
      *
      * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
      */
     private StreetEdge splitEdge = null;
+
+    /**
+     * Keep track of epoch time the request was created by OTP. This is currently only used by the
+     * GTFS-Flex implementation.
+     *
+     * In GTFS-Flex, deviated-route and call-and-ride service can define a trip-level parameter
+     * `drt_advance_book_min`, which determines how far in advance the flexible segment must be
+     * scheduled. If `flexIgnoreDrtAdvanceBookMin = false`, OTP will only provide itineraries which
+     * are feasible based on that constraint. For example, if the current time is 1:00pm and a
+     * particular service must be scheduled one hour in advance, the earliest time the service
+     * is usable is 2:00pm.
+     */
+    public long clockTimeSec;
 
     /* CONSTRUCTORS */
 
@@ -712,8 +877,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.wheelchairAccessible = wheelchairAccessible;
     }
 
-
-
     /**
      * only allow traversal by the specified mode; don't allow walking bikes. This is used during contraction to reduce the number of possible paths.
      */
@@ -744,7 +907,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-    
+
     /** @return the (soft) maximum walk distance */
     // If transit is not to be used and this is a point to point search
     // or one with soft walk limiting, disable walk limit.
@@ -752,10 +915,10 @@ public class RoutingRequest implements Cloneable, Serializable {
         if (modes.isTransit() || (batch && !softWalkLimiting)) {
             return maxWalkDistance;
         } else {
-            return Double.MAX_VALUE;            
+            return Double.MAX_VALUE;
         }
     }
-    
+
     public void setWalkBoardCost(int walkBoardCost) {
         if (walkBoardCost < 0) {
             this.walkBoardCost = 0;
@@ -764,7 +927,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.walkBoardCost = walkBoardCost;
         }
     }
-    
+
     public void setBikeBoardCost(int bikeBoardCost) {
         if (bikeBoardCost < 0) {
             this.bikeBoardCost = 0;
@@ -773,7 +936,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             this.bikeBoardCost = bikeBoardCost;
         }
     }
-    
+
     public void setPreferredAgencies(String s) {
         if (!s.isEmpty()) {
             preferredAgencies = new HashSet<>();
@@ -789,7 +952,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             preferredRoutes = RouteMatcher.emptyMatcher();
         }
     }
-    
+
     public void setOtherThanPreferredRoutesPenalty(int penalty) {
         if(penalty < 0) penalty = 0;
         this.otherThanPreferredRoutesPenalty = penalty;
@@ -912,21 +1075,21 @@ public class RoutingRequest implements Cloneable, Serializable {
                 // Fix the date with the provided strategy.
                 LOG.warn("Could not parse date/time. Attempting invalid date strategy: {}", invalidDateStrategy);
                 switch (invalidDateStrategy.toUpperCase()) {
-                    case "USE_CURRENT":
-                        // Attempt to use provided time.
-                        Date now = new Date();
-                        date = new SimpleDateFormat("yyyy-MM-dd").format(now);
-                        dateObject = DateUtils.toDate(date, time, tz);
-                        if (dateObject == null) {
-                            // Time didn't parse. Use current time instead.
-                            LOG.warn("Couldn't parse time. Using current time instead.");
-                            dateObject = now;
-                        }
-                        break;
-                    // TODO: Add other strategies? For example, guess the nearest date to the one provided.
-                    default:
-                        // If invalidDateStrategy is not one of the above
-                        throw new IllegalArgumentException("Date or time parameter is invalid.");
+                case "USE_CURRENT":
+                    // Attempt to use provided time.
+                    Date now = new Date();
+                    date = new SimpleDateFormat("yyyy-MM-dd").format(now);
+                    dateObject = DateUtils.toDate(date, time, tz);
+                    if (dateObject == null) {
+                        // Time didn't parse. Use current time instead.
+                        LOG.warn("Couldn't parse time. Using current time instead.");
+                        dateObject = now;
+                    }
+                    break;
+                // TODO: Add other strategies? For example, guess the nearest date to the one provided.
+                default:
+                    // If invalidDateStrategy is not one of the above
+                    throw new IllegalArgumentException("Date or time parameter is invalid.");
                 }
             }
         }
@@ -953,8 +1116,8 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public String toString(String sep) {
         return from + sep + to + sep + getMaxWalkDistance() + sep + getDateTime() + sep
-                + arriveBy + sep + optimize + sep + modes.getAsStr() + sep
-                + getNumItineraries();
+            + arriveBy + sep + optimize + sep + modes.getAsStr() + sep
+            + getNumItineraries();
     }
 
     public void removeMode(TraverseMode mode) {
@@ -1052,10 +1215,12 @@ public class RoutingRequest implements Cloneable, Serializable {
         return ret;
     }
 
-    public void setRoutingContext(Graph graph) {
+    // Set routing context with passed-in set of temporary vertices. Needed for intermediate places
+    // as a consequence of the check that temporary vertices are request-specific.
+    public void setRoutingContext(Graph graph, Collection<Vertex> temporaryVertices) {
         if (rctx == null) {
             // graphService.getGraph(routerId)
-            this.rctx = new RoutingContext(this, graph);
+            this.rctx = new RoutingContext(this, graph, temporaryVertices);
             // check after back reference is established, to allow temp edge cleanup on exceptions
             this.rctx.check();
         } else {
@@ -1067,6 +1232,10 @@ public class RoutingRequest implements Cloneable, Serializable {
                 return;
             }
         }
+    }
+
+    public void setRoutingContext(Graph graph) {
+        setRoutingContext(graph, null);
     }
 
     /** For use in tests. Force RoutingContext to specific vertices rather than making temp edges. */
@@ -1120,68 +1289,79 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         } else {
             endpointsMatch = ((from == null && other.from == null) || from.equals(other.from))
-                    && ((to == null && other.to == null) || to.equals(other.to));
+                && ((to == null && other.to == null) || to.equals(other.to));
         }
         return endpointsMatch
-                && dateTime == other.dateTime
-                && arriveBy == other.arriveBy
-                && numItineraries == other.numItineraries // should only apply in non-batch?
-                && walkSpeed == other.walkSpeed
-                && bikeSpeed == other.bikeSpeed
-                && carSpeed == other.carSpeed
-                && maxWeight == other.maxWeight
-                && worstTime == other.worstTime
-                && maxTransfers == other.maxTransfers
-                && modes.equals(other.modes)
-                && wheelchairAccessible == other.wheelchairAccessible
-                && optimize.equals(other.optimize)
-                && maxWalkDistance == other.maxWalkDistance
-                && maxTransferWalkDistance == other.maxTransferWalkDistance
-                && maxPreTransitTime == other.maxPreTransitTime
-                && transferPenalty == other.transferPenalty
-                && maxSlope == other.maxSlope
-                && walkReluctance == other.walkReluctance
-                && waitReluctance == other.waitReluctance
-                && waitAtBeginningFactor == other.waitAtBeginningFactor
-                && walkBoardCost == other.walkBoardCost
-                && bikeBoardCost == other.bikeBoardCost
-                && bannedRoutes.equals(other.bannedRoutes)
-                && bannedTrips.equals(other.bannedTrips)
-                && preferredRoutes.equals(other.preferredRoutes)
-                && unpreferredRoutes.equals(other.unpreferredRoutes)
-                && transferSlack == other.transferSlack
-                && boardSlack == other.boardSlack
-                && alightSlack == other.alightSlack
-                && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
-                && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
-                && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
-                && triangleSafetyFactor == other.triangleSafetyFactor
-                && triangleSlopeFactor == other.triangleSlopeFactor
-                && triangleTimeFactor == other.triangleTimeFactor
-                && stairsReluctance == other.stairsReluctance
-                && elevatorBoardTime == other.elevatorBoardTime
-                && elevatorBoardCost == other.elevatorBoardCost
-                && elevatorHopTime == other.elevatorHopTime
-                && elevatorHopCost == other.elevatorHopCost
-                && bikeSwitchTime == other.bikeSwitchTime
-                && bikeSwitchCost == other.bikeSwitchCost
-                && bikeRentalPickupTime == other.bikeRentalPickupTime
-                && bikeRentalPickupCost == other.bikeRentalPickupCost
-                && bikeRentalDropoffTime == other.bikeRentalDropoffTime
-                && bikeRentalDropoffCost == other.bikeRentalDropoffCost
-                && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
-                && extensions.equals(other.extensions)
-                && clampInitialWait == other.clampInitialWait
-                && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
-                && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
-                && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
-                && Objects.equal(startingTransitTripId, other.startingTransitTripId)
-                && useTraffic == other.useTraffic
-                && disableAlertFiltering == other.disableAlertFiltering
-                && geoidElevation == other.geoidElevation
-                && invalidDateStrategy.equals(other.invalidDateStrategy)
-                && minTransitDistance == other.minTransitDistance
-                && searchTimeout == other.searchTimeout;
+            && dateTime == other.dateTime
+            && arriveBy == other.arriveBy
+            && numItineraries == other.numItineraries // should only apply in non-batch?
+            && walkSpeed == other.walkSpeed
+            && bikeSpeed == other.bikeSpeed
+            && carSpeed == other.carSpeed
+            && maxWeight == other.maxWeight
+            && worstTime == other.worstTime
+            && maxTransfers == other.maxTransfers
+            && modes.equals(other.modes)
+            && wheelchairAccessible == other.wheelchairAccessible
+            && optimize.equals(other.optimize)
+            && maxWalkDistance == other.maxWalkDistance
+            && maxTransferWalkDistance == other.maxTransferWalkDistance
+            && maxPreTransitTime == other.maxPreTransitTime
+            && transferPenalty == other.transferPenalty
+            && maxSlope == other.maxSlope
+            && walkReluctance == other.walkReluctance
+            && waitReluctance == other.waitReluctance
+            && waitAtBeginningFactor == other.waitAtBeginningFactor
+            && walkBoardCost == other.walkBoardCost
+            && bikeBoardCost == other.bikeBoardCost
+            && bannedRoutes.equals(other.bannedRoutes)
+            && bannedTrips.equals(other.bannedTrips)
+            && preferredRoutes.equals(other.preferredRoutes)
+            && unpreferredRoutes.equals(other.unpreferredRoutes)
+            && transferSlack == other.transferSlack
+            && boardSlack == other.boardSlack
+            && alightSlack == other.alightSlack
+            && nonpreferredTransferPenalty == other.nonpreferredTransferPenalty
+            && otherThanPreferredRoutesPenalty == other.otherThanPreferredRoutesPenalty
+            && useUnpreferredRoutesPenalty == other.useUnpreferredRoutesPenalty
+            && triangleSafetyFactor == other.triangleSafetyFactor
+            && triangleSlopeFactor == other.triangleSlopeFactor
+            && triangleTimeFactor == other.triangleTimeFactor
+            && stairsReluctance == other.stairsReluctance
+            && elevatorBoardTime == other.elevatorBoardTime
+            && elevatorBoardCost == other.elevatorBoardCost
+            && elevatorHopTime == other.elevatorHopTime
+            && elevatorHopCost == other.elevatorHopCost
+            && bikeSwitchTime == other.bikeSwitchTime
+            && bikeSwitchCost == other.bikeSwitchCost
+            && bikeRentalPickupTime == other.bikeRentalPickupTime
+            && bikeRentalPickupCost == other.bikeRentalPickupCost
+            && bikeRentalDropoffTime == other.bikeRentalDropoffTime
+            && bikeRentalDropoffCost == other.bikeRentalDropoffCost
+            && useBikeRentalAvailabilityInformation == other.useBikeRentalAvailabilityInformation
+            && extensions.equals(other.extensions)
+            && clampInitialWait == other.clampInitialWait
+            && reverseOptimizeOnTheFly == other.reverseOptimizeOnTheFly
+            && ignoreRealtimeUpdates == other.ignoreRealtimeUpdates
+            && disableRemainingWeightHeuristic == other.disableRemainingWeightHeuristic
+            && Objects.equal(startingTransitTripId, other.startingTransitTripId)
+            && disableAlertFiltering == other.disableAlertFiltering
+            && geoidElevation == other.geoidElevation
+            && invalidDateStrategy.equals(other.invalidDateStrategy)
+            && minTransitDistance == other.minTransitDistance
+            && searchTimeout == other.searchTimeout
+            && flexFlagStopExtraPenalty == other.flexFlagStopExtraPenalty
+            && flexDeviatedRouteExtraPenalty == other.flexDeviatedRouteExtraPenalty
+            && flexCallAndRideReluctance == other.flexCallAndRideReluctance
+            && flexReduceCallAndRideSeconds == other.flexReduceCallAndRideSeconds
+            && flexReduceCallAndRideRatio == other.flexReduceCallAndRideRatio
+            && flexFlagStopBufferSize == other.flexFlagStopBufferSize
+            && flexUseReservationServices == other.flexUseReservationServices
+            && flexUseEligibilityServices == other.flexUseEligibilityServices
+            && flexIgnoreDrtAdvanceBookMin == other.flexIgnoreDrtAdvanceBookMin
+            && flexMinPartialHopLength == other.flexMinPartialHopLength
+            && clockTimeSec == other.clockTimeSec
+            && serviceDayLookout == other.serviceDayLookout;
     }
 
     /**
@@ -1191,27 +1371,43 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Override
     public int hashCode() {
         int hashCode = new Double(walkSpeed).hashCode() + new Double(bikeSpeed).hashCode()
-                + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
-                + (int) (worstTime & 0xffffffff) + modes.hashCode()
-                + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
-                + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
-                + new Double(maxTransferWalkDistance).hashCode()
-                + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
-                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + new Double(waitAtBeginningFactor).hashCode() * 15485863
-                + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
-                + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
-                + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
-                + new Double(triangleSafetyFactor).hashCode() * 195233277
-                + new Double(triangleSlopeFactor).hashCode() * 136372361
-                + new Double(triangleTimeFactor).hashCode() * 790052899
-                + new Double(stairsReluctance).hashCode() * 315595321
-                + maxPreTransitTime * 63061489
-                + new Long(clampInitialWait).hashCode() * 209477
-                + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
-                + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
-                + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
-                + new Boolean(useTraffic).hashCode() * 10169;
+            + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
+            + (int) (worstTime & 0xffffffff) + modes.hashCode()
+            + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
+            + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
+            + new Double(maxTransferWalkDistance).hashCode()
+            + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
+            + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
+            + new Double(waitAtBeginningFactor).hashCode() * 15485863
+            + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
+            + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
+            + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
+            + new Double(triangleSafetyFactor).hashCode() * 195233277
+            + new Double(triangleSlopeFactor).hashCode() * 136372361
+            + new Double(triangleTimeFactor).hashCode() * 790052899
+            + new Double(stairsReluctance).hashCode() * 315595321
+            + maxPreTransitTime * 63061489
+            + new Long(clampInitialWait).hashCode() * 209477
+            + new Boolean(reverseOptimizeOnTheFly).hashCode() * 95112799
+            + new Boolean(ignoreRealtimeUpdates).hashCode() * 154329
+            + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
+            + new Boolean(useTraffic).hashCode() * 10169
+            + Integer.hashCode(flexFlagStopExtraPenalty) * 179424691
+            + Integer.hashCode(flexDeviatedRouteExtraPenalty) *  7424299
+            + Double.hashCode(flexCallAndRideReluctance) * 86666621
+            + Integer.hashCode(flexMaxCallAndRideSeconds) * 9994393
+            + Integer.hashCode(flexReduceCallAndRideSeconds) * 92356763
+            + Double.hashCode(flexReduceCallAndRideRatio) *  171157957
+            + Double.hashCode(flexFlagStopBufferSize) * 803989
+            + Boolean.hashCode(flexUseReservationServices) * 92429033
+            + Boolean.hashCode(flexUseEligibilityServices) * 7916959
+            + Boolean.hashCode(flexIgnoreDrtAdvanceBookMin) * 179992387
+            + Integer.hashCode(flexMinPartialHopLength) * 15485863
+            + Long.hashCode(clockTimeSec) * 833389
+            + new Boolean(disableRemainingWeightHeuristic).hashCode() * 193939
+            + new Boolean(useTraffic).hashCode() * 10169
+            + Integer.hashCode(serviceDayLookout) * 31558519;
+
         if (batch) {
             hashCode *= -1;
             // batch mode, only one of two endpoints matters
@@ -1320,7 +1516,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
     public void setMaxWalkDistance(double maxWalkDistance) {
-        if (maxWalkDistance > 0) {
+        if (maxWalkDistance >= 0) {
             this.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
         }
@@ -1402,7 +1598,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         long preferences_penalty = 0;
         String agencyID = route.getAgency().getId();
         if ((preferredRoutes != null && !preferredRoutes.equals(RouteMatcher.emptyMatcher())) ||
-                (preferredAgencies != null && !preferredAgencies.isEmpty())) {
+            (preferredAgencies != null && !preferredAgencies.isEmpty())) {
             boolean isPreferedRoute = preferredRoutes != null && preferredRoutes.matches(route);
             boolean isPreferedAgency = preferredAgencies != null && preferredAgencies.contains(agencyID);
             if (!isPreferedRoute && !isPreferedAgency) {
@@ -1472,6 +1668,14 @@ public class RoutingRequest implements Cloneable, Serializable {
             }
         }
 
+    }
+
+    public void resetClockTime() {
+        this.clockTimeSec = System.currentTimeMillis() / 1000;
+    }
+
+    public void setServiceDayLookout(int serviceDayLookout) {
+        this.serviceDayLookout = serviceDayLookout;
     }
 
     public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {

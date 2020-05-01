@@ -6,7 +6,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import com.google.common.io.ByteStreams;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Graph.LoadLevel;
 import org.opentripplanner.routing.services.GraphSource;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import java.io.*;
 /**
  * The primary implementation of the GraphSource interface. The graph is loaded from a serialized
  * graph from a given source.
- * 
+ *
  */
 public class InputStreamGraphSource implements GraphSource {
 
@@ -38,8 +37,6 @@ public class InputStreamGraphSource implements GraphSource {
 
     private long graphLastModified = 0L;
 
-    private LoadLevel loadLevel;
-
     private Object preEvictMutex = new Boolean(false);
 
     /**
@@ -48,32 +45,22 @@ public class InputStreamGraphSource implements GraphSource {
     private Streams streams;
 
     /**
-     * @param routerId
-     * @param path
-     * @param loadLevel
      * @return A GraphSource loading graph from the file system under a base path.
      */
-    public static InputStreamGraphSource newFileGraphSource(String routerId, File path,
-            LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new FileStreams(path));
+    public static InputStreamGraphSource newFileGraphSource(String routerId, File path) {
+        return new InputStreamGraphSource(routerId, new FileStreams(path));
     }
 
     /**
-     * @param routerId
-     * @param path
-     * @param loadLevel
      * @return A GraphSource loading graph from an embedded classpath resources (a graph bundled
      *         inside a pre-packaged WAR for example).
      */
-    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path,
-            LoadLevel loadLevel) {
-        return new InputStreamGraphSource(routerId, loadLevel, new ClasspathStreams(path));
+    public static InputStreamGraphSource newClasspathGraphSource(String routerId, File path) {
+        return new InputStreamGraphSource(routerId, new ClasspathStreams(path));
     }
 
-    private InputStreamGraphSource(String routerId, LoadLevel loadLevel,
-            Streams streams) {
+    private InputStreamGraphSource(String routerId, Streams streams) {
         this.routerId = routerId;
-        this.loadLevel = loadLevel;
         this.streams = streams;
     }
 
@@ -151,7 +138,7 @@ public class InputStreamGraphSource implements GraphSource {
 
     /**
      * Check if a graph has been modified since the last time it has been loaded.
-     * 
+     *
      * @param lastModified Time of last modification of current loaded data.
      * @return True if the input data has been modified and need to be reloaded.
      */
@@ -159,8 +146,8 @@ public class InputStreamGraphSource implements GraphSource {
         // We check only for graph file modification, not config
         long validEndTime = System.currentTimeMillis() - LOAD_DELAY_SEC * 1000;
         LOG.debug(
-                "checkAutoReload router '{}' validEndTime={} lastModified={} graphLastModified={}",
-                routerId, validEndTime, lastModified, graphLastModified);
+            "checkAutoReload router '{}' validEndTime={} lastModified={} graphLastModified={}",
+            routerId, validEndTime, lastModified, graphLastModified);
         if (lastModified != graphLastModified && lastModified <= validEndTime) {
             // Only reload graph modified more than 1 mn ago.
             LOG.info("Router ID '{}' graph input modification detected, force reload.", routerId);
@@ -189,7 +176,7 @@ public class InputStreamGraphSource implements GraphSource {
         try (InputStream is = streams.getGraphInputStream()) {
             LOG.info("Loading graph...");
             try {
-                newGraph = Graph.load(new ObjectInputStream(is), loadLevel);
+                newGraph = Graph.load(is);
             } catch (Exception ex) {
                 LOG.error("Exception while loading graph '{}'.", routerId, ex);
                 return null;
@@ -284,7 +271,7 @@ public class InputStreamGraphSource implements GraphSource {
             File graphFile = new File(path, GRAPH_FILENAME);
             LOG.debug("Loading graph from classpath at '{}'", graphFile.getPath());
             return Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(graphFile.getPath());
+                .getResourceAsStream(graphFile.getPath());
         }
 
         @Override
@@ -292,7 +279,7 @@ public class InputStreamGraphSource implements GraphSource {
             File configFile = new File(path, Router.ROUTER_CONFIG_FILENAME);
             LOG.debug("Trying to load config on classpath at '{}'", configFile.getPath());
             return Thread.currentThread().getContextClassLoader()
-                    .getResourceAsStream(configFile.getPath());
+                .getResourceAsStream(configFile.getPath());
         }
 
         /**
@@ -314,16 +301,13 @@ public class InputStreamGraphSource implements GraphSource {
 
         public File basePath;
 
-        public LoadLevel loadLevel = LoadLevel.FULL;
-
         public FileFactory(File basePath) {
             this.basePath = basePath;
         }
 
         @Override
         public GraphSource createGraphSource(String routerId) {
-            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId),
-                    loadLevel);
+            return InputStreamGraphSource.newFileGraphSource(routerId, getBasePath(routerId));
         }
 
         @Override

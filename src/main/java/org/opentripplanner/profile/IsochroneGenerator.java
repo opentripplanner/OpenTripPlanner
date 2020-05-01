@@ -1,6 +1,6 @@
 package org.opentripplanner.profile;
 
-import com.vividsolutions.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Coordinate;
 import org.apache.commons.math3.util.FastMath;
 import org.opentripplanner.analyst.PointSet;
 import org.opentripplanner.analyst.core.IsochroneData;
