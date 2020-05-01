@@ -222,12 +222,18 @@ public abstract class GraphPathToItineraryMapper {
 
             if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
-                    legIndexPairs[1] = i;
-                } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
-                    if (legIndexPairs[1] != states.length - 1) {
-                        legsIndexes.add(legIndexPairs);
+                    if (i == states.length - 2){
+                        legIndexPairs[1] = i + 1;
+                    }else{
+                        legIndexPairs[1] = i;
                     }
-                    legIndexPairs = new int[] {i, states.length - 1};
+                } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
+                    if (i != 1){
+                        if (legIndexPairs[1] != states.length - 1) {
+                            legsIndexes.add(legIndexPairs);
+                        }
+                        legIndexPairs = new int[] {i, states.length - 1};
+                    }
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;
@@ -421,7 +427,7 @@ public abstract class GraphPathToItineraryMapper {
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
             Edge edge = state.getBackEdge();
 
-            if (mode != null) {
+            if (mode != null && !mode.equals(TraverseMode.LEG_SWITCH)) {
                 leg.mode = mode;
             }
 
@@ -499,6 +505,7 @@ public abstract class GraphPathToItineraryMapper {
             place.platformCode = stop.getCode();
             place.zoneId = stop.getZone();
             place.vertexType = VertexType.TRANSIT;
+            place.name = stop.getName();
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
             LOG.trace("Added bike share Id {} to place", place.bikeShareId);
@@ -514,7 +521,7 @@ public abstract class GraphPathToItineraryMapper {
 
     /**
      * Converts a list of street edges to a list of turn-by-turn directions.
-     * 
+     *
      * @param previous a non-transit leg that immediately precedes this one (bike-walking, say), or null
      */
     public static List<WalkStep> generateWalkSteps(Graph graph, State[] states, WalkStep previous, Locale requestedLocale) {
@@ -725,7 +732,7 @@ public abstract class GraphPathToItineraryMapper {
 
                     if (twoBack.distance < MAX_ZAG_DISTANCE
                             && lastStep.streetNameNoParens().equals(threeBack.streetNameNoParens())) {
-                        
+
                         if (((lastStep.relativeDirection == RelativeDirection.RIGHT ||
                                 lastStep.relativeDirection == RelativeDirection.HARD_RIGHT) &&
                                 (twoBack.relativeDirection == RelativeDirection.RIGHT ||
@@ -734,25 +741,25 @@ public abstract class GraphPathToItineraryMapper {
                                 lastStep.relativeDirection == RelativeDirection.HARD_LEFT) &&
                                 (twoBack.relativeDirection == RelativeDirection.LEFT ||
                                 twoBack.relativeDirection == RelativeDirection.HARD_LEFT))) {
-                            // in this case, we have two left turns or two right turns in quick 
+                            // in this case, we have two left turns or two right turns in quick
                             // succession; this is probably a U-turn.
-                            
+
                             steps.remove(last - 1);
-                            
+
                             lastStep.distance += twoBack.distance;
-                            
-                            // A U-turn to the left, typical in the US. 
+
+                            // A U-turn to the left, typical in the US.
                             if (lastStep.relativeDirection == RelativeDirection.LEFT ||
                                     lastStep.relativeDirection == RelativeDirection.HARD_LEFT)
                                 lastStep.relativeDirection = RelativeDirection.UTURN_LEFT;
                             else
                                 lastStep.relativeDirection = RelativeDirection.UTURN_RIGHT;
-                            
-                            // in this case, we're definitely staying on the same street 
+
+                            // in this case, we're definitely staying on the same street
                             // (since it's zag removal, the street names are the same)
                             lastStep.stayOn = true;
                         }
-                                
+
                         else {
                             // What is a zag? TODO write meaningful documentation for this.
                             // It appears to mean simplifying out several rapid turns in succession
@@ -799,11 +806,11 @@ public abstract class GraphPathToItineraryMapper {
 
         // add bike rental information if applicable
         if(onBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(steps.size()-1).bikeRentalOnStation = 
+            steps.get(steps.size()-1).bikeRentalOnStation =
                     new BikeRentalStationInfo((BikeRentalStationVertex) onBikeRentalState.getBackEdge().getToVertex());
         }
         if(offBikeRentalState != null && !steps.isEmpty()) {
-            steps.get(0).bikeRentalOffStation = 
+            steps.get(0).bikeRentalOffStation =
                     new BikeRentalStationInfo((BikeRentalStationVertex) offBikeRentalState.getBackEdge().getFromVertex());
         }
 
