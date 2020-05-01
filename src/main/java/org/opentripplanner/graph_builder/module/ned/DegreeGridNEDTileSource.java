@@ -8,6 +8,7 @@ import org.jets3t.service.impl.rest.httpclient.RestS3Service;
 import org.jets3t.service.model.S3Object;
 import org.jets3t.service.security.AWSCredentials;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.annotation.Graphwide;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -15,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -33,6 +33,8 @@ import java.util.List;
 public class DegreeGridNEDTileSource implements NEDTileSource {
     private static Logger log = LoggerFactory.getLogger(DegreeGridNEDTileSource.class);
 
+    private Graph graph;
+
     private File cacheDirectory;
 
     public String awsAccessKey;
@@ -49,6 +51,7 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
     }
 
     @Override public void fetchData(Graph graph, File cacheDirectory) {
+        this.graph = graph;
         this.cacheDirectory = cacheDirectory;
 
         HashSet<P2<Integer>> tiles = new HashSet<P2<Integer>>();
@@ -66,6 +69,9 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
             if (tilePath != null) {
                 paths.add(tilePath);
             }
+        }
+        if (paths.size() == 0) {
+            throw new RuntimeException("No elevation tiles were able to be downloaded!");
         }
         nedTiles = paths;
     }
@@ -119,10 +125,30 @@ public class DegreeGridNEDTileSource implements NEDTileSource {
                 }
                 ostream.close();
                 istream.close();
-            } catch (ServiceException | IOException e) {
-                log.error("Error downloading tile {}! Error: {}.", key, e.getMessage());
+            } catch (S3ServiceException e) {
+                // Check if the error code is a NoSuchKey code which indicates that the file was not found in the S3
+                // bucket. If this is the cause, allow execution to continue, but add an annotation about the missing
+                // file.
+                //
+                // Note: The IAM policy for the provided credentials must allow both s3:GetObject and s3:ListBucket for
+                // the target bucket. If just GetObject is provided, the S3ServiceException will instead indicate a
+                // forbidden access error.
+                if (e.getS3ErrorCode().equals("NoSuchKey")) {
+                    log.error(
+                        graph.addBuilderAnnotation(
+                            new Graphwide(
+                                String.format("Elevation tile %s missing from s3bucket. Proceeding without tile!", key)
+                            )
+                        )
+                    );
+                    return null;
+                }
+                // Some other error occurred.
                 path.deleteOnExit();
-                return null;
+                throw new RuntimeException(e);
+            } catch (ServiceException | IOException e) {
+                path.deleteOnExit();
+                throw new RuntimeException(e);
             }
             return path;
         }

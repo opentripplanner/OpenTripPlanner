@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import com.google.common.io.ByteStreams;
 import org.geotools.coverage.grid.GridCoverage2D;
-import org.geotools.coverage.grid.Interpolator2D;
 import org.opengis.coverage.Coverage;
 import org.opentripplanner.graph_builder.services.ned.ElevationGridCoverageFactory;
 import org.opentripplanner.graph_builder.services.ned.NEDTileSource;
@@ -10,7 +9,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.media.jai.InterpolationBilinear;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
@@ -34,6 +32,8 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
     public final NEDTileSource tileSource;
 
     private List<VerticalDatum> datums;
+
+    private List<GridCoverage2D> regionCoverages = new ArrayList<>();
 
     public NEDGridCoverageFactoryImpl(File cacheDirectory) {
         this.cacheDirectory = cacheDirectory;
@@ -102,22 +102,27 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
         }
     }
 
-    /** @return a GeoTools grid coverage for the entire area of interest. */
+    /**
+     * Creates a new thread-specific UnifiedGridCoverage instance with new Interpolator2D instances that wrap the
+     * underlying shared elevation tile data. During a refactor in the year 2020, the code at one point was written such
+     * that a new UnifiedGridCoverage instance was created with unique tile data for each thread to use. However,
+     * benchmarking showed that this caused longer run times which is likely due to too much memory competing for a slot
+     * in the processor cache.
+     */
     public Coverage getGridCoverage() {
-        loadVerticalDatum();
-        List<File> paths = tileSource.getNEDTiles();
-        UnifiedGridCoverage unifiedCoverage = null;
-        // Make one grid coverage for each NED tile, adding them all to a single UnifiedGridCoverage.
-        for (File path : paths) {
-            GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
-            GridCoverage2D regionCoverage = factory.getGridCoverage();
-            if (unifiedCoverage == null) {
-                unifiedCoverage = new UnifiedGridCoverage("unified", regionCoverage, datums);
-            } else {
-                unifiedCoverage.add(regionCoverage);
+        // If the tile data hasn't been loaded into memory yet, do that now.
+        if (regionCoverages.size() == 0) {
+            loadVerticalDatum();
+            // Make one grid coverage for each NED tile, adding them to a list of coverage instances that can then be
+            // wrapped with thread-specific interpolators.
+            for (File path : tileSource.getNEDTiles()) {
+                GeotiffGridCoverageFactoryImpl factory = new GeotiffGridCoverageFactoryImpl(path);
+                regionCoverages.add(factory.getUninterpolatedGridCoverage());
             }
         }
-        return unifiedCoverage;
+
+        // Create a new UnifiedGridCoverage using the shared region coverages.
+        return new UnifiedGridCoverage(regionCoverages, datums);
     }
 
     /**
@@ -174,7 +179,6 @@ public class NEDGridCoverageFactoryImpl implements ElevationGridCoverageFactory 
                 throw new RuntimeException(ex);
             }
         }
-
     }
 
     /**

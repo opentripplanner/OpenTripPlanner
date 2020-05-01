@@ -2,6 +2,7 @@ package org.opentripplanner.graph_builder.module.ned;
 
 import org.geotools.coverage.AbstractCoverage;
 import org.geotools.coverage.grid.GridCoverage2D;
+import org.geotools.coverage.grid.Interpolator2D;
 import org.geotools.geometry.jts.ReferencedEnvelope;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
@@ -15,6 +16,7 @@ import org.opengis.geometry.DirectPosition;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.media.jai.InterpolationBilinear;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -39,21 +41,41 @@ public class UnifiedGridCoverage extends AbstractCoverage {
      * regions where this will result in much better performance.
      */
     private final SpatialIndex datumRegionIndex;
-    private ArrayList<Coverage> regions;
-    private List<VerticalDatum> datums;
+    private final ArrayList<Coverage> regions;
 
     /**
      * It would be nice if we could construct this unified coverage with zero sub-coverages and add all sub-coverages
      * in the same way. However, the superclass constructor (AbstractCoverage) needs a coverage to copy properties from.
      * So the first sub-coverage needs to be passed in at construction time.
      */
-    protected UnifiedGridCoverage(CharSequence name, GridCoverage2D coverage, List<VerticalDatum> datums) {
-        super(name, coverage);
+    protected UnifiedGridCoverage(List<GridCoverage2D> regionCoverages, List<VerticalDatum> datums) {
+        super("unified", regionCoverages.get(0));
         regions = new ArrayList<>();
-        this.datums = datums;
         datumRegionIndex = new STRtree();
-        // Add first coverage to list of regions/spatial index.
-        this.add(coverage);
+
+        // Iterate through region coverages, creating Interpolators for each region and then adding them and the
+        // intersected datum to the spatial index.
+        for (GridCoverage2D regionCoverage : regionCoverages) {
+            // TODO might bicubic interpolation give better results?
+            GridCoverage2D regionCoverageInterpolator = Interpolator2D.create(
+                regionCoverage,
+                new InterpolationBilinear()
+            );
+
+            // Iterate over datums to find intersection envelope with each region and add to spatial index.
+            for (VerticalDatum datum : datums) {
+                Envelope datumEnvelope = new Envelope(
+                    datum.lowerLeftLongitude,
+                    datum.lowerLeftLongitude + datum.deltaLongitude,
+                    datum.lowerLeftLatitude,
+                    datum.lowerLeftLatitude + datum.deltaLatitude
+                );
+                ReferencedEnvelope regionEnvelope = new ReferencedEnvelope(regionCoverageInterpolator.getEnvelope());
+                Envelope intersection = regionEnvelope.intersection(datumEnvelope);
+                datumRegionIndex.insert(intersection, new DatumRegion(datum, regionCoverageInterpolator));
+            }
+            regions.add(regionCoverageInterpolator);
+        }
     }
 
     @Override
@@ -89,17 +111,6 @@ public class UnifiedGridCoverage extends AbstractCoverage {
     @Override
     public SampleDimension getSampleDimension(int index) throws IndexOutOfBoundsException {
         return regions.get(0).getSampleDimension(index);
-    }
-
-    public void add(GridCoverage2D regionCoverage) {
-        // Iterate over datums to find intersection envelope with each region and add to spatial index.
-        for (VerticalDatum datum : datums) {
-            Envelope datumEnvelope = new Envelope(datum.lowerLeftLongitude, datum.lowerLeftLongitude + datum.deltaLongitude, datum.lowerLeftLatitude, datum.lowerLeftLatitude + datum.deltaLatitude);
-            ReferencedEnvelope regionEnvelope = new ReferencedEnvelope(regionCoverage.getEnvelope());
-            Envelope intersection = regionEnvelope.intersection(datumEnvelope);
-            datumRegionIndex.insert(intersection, new DatumRegion(datum, regionCoverage));
-        }
-        regions.add(regionCoverage);
     }
 
     public class DatumRegion {
