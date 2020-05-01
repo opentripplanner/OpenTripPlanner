@@ -119,6 +119,7 @@ otp.layers.StopsLayer =
         // TriMet-specific code that adds an additional link to the trimet.org website's stop page
         // Note: this is different from the stop_url page.
         if(isTriMet) {
+            // Get stop_id value (without agency_id prefix).
             var stopId = stop.id.split(':')[1];
             stop.titleLink = 'https://trimet.org/ride/stop.html?stop_id=' + stopId;
         }
