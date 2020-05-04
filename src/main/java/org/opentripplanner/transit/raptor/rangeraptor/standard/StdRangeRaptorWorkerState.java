@@ -80,7 +80,7 @@ public final class StdRangeRaptorWorkerState<T
         int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
         bestTimes.setAccessStopTime(stop, arrivalTime);
-        stopArrivalsState.setInitialTime(stop, arrivalTime, durationInSeconds);
+        stopArrivalsState.setAccess(stop, arrivalTime, accessEgressLeg);
     }
 
     @Override

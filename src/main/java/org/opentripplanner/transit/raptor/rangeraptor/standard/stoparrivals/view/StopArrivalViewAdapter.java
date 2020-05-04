@@ -26,11 +26,6 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
     }
 
     @Override
-    public RaptorTransfer accessEgress() {
-        return null; //TODO throw?
-    }
-
-    @Override
     public int round() {
         return round;
     }
@@ -39,11 +34,13 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
     static final class Access<T extends RaptorTripSchedule> extends StopArrivalViewAdapter<T> {
         private final int departureTime;
         private final int arrivalTime;
+        private final RaptorTransfer access;
 
-        Access(int stop, int departureTime, int arrivalTime) {
+        Access(int stop, int departureTime, int arrivalTime, RaptorTransfer access) {
             super(0, stop);
             this.departureTime = departureTime;
             this.arrivalTime = arrivalTime;
+            this.access = access;
         }
 
         @Override
@@ -54,6 +51,11 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
         @Override
         public int departureTime() {
             return departureTime;
+        }
+
+        @Override
+        public RaptorTransfer accessEgress() {
+            return access;
         }
 
         @Override
@@ -98,6 +100,11 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
         }
 
         @Override
+        public RaptorTransfer accessEgress() {
+            throw new UnsupportedOperationException("No accessEgress for transit stop arrival");
+        }
+
+        @Override
         public boolean arrivedByTransit() {
             return true;
         }
@@ -133,6 +140,11 @@ abstract class StopArrivalViewAdapter<T extends RaptorTripSchedule> implements A
         @Override
         public int departureTime() {
             return cursor.departureTime(arrivalTime(), arrival.transferDuration());
+        }
+
+        @Override
+        public RaptorTransfer accessEgress() {
+            throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
         }
 
         @Override
