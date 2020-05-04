@@ -86,7 +86,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     public HeuristicSearchTask<T> withRequest(RaptorRequest<T> request) {
         this.request = request.mutate()
                 .searchParams()
-                .allowWaitingBetweenAccessAndTransit(true)
                 .build();
         return this;
     }
@@ -136,7 +135,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
                     .searchDirection(direction)
                     .searchParams()
                     .searchOneIterationOnly()
-                    .allowWaitingBetweenAccessAndTransit(true)
                     .build();
             search = config.createHeuristicSearch(transitData, heuristicReq);
         }

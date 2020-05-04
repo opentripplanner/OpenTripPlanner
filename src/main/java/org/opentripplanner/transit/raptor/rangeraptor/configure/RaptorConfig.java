@@ -97,8 +97,7 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
                 ctx.roundProvider(),
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
-                ctx.timers(),
-                ctx.searchParams().allowWaitingBetweenAccessAndTransit()
+                ctx.timers()
         );
     }
 
