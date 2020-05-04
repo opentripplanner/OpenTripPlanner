@@ -97,6 +97,7 @@ public class RoutingWorker {
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
+        request.rctx.checkIfVerticesFound();
         if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
 
         long startTime = System.currentTimeMillis();
