@@ -15,7 +15,7 @@ import java.util.Objects;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 public final class Path<T extends RaptorTripSchedule> {
-    private final int iteration;
+    private final int iterationDepartureTime;
     private final int startTime;
     private final int endTime;
     private final int numberOfTransfers;
@@ -35,8 +35,14 @@ public final class Path<T extends RaptorTripSchedule> {
     }
 
     /** @see #dummyPath(int, int, int, int, int) */
-    private Path(int iteration, int startTime, int endTime, int numberOfTransfers, int generalizedCost) {
-        this.iteration = iteration;
+    private Path(
+            int iterationDepartureTime,
+            int startTime,
+            int endTime,
+            int numberOfTransfers,
+            int generalizedCost
+    ) {
+        this.iterationDepartureTime = iterationDepartureTime;
         this.startTime = startTime;
         this.endTime = endTime;
         this.numberOfTransfers = numberOfTransfers;
@@ -45,8 +51,8 @@ public final class Path<T extends RaptorTripSchedule> {
         this.egressPathLeg = null;
     }
 
-    public Path(int iteration, AccessPathLeg<T> accessLeg, int generalizedCost) {
-        this.iteration = iteration;
+    public Path(int iterationDepartureTime, AccessPathLeg<T> accessLeg, int generalizedCost) {
+        this.iterationDepartureTime = iterationDepartureTime;
         this.startTime = accessLeg.fromTime();
         this.numberOfTransfers = countNumberOfTransfers(accessLeg);
         this.generalizedCost = generalizedCost;
@@ -56,12 +62,12 @@ public final class Path<T extends RaptorTripSchedule> {
     }
 
     /**
-     * The Range Raptor iteration. This can be used in the path-pareto-function to make sure
+     * The Range Raptor iteration departure time. This can be used in the path-pareto-function to make sure
      * all results found in previous iterations are kept, and not dominated by new results.
      * This is used for the time-table view.
      */
-    public final int rangeRaptorIteration() {
-        return iteration;
+    public final int rangeRaptorIterationDepartureTime() {
+        return iterationDepartureTime;
     }
 
     /**
