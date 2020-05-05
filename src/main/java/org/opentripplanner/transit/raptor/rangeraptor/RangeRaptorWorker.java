@@ -51,7 +51,7 @@ import java.util.Iterator;
 public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends WorkerState<T>> implements Worker<T> {
 
 
-    private final TransitRoutingStrategy<T> transitWorker;
+    private final RoutingStrategy<T> transitWorker;
 
     /**
      * The RangeRaptor state - we delegate keeping track of state to the state object,
@@ -90,7 +90,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     public RangeRaptorWorker(
             S state,
-            TransitRoutingStrategy<T> transitWorker,
+            RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
             Collection<RaptorTransfer> accessLegs,
             RoundProvider roundProvider,
@@ -176,7 +176,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private void doTransfersForAccessLegs(int iterationDepartureTime) {
         for (RaptorTransfer it : accessLegs) {
-            state.setInitialTimeForIteration(it, iterationDepartureTime);
+            transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
         }
     }
 

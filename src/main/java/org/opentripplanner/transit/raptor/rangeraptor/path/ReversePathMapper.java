@@ -67,6 +67,7 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
             ArrivalView<T> lastStopArrival
     ) {
         return new AccessPathLeg<>(
+                destinationArrival.accessEgress(),
                 lastStopArrival.stop(),
                 destinationArrival.arrivalTime(),
                 destinationArrival.departureTime(),
@@ -136,6 +137,6 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         int boardSlack = transitLayerSlackProvider.alightSlack(tripSchedule.pattern());
         int fromTime = transitAlightTime + boardSlack;
         int toTime = fromTime + (stopArrival.departureTime() - stopArrival.arrivalTime());
-        return new EgressPathLeg<>(stopArrival.stop(), fromTime, toTime);
+        return new EgressPathLeg<>(stopArrival.accessEgress(), stopArrival.stop(), fromTime, toTime);
     }
 }

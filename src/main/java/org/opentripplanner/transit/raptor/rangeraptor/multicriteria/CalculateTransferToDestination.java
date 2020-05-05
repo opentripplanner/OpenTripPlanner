@@ -8,6 +8,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPat
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 
+import java.util.List;
+
 /**
  * This class listen to pareto set egress stop arrivals and on accepted
  * transit arrivals make the transfer to the destination.
@@ -17,16 +19,16 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoSetEventListener;
 public class CalculateTransferToDestination<T extends RaptorTripSchedule>
         implements ParetoSetEventListener<ArrivalView<T>> {
 
-    private final RaptorTransfer egressLeg;
+    private final List<RaptorTransfer> egressLegs;
     private final DestinationArrivalPaths<T> destinationArrivals;
     private final CostCalculator costCalculator;
 
     CalculateTransferToDestination(
-            RaptorTransfer egressLeg,
+            List<RaptorTransfer> egressLegs,
             DestinationArrivalPaths<T> destinationArrivals,
             CostCalculator costCalculator
     ) {
-        this.egressLeg = egressLeg;
+        this.egressLegs = egressLegs;
         this.destinationArrivals = destinationArrivals;
         this.costCalculator = costCalculator;
     }
@@ -42,11 +44,13 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
     public void notifyElementAccepted(ArrivalView<T> newElement) {
         if(newElement instanceof TransitStopArrival) {
             TransitStopArrival<T> transitStopArrival = (TransitStopArrival<T>) newElement;
-            destinationArrivals.add(
+            for (RaptorTransfer egressLeg : egressLegs) {
+                destinationArrivals.add(
                     transitStopArrival,
                     egressLeg,
                     costCalculator.walkCost(egressLeg.durationInSeconds())
-            );
+                );
+            }
         }
     }
 }

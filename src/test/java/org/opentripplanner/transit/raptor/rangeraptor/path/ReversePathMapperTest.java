@@ -17,7 +17,9 @@ public class ReversePathMapperTest {
         // Given:
         Egress egress = basicTripByReverseSearch();
         DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
+                null,
                 egress.previous(),
+                egress.previous().arrivalTime(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );

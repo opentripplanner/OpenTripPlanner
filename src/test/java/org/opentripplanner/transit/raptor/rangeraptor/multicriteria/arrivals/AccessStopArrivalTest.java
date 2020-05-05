@@ -19,8 +19,11 @@ public class AccessStopArrivalTest {
         ALIGHT_STOP,
         DEPARTURE_TIME,
         LEG_DURATION,
-        COST
+        COST,
+        null
     );
+
+
 
     @Test
     public void arrivedByAccessLeg() {

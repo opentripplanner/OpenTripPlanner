@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 
 /**
@@ -20,6 +21,11 @@ public final class TransitStopArrival<T extends RaptorTripSchedule> extends Abst
                 additionalCost
         );
         this.trip = trip;
+    }
+
+    @Override
+    public RaptorTransfer accessEgress() {
+        throw new UnsupportedOperationException("No accessEgress for transit stop arrival");
     }
 
     @Override

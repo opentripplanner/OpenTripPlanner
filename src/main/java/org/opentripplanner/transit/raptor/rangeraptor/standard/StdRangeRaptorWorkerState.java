@@ -71,15 +71,16 @@ public final class StdRangeRaptorWorkerState<T
     }
 
     @Override
-    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int iterationDepartureTime) {
+    public final void setInitialTimeForIteration(RaptorTransfer accessEgressLeg, int departureTime) {
         int durationInSeconds = accessEgressLeg.durationInSeconds();
         int stop = accessEgressLeg.stop();
+
         // The time of arrival at the given stop for the current iteration
         // (or departure time at the last stop if we search backwards).
-        int arrivalTime = calculator.plusDuration(iterationDepartureTime, durationInSeconds);
+        int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
         bestTimes.setAccessStopTime(stop, arrivalTime);
-        stopArrivalsState.setInitialTime(stop, arrivalTime, durationInSeconds);
+        stopArrivalsState.setAccess(stop, arrivalTime, accessEgressLeg);
     }
 
     @Override

@@ -40,7 +40,8 @@ public class TransferStopArrivalTest {
             ACCESS_TO_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION,
-            ACCESS_COST
+            ACCESS_COST,
+            null
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(

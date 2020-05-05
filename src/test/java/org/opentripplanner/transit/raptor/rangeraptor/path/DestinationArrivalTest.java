@@ -4,7 +4,6 @@ import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertSame;
@@ -29,8 +28,6 @@ public class DestinationArrivalTest {
     private static final int EXPECTED_ARRIVAL_TIME = TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME;
     private static final int EXPECTED_TOTAL_COST = ACCESS_COST + TRANSIT_COST + DESTINATION_COST;
 
-    private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
-
     /**
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
@@ -38,7 +35,8 @@ public class DestinationArrivalTest {
             ACCESS_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION_TIME,
-            ACCESS_COST
+            ACCESS_COST,
+            null
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
@@ -51,8 +49,10 @@ public class DestinationArrivalTest {
             TRANSIT_COST
     );
 
-    private DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
+    private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
+            null,
             TRANSIT_ARRIVAL,
+            TRANSIT_ALIGHT_TIME,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST
     );
