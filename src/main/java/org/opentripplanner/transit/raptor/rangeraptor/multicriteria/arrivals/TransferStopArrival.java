@@ -26,6 +26,11 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
+    public RaptorTransfer accessEgress() {
+        throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
+    }
+
+    @Override
     public boolean arrivedByTransfer() {
         return true;
     }

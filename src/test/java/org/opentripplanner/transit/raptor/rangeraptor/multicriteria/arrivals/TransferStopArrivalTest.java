@@ -37,6 +37,7 @@ public class TransferStopArrivalTest {
 
     private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
+            null,
             ACCESS_TO_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION,

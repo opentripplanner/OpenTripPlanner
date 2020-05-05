@@ -20,6 +20,23 @@ public interface RaptorTransfer {
     int stop();
 
     /**
+     * Returns the earliest possible departure time for the leg. Used Eg. in flex routing and TNC
+     * when the access leg can't start immediately, but have to wait for a vehicle arriving. Also
+     * DRT systems or bike shares can have operation time limitations.
+     *
+     * Returns -1 if transfer is not possible after the requested departure time
+     */
+    int earliestDepartureTime(int requestedDepartureTime);
+
+    /**
+     * Returns the latest possible arrival time for the leg. Used in DRT systems or bike shares
+     * where they can have operation time limitations.
+     *
+     * Returns -1 if transfer is not possible before the requested arrival time
+     */
+    int latestArrivalTime(int requestedArrivalTime);
+
+    /**
      * The time duration to walk or travel the leg in seconds. This is not the entire duration from the journey origin,
      * but just:
      * <ul>

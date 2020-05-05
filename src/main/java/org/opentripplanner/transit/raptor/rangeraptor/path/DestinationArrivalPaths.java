@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.opentripplanner.transit.raptor.api.path.Path;
+import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
@@ -29,32 +30,46 @@ import java.util.Collection;
  */
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
-    private final TransitCalculator calculator;
+    private final TransitCalculator transitCalculator;
+    private final CostCalculator costCalculator;
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<T>> debugHandler;
     private boolean reachedCurrentRound = false;
 
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
-            TransitCalculator calculator,
+            TransitCalculator transitCalculator,
+            CostCalculator costCalculator,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle
     ) {
+        this.costCalculator = costCalculator;
         this.paths = new ParetoSet<>(paretoComparator, debugHandlerFactory.paretoSetDebugPathListener());
         this.debugHandler = debugHandlerFactory.debugStopArrival();
-        this.calculator = calculator;
+        this.transitCalculator = transitCalculator;
         this.pathMapper = pathMapper;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
     }
 
     public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
+        int departureTime = transitCalculator.departureTime(egressLeg, egressStopArrival.arrivalTime());
 
-        int arrivalTime = calculator.plusDuration(egressStopArrival.arrivalTime(), egressLeg.durationInSeconds());
+        if (departureTime == -1) { return; }
 
-        DestinationArrival<T> destArrival = new DestinationArrival<>(egressStopArrival, arrivalTime, additionalCost);
+        int arrivalTime = transitCalculator.plusDuration(departureTime, egressLeg.durationInSeconds());
 
-        if (calculator.exceedsTimeLimit(arrivalTime)) {
+        int waitTimeInSeconds = Math.abs(departureTime - egressStopArrival.arrivalTime());
+
+        DestinationArrival<T> destArrival = new DestinationArrival<>(
+            egressLeg,
+            egressStopArrival,
+            departureTime, // TODO: What about NoWaitTransitWorker
+            arrivalTime,
+            additionalCost + costCalculator.waitCost(waitTimeInSeconds)
+        );
+
+        if (transitCalculator.exceedsTimeLimit(arrivalTime)) {
             debugRejectByTimeLimitOptimization(destArrival);
         } else {
             Path<T> path = pathMapper.mapToPath(destArrival);
@@ -98,7 +113,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
 
     private void debugRejectByTimeLimitOptimization(DestinationArrival<T> destArrival) {
         if (debugHandler != null) {
-            debugHandler.reject(destArrival.previous(), null, calculator.exceedsTimeLimitReason());
+            debugHandler.reject(destArrival.previous(), null, transitCalculator.exceedsTimeLimitReason());
         }
     }
 }
