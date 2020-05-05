@@ -36,15 +36,14 @@ public class TransitStopArrivalTest {
     private static final TransitCalculator TRANSIT_CALCULATOR = testDummyCalculator(true);
 
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            null,
             ACCESS_TO_STOP,
             ACCESS_DEPARTURE_TIME,
             ACCESS_DURATION,
             ACCESS_COST,
-            TRANSIT_CALCULATOR
+            null
     );
 
-    private TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
+    private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
             ACCESS_ARRIVAL,
             TRANSIT_TO_STOP,
             TRANSIT_ALIGHT_TIME,
@@ -113,7 +112,7 @@ public class TransitStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "TransitStopArrival { Rnd: 1, Stop: 101, Time: 9:20:00 (9:00:00), Cost: 700 }",
+                "TransitStopArrival { Rnd: 1, Stop: 101, Time: 9:20 (9:00), Cost: 700 }",
                 subject.toString()
         );
     }

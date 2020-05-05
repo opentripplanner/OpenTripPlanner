@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
 import com.csvreader.CsvReader;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.io.File;
@@ -8,10 +9,14 @@ import java.io.IOException;
 import java.io.PrintWriter;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 
 /**
@@ -81,7 +86,7 @@ public class CsvFileIO {
         printResultsForFirstStrategyRun = false;
 
         try (PrintWriter out = new PrintWriter(expectedResultsOutputFile, CHARSET_UTF_8.name())) {
-            out.println("tcId,transfers,duration,cost,walkDistance,startTime,endTime,details");
+            out.println("tcId,transfers,duration,cost,walkDistance,startTime,endTime,modes,agencies,routes,details");
 
             for (TestCase tc : testCases) {
                 for (Result result : tc.actualResults()) {
@@ -89,15 +94,21 @@ public class CsvFileIO {
                     out.print(CSV_DELIMITER);
                     out.print(result.transfers);
                     out.print(CSV_DELIMITER);
-                    out.print(result.duration);
+                    out.print(time2str(result.duration));
                     out.print(CSV_DELIMITER);
                     out.print(result.cost);
                     out.print(CSV_DELIMITER);
                     out.print(result.walkDistance);
                     out.print(CSV_DELIMITER);
-                    out.print(result.startTime);
+                    out.print(time2str(result.startTime));
                     out.print(CSV_DELIMITER);
-                    out.print(result.endTime);
+                    out.print(time2str(result.endTime));
+                    out.print(CSV_DELIMITER);
+                    out.print(col2Str(result.modes));
+                    out.print(CSV_DELIMITER);
+                    out.print(col2Str(result.agencies));
+                    out.print(CSV_DELIMITER);
+                    out.print(col2Str(result.routes));
                     out.print(CSV_DELIMITER);
                     out.print(result.details);
                     out.println();
@@ -132,16 +143,20 @@ public class CsvFileIO {
 
     private Result readExpectedResult(CsvReader csvReader) throws IOException {
         try {
-            return new Result(
+            Result r  = new Result(
                     csvReader.get("tcId"),
                     Integer.parseInt(csvReader.get("transfers")),
-                    Integer.parseInt(csvReader.get("duration")),
+                    time2Int(csvReader.get("duration")),
                     Integer.parseInt(csvReader.get("cost")),
                     Integer.parseInt(csvReader.get("walkDistance")),
-                    csvReader.get("startTime"),
-                    csvReader.get("endTime"),
+                    time2Int(csvReader.get("startTime")),
+                    time2Int(csvReader.get("endTime")),
                     csvReader.get("details")
             );
+            r.modes.addAll(str2Col(csvReader.get("modes"), TraverseMode::valueOf));
+            r.agencies.addAll(str2Col(csvReader.get("agencies")));
+            r.routes.addAll(str2Col(csvReader.get("routes")));
+            return r;
         }
         catch (RuntimeException e) {
             throw new java.lang.IllegalStateException(e.getMessage() + ". Line: " + csvReader.getRawRecord(), e);
@@ -150,5 +165,23 @@ public class CsvFileIO {
 
     private boolean isCommentOrEmpty(String line) {
         return line.startsWith("#") || line.matches("[\\s,;]*");
+    }
+
+    static String time2str(Integer timeOrDuration) {
+        return TimeUtils.timeToStrLong(timeOrDuration);
+    }
+
+    static Integer time2Int(String timeOrDuration) {
+        return TimeUtils.parseTimeLong(timeOrDuration, -1);
+    }
+    static String col2Str(Collection<?> c) {
+        return c.stream().map(Object::toString).collect(Collectors.joining(" "));
+    }
+    static List<String> str2Col(String elements) {
+        return str2Col(elements, s -> s);
+    }
+    static <T> List<T> str2Col(String elements, Function<String, T> mapFunction) {
+        if(elements == null || elements.isBlank()) { return List.of(); }
+        return Arrays.stream(elements.split(" ")).map(mapFunction).collect(Collectors.toList());
     }
 }
