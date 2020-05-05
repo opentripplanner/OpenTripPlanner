@@ -23,7 +23,7 @@ import java.util.Collection;
 */
 public interface StopArrivalsState<T extends RaptorTripSchedule> {
 
-    void setInitialTime(final int stop, final int arrivalTime, int durationInSeconds);
+    void setAccess(final int stop, final int arrivalTime, RaptorTransfer access);
 
     Collection<Path<T>> extractPaths();
 

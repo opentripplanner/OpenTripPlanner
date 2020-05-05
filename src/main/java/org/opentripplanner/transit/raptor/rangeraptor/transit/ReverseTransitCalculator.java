@@ -4,6 +4,7 @@ import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.transit.IntIterator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTimeTable;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.IntIterators;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
@@ -100,6 +101,11 @@ final class ReverseTransitCalculator implements TransitCalculator {
     @Override
     public final int unreachedTime() {
         return Integer.MIN_VALUE;
+    }
+
+    @Override
+    public int departureTime(RaptorTransfer transfer, int departureTime) {
+        return transfer.latestArrivalTime(departureTime);
     }
 
     @Override
