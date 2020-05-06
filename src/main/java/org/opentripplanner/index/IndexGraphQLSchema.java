@@ -30,6 +30,8 @@ import org.opentripplanner.index.model.StopTimesInPattern;
 import org.opentripplanner.index.model.TripTimeShort;
 import org.opentripplanner.profile.StopCluster;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
+import org.opentripplanner.routing.edgetype.Timetable;
+import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -569,12 +571,33 @@ public class IndexGraphQLSchema {
                     .build())
                 .dataFetcher(environment -> {
                     try {
-                        Trip trip = (Trip) environment.getSource();
-                        return TripTimeShort.fromTripTimes(
-                            index.graph.timetableSnapshotSource.getTimetableSnapshot()
-                                .resolve(index.patternForTrip.get(trip),
-                                    ServiceDate.parseString(environment.getArgument("serviceDay")))
-                                , trip);
+                        final Trip trip = (Trip) environment.getSource();
+                        final TripPattern pattern = index.patternForTrip.get(trip);
+                        if (pattern == null) {
+                            // pattern not found for trip, so no timetable available
+                            return null;
+                        }
+                        // if there is no updater, or no update has been done yet,
+                        // snapshot source and snapshot is `null`, in that case
+                        // use the static schedule
+                        final Timetable timetable;
+                        if (index.graph.timetableSnapshotSource != null) {
+                            TimetableSnapshot snapshot = index.graph.timetableSnapshotSource.getTimetableSnapshot();
+                            if (snapshot == null) {
+                                // no update has been applied yet, use scheduled timetable
+                                timetable = pattern.scheduledTimetable;
+                            } else {
+                                timetable =
+                                    snapshot.resolve(index.patternForTrip.get(trip),
+                                        ServiceDate.parseString(environment.getArgument("serviceDay")));
+                            }
+                        } else {
+                            timetable = pattern.scheduledTimetable;
+                        }
+                        if(timetable == null) {
+                            return null;
+                        }
+                        return TripTimeShort.fromTripTimes(timetable, trip);
                     } catch (ParseException e) {
                          return null; // Invalid date format
                     }
