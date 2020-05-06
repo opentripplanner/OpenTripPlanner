@@ -29,7 +29,7 @@ public class PathTest {
 
     @Test
     public void totalTravelDurationInSeconds() {
-        Assert.assertEquals("2:00:00", TimeUtils.timeToStrCompact(subject.travelDurationInSeconds()));
+        Assert.assertEquals("2:00", TimeUtils.timeToStrCompact(subject.travelDurationInSeconds()));
     }
 
     @Test
@@ -60,8 +60,8 @@ public class PathTest {
     @Test
     public void testToString() {
         Assert.assertEquals(
-                "Walk 3m - 1 - Transit 10:05 10:35 - 2 - Walk 3m - 3 - "
-                        + "Transit 11:00 11:23 - 4 - Transit 11:40 11:52 - 5 - Walk 7m "
+                "Walk 3m ~ 1 ~ BUS 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
+                        + "BUS 11:00 11:23 ~ 4 ~ BUS 11:40 11:52 ~ 5 ~ Walk 7m "
                         + "[10:00:00 12:00:00 2h, cost: 60]",
                 subject.toString()
         );

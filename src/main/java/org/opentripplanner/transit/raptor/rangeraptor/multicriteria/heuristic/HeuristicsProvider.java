@@ -42,6 +42,10 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
         this.debugHandlerFactory = debugHandlerFactory;
     }
 
+    /**
+     * This is a very effective optimization, enabled by the
+     * {@link org.opentripplanner.transit.raptor.api.request.Optimization#PARETO_CHECK_AGAINST_DESTINATION}.
+     */
     public boolean rejectDestinationArrivalBasedOnHeuristic(AbstractStopArrival<T> arrival) {
         if(heuristics == null || paths.isEmpty()) {
             return false;

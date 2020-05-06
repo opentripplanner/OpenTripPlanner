@@ -35,6 +35,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<T>> debugHandler;
     private boolean reachedCurrentRound = false;
+    private int iterationDepartureTime = -1;
 
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
@@ -50,6 +51,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         this.transitCalculator = transitCalculator;
         this.pathMapper = pathMapper;
         lifeCycle.onPrepareForNextRound(round -> clearReachedCurrentRoundFlag());
+        lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
     public void add(ArrivalView<T> egressStopArrival, RaptorTransfer egressLeg, int additionalCost) {
@@ -87,12 +89,16 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         return reachedCurrentRound;
     }
 
+    public void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
+        this.iterationDepartureTime = iterationDepartureTime;
+    }
+
     public boolean isEmpty() {
         return paths.isEmpty();
     }
 
     public boolean qualify(int departureTime, int arrivalTime, int numberOfTransfers, int cost) {
-        return paths.qualify(Path.dummyPath(departureTime, arrivalTime, numberOfTransfers, cost));
+        return paths.qualify(Path.dummyPath(iterationDepartureTime, departureTime, arrivalTime, numberOfTransfers, cost));
     }
 
     public Collection<Path<T>> listPaths() {

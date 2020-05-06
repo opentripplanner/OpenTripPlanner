@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.speed_test.transit;
 
 import gnu.trove.map.TIntIntMap;
 import gnu.trove.map.hash.TIntIntHashMap;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -9,7 +10,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
+import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -50,14 +51,14 @@ class StreetSearch {
     void route(Place place, boolean fromOrigin) {
         Vertex vertex = null;
 
-        if(place.getStopId() != null) {
-            vertex = graph.getVertex(place.getStopId().getId());
+        if(place.stopId != null) {
+            vertex = graph.getVertex(place.stopId.getId());
         }
         if(vertex == null) {
             vertex = new TemporaryStreetLocation(
-                    place.getDescription(),
-                    place.getCoordinate(),
-                    new NonLocalizedString(place.getDescription()),
+                    place.name,
+                    new Coordinate(place.coordinate.longitude(), place.coordinate.latitude()),
+                    new NonLocalizedString(place.name),
                     !fromOrigin
             );
             splitter.link(vertex);

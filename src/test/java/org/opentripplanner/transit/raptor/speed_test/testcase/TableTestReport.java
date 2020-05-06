@@ -1,7 +1,5 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.util.TimeUtils;
-
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -44,17 +42,13 @@ public class TableTestReport {
     }
 
     private static void addTo(OutputTable table, Result result) {
-        boolean longFormat = true;
-
         table.addRow(
                 result.status.label,
                 result.transfers,
-                TimeUtils.timeToStrCompact(result.duration),
+                result.durationAsStr(),
                 result.cost,
-                // Strip of seconds for faster reading - most service schedules are by the minute not seconds
-                longFormat ? result.startTime : result.startTime.substring(0, 5),
-                // Strip of seconds for faster reading - most service schedules are by the minute not seconds
-                longFormat ? result.endTime : result.endTime.substring(0, 5),
+                result.startTimeAsStr(),
+                result.endTimeAsStr(),
                 toStr(result.modes),
                 toStr(result.agencies),
                 toStr(result.routes),
