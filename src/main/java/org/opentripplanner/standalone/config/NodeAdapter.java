@@ -90,7 +90,7 @@ public class NodeAdapter {
 
     public NodeAdapter path(String paramName) {
         NodeAdapter child = new NodeAdapter(
-                json.path(paramName),
+                param(paramName),
                 source,
                 fullPath(paramName)
         );
@@ -341,6 +341,7 @@ public class NodeAdapter {
             // Recursive call to get child unused parameters
             unusedParams.addAll(c.unusedParams());
         }
+        unusedParams.sort(String::compareTo);
         return unusedParams;
     }
 
