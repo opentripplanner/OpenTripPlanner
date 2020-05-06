@@ -73,14 +73,14 @@ public class RoutingWorker {
         try {
             itineraries.addAll(DirectStreetRouter.route(router, request));
         } catch (RoutingValidationException e) {
-            routingErrors.add(e.getRoutingError());
+            routingErrors.addAll(e.getRoutingErrors());
         }
 
         // Transit routing
         try {
             itineraries.addAll(routeTransit(router));
         } catch (RoutingValidationException e) {
-            routingErrors.add(e.getRoutingError());
+            routingErrors.addAll(e.getRoutingErrors());
         }
 
         // Filter itineraries
@@ -238,11 +238,14 @@ public class RoutingWorker {
 
         if(accessExist && egressExist) { return; }
 
-        List<InputField> missingPlaces = new ArrayList<>();
-        if(!accessExist) { missingPlaces.add(InputField.FROM_PLACE); }
-        if(!egressExist) { missingPlaces.add(InputField.TO_PLACE); }
+        List<RoutingError> routingErrors = new ArrayList<>();
+        if(!accessExist) { routingErrors.add(
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.FROM_PLACE));
+        }
+        if(!egressExist) { routingErrors.add(
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.TO_PLACE));
+        }
 
-        throw new RoutingValidationException(
-            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, missingPlaces));
+        throw new RoutingValidationException(routingErrors);
     }
 }

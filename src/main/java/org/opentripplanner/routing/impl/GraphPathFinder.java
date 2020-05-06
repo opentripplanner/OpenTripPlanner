@@ -163,7 +163,7 @@ public class GraphPathFinder {
             }
             request.rctx.debugOutput.finishedCalculating();
         } catch (RoutingValidationException e) {
-            if (e.getRoutingError().code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))
+            if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))
             LOG.info("Vertex not found: " + request.from + " : " + request.to);
             throw e;
         }

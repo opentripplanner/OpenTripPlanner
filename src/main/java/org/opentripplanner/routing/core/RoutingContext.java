@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -233,22 +234,24 @@ public class RoutingContext implements Cloneable {
     /* INSTANCE METHODS */
 
     public void checkIfVerticesFound() {
-        ArrayList<InputField> notFound = new ArrayList<>();
+        List<RoutingError> routingErrors = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
         if (fromVertices == null) {
-            notFound.add(InputField.FROM_PLACE);
+            routingErrors.add(
+                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
+            );
         }
 
         // check destination present when not doing a depart-after batch search
         if (toVertices == null) {
-            notFound.add(InputField.TO_PLACE);
-        }
-        if (notFound.size() > 0) {
-            throw new RoutingValidationException(
-                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND,
-                    notFound)
+            routingErrors.add(
+                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );
+        }
+
+        if (routingErrors.size() > 0) {
+            throw new RoutingValidationException(routingErrors);
         }
     }
 

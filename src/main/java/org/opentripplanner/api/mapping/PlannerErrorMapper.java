@@ -20,12 +20,9 @@ public class PlannerErrorMapper {
                 api.message = Message.NO_TRANSIT_TIMES;
                 break;
             case LOCATION_NOT_FOUND:
-                if (domain.inputFields.contains(InputField.FROM_PLACE)
-                    && domain.inputFields.contains(InputField.TO_PLACE)) {
-                    api.message = Message.GEOCODE_FROM_TO_NOT_FOUND;
-                } else if (domain.inputFields.contains(InputField.FROM_PLACE)) {
+                if (domain.inputField.equals(InputField.FROM_PLACE)) {
                     api.message = Message.GEOCODE_FROM_NOT_FOUND;
-                } else if (domain.inputFields.contains(InputField.TO_PLACE)) {
+                } else if (domain.inputField.equals(InputField.TO_PLACE)) {
                     api.message = Message.GEOCODE_TO_NOT_FOUND;
                 } else {
                     throw new IllegalArgumentException();

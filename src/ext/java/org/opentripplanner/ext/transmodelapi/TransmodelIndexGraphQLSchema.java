@@ -2901,11 +2901,9 @@ public class TransmodelIndexGraphQLSchema {
                                         .sorted(Comparator.comparing(s -> s.distance))
                                         .collect(Collectors.toList());
                             } catch (RoutingValidationException e) {
-                                if (e.getRoutingError().code.equals(RoutingErrorCode.LOCATION_NOT_FOUND)) {
-                                    LOG.warn(
-                                        "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
-                                        e);
-                                }
+                                LOG.warn(
+                                    "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
+                                    e);
                                 stops = Collections.emptyList();
                             }
 
