@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -41,6 +42,8 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 09:53 and ends at 12:00.
  */
 public class StopArrivalsTestData {
+
+    public static final WorkerLifeCycle WORKER_LIFE_CYCLE = new LifeCycleSubscriptions();
 
     /** Provide a Cost Calculator for tests that dont care to much avout testing the cost */
     public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
@@ -166,7 +169,7 @@ public class StopArrivalsTestData {
                 null, STOP_1, A_START, A_END, leg2.asTransitLeg()
         );
 
-        return new Path<>(leg1, RaptorCostConverter.toOtpDomainCost(6_000));
+        return new Path<>(1, leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }
 
     public static List<Integer> basicTripStops() {

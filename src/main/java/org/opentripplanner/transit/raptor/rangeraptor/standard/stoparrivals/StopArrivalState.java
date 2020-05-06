@@ -119,13 +119,13 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
     @Override
     public String toString() {
         return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
-                TimeUtils.timeToStrLong(bestArrivalTime, NOT_SET),
+                TimeUtils.timeToStrCompact(bestArrivalTime, NOT_SET),
                 IntUtils.intToString(boardStop, NOT_SET),
                 TimeUtils.timeToStrCompact(boardTime, NOT_SET),
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-                TimeUtils.timeToStrCompact(accessOrTransferDuration, NOT_SET)
+                TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
         );
     }
 }

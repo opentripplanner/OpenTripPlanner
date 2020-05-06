@@ -38,7 +38,7 @@ public class StopArrivalStateParetoSetTest {
     private static final AbstractStopArrival<RaptorTripSchedule> TRANSFER_R1 = newMcTransitStopState(ROUND_1,998, 10);
     private static final AbstractStopArrival<RaptorTripSchedule> TRANSFER_R2 = newMcTransitStopState(ROUND_2,997, 20);
 
-    private StopArrivalParetoSet<RaptorTripSchedule> subject = new StopArrivalParetoSet<>(null);
+    private final StopArrivalParetoSet<RaptorTripSchedule> subject = new StopArrivalParetoSet<>(null);
 
     @Test
     public void addOneElementToSet() {
@@ -113,7 +113,7 @@ public class StopArrivalStateParetoSetTest {
     }
 
     private static AccessStopArrival<RaptorTripSchedule> newAccessStopState(int stop, int accessDurationInSeconds) {
-        return new AccessStopArrival<>(null, stop, A_TIME, accessDurationInSeconds, ANY, CALCULATOR);
+        return new AccessStopArrival<>(stop, A_TIME, accessDurationInSeconds, ANY, null);
     }
 
     private static TransitStopArrival<RaptorTripSchedule> newMcTransitStopState(int round, int stop, int arrivalTime) {

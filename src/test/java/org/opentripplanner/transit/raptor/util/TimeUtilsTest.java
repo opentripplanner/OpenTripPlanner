@@ -28,17 +28,17 @@ public class TimeUtilsTest {
 
     @Test
     public void timeToStrCompact() {
-        assertEquals("9:31:00", TimeUtils.timeToStrCompact(T_09_31_00));
+        assertEquals("9:31", TimeUtils.timeToStrCompact(T_09_31_00));
         assertEquals("9:36:55", TimeUtils.timeToStrCompact(T_09_36_55));
         assertEquals("13:33:57", TimeUtils.timeToStrCompact(T_13_33_57));
-        assertEquals("58:59", TimeUtils.timeToStrCompact(T_00_58_59));
-        assertEquals("5:51", TimeUtils.timeToStrCompact(T_00_05_51));
-        assertEquals("0:09", TimeUtils.timeToStrCompact(T_00_00_09));
+        assertEquals("0:58:59", TimeUtils.timeToStrCompact(T_00_58_59));
+        assertEquals("0:05:51", TimeUtils.timeToStrCompact(T_00_05_51));
+        assertEquals("0:00:09", TimeUtils.timeToStrCompact(T_00_00_09));
         assertEquals("13:33:57", TimeUtils.timeToStrCompact(T_13_33_57, NOT_SET));
         assertEquals("", TimeUtils.timeToStrCompact(NOT_SET, NOT_SET));
         assertEquals("9:36:07", TimeUtils.timeToStrCompact(CAL));
         assertEquals("-13:33:57", TimeUtils.timeToStrCompact(-T_13_33_57));
-        assertEquals("-0:09", TimeUtils.timeToStrCompact(-T_00_00_09));
+        assertEquals("-0:00:09", TimeUtils.timeToStrCompact(-T_00_00_09));
     }
 
     @Test
@@ -76,6 +76,7 @@ public class TimeUtilsTest {
         assertEquals("-13h33m57s", TimeUtils.durationToStr(-T_13_33_57));
         assertEquals("-9h31m", TimeUtils.durationToStr(-T_09_31_00));
         assertEquals("-9s", TimeUtils.durationToStr(-T_00_00_09));
+        assertEquals("", TimeUtils.durationToStr(NOT_SET, NOT_SET));
     }
 
     @Test
@@ -83,18 +84,18 @@ public class TimeUtilsTest {
         Locale defaultLocale = Locale.getDefault();
         try {
             Locale.setDefault(Locale.FRANCE);
-            assertEquals("0 seconds", TimeUtils.timeMsToStrInSec(0));
-            assertEquals("0,001 seconds", TimeUtils.timeMsToStrInSec(1));
-            assertEquals("0,099 seconds", TimeUtils.timeMsToStrInSec(99));
-            assertEquals("0,10 seconds", TimeUtils.timeMsToStrInSec(100));
-            assertEquals("0,99 seconds", TimeUtils.timeMsToStrInSec(994));
-            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(995));
-            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(999));
-            assertEquals("1 second", TimeUtils.timeMsToStrInSec(1000));
-            assertEquals("1,0 seconds", TimeUtils.timeMsToStrInSec(1001));
-            assertEquals("9,9 seconds", TimeUtils.timeMsToStrInSec(9_949));
-            assertEquals("10 seconds", TimeUtils.timeMsToStrInSec(9_950));
-            assertEquals("-0,456 seconds", TimeUtils.timeMsToStrInSec(-456));
+            assertEquals("0 seconds", TimeUtils.msToSecondsStr(0));
+            assertEquals("0,001 seconds", TimeUtils.msToSecondsStr(1));
+            assertEquals("0,099 seconds", TimeUtils.msToSecondsStr(99));
+            assertEquals("0,10 seconds", TimeUtils.msToSecondsStr(100));
+            assertEquals("0,99 seconds", TimeUtils.msToSecondsStr(994));
+            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(995));
+            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(999));
+            assertEquals("1 second", TimeUtils.msToSecondsStr(1000));
+            assertEquals("1,0 seconds", TimeUtils.msToSecondsStr(1001));
+            assertEquals("9,9 seconds", TimeUtils.msToSecondsStr(9_949));
+            assertEquals("10 seconds", TimeUtils.msToSecondsStr(9_950));
+            assertEquals("-0,456 seconds", TimeUtils.msToSecondsStr(-456));
         }
         finally {
             Locale.setDefault(defaultLocale);

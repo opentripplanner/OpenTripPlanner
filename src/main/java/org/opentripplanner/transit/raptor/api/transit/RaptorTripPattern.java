@@ -35,4 +35,7 @@ public interface RaptorTripPattern {
      * Number of stops in pattern.
      */
     int numberOfStopsInPattern();
+
+    /** The transit mode for this pattern, used for debugging purposes only. */
+    String modeInfo();
 }

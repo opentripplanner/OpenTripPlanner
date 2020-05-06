@@ -75,7 +75,7 @@ public class SearchContext<T extends RaptorTripSchedule> {
             request.searchParams().numberOfAdditionalTransfers(),
             lifeCycle()
         );
-        this.pathMapper = createPathMapper(request);
+        this.pathMapper = createPathMapper(request, lifeCycle());
         this.timers = timers;
         this.debugFactory = new DebugHandlerFactory<>(debugRequest(request), lifeCycle());
     }
@@ -223,11 +223,12 @@ public class SearchContext<T extends RaptorTripSchedule> {
     }
 
     private static <S extends RaptorTripSchedule> PathMapper<S> createPathMapper(
-            RaptorRequest<S> request
+            RaptorRequest<S> request,
+            WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider())
-                : new ReversePathMapper<>(request.slackProvider());
+                ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
+                : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
     }
 
     private static CostCalculator createCostCalculator(int[] stopVisitCost, McCostParams f, WorkerLifeCycle lifeCycle) {
