@@ -138,6 +138,9 @@ public class CommandLineParameters implements Cloneable {
     @Parameter(names = { "--enableScriptingWebService" }, description = "enable scripting through a web-service (Warning! Very unsafe for public facing servers)")
     boolean enableScriptingWebService = false;
 
+    @Parameter(names = { "--sharedVehiclesApi" }, description = "API for fetching info about renable vehicles")
+    public String sharedVehiclesApi = null;
+
     /** Set some convenience parameters based on other parameters' values. */
     public void infer() {
         server |= (inMemory || preFlight || port != null);
@@ -153,6 +156,9 @@ public class CommandLineParameters implements Cloneable {
         if (server && securePort == null) {
             securePort = DEFAULT_SECURE_PORT;
             new AvailablePort().validate(securePort);
+        }
+        if (sharedVehiclesApi != null) {
+            System.setProperty("sharedVehiclesApi", sharedVehiclesApi);
         }
     }
 
