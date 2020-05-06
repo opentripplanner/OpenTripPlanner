@@ -66,7 +66,7 @@ public class PlainStreetEdgeTest {
     @Test
     public void testTraverseAsPedestrian() {
         StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        e1.setCarSpeed(10.0f);
+        e1.setMaxStreetTraverseSpeed(10.0f);
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.WALK);
@@ -85,7 +85,7 @@ public class PlainStreetEdgeTest {
     @Test
     public void testTraverseAsCar() {
         StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        e1.setCarSpeed(10.0f);
+        e1.setMaxStreetTraverseSpeed(10.0f);
 
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
@@ -95,7 +95,7 @@ public class PlainStreetEdgeTest {
         State s1 = e1.traverse(s0);
         
         // Should use the speed on the edge.
-        double expectedWeight = e1.getDistanceInMeters() / e1.getCarSpeed();
+        double expectedWeight = e1.getDistanceInMeters() / e1.getMaxStreetTraverseSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);

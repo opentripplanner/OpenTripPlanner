@@ -229,7 +229,7 @@ public class TurnCostTest {
 
         StreetTraversalPermission perm = StreetTraversalPermission.ALL;
         StreetEdge pse = new StreetEdge(vA, vB, geom, name, length, perm, back);
-        pse.setCarSpeed(1.0f);
+        pse.setMaxStreetTraverseSpeed(1.0f);
         return pse;
     }
 

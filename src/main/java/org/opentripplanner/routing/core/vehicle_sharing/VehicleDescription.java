@@ -3,7 +3,9 @@ package org.opentripplanner.routing.core.vehicle_sharing;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public abstract class VehicleDescription {
 
@@ -77,8 +79,11 @@ public abstract class VehicleDescription {
         return provider.getName();
     }
 
+    /**
+     * Returns maximum speed on given street. Trivial getter for most vehicles.
+     */
     @JsonIgnore
-    public abstract double getMaxSpeedInMetersPerSecond();
+    public abstract double getMaxSpeedInMetersPerSecond(StreetEdge streetEdge);
 
     @JsonIgnore
     public abstract TraverseMode getTraverseMode();

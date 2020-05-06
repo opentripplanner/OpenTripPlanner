@@ -292,7 +292,8 @@ public abstract class GraphPathToTripPlanConverter {
                     }
                     legIndexPairs = new int[]{i, states.length - 1};
                 }
-            } else if (backMode != forwardMode) {                       // Mode change => leg switch
+            } else if (backMode != forwardMode || states[i - 1].getCurrentVehicle() != states[i].getCurrentVehicle()) {          // Mode/Vehicle change => leg switch
+//              We can dropoff vehicle and rent another at the same node. Such situations must be detected.
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[]{i, states.length - 1};

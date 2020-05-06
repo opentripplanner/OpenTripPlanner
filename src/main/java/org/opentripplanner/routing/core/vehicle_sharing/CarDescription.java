@@ -1,6 +1,9 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+
+import static java.lang.Double.min;
 
 public class CarDescription extends VehicleDescription {
 
@@ -20,8 +23,8 @@ public class CarDescription extends VehicleDescription {
     }
 
     @Override
-    public double getMaxSpeedInMetersPerSecond() {
-        return MAX_SPEED_IN_METERS_PER_SECOND;
+    public double getMaxSpeedInMetersPerSecond(StreetEdge streetEdge) {
+        return min(MAX_SPEED_IN_METERS_PER_SECOND,streetEdge.getMaxStreetTraverseSpeed());
     }
 
     @Override

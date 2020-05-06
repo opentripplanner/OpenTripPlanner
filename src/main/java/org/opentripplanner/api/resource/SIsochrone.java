@@ -715,7 +715,7 @@ public class SIsochrone extends RoutingResource {
         if (usesCar) {
             if (edge instanceof StreetEdge) {
                 StreetEdge pe = (StreetEdge) edge;
-                userSpeed = pe.getCarSpeed();
+                userSpeed = pe.getMaxStreetTraverseSpeed();
                 // we need to check again if the originalTravelSpeed is faster
                 if ((isTooFast == true) && (originalTravelSpeed > userSpeed)
                         && (hasUshape == false)) {
