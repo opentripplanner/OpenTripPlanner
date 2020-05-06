@@ -1021,7 +1021,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                     streetRequest.streetSubRequestModes.setWalk(true);
                     streetRequest.parkAndRide = true;
                     break;
-                case TAXI:
+                case CAR_PICKUP:
                     streetRequest.streetSubRequestModes.setCar(true);
                     streetRequest.streetSubRequestModes.setWalk(true);
                     streetRequest.taxi = true;
