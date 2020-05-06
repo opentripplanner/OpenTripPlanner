@@ -4,11 +4,13 @@ public enum RoutingErrorCode {
   /**
    * Location was found, but it was located outside the street network.
    */
+  //TODO Currently not in use
   OUTSIDE_BOUNDS,
 
   /**
    * The time provided was outside the available service period.
    */
+  //TODO Currently not in use
   OUTSIDE_SERVICE_PERIOD,
 
   /**
