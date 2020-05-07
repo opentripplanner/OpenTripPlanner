@@ -11,6 +11,7 @@ import org.opentripplanner.routing.core.TraverseMode;
  */
 public class Itinerary {
 
+    public boolean usedNotRecommendedRoute = false;
     /**
      * Duration of the trip on this itinerary, in seconds.
      */

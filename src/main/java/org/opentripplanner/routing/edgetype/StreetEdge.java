@@ -466,6 +466,9 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
+        if(!canTraverse(options, traverseMode)){
+            s1.setUsedNotRecommendedRoutes();
+        }
         s1.incrementTimeInSeconds(roundedTime);
         s1.incrementWalkDistanceInMeters(getDistanceInMeters());
         s1.incrementWeight(weight);
