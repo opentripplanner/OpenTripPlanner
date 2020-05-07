@@ -107,10 +107,10 @@ public class State implements Cloneable {
         this.stateData.usingRentedBike = false;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-        if (options.taxi) {
-            this.stateData.taxiState = options.arriveBy
-                ? TaxiState.WALK_FROM_DROP_OFF
-                : TaxiState.WALK_TO_PICKUP;
+        if (options.carPickup) {
+            this.stateData.carPickupState = options.arriveBy
+                ? CarPickupState.WALK_FROM_DROP_OFF
+                : CarPickupState.WALK_TO_PICKUP;
             this.stateData.nonTransitMode = TraverseMode.WALK;
         }
         if (options.parkAndRide) {
@@ -166,8 +166,8 @@ public class State implements Cloneable {
                 " pr=" + this.isCarParked() + ">";
     }
 
-    public TaxiState getTaxiState() {
-        return stateData.taxiState;
+    public CarPickupState getTaxiState() {
+        return stateData.carPickupState;
     }
     
     /** Returns time in seconds since epoch */
@@ -214,7 +214,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
             // Checks that taxi has actually been used
-            taxiOk = getTaxiState() != TaxiState.WALK_FROM_DROP_OFF;
+            taxiOk = getTaxiState() != CarPickupState.WALK_FROM_DROP_OFF;
         } else {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
@@ -222,7 +222,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
             // Checks that taxi has actually been used
-            taxiOk = getTaxiState() != TaxiState.WALK_TO_PICKUP;
+            taxiOk = getTaxiState() != CarPickupState.WALK_TO_PICKUP;
         }
         return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && taxiOk;
     }
@@ -349,7 +349,7 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
-        newState.stateData.taxiState = stateData.taxiState;
+        newState.stateData.carPickupState = stateData.carPickupState;
         return newState;
     }
 

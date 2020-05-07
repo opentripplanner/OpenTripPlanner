@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.core;
 
-public enum TaxiState {
+public enum CarPickupState {
   WALK_TO_PICKUP,
-  IN_TAXI,
+  IN_CAR,
   WALK_FROM_DROP_OFF
 }

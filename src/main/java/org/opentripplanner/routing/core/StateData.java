@@ -24,7 +24,7 @@ public class StateData implements Cloneable {
 
     protected boolean hasUsedRentedBike;
 
-    protected TaxiState taxiState;
+    protected CarPickupState carPickupState;
 
     protected RoutingRequest opt;
 
