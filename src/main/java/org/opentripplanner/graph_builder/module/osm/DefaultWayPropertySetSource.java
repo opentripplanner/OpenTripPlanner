@@ -477,7 +477,7 @@ public class DefaultWayPropertySetSource implements WayPropertySetSource {
         /* and some names */
         // Basics
         props.createNames("highway=cycleway", "name.bike_path");
-        props.createNames("cycleway=track", "name.bike_path2");
+        props.createNames("cycleway=track", "name.bike_path");
         props.createNames("highway=pedestrian", "name.pedestrian_path");
         props.createNames("highway=pedestrian;area=yes", "name.pedestrian_area");
         props.createNames("highway=path", "name.path");
