@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -37,24 +38,21 @@ public class TransferStopArrivalTest {
 
     private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_TO_STOP,
-            ACCESS_DEPARTURE_TIME,
-            ACCESS_DURATION,
-            ACCESS_COST,
-            null
+        ACCESS_DEPARTURE_TIME,
+        ACCESS_COST,
+        new TestRaptorTransfer(ACCESS_TO_STOP, ACCESS_DURATION)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
-            ACCESS_ARRIVAL,
+            ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_TO_STOP,
-            TRANSIT_ALIGHT_TIME,
             TRANSIT_BOARD_TIME,
-            TRANSIT_TRIP,
-            ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION,
-            TRANSIT_COST
+            TRANSIT_ALIGHT_TIME,
+            TRANSIT_COST,
+            TRANSIT_TRIP
     );
 
-    private TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
+    private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
             new TestLeg(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
             TRANSFER_ALIGHT_TIME,

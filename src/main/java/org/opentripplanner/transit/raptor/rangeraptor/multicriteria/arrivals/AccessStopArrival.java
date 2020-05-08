@@ -13,20 +13,8 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public final class AccessStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
     private final RaptorTransfer access;
 
-    public AccessStopArrival(
-        int stop,
-        int departureTime,
-        int accessDurationInSeconds,
-        int cost,
-        RaptorTransfer access
-    ) {
-        super(
-                stop,
-                departureTime,
-                departureTime + accessDurationInSeconds,
-                accessDurationInSeconds,
-                cost
-        );
+    public AccessStopArrival(int departureTime, int cost, RaptorTransfer access) {
+        super(access.stop(), departureTime, access.durationInSeconds(), cost);
         this.access = access;
     }
 
@@ -37,5 +25,18 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
 
     public boolean arrivedByAccessLeg() {
         return true;
+    }
+
+    @Override
+    public AbstractStopArrival<T> timeShiftNewArrivalTime(int newRequestedArrivalTime) {
+        int latestArrivalTime = access.latestArrivalTime(newRequestedArrivalTime);
+
+        if(latestArrivalTime == -1) { return this; }
+
+        int timeShift = latestArrivalTime - arrivalTime();
+
+        return timeShift == 0
+            ? this
+            : new AccessStopArrival<>(departureTime() + timeShift, cost(), access);
     }
 }

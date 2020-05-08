@@ -41,6 +41,24 @@ public class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
+    public int relativePatternBoardCost(
+        int prevStopArrivalCost,
+        int boardWaitTime,
+        int relativeTransitTime,
+        int boardStop
+    ) {
+        int cost = prevStopArrivalCost
+            + waitFactorApplied * boardWaitTime
+            + transitFactor * relativeTransitTime
+            + boardCost;
+
+        if(stopVisitCost != null) {
+            cost += stopVisitCost[boardStop];
+        }
+        return cost;
+    }
+
+    @Override
     public int transitArrivalCost(int waitTime, int transitTime, int fromStop, int toStop) {
         int cost = waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
         if(stopVisitCost != null) {

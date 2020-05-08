@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -36,21 +37,18 @@ public class TransitStopArrivalTest {
     private static final TransitCalculator TRANSIT_CALCULATOR = testDummyCalculator(true);
 
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_TO_STOP,
             ACCESS_DEPARTURE_TIME,
-            ACCESS_DURATION,
             ACCESS_COST,
-            null
+            new TestRaptorTransfer(ACCESS_TO_STOP, ACCESS_DURATION)
     );
 
     private final TransitStopArrival<RaptorTripSchedule> subject = new TransitStopArrival<>(
-            ACCESS_ARRIVAL,
+            ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_TO_STOP,
-            TRANSIT_ALIGHT_TIME,
             TRANSIT_BOARD_TIME,
-            TRANSIT_TRIP,
-            TRANSIT_TRAVEL_DURATION,
-            TRANSIT_COST
+            TRANSIT_ALIGHT_TIME,
+            TRANSIT_COST,
+            TRANSIT_TRIP
     );
 
 
@@ -105,8 +103,8 @@ public class TransitStopArrivalTest {
     }
 
     @Test
-    public void previous() {
-        assertSame(ACCESS_ARRIVAL, subject.previous());
+    public void access() {
+        assertSame(ACCESS_ARRIVAL.accessEgress(), subject.previous().accessEgress());
     }
 
     @Test

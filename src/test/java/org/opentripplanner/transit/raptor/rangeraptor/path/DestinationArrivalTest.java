@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 
@@ -32,21 +33,18 @@ public class DestinationArrivalTest {
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_STOP,
             ACCESS_DEPARTURE_TIME,
-            ACCESS_DURATION_TIME,
             ACCESS_COST,
-            null
+            new TestRaptorTransfer(ACCESS_STOP, ACCESS_DURATION_TIME)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
-            ACCESS_ARRIVAL,
+            ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_STOP,
-            TRANSIT_ALIGHT_TIME,
             TRANSIT_BOARD_TIME,
-            A_TRIP,
-            ACCESS_DURATION_TIME + BOARD_SLACK + TRANSIT_ALIGHT_TIME - TRANSIT_BOARD_TIME,
-            TRANSIT_COST
+            TRANSIT_ALIGHT_TIME,
+            TRANSIT_COST,
+            A_TRIP
     );
 
     private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(

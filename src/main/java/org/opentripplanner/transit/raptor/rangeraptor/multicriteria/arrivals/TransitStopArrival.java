@@ -11,13 +11,19 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 public final class TransitStopArrival<T extends RaptorTripSchedule> extends AbstractStopArrival<T> {
     private final T trip;
 
-    public TransitStopArrival(AbstractStopArrival<T> previousState, int stopIndex, int arrivalTime, int boardTime, T trip, int travelDuration, int additionalCost) {
+    public TransitStopArrival(
+        AbstractStopArrival<T> previousState,
+        int stopIndex,
+        int boardTime,
+        int arrivalTime,
+        int additionalCost,
+        T trip
+    ) {
         super(
                 previousState,
                 stopIndex,
                 boardTime,
                 arrivalTime,
-                travelDuration,
                 additionalCost
         );
         this.trip = trip;

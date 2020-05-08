@@ -15,7 +15,6 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
                 transferLeg.stop(),
                 arrivalTime - transferLeg.durationInSeconds(),
                 arrivalTime,
-                previousState.travelDuration() + transferLeg.durationInSeconds(),
                 additionalCost
         );
     }
