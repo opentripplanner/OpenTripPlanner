@@ -38,16 +38,16 @@ public class ReversePathMapperTest {
         assertEquals("Access 10:00-10:03(3m) -> Stop 1", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T1 10:05-10:35(30m) -> Stop 2", leg.toString());
+        assertEquals("BUS T1 10:05-10:35(30m) -> Stop 2", leg.toString());
 
         leg = leg.nextLeg();
         assertEquals("Walk 10:36-10:39(3m) -> Stop 3", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T2 11:00-11:23(23m) -> Stop 4", leg.toString());
+        assertEquals("BUS T2 11:00-11:23(23m) -> Stop 4", leg.toString());
 
         leg = leg.nextLeg();
-        assertEquals("T3 11:40-11:52(12m) -> Stop 5", leg.toString());
+        assertEquals("BUS T3 11:40-11:52(12m) -> Stop 5", leg.toString());
 
         leg = leg.nextLeg();
         assertEquals("Egress 11:53-12:00(7m)", leg.toString());
@@ -60,8 +60,8 @@ public class ReversePathMapperTest {
         assertEquals(60, path.cost());
 
         assertEquals(
-                "Walk 3m ~ 1 ~ BUS 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
-                        + "BUS 11:00 11:23 ~ 4 ~ BUS 11:40 11:52 ~ 5 ~ Walk 7m "
+                "Walk 3m ~ 1 ~ BUS T1 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
+                        + "BUS T2 11:00 11:23 ~ 4 ~ BUS T3 11:40 11:52 ~ 5 ~ Walk 7m "
                         + "[10:00:00 12:00:00 2h, cost: 60]",
                 path.toString()
         );

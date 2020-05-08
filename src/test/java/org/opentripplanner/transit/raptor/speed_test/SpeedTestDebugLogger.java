@@ -71,7 +71,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private void print(ArrivalView<?> a, String action, String optReason) {
-        String trip = a.arrivedByTransit() ? a.trip().debugInfo() : "";
+        String pattern = a.arrivedByTransit() ? a.trip().pattern().debugInfo() : "";
         print(
                 action,
                 a.round(),
@@ -79,7 +79,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
                 a.stop(),
                 a.arrivalTime(),
                 a.cost(),
-                trip,
+                pattern,
                 details(action, optReason, path(a))
         );
     }
@@ -102,7 +102,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            buf.transit(a.trip().pattern().modeInfo(), a.departureTime(), a.arrivalTime());
+            buf.transit(a.trip().pattern().debugInfo(),  a.departureTime(), a.arrivalTime());
         } else {
             buf.walk(legDuration(a));
         }
@@ -137,7 +137,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         );
     }
 
-    private void print(String action, int round, String leg, int toStop, int toTime, int cost, String trip, String details) {
+    private void print(String action, int round, String leg, int toStop, int toTime, int cost, String pattern, String details) {
         System.err.printf(
                 "%-9s | %-8s | %2d  | %5s | %8s | %8d | %-24s | %s %n",
                 center(action, 9),
@@ -146,7 +146,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
                 IntUtils.intToString(toStop, NOT_SET),
                 TimeUtils.timeToStrLong(toTime),
                 cost,
-                trip,
+                pattern,
                 details
         );
     }

@@ -26,8 +26,8 @@ public class PathStringBuilder {
         return append("Walk ").duration(duration);
     }
 
-    public PathStringBuilder transit(String mode, int fromTime, int toTime) {
-        return append(mode).append(" ").time(fromTime, toTime);
+    public PathStringBuilder transit(String description, int fromTime, int toTime) {
+        return append(description).append(" ").time(fromTime, toTime);
     }
 
     @Override

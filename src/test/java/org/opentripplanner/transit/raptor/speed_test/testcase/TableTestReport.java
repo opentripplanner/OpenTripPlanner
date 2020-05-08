@@ -1,5 +1,7 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
+import org.opentripplanner.transit.raptor.util.TimeUtils;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
@@ -47,8 +49,8 @@ public class TableTestReport {
                 result.transfers,
                 result.durationAsStr(),
                 result.cost,
-                result.startTimeAsStr(),
-                result.endTimeAsStr(),
+                TimeUtils.timeToStrLong(result.startTime),
+                TimeUtils.timeToStrLong(result.endTime),
                 toStr(result.modes),
                 toStr(result.agencies),
                 toStr(result.routes),

@@ -32,7 +32,7 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         @Override public int numberOfStopsInPattern() { return stopIndexes.length; }
 
         @Override
-        public String modeInfo() { return "BUS"; }
+        public String debugInfo() { return "BUS " + name; }
 
         private boolean isNotRestricted(int index, int mask) {
             return restrictions == null || (restrictions[index] & mask) > 0;
@@ -57,11 +57,6 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
     @Override
     public int departure(int stopPosInPattern) {
         return departureTimes[stopPosInPattern];
-    }
-
-    @Override
-    public String debugInfo() {
-        return name;
     }
 
     @Override

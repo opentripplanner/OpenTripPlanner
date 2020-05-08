@@ -137,7 +137,7 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                         + " [FromStop: " + fromStop
                         + ", toStop: " + toStop
                         + ", " + lbl + ": " + TimeUtils.timeToStrLong(time)
-                        + ", schedule: " + schedule.debugInfo() + "]"
+                        + ", pattern: " + schedule.pattern().debugInfo() + "]"
         );
     }
 
