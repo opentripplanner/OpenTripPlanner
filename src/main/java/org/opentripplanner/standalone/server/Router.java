@@ -4,6 +4,7 @@ import ch.qos.logback.classic.Level;
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
+import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
@@ -75,6 +76,7 @@ public class Router {
             this.requestLogger = createLogger(routerConfig.requestLogFile());
             LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile());
         } else {
+            this.requestLogger = createConsoleLogger();
             LOG.info("Incoming requests will not be logged.");
         }
 
@@ -129,6 +131,23 @@ public class Router {
         fileAppender.start();
         ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("REQ_LOG");
         logger.addAppender(fileAppender);
+        logger.setLevel(Level.INFO);
+        logger.setAdditive(false);
+        return logger;
+    }
+
+    private static ch.qos.logback.classic.Logger createConsoleLogger(){
+        LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
+        PatternLayoutEncoder ple = new PatternLayoutEncoder();
+        ple.setPattern("%d{yyyy-MM-dd'T'HH:mm:ss.SSS} %msg%n");
+        ple.setContext(lc);
+        ple.start();
+        ConsoleAppender<ILoggingEvent> consoleAppender = new ConsoleAppender<>();
+        consoleAppender.setEncoder(ple);
+        consoleAppender.setContext(lc);
+        consoleAppender.start();
+        ch.qos.logback.classic.Logger logger = (ch.qos.logback.classic.Logger) LoggerFactory.getLogger("REQ_LOG");
+        logger.addAppender(consoleAppender);
         logger.setLevel(Level.INFO);
         logger.setAdditive(false);
         return logger;

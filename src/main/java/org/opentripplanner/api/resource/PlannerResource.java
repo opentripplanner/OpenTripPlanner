@@ -101,21 +101,23 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
             sb.append(' ');
-            sb.append(request.streetSubRequestModes.getAsStr());
-            sb.append(' ');
+            sb.append(request.modes.transitModes);
+            sb.append(" [");
             sb.append(request.from.lat);
-            sb.append(' ');
+            sb.append(',');
             sb.append(request.from.lng);
-            sb.append(' ');
+            sb.append("] [");
             sb.append(request.to.lat);
-            sb.append(' ');
+            sb.append(',');
             sb.append(request.to.lng);
-            sb.append(' ');
+            sb.append("] ");
             if (res != null) {
+                sb.append(" <");
                 for (Itinerary it : res.getTripPlan().itineraries) {
                     sb.append(it.durationSeconds);
-                    sb.append(' ');
+                    sb.append(",");
                 }
+                sb.append("> ");
             }
             router.requestLogger.info(sb.toString());
         }
