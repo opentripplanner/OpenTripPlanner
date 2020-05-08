@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 
+import static java.lang.Double.min;
+
 /**
  * This represents a street segment.
  *
@@ -270,9 +272,6 @@ public class StreetEdge extends Edge implements Cloneable {
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
         if (!canTraverse(options, traverseMode) &&
                 !(traverseMode==TraverseMode.BICYCLE && canTraverse(options, TraverseMode.WALK))) {
-//            if (traverseMode == TraverseMode.BICYCLE) {
-//                return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
-//            }
             return null;
         }
 
@@ -504,7 +503,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if(currentVehicle != null){
             maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond(this);
         }
-        return maxVehicleSpeed;
+        return min(maxVehicleSpeed,getMaxStreetTraverseSpeed());
     }
 
     @Override

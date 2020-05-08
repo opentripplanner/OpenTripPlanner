@@ -27,9 +27,9 @@ public class KickScooterDescription extends VehicleDescription {
     @Override
     public double getMaxSpeedInMetersPerSecond(StreetEdge streetEdge) {
         if (streetEdge.canTraverseIncludingBarrier(TraverseMode.BICYCLE))
-            return min(MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH, streetEdge.getMaxStreetTraverseSpeed());
+            return MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH;
         else
-            return min(MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH, streetEdge.getMaxStreetTraverseSpeed());
+            return MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH;
     }
 
     @Override

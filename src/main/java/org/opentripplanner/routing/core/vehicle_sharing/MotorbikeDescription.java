@@ -24,7 +24,7 @@ public class MotorbikeDescription extends VehicleDescription {
 
     @Override
     public double getMaxSpeedInMetersPerSecond(StreetEdge streetEdge) {
-        return min(MAX_SPEED_IN_METERS_PER_SECOND,streetEdge.getMaxStreetTraverseSpeed());
+        return MAX_SPEED_IN_METERS_PER_SECOND;
     }
 
     @Override
