@@ -40,7 +40,7 @@ public class VehiclePositionsDiff {
                 return new MotorbikeDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
             case KICKSCOOTER:
                 return new KickScooterDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
-            default: // TODO (AdamWiktor) Add support for kickscooter
+            default:
                 LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
                 return null;
         }

@@ -185,12 +185,7 @@ public abstract class GraphPathToTripPlanConverter {
             itinerary.transfers--;
         }
         itinerary.itineraryType = generateItineraryType(itinerary.legs);
-        for(State state :path.states){
-            if(state.usedNotRecommendedRoute){
-                itinerary.usedNotRecommendedRoute = true;
-                break;
-            }
-        }
+        itinerary.usedNotRecommendedRoute = path.states.stream().anyMatch(s -> s.usedNotRecommendedRoute);
         return itinerary;
     }
 

@@ -240,6 +240,10 @@ public class StreetEdge extends Edge implements Cloneable {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
     }
 
+    private boolean canWalkBike(TraverseMode mode, RoutingRequest options) {
+        return mode == TraverseMode.BICYCLE && canTraverse(options, TraverseMode.WALK);
+    }
+
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
@@ -270,8 +274,7 @@ public class StreetEdge extends Edge implements Cloneable {
         walkingBike &= TraverseMode.WALK.equals(traverseMode);
 
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
-        if (!canTraverse(options, traverseMode) &&
-                !(traverseMode==TraverseMode.BICYCLE && canTraverse(options, TraverseMode.WALK))) {
+        if (!canTraverse(options, traverseMode) && !(canWalkBike(traverseMode, options))) {
             return null;
         }
 
@@ -465,7 +468,7 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
-        if(!canTraverse(options, traverseMode)){
+        if(!canTraverse(options, traverseMode)) { // Walking bike/kickscooter
             s1.setUsedNotRecommendedRoutes();
         }
         s1.incrementTimeInSeconds(roundedTime);
@@ -500,7 +503,7 @@ public class StreetEdge extends Edge implements Cloneable {
      */
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, VehicleDescription currentVehicle, long timeMillis) {
         double maxVehicleSpeed = options.getSpeed(traverseMode);
-        if(currentVehicle != null){
+        if(currentVehicle != null) {
             maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond(this);
         }
         return min(maxVehicleSpeed,getMaxStreetTraverseSpeed());

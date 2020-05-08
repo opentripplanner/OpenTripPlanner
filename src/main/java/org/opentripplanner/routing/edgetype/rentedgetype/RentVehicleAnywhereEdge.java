@@ -46,8 +46,6 @@ public class RentVehicleAnywhereEdge extends Edge {
         } else if (s0.getOptions().reverseOptimizing) {
             return null; // TODO AdamWiktor return something useful to enable reverse optimizing
         } else {
-            if(availableVehicles.isEmpty())
-                return null;
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
                     .filter(v -> s0.getOptions().vehiclesAllowedToRent.isRentable(v))
                     .collect(Collectors.toList());

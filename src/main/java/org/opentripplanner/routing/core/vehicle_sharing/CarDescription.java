@@ -3,8 +3,6 @@ package org.opentripplanner.routing.core.vehicle_sharing;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
-import static java.lang.Double.min;
-
 public class CarDescription extends VehicleDescription {
 
     private static final double MAX_SPEED_IN_METERS_PER_SECOND = 40;
