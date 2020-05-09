@@ -1,23 +1,21 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
+import org.opentripplanner.transit.raptor._shared.Access;
+import org.opentripplanner.transit.raptor._shared.Bus;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.searchAfterEDT;
-import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.searchBeforeLAT;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripForwardSearch;
+import static org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch.findTripReverseSearch;
 
 public class TripTimesSearchTest {
 
     // The route have 3 stops A,B,C with the following indexes:
     public static final int STOP_A_INDEX = 111;
     public static final int STOP_C_INDEX = 333;
-
-    // The stop between A and C have the following stop position in the pattern
-    public static final int STOP_A_POS = 0;
-    public static final int STOP_C_POS = 2;
 
     public static final int A_BOARD_TIME = 110;
     public static final int C_ALIGHT_TIME = 300;
@@ -35,16 +33,16 @@ public class TripTimesSearchTest {
 
     @Test
     public void findTripWithPlentySlack() {
-        TripTimesSearch.Result r;
+        TripTimesSearch.BoarAlightTimes r;
 
         // Search AFTER EDT
-        r = searchAfterEDT(schedule, STOP_A_INDEX, STOP_C_INDEX, A_BOARD_EARLY);
+        r = findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_LATE));
 
         assertEquals(A_BOARD_TIME, r.boardTime);
         assertEquals(C_ALIGHT_TIME, r.alightTime);
 
         // Search BEFORE LAT
-        r = searchBeforeLAT(schedule, STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_LATE);
+        r = findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_EARLY));
 
         assertEquals(A_BOARD_TIME, r.boardTime);
         assertEquals(C_ALIGHT_TIME, r.alightTime);
@@ -52,84 +50,74 @@ public class TripTimesSearchTest {
 
     @Test
     public void findTripWithoutSlack() {
-        TripTimesSearch.Result r;
+        TripTimesSearch.BoarAlightTimes r;
 
         // Search AFTER EDT
-        r = searchAfterEDT(schedule, STOP_A_INDEX, STOP_C_INDEX, A_BOARD_TIME);
+        r = findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME));
 
         assertEquals(A_BOARD_TIME, r.boardTime);
         assertEquals(C_ALIGHT_TIME, r.alightTime);
 
 
         // Search BEFORE LAT
-        r = searchBeforeLAT(schedule, STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME);
+        r = findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_TIME));
 
         assertEquals(A_BOARD_TIME, r.boardTime);
         assertEquals(C_ALIGHT_TIME, r.alightTime);
     }
 
     @Test
-    public void noTripFoundWhenDepartureIsToLate() {
-        try {
-            int oneSecondAfterLastDeparture = schedule.departure(STOP_C_POS) + 1;
-            searchAfterEDT(schedule, STOP_A_INDEX, STOP_C_INDEX, oneSecondAfterLastDeparture);
-            fail();
-        }
-        catch (IllegalStateException e) {
-            assertTrue(
-                    e.getMessage(),
-                    e.getMessage().contains("No departures after earliest-departure-time")
-            );
-        }
-    }
-
-    @Test
     public void noTripFoundWhenArrivalIsToEarly() {
         try {
-            int oneSecondBeforeFirstArrival = schedule.arrival(STOP_A_POS) - 1;
-            searchBeforeLAT(schedule, STOP_A_INDEX, STOP_C_INDEX, oneSecondBeforeFirstArrival);
+            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME - 1));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                     e.getMessage(),
-                    e.getMessage().contains("No arrivals before latest-arrival-time")
+                    e.getMessage().contains("No stops matching 'toStop'.")
             );
         }
     }
 
     @Test
-    public void noTripFoundMatchingFromStop() {
+    public void noTripFoundWhenReverseArrivalIsToLate() {
         try {
-            searchAfterEDT(schedule, STOP_A_INDEX, STOP_C_INDEX, A_BOARD_TIME + 1);
-            fail();
-        }
-        catch (IllegalStateException e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'fromStop'"));
-        }
-    }
-
-    @Test
-    public void noTripFoundMatchingToStop() {
-        try {
-            searchBeforeLAT(schedule, STOP_A_INDEX, STOP_C_INDEX, C_ALIGHT_TIME -1);
-            fail();
-        }
-        catch (IllegalStateException e) {
-            assertTrue(e.getMessage(), e.getMessage().contains("No stops matching 'toStop'"));
-        }
-    }
-
-    @Test
-    public void noTripFoundWhenToStopIsMissing() {
-        try {
-            searchAfterEDT(schedule, STOP_A_INDEX, STOP_A_INDEX, A_BOARD_EARLY);
+            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, A_BOARD_TIME + 1));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                     e.getMessage(),
-                    e.getMessage().contains("No stops matching 'toStop'")
+                    e.getMessage().contains("No stops matching 'fromStop'.")
+            );
+        }
+    }
+
+    @Test
+    public void noTripFoundWhenArrivalIsWayTooEarly() {
+        try {
+            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_C_INDEX, 0));
+            fail();
+        }
+        catch (IllegalStateException e) {
+            assertTrue(
+                e.getMessage(),
+                e.getMessage().contains("No arrivals before 'latestArrivalTime'")
+            );
+        }
+    }
+
+    @Test
+    public void noTripFoundWhenReverseArrivalIsWayTooEarly() {
+        try {
+            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_A_INDEX, 10_000));
+            fail();
+        }
+        catch (IllegalStateException e) {
+            assertTrue(
+                e.getMessage(),
+                e.getMessage().contains("No departures after 'earliestDepartureTime'")
             );
         }
     }
@@ -137,13 +125,27 @@ public class TripTimesSearchTest {
     @Test
     public void noTripFoundWhenFromStopIsMissing() {
         try {
-            searchBeforeLAT(schedule, STOP_C_INDEX, STOP_C_INDEX, C_ALIGHT_LATE);
+            findTripForwardSearch(busFwd(STOP_A_INDEX, STOP_A_INDEX, C_ALIGHT_LATE));
             fail();
         }
         catch (IllegalStateException e) {
             assertTrue(
                     e.getMessage(),
                     e.getMessage().contains("No stops matching 'fromStop'")
+            );
+        }
+    }
+
+    @Test
+    public void noTripFoundWhenToStopIsMissingInReverseSearch() {
+        try {
+            findTripReverseSearch(busRwd(STOP_C_INDEX, STOP_C_INDEX, A_BOARD_EARLY));
+            fail();
+        }
+        catch (IllegalStateException e) {
+            assertTrue(
+                    e.getMessage(),
+                    e.getMessage().contains("No stops matching 'toStop'")
             );
         }
     }
@@ -155,53 +157,62 @@ public class TripTimesSearchTest {
     @Test
     public void findTripWhenScheduleLoops() {
         // Create a trip schedule that run in a 2 loops with a stop before and after the loop
-        // stops: Start at 111, loop twice: 11, 22, 33, 44, 55, and end at 555
-        // alight times:    [  -, 100, 200, 300, 400 ...] and
-        // departure times: [ 10, 110, 210, 310, 410 ...].
-
-        TestRaptorTripSchedule schedule = TestRaptorTripSchedule
+        // stops: Start at 1, loop twice: 111, 122, 133, 144, 155, and end at 1155
+        // alight times:    [  -, 100, 200, 300, 400, .., 1100] and
+        // departure times: [ 10, 110, 210, 310, 410, .., 1110].
+        schedule = TestRaptorTripSchedule
                 .create("T2")
-                .withBoardTimes(10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
-                .withAlightTimes(0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
-                .withStopIndexes(111, 11, 22, 33, 44, 55, 11, 22, 33, 44, 55, 555)
+                .withBoardTimes( 10, 110, 210, 310, 410, 510, 610, 710, 810, 910, 1010, 1110)
+                .withAlightTimes( 0, 100, 200, 300, 400, 500, 600, 700, 800, 900, 1000, 1100)
+                .withStopIndexes( 1, 111, 122, 133, 144, 155, 111, 122, 133, 144,  155, 1155)
                 .build();
 
-        TripTimesSearch.Result r;
+        TripTimesSearch.BoarAlightTimes r;
 
-        // TEST THE searchAfterEDT(...)
+        // TEST FORWARD SEARCH
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
-            r = searchAfterEDT(schedule, 22, 33, 600);
+            r = findTripForwardSearch(busFwd( 122, 133, 800));
             assertEquals(710, r.boardTime);
             assertEquals(800, r.alightTime);
 
             // Board in the 1st loop at stop 4 and get off at stop 3
-            r = searchAfterEDT(schedule, 44, 33, 400);
+            r = findTripForwardSearch(busFwd(144, 133, 800));
             assertEquals(410, r.boardTime);
             assertEquals(800, r.alightTime);
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
-            r = searchAfterEDT(schedule, 111, 555, 10);
+            r = findTripForwardSearch(busFwd(1, 1155, 1100));
             assertEquals(10, r.boardTime);
             assertEquals(1100, r.alightTime);
         }
 
-        // REPEAT THE SAME TESTS, BUT USE THE searchBeforeLAT(...) METHOD INSTEAD
+        // TEST REVERSE SEARCH
         {
             // Board in the 2nd loop at stop 2 and get off at stop 3
-            r = searchBeforeLAT(schedule, 22, 33, 800);
+            r = findTripReverseSearch(busRwd(133, 122, 710));
             assertEquals(710, r.boardTime);
             assertEquals(800, r.alightTime);
 
             // Board in the 1st loop at stop 4 and get off at stop 3
-            r = searchBeforeLAT(schedule, 44, 33, 800);
+            r = findTripReverseSearch(busRwd(133, 144, 410));
             assertEquals(410, r.boardTime);
             assertEquals(800, r.alightTime);
 
             // Board in the 1st stop, ride the loop twice, alight at the last stop
-            r = searchBeforeLAT(schedule, 111, 555, 1100);
+            r = findTripReverseSearch(busRwd( 1155, 1, 10));
             assertEquals(10, r.boardTime);
             assertEquals(1100, r.alightTime);
         }
+    }
+
+    Bus busFwd(int accessToStop, int transitToStop, int arrivalTime) {
+        Access access = new Access(accessToStop, -9999, -9999);
+        return new Bus(1, transitToStop, -9999, arrivalTime, schedule, access);
+    }
+
+    Bus busRwd(int accessToStop, int transitToStop, int arrivalTime) {
+        Access access = new Access(accessToStop, -9999, -9999);
+        return new Bus(1, transitToStop, -9999, arrivalTime, schedule, access);
     }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.TransferLegView;
 
 /**
  *
@@ -20,17 +21,18 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
     }
 
     @Override
-    public int transferFromStop() {
-        return previousStop();
-    }
-
-    @Override
-    public RaptorTransfer accessEgress() {
-        throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
-    }
-
-    @Override
     public boolean arrivedByTransfer() {
         return true;
+    }
+
+    @Override
+    public TransferLegView transferLeg() {
+        return () -> durationInSeconds();
+    }
+
+    private int durationInSeconds() {
+        // We do not keep the reference to the TransitLayer transfer(RaptorTransfer),
+        // so we compute the duration.
+        return arrivalTime() - previous().arrivalTime();
     }
 }

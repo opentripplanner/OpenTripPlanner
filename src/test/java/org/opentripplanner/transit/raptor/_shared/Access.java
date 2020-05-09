@@ -1,8 +1,20 @@
 package org.opentripplanner.transit.raptor._shared;
 
-class Access extends AbstractStopArrival {
-    Access(int stop, int departureTime, int arrivalTime) {
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
+import org.opentripplanner.transit.raptor.api.view.AccessLegView;
+
+public class Access extends AbstractStopArrival {
+
+    private final RaptorTransfer access;
+
+    public Access(int stop, int departureTime, int arrivalTime) {
         super(0, stop, departureTime, arrivalTime, 1000, null);
+        this.access = new TestRaptorTransfer(stop, arrivalTime - departureTime);
     }
     @Override public boolean arrivedByAccessLeg() { return true; }
+
+    @Override
+    public AccessLegView accessLeg() {
+        return () -> access;
+    }
 }

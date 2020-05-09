@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor._shared;
 
 
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 
 abstract class AbstractStopArrival implements ArrivalView<TestRaptorTripSchedule> {
@@ -27,11 +26,6 @@ abstract class AbstractStopArrival implements ArrivalView<TestRaptorTripSchedule
         this.arrivalTime = arrivalTime;
         this.cost = (previous==null ? 0 : previous.cost()) + extraCost;
         this.previous = previous;
-    }
-
-    @Override
-    public RaptorTransfer accessEgress() {
-        return null;
     }
 
     @Override public int stop() { return stop; }

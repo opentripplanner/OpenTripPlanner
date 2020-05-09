@@ -144,7 +144,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         int departureTime = calculator.departureTime(it, iterationDepartureTime);
 
         // This access is not available after the iteration departure time
-        if (departureTime == -1) return;
+        if (departureTime == -1) { return; }
 
         state.setInitialTimeForIteration(it, departureTime);
     }

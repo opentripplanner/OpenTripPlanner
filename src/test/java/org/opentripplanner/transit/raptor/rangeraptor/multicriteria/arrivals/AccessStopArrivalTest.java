@@ -2,7 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -41,11 +41,6 @@ public class AccessStopArrivalTest {
     }
 
     @Test
-    public void departureTime() {
-        assertEquals(DEPARTURE_TIME, subject.departureTime());
-    }
-
-    @Test
     public void cost() {
         assertEquals(COST, subject.cost());
     }
@@ -75,7 +70,7 @@ public class AccessStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "AccessStopArrival { Rnd: 0, Stop: 100, Time: 8:10 (8:00), Cost: 500 }",
+                "Access { stop: 100, duration: 10m, arrival-time: 8:10, cost: 500 }",
                 subject.toString()
         );
     }
@@ -91,7 +86,7 @@ public class AccessStopArrivalTest {
         assertEquals(subject.travelDuration(), result.travelDuration());
         assertEquals(subject.round(), result.round());
         assertEquals(subject.stop(), result.stop());
-        assertEquals(subject.accessEgress(), result.accessEgress());
+        assertSame(subject.accessLeg().access(), result.accessLeg().access());
         assertEquals(subject.arrivedByAccessLeg(), result.arrivedByAccessLeg());
     }
 

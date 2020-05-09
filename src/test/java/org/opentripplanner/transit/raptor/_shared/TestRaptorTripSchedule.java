@@ -72,8 +72,8 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
     public String toString() {
         return ToStringBuilder
                 .of(TestRaptorTripSchedule.class)
-                .addAsHhMm("arrivals", arrivalTimes)
-                .addAsHhMm("departures", departureTimes)
+                .addServiceTimeSchedule("arrivals", arrivalTimes)
+                .addServiceTimeSchedule("departures", departureTimes)
                 .addInts("stops", stopIndexes)
                 .toString();
     }

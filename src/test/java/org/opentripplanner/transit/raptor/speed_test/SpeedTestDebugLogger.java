@@ -71,11 +71,11 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
     }
 
     private void print(ArrivalView<?> a, String action, String optReason) {
-        String pattern = a.arrivedByTransit() ? a.trip().pattern().debugInfo() : "";
+        String pattern = a.arrivedByTransit() ? a.transitLeg().trip().pattern().debugInfo() : "";
         print(
                 action,
                 a.round(),
-                a.legType(),
+                legType(a),
                 a.stop(),
                 a.arrivalTime(),
                 a.cost(),
@@ -102,7 +102,7 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
         buf.sep();
 
         if (a.arrivedByTransit()) {
-            buf.transit(a.trip().pattern().debugInfo(),  a.departureTime(), a.arrivalTime());
+            buf.transit(a.transitLeg().trip().pattern().debugInfo(),  a.departureTime(), a.arrivalTime());
         } else {
             buf.walk(legDuration(a));
         }
@@ -189,5 +189,14 @@ class SpeedTestDebugLogger<T extends RaptorTripSchedule> implements DebugLogger 
                 System.err.printf("%-16s | %s%n", topic, message);
             }
         }
+    }
+
+    private String legType(ArrivalView<?> a) {
+        if (a.arrivedByAccessLeg()) { return "Access"; }
+        if (a.arrivedByTransit()) { return "Transit"; }
+        // We use Walk instead of Transfer so it is easier to distinguish from Transit
+        if (a.arrivedByTransfer()) { return "Walk"; }
+        if (a.arrivedAtDestination()) { return "Egress"; }
+        throw new IllegalStateException("Unknown mode for: " + this);
     }
 }

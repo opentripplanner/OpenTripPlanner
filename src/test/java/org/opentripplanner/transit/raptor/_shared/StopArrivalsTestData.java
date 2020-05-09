@@ -124,7 +124,7 @@ public class StopArrivalsTestData {
     public static Egress basicTripByForwardSearch() {
         AbstractStopArrival prevArrival;
         int timeShift = 3 * 60;
-        prevArrival = new Access(STOP_1, A_START-timeShift, A_END-timeShift);
+        prevArrival = new Access(STOP_1, A_START, A_END);
         prevArrival = new Bus(1, STOP_2, T1_START, T1_END + ALIGHT_SLACK, TRIP_1, prevArrival);
         prevArrival = new Walk(1, STOP_3, W1_START, W1_END, prevArrival);
         prevArrival = new Bus(2, STOP_4, T2_START, T2_END + ALIGHT_SLACK, TRIP_2, prevArrival);
@@ -138,7 +138,7 @@ public class StopArrivalsTestData {
     public static Egress basicTripByReverseSearch() {
         AbstractStopArrival arrival;
         int timeShift = 3 * 60;
-        arrival = new Access(STOP_5, E_END+timeShift, E_START+timeShift);
+        arrival = new Access(STOP_5, E_END, E_START);
         // Board slack is subtracted from the arrival time to get the latest possible
         arrival = new Bus(1, STOP_4, T3_END, T3_START - BOARD_SLACK, TRIP_3, arrival);
         arrival = new Bus(2, STOP_3, T2_END, T2_START - BOARD_SLACK, TRIP_2, arrival);

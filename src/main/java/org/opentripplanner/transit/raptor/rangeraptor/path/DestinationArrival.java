@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.api.view.EgressLegView;
 
 
 /**
@@ -26,7 +27,6 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
 class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
-
     private final ArrivalView<T> previous;
     private final RaptorTransfer egress;
     private final int departureTime;
@@ -35,7 +35,13 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     private final int cost;
 
 
-    DestinationArrival(RaptorTransfer egress, ArrivalView<T> previous, int departureTime, int arrivalTime, int additionalCost) {
+    DestinationArrival(
+        RaptorTransfer egress,
+        ArrivalView<T> previous,
+        int departureTime,
+        int arrivalTime,
+        int additionalCost
+    ) {
         this.previous = previous;
         this.egress = egress;
         this.departureTime = departureTime;
@@ -44,18 +50,9 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
         this.cost = previous.cost() + additionalCost;
     }
 
-    int numberOfTransfers() {
-        return numberOfTransfers;
-    }
-
     @Override
     public int stop() {
         throw new UnsupportedOperationException();
-    }
-
-    @Override
-    public RaptorTransfer accessEgress() {
-        return egress;
     }
 
     @Override
@@ -89,8 +86,8 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     }
 
     @Override
-    public int transferFromStop() {
-        return previous == null ? -1 : previous.stop();
+    public EgressLegView egressLeg() {
+        return () -> egress;
     }
 
     @Override

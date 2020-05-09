@@ -6,6 +6,7 @@ import org.opentripplanner.transit.raptor._shared.StopArrivalsTestData;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.path.PathLeg;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.transit.raptor._shared.StopArrivalsTestData.basicTripByReverseSearch;
@@ -17,14 +18,16 @@ public class ReversePathMapperTest {
         // Given:
         Egress egress = basicTripByReverseSearch();
         DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
-                null,
+                new TestRaptorTransfer(
+                    egress.previous().stop(),
+                    egress.arrivalTime() - egress.previous().arrivalTime()
+                ),
                 egress.previous(),
                 egress.previous().arrivalTime(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
         PathMapper<TestRaptorTripSchedule> mapper = new ReversePathMapper<>(
-                StopArrivalsTestData.SLACK_PROVIDER,
                 StopArrivalsTestData.WORKER_LIFE_CYCLE
         );
 

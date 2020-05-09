@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -69,11 +69,6 @@ public class TransferStopArrivalTest {
     }
 
     @Test
-    public void transferFromStop() {
-        assertEquals(TRANSIT_TO_STOP, subject.transferFromStop());
-    }
-
-    @Test
     public void stop() {
         assertEquals(TRANSFER_TO_STOP, subject.stop());
     }
@@ -114,7 +109,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "TransferStopArrival { Rnd: 1, Stop: 102, Time: 9:26 (9:20), Cost: 1100 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26, cost: 1100 }",
                 subject.toString()
         );
     }

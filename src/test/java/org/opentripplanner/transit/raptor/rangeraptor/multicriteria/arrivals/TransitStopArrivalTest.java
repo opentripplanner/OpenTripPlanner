@@ -3,7 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.TestRaptorTransfer;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -104,13 +104,13 @@ public class TransitStopArrivalTest {
 
     @Test
     public void access() {
-        assertSame(ACCESS_ARRIVAL.accessEgress(), subject.previous().accessEgress());
+        assertSame(ACCESS_ARRIVAL.accessLeg().access(), subject.previous().accessLeg().access());
     }
 
     @Test
     public void testToString() {
         assertEquals(
-                "TransitStopArrival { Rnd: 1, Stop: 101, Time: 9:20 (9:00), Cost: 700 }",
+                "Transit { round: 1, stop: 101, pattern: BUS T1, arrival-time: 9:20, cost: 700 }",
                 subject.toString()
         );
     }
