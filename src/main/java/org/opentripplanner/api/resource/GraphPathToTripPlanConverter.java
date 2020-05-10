@@ -185,6 +185,18 @@ public abstract class GraphPathToTripPlanConverter {
             itinerary.transfers--;
         }
         itinerary.itineraryType = generateItineraryType(itinerary.legs);
+
+        String googleMapsURL = "https://www.google.pl/maps/dir/";
+        googleMapsURL=itinerary.legs.stream().map(leg->"'"+leg.from.lat+","+leg.from.lon+"'/").reduce(googleMapsURL,(s1,s2)->s1+s2);
+
+        googleMapsURL+="'";
+        googleMapsURL+=itinerary.legs.get(itinerary.legs.size()-1).to.lat;
+        googleMapsURL+=",";
+        googleMapsURL+=itinerary.legs.get(itinerary.legs.size()-1).to.lon;
+        googleMapsURL+="'/";
+//        TODO this probably should be removed
+        System.out.println(googleMapsURL+"     TODO please remove me");
+
         return itinerary;
     }
 
