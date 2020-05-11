@@ -34,7 +34,7 @@ import java.time.Period;
 public class BuildConfig {
     private static final Logger LOG = LoggerFactory.getLogger(BuildConfig.class);
 
-    public static final BuildConfig DEFAULT = new BuildConfig(MissingNode.getInstance(), "DEFAULT");
+    public static final BuildConfig DEFAULT = new BuildConfig(MissingNode.getInstance(), "DEFAULT", false);
 
     private static final double DEFAULT_SUBWAY_ACCESS_TIME_MINUTES = 2.0;
 
@@ -296,7 +296,7 @@ public class BuildConfig {
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
      * Until that class is more type safe, it seems simpler to just list out the parameters by name here.
      */
-    public BuildConfig(JsonNode node, String source) {
+    public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter c = new NodeAdapter(node, source);
         rawJson = node;
         dataImportReport = c.asBoolean("dataImportReport", false);
@@ -341,7 +341,9 @@ public class BuildConfig {
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
 
-        c.logAllUnusedParameters(LOG);
+        if(logUnusedParams) {
+            c.logAllUnusedParameters(LOG);
+        }
     }
 
     /**

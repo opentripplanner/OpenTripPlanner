@@ -88,7 +88,7 @@ public class ConfigLoader {
      * @see #loadJsonFile for more details.
      */
     public OtpConfig loadOtpConfig() {
-        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME);
+        return new OtpConfig(loadJsonByFilename(OTP_CONFIG_FILENAME), OTP_CONFIG_FILENAME, true);
     }
 
     /**
@@ -104,7 +104,7 @@ public class ConfigLoader {
         if(node.isMissingNode()) {
             return BuildConfig.DEFAULT;
         }
-        return new BuildConfig(node, BUILD_CONFIG_FILENAME);
+        return new BuildConfig(node, BUILD_CONFIG_FILENAME, true);
     }
 
     /**
@@ -118,7 +118,7 @@ public class ConfigLoader {
         if(node.isMissingNode()) {
             return RouterConfig.DEFAULT;
         }
-        return new RouterConfig(node, ROUTER_CONFIG_FILENAME);
+        return new RouterConfig(node, ROUTER_CONFIG_FILENAME, true);
     }
 
     /**
