@@ -189,7 +189,7 @@ public class GraphBuilder implements Runnable {
                 new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
-                    null,
+                    new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
                     config.readCachedElevations,
                     config.writeCachedElevations,
                     config.elevationUnitMultiplier,
@@ -204,7 +204,7 @@ public class GraphBuilder implements Runnable {
             ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
-                    null,
+                    new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
                     config.readCachedElevations,
                     config.writeCachedElevations,
                     config.elevationUnitMultiplier,
@@ -219,7 +219,7 @@ public class GraphBuilder implements Runnable {
                 ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demSource);
                 GraphBuilderModule elevationBuilder = new ElevationModule(
                         gcf,
-                        null,
+                        new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
                         config.readCachedElevations,
                         config.writeCachedElevations,
                         config.elevationUnitMultiplier,

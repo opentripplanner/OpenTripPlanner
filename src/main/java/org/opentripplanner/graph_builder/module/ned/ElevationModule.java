@@ -132,7 +132,7 @@ public class ElevationModule implements GraphBuilderModule {
 
     public ElevationModule(
         ElevationGridCoverageFactory factory,
-        File cacheDirectory,
+        File cachedElevationsFile,
         boolean readCachedElevations,
         boolean writeCachedElevations,
         double elevationUnitMultiplier,
@@ -141,7 +141,7 @@ public class ElevationModule implements GraphBuilderModule {
         boolean multiThreadElevationCalculations
     ) {
         gridCoverageFactory = factory;
-        cachedElevationsFile = cacheDirectory != null ? new File(cacheDirectory, "cached_elevations.obj") : null;
+        this.cachedElevationsFile = cachedElevationsFile;
         this.readCachedElevations = readCachedElevations;
         this.writeCachedElevations = writeCachedElevations;
         this.elevationUnitMultiplier = elevationUnitMultiplier;
