@@ -29,7 +29,8 @@ public class RouterConfigSerializer extends Serializer<RouterConfig> {
     public RouterConfig read(Kryo kryo, Input input, Class<RouterConfig> type) {
         return new RouterConfig(
                 ConfigLoader.nodeFromString(input.readString(), SOURCE),
-                SOURCE
+                SOURCE,
+                false
         );
     }
 }

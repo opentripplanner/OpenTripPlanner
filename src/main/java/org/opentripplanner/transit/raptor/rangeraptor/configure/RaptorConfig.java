@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.api.view.Heuristics;
 import org.opentripplanner.transit.raptor.api.view.Worker;
 import org.opentripplanner.transit.raptor.rangeraptor.RangeRaptorWorker;
-import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerState;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.configure.McRangeRaptorConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.standard.configure.StdRangeRaptorConfig;
@@ -87,18 +87,17 @@ public class RaptorConfig<T extends RaptorTripSchedule> {
     private Worker<T> createWorker(
             SearchContext<T> ctx,
             WorkerState<T> workerState,
-            TransitRoutingStrategy<T> transitRoutingStrategy
+            RoutingStrategy<T> routingStrategy
     ) {
         return new RangeRaptorWorker<>(
                 workerState,
-                transitRoutingStrategy,
+                routingStrategy,
                 ctx.transit(),
                 ctx.accessLegs(),
                 ctx.roundProvider(),
                 ctx.calculator(),
                 ctx.createLifeCyclePublisher(),
-                ctx.timers(),
-                ctx.searchParams().allowWaitingBetweenAccessAndTransit()
+                ctx.timers()
         );
     }
 

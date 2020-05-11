@@ -23,7 +23,7 @@ public class BuildConfigTest {
         // Given
         JsonNode node  = jsonNodeForTest("{ 'parentStopLinking' : true }");
 
-        BuildConfig subject = new BuildConfig(node, "Test");
+        BuildConfig subject = new BuildConfig(node, "Test", false);
 
         // Then
         assertTrue(subject.parentStopLinking);

@@ -86,7 +86,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
     public HeuristicSearchTask<T> withRequest(RaptorRequest<T> request) {
         this.request = request.mutate()
                 .searchParams()
-                .allowWaitingBetweenAccessAndTransit(true)
                 .build();
         return this;
     }
@@ -121,7 +120,7 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
             throw new DestinationNotReachedException();
         }
         if(LOG.isDebugEnabled()) {
-            String time = TimeUtils.timeMsToStrInSec(System.currentTimeMillis() - start);
+            String time = TimeUtils.msToSecondsStr(System.currentTimeMillis() - start);
             LOG.debug("RangeRaptor - {} heuristic search performed in {}.", name, time);
         }
     }
@@ -136,7 +135,6 @@ public class HeuristicSearchTask<T extends RaptorTripSchedule> {
                     .searchDirection(direction)
                     .searchParams()
                     .searchOneIterationOnly()
-                    .allowWaitingBetweenAccessAndTransit(true)
                     .build();
             search = config.createHeuristicSearch(transitData, heuristicReq);
         }

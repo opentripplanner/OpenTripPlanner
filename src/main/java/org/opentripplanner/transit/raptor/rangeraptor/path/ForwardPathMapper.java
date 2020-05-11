@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 
 
@@ -18,6 +19,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
  * to the domain of result paths. All values not needed for routing is computed as part of this mapping.
  */
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
+    private int iterationDepartureTime = -1;
 
     /**
      * Note! This is not the Raptor internal SlackProvider, but the slack-provider
@@ -26,8 +28,13 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
     private final RaptorSlackProvider transitLayerSlackProvider;
 
 
-    public ForwardPathMapper(RaptorSlackProvider slackProvider) {
+    public ForwardPathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
         this.transitLayerSlackProvider = slackProvider;
+        lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
+    }
+
+    private void setRangeRaptorIterationDepartureTime(int iterationDepartureTime) {
+        this.iterationDepartureTime = iterationDepartureTime;
     }
 
     @Override
@@ -39,6 +46,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         from = destinationArrival.previous();
         lastLeg = new EgressPathLeg<>(
+                destinationArrival.accessEgress(),
                 from.stop(),
                 destinationArrival.departureTime(),
                 destinationArrival.arrivalTime()
@@ -83,7 +91,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
         AccessPathLeg<T> accessLeg = createAccessPathLeg(from, transitLeg);
 
-        return new Path<>(accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
+        return new Path<>(iterationDepartureTime, accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
     }
 
     private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {
@@ -92,6 +100,6 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         int timeShift = arrivalTime - from.arrivalTime();
         int departureTime = from.departureTime() + timeShift;
 
-        return new AccessPathLeg<>(from.stop(), departureTime, arrivalTime, nextLeg);
+        return new AccessPathLeg<>(from.accessEgress(), from.stop(), departureTime, arrivalTime, nextLeg);
     }
 }

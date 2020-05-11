@@ -10,6 +10,7 @@ import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
 import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
+import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -41,6 +42,8 @@ import static org.opentripplanner.transit.raptor.util.TimeUtils.hm2time;
  * The Trip has 2 transfers, 1 connected by walking and without. The trip start at 09:53 and ends at 12:00.
  */
 public class StopArrivalsTestData {
+
+    public static final WorkerLifeCycle WORKER_LIFE_CYCLE = new LifeCycleSubscriptions();
 
     /** Provide a Cost Calculator for tests that dont care to much avout testing the cost */
     public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
@@ -149,7 +152,7 @@ public class StopArrivalsTestData {
      * here returned as a path.
      */
     public static Path<TestRaptorTripSchedule> basicTripAsPath() {
-        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(STOP_5, E_START, E_END);
+        PathLeg<TestRaptorTripSchedule> leg6 = new EgressPathLeg<>(null, STOP_5, E_START, E_END);
         TransitPathLeg<TestRaptorTripSchedule> leg5 = new TransitPathLeg<>(
                 STOP_4, T3_START, STOP_5, T3_END, TRIP_3, leg6
         );
@@ -163,10 +166,10 @@ public class StopArrivalsTestData {
                 STOP_1, T1_START, STOP_2, T1_END, TRIP_1, leg3
         );
         AccessPathLeg<TestRaptorTripSchedule> leg1 = new AccessPathLeg<>(
-                STOP_1, A_START, A_END, leg2.asTransitLeg()
+                null, STOP_1, A_START, A_END, leg2.asTransitLeg()
         );
 
-        return new Path<>(leg1, RaptorCostConverter.toOtpDomainCost(6_000));
+        return new Path<>(1, leg1, RaptorCostConverter.toOtpDomainCost(6_000));
     }
 
     public static List<Integer> basicTripStops() {

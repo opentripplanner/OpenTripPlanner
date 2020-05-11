@@ -24,7 +24,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
     private int maxNumberOfTransfers;
     private double relaxCostAtDestination;
     private boolean timetableEnabled;
-    private boolean allowWaitingBetweenAccessAndTransit;
     private final Collection<RaptorTransfer> accessLegs = new ArrayList<>();
     private final Collection<RaptorTransfer> egressLegs = new ArrayList<>();
 
@@ -38,7 +37,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
         this.maxNumberOfTransfers = defaults.maxNumberOfTransfers();
         this.relaxCostAtDestination = defaults.relaxCostAtDestination();
         this.timetableEnabled = defaults.timetableEnabled();
-        this.allowWaitingBetweenAccessAndTransit = defaults.allowWaitingBetweenAccessAndTransit();
         this.accessLegs.addAll(defaults.accessLegs());
         this.egressLegs.addAll(defaults.egressLegs());
     }
@@ -123,15 +121,6 @@ public class SearchParamsBuilder<T extends RaptorTripSchedule> {
 
     public SearchParamsBuilder<T> timetableEnabled(boolean enable) {
         this.timetableEnabled = enable;
-        return this;
-    }
-
-    public boolean allowWaitingBetweenAccessAndTransit() {
-        return allowWaitingBetweenAccessAndTransit;
-    }
-
-    public SearchParamsBuilder<T> allowWaitingBetweenAccessAndTransit(boolean enable) {
-        this.allowWaitingBetweenAccessAndTransit = enable;
         return this;
     }
 

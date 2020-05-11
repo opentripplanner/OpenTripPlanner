@@ -51,7 +51,7 @@ import java.util.Iterator;
 public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends WorkerState<T>> implements Worker<T> {
 
 
-    private final TransitRoutingStrategy<T> transitWorker;
+    private final RoutingStrategy<T> transitWorker;
 
     /**
      * The RangeRaptor state - we delegate keeping track of state to the state object,
@@ -79,25 +79,24 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     private final Collection<RaptorTransfer> accessLegs;
 
-    private final boolean matchBoardingAlightExactInFirstRound;
-
     /**
      * The life cycle is used to publish life cycle events to everyone who
      * listen.
      */
     private final LifeCycleEventPublisher lifeCycle;
 
+    private boolean inFirstIteration = true;
+
 
     public RangeRaptorWorker(
             S state,
-            TransitRoutingStrategy<T> transitWorker,
+            RoutingStrategy<T> transitWorker,
             RaptorTransitDataProvider<T> transitData,
             Collection<RaptorTransfer> accessLegs,
             RoundProvider roundProvider,
             TransitCalculator calculator,
             LifeCycleEventPublisher lifeCyclePublisher,
-            WorkerPerformanceTimers timers,
-            boolean waitAtBeginningEnabled
+            WorkerPerformanceTimers timers
     ) {
         this.transitWorker = transitWorker;
         this.state = state;
@@ -109,7 +108,6 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         // "everyone" by providing access to it in the context.
         this.roundTracker = (RoundTracker) roundProvider;
         this.lifeCycle = lifeCyclePublisher;
-        this.matchBoardingAlightExactInFirstRound = !waitAtBeginningEnabled;
     }
 
     /**
@@ -135,6 +133,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             while (it.hasNext()) {
                 // Run the raptor search for this particular iteration departure time
                 runRaptorForMinute(it.next());
+                inFirstIteration = false;
             }
         });
         return state.extractPaths();
@@ -177,7 +176,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private void doTransfersForAccessLegs(int iterationDepartureTime) {
         for (RaptorTransfer it : accessLegs) {
-            state.setInitialTimeForIteration(it, iterationDepartureTime);
+            transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
         }
     }
 
@@ -239,12 +238,21 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * This is protected to allow reverse search to override and create a alight search instead.
      */
     private TripScheduleSearch<T> createTripSearch(RaptorTimeTable<T> timeTable) {
-        if(matchBoardingAlightExactInFirstRound && roundTracker.round() == 1) {
+        if(!inFirstIteration && roundTracker.isFirstRound()) {
+            // For the first round of every iteration(except the first) we restrict the first
+            // departure to happen within the time-window of the iteration. Another way to put this,
+            // is to say that we allow for the access leg to be time-shifted to a later departure,
+            // but not past the previous iteration departure time. This save a bit of processing,
+            // but most importantly allow us to use the departure-time as a pareto criteria in
+            // time-table view. This is not valid for the first iteration, because we could jump on
+            // a bus, take it on stop and walk back and then wait to board a later trip - this kind
+            // of results would be rejected by earlier iterations, for all iterations except the
+            // first.
             return calculator.createExactTripSearch(timeTable);
         }
-        else {
-            return calculator.createTripSearch(timeTable);
-        }
+
+        // Default: create a standard trip search
+        return calculator.createTripSearch(timeTable);
     }
 
     // Track time spent, measure performance

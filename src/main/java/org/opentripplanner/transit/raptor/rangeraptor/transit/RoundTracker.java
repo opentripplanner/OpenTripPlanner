@@ -75,6 +75,13 @@ public class RoundTracker implements RoundProvider {
         return round;
     }
 
+    /**
+     * Return true if this round is the fist round, calculating the first transit leg.
+     * Access is calculated in round zero (0).
+     */
+    public boolean isFirstRound() {
+        return round == 1;
+    }
 
     /* private methods */
 

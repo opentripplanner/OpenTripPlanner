@@ -18,7 +18,7 @@ public class OtpConfig {
     public final Map<OTPFeature, Boolean> otpFeatures;
 
 
-    OtpConfig(JsonNode otpConfig, String source) {
+    OtpConfig(JsonNode otpConfig, String source, boolean logUnusedParams) {
         this.rawConfig = otpConfig;
         NodeAdapter adapter = new NodeAdapter(otpConfig, source);
 
@@ -27,7 +27,8 @@ public class OtpConfig {
                 OTPFeature.class,
                 NodeAdapter::asBoolean
         );
-
-        adapter.logAllUnusedParameters(LOG);
+        if(logUnusedParams) {
+            adapter.logAllUnusedParameters(LOG);
+        }
     }
 }
