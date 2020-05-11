@@ -120,7 +120,9 @@ public class RoutingWorker {
         LOG.debug("Access/egress routing took {} ms",
                 System.currentTimeMillis() - startTimeAccessEgress
         );
-        verifyEgressAccess(accessTransfers, egressTransfers);
+        if(!verifyEgressAccess(accessTransfers, egressTransfers)){
+            return Collections.emptyList();
+        };
 
         /* Prepare transit search */
 
@@ -225,20 +227,20 @@ public class RoutingWorker {
         );
     }
 
-    private void verifyEgressAccess(
+    private boolean verifyEgressAccess(
             Collection<?> access,
             Collection<?> egress
     ) {
         boolean accessExist = !access.isEmpty();
         boolean egressExist = !egress.isEmpty();
 
-        if(accessExist && egressExist) { return; }
+        if(accessExist && egressExist) { return true; }
 
         List<String> missingPlaces = new ArrayList<>();
         if(!accessExist) { missingPlaces.add("from"); }
         if(!egressExist) { missingPlaces.add("to"); }
-
-        throw new VertexNotFoundException(missingPlaces);
+        LOG.info("Trip is not possible. You might be trying to plan a trip outside the map data boundary. Missing {}",missingPlaces);
+        return false;
     }
 
     /**

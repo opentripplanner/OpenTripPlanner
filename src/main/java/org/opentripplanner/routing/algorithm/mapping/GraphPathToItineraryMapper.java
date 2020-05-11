@@ -194,20 +194,20 @@ public abstract class GraphPathToItineraryMapper {
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
      */
     private static State[][] sliceStates(State[] states) {
-        boolean trivial = true;
-
-        for (State state : states) {
-            TraverseMode traverseMode = state.getBackMode();
-
-            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
-                trivial = false;
-                break;
-            }
-        }
-
-        if (trivial) {
-            throw new TrivialPathException();
-        }
+//        boolean trivial = true;
+//
+//        for (State state : states) {
+//            TraverseMode traverseMode = state.getBackMode();
+//
+//            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
+//                trivial = false;
+//                break;
+//            }
+//        }
+//
+//        if (trivial) {
+//            throw new TrivialPathException();
+//        }
 
         int[] legIndexPairs = {0, states.length - 1};
         List<int[]> legsIndexes = new ArrayList<int[]>();
