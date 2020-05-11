@@ -190,12 +190,12 @@ public class GraphBuilder implements Runnable {
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
                     null,
-                    false,
-                    false,
+                    config.readCachedElevations,
+                    config.writeCachedElevations,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
-                    false,
-                   true
+                    config.includeEllipsoidToGeoidDifference,
+                config.multiThreadElevationCalculations
             );
             graphBuilder.addModule(elevationBuilder);
         } else if (config.fetchElevationUS) {
@@ -205,12 +205,12 @@ public class GraphBuilder implements Runnable {
             GraphBuilderModule elevationBuilder = new ElevationModule(
                     gcf,
                     null,
-                    false,
-                    false,
+                    config.readCachedElevations,
+                    config.writeCachedElevations,
                     config.elevationUnitMultiplier,
                     config.distanceBetweenElevationSamples,
-                    false,
-                    true
+                    config.includeEllipsoidToGeoidDifference,
+                    config.multiThreadElevationCalculations
                 );
             graphBuilder.addModule(elevationBuilder);
         } else if (dataSources.has(DEM)) {
@@ -220,12 +220,12 @@ public class GraphBuilder implements Runnable {
                 GraphBuilderModule elevationBuilder = new ElevationModule(
                         gcf,
                         null,
-                        false,
-                        false,
+                        config.readCachedElevations,
+                        config.writeCachedElevations,
                         config.elevationUnitMultiplier,
                         config.distanceBetweenElevationSamples,
-                        false,
-                        true
+                        config.includeEllipsoidToGeoidDifference,
+                    config.multiThreadElevationCalculations
                 );
                 graphBuilder.addModule(elevationBuilder);
             }
