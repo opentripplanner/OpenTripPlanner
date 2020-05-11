@@ -84,6 +84,9 @@ public class RoutingWorker {
                     TripPlanMapper.mapTripPlan(request, itineraries),
                     responseMetadata
             );
+        }catch (Exception e){
+            LOG.error("Exception for request {}",request,e);
+            throw e;
         }
         finally {
             request.cleanup();
@@ -239,7 +242,7 @@ public class RoutingWorker {
         List<String> missingPlaces = new ArrayList<>();
         if(!accessExist) { missingPlaces.add("from"); }
         if(!egressExist) { missingPlaces.add("to"); }
-        LOG.info("Trip is not possible. You might be trying to plan a trip outside the map data boundary. Missing {}",missingPlaces);
+        LOG.info("You might be trying to plan a trip outside the map data boundary. Missing {}",missingPlaces);
         return false;
     }
 
