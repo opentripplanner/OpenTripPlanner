@@ -177,6 +177,7 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(streetLinkerModule);
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
+        List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
         if (config.elevationBucket != null) {
             // Download the elevation tiles from an Amazon S3 bucket
             S3BucketConfig bucketConfig = config.elevationBucket;
@@ -185,25 +186,23 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsAccessKey = bucketConfig.accessKey;
             awsTileSource.awsSecretKey = bucketConfig.secretKey;
             awsTileSource.awsBucketName = bucketConfig.bucketName;
-            NEDGridCoverageFactoryImpl gcf =
-                new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource);
-            GraphBuilderModule elevationBuilder = new ElevationModule(
-                    gcf,
-                    new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
-                    config.readCachedElevations,
-                    config.writeCachedElevations,
-                    config.elevationUnitMultiplier,
-                    config.distanceBetweenElevationSamples,
-                    config.includeEllipsoidToGeoidDifference,
-                config.multiThreadElevationCalculations
-            );
-            graphBuilder.addModule(elevationBuilder);
+            elevationGridCoverageFactories.add(
+                new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource));
         } else if (config.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(dataSources.getCacheDirectory(), "ned");
-            ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(
-                    gcf,
+            elevationGridCoverageFactories.add(
+                new NEDGridCoverageFactoryImpl(cacheDirectory));
+        } else if (dataSources.has(DEM)) {
+            // Load the elevation from a file in the graph inputs directory
+            for (DataSource demSource : dataSources.get(DEM)) {
+                elevationGridCoverageFactories.add(new GeotiffGridCoverageFactoryImpl(demSource));
+            }
+        }
+        for (ElevationGridCoverageFactory factory : elevationGridCoverageFactories) {
+            graphBuilder.addModule(
+                new ElevationModule(
+                    factory,
                     new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
                     config.readCachedElevations,
                     config.writeCachedElevations,
@@ -211,24 +210,8 @@ public class GraphBuilder implements Runnable {
                     config.distanceBetweenElevationSamples,
                     config.includeEllipsoidToGeoidDifference,
                     config.multiThreadElevationCalculations
-                );
-            graphBuilder.addModule(elevationBuilder);
-        } else if (dataSources.has(DEM)) {
-            // Load the elevation from a file in the graph inputs directory
-            for (DataSource demSource : dataSources.get(DEM)) {
-                ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demSource);
-                GraphBuilderModule elevationBuilder = new ElevationModule(
-                        gcf,
-                        new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
-                        config.readCachedElevations,
-                        config.writeCachedElevations,
-                        config.elevationUnitMultiplier,
-                        config.distanceBetweenElevationSamples,
-                        config.includeEllipsoidToGeoidDifference,
-                    config.multiThreadElevationCalculations
-                );
-                graphBuilder.addModule(elevationBuilder);
-            }
+                )
+            );
         }
         if ( hasTransitData ) {
             // The stops can be linked to each other once they are already linked to the street network.
