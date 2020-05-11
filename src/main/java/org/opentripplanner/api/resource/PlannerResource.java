@@ -99,7 +99,8 @@ public class PlannerResource extends RoutingResource {
             sb.append(' ');
             sb.append(request.arriveBy ? "ARRIVE" : "DEPART");
             sb.append(' ');
-            sb.append(LocalDateTime.ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
+            sb.append(LocalDateTime
+                .ofInstant(Instant.ofEpochSecond(request.dateTime), ZoneId.systemDefault()));
             sb.append(' ');
             sb.append(request.modes.transitModes);
             sb.append(" [");
