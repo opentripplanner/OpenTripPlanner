@@ -31,6 +31,9 @@ public class TestRaptorTripSchedule implements RaptorTripSchedule {
         }
         @Override public int numberOfStopsInPattern() { return stopIndexes.length; }
 
+        @Override
+        public String modeInfo() { return "BUS"; }
+
         private boolean isNotRestricted(int index, int mask) {
             return restrictions == null || (restrictions[index] & mask) > 0;
         }

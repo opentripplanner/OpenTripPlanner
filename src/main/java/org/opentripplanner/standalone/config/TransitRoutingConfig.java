@@ -43,7 +43,7 @@ public final class TransitRoutingConfig
             dft.searchThreadPoolSize()
         );
         // Dynamic Search Window
-        this.dynamicSearchWindowCoefficients = new DynamicSearchWindowCoefficientsImpl(
+        this.dynamicSearchWindowCoefficients = new DynamicSearchWindowConfig(
             c.path("dynamicSearchWindow")
         );
         this.stopTransferCost = c.asEnumMapAllKeysRequired(
@@ -88,7 +88,7 @@ public final class TransitRoutingConfig
         return stopTransferCost.get(key);
     }
 
-    private static class DynamicSearchWindowCoefficientsImpl
+    private static class DynamicSearchWindowConfig
             implements DynamicSearchWindowCoefficients
     {
         private final double minTripTimeCoefficient;
@@ -96,11 +96,9 @@ public final class TransitRoutingConfig
         private final int maxWinTimeMinutes;
         private final int stepMinutes;
 
-        public DynamicSearchWindowCoefficientsImpl(NodeAdapter dsWin) {
+        public DynamicSearchWindowConfig(NodeAdapter dsWin) {
             DynamicSearchWindowCoefficients dsWinDft = new DynamicSearchWindowCoefficients() {};
-            this.minTripTimeCoefficient = dsWin.asDouble(
-                    "minTripTimeCoefficient", dsWinDft.minTripTimeCoefficient()
-            );
+            this.minTripTimeCoefficient = dsWin.asDouble("minTripTimeCoefficient", dsWinDft.minTripTimeCoefficient());
             this.minWinTimeMinutes = dsWin.asInt("minWinTimeMinutes",  dsWinDft.minWinTimeMinutes());
             this.maxWinTimeMinutes = dsWin.asInt("maxWinTimeMinutes",  dsWinDft.maxWinTimeMinutes());
             this.stepMinutes = dsWin.asInt("stepMinutes",  dsWinDft.stepMinutes());

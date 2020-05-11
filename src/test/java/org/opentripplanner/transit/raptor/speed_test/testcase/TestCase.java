@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import org.opentripplanner.transit.raptor.speed_test.api.model.Itinerary;
+import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
+import org.opentripplanner.transit.raptor.speed_test.model.Place;
+import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import java.util.Collection;
 import java.util.List;
-
-import static org.opentripplanner.transit.raptor.util.TimeUtils.timeToStrShort;
 
 
 /**
@@ -47,20 +47,26 @@ public class TestCase {
 
     public String toString(int departureTime, int arrivalTime, int window) {
         return String.format(
-                "#%s %s - %s, (%.3f, %.3f) - (%.3f, %.3f), %s-%s(%s)",
-                id, fromPlace.getDescription(), toPlace.getDescription(),
-                fromPlace.getLat(), fromPlace.getLon(),
-                toPlace.getLat(), toPlace.getLon(),
+                "#%s %s - %s, %s - %s, %s-%s(%s)",
+                id, fromPlace.name, toPlace.name,
+                fromPlace.coordinate,
+                toPlace.coordinate,
                 timeToString(this.departureTime, departureTime),
                 timeToString(this.arrivalTime, arrivalTime),
-                timeToString(this.window, window)
+                durationToString(this.window, window)
         );
     }
 
     private String timeToString(int orgTime, int calcTime) {
         return orgTime == NOT_SET && calcTime > 0
-                ? timeToStrShort(calcTime) + "*"
-                : timeToStrShort(orgTime);
+                ? TimeUtils.timeToStrCompact(calcTime) + "*"
+                : TimeUtils.timeToStrCompact(orgTime);
+    }
+
+    private String durationToString(int orgTime, int calcTime) {
+        return orgTime == NOT_SET && calcTime > 0
+            ? TimeUtils.durationToStr(calcTime) + "*"
+            : TimeUtils.durationToStr(orgTime);
     }
 
     /**

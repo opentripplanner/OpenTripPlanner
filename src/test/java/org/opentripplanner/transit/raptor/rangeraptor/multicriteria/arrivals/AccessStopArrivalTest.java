@@ -2,7 +2,6 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -10,15 +9,19 @@ import static org.junit.Assert.assertTrue;
 
 public class AccessStopArrivalTest {
 
-    private static final int BOARD_SLACK = 45;
     private static final int ALIGHT_STOP = 100;
-    private static final int DEPATURE_TIME = 8 * 60 * 60;
+    private static final int DEPARTURE_TIME = 8 * 60 * 60;
     private static final int LEG_DURATION = 10 * 60;
-    private static final int ALIGHT_TIME = DEPATURE_TIME + LEG_DURATION;
+    private static final int ALIGHT_TIME = DEPARTURE_TIME + LEG_DURATION;
     private static final int COST = 500;
 
-    private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
-    private AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(ALIGHT_STOP, DEPATURE_TIME, LEG_DURATION, COST, TRANSIT_CALCULATOR);
+    private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
+        ALIGHT_STOP,
+        DEPARTURE_TIME,
+        LEG_DURATION,
+        COST,
+        null
+    );
 
 
 
@@ -41,7 +44,7 @@ public class AccessStopArrivalTest {
 
     @Test
     public void departureTime() {
-        assertEquals(DEPATURE_TIME, subject.departureTime());
+        assertEquals(DEPARTURE_TIME, subject.departureTime());
     }
 
     @Test
@@ -74,7 +77,7 @@ public class AccessStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "AccessStopArrival { Rnd: 0, Stop: 100, Time: 8:10:00 (8:00:00), Cost: 500 }",
+                "AccessStopArrival { Rnd: 0, Stop: 100, Time: 8:10 (8:00), Cost: 500 }",
                 subject.toString()
         );
     }

@@ -148,9 +148,7 @@ public class RoutingWorker {
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 transitLayer,
                 requestTransitDataProvider.getStartOfTime(),
-                request,
-                accessTransfers,
-                egressTransfers
+                request
         );
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 

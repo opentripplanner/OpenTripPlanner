@@ -13,6 +13,9 @@ import org.opentripplanner.transit.raptor.util.BitSetIterator;
 
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import static java.util.Collections.emptyList;
 
@@ -48,7 +51,12 @@ public final class Stops<T extends RaptorTripSchedule> {
         this.debugHandlerFactory = debugHandlerFactory;
         this.debugStats = new DebugStopArrivalsStatistics(debugLogger);
 
-        for (RaptorTransfer it : egressLegs) {
+        Collection<Map.Entry<Integer, List<RaptorTransfer>>> groupedEgressLegs = egressLegs
+            .stream()
+            .collect(Collectors.groupingBy(RaptorTransfer::stop))
+            .entrySet();
+
+        for (Map.Entry<Integer, List<RaptorTransfer>> it : groupedEgressLegs) {
             glueTogetherEgressStopWithDestinationArrivals(it, costCalculator, paths);
         }
     }
@@ -104,14 +112,14 @@ public final class Stops<T extends RaptorTripSchedule> {
      * stop, the "glue" make sure new destination arrivals is added to the destination arrivals.
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
-            RaptorTransfer egressLeg,
+            Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
             CostCalculator costCalculator,
             DestinationArrivalPaths<T> paths
     ) {
-        int stop = egressLeg.stop();
+        int stop = egressLegs.getKey();
         // The factory is creating the actual "glue"
         this.stops[stop] = StopArrivalParetoSet.createEgressStopArrivalSet(
-                egressLeg,
+                egressLegs,
                 costCalculator,
                 paths,
                 debugHandlerFactory
