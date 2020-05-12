@@ -199,6 +199,9 @@ public class GraphBuilder implements Runnable {
                 elevationGridCoverageFactories.add(new GeotiffGridCoverageFactoryImpl(demSource));
             }
         }
+        // Refactoring this class, it was made clear that this allows for adding multiple elevation
+        // modules to the same graph builder. We do not actually know if this is supported by the
+        // ElevationModule class.
         for (ElevationGridCoverageFactory factory : elevationGridCoverageFactories) {
             graphBuilder.addModule(
                 new ElevationModule(
