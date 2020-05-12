@@ -14,7 +14,6 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
         super(
                 previousState,
                 transferLeg.stop(),
-                arrivalTime - transferLeg.durationInSeconds(),
                 arrivalTime,
                 additionalCost
         );
@@ -27,7 +26,7 @@ public final class TransferStopArrival<T extends RaptorTripSchedule> extends Abs
 
     @Override
     public TransferLegView transferLeg() {
-        return () -> durationInSeconds();
+        return this::durationInSeconds;
     }
 
     private int durationInSeconds() {

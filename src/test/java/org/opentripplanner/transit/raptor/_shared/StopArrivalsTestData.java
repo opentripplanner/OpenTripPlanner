@@ -8,10 +8,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
-import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
-import org.opentripplanner.transit.raptor.rangeraptor.transit.DefaultCostCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
 import java.util.Arrays;
@@ -45,17 +42,7 @@ public class StopArrivalsTestData {
 
     public static final WorkerLifeCycle WORKER_LIFE_CYCLE = new LifeCycleSubscriptions();
 
-    /** Provide a Cost Calculator for tests that dont care to much avout testing the cost */
-    public static final CostCalculator COST_CALCULATOR = new DefaultCostCalculator(
-        new int[] { 0, 0, 0, 0, 0},
-        0,
-        2.0,
-        1.0,
-        new LifeCycleSubscriptions()
-    );
-
     // We use 2 minutes slack distributed by (in seconds):
-    private static final int TRANSFER_SLACK = 4 * 60;
     private static final int BOARD_SLACK = 2 * 60;
     private static final int ALIGHT_SLACK = 60;
 
@@ -84,17 +71,11 @@ public class StopArrivalsTestData {
 
     public static final int TRIP_DURATION = E_END - A_START;
 
-
     private static final int STOP_1 = 1;
     private static final int STOP_2 = 2;
     private static final int STOP_3 = 3;
     private static final int STOP_4 = 4;
     private static final int STOP_5 = 5;
-
-
-    public static final RaptorSlackProvider SLACK_PROVIDER = RaptorSlackProvider.defaults(
-            TRANSFER_SLACK, BOARD_SLACK, ALIGHT_SLACK
-    );
 
     private static final TestRaptorTripSchedule TRIP_1 = TestRaptorTripSchedule
             .create("T1")
@@ -123,12 +104,11 @@ public class StopArrivalsTestData {
 
     public static Egress basicTripByForwardSearch() {
         AbstractStopArrival prevArrival;
-        int timeShift = 3 * 60;
         prevArrival = new Access(STOP_1, A_START, A_END);
-        prevArrival = new Bus(1, STOP_2, T1_START, T1_END + ALIGHT_SLACK, TRIP_1, prevArrival);
+        prevArrival = new Bus(1, STOP_2, T1_END, TRIP_1, prevArrival);
         prevArrival = new Walk(1, STOP_3, W1_START, W1_END, prevArrival);
-        prevArrival = new Bus(2, STOP_4, T2_START, T2_END + ALIGHT_SLACK, TRIP_2, prevArrival);
-        prevArrival = new Bus(3, STOP_5, T3_START, T3_END + ALIGHT_SLACK, TRIP_3, prevArrival);
+        prevArrival = new Bus(2, STOP_4, T2_END, TRIP_2, prevArrival);
+        prevArrival = new Bus(3, STOP_5, T3_END, TRIP_3, prevArrival);
         return new Egress(E_START, E_END, prevArrival);
     }
 
@@ -137,13 +117,12 @@ public class StopArrivalsTestData {
      */
     public static Egress basicTripByReverseSearch() {
         AbstractStopArrival arrival;
-        int timeShift = 3 * 60;
         arrival = new Access(STOP_5, E_END, E_START);
         // Board slack is subtracted from the arrival time to get the latest possible
-        arrival = new Bus(1, STOP_4, T3_END, T3_START - BOARD_SLACK, TRIP_3, arrival);
-        arrival = new Bus(2, STOP_3, T2_END, T2_START - BOARD_SLACK, TRIP_2, arrival);
+        arrival = new Bus(1, STOP_4, T3_START, TRIP_3, arrival);
+        arrival = new Bus(2, STOP_3, T2_START, TRIP_2, arrival);
         arrival = new Walk(2, STOP_2, W1_END, W1_START, arrival);
-        arrival = new Bus(3, STOP_1, T1_END, T1_START - BOARD_SLACK, TRIP_1, arrival);
+        arrival = new Bus(3, STOP_1, T1_START, TRIP_1, arrival);
         return new Egress(A_END, A_START, arrival);
     }
 

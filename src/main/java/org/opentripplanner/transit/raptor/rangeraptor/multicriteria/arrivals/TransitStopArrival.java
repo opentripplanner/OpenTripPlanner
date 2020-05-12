@@ -17,7 +17,6 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
     public TransitStopArrival(
         AbstractStopArrival<T> previousState,
         int stopIndex,
-        int boardTime,
         int arrivalTime,
         int additionalCost,
         T trip
@@ -25,7 +24,6 @@ public final class TransitStopArrival<T extends RaptorTripSchedule>
         super(
                 previousState,
                 stopIndex,
-                boardTime,
                 arrivalTime,
                 additionalCost
         );

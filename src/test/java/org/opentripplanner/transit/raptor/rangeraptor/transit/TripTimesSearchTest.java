@@ -208,11 +208,11 @@ public class TripTimesSearchTest {
 
     Bus busFwd(int accessToStop, int transitToStop, int arrivalTime) {
         Access access = new Access(accessToStop, -9999, -9999);
-        return new Bus(1, transitToStop, -9999, arrivalTime, schedule, access);
+        return new Bus(1, transitToStop, arrivalTime, schedule, access);
     }
 
     Bus busRwd(int accessToStop, int transitToStop, int arrivalTime) {
         Access access = new Access(accessToStop, -9999, -9999);
-        return new Bus(1, transitToStop, -9999, arrivalTime, schedule, access);
+        return new Bus(1, transitToStop, arrivalTime, schedule, access);
     }
 }

@@ -9,13 +9,11 @@ final class Access<T extends RaptorTripSchedule>
     extends StopArrivalViewAdapter<T>
     implements AccessLegView
 {
-    private final int departureTime;
     private final int arrivalTime;
     private final RaptorTransfer access;
 
-    Access(int stop, int departureTime, int arrivalTime, RaptorTransfer access) {
+    Access(int stop, int arrivalTime, RaptorTransfer access) {
         super(0, stop);
-        this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.access = access;
     }
@@ -23,11 +21,6 @@ final class Access<T extends RaptorTripSchedule>
     @Override
     public int arrivalTime() {
         return arrivalTime;
-    }
-
-    @Override
-    public int departureTime() {
-        return departureTime;
     }
 
     @Override

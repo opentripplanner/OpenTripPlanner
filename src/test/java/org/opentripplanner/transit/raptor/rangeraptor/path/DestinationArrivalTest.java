@@ -41,7 +41,6 @@ public class DestinationArrivalTest {
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
             ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_STOP,
-            TRANSIT_BOARD_TIME,
             TRANSIT_ALIGHT_TIME,
             TRANSIT_COST,
             A_TRIP
@@ -50,15 +49,9 @@ public class DestinationArrivalTest {
     private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
             new TestRaptorTransfer(TRANSIT_STOP, DESTINATION_DURATION_TIME),
             TRANSIT_ARRIVAL,
-            TRANSIT_ALIGHT_TIME,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST
     );
-
-    @Test
-    public void departureTime() {
-        assertEquals(TRANSIT_ARRIVAL.arrivalTime(), subject.departureTime());
-    }
 
     @Test
     public void arrivalTime() {

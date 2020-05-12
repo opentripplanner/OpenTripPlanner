@@ -131,7 +131,6 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
                 new TransitStopArrival<>(
                         boarding.prevArrival,
                         alightStop,
-                        boarding.boardTime,
                         stopArrivalTime,
                         costTransitLeg,
                         boarding.trip

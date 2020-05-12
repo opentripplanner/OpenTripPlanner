@@ -80,7 +80,6 @@ public class AccessStopArrivalTest {
         final int dTime = 60;
         AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
 
-        assertEquals(result.departureTime(), DEPARTURE_TIME + dTime);
         assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
         assertEquals(subject.cost(), result.cost());
         assertEquals(subject.travelDuration(), result.travelDuration());

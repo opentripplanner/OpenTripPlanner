@@ -17,12 +17,8 @@ public class ForwardPathMapperTest {
     public void mapToPathForwardSearch() {
         Egress egress = StopArrivalsTestData.basicTripByForwardSearch();
         DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
-                new TestRaptorTransfer(
-                    egress.previous().stop(),
-                    egress.arrivalTime() - egress.previous().arrivalTime()
-                ),
+                new TestRaptorTransfer(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
-                egress.previous().arrivalTime(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );

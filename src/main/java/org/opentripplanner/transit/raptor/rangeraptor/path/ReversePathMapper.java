@@ -53,12 +53,13 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
     AccessPathLeg<T> mapAccessLeg(DestinationArrival<T> destArrival) {
         ArrivalView<T> prevArrival = destArrival.previous();
         RaptorTransfer access = destArrival.egressLeg().egress();
-        int targetArrivalTime = destArrival.arrivalTime() - access.durationInSeconds();
+        int targetDepartureTime = destArrival.arrivalTime();
+        int targetArrivalTime = destArrival.arrivalTime() + access.durationInSeconds();
 
         return new AccessPathLeg<>(
                 access,
                 prevArrival.stop(),
-                destArrival.arrivalTime(),
+                targetDepartureTime,
                 targetArrivalTime,
                 mapToTransit(prevArrival)   // Recursive
         );
@@ -109,16 +110,17 @@ public final class ReversePathMapper<T extends RaptorTripSchedule> implements Pa
         );
     }
 
-    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> stopArrival) {
-        RaptorTransfer egress = stopArrival.accessLeg().access();
-        int egressArrivalTime = stopArrival.arrivalTime() - egress.durationInSeconds();
+    private EgressPathLeg<T> mapToEgressLeg(ArrivalView<T> accessArrival) {
+        RaptorTransfer egress = accessArrival.accessLeg().access();
+        int targetDepartureTime = accessArrival.arrivalTime();
+        int targetArrivalTime = accessArrival.arrivalTime() + egress.durationInSeconds();
 
         // No need to time-shift the egress leg, this is done when stopArrival is created
         return new EgressPathLeg<>(
             egress,
-            stopArrival.stop(),
-            stopArrival.arrivalTime(),
-            egressArrivalTime
+            accessArrival.stop(),
+            targetDepartureTime,
+            targetArrivalTime
         );
     }
 }

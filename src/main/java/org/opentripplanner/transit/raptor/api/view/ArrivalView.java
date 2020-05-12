@@ -48,17 +48,6 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
     int round();
 
     /**
-     * The last leg departure time.
-     * @deprecated A stop arrival do not have a departure time - the leg to get there has.
-     * But it is very easy to get it wron - does itt include slack? Can it be used to calculate
-     * wait time - in most cases NO!
-     */
-    @Deprecated
-    default int departureTime() {
-        throw new UnsupportedOperationException();
-    }
-
-    /**
      * The arrival time for when the stop is reached including alight-slack.
      */
     int arrivalTime();

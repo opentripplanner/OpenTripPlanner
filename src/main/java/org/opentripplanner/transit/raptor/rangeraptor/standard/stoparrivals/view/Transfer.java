@@ -24,11 +24,6 @@ final class Transfer<T extends RaptorTripSchedule>
     }
 
     @Override
-    public int departureTime() {
-        return cursor.departureTime(arrivalTime(), arrival.transferDuration());
-    }
-
-    @Override
     public boolean arrivedByTransfer() {
         return true;
     }

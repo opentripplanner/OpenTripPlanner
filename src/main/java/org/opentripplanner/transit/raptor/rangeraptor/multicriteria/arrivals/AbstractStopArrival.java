@@ -36,7 +36,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      */
     private final int paretoRound;
     private final int stop;
-    private final int departureTime;
     private final int arrivalTime;
     private final int travelDuration;
     private final int cost;
@@ -46,15 +45,13 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      *
      * @param previous the previous arrival visited for the current trip
      * @param stop stop index for this arrival
-     * @param departureTime the departure time from the previous stop
      * @param arrivalTime the arrival time for this stop index
      * @param additionalCost the accumulated cost at this stop arrival
      */
-    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int departureTime, int arrivalTime, int additionalCost) {
+    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int arrivalTime, int additionalCost) {
         this.previous = previous;
         this.paretoRound = previous.paretoRound + (isTransitFollowedByTransit() ? 2 : 1);
         this.stop = stop;
-        this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.travelDuration = previous.travelDuration + (arrivalTime - previous.arrivalTime);
         this.cost = previous.cost + additionalCost;
@@ -67,7 +64,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
         this.previous = null;
         this.paretoRound = 0;
         this.stop = stop;
-        this.departureTime = departureTime;
         this.arrivalTime = departureTime + travelDuration;
         this.travelDuration = travelDuration;
         this.cost = initialCost;
@@ -82,11 +78,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     @Override
     public final int stop() {
         return stop;
-    }
-
-    @Override
-    public int departureTime() {
-        return departureTime;
     }
 
     @Override

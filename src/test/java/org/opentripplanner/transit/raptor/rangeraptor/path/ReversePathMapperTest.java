@@ -18,12 +18,8 @@ public class ReversePathMapperTest {
         // Given:
         Egress egress = basicTripByReverseSearch();
         DestinationArrival<TestRaptorTripSchedule> destArrival = new DestinationArrival<>(
-                new TestRaptorTransfer(
-                    egress.previous().stop(),
-                    egress.arrivalTime() - egress.previous().arrivalTime()
-                ),
+                new TestRaptorTransfer(egress.previous().stop(), egress.durationInSeconds()),
                 egress.previous(),
-                egress.previous().arrivalTime(),
                 egress.arrivalTime(),
                 egress.additionalCost()
         );
@@ -33,8 +29,6 @@ public class ReversePathMapperTest {
 
         //When:
         Path<TestRaptorTripSchedule> path = mapper.mapToPath(destArrival);
-
-        System.out.println(path.toString());
 
         // Then:
         PathLeg<?> leg = path.accessLeg();

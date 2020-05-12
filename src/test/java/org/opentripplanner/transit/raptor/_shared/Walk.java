@@ -4,11 +4,14 @@ import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.TransferLegView;
 
 class Walk extends AbstractStopArrival {
+    private final int durationInSeconds;
 
     Walk(
             int round, int stop, int departureTime, int arrivalTime, ArrivalView<TestRaptorTripSchedule> previous
     ) {
-        super(round, stop, departureTime, arrivalTime, 1000, previous);
+        super(round, stop, arrivalTime, 1000, previous);
+        // In a reverse search we the arrival is before the departure
+        this.durationInSeconds = Math.abs(arrivalTime - departureTime);
     }
 
     @Override public boolean arrivedByTransfer() {
@@ -16,11 +19,6 @@ class Walk extends AbstractStopArrival {
     }
 
     @Override public TransferLegView transferLeg() {
-        return () -> durationInSeconds();
-    }
-
-    private int durationInSeconds() {
-        // The duration is a positive number, also when traveling in REVERSE
-        return Math.abs(arrivalTime() -  departureTime());
+        return () -> durationInSeconds;
     }
 }

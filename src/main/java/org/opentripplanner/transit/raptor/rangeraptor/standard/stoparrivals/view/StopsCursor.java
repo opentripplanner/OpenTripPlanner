@@ -87,8 +87,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
      */
     private ArrivalView<T> newAccessView(int stop) {
         AccessStopArrivalState<T> arrival = stops.get(0, stop).asAccessStopArrivalState();
-        int departureTime = transitCalculator.minusDuration(arrival.time(), arrival.accessDuration());
-        return new Access<>(stop, departureTime, arrival.time(), arrival.access());
+        return new Access<>(stop, arrival.time(), arrival.access());
     }
 
     /**
@@ -110,7 +109,7 @@ public class StopsCursor<T extends RaptorTripSchedule> {
         int departureTime = transitCalculator.departureTime(state.access(), preferredDepartureTime);
         int arrivalTime = transitCalculator.plusDuration(departureTime, state.access().durationInSeconds());
 
-        return new Access<>(stop, departureTime, arrivalTime, state.access());
+        return new Access<>(stop, arrivalTime, state.access());
     }
 
     private ArrivalView<T> newTransitOrTransferView(int round, int stop) {

@@ -29,7 +29,6 @@ import org.opentripplanner.transit.raptor.api.view.EgressLegView;
 class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T> {
     private final ArrivalView<T> previous;
     private final RaptorTransfer egress;
-    private final int departureTime;
     private final int arrivalTime;
     private final int numberOfTransfers;
     private final int cost;
@@ -38,13 +37,11 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     DestinationArrival(
         RaptorTransfer egress,
         ArrivalView<T> previous,
-        int departureTime,
         int arrivalTime,
         int additionalCost
     ) {
         this.previous = previous;
         this.egress = egress;
-        this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
         this.numberOfTransfers = previous.round() - 1;
         this.cost = previous.cost() + additionalCost;
@@ -58,11 +55,6 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
     @Override
     public int round() {
         return numberOfTransfers + 1;
-    }
-
-    @Override
-    public int departureTime() {
-        return departureTime;
     }
 
     @Override
