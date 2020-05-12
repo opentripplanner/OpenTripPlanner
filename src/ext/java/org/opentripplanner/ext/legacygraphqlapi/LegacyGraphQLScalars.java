@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
+package org.opentripplanner.ext.legacygraphqlapi;
 
 import graphql.language.StringValue;
 import graphql.schema.Coercing;

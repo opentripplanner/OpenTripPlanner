@@ -12,11 +12,12 @@ import java.util.stream.Collectors;
 
 class IntrospectionTypeWiring {
 
-  static TypeRuntimeWiring build(Class clazz) throws Exception {
-    Object instance = clazz.getConstructor().newInstance();
+  static <T> TypeRuntimeWiring build(Class<T> clazz) throws Exception {
+    T instance = clazz.getConstructor().newInstance();
 
     return TypeRuntimeWiring
-        .newTypeWiring(clazz.getSimpleName()
+        .newTypeWiring(clazz
+            .getSimpleName()
             .replaceFirst("LegacyGraphQL", "")
             .replaceAll("Impl$", ""))
         .dataFetchers(Arrays
@@ -31,9 +32,9 @@ class IntrospectionTypeWiring {
         .build();
   }
 
-  private static Predicate<Method> isMethodPublic = method -> Modifier.isPublic(method.getModifiers());
+  private static final Predicate<Method> isMethodPublic = method -> Modifier.isPublic(method.getModifiers());
 
-  private static Predicate<Method> isMethodReturnTypeDataFetcher = (
+  private static final Predicate<Method> isMethodReturnTypeDataFetcher = (
       (Predicate<Method>) method -> method.getReturnType().equals(DataFetcher.class)
   ).or(method -> Arrays.asList(method.getReturnType().getInterfaces()).contains(DataFetcher.class));
 }
