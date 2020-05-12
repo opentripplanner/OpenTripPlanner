@@ -17,7 +17,6 @@ import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.ElevatorAlightEdge;
 import org.opentripplanner.routing.edgetype.ElevatorBoardEdge;
 import org.opentripplanner.routing.edgetype.ElevatorHopEdge;
@@ -114,7 +113,7 @@ public class AddTransitModelEntitiesToGraph {
         for (Stop stop : transitService.getAllStops()) {
             Set<TransitMode> modes = stopModeMap.get(stop);
             TransitStopVertex stopVertex = new TransitStopVertex(graph, stop, modes);
-            if (modes != null && modes.contains(TraverseMode.SUBWAY)) {
+            if (modes != null && modes.contains(TransitMode.SUBWAY)) {
                 stopVertex.setStreetToStopTime(subwayAccessTime);
             }
 
