@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone;
 
+import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
 import org.opentripplanner.profile.StopClusterMode;
@@ -185,6 +187,36 @@ public class GraphBuilderParameters {
     public final Boolean extraEdgesStopPlatformLink;
 
     /**
+     * When set to true (it is by default), the elevation module will attempt to read this file in order to reuse
+     * calculations of elevation data for various coordinate sequences instead of recalculating them all over again.
+     */
+    public boolean readCachedElevations;
+
+    /**
+     * When set to true (it is false by default), the elevation module will create a file of a lookup map of the
+     * LineStrings and the corresponding calculated elevation data for those coordinates. Subsequent graph builds can
+     * reuse the data in this file to avoid recalculating all the elevation data again.
+     */
+    public boolean writeCachedElevations;
+
+    /**
+     * When set to true (it is false by default), the elevation module will include the Ellipsoid to Geiod difference in
+     * the calculations of every point along every StreetWithElevationEdge in the graph.
+     *
+     * NOTE: if this is set to true for graph building, make sure to not set the value of
+     * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of the
+     * elevation values in the street edges.
+     */
+    public boolean includeEllipsoidToGeoidDifference;
+
+    /**
+     * Whether or not to multi-thread the elevation calculations in the elevation module. The default is set to false.
+     * For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single
+     * processor. If multi-threading is activated, parallel streams will be used to calculate the elevations.
+     */
+    public boolean multiThreadElevationCalculations;
+
+    /**
      * Set all parameters from the given Jackson JSON tree, applying defaults.
      * Supplying MissingNode.getInstance() will cause all the defaults to be applied.
      * This could be done automatically with the "reflective query scraper" but it's less type safe and less clear.
@@ -220,6 +252,10 @@ public class GraphBuilderParameters {
         banDiscouragedBiking = config.path("banDiscouragedBiking").asBoolean(false);
         maxTransferDistance = config.path("maxTransferDistance").asDouble(2000);
         extraEdgesStopPlatformLink = config.path("extraEdgesStopPlatformLink").asBoolean(false);
+        readCachedElevations = config.path("readCachedElevations").asBoolean(true);
+        writeCachedElevations = config.path("writeCachedElevations").asBoolean(false);
+        includeEllipsoidToGeoidDifference = config.path("includeEllipsoidToGeoidDifference").asBoolean(false);
+        multiThreadElevationCalculations = config.path("multiThreadElevationCalculations").asBoolean(false);
     }
 
 
