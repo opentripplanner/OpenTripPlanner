@@ -31,8 +31,8 @@ public final class StdStopArrivalsState<T extends RaptorTripSchedule> implements
     }
 
     @Override
-    public final void setInitialTime(final int stop, final int arrivalTime, int durationInSeconds) {
-        stops.setInitialTime(stop, arrivalTime, durationInSeconds);
+    public final void setAccess(final int stop, final int arrivalTime, RaptorTransfer access) {
+        stops.setAccess(stop, arrivalTime, access);
     }
 
     @Override

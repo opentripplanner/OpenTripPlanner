@@ -14,7 +14,8 @@ import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransitDataProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
-import org.opentripplanner.transit.raptor.speed_test.api.model.TripPlan;
+import org.opentripplanner.transit.raptor.speed_test.model.Itinerary;
+import org.opentripplanner.transit.raptor.speed_test.model.TripPlan;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestCmdLineOpts;
 import org.opentripplanner.transit.raptor.speed_test.options.SpeedTestConfig;
 import org.opentripplanner.transit.raptor.speed_test.testcase.CsvFileIO;
@@ -22,7 +23,6 @@ import org.opentripplanner.transit.raptor.speed_test.testcase.NoResultFound;
 import org.opentripplanner.transit.raptor.speed_test.testcase.TestCase;
 import org.opentripplanner.transit.raptor.speed_test.transit.EgressAccessRouter;
 import org.opentripplanner.transit.raptor.speed_test.transit.ItineraryMapper;
-import org.opentripplanner.transit.raptor.speed_test.transit.ItinerarySet;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 import org.opentripplanner.util.OtpAppException;
 
@@ -153,8 +153,10 @@ public class SpeedTest {
         // one time; Hence skip JIT compiler warm-up.
         int samplesPrProfile = opts.numberOfTestsSamplesToRun() / opts.profiles().length;
         if(testCasesToRun.size() > 1 || samplesPrProfile > 1) {
-            // Warm-up JIT compiler
-            runSingleTestCase(tripPlans, testCases.get(1), true);
+            // Warm-up JIT compiler, run the second test-case if it exist to avoid the same
+            // test case from being repeated. If there is just one case, then run it.
+            int index = testCasesToRun.size() == 1 ? 0 : 1;
+            runSingleTestCase(tripPlans, testCases.get(index), true);
         }
 
         ResultPrinter.logSingleTestHeader(routeProfile);
@@ -290,7 +292,7 @@ public class SpeedTest {
             int sample,
             int nSamples
     ) {
-        System.out.println("Set up test");
+        System.err.println("Set up test");
         if (opts.compareHeuristics()) {
             heuristicProfile = profilesToRun[0];
             routeProfile = profilesToRun[1 + sample % (profilesToRun.length - 1)];
@@ -340,7 +342,7 @@ public class SpeedTest {
             RaptorResponse<TripSchedule> response,
             EgressAccessRouter streetRouter
     ) {
-        ItinerarySet itineraries = ItineraryMapper.mapItineraries(
+        List<Itinerary> itineraries = ItineraryMapper.mapItineraries(
                 request, response.paths(), streetRouter, transitLayer
         );
 

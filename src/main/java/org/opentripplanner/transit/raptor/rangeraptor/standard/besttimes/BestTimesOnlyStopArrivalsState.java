@@ -34,7 +34,7 @@ public class BestTimesOnlyStopArrivalsState<T extends RaptorTripSchedule> implem
     }
 
     @Override
-    public void setInitialTime(int stop, int arrivalTime, int durationInSeconds) {
+    public void setAccess(int stop, int arrivalTime, RaptorTransfer access) {
         bestNumberOfTransfers.arriveAtStop(stop);
     }
 

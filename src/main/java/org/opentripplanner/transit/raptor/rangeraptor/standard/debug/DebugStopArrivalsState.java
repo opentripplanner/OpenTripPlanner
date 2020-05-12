@@ -37,8 +37,8 @@ public final class DebugStopArrivalsState<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public final void setInitialTime(final int stop, final int arrivalTime, int durationInSeconds) {
-        delegate.setInitialTime(stop, arrivalTime, durationInSeconds);
+    public final void setAccess(final int stop, final int arrivalTime, RaptorTransfer access) {
+        delegate.setAccess(stop, arrivalTime, access);
         debug.acceptAccess(stop);
     }
 

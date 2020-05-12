@@ -21,7 +21,7 @@ public class RouterConfig implements Serializable {
     private static final Logger LOG = LoggerFactory.getLogger(RouterConfig.class);
 
     public static final RouterConfig DEFAULT = new RouterConfig(
-            MissingNode.getInstance(), "DEFAULT"
+            MissingNode.getInstance(), "DEFAULT", false
     );
 
     /**
@@ -34,7 +34,7 @@ public class RouterConfig implements Serializable {
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
 
-    public RouterConfig(JsonNode node, String source) {
+    public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
         this.requestLogFile = adapter.asText("requestLogFile", null);
@@ -43,7 +43,14 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        adapter.logAllUnusedParameters(LOG);
+
+        // Touch parameters read at a later point in time to avoid reporting them when
+        // logging unused parameters.
+        adapter.path("updaters");
+
+        if(logUnusedParams) {
+            adapter.logAllUnusedParameters(LOG);
+        }
     }
 
     public String requestLogFile() {

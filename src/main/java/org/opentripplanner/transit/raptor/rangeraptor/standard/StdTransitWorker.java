@@ -1,9 +1,10 @@
 package org.opentripplanner.transit.raptor.rangeraptor.standard;
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
-import org.opentripplanner.transit.raptor.rangeraptor.TransitRoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
 
@@ -13,7 +14,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch
  *
  * @param <T> The TripSchedule type defined by the user of the raptor API.
  */
-public final class StdTransitWorker<T extends RaptorTripSchedule> implements TransitRoutingStrategy<T> {
+public final class StdTransitWorker<T extends RaptorTripSchedule> implements RoutingStrategy<T> {
 
     private static final int NOT_SET = -1;
 
@@ -98,5 +99,17 @@ public final class StdTransitWorker<T extends RaptorTripSchedule> implements Tra
                 }
             }
         }
+    }
+
+    @Override
+    public void setInitialTimeForIteration(RaptorTransfer it, int iterationDepartureTime) {
+        // Earliest possible departure time from the origin, or latest possible arrival time at the
+        // destination if searching backwards, using this AccessEgress.
+        int departureTime = calculator.departureTime(it, iterationDepartureTime);
+
+        // This access is not available after the iteration departure time
+        if (departureTime == -1) return;
+
+        state.setInitialTimeForIteration(it, departureTime);
     }
 }

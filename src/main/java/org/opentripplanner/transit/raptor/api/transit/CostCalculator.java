@@ -18,6 +18,11 @@ public interface CostCalculator {
     int walkCost(int walkTimeInSeconds);
 
     /**
+     * Calculate the value, when waiting between the last transit and egress legs
+     */
+    int waitCost(int waitTimeInSeconds);
+
+    /**
      * Used for estimating the remaining value for a criteria at a given stop arrival. The
      * calculated value should be a an optimistic estimate for the heuristics to work properly. So,
      * to calculate the generalized cost for given the {@code minTravelTime} and {@code

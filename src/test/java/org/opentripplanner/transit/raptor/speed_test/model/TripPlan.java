@@ -1,7 +1,6 @@
-package org.opentripplanner.transit.raptor.speed_test.api.model;
+package org.opentripplanner.transit.raptor.speed_test.model;
 
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
-import org.opentripplanner.transit.raptor.speed_test.testcase.Place;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -28,8 +27,6 @@ public class TripPlan {
 
     /** A list of possible itineraries */
     private List<Itinerary> itineraries = new ArrayList<Itinerary>();
-
-    public TripPlan() { }
 
     public TripPlan(
             Date date,

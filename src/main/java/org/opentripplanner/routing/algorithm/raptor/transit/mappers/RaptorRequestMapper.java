@@ -57,7 +57,6 @@ public class RaptorRequestMapper {
                 .addEgressStops(egressTimes.stream()
                     .map(t -> (RaptorTransfer) t).collect(Collectors.toList()))
                 .boardSlackInSeconds(request.boardSlack)
-                .allowWaitingBetweenAccessAndTransit(false)
                 .timetableEnabled(true);
 
         builder.mcCostFactors()

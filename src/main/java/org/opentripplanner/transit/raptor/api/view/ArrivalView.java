@@ -1,6 +1,7 @@
 package org.opentripplanner.transit.raptor.api.view;
 
 
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
@@ -39,6 +40,13 @@ public interface ArrivalView<T extends RaptorTripSchedule> {
      * @throws UnsupportedOperationException if arrived at destination.
      */
     int stop();
+
+    /**
+     * The access or egress connecting this leg to the start or end location of the search.
+     *
+     * @throws UnsupportedOperationException if did not arrive via street network.
+     */
+    RaptorTransfer accessEgress();
 
     /**
      * The Range Raptor ROUND this stop is reached. Note! the destination

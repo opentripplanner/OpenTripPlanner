@@ -73,10 +73,6 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return accessOrTransferDuration;
     }
 
-    final boolean arrivedByAccess() {
-        return !arrivedByTransfer() && accessOrTransferDuration != NOT_SET;
-    }
-
     public final boolean arrivedByTransit() {
         return transitArrivalTime != NOT_SET;
     }
@@ -85,7 +81,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         return transferFromStop != NOT_SET;
     }
 
-    final void setAccessTime(int time, int accessDuration) {
+    void setAccessTime(int time, int accessDuration) {
         this.bestArrivalTime = time;
         this.accessOrTransferDuration = accessDuration;
     }
@@ -116,22 +112,20 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
         this.accessOrTransferDuration = transferTime;
     }
 
+    public AccessStopArrivalState<T> asAccessStopArrivalState() {
+        return (AccessStopArrivalState<T>) this;
+    }
+
     @Override
     public String toString() {
-        if(arrivedByAccess()) {
-            return String.format("Access Arrival { time: %s, duration: %s }",
-                    TimeUtils.timeToStrLong(bestArrivalTime),
-                    TimeUtils.timeToStrCompact(accessOrTransferDuration)
-            );
-        }
         return String.format("Arrival { time: %s, Transit: %s %s-%s, trip: %s, Transfer from: %s %s }",
-                TimeUtils.timeToStrLong(bestArrivalTime, NOT_SET),
+                TimeUtils.timeToStrCompact(bestArrivalTime, NOT_SET),
                 IntUtils.intToString(boardStop, NOT_SET),
                 TimeUtils.timeToStrCompact(boardTime, NOT_SET),
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
                 trip == null ? "" : trip.debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
-                TimeUtils.timeToStrCompact(accessOrTransferDuration, NOT_SET)
+                TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
         );
     }
 }

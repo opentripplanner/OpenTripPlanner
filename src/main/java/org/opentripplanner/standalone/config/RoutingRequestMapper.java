@@ -43,7 +43,7 @@ public class RoutingRequestMapper {
         request.bikeTriangleTimeFactor = c.asDouble("bikeTriangleTimeFactor", dft.bikeTriangleTimeFactor);
         request.bikeSwitchTime = c.asInt("bikeSwitchTime", dft.bikeSwitchTime);
         request.bikeSwitchCost = c.asInt("bikeSwitchCost", dft.bikeSwitchCost);
-        request.boardSlack = c.asInt("boardSlack", 0);
+        request.boardSlack = c.asInt("boardSlack", dft.boardSlack);
         request.boardSlackForMode = c.asEnumMap("boardSlackForMode", TraverseMode.class, NodeAdapter::asInt);
         request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
         request.carAccelerationSpeed = c.asDouble("carAccelerationSpeed", dft.carAccelerationSpeed);
