@@ -183,7 +183,7 @@ public class RoutingWorker {
     }
 
     private ItineraryFilter filterChain() {
-        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
+        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
         builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);

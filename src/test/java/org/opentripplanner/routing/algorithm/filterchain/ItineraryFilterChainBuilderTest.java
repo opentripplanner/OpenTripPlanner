@@ -19,7 +19,7 @@ import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class ItineraryFilterChainBuilderTest {
     // Given a default chain
-    private ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
+    private ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(false);
 
     // And some itineraries, with some none optimal option
     private Itinerary i1 = itinerary(leg(A, E, 6, 8, 5.0, WALK));

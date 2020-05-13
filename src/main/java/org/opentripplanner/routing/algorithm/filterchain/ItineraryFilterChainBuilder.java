@@ -8,7 +8,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDeparture
 import org.opentripplanner.routing.algorithm.filterchain.filters.LongTransitWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnWalkingArrivalAndDeparture;
+import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
 
 import java.time.Instant;
@@ -21,12 +21,19 @@ import java.util.stream.Collectors;
  * Create a filter chain based on the given config.
  */
 public class ItineraryFilterChainBuilder {
+    private final boolean arriveBy;
     private double groupByP = 0.68;
     private int minLimit = 3;
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
     private boolean debug;
+
+
+    /** @param arriveBy Used to set the correct sort order.  */
+    public ItineraryFilterChainBuilder(boolean arriveBy) {
+        this.arriveBy = arriveBy;
+    }
 
     /**
      * Max departure time. This is a absolute filter on the itinerary departure time from the
@@ -97,7 +104,7 @@ public class ItineraryFilterChainBuilder {
         }
 
         // Sort itineraries
-        filters.add(new SortOnWalkingArrivalAndDeparture());
+        filters.add(new OtpDefaultSortOrder(arriveBy));
 
         // Remove itineraries if max limit is exceeded
         if (maxLimit >= minLimit) {
