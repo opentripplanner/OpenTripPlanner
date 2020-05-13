@@ -186,6 +186,16 @@ public abstract class GraphPathToTripPlanConverter {
         }
         itinerary.itineraryType = generateItineraryType(itinerary.legs);
         itinerary.usedNotRecommendedRoute = path.states.stream().anyMatch(s -> s.usedNotRecommendedRoute);
+
+        String googleMapsURL = "https://www.google.pl/maps/dir/";
+        List<Place> places = itinerary.legs.stream().map(leg->leg.from).collect(Collectors.toList());
+        places.add(itinerary.legs.get(itinerary.legs.size()-1).to);
+
+        googleMapsURL=places.stream().map(place->"'"+place.lat+","+place.lon+"'/").reduce(googleMapsURL,(s1,s2)->s1+s2);
+
+//        TODO this probably should be removed
+        System.out.println(googleMapsURL+"     TODO please remove me");
+
         return itinerary;
     }
 
@@ -293,8 +303,7 @@ public abstract class GraphPathToTripPlanConverter {
                     }
                     legIndexPairs = new int[]{i, states.length - 1};
                 }
-            } else if (backMode != forwardMode || states[i - 1].getCurrentVehicle() != states[i].getCurrentVehicle()) {          // Mode/Vehicle change => leg switch
-//              We can dropoff vehicle and rent another at the same node. Such situations must be detected.
+            } else if (backMode != forwardMode) {                       // Mode change => leg switch
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[]{i, states.length - 1};
