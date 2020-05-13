@@ -40,4 +40,9 @@ public class MaxLimitFilter implements ItineraryFilter {
         }
         return itineraries.stream().limit(i).collect(Collectors.toList());
     }
+
+    @Override
+    public boolean removeItineraries() {
+        return true;
+    }
 }

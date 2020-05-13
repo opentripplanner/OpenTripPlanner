@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
@@ -14,6 +14,7 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongest
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 /**
@@ -80,7 +81,7 @@ public class ItineraryFilterChainBuilder {
     }
 
     public ItineraryFilter build() {
-        final List<ItineraryFilter> filters = new ArrayList<>();
+        List<ItineraryFilter> filters = new ArrayList<>();
 
         filters.add(new LongTransitWalkingFilter());
 
@@ -103,6 +104,18 @@ public class ItineraryFilterChainBuilder {
             filters.add(new MaxLimitFilter("MAX", maxLimit));
         }
 
-        return debug ? new DebugFilterChain(filters) : new FilterChain(filters);
+        if(debug) {
+            filters = addDebugWrppers(filters);
+        }
+
+        return new FilterChain(filters);
+    }
+
+
+    /* private methods */
+
+    private List<ItineraryFilter> addDebugWrppers(List<ItineraryFilter> filters) {
+        final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
+        return filters.stream().map(factory::wrap).collect(Collectors.toList());
     }
 }
