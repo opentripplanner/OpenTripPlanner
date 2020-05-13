@@ -423,7 +423,7 @@ public class WalkableAreaBuilder {
 
             AreaEdge street = edgeFactory.createAreaEdge(startEndpoint, endEndpoint, line, name,
                     length, areaPermissions, false, edgeList);
-            street.setCarSpeed(carSpeed);
+            street.setMaxStreetTraverseSpeed(carSpeed);
 
             if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
                 street.setHasBogusName(true);
@@ -442,7 +442,7 @@ public class WalkableAreaBuilder {
 
             AreaEdge backStreet = edgeFactory.createAreaEdge(endEndpoint, startEndpoint,
                     (LineString) line.reverse(), name, length, areaPermissions, true, edgeList);
-            backStreet.setCarSpeed(carSpeed);
+            backStreet.setMaxStreetTraverseSpeed(carSpeed);
 
             if (!areaEntity.hasTag("name") && !areaEntity.hasTag("ref")) {
                 backStreet.setHasBogusName(true);

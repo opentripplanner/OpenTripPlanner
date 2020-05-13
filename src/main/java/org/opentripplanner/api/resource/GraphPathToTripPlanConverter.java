@@ -185,6 +185,7 @@ public abstract class GraphPathToTripPlanConverter {
             itinerary.transfers--;
         }
         itinerary.itineraryType = generateItineraryType(itinerary.legs);
+        itinerary.usedNotRecommendedRoute = path.states.stream().anyMatch(s -> s.usedNotRecommendedRoute);
 
         String googleMapsURL = "https://www.google.pl/maps/dir/";
         List<Place> places = itinerary.legs.stream().map(leg->leg.from).collect(Collectors.toList());

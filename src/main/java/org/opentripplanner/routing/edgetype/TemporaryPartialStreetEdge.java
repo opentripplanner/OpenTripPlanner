@@ -4,7 +4,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
@@ -32,7 +31,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
             LineString geometry, I18NString name, double length) {
         super(v1, v2, geometry, name, length, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
-        setCarSpeed(parentEdge.getCarSpeed());
+        setMaxStreetTraverseSpeed(parentEdge.getMaxStreetTraverseSpeed());
         setElevationProfileUsingParents();
 
         // Assert that the edge is going in the right direction [only possible if vertex is temporary]
@@ -49,7 +48,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
             LineString geometry, I18NString name) {
         super(v1, v2, geometry, name, 0, parentEdge.getPermission(), false);
         this.parentEdge = parentEdge;
-        setCarSpeed(parentEdge.getCarSpeed());
+        setMaxStreetTraverseSpeed(parentEdge.getMaxStreetTraverseSpeed());
 
         // No length is known, so we use the provided geometry to estimate it
         calculateLengthFromGeometry();
@@ -135,7 +134,7 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
     public String toString() {
         return "TemporaryPartialStreetEdge(" + this.getName() + ", " + this.getFromVertex() + " -> "
                 + this.getToVertex() + " length=" + this.getDistanceInMeters() + " carSpeed="
-                + this.getCarSpeed() + " parentEdge=" + parentEdge + ")";
+                + this.getMaxStreetTraverseSpeed() + " parentEdge=" + parentEdge + ")";
     }
 
     private void assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(StreetVertex v1) {

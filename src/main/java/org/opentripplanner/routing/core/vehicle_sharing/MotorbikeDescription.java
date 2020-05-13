@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class MotorbikeDescription extends VehicleDescription {
 
@@ -20,7 +21,7 @@ public class MotorbikeDescription extends VehicleDescription {
     }
 
     @Override
-    public double getMaxSpeedInMetersPerSecond() {
+    public double getMaxSpeedInMetersPerSecond(StreetEdge streetEdge) {
         return MAX_SPEED_IN_METERS_PER_SECOND;
     }
 
