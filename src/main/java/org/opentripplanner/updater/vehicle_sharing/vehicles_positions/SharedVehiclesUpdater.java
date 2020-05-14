@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_sharing;
+package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.annotations.VisibleForTesting;
@@ -29,7 +29,7 @@ import static org.apache.lucene.util.SloppyMath.haversin;
 
 public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);
 
     private static final double MAX_DISTANCE_TO_EDGE_IN_METERS = 500;
     private static final double MAX_DISTANCE_TO_VERTEX_IN_KM = 0.2;

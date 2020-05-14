@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_sharing;
+package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import java.util.List;
 
