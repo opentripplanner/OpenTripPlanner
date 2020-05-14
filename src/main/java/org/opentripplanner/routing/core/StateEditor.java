@@ -404,6 +404,20 @@ public class StateEditor {
         child.stateData.currentVehicle = null;
     }
 
+    public void reversedDoneVehicleRenting(VehicleDescription vehicleDescription) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentVehicle = vehicleDescription;
+        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+    }
+
+    public void reversedBeginVehicleRenting() {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(child.stateData.currentVehicle.getRentTimeInSeconds());
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
+        child.stateData.currentVehicle = null;
+    }
+
     /**
      * This has two effects: marks the car as parked, and switches the current mode.
      * Marking the car parked is important for allowing co-dominance of walking and driving states.

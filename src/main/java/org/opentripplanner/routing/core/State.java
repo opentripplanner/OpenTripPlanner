@@ -10,6 +10,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.*;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -673,6 +674,8 @@ public class State implements Cloneable {
             if (forward && firstBoardOrLastAlight(orig, edge)) {
                 ret = ((TransitBoardAlight) edge).traverse(ret, orig.getBackState().getTimeSeconds());
                 newInitialWaitTime = ret.stateData.initialWaitTime;
+            } else if (edge instanceof RentVehicleAnywhereEdge) {
+                ret = reverseOptimizeRentingVehicles((RentVehicleAnywhereEdge) edge, ret, orig);
             } else {
                 ret = edge.traverse(ret);
             }
@@ -693,6 +696,22 @@ public class State implements Cloneable {
         }
 
         return forward ? forward(ret, newInitialWaitTime) : ret;
+    }
+
+    private State reverseOptimizeRentingVehicles(RentVehicleAnywhereEdge edge, State ret, State orig) {
+        if (ret.stateData.opt.reverseOptimizing) {
+            if (ret.isCurrentlyRentingVehicle()) {
+                return edge.reversedTraverseBeginRenting(ret);
+            } else {
+                return edge.reversedTraverseDoneRenting(ret, orig.getBackState().getCurrentVehicle());
+            }
+        } else {
+            if (ret.isCurrentlyRentingVehicle()) {
+                return edge.doneVehicleRenting(ret);
+            } else {
+                return edge.beginVehicleRenting(ret, orig.getBackState().getCurrentVehicle());
+            }
+        }
     }
 
     /**
