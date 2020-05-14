@@ -32,7 +32,8 @@ public class BuildConfigSerializer extends Serializer<BuildConfig> {
     public BuildConfig read(Kryo kryo, Input input, Class<BuildConfig> type) {
         return new BuildConfig(
                 ConfigLoader.nodeFromString(input.readString(), SOURCE),
-                SOURCE
+                SOURCE,
+                false
         );
     }
 }
