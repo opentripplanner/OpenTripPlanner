@@ -166,7 +166,7 @@ public class State implements Cloneable {
                 " pr=" + this.isCarParked() + ">";
     }
 
-    public CarPickupState getTaxiState() {
+    public CarPickupState getCarPickupState() {
         return stateData.carPickupState;
     }
     
@@ -206,7 +206,7 @@ public class State implements Cloneable {
         boolean bikeRentingOk;
         boolean bikeParkAndRideOk;
         boolean carParkAndRideOk;
-        boolean taxiOk;
+        boolean pickedUpByCar;
         if (stateData.opt.arriveBy) {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
@@ -214,7 +214,7 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
             // Checks that taxi has actually been used
-            taxiOk = getTaxiState() != CarPickupState.WALK_FROM_DROP_OFF;
+            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_FROM_DROP_OFF;
         } else {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
@@ -222,9 +222,9 @@ public class State implements Cloneable {
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
             // Checks that taxi has actually been used
-            taxiOk = getTaxiState() != CarPickupState.WALK_TO_PICKUP;
+            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_TO_PICKUP;
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && taxiOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && pickedUpByCar;
     }
 
     public double getWalkDistance() {

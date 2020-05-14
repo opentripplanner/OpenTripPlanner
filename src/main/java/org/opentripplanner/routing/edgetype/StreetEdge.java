@@ -259,7 +259,7 @@ public class StreetEdge extends Edge implements Cloneable {
             if (options.arriveBy) {
                 // Check if we can enter the taxi and continue by car
                 // Final WALK check needed to prevent infinite recursion.
-                if (s0.getTaxiState().equals(CarPickupState.WALK_FROM_DROP_OFF)
+                if (s0.getCarPickupState().equals(CarPickupState.WALK_FROM_DROP_OFF)
                         && currMode == TraverseMode.WALK) {
                     editor = doTraverse(s0, options, TraverseMode.CAR);
                     if (editor != null) {
@@ -274,7 +274,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
                 // Check if we can exit the taxi and continue by walking
                 // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getTaxiState().equals(CarPickupState.IN_CAR) &&
+                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
                         !getPermission().allows(TraverseMode.CAR)
                         && currMode == TraverseMode.CAR) {
                     // Check if it is possible to continue by walking
@@ -287,7 +287,7 @@ public class StreetEdge extends Edge implements Cloneable {
             } else { /* departAfter */
                 // Check if we can enter the taxi and continue by car
                 // Final WALK check needed to prevent infinite recursion.
-                if (s0.getTaxiState().equals(CarPickupState.WALK_TO_PICKUP)
+                if (s0.getCarPickupState().equals(CarPickupState.WALK_TO_PICKUP)
                     && currMode == TraverseMode.WALK) {
                     editor = doTraverse(s0, options, TraverseMode.CAR);
                     if (editor != null) {
@@ -302,7 +302,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
                 // Check if we can exit the taxi and continue by walking
                 // Final CAR check needed to prevent infinite recursion.
-                if ( s0.getTaxiState().equals(CarPickupState.IN_CAR) &&
+                if ( s0.getCarPickupState().equals(CarPickupState.IN_CAR) &&
                     !getPermission().allows(TraverseMode.CAR)
                     && currMode == TraverseMode.CAR) {
                     // Check if it is possible to continue by walking
