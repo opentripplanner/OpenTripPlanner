@@ -107,7 +107,13 @@ public class State implements Cloneable {
         this.stateData.usingRentedBike = false;
         /* If the itinerary is to begin with a car that is left for transit, the initial state of arriveBy searches is
            with the car already "parked" and in WALK mode. Otherwise, we are in CAR mode and "unparked". */
-        if (options.parkAndRide || options.kissAndRide) {
+        if (options.carPickup) {
+            this.stateData.carPickupState = options.arriveBy
+                ? CarPickupState.WALK_FROM_DROP_OFF
+                : CarPickupState.WALK_TO_PICKUP;
+            this.stateData.nonTransitMode = TraverseMode.WALK;
+        }
+        if (options.parkAndRide) {
             this.stateData.carParked = options.arriveBy;
             this.stateData.nonTransitMode = this.stateData.carParked ? TraverseMode.WALK : TraverseMode.CAR;
         } else if (options.bikeParkAndRide) {
@@ -159,6 +165,10 @@ public class State implements Cloneable {
                 " br=" + this.isBikeRenting() +
                 " pr=" + this.isCarParked() + ">";
     }
+
+    public CarPickupState getCarPickupState() {
+        return stateData.carPickupState;
+    }
     
     /** Returns time in seconds since epoch */
     public long getTimeSeconds() {
@@ -191,25 +201,30 @@ public class State implements Cloneable {
      */
     public boolean isFinal() {
         // When drive-to-transit is enabled, we need to check whether the car has been parked (or whether it has been picked up in reverse).
-        boolean parkAndRide = stateData.opt.parkAndRide || stateData.opt.kissAndRide;
+        boolean parkAndRide = stateData.opt.parkAndRide;
         boolean bikeParkAndRide = stateData.opt.bikeParkAndRide;
         boolean bikeRentingOk;
         boolean bikeParkAndRideOk;
         boolean carParkAndRideOk;
+        boolean pickedUpByCar;
         if (stateData.opt.arriveBy) {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
             bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
             bikeParkAndRideOk = !bikeParkAndRide || !isBikeParked();
             carParkAndRideOk = !parkAndRide || !isCarParked();
+            // Checks that taxi has actually been used
+            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_FROM_DROP_OFF;
         } else {
             // Check that we are not renting a bike at the destination
             // Also check that a bike was rented if bikeRental is specified
             bikeRentingOk = !isBikeRenting() && (!stateData.opt.bikeRental || hasUsedRentedBike());
             bikeParkAndRideOk = !bikeParkAndRide || isBikeParked();
             carParkAndRideOk = !parkAndRide || isCarParked();
+            // Checks that taxi has actually been used
+            pickedUpByCar = getCarPickupState() != CarPickupState.WALK_TO_PICKUP;
         }
-        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk;
+        return bikeRentingOk && bikeParkAndRideOk && carParkAndRideOk && pickedUpByCar;
     }
 
     public double getWalkDistance() {
@@ -334,6 +349,7 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        newState.stateData.carPickupState = stateData.carPickupState;
         return newState;
     }
 

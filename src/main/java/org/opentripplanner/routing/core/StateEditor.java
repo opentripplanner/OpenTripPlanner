@@ -272,6 +272,19 @@ public class StateEditor {
         child.stateData.usingRentedBike = state.isBikeRenting();
     }
 
+    public void setTaxiState(CarPickupState carPickupState) {
+        child.stateData.carPickupState = carPickupState;
+        switch (carPickupState) {
+            case WALK_TO_PICKUP:
+            case WALK_FROM_DROP_OFF:
+                child.stateData.nonTransitMode = TraverseMode.WALK;
+                break;
+            case IN_CAR:
+                child.stateData.nonTransitMode = TraverseMode.CAR;
+                break;
+        }
+    }
+
     /* PUBLIC GETTER METHODS */
 
     public long getTimeSeconds() {

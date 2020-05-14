@@ -96,7 +96,7 @@ public class EnumTypes {
         .value("bike_rental", StreetMode.BIKE_RENTAL)
         .value("car", StreetMode.CAR)
         .value("car_park", StreetMode.CAR_TO_PARK)
-        .value("taxi", StreetMode.TAXI)
+        .value("car_pickup", StreetMode.CAR_PICKUP)
         .value("car_rental", StreetMode.CAR_RENTAL)
         .build();
 
