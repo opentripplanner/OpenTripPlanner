@@ -54,7 +54,6 @@ public class TransmodelGraphQLPlanner {
             Router router = ctx.getRouter();
 
             request = createRequest(environment);
-            request.setRoutingContext(router.graph);
 
             RoutingResponse res = ctx.getRoutingService().route(request, router);
 

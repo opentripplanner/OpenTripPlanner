@@ -28,7 +28,7 @@ public class DirectStreetRouter {
   private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
 
   public static List<Itinerary> route(Router router, RoutingRequest request) {
-    request.rctx.checkIfVerticesFound();
+    request.setRoutingContext(router.graph);
     try {
       if (request.modes.directMode == null) {
         return Collections.emptyList();
