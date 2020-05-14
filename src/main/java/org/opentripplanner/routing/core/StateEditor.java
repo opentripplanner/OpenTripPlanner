@@ -392,16 +392,18 @@ public class StateEditor {
         child.stateData.currentTraverseMode = TraverseMode.WALK;
     }
 
-    public void beginVehicleRenting(VehicleDescription vehicleDescription) {
+    public void beginVehicleRenting(VehicleDescription vehicleDescription, RoutingRequest options) {
         cloneStateDataAsNeeded();
-        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        incrementWeight(vehicleDescription.getRentTimeInSeconds() * options.rentingReluctance);
+        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
 
-    public void doneVehicleRenting() {
+    public void doneVehicleRenting(RoutingRequest options) {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * options.rentingReluctance);
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
