@@ -14,6 +14,7 @@ public class VehiclePositionsDiff {
 
     private static final String CAR = "car";
     private static final String MOTORBIKE = "scooter";
+    private static final String KICKSCOOTER = "un-pedal-scooter";
 
     private final List<VehicleDescription> appeared;
 
@@ -37,7 +38,9 @@ public class VehiclePositionsDiff {
                 return new CarDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
             case MOTORBIKE:
                 return new MotorbikeDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
-            default: // TODO (AdamWiktor) Add support for kickscooter
+            case KICKSCOOTER:
+                return new KickScooterDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
+            default:
                 LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
                 return null;
         }

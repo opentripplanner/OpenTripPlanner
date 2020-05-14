@@ -59,7 +59,7 @@ public class SimpleIntersectionTraversalCostModel extends AbstractIntersectionTr
         } else {
 
             //assume highway vertex
-            if(from.getCarSpeed()>25 && to.getCarSpeed()>25) {
+            if(from.getMaxStreetTraverseSpeed()>25 && to.getMaxStreetTraverseSpeed()>25) {
                 return 0;
             }
 

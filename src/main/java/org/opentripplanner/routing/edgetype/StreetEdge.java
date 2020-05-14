@@ -26,6 +26,8 @@ import java.io.IOException;
 import java.io.ObjectOutputStream;
 import java.util.*;
 
+import static java.lang.Double.min;
+
 /**
  * This represents a street segment.
  *
@@ -94,7 +96,7 @@ public class StreetEdge extends Edge implements Cloneable {
      * The speed (meters / sec) at which an automobile can traverse
      * this street segment.
      */
-    private float carSpeed;
+    private float maxStreetTraverseSpeed;
 
     /**
      * The angle at the start of the edge geometry.
@@ -117,7 +119,7 @@ public class StreetEdge extends Edge implements Cloneable {
         this.bicycleSafetyFactor = 1.0f;
         this.name = name;
         this.setPermission(permission);
-        this.setCarSpeed(DEFAULT_CAR_SPEED);
+        this.setMaxStreetTraverseSpeed(DEFAULT_CAR_SPEED);
         this.setWheelchairAccessible(true); // accessible by default
         if (geometry != null) {
             try {
@@ -238,6 +240,10 @@ public class StreetEdge extends Edge implements Cloneable {
         return length_mm / 1000.0; // CONVERT FROM FIXED MILLIMETERS TO FLOAT METERS
     }
 
+    private boolean canWalkBike(TraverseMode mode, RoutingRequest options) {
+        return mode == TraverseMode.BICYCLE && canTraverse(options, TraverseMode.WALK);
+    }
+
     @Override
     public State traverse(State s0) {
         final RoutingRequest options = s0.getOptions();
@@ -268,10 +274,7 @@ public class StreetEdge extends Edge implements Cloneable {
         walkingBike &= TraverseMode.WALK.equals(traverseMode);
 
         /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
-        if (!canTraverse(options, traverseMode)) {
-            if (traverseMode == TraverseMode.BICYCLE) {
-                return doTraverse(s0, options.bikeWalkingOptions, TraverseMode.WALK);
-            }
+        if (!canTraverse(options, traverseMode) && !(canWalkBike(traverseMode, options))) {
             return null;
         }
 
@@ -465,6 +468,9 @@ public class StreetEdge extends Edge implements Cloneable {
             }
         }
 
+        if(!canTraverse(options, traverseMode)) { // Walking bike/kickscooter
+            s1.setUsedNotRecommendedRoutes();
+        }
         s1.incrementTimeInSeconds(roundedTime);
         s1.incrementWalkDistanceInMeters(getDistanceInMeters());
         s1.incrementWeight(weight);
@@ -490,29 +496,17 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /**
-     * Calculate the average automobile traversal speed of this segment, given
-     * the RoutingRequest, and return it in meters per second.
-     */
-    private double calculateCarSpeed(RoutingRequest options) {
-
-        return getCarSpeed();
-    }
-
-    /**
      * Calculate the speed appropriately given the RoutingRequest and traverseMode and the current wall clock time.
      * Note: this is not strictly symmetrical, because in a forward search we get the speed based on the
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
      */
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, VehicleDescription currentVehicle, long timeMillis) {
-        double optionsMaxSpeed = options.getSpeed(traverseMode);
-        double maxVehicleSpeed = Double.POSITIVE_INFINITY;
-        if(currentVehicle != null){
-            maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond();
+        double maxVehicleSpeed = options.getSpeed(traverseMode);
+        if(currentVehicle != null) {
+            maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond(this);
         }
-        double streetMaxSpeed = calculateCarSpeed(options);
-
-        return Double.min(optionsMaxSpeed,Double.min(maxVehicleSpeed,streetMaxSpeed));
+        return min(maxVehicleSpeed,getMaxStreetTraverseSpeed());
     }
 
     @Override
@@ -551,7 +545,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     public String toString() {
         return "StreetEdge(" + getId() + ", " + name + ", " + fromv + " -> " + tov
-                + " length=" + this.getDistanceInMeters() + " carSpeed=" + this.getCarSpeed()
+                + " length=" + this.getDistanceInMeters() + " carSpeed=" + this.getMaxStreetTraverseSpeed()
                 + " permission=" + this.getPermission() + ")";
     }
 
@@ -694,12 +688,12 @@ public class StreetEdge extends Edge implements Cloneable {
 	    flags = BitSetUtils.set(flags, STAIRS_FLAG_INDEX, stairs);
 	}
 
-	public float getCarSpeed() {
-		return carSpeed;
+	public float getMaxStreetTraverseSpeed() {
+		return maxStreetTraverseSpeed;
 	}
 
-	public void setCarSpeed(float carSpeed) {
-		this.carSpeed = carSpeed;
+	public void setMaxStreetTraverseSpeed(float maxStreetTraverseSpeed) {
+		this.maxStreetTraverseSpeed = maxStreetTraverseSpeed;
 	}
 
 	public boolean isSlopeOverride() {

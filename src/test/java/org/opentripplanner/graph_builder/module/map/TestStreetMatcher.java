@@ -237,7 +237,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public float getCarSpeed() {
+        public float getMaxStreetTraverseSpeed() {
             return 11.2f;
         }
 
@@ -252,7 +252,7 @@ public class TestStreetMatcher {
         }
 
         @Override
-        public void setCarSpeed(float carSpeed) {}
+        public void setMaxStreetTraverseSpeed(float maxStreetTraverseSpeed) {}
 
     }
 }
