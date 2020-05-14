@@ -14,6 +14,8 @@ public class StateData implements Cloneable {
     // the time at which the search started
     protected long startTime;
 
+    // TODO OTP2 Many of these could be replaced by a more generic state machine implementation
+
     protected boolean usingRentedBike;
 
     protected boolean carParked;
@@ -21,6 +23,8 @@ public class StateData implements Cloneable {
     protected boolean bikeParked;
 
     protected boolean hasUsedRentedBike;
+
+    protected CarPickupState carPickupState;
 
     protected RoutingRequest opt;
 
