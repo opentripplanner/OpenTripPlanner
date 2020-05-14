@@ -7,7 +7,8 @@
 - Fixes surefire test failure during build (#2816)
 - Improve documentation for `mode` routing parameter (#2809)
 - Disable linking from already linked stops (#2372)
-- Optimize elevation calculations
+- Optimize elevation calculations (#2990)
+- Safely catch some elevation interpolation exceptions (#3078)
 
 ## 1.4 (2019-07-30)
 
