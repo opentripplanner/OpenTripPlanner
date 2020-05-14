@@ -10,7 +10,8 @@ import org.opentripplanner.updater.example.ExamplePollingGraphUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
-import org.opentripplanner.updater.vehicle_sharing.SharedVehiclesUpdater;
+import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesUpdater;
+import org.opentripplanner.updater.vehicle_sharing.vehicles_positions.SharedVehiclesUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -86,47 +87,42 @@ public abstract class GraphUpdaterConfigurator {
                     updater = new WinkkiPollingGraphUpdater();
                 }
             }
-            if (updater == null) {
-                LOG.error("Unknown updater type: " + type);
+            if (updater != null) {
+                addUpdater(graph, updaterManager, updater, configItem);
             } else {
-                try {
-                    // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
-                    // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
-                    updater.setGraphUpdaterManager(updaterManager);
-                    // All GraphUpdaters are JsonConfigurable - send them their config information.
-                    updater.configure(graph, configItem);
-                    // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
-                    updater.setup(graph);
-                    // Add graph updater to manager.
-                    updaterManager.addUpdater(updater);
-                    LOG.info("Configured GraphUpdater: {}", updater);
-                } catch (Exception e) {
-                    LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
-                }
+                LOG.error("Unknown updater type: {}", type);
             }
         }
 
-//        TODO(mszewczyk) Now Updater is configured mannualy
-        GraphUpdater updater = new SharedVehiclesUpdater();
+        addUpdater(graph, updaterManager, new SharedVehiclesUpdater(), null);
+        addUpdater(graph, updaterManager, new ParkingZonesUpdater(), null);
 
-        try {
-            updater.setGraphUpdaterManager(updaterManager);
-            updater.configure(graph, null);
-            updater.setup(graph);
-            updaterManager.addUpdater(updater);
-            LOG.info("Configured GraphUpdater: {}", updater);
-        } catch (Exception e) {
-            LOG.error("Failed to configure graph updater:", e);
-        }
         // Now that all the updaters are configured, kick them all off in their own threads.
         updaterManager.startUpdaters();
         return updaterManager;
     }
 
+    private static void addUpdater(Graph graph, GraphUpdaterManager updaterManager, GraphUpdater updater, JsonNode configItem) {
+        try {
+            // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
+            // Perhaps this should be done in "updaterManager.addUpdater" below, to ensure the link is reciprocal.
+            updater.setGraphUpdaterManager(updaterManager);
+            // All GraphUpdaters are JsonConfigurable - send them their config information.
+            updater.configure(graph, configItem);
+            // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
+            updater.setup(graph);
+            // Add graph updater to manager.
+            updaterManager.addUpdater(updater);
+            LOG.info("Configured GraphUpdater: {}", updater);
+        } catch (Exception e) {
+            LOG.error("Failed to configure graph updater", e);
+        }
+    }
+
     public static void shutdownGraph(Graph graph) {
         GraphUpdaterManager updaterManager = graph.updaterManager;
         if (updaterManager != null) {
-            LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
+            LOG.info("Stopping updater manager with {} updaters.", updaterManager.size());
             updaterManager.stop();
         }
     }
