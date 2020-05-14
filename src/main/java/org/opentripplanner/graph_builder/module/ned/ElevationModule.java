@@ -603,7 +603,7 @@ public class ElevationModule implements GraphBuilderModule {
                     coordList.toArray(coordArr));
 
             setEdgeElevationProfile(ee, elevPCS, graph);
-        } catch (PointOutsideCoverageException | TransformException e) {
+        } catch (ElevationLookupException e) {
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
     }
@@ -630,11 +630,15 @@ public class ElevationModule implements GraphBuilderModule {
                     // The Coverage instance relies on some synchronized static methods shared across all threads that
                     // can cause deadlocks if not fully initialized. Therefore, make a single request for the first
                     // point on the edge to initialize these other items.
-                    double[] dummy = new double[1];
-                    coverage.evaluate(
-                        new DirectPosition2D(GeometryUtils.WGS84_XY, examplarCoordinate.x, examplarCoordinate.y),
-                        dummy
-                    );
+                    try {
+                        getElevation(coverage, examplarCoordinate);
+                    } catch (ElevationLookupException e) {
+                        log.debug(
+                            "Error processing elevation for coordinate: {} due to error: {}",
+                            examplarCoordinate,
+                            e
+                        );
+                    }
                     coverageInterpolatorThreadLocal.set(coverage);
                 }
             }
@@ -662,8 +666,18 @@ public class ElevationModule implements GraphBuilderModule {
      * @param c the coordinate (NAD83)
      * @return elevation in meters
      */
-    private double getElevation(Coverage coverage, Coordinate c) throws PointOutsideCoverageException, TransformException {
-        return getElevation(coverage, c.x, c.y);
+    private double getElevation(Coverage coverage, Coordinate c) throws ElevationLookupException {
+        try {
+            return getElevation(coverage, c.x, c.y);
+        } catch (ArrayIndexOutOfBoundsException | PointOutsideCoverageException | TransformException e) {
+            throw new ElevationLookupException(e);
+        }
+    }
+
+    class ElevationLookupException extends Exception {
+        public ElevationLookupException(Exception e) {
+            super(e);
+        }
     }
 
     /**
