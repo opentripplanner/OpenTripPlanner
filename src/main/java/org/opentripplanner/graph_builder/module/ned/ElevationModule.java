@@ -604,6 +604,7 @@ public class ElevationModule implements GraphBuilderModule {
 
             setEdgeElevationProfile(ee, elevPCS, graph);
         } catch (ElevationLookupException e) {
+            // only catch known elevation lookup exceptions
             log.debug("Error processing elevation for edge: {} due to error: {}", ee, e);
         }
     }
@@ -670,10 +671,18 @@ public class ElevationModule implements GraphBuilderModule {
         try {
             return getElevation(coverage, c.x, c.y);
         } catch (ArrayIndexOutOfBoundsException | PointOutsideCoverageException | TransformException e) {
+            // Each of the above exceptions can occur when finding the elevation at a coordinate.
+            // - The ArrayIndexOutOfBoundsException seems to occur at the edges of some elevation tiles that
+            //     might have areas with NoData. See https://github.com/opentripplanner/OpenTripPlanner/issues/2792
+            // - The PointOutsideCoverageException can be thrown for points that are outside of the elevation tile area.
+            // - The TransformException can occur when trying to compute the EllipsoidToGeoidDifference.
             throw new ElevationLookupException(e);
         }
     }
 
+    /**
+     * A custom exception wrapper for all known elevation lookup exceptions
+     */
     class ElevationLookupException extends Exception {
         public ElevationLookupException(Exception e) {
             super(e);
