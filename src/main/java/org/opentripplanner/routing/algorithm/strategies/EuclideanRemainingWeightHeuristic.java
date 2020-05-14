@@ -71,6 +71,8 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     public double estimateRemainingWeight (State s) {
         Vertex sv = s.getVertex();
         double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
+
+//      If transit is enabled and rental is disabled we can put lower bound on distance that must be walked.
         if (transit && !rental) {
             if (euclideanDistance < requiredWalkDistance) {
                 return walkReluctance * euclideanDistance / maxStreetSpeed;

@@ -171,7 +171,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Used instead of walk reluctance for stairs */
     public double stairsReluctance = 2.0;
 
-    /** How much we hate waiting to rent vehicle */
+    /** How much we hate picking up a vehicle/dropping it off */
     public double rentingReluctance = 3.0;
 
     /** Multiplicative factor on expected turning time. */
