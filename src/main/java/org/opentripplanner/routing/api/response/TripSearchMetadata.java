@@ -1,4 +1,4 @@
-package org.opentripplanner.model.routing;
+package org.opentripplanner.routing.api.response;
 
 import java.time.Duration;
 import java.time.Instant;

@@ -3,7 +3,6 @@ package org.opentripplanner.updater;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import org.opentripplanner.GtfsTest;
 import org.opentripplanner.routing.RoutingService;
-import org.rutebanken.netex.model.Routing;
 
 public class GtfsRealtimeFuzzyTripMatcherTest extends GtfsTest {
 
