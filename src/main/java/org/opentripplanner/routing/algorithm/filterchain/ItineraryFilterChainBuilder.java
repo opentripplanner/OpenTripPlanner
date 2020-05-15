@@ -7,13 +7,14 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LongTransitWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
 
@@ -28,6 +29,7 @@ public class ItineraryFilterChainBuilder {
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
     private boolean debug;
+    private Consumer<Itinerary> maxLimitReachedSubscriber;
 
 
     /** @param arriveBy Used to set the correct sort order.  */
@@ -80,6 +82,20 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
+     * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
+     * To get notified about this a subscriber can be added. The first itinerary removed by the
+     * {@code maxLimit} is retuned. The 'maxLimit' check is last thing happening in the
+     * filter-chain after the final sort. So, if another filter remove an itinerary, the
+     * itinerary is not considered with the respect to this feature.
+     *
+     * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
+     *                                  Only the first element removed is passed to the subscriber.
+     */
+    public void setMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
+        this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
+    }
+
+    /**
      * This will NOT delete itineraries, but tag them as deleted using the
      * {@link Itinerary#systemNotices}.
      */
@@ -108,7 +124,7 @@ public class ItineraryFilterChainBuilder {
 
         // Remove itineraries if max limit is exceeded
         if (maxLimit >= minLimit) {
-            filters.add(new MaxLimitFilter("MAX", maxLimit));
+            filters.add(new MaxLimitFilter("MAX", maxLimit, maxLimitReachedSubscriber));
         }
 
         if(debug) {

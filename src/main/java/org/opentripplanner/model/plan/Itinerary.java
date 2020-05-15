@@ -179,10 +179,6 @@ public class Itinerary {
         systemNotices.add(notice);
     }
 
-    public boolean hasSystemNotices() {
-        return !systemNotices.isEmpty();
-    }
-
     public void timeShiftToStartAt(Calendar afterTime) {
         Calendar startTimeFirstLeg = firstLeg().startTime;
         int adjustmentMilliSeconds =
