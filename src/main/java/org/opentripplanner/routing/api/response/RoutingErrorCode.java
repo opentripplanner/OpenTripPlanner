@@ -2,6 +2,10 @@ package org.opentripplanner.routing.api.response;
 
 public enum RoutingErrorCode {
   /**
+   * The origin and destination is not connected by transit, regardless of search time.
+   */
+  NO_TRANSIT_CONNECTION,
+  /**
    * Location was found, but it was located outside the street network.
    */
   //TODO Currently not in use

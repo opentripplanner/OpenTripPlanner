@@ -13,6 +13,9 @@ public class PlannerErrorMapper {
         PlannerError api = new PlannerError();
 
         switch (domain.code) {
+            case NO_TRANSIT_CONNECTION:
+                api.message = Message.PATH_NOT_FOUND;
+                break;
             case OUTSIDE_BOUNDS:
                 api.message = Message.OUTSIDE_BOUNDS;
                 break;

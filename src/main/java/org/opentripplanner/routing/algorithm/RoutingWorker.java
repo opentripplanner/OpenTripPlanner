@@ -174,6 +174,8 @@ public class RoutingWorker {
 
         setResponseMetadata(requestTransitDataProvider, transitResponse);
 
+        checkIfTransitConnectionExists(transitResponse);
+
         // Filter itineraries away that depart after the latest-departure-time for depart after
         // search. These itineraries is a result of timeshifting the access leg and is needed for
         // the raptor to prune the results. These itineraries are often not ideal, but if they
@@ -245,5 +247,17 @@ public class RoutingWorker {
         }
 
         throw new RoutingValidationException(routingErrors);
+    }
+
+    /**
+     * If no paths or search window is found, we assume there is no transit connection between
+     * the origin and destination.
+     */
+    private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
+        int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
+        if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
+            throw new RoutingValidationException(Collections.singletonList(
+                new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null)));
+        }
     }
 }
