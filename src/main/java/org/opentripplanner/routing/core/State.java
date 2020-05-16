@@ -22,6 +22,8 @@ public class State implements Cloneable {
 
     protected TraversalStatistics traversalStatistics;
 
+    protected double distanceTraversedInCurrentVehicle;
+
     // the current time at this state, in milliseconds
     protected long time;
 
@@ -864,5 +866,11 @@ public class State implements Cloneable {
 
     public Map<TraverseMode, Integer> createTimeTraversedInModeMap() {
         return traversalStatistics.createTimeTraversedInModeMap();
+    }
+
+    public boolean vehicleHasEnoughRange(double distanceInMeters) {
+        if (getCurrentVehicle() != null)
+            return distanceTraversedInCurrentVehicle + distanceInMeters <= getCurrentVehicle().getRangeInMeters();
+        return true;
     }
 }

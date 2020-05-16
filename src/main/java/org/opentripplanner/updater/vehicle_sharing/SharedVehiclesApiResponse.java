@@ -36,6 +36,11 @@ public class SharedVehiclesApiResponse {
         private String gearbox;
         private String type;
         private VehicleProvider provider;
+        private double range;
+
+        public double getRangeInMeters() {
+            return range*1000;
+        }
 
         public String getProviderVehicleId() {
             return providerVehicleId;

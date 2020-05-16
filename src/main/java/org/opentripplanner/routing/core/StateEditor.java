@@ -252,6 +252,7 @@ public class StateEditor {
             defectiveTraversal = true;
             return;
         }
+        incrementDistanceInCurrentVehicle(length);
         incrementDistanceTraversedInMode(length);
         child.traverseDistanceInMeters += length;
     }
@@ -605,6 +606,12 @@ public class StateEditor {
 
     public boolean usedNotRecommendedRoutes() {
         return child.usedNotRecommendedRoute;
+    }
+
+
+    public void incrementDistanceInCurrentVehicle (double distanceInMeters){
+        if (child.getCurrentVehicle() != null)
+            child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }
 
 }

@@ -17,6 +17,11 @@ public class KickScooterDescription extends VehicleDescription {
     private static final VehicleType VEHICLE_TYPE = VehicleType.KICKSCOOTER;
 
     public KickScooterDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                                  Gearbox gearbox, Provider provider, double rangeInMeters) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider,  rangeInMeters);
+    }
+
+    public KickScooterDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                                   Gearbox gearbox, Provider provider) {
         super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
     }
