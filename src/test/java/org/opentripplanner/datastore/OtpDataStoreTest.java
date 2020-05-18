@@ -222,7 +222,7 @@ public class OtpDataStoreTest {
 
     private static void writeZip(File dir, String filename) throws IOException {
         ZipOutputStream out = new ZipOutputStream(new FileOutputStream(new File(dir, filename)));
-        ZipEntry e = new ZipEntry("stop.txt");
+        ZipEntry e = new ZipEntry("stop_times.txt");
         out.putNextEntry(e);
         out.write("data".getBytes(StandardCharsets.UTF_8));
         out.closeEntry();

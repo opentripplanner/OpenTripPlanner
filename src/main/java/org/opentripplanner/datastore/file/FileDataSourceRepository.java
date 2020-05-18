@@ -1,6 +1,9 @@
 package org.opentripplanner.datastore.file;
 
 
+import java.io.FileInputStream;
+import java.util.zip.ZipEntry;
+import java.util.zip.ZipInputStream;
 import org.opentripplanner.datastore.CompositeDataSource;
 import org.opentripplanner.datastore.DataSource;
 import org.opentripplanner.datastore.FileType;
@@ -134,7 +137,7 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
     private static FileType resolveFileType(File file) {
         String name = file.getName();
-        if (isTransitFile(file, "gtfs")) { return GTFS; }
+        if (isGTFSFile(file)) { return GTFS; }
         if (isTransitFile(file, "netex")) { return NETEX; }
         if (name.endsWith(".pbf")) { return OSM; }
         if (name.endsWith(".osm")) { return OSM; }
@@ -152,4 +155,19 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         return file.getName().toLowerCase().contains(subName)
                 && (file.isDirectory() || file.getName().endsWith(".zip"));
     }
+
+  private static boolean isGTFSFile(File file) {
+    if (file.getName().endsWith("zip") && !isTransitFile(file, "netex")) {
+      try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
+        for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()){
+          if(entry.getName().endsWith("stop_times.txt")){
+            return true;
+          }
+        }
+      } catch (Exception e) {
+
+      }
+    }
+    return false;
+  }
 }

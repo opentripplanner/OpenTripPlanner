@@ -85,7 +85,7 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata.geoidElevation = request.geoidElevation;
         }
         catch (Exception e) {
-            LOG.warn("System error");
+            LOG.warn("System error", e);
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.setError(error);
