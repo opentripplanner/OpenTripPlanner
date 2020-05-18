@@ -48,16 +48,16 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private AlertsUpdateHandler updateHandler = null;
 
+    private boolean fuzzyTripMatching;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, GtfsRealTimeAlertsUpdaterConfig config) {
+    public void configure(GtfsRealTimeAlertsUpdaterConfig config) throws Exception {
         super.configure(config);
-        // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
-        this.alertPatchService = alertPatchService;
+
         String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
@@ -65,14 +65,19 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.url = url;
         this.earlyStart = config.getEarlyStartSec();
         this.feedId = config.getFeedId();
-        if (config.fuzzyTripMatching()) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
-        }
+        this.fuzzyTripMatching = config.fuzzyTripMatching();
+
         LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
 
     @Override
     public void setup(Graph graph) {
+        // TODO: add options to choose different patch services
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        if (fuzzyTripMatching) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+        }
+        this.alertPatchService = alertPatchService;
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }

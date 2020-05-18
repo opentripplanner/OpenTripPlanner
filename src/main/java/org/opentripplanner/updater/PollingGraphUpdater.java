@@ -78,7 +78,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     }
 
     /** Shared configuration code for all polling graph updaters. */
-    protected void configure(PollingGraphUpdaterConfig config) {
+    protected void configure(PollingGraphUpdaterConfig config) throws Exception {
         pollingPeriodSeconds = config.getFrequencySec();
         type = config.getSourceType();
     }

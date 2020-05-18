@@ -69,6 +69,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
+    private boolean fuzzyTripMatching;
+
     /**
      * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
      * safe way.
@@ -80,7 +82,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, SiriVMUpdaterConfig config) throws Exception {
+    public void configure(SiriVMUpdaterConfig config) throws Exception {
         super.configure(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -105,9 +107,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
         this.purgeExpiredData = config.purgeExpiredData();
-        if (config.fuzzyTripMatching()) {
-            this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
-        }
+        this.fuzzyTripMatching = config.fuzzyTripMatching();
 
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
@@ -116,6 +116,9 @@ public class SiriVMUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
+        if (fuzzyTripMatching) {
+            this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+        }
         // Only create a realtime data snapshot source if none exists already
         // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
         //           - Ideally we should inject the snapshotSource on this class.

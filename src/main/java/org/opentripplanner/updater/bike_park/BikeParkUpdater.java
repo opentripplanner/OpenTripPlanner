@@ -55,7 +55,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, PollingGraphUpdaterConfig config) throws Exception {
+    public void configure(PollingGraphUpdaterConfig config) throws Exception {
         super.configure(config);
         // Set source from preferences
         String sourceType = config.getSourceType();
@@ -73,12 +73,12 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         }
 
         // Configure updater
-        this.graph = graph;
         this.source = source;
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
     public void setup(Graph graph) {
+        this.graph = graph;
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike park station service needs a graph writer runnable

@@ -72,7 +72,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, SiriETUpdaterConfig config) throws Exception {
+    public void configure(SiriETUpdaterConfig config) throws Exception {
         super.configure(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();

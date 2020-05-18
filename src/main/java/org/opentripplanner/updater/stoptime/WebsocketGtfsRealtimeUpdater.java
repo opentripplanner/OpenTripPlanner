@@ -69,7 +69,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, WebSocketGtfsRealTimeUpdaterConfig config) {
+    public void configure(WebSocketGtfsRealTimeUpdaterConfig config) {
         url = config.getUrl();
         feedId = config.getFeedId();
         reconnectPeriodSec = config.getReconnectPeriodSec();

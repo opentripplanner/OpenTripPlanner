@@ -46,7 +46,6 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private static Map<String, String> requestHeaders = new HashMap<>();
 
-
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -54,6 +53,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) throws Exception {
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler(feedId);
         }
@@ -63,10 +64,9 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     }
 
-    public void configure(Graph graph, SiriSXUpdaterConfig config) {
+    public void configure(SiriSXUpdaterConfig config) throws Exception {
         super.configure(config);
         // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
         this.alertPatchService = alertPatchService;
         String url = config.getUrl();
         if (url == null) {
@@ -89,8 +89,6 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         }
 
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
-
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
 
         requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 

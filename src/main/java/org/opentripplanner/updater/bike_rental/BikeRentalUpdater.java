@@ -49,7 +49,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, BikeRentalUpdaterConfig config) throws Exception {
+    public void configure(BikeRentalUpdaterConfig config) throws Exception {
         super.configure(config);
 
         // Set data source type from config JSON

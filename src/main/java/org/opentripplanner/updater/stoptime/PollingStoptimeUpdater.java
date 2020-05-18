@@ -59,6 +59,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private String feedId;
 
+    private boolean fuzzyTripMatching;
+
     /**
      * Set only if we should attempt to match the trip_id from other data in TripDescriptor
      */
@@ -69,7 +71,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(Graph graph, PollingStopTimeUpdaterConfig config) throws Exception {
+    public void configure(PollingStopTimeUpdaterConfig config) throws Exception {
         // Create update streamer from preferences
         feedId = config.getFeedId();
         String sourceType = config.getSourceType();
@@ -99,14 +101,17 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
         this.purgeExpiredData = config.purgeExpiredData();
-        if (config.fuzzyTripMatching()) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
-        }
+        this.fuzzyTripMatching = config.fuzzyTripMatching();
+
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
 
     @Override
     public void setup(Graph graph) {
+        if (fuzzyTripMatching) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+        }
+
         // Only create a realtime data snapshot source if none exists already
         TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
 

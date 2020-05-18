@@ -40,7 +40,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     // The property frequencySec is already read and used by the abstract base class.
-    public void configure(Graph graph, PollingGraphUpdaterConfig config) {
+    public void configure(PollingGraphUpdaterConfig config) throws Exception {
         super.configure(config);
         url = config.getUrl();
         LOG.info("Configured example polling updater: frequencySec={} and url={}", pollingPeriodSeconds, url);

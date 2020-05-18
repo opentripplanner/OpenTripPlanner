@@ -42,7 +42,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
     private String url;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
-    public void configure(Graph graph, ExampleGraphUpdaterConfig config) {
+    public void configure(ExampleGraphUpdaterConfig config) {
         frequencySec = config.getFrequencySec();
         url = config.getUrl();
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
