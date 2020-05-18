@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.stoptime;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -70,11 +69,10 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
-        url = config.path("url").asText();
-        feedId = config.path("feedId").asText("");
-        reconnectPeriodSec = config.path("reconnectPeriodSec").asInt(DEFAULT_RECONNECT_PERIOD_SEC);
+    public void configure(Graph graph, WebSocketGtfsRealTimeUpdaterConfig config) {
+        url = config.getUrl();
+        feedId = config.getFeedId();
+        reconnectPeriodSec = config.getReconnectPeriodSec();
     }
 
     @Override
@@ -185,5 +183,11 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public String getName() {
         return "WebsocketGtfsRealtimeUpdater";
+    }
+
+    public interface WebSocketGtfsRealTimeUpdaterConfig {
+        String getUrl();
+        String getFeedId();
+        int getReconnectPeriodSec();
     }
 }

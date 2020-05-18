@@ -1,7 +1,5 @@
 package org.opentripplanner.updater;
 
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 
@@ -10,6 +8,6 @@ import org.opentripplanner.routing.graph.Graph;
  */
 public interface JsonConfigurable {
 
-    public abstract void configure (Graph graph, JsonNode jsonNode) throws Exception;
+    void configure (Graph graph, JsonNode updaterConfigItem) throws Exception;
 
 }

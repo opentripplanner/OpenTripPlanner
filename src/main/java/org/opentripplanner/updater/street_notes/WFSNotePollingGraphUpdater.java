@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.street_notes;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import org.locationtech.jts.geom.Geometry;
@@ -34,7 +33,6 @@ import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 /**
  * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.
@@ -81,10 +79,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        url = new URL(config.path("url").asText());
-        featureType = config.path("featureType").asText();
+    public void configure(Graph graph, WFSNotePollingGraphUpdaterConfig config) throws Exception {
+        super.configure(config);
+        url = new URL(config.getUrl());
+        featureType = config.getFeatureType();
         this.graph = graph;
         LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
                 pollingPeriodSeconds, url.toString(), featureType);
@@ -192,4 +190,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         return ret;
     }
 
+    public interface WFSNotePollingGraphUpdaterConfig extends PollingGraphUpdaterConfig {
+        String getFeatureType();
+    }
 }

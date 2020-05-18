@@ -1,13 +1,11 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -82,36 +80,36 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    public void configurePolling(Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, SiriVMUpdaterConfig config) throws Exception {
+        super.configure(config);
         // Create update streamer from preferences
-        feedId = config.path("feedId").asText("");
-        String sourceType = config.path("sourceType").asText();
+        feedId = config.getFeedId();
+        String sourceType = config.getSourceType();
 
         updateSource = new SiriVMHttpTripUpdateSource();
 
         // Configure update source
         if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config);
+            ((JsonConfigurable) updateSource).configure(graph, config.getSource());
         } else {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
         }
 
-        int logFrequency = config.path("logFrequency").asInt(-1);
+        int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
             this.logFrequency = logFrequency;
         }
-        int maxSnapshotFrequency = config.path("maxSnapshotFrequencyMs").asInt(-1);
+        int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
         if (maxSnapshotFrequency >= 0) {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
-        this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
-        if (config.path("fuzzyTripMatching").asBoolean(true)) {
+        this.purgeExpiredData = config.purgeExpiredData();
+        if (config.fuzzyTripMatching()) {
             this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         }
 
-        blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
+        blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
         LOG.info("Creating stop time updater (SIRI VM) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
@@ -177,4 +175,12 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         return "Polling SIRI VM updater with update source = " + s;
     }
 
+    public interface SiriVMUpdaterConfig extends PollingGraphUpdaterConfig {
+        String getFeedId();
+        int getLogFrequency();
+        int getMaxSnapshotFrequencyMs();
+        boolean purgeExpiredData();
+        boolean fuzzyTripMatching();
+        boolean blockReadinessUntilInitialized();
+    }
 }

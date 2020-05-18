@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.stoptime;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
@@ -70,11 +69,10 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    public void configurePolling(Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, PollingStopTimeUpdaterConfig config) throws Exception {
         // Create update streamer from preferences
-        feedId = config.path("feedId").asText("");
-        String sourceType = config.path("sourceType").asText();
+        feedId = config.getFeedId();
+        String sourceType = config.getSourceType();
         if (sourceType != null) {
             if (sourceType.equals("gtfs-http")) {
                 updateSource = new GtfsRealtimeHttpTripUpdateSource();
@@ -88,20 +86,20 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
         } else if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config);
+            ((JsonConfigurable) updateSource).configure(graph, config.getSource());
         }
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
-        int logFrequency = config.path("logFrequency").asInt(-1);
+        int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
             this.logFrequency = logFrequency;
         }
-        int maxSnapshotFrequency = config.path("maxSnapshotFrequencyMs").asInt(-1);
+        int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
         if (maxSnapshotFrequency >= 0) {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
-        this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
-        if (config.path("fuzzyTripMatching").asBoolean(false)) {
+        this.purgeExpiredData = config.purgeExpiredData();
+        if (config.fuzzyTripMatching()) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
@@ -152,5 +150,13 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     public String toString() {
         String s = (updateSource == null) ? "NONE" : updateSource.toString();
         return "Streaming stoptime updater with update source = " + s;
+    }
+
+    public interface PollingStopTimeUpdaterConfig extends PollingGraphUpdaterConfig {
+        String getFeedId();
+        int getLogFrequency();
+        int getMaxSnapshotFrequencyMs();
+        boolean purgeExpiredData();
+        boolean fuzzyTripMatching();
     }
 }

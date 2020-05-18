@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
@@ -73,29 +72,29 @@ public class SiriETUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    public void configurePolling(Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, SiriETUpdaterConfig config) throws Exception {
+        super.configure(config);
         // Create update streamer from preferences
-        feedId = config.path("feedId").asText("");
-        String sourceType = config.path("sourceType").asText();
+        feedId = config.getFeedId();
+        String sourceType = config.getSourceType();
 
         SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource();
         // Configure update source before we asign it to the member field witch is not
         // configurable.
-        source.configure(graph, config);
+        source.configure(graph, config.getSource());
         updateSource = source;
 
-        int logFrequency = config.path("logFrequency").asInt(-1);
+        int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
             this.logFrequency = logFrequency;
         }
-        int maxSnapshotFrequency = config.path("maxSnapshotFrequencyMs").asInt(-1);
+        int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
         if (maxSnapshotFrequency >= 0) {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
-        this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
+        this.purgeExpiredData = config.purgeExpiredData();
 
-        blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
+        blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
         LOG.info("Creating stop time updater (SIRI ET) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }
@@ -156,5 +155,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
     public String toString() {
         String s = (updateSource == null) ? "NONE" : updateSource.toString();
         return "Polling SIRI ET updater with update source = " + s;
+    }
+
+    public interface SiriETUpdaterConfig extends PollingGraphUpdaterConfig {
+        String getFeedId();
+        int getLogFrequency();
+        int getMaxSnapshotFrequencyMs();
+        boolean purgeExpiredData();
+        boolean blockReadinessUntilInitialized();
     }
 }

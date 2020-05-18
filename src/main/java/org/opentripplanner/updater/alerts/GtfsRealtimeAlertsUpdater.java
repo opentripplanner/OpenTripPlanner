@@ -2,7 +2,6 @@ package org.opentripplanner.updater.alerts;
 
 import java.io.InputStream;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
@@ -54,19 +53,19 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, GtfsRealTimeAlertsUpdaterConfig config) {
+        super.configure(config);
         // TODO: add options to choose different patch services
         AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
         this.alertPatchService = alertPatchService;
-        String url = config.path("url").asText();
+        String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.earlyStart = config.path("earlyStartSec").asInt(0);
-        this.feedId = config.path("feedId").asText();
-        if (config.path("fuzzyTripMatching").asBoolean(false)) {
+        this.earlyStart = config.getEarlyStartSec();
+        this.feedId = config.getFeedId();
+        if (config.fuzzyTripMatching()) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
         LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
@@ -122,5 +121,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
+    }
+
+    public interface GtfsRealTimeAlertsUpdaterConfig extends PollingGraphUpdaterConfig {
+        int getEarlyStartSec();
+        String getFeedId();
+        boolean fuzzyTripMatching();
     }
 }

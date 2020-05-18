@@ -1,7 +1,6 @@
 package org.opentripplanner.updater;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,9 +26,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      * frequencySec.
      */
     abstract protected void runPolling() throws Exception;
-
-    /** Mirrors GraphUpdater.configure method. */
-    abstract protected void configurePolling(Graph graph, JsonNode config) throws Exception;
 
     /** How long to wait after polling to poll again. */
     protected Integer pollingPeriodSeconds;
@@ -82,12 +78,9 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     }
 
     /** Shared configuration code for all polling graph updaters. */
-    @Override
-    final public void configure (Graph graph, JsonNode config) throws Exception {
-        pollingPeriodSeconds = config.path("frequencySec").asInt(60);
-        type = config.path("type").asText("");
-        // Additional configuration for the concrete subclass
-        configurePolling(graph, config);
+    protected void configure(PollingGraphUpdaterConfig config) {
+        pollingPeriodSeconds = config.getFrequencySec();
+        type = config.getSourceType();
     }
 
     /**
@@ -102,5 +95,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
     public String getName() {
         return type;
+    }
+
+    public interface PollingGraphUpdaterConfig {
+        String getSourceType();
+        JsonNode getSource();
+        String getUrl();
+        int getFrequencySec();
     }
 }

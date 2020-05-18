@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -52,15 +51,14 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public BikeParkUpdater() {
     }
 
-    @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, PollingGraphUpdaterConfig config) throws Exception {
+        super.configure(config);
         // Set source from preferences
-        String sourceType = config.path("sourceType").asText();
+        String sourceType = config.getSourceType();
         BikeParkDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("kml-placemarks")) {
@@ -71,7 +69,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
         } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(graph, config);
+            ((JsonConfigurable) source).configure(graph, config.getSource());
         }
 
         // Configure updater
@@ -80,7 +78,6 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
-    @Override
     public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
@@ -102,7 +99,6 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         updaterManager.execute(graphWriterRunnable);
     }
 
-    @Override
     public void teardown() {
     }
 

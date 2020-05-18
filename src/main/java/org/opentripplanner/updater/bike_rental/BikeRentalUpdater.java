@@ -9,7 +9,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
-import com.fasterxml.jackson.databind.JsonNode;
+
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -34,8 +34,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    private static final String DEFAULT_NETWORK_LIST = "default";
-
     Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
 
     private BikeRentalDataSource source;
@@ -51,15 +49,15 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    protected void configurePolling (Graph graph, JsonNode config) throws Exception {
+    public void configure(Graph graph, BikeRentalUpdaterConfig config) throws Exception {
+        super.configure(config);
 
         // Set data source type from config JSON
-        String sourceType = config.path("sourceType").asText();
-        String apiKey = config.path("apiKey").asText();
+        String sourceType = config.getSourceType();
+        String apiKey = config.getApiKey();
         // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
         // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
-        String networkName = config.path("network").asText();
+        String networkName = config.getNetwork();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
@@ -100,13 +98,13 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
         } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(graph, config);
+            ((JsonConfigurable) source).configure(graph, config.getSource());
         }
 
         // Configure updater
         LOG.info("Setting up bike rental updater.");
         this.source = source;
-        this.network = config.path("networks").asText(DEFAULT_NETWORK_LIST);
+        this.network = config.getNetworks();
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
         } else {
@@ -197,5 +195,11 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 verticesByStation.remove(station);
             }
         }
+    }
+
+    public interface BikeRentalUpdaterConfig extends PollingGraphUpdaterConfig {
+        String getNetwork();
+        String getNetworks();
+        String getApiKey();
     }
 }
