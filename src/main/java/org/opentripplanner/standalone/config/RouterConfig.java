@@ -4,6 +4,7 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.standalone.config.updater_config.UpdaterConfig;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -33,6 +34,7 @@ public class RouterConfig implements Serializable {
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
+    private final UpdaterConfig updaterConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -43,10 +45,7 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-
-        // Touch parameters read at a later point in time to avoid reporting them when
-        // logging unused parameters.
-        adapter.path("updaters");
+        this.updaterConfig = new UpdaterConfig(adapter.asRawNode("updaters"));
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -78,6 +77,8 @@ public class RouterConfig implements Serializable {
     public TransitTuningParameters transitTuningParameters() {
         return transitConfig;
     }
+
+    public UpdaterConfig updaterConfig() { return updaterConfig; }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
