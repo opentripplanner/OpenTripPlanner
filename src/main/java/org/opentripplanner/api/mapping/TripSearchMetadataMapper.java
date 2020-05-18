@@ -1,7 +1,7 @@
 package org.opentripplanner.api.mapping;
 
 import org.opentripplanner.api.model.ApiTripSearchMetadata;
-import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 public class TripSearchMetadataMapper {
 

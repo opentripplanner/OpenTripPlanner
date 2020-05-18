@@ -1,14 +1,17 @@
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
+import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.RoutingResource;
+import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -62,7 +65,6 @@ public class PlannerResource extends RoutingResource {
             /* Fill in request fields from query parameters via shared superclass method, catching any errors. */
             request = super.buildRequest();
             router = otpServer.getRouter();
-            request.setRoutingContext(router.graph);
 
             // Route
             RoutingService routingService = new RoutingService(router.graph);
@@ -72,6 +74,10 @@ public class PlannerResource extends RoutingResource {
             TripPlanMapper tripPlanMapper = new TripPlanMapper(request.locale);
             response.setPlan(tripPlanMapper.mapTripPlan(res.getTripPlan()));
             response.setMetadata(TripSearchMetadataMapper.mapTripSearchMetadata(res.getMetadata()));
+            if (!res.getRoutingErrors().isEmpty()) {
+                // The api can only return one error message, so the first one is mapped
+                response.setError(PlannerErrorMapper.mapMessage(res.getRoutingErrors().get(0)));
+            }
 
             /* Populate up the elevation metadata */
             response.elevationMetadata = new ElevationMetadata();
@@ -79,10 +85,9 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata.geoidElevation = request.geoidElevation;
         }
         catch (Exception e) {
-            PlannerError error = new PlannerError(e);
-            if(!PlannerError.isPlanningError(e.getClass())) {
-                LOG.warn("Error while planning path: ", e);
-            }
+            LOG.warn("System error");
+            PlannerError error = new PlannerError();
+            error.setMsg(Message.SYSTEM_ERROR);
             response.setError(error);
         } finally {
             if (request != null && request.rctx != null) {

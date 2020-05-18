@@ -177,6 +177,7 @@ public class GraphBuilder implements Runnable {
         graphBuilder.addModule(streetLinkerModule);
         // Load elevation data and apply it to the streets.
         // We want to do run this module after loading the OSM street network but before finding transfers.
+        List<ElevationGridCoverageFactory> elevationGridCoverageFactories = new ArrayList<>();
         if (config.elevationBucket != null) {
             // Download the elevation tiles from an Amazon S3 bucket
             S3BucketConfig bucketConfig = config.elevationBucket;
@@ -185,35 +186,35 @@ public class GraphBuilder implements Runnable {
             awsTileSource.awsAccessKey = bucketConfig.accessKey;
             awsTileSource.awsSecretKey = bucketConfig.secretKey;
             awsTileSource.awsBucketName = bucketConfig.bucketName;
-            NEDGridCoverageFactoryImpl gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            gcf.tileSource = awsTileSource;
-            GraphBuilderModule elevationBuilder = new ElevationModule(
-                    gcf,
-                    config.elevationUnitMultiplier,
-                    config.distanceBetweenElevationSamples
-            );
-            graphBuilder.addModule(elevationBuilder);
+            elevationGridCoverageFactories.add(
+                new NEDGridCoverageFactoryImpl(cacheDirectory, awsTileSource));
         } else if (config.fetchElevationUS) {
             // Download the elevation tiles from the official web service
             File cacheDirectory = new File(dataSources.getCacheDirectory(), "ned");
-            ElevationGridCoverageFactory gcf = new NEDGridCoverageFactoryImpl(cacheDirectory);
-            GraphBuilderModule elevationBuilder = new ElevationModule(
-                    gcf,
-                    config.elevationUnitMultiplier,
-                    config.distanceBetweenElevationSamples
-            );
-            graphBuilder.addModule(elevationBuilder);
+            elevationGridCoverageFactories.add(
+                new NEDGridCoverageFactoryImpl(cacheDirectory));
         } else if (dataSources.has(DEM)) {
             // Load the elevation from a file in the graph inputs directory
             for (DataSource demSource : dataSources.get(DEM)) {
-                ElevationGridCoverageFactory gcf = new GeotiffGridCoverageFactoryImpl(demSource);
-                GraphBuilderModule elevationBuilder = new ElevationModule(
-                        gcf,
-                        config.elevationUnitMultiplier,
-                        config.distanceBetweenElevationSamples
-                );
-                graphBuilder.addModule(elevationBuilder);
+                elevationGridCoverageFactories.add(new GeotiffGridCoverageFactoryImpl(demSource));
             }
+        }
+        // Refactoring this class, it was made clear that this allows for adding multiple elevation
+        // modules to the same graph builder. We do not actually know if this is supported by the
+        // ElevationModule class.
+        for (ElevationGridCoverageFactory factory : elevationGridCoverageFactories) {
+            graphBuilder.addModule(
+                new ElevationModule(
+                    factory,
+                    new File(dataSources.getCacheDirectory(), "cached_elevations.obj"),
+                    config.readCachedElevations,
+                    config.writeCachedElevations,
+                    config.elevationUnitMultiplier,
+                    config.distanceBetweenElevationSamples,
+                    config.includeEllipsoidToGeoidDifference,
+                    config.multiThreadElevationCalculations
+                )
+            );
         }
         if ( hasTransitData ) {
             // The stops can be linked to each other once they are already linked to the street network.

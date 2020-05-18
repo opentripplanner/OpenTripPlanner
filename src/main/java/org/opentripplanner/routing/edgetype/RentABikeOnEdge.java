@@ -2,7 +2,7 @@ package org.opentripplanner.routing.edgetype;
 
 import java.util.Set;
 
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 
