@@ -85,8 +85,8 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
     }
 
     @Override
-    public void configure(Graph graph, JsonNode config) {
-        super.configure(graph, config);
+    public void configure(JsonNode config) {
+        super.configure(config);
         setNamePrefix(config.path("namePrefix").asText());
     }
 

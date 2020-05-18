@@ -92,7 +92,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
      * from the JSON coming in from the update source.
      */
     @Override
-    public void configure (Graph graph, JsonNode jsonNode) {
+    public void configure (JsonNode jsonNode) {
         // path() returns MissingNode not null, allowing chained function calls.
         String url = jsonNode.path("url").asText();
         if (url == null) {

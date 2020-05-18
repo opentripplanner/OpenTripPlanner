@@ -81,7 +81,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource();
         // Configure update source before we asign it to the member field witch is not
         // configurable.
-        source.configure(graph, config.getSource());
+        source.configure(config.getSource());
         updateSource = source;
 
         int logFrequency = config.getLogFrequency();

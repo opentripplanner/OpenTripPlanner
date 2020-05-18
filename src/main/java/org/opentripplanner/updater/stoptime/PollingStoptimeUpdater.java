@@ -86,7 +86,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
         } else if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(graph, config.getSource());
+            ((JsonConfigurable) updateSource).configure(config.getSource());
         }
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...

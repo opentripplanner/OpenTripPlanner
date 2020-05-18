@@ -36,7 +36,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     private String feedId;
 
     @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
+    public void configure(JsonNode config) throws Exception {
         this.feedId = config.path("feedId").asText();
         this.file = new File(config.path("file").asText(""));
     }

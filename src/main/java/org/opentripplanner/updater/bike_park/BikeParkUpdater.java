@@ -69,7 +69,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
         } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(graph, config.getSource());
+            ((JsonConfigurable) source).configure(config.getSource());
         }
 
         // Configure updater

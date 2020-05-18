@@ -35,7 +35,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     private String url;
 
     @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
+    public void configure(JsonNode config) throws Exception {
         String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");

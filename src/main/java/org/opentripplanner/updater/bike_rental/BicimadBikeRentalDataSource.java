@@ -165,7 +165,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
          * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
          * from the JSON coming in from the update source.
          */
-        @Override public void configure(Graph graph, JsonNode jsonNode) {
+        @Override public void configure(JsonNode jsonNode) {
                 String url = jsonNode.path("url").asText(); // path() returns MissingNode not null.
                 if (url == null) {
                         throw new IllegalArgumentException(

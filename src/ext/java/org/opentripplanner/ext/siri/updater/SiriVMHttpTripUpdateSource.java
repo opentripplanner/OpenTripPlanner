@@ -39,7 +39,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     private static Map<String, String> requestHeaders = new HashMap<>();
 
     @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
+    public void configure(JsonNode config) throws Exception {
         String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");

@@ -73,7 +73,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     }
     
     @Override
-    public void configure(Graph graph, JsonNode config) {
+    public void configure(JsonNode config) {
         String url = config.path("url").asText();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
