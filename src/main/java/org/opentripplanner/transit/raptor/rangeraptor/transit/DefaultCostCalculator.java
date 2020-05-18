@@ -41,7 +41,7 @@ public class DefaultCostCalculator implements CostCalculator {
     }
 
     @Override
-    public int relativePatternBoardCost(
+    public int onTripRelativeCost(
         int prevStopArrivalCost,
         int boardWaitTime,
         int relativeTransitTime,

@@ -2,10 +2,10 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
-import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
-import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.rangeraptor.RoutingStrategy;
+import org.opentripplanner.transit.raptor.rangeraptor.SlackProvider;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TripScheduleSearch;
@@ -24,7 +24,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     private final TransitCalculator calculator;
     private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
-    private final ParetoSet<Boarding<T>> patternBoardings = new ParetoSet<>(Boarding.paretoComparator());
+    private final ParetoSet<Boarding<T>> patternBoardings = new ParetoSet<>(Boarding.paretoComparatorRelativeCost());
 
     private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
@@ -57,10 +57,10 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         if (pattern.alightingPossibleAt(stopPos)) {
             for (Boarding<T> boarding : patternBoardings) {
                 state.transitToStop(
-                        boarding,
-                        stopIndex,
-                        boarding.trip.arrival(stopPos),
-                        slackProvider.alightSlack()
+                    boarding,
+                    stopIndex,
+                    boarding.trip.arrival(stopPos),
+                    slackProvider.alightSlack()
                 );
             }
         }
@@ -69,7 +69,6 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         if(!pattern.boardingPossibleAt(stopPos)) {
             return;
         }
-
 
         // For each arrival at the current stop
         for (AbstractStopArrival<T> prevArrival : state.listStopArrivalsPreviousRound(stopIndex)) {
@@ -91,9 +90,14 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                 }
 
                 final int boardWaitTime = boardTime - prevArrival.arrivalTime();
-                // Any relative trip duration, the calculated value is negative, but that works fine
-                final int relativeTransitTime = trip.departure(0) - boardTime;
-                final int relativeBoardCost = calculateRelativeBoardCost(
+
+                // We want to find the "relative-transit-time" spent onboard so we can add it to the
+                // cost when comparing two trips A and B. Let A board at stop S at 10:00 and B
+                // board at stop T at 10:05. Than, clearly it does not matter when we alight, Trip A
+                // is going to spend 5 minutes more in transit than trip when alighting at the same
+                // stop. Hence we can use the negative board-time as the "relative-transit-time".
+                final int relativeTransitTime =  - boardTime;
+                final int relativeBoardCost = calculateOnTripRelativeCost(
                     prevArrival,
                     relativeTransitTime,
                     boardWaitTime
@@ -107,7 +111,8 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                         boardTime,
                         boardWaitTime,
                         relativeBoardCost,
-                        trip
+                        trip,
+                        tripSearch.getCandidateTripIndex()
                     )
                 );
             }
@@ -115,21 +120,21 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     /**
-     * Calculate the boarding cost relative to other boardings of the same pattern. The
-     * board stop and stop-arrival, as well as the trip vary.
+     * Calculate the relative cost of for two paths on-board a trip.
      *
+     * @param prevArrival The stop-arrival where the trip was boarded.
      * @param boardWaitTime the wait-time at the board stop before boarding.
      * @param relativeTransitTime The time spent on transit. We do not know the alight-stop,
      *                            so it is impossible to know the correct result. But the only thing
      *                            that maters is that the relative difference between to boardings
      *                            are correct.
      */
-    private int calculateRelativeBoardCost(
+    private int calculateOnTripRelativeCost(
         AbstractStopArrival<T> prevArrival,
         int relativeTransitTime,
         int boardWaitTime
     ) {
-        return costCalculator.relativePatternBoardCost(
+        return costCalculator.onTripRelativeCost(
             prevArrival.cost(),
             boardWaitTime,
             relativeTransitTime,

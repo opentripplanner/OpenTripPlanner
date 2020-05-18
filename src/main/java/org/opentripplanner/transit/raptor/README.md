@@ -30,6 +30,9 @@ _stop arrival_ witch have a link to the previous _stop-arrival_ so we can comput
 the search is complete.
 
 ## Range Raptor (RR)
+_The code for this is found in the `org.opentripplanner.transit.raptor.rangeraptor.standard` 
+package._ 
+
 _Range Raptor_ works in iterations over minutes. Let say you want to travel from A to B sometime 
 between 12:00 and 13:00. Then _Range Raptor_ start at 13:00, and for each minute run the search 
 again: 12:59, 12:58 ... until 12:00. The way Raptor works enable us to do this in a super efficient 
@@ -41,11 +44,14 @@ no later than 13:00. The "optimal trip" guarantee is only valid for the _search-
 might be a trip leaving after 13:00 that is faster than the trips found. 
 
 ## Multi-criteria Range Raptor (McRR) 
-Raptor gives us the optimal trip based on _arrival time_. With some overhead we can add _number of 
-transfers_. _Range Raptor_ also gives us the shortest travel duration (within its search window). 
-But we want more - OTP is today only optimized on cost, witch is a mix of _time, waiting time, 
-walking distance, transfers_ and so on. So, a McRR search will return a *pareto-optimal* set of 
-paths with at least these criteria:
+_The code for this is found in the `org.opentripplanner.transit.raptor.rangeraptor.multicriteria` 
+package._ 
+
+Raptor gives us the optimal trip based on _arrival time_ and _number of 
+transfers_. _Range Raptor_ also gives us the shortest travel duration (within its search-window). 
+The OTP McRangeRaptor add another cirteria: `generalized-cost`, witch is a function of 
+`travel-time`, `waiting-time`, `walking-distance`, `transfers` and so on. McRR search will return 
+a *pareto-optimal* set of paths with at least these criteria:
 - arrival time (seconds)
 - number of transfers (scalar)
 - travel duration (seconds)
@@ -57,20 +63,19 @@ Due to performance reasons it might not be 100% dynamic.
 
 Because _Raptor_ is much faster than the _multi-criteria_ Raptor we will provide an option 
 (request parameter) to run both _RR_  and _McRR_. We might even use _RR_ as a heuristics 
-optimization for McRR. In a bench mark test, RR takes on average 80ms while McRR with the same 
-configuration takes 400ms. If we add _walking distance_ as an extra criteria the average time 
-increase to 1000ms. (The numbers provided are for relative comparison - it is to early to compare 
-with the existing OTP performance).
+optimization for McRR. In a bench mark test(SpeedTest), RR takes on average 80ms while McRR with 
+the same configuration takes 400ms. If we add _walking distance_ as an extra criteria the average 
+time increase to 1000ms. (This is based on early testing, the McRR is mutch faster today, because 
+of the optimizations - the numbers is just to give you a feeling of wht to expect).
 
 ## Paths and Itineraries 
 In this context, Path and Itineraries are almost the same. We use *Path* to talk about the minimum 
-set of data returned by Raptor, then these paths are decorated with more information and returned 
-to the end user as Itineraries. 
+set of data returned by Raptor. The paths decorated with information from the transit-layer is used
+to create the itineraries, witch is returned fro the routing code (to end user).  
 
 ## Pareto optimal/efficiency set
 All paths that is considered *pareto optimal* for a set of criteria is returned by the McRR. This 
-can be a large set (like 500 paths), so we need to reduce this by applying a filter to the set of 
-paths and further a final filter to the itineraries (paths decorated with more info). The idea 
+can be a large set (like 500 paths), so there is a filter-chain to the set of itineraries. The idea 
 here is to have a configurable filter-chain with decorating, mapping, sorting and filtering 
 capabilities.
 
