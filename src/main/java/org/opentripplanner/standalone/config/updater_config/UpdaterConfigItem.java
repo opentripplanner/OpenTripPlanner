@@ -12,6 +12,10 @@ import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
 
+/**
+ * This class is an object representation of a single real-time updater in 'router-config.json'.
+ * Each updater defines an inner interface with its required attributes.
+ */
 public class UpdaterConfigItem
     implements WebsocketGtfsRealtimeUpdater.WebSocketGtfsRealTimeUpdaterConfig,
     ExampleGraphUpdater.ExampleGraphUpdaterConfig,

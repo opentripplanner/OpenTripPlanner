@@ -7,6 +7,9 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class is an object representation of the list of real-time updaters in 'router-config.json'.
+ */
 public class UpdaterConfig {
 
   public static final UpdaterConfig DEFAULT = new UpdaterConfig(
