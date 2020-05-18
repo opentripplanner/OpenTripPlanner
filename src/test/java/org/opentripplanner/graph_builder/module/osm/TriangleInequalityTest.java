@@ -9,7 +9,7 @@ import org.opentripplanner.datastore.file.FileDataSource;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Edge;

@@ -7,7 +7,6 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;

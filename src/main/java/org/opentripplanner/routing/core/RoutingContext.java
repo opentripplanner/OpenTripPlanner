@@ -7,15 +7,18 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.error.GraphNotFoundException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -23,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -160,8 +164,17 @@ public class RoutingContext implements Cloneable {
 
         if (findPlaces) {
             // normal mode, search for vertices based RoutingRequest and split streets
-            fromVertices = graph.streetIndex.getVerticesForLocation(opt.from, opt, false);
-            toVertices = graph.streetIndex.getVerticesForLocation(opt.to, opt, true);
+            fromVertices = graph.streetIndex.getVerticesForLocation(
+                opt.from,
+                opt,
+                false
+            );
+            toVertices = graph.streetIndex.getVerticesForLocation(
+                opt.to,
+                opt,
+                true
+            );
+
         } else {
             // debug mode, force endpoint vertices to those specified rather than searching
             fromVertices = from;
@@ -221,19 +234,24 @@ public class RoutingContext implements Cloneable {
     /* INSTANCE METHODS */
 
     public void checkIfVerticesFound() {
-        ArrayList<String> notFound = new ArrayList<>();
+        List<RoutingError> routingErrors = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
         if (fromVertices == null) {
-            notFound.add("from");
+            routingErrors.add(
+                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
+            );
         }
 
         // check destination present when not doing a depart-after batch search
         if (toVertices == null) {
-            notFound.add("to");
+            routingErrors.add(
+                new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
+            );
         }
-        if (notFound.size() > 0) {
-            throw new VertexNotFoundException(notFound);
+
+        if (routingErrors.size() > 0) {
+            throw new RoutingValidationException(routingErrors);
         }
     }
 

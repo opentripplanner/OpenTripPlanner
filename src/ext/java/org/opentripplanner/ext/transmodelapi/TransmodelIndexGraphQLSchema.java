@@ -58,7 +58,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -67,12 +67,10 @@ import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.request.StreetMode;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TranslatedString;
@@ -2901,8 +2899,10 @@ public class TransmodelIndexGraphQLSchema {
                                                         .equalsIgnoreCase(environment.getArgument("authority")))
                                         .sorted(Comparator.comparing(s -> s.distance))
                                         .collect(Collectors.toList());
-                            } catch (VertexNotFoundException e) {
-                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
+                            } catch (RoutingValidationException e) {
+                                LOG.warn(
+                                    "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
+                                    e);
                                 stops = Collections.emptyList();
                             }
 

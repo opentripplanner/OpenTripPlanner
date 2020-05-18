@@ -5,7 +5,7 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.List;
 

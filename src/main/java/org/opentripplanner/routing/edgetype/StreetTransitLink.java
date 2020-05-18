@@ -5,7 +5,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -104,7 +104,7 @@ public class StreetTransitLink extends Edge {
         /* Only enter stations in CAR mode if parking is not required (kiss and ride) */
         /* Note that in arriveBy searches this is double-traversing link edges to fork the state into both WALK and CAR mode. This is an insane hack. */
         if (s0.getNonTransitMode() == TraverseMode.CAR) {
-            if (req.kissAndRide && !s0.isCarParked()) {
+            if (req.carPickup && !s0.isCarParked()) {
                 s1.setCarParked(true);
             } else {
                 return null;

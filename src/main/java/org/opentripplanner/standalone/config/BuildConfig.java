@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.graph_builder.module.osm.WayPropertySetSource;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
@@ -207,6 +208,36 @@ public class BuildConfig {
     public double distanceBetweenElevationSamples;
 
     /**
+     * When set to true (it is by default), the elevation module will attempt to read this file in order to reuse
+     * calculations of elevation data for various coordinate sequences instead of recalculating them all over again.
+     */
+    public boolean readCachedElevations;
+
+    /**
+     * When set to true (it is false by default), the elevation module will create a file of a lookup map of the
+     * LineStrings and the corresponding calculated elevation data for those coordinates. Subsequent graph builds can
+     * reuse the data in this file to avoid recalculating all the elevation data again.
+     */
+    public boolean writeCachedElevations;
+
+    /**
+     * When set to true (it is false by default), the elevation module will include the Ellipsoid to Geiod difference in
+     * the calculations of every point along every StreetWithElevationEdge in the graph.
+     *
+     * NOTE: if this is set to true for graph building, make sure to not set the value of
+     * {@link RoutingResource#geoidElevation} to true otherwise OTP will add this geoid value again to all of the
+     * elevation values in the street edges.
+     */
+    public boolean includeEllipsoidToGeoidDifference;
+
+    /**
+     * Whether or not to multi-thread the elevation calculations in the elevation module. The default is set to false.
+     * For unknown reasons that seem to depend on data and machine settings, it might be faster to use a single
+     * processor. If multi-threading is activated, parallel streams will be used to calculate the elevations.
+     */
+    public boolean multiThreadElevationCalculations;
+
+    /**
      * Limit the import of transit services to the given START date. Inclusive. If set, any transit
      * service on a day BEFORE the given date is dropped and will not be part of the graph.
      * Use an absolute date or a period relative to the date the graph is build(BUILD_DAY).
@@ -300,6 +331,10 @@ public class BuildConfig {
         distanceBetweenElevationSamples = c.asDouble("distanceBetweenElevationSamples",
                 CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
         );
+        readCachedElevations = c.asBoolean("readCachedElevations", true);
+        writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
+        multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
 

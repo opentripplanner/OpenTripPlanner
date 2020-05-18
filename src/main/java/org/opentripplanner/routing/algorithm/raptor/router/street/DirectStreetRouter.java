@@ -6,7 +6,7 @@ import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.algorithm.mapping.ItinerariesHelper;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.impl.GraphPathFinder;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -28,6 +28,7 @@ public class DirectStreetRouter {
   private static final double MAX_CAR_DISTANCE_METERS  = 500_000;
 
   public static List<Itinerary> route(Router router, RoutingRequest request) {
+    request.setRoutingContext(router.graph);
     try {
       if (request.modes.directMode == null) {
         return Collections.emptyList();
