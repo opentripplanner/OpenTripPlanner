@@ -42,7 +42,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
     private String url;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
-    public void configure(ExampleGraphUpdaterConfig config) {
+    public ExampleGraphUpdater(PollingGraphUpdater.PollingGraphUpdaterConfig config) {
         frequencySec = config.getFrequencySec();
         url = config.getUrl();
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
@@ -74,9 +74,5 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     public String getName() {
         return "ExampleGraphUpdater";
-    }
-
-    public interface ExampleGraphUpdaterConfig
-        extends PollingGraphUpdater.PollingGraphUpdaterConfig {
     }
 }

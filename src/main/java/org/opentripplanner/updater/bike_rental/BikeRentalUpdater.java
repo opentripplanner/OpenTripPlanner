@@ -44,13 +44,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private String network = "default";
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(BikeRentalUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public BikeRentalUpdater(BikeRentalUpdaterConfig config) throws Exception {
+        super(config);
 
         // Set data source type from config JSON
         String sourceType = config.getSourceType();
@@ -111,6 +106,11 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
             LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
         }
 
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override

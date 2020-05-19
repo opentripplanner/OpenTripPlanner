@@ -55,8 +55,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public void configure(GtfsRealTimeAlertsUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public GtfsRealtimeAlertsUpdater(GtfsRealTimeAlertsUpdaterConfig config) throws Exception {
+        super(config);
 
         String url = config.getUrl();
         if (url == null) {

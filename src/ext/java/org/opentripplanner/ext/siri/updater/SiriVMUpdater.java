@@ -77,13 +77,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(SiriVMUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public SiriVMUpdater(SiriVMUpdaterConfig config) throws Exception {
+        super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
         String sourceType = config.getSourceType();
@@ -112,6 +107,11 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
         LOG.info("Creating stop time updater (SIRI VM) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override

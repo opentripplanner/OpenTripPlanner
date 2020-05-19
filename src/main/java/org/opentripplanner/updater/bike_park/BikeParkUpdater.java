@@ -48,15 +48,8 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService bikeService;
 
-    public BikeParkUpdater() {
-    }
-
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(PollingGraphUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public BikeParkUpdater(PollingGraphUpdaterConfig config) throws Exception {
+        super(config);
         // Set source from preferences
         String sourceType = config.getSourceType();
         BikeParkDataSource source = null;
@@ -75,6 +68,10 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         // Configure updater
         this.source = source;
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
+    }
+
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     public void setup(Graph graph) {

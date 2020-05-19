@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
@@ -17,7 +16,6 @@ import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
  */
 public class UpdaterConfig
     implements WebsocketGtfsRealtimeUpdater.WebSocketGtfsRealTimeUpdaterConfig,
-    ExampleGraphUpdater.ExampleGraphUpdaterConfig,
     GtfsRealtimeAlertsUpdater.GtfsRealTimeAlertsUpdaterConfig,
     PollingStoptimeUpdater.PollingStopTimeUpdaterConfig,
     BikeRentalUpdater.BikeRentalUpdaterConfig,

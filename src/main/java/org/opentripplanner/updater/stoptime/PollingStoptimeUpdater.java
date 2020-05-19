@@ -66,12 +66,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(PollingStopTimeUpdaterConfig config) throws Exception {
+    public PollingStoptimeUpdater(PollingStopTimeUpdaterConfig config) throws Exception {
+        super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
         String sourceType = config.getSourceType();
@@ -104,6 +100,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         this.fuzzyTripMatching = config.fuzzyTripMatching();
 
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override

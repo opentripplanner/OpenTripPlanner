@@ -46,26 +46,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private static Map<String, String> requestHeaders = new HashMap<>();
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    @Override
-    public void setup(Graph graph) throws Exception {
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
-        if (updateHandler == null) {
-            updateHandler = new SiriAlertsUpdateHandler(feedId);
-        }
-        updateHandler.setEarlyStart(earlyStart);
-        updateHandler.setAlertPatchService(alertPatchService);
-        updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
-
-    }
-
-    public void configure(SiriSXUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public SiriSXUpdater(SiriSXUpdaterConfig config) throws Exception {
+        super(config);
         // TODO: add options to choose different patch services
         this.alertPatchService = alertPatchService;
         String url = config.getUrl();
@@ -93,6 +75,24 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
 
         LOG.info("Creating real-time alert updater (SIRI SX) running every {} seconds : {}", pollingPeriodSeconds, url);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
+    }
+
+    @Override
+    public void setup(Graph graph) throws Exception {
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+        if (updateHandler == null) {
+            updateHandler = new SiriAlertsUpdateHandler(feedId);
+        }
+        updateHandler.setEarlyStart(earlyStart);
+        updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
+
     }
 
     @Override

@@ -47,6 +47,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      */
     private String type;
 
+    /** Shared configuration code for all polling graph updaters. */
+    public PollingGraphUpdater(PollingGraphUpdaterConfig config) throws Exception {
+        pollingPeriodSeconds = config.getFrequencySec();
+        type = config.getSourceType();
+    }
+
     @Override
     final public void run() {
         try {
@@ -75,12 +81,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
             // When updater is interrupted
             LOG.error("Polling updater {} was interrupted and is stopping.", this.getClass().getName());
         }
-    }
-
-    /** Shared configuration code for all polling graph updaters. */
-    protected void configure(PollingGraphUpdaterConfig config) throws Exception {
-        pollingPeriodSeconds = config.getFrequencySec();
-        type = config.getSourceType();
     }
 
     /**

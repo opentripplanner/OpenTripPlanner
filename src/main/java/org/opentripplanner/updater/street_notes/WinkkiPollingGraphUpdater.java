@@ -22,6 +22,10 @@ import java.util.Date;
 
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
+    public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterConfig config) throws Exception {
+        super(config);
+    }
+
     protected Alert getNote(SimpleFeature feature) {
         Alert alert = Alert.createSimpleAlerts("winkki:" + feature.getAttribute("licence_type"));
         alert.alertDescriptionText = feature.getAttribute("event_description") == null ?

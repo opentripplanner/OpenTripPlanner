@@ -64,15 +64,15 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      */
     private int reconnectPeriodSec;
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(WebSocketGtfsRealTimeUpdaterConfig config) {
+    public WebsocketGtfsRealtimeUpdater(WebSocketGtfsRealTimeUpdaterConfig config) {
         url = config.getUrl();
         feedId = config.getFeedId();
         reconnectPeriodSec = config.getReconnectPeriodSec();
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override

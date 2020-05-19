@@ -79,48 +79,37 @@ public abstract class GraphUpdaterConfigurator {
                 if (type != null) {
                     switch (type) {
                         case "bike-rental":
-                            updater = new BikeRentalUpdater();
-                            ((BikeRentalUpdater) updater).configure(configItem);
+                            updater = new BikeRentalUpdater(configItem);
                             break;
                         case "bike-park":
-                            updater = new BikeParkUpdater();
-                            ((BikeParkUpdater) updater).configure(configItem);
+                            updater = new BikeParkUpdater(configItem);
                             break;
                         case "stop-time-updater":
-                            updater = new PollingStoptimeUpdater();
-                            ((PollingStoptimeUpdater) updater).configure(configItem);
+                            updater = new PollingStoptimeUpdater(configItem);
                             break;
                         case "websocket-gtfs-rt-updater":
-                            updater = new WebsocketGtfsRealtimeUpdater();
-                            ((WebsocketGtfsRealtimeUpdater) updater).configure(configItem);
+                            updater = new WebsocketGtfsRealtimeUpdater(configItem);
                             break;
                         case "real-time-alerts":
-                            updater = new GtfsRealtimeAlertsUpdater();
-                            ((GtfsRealtimeAlertsUpdater) updater).configure(configItem);
+                            updater = new GtfsRealtimeAlertsUpdater(configItem);
                             break;
                         case "example-updater":
-                            updater = new ExampleGraphUpdater();
-                            ((ExampleGraphUpdater) updater).configure(configItem);
+                            updater = new ExampleGraphUpdater(configItem);
                             break;
                         case "example-polling-updater":
-                            updater = new ExamplePollingGraphUpdater();
-                            ((ExamplePollingGraphUpdater) updater).configure(configItem);
+                            updater = new ExamplePollingGraphUpdater(configItem);
                             break;
                         case "winkki-polling-updater":
-                            updater = new WinkkiPollingGraphUpdater();
-                            ((WinkkiPollingGraphUpdater) updater).configure(configItem);
+                            updater = new WinkkiPollingGraphUpdater(configItem);
                             break;
                         case "siri-et-updater":
-                            updater = new SiriETUpdater();
-                            ((SiriETUpdater) updater).configure(configItem);
+                            updater = new SiriETUpdater(configItem);
                             break;
                         case "siri-vm-updater":
-                            updater = new SiriVMUpdater();
-                            ((SiriVMUpdater) updater).configure(configItem);
+                            updater = new SiriVMUpdater(configItem);
                             break;
                         case "siri-sx-updater":
-                            updater = new SiriSXUpdater();
-                            ((SiriSXUpdater) updater).configure(configItem);
+                            updater = new SiriSXUpdater(configItem);
                             break;
                     }
                 }

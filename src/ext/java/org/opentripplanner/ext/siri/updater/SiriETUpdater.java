@@ -67,13 +67,8 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    @Override
-    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
-        this.updaterManager = updaterManager;
-    }
-
-    public void configure(SiriETUpdaterConfig config) throws Exception {
-        super.configure(config);
+    public SiriETUpdater(SiriETUpdaterConfig config) throws Exception {
+        super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
         String sourceType = config.getSourceType();
@@ -97,6 +92,11 @@ public class SiriETUpdater extends PollingGraphUpdater {
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
 
         LOG.info("Creating stop time updater (SIRI ET) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
+    }
+
+    @Override
+    public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
+        this.updaterManager = updaterManager;
     }
 
     @Override
