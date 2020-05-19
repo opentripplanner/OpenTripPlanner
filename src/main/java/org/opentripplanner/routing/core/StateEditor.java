@@ -397,6 +397,7 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        child.distanceTraversedInCurrentVehicle = 0;
         incrementWeight(vehicleDescription.getRentTimeInSeconds() * options.rentingReluctance);
         incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
