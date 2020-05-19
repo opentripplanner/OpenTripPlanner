@@ -76,6 +76,19 @@ public class NodeAdapter {
         this.contextPath = contextPath;
     }
 
+    public <T> List<T> asList(String paramName, Function<NodeAdapter, T> factory) {
+        List<T> result = new ArrayList<>();
+        int i = 0;
+        for (JsonNode node : param(paramName)) {
+            String pName = paramName + "[" + i + "]";
+            NodeAdapter child = new NodeAdapter(node, source, fullPath(pName));
+            children.add(child);
+            result.add(factory.apply(child));
+            ++i;
+        }
+        return result;
+    }
+
     public String getSource() {
         return source;
     }

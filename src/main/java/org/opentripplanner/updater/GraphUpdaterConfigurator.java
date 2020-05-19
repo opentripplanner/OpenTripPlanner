@@ -6,8 +6,7 @@ import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.updater_config.UpdaterConfig;
-import org.opentripplanner.standalone.config.updater_config.UpdaterConfigItem;
+import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -40,11 +39,11 @@ public abstract class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    public static void setupGraph(Graph graph, UpdaterConfig updaterConfig) {
+    public static void setupGraph(Graph graph, List<UpdaterConfig> updaterConfigList) {
 
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        updaters.addAll(createUpdatersFromConfig(graph, updaterConfig));
+        updaters.addAll(createUpdatersFromConfig(graph, updaterConfigList));
 
         setupUpdaters(graph, updaters);
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, updaters);
@@ -64,11 +63,13 @@ public abstract class GraphUpdaterConfigurator {
      * @param graph the graph that will be modified by these updaters
      * @return a GraphUpdaterManager containing all the created updaters
      */
-    private static List<GraphUpdater> createUpdatersFromConfig(Graph graph, UpdaterConfig config) {
-
+    private static List<GraphUpdater> createUpdatersFromConfig(
+        Graph graph,
+        List<UpdaterConfig> configList
+    ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (UpdaterConfigItem configItem : config.getItems()) {
+        for (UpdaterConfig configItem : configList) {
 
             // For each sub-node, determine which kind of updater is being created.
             String type = configItem.getType();

@@ -1,11 +1,10 @@
-package org.opentripplanner.standalone.config.updater_config;
+package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
-import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -16,7 +15,7 @@ import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
  * This class is an object representation of a single real-time updater in 'router-config.json'.
  * Each updater defines an inner interface with its required attributes.
  */
-public class UpdaterConfigItem
+public class UpdaterConfig
     implements WebsocketGtfsRealtimeUpdater.WebSocketGtfsRealTimeUpdaterConfig,
     ExampleGraphUpdater.ExampleGraphUpdaterConfig,
     GtfsRealtimeAlertsUpdater.GtfsRealTimeAlertsUpdaterConfig,
@@ -47,7 +46,7 @@ public class UpdaterConfigItem
   private final String featureType;
   private final JsonNode source;
 
-  public UpdaterConfigItem(NodeAdapter c) {
+  public UpdaterConfig(NodeAdapter c) {
     this.url = c.asText("url", null);
     this.frequencySec = c.asInt("frequencySec", 60);
     this.feedId = c.asText("feedId", null);

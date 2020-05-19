@@ -269,4 +269,13 @@ public class NodeAdapterTest {
             assertTrue(e.getMessage(), e.getMessage().contains("Source: Test"));
         }
     }
+
+    @Test
+    public void objectAsList() {
+        NodeAdapter subject  = newNodeAdapterForTest("{ key : [{ a: 'I' }, { a: '2' } ] }");
+
+        List<String> result = subject.asList("key", a -> a.asText("a"));
+
+        assertEquals("[I, 2]", result.toString());
+    }
 }
