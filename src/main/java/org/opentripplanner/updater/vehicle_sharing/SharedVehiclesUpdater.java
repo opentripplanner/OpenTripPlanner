@@ -122,7 +122,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
         List<Pair<Vertex, VehicleDescription>> appearedVertex = coordsToVertex(diff.getAppeared());
         LOG.info("Got {} vehicles mapped to vertexes", appearedVertex.size());
 
-         List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = prepareAppearedEdge(appearedVertex);
+        List<Pair<RentVehicleAnywhereEdge, VehicleDescription>> appearedEdges = prepareAppearedEdge(appearedVertex);
         List<RentVehicleAnywhereEdge> rememberedVehicles = getRememberedEdges(appearedVertex);
         VehicleSharingGraphWriterRunnable graphWriterRunnable =
                 new VehicleSharingGraphWriterRunnable(appearedEdges, rememberedVehicles);

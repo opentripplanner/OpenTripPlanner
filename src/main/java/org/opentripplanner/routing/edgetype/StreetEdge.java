@@ -277,6 +277,10 @@ public class StreetEdge extends Edge implements Cloneable {
         if (!canTraverse(options, traverseMode) && !(canWalkBike(traverseMode, options))) {
             return null;
         }
+        /* We have to check whether we have enough fuel left in our vehicle*/
+        if(!s0.vehicleHasEnoughRange(getDistanceInMeters())){
+            return null;
+        }
 
         // Automobiles have variable speeds depending on the edge type
         double speed = calculateSpeed(options, traverseMode,s0.getCurrentVehicle(), s0.getTimeInMillis());

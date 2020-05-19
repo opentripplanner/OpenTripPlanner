@@ -252,6 +252,7 @@ public class StateEditor {
             defectiveTraversal = true;
             return;
         }
+        incrementDistanceInCurrentVehicle(length);
         incrementDistanceTraversedInMode(length);
         child.traverseDistanceInMeters += length;
     }
@@ -396,6 +397,7 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        child.distanceTraversedInCurrentVehicle = 0;
         incrementWeight(vehicleDescription.getRentTimeInSeconds() * options.rentingReluctance);
         incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
@@ -605,6 +607,11 @@ public class StateEditor {
 
     public boolean usedNotRecommendedRoutes() {
         return child.usedNotRecommendedRoute;
+    }
+
+    private void incrementDistanceInCurrentVehicle (double distanceInMeters){
+        if (child.getCurrentVehicle() != null)
+            child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }
 
 }
