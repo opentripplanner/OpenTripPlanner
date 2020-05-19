@@ -608,8 +608,7 @@ public class StateEditor {
         return child.usedNotRecommendedRoute;
     }
 
-
-    public void incrementDistanceInCurrentVehicle (double distanceInMeters){
+    private void incrementDistanceInCurrentVehicle (double distanceInMeters){
         if (child.getCurrentVehicle() != null)
             child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }
