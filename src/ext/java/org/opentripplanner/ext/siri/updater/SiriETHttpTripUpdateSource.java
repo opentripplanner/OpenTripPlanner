@@ -25,9 +25,9 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     /**
      * Feed id that is used to match trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    private String url;
+    private final String url;
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
@@ -37,7 +37,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
     private int previewIntervalMillis = -1;
 
-    private static Map<String, String> requestHeaders = new HashMap<>();
+    private static final Map<String, String> requestHeaders = new HashMap<>();
 
     public SiriETHttpTripUpdateSource(Config config) {
         String url = config.getUrl();

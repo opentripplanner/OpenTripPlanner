@@ -20,7 +20,7 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
 	private Map<String, List<String>> urlParameters = new HashMap<>();
 
-	public ShareBikeRentalDataSource(Config config) throws UnsupportedEncodingException, MalformedURLException {
+	public ShareBikeRentalDataSource(Config config) {
 		super(config, "result/LiveStationData");
 		setUrl(config.getUrl());
 	}

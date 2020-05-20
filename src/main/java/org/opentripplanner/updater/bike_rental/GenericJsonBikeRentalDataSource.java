@@ -28,9 +28,9 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     private String headerName;
     private String headerValue;
 
-    private String jsonParsePath;
+    private final String jsonParsePath;
 
-    List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
+    List<BikeRentalStation> stations = new ArrayList<>();
 
     /**
      * Construct superclass
@@ -78,7 +78,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     @Override
     public boolean update() {
         try {
-            InputStream data = null;
+            InputStream data;
         	
         	URL url2 = new URL(url);
         	
@@ -147,7 +147,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
 
     private String convertStreamToString(java.io.InputStream is) {
         java.util.Scanner scanner = null;
-        String result="";
+        String result;
         try {
            
             scanner = new java.util.Scanner(is).useDelimiter("\\A");

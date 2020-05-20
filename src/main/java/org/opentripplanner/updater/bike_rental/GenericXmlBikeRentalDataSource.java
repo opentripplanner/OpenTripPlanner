@@ -15,24 +15,19 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
 
     private final String url;
 
-    List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
+    List<BikeRentalStation> stations = new ArrayList<>();
 
-    private XmlDataListDownloader<BikeRentalStation> xmlDownloader;
+    private final XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
     public GenericXmlBikeRentalDataSource(Config config, String path) {
         url = config.getUrl();
-        xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
+        xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader.setPath(path);
-        xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikeRentalStation>() {
-            @Override
-            public BikeRentalStation build(Map<String, String> attributes) {
-                /* TODO Do not make this class abstract, but instead make the client
-                 * provide itself the factory?
-                 */
-                return makeStation(attributes);
-            }
-        });
+        /* TODO Do not make this class abstract, but instead make the client
+         * provide itself the factory?
+         */
+        xmlDownloader.setDataFactory(this::makeStation);
     }
 
     @Override

@@ -12,7 +12,6 @@ import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -39,7 +38,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     /**
      * Update streamer
      */
-    private EstimatedTimetableSource updateSource;
+    private final EstimatedTimetableSource updateSource;
 
     /**
      * Property to set on the RealtimeDataSnapshotSource
@@ -54,12 +53,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
     /**
      * Property to set on the RealtimeDataSnapshotSource
      */
-    private Boolean purgeExpiredData;
+    private final Boolean purgeExpiredData;
 
     /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
     /**
      * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
@@ -67,14 +66,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriETUpdater(Config config) throws Exception {
+    public SiriETUpdater(Config config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
-        String sourceType = config.getSource().getName();
 
-        SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource(config.getSource());
-        updateSource = source;
+        updateSource = new SiriETHttpTripUpdateSource(config.getSource());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -97,7 +94,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
         // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
         //           - Ideally we should inject the snapshotSource on this class.
@@ -123,7 +120,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
      * applies those updates to the graph.
      */
     @Override
-    public void runPolling() throws Exception {
+    public void runPolling() {
         boolean moreData = false;
         do {
             Siri updates = updateSource.getUpdates();

@@ -28,15 +28,13 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
 
-    private String url;
+    private final String url;
 
-    private String feedId;
-
-    private SiriFuzzyTripMatcher fuzzyTripMatcher;
+    private final String feedId;
 
     private AlertPatchService alertPatchService;
 
-    private long earlyStart;
+    private final long earlyStart;
 
     private SiriAlertsUpdateHandler updateHandler = null;
 
@@ -44,12 +42,11 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private int timeout;
 
-    private static Map<String, String> requestHeaders = new HashMap<>();
+    private static final Map<String, String> requestHeaders = new HashMap<>();
 
-    public SiriSXUpdater(Config config) throws Exception {
+    public SiriSXUpdater(Config config) {
         super(config);
         // TODO: add options to choose different patch services
-        this.alertPatchService = alertPatchService;
         String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
@@ -83,9 +80,9 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws Exception {
+    public void setup(Graph graph) {
         AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
+        SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler(feedId);
         }
@@ -96,7 +93,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void runPolling() throws Exception {
+    protected void runPolling() {
         boolean moreData = false;
         do {
             Siri updates = getUpdates();

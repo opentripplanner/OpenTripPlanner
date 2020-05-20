@@ -59,12 +59,12 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      */
     private Map<T2<NoteMatcher, Alert>, MatcherAndAlert> uniqueMatchers;
 
-    private URL url;
-    private String featureType;
+    private final URL url;
+    private final String featureType;
     private Query query;
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
-    private DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
+    private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
 
     // How much should the geometries be padded with in order to be sure they intersect with graph edges
     private static final double SEARCH_RADIUS_M = 1;
@@ -73,7 +73,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     // Set the matcher type for the notes, can be overridden in extending classes
     private static final NoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
 
-    private static Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
 
     /**
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
@@ -83,7 +83,6 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         super(config);
         url = new URL(config.getUrl());
         featureType = config.getFeatureType();
-        this.graph = graph;
         LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
                 pollingPeriodSeconds, url.toString(), featureType);
     }

@@ -115,7 +115,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
 
         private String convertStreamToString(java.io.InputStream is) {
                 java.util.Scanner scanner = null;
-                String result = "";
+                String result;
                 try {
 
                         scanner = new java.util.Scanner(is).useDelimiter("\\A");

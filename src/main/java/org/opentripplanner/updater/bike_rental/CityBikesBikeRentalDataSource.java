@@ -28,7 +28,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     private final String url;
 
-    ArrayList<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
+    ArrayList<BikeRentalStation> stations = new ArrayList<>();
 
     public CityBikesBikeRentalDataSource(Config config) {
         this.url = config.getUrl();
@@ -57,18 +57,12 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
         } catch (IOException e) {
             log.warn("Error reading bike rental feed from " + url, e);
             return false;
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad XML of some sort)", e);
-            return false;
         }
         return true;
     }
 
-    private void parseJson(String data) throws ParserConfigurationException, SAXException,
-            IOException {
-        ArrayList<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
+    private void parseJson(String data) throws IOException {
+        ArrayList<BikeRentalStation> out = new ArrayList<>();
 
         // Jackson ObjectMapper to read in JSON
         // TODO: test against real data
@@ -82,7 +76,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
             brStation.name = new NonLocalizedString(stationNode.get("name").textValue());
             brStation.bikesAvailable = stationNode.get("bikes").intValue();
             brStation.spacesAvailable = stationNode.get("free").intValue();
-            if (brStation != null && brStation.id != null) {
+            if (brStation.id != null) {
                 out.add(brStation);
             }
         }

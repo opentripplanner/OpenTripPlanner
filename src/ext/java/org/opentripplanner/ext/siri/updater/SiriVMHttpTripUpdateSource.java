@@ -24,16 +24,16 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     /**
      * Feed id that is used to match trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    private String url;
+    private final String url;
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
     private String requestorRef;
     private int timeout;
 
-    private static Map<String, String> requestHeaders = new HashMap<>();
+    private static final Map<String, String> requestHeaders = new HashMap<>();
 
     public SiriVMHttpTripUpdateSource(Config config) {
         String url = config.getUrl();

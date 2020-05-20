@@ -51,21 +51,21 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     /**
      * Property to set on the RealtimeDataSnapshotSource
      */
-    private Boolean purgeExpiredData;
+    private final Boolean purgeExpiredData;
 
     /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    private boolean fuzzyTripMatching;
+    private final boolean fuzzyTripMatching;
 
     /**
      * Set only if we should attempt to match the trip_id from other data in TripDescriptor
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public PollingStoptimeUpdater(Config config) throws Exception {
+    public PollingStoptimeUpdater(Config config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -113,7 +113,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
 
         // Only create a realtime data snapshot source if none exists already
-        TimetableSnapshotSource snapshotSource = graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
+        TimetableSnapshotSource snapshotSource =
+            graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
 
         // Set properties of realtime data snapshot source
         if (logFrequency != null) {

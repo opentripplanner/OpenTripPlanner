@@ -1,14 +1,13 @@
 package org.opentripplanner.updater.bike_rental;
 
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
-import java.util.concurrent.ExecutionException;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
@@ -33,17 +32,17 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<BikeRentalStation, BikeRentalStationVertex>();
+    Map<BikeRentalStation, BikeRentalStationVertex> verticesByStation = new HashMap<>();
 
-    private BikeRentalDataSource source;
+    private final BikeRentalDataSource source;
 
     private SimpleStreetSplitter linker;
 
     private BikeRentalStationService service;
 
-    private String network = "default";
+    private final String network;
 
-    public BikeRentalUpdater(Config config) throws Exception {
+    public BikeRentalUpdater(Config config) throws IllegalArgumentException {
         super(config);
 
         // Set data source type from config JSON
@@ -54,38 +53,62 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         String networkName = config.getNetwork();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
-            if (sourceType.equals("jcdecaux")) {
-                source = new JCDecauxBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("b-cycle")) {
-                source = new BCycleBikeRentalDataSource(config.getSource(), apiKey, networkName);
-            } else if (sourceType.equals("bixi")) {
-                source = new BixiBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("keolis-rennes")) {
-                source = new KeolisRennesBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("ov-fiets")) {
-                source = new OVFietsKMLDataSource(config.getSource());
-            } else if (sourceType.equals("city-bikes")) {
-                source = new CityBikesBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("vcub")) {
-                source = new VCubDataSource(config.getSource());
-            } else if (sourceType.equals("citi-bike-nyc")) {
-                source = new CitiBikeNycBikeRentalDataSource(config.getSource(), networkName);
-            } else if (sourceType.equals("next-bike")) {
-                source = new NextBikeRentalDataSource(config.getSource(), networkName);
-            } else if (sourceType.equals("kml")) {
-                source = new GenericKmlBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("sf-bay-area")) {
-                source = new SanFranciscoBayAreaBikeRentalDataSource(config.getSource(), networkName);
-            } else if (sourceType.equals("share-bike")) {
-                source = new ShareBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("uip-bike")) {
-                source = new UIPBikeRentalDataSource(config.getSource(), apiKey);
-            } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource(config.getSource(), networkName);
-            } else if (sourceType.equals("smoove")) {
-                source = new SmooveBikeRentalDataSource(config.getSource());
-            } else if (sourceType.equals("bicimad")) {
-                source = new BicimadBikeRentalDataSource(config.getSource());
+            switch (sourceType) {
+                case "jcdecaux":
+                    source = new JCDecauxBikeRentalDataSource(config.getSource());
+                    break;
+                case "b-cycle":
+                    source = new BCycleBikeRentalDataSource(
+                        config.getSource(),
+                        apiKey,
+                        networkName
+                    );
+                    break;
+                case "bixi":
+                    source = new BixiBikeRentalDataSource(config.getSource());
+                    break;
+                case "keolis-rennes":
+                    source = new KeolisRennesBikeRentalDataSource(config.getSource());
+                    break;
+                case "ov-fiets":
+                    source = new OVFietsKMLDataSource(config.getSource());
+                    break;
+                case "city-bikes":
+                    source = new CityBikesBikeRentalDataSource(config.getSource());
+                    break;
+                case "vcub":
+                    source = new VCubDataSource(config.getSource());
+                    break;
+                case "citi-bike-nyc":
+                    source = new CitiBikeNycBikeRentalDataSource(config.getSource(), networkName);
+                    break;
+                case "next-bike":
+                    source = new NextBikeRentalDataSource(config.getSource(), networkName);
+                    break;
+                case "kml":
+                    source = new GenericKmlBikeRentalDataSource(config.getSource());
+                    break;
+                case "sf-bay-area":
+                    source = new SanFranciscoBayAreaBikeRentalDataSource(
+                        config.getSource(),
+                        networkName
+                    );
+                    break;
+                case "share-bike":
+                    source = new ShareBikeRentalDataSource(config.getSource());
+                    break;
+                case "uip-bike":
+                    source = new UIPBikeRentalDataSource(config.getSource(), apiKey);
+                    break;
+                case "gbfs":
+                    source = new GbfsBikeRentalDataSource(config.getSource(), networkName);
+                    break;
+                case "smoove":
+                    source = new SmooveBikeRentalDataSource(config.getSource());
+                    break;
+                case "bicimad":
+                    source = new BicimadBikeRentalDataSource(config.getSource());
+                    break;
             }
         }
 
@@ -111,7 +134,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike rental station service needs a graph writer runnable
@@ -119,7 +142,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void runPolling() throws Exception {
+    protected void runPolling() {
         LOG.debug("Updating bike rental stations from " + source);
         if (!source.update()) {
             LOG.debug("No updates");
@@ -138,7 +161,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private class BikeRentalGraphWriterRunnable implements GraphWriterRunnable {
 
-        private List<BikeRentalStation> stations;
+        private final List<BikeRentalStation> stations;
 
         public BikeRentalGraphWriterRunnable(List<BikeRentalStation> stations) {
             this.stations = stations;
@@ -148,7 +171,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         public void run(Graph graph) {
             // Apply stations to graph
             Set<BikeRentalStation> stationSet = new HashSet<>();
-            Set<String> defaultNetworks = new HashSet<>(Arrays.asList(network));
+            Set<String> defaultNetworks = new HashSet<>(Collections.singletonList(network));
             /* add any new stations and update bike counts for existing stations */
             for (BikeRentalStation station : stations) {
                 if (station.networks == null) {
@@ -174,7 +197,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
                 }
             }
             /* remove existing stations that were not present in the update */
-            List<BikeRentalStation> toRemove = new ArrayList<BikeRentalStation>();
+            List<BikeRentalStation> toRemove = new ArrayList<>();
             for (Entry<BikeRentalStation, BikeRentalStationVertex> entry : verticesByStation.entrySet()) {
                 BikeRentalStation station = entry.getKey();
                 if (stationSet.contains(station))

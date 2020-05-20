@@ -2,7 +2,6 @@ package org.opentripplanner.updater.bike_park;
 
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
@@ -27,39 +26,36 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
 
     private String namePrefix = null;
 
-    private boolean zip;
+    private final boolean zip;
 
-    private XmlDataListDownloader<BikePark> xmlDownloader;
+    private final XmlDataListDownloader<BikePark> xmlDownloader;
 
     private List<BikePark> bikeParks;
 
     public KmlBikeParkDataSource(Config config) {
-        xmlDownloader = new XmlDataListDownloader<BikePark>();
+        xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
-        xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikePark>() {
-            @Override
-            public BikePark build(Map<String, String> attributes) {
-                BikePark bikePark = new BikePark();
-                if (!attributes.containsKey("name")) {
-                    LOG.warn("Missing name in KML Placemark, cannot create bike park.");
-                    return null;
-                }
-                if (!attributes.containsKey("Point")) {
-                    LOG.warn("Missing Point geometry in KML Placemark, cannot create bike park.");
-                    return null;
-                }
-                bikePark.name = attributes.get("name").trim();
-                if (namePrefix != null)
-                    bikePark.name = namePrefix + bikePark.name;
-                String[] coords = attributes.get("Point").trim().split(",");
-                bikePark.x = Double.parseDouble(coords[0]);
-                bikePark.y = Double.parseDouble(coords[1]);
-                // There is no ID in KML, assume unique names and location.
-                bikePark.id = String.format(Locale.US, "%s[%.3f-%.3f]",
-                        bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
-                return bikePark;
+        xmlDownloader.setDataFactory(attributes -> {
+            BikePark bikePark = new BikePark();
+            if (!attributes.containsKey("name")) {
+                LOG.warn("Missing name in KML Placemark, cannot create bike park.");
+                return null;
             }
+            if (!attributes.containsKey("Point")) {
+                LOG.warn("Missing Point geometry in KML Placemark, cannot create bike park.");
+                return null;
+            }
+            bikePark.name = attributes.get("name").trim();
+            if (namePrefix != null)
+                bikePark.name = namePrefix + bikePark.name;
+            String[] coords = attributes.get("Point").trim().split(",");
+            bikePark.x = Double.parseDouble(coords[0]);
+            bikePark.y = Double.parseDouble(coords[1]);
+            // There is no ID in KML, assume unique names and location.
+            bikePark.id = String.format(Locale.US, "%s[%.3f-%.3f]",
+                    bikePark.name.replace(" ", "_"), bikePark.x, bikePark.y);
+            return bikePark;
         });
         url = config.getUrl();
         namePrefix = config.getNamePrefix();

@@ -38,7 +38,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
      *        the dataSource. Default to null (compatible with all).
      */
     public void setNetworks(String networks) {
-        this.networks = new HashSet<String>();
+        this.networks = new HashSet<>();
         this.networks.addAll(Arrays.asList(networks.split(",")));
     }
 

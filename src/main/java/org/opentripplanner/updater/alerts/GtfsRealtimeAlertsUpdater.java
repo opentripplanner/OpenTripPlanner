@@ -7,7 +7,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.HttpUtils;
@@ -36,26 +35,26 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private Long lastTimestamp = Long.MIN_VALUE;
 
-    private String url;
+    private final String url;
 
-    private String feedId;
+    private final String feedId;
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     private AlertPatchService alertPatchService;
 
-    private long earlyStart;
+    private final long earlyStart;
 
     private AlertsUpdateHandler updateHandler = null;
 
-    private boolean fuzzyTripMatching;
+    private final boolean fuzzyTripMatching;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
-    public GtfsRealtimeAlertsUpdater(Config config) throws Exception {
+    public GtfsRealtimeAlertsUpdater(Config config) {
         super(config);
 
         String url = config.getUrl();
@@ -107,12 +106,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             }
 
             // Handle update in graph writer runnable
-            updaterManager.execute(new GraphWriterRunnable() {
-                @Override
-                public void run(Graph graph) {
-                    updateHandler.update(feed);
-                }
-            });
+            updaterManager.execute(graph -> updateHandler.update(feed));
 
             lastTimestamp = feedTimestamp;
         } catch (Exception e) {

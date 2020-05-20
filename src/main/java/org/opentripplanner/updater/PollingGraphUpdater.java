@@ -49,7 +49,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     private String type;
 
     /** Shared configuration code for all polling graph updaters. */
-    public PollingGraphUpdater(PollingGraphUpdaterConfig config) throws Exception {
+    public PollingGraphUpdater(PollingGraphUpdaterConfig config) {
         pollingPeriodSeconds = config.getFrequencySec();
         type = config.getSource().getName();
     }

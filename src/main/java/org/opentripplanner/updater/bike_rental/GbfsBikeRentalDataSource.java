@@ -4,8 +4,6 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
@@ -14,18 +12,14 @@ import java.util.*;
  */
 public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
-
     private final GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
     private final GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
     private final GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
 
-    private String baseUrl;
-
     private final String networkName;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
-    private boolean routeAsCar;
+    private final boolean routeAsCar;
 
     public GbfsBikeRentalDataSource (Config config, String networkName) {
         setBaseUrl(config.getUrl());
@@ -41,7 +35,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     }
 
     private void setBaseUrl (String url) {
-        baseUrl = url;
+        String baseUrl = url;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
         stationInformationSource.setUrl(baseUrl + "station_information.json");
         stationStatusSource.setUrl(baseUrl + "station_status.json");
