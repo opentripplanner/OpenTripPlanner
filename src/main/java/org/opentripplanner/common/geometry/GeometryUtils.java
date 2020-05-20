@@ -1,7 +1,9 @@
 package org.opentripplanner.common.geometry;
 
 import org.geojson.LngLatAlt;
+import org.geotools.geometry.jts.JTS;
 import org.geotools.referencing.CRS;
+import org.geotools.referencing.GeodeticCalculator;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
@@ -12,6 +14,7 @@ import org.locationtech.jts.linearref.LengthLocationMap;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opengis.referencing.crs.CoordinateReferenceSystem;
+import org.opengis.referencing.operation.TransformException;
 import org.opentripplanner.common.model.P2;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -151,6 +154,23 @@ public class GeometryUtils {
         else if (r > 1.0)
             return 1.0;
         return r;
+    }
+
+
+    /**
+    */
+    public static double calculateDistance(Coordinate from, Coordinate to) {
+        try {
+            // the following code is based on JTS.orthodromicDistance( start, end, crs )
+            GeodeticCalculator gc = new GeodeticCalculator(WGS84_XY);
+            gc.setStartingPosition(JTS.toDirectPosition(from, WGS84_XY));
+            gc.setDestinationPosition(JTS.toDirectPosition(to, WGS84_XY));
+
+            return gc.getOrthodromicDistance();
+        }
+        catch (TransformException e) {
+            throw new IllegalStateException(e.getMessage(), e);
+        }
     }
 
     private static Coordinate[] convertPath(List<LngLatAlt> path) {
