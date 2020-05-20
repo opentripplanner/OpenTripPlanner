@@ -27,10 +27,9 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
@@ -175,13 +174,15 @@ public class GraphIndex {
 
     /**
      * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
-     * added by realtime updates are added to the collection.
+     * added by realtime updates are added to the collection. A set is used here because trip
+     * patterns that were updated by realtime data is both part of the GraphIndex and the
+     * TimetableSnapshot.
      */
     public Collection<TripPattern> getPatternsForStop(
             Stop stop,
             TimetableSnapshot timetableSnapshot
     ) {
-        List<TripPattern> tripPatterns = new ArrayList<>(getPatternsForStop(stop));
+        Set<TripPattern> tripPatterns = new HashSet<>(getPatternsForStop(stop));
 
         if (timetableSnapshot != null) {
             tripPatterns.addAll(timetableSnapshot.getPatternsForStop(stop));

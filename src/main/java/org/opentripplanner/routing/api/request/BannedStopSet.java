@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.request;
+package org.opentripplanner.routing.api.request;
 
 import java.util.HashSet;
 

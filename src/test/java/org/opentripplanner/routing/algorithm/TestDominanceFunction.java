@@ -2,7 +2,7 @@ package org.opentripplanner.routing.algorithm;
 
 import junit.framework.TestCase;
 import org.junit.Assert;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;

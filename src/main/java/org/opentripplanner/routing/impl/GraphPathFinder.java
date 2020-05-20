@@ -7,11 +7,12 @@ import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
-import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
@@ -140,7 +141,7 @@ public class GraphPathFinder {
 
     /**
      *  Try to find N paths through the Graph
-     * @throws VertexNotFoundException
+     * @throws RoutingValidationException
      * @throws PathNotFoundException
      */
     public List<GraphPath> graphPathFinderEntryPoint (RoutingRequest request) {
@@ -161,7 +162,8 @@ public class GraphPathFinder {
                 paths = getGraphPathsConsideringIntermediates(relaxedRequest);
             }
             request.rctx.debugOutput.finishedCalculating();
-        } catch (VertexNotFoundException e) {
+        } catch (RoutingValidationException e) {
+            if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))
             LOG.info("Vertex not found: " + request.from + " : " + request.to);
             throw e;
         }

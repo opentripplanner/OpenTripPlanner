@@ -26,7 +26,7 @@ import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -632,8 +632,11 @@ public class SimpleStreetSplitter {
         if (options != null) {
             TraverseModeSet modes = options.streetSubRequestModes;
             if (modes.getCar())
+                if (options.carPickup) {
+                    nonTransitMode = TraverseMode.WALK;
+                }
                 // for park and ride we will start in car mode and walk to the end vertex
-                if (endVertex && (options.parkAndRide || options.kissAndRide)) {
+                else if (endVertex && options.parkAndRide) {
                     nonTransitMode = TraverseMode.WALK;
                 } else {
                     nonTransitMode = TraverseMode.CAR;

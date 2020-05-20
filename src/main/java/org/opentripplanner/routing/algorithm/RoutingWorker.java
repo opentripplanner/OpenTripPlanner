@@ -1,8 +1,11 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.routing.RoutingResponse;
-import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -14,8 +17,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
-import org.opentripplanner.routing.error.VertexNotFoundException;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -62,33 +65,38 @@ public class RoutingWorker {
     }
 
     public RoutingResponse route(Router router) {
+        List<Itinerary> itineraries = new ArrayList<>();
+        List<RoutingError> routingErrors = new ArrayList<>();
+
+        // Direct street routing
         try {
-            List<Itinerary> itineraries;
+            itineraries.addAll(DirectStreetRouter.route(router, request));
+        } catch (RoutingValidationException e) {
+            routingErrors.addAll(e.getRoutingErrors());
+        }
 
-            // Direct street routing
-            itineraries = new ArrayList<>(DirectStreetRouter.route(router, request));
-
-            // Transit routing
+        // Transit routing
+        try {
             itineraries.addAll(routeTransit(router));
-
-            long startTimeFiltering = System.currentTimeMillis();
-            // Filter itineraries
-            List<Itinerary> filteredItineraries = filterChain().filter(itineraries);
-
-            LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
-            LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
-
-            return new RoutingResponse(
-                    TripPlanMapper.mapTripPlan(request, filteredItineraries),
-                    createTripSearchMetadata()
-            );
+        } catch (RoutingValidationException e) {
+            routingErrors.addAll(e.getRoutingErrors());
         }
-        finally {
-            request.cleanup();
-        }
+
+        // Filter itineraries
+        long startTimeFiltering = System.currentTimeMillis();
+        itineraries = filterChain().filter(itineraries);
+        LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
+        LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
+
+        return new RoutingResponse(
+            TripPlanMapper.mapTripPlan(request, itineraries),
+            createTripSearchMetadata(),
+            routingErrors
+        );
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
+        request.setRoutingContext(router.graph);
         if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
 
         long startTime = System.currentTimeMillis();
@@ -166,6 +174,8 @@ public class RoutingWorker {
             itineraries.add(itinerary);
         }
 
+        checkIfTransitConnectionExists(transitResponse);
+
         // Filter itineraries away that depart after the latest-departure-time for depart after
         // search. These itineraries is a result of timeshifting the access leg and is needed for
         // the raptor to prune the results. These itineraries are often not ideal, but if they
@@ -207,11 +217,27 @@ public class RoutingWorker {
 
         if(accessExist && egressExist) { return; }
 
-        List<String> missingPlaces = new ArrayList<>();
-        if(!accessExist) { missingPlaces.add("from"); }
-        if(!egressExist) { missingPlaces.add("to"); }
+        List<RoutingError> routingErrors = new ArrayList<>();
+        if(!accessExist) { routingErrors.add(
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.FROM_PLACE));
+        }
+        if(!egressExist) { routingErrors.add(
+            new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.TO_PLACE));
+        }
 
-        throw new VertexNotFoundException(missingPlaces);
+        throw new RoutingValidationException(routingErrors);
+    }
+
+    /**
+     * If no paths or search window is found, we assume there is no transit connection between
+     * the origin and destination.
+     */
+    private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
+        int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
+        if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
+            throw new RoutingValidationException(Collections.singletonList(
+                new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null)));
+        }
     }
 
     private TripSearchMetadata createTripSearchMetadata() {

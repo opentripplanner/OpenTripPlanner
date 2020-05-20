@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Arrays;
 import java.util.Collection;

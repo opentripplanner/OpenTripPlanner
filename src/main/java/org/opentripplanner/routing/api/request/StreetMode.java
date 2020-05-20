@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.request;
+package org.opentripplanner.routing.api.request;
 
 public enum StreetMode {
   /**
@@ -39,8 +39,7 @@ public enum StreetMode {
    * Walk to a pickup point along the road, drive to a drop-off point along the road,
    * and walk the rest of the way. This can include various taxi-services or kiss & ride.
    */
-  // TODO OTP2 This could be implemented with walk legs at both ends in order to also use as egress
-  TAXI(true, true),
+  CAR_PICKUP(true, true),
   /**
    * Walk to a car rental point, drive to a car rental drop-off point and walk the rest of the way.
    * This can include car rental at fixed locations or free-floating services.
