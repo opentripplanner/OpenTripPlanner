@@ -562,16 +562,14 @@ seconds needed for the boarding and alighting processes in `router-config.json` 
 
 ## Timeout
 
-TODO OTP2 - Clean up this text - there is a timeout for the street search but not for the transit 
-search, it should be limited by the size of the search-window, not a timeout.
-
-Path searches can sometimes take a long time to complete, especially certain problematic cases that
-have yet to be optimized. Often the street part of the routing can take a long time if searching
-very long distances. You can set the street routing timeout to avoid tying up server resources on
-pointless searches and ensure that your users receive a timely response. You can also limit the max
-distance to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made
-with information that can help identify problematic searches and improve our routing methods. The
-simplest timeout option is:
+In OTP1 path searches sometimes toke a long time to complete. With the new Raptor algorithm this not
+the case anymore. The street part of the routing may still take a long time if searching very long
+distances. You can set the street routing timeout to avoid tying up server resources on pointless
+searches and ensure that your users receive a timely response. You can also limit the max distance
+to search for WALK, BIKE and CAR. When a search times out, a WARN level log entry is made with
+information that can help identify problematic searches and improve our routing methods. There are 
+no timeouts for the transit part of the routing search, instead configure a reasonable dynamic 
+search-window. To set the street routing timeout use the following config:
 
 ```JSON
 // router-config.json
@@ -580,8 +578,7 @@ simplest timeout option is:
 }
 ```
 
-This specifies a single timeout in (optionally fractional) seconds. Searching is aborted after this many seconds and any
-paths already found are returned to the client. 
+This specifies a timeout in (optionally fractional) seconds. The search abort after this many seconds and any paths found are returned to the client. 
 
 ## Logging incoming requests
 
@@ -600,7 +597,7 @@ Each line in the resulting log file will look like this:
 
 `2016-04-19T18:23:13.486 0:0:0:0:0:0:0:1 ARRIVE 2016-04-07T00:17 WALK,BUS,CABLE_CAR,TRANSIT,BUSISH 45.559737193889966 -122.64999389648438 45.525592487765635 -122.39044189453124 6095 3 5864 3 6215 3`
 
-The fields are separated by whitespace and are (in order):
+The fields separated by whitespace are (in order):
 
 1. Date and time the request was received
 2. IP address of the user
@@ -638,7 +635,7 @@ Split a travel search in smaller jobs and run them in parallel to improve perfor
 **Type:** `int`  **Default value:** 0
 
 ### transit.dynamicSearchWindow
-The dynamic search window coefficients are used to calculate EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
+The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
 
 #### transit.dynamicSearchWindow.minTripTimeCoefficient
 The coefficient to multiply with minimum travel time found using a heuristic search. This 
