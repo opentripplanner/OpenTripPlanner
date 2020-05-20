@@ -120,11 +120,8 @@ public class RoutingWorker {
         );
         verifyEgressAccess(accessTransfers, egressTransfers);
 
-        /* Prepare transit search */
-
+        // Prepare transit search
         double startTimeRouting = System.currentTimeMillis();
-
-
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
@@ -142,7 +139,7 @@ public class RoutingWorker {
         LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
         LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
-        /* Create itineraries */
+        // Create itineraries
 
         double startItineraries = System.currentTimeMillis();
 

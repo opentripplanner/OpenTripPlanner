@@ -212,6 +212,10 @@ public class Itinerary {
     @Override
     public String toString() {
         return ToStringBuilder.of(Itinerary.class)
+                .addStr("from", firstLeg().from.toStringShort())
+                .addStr("to", lastLeg().to.toStringShort())
+                .addCalTime("start", firstLeg().startTime)
+                .addCalTime("end", lastLeg().startTime)
                 .addNum("nTransfers", nTransfers, -1)
                 .addDuration("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)
