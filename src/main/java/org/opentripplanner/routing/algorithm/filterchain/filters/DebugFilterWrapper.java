@@ -25,10 +25,10 @@ public class DebugFilterWrapper implements ItineraryFilter {
 
   @Override
   public List<Itinerary> filter(List<Itinerary> itineraries) {
-    List<Itinerary> reminding = remindingItineraries(itineraries);
-    List<Itinerary> filtered = delegate.filter(reminding);
+    List<Itinerary> previouslyUnfiltered = remindingItineraries(itineraries);
+    List<Itinerary> filtered = delegate.filter(previouslyUnfiltered);
 
-    for (Itinerary it : reminding) {
+    for (Itinerary it : previouslyUnfiltered) {
       if(!filtered.contains(it)) {
         markItineraryAsDeleted(it);
       }
