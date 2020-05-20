@@ -33,7 +33,7 @@ public class VehiclePositionsDiff {
         FuelType fuelType = FuelType.fromString(vehicle.getFuelType());
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
         Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
-        double rangeInMeters = vehicle.getRangeInMeters();
+        Double rangeInMeters = vehicle.getRangeInMeters();
 
         switch (vehicle.getType()) {
             case CAR:
