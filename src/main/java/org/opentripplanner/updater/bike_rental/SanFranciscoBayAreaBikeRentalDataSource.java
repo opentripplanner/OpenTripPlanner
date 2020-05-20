@@ -17,7 +17,7 @@ public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRent
     private String networkName;
 
     public SanFranciscoBayAreaBikeRentalDataSource(
-        GenericJsonBikeRentalDataSourceConfig config,
+        Config config,
         String networkName
     ) {
         super(config,"stationBeanList");

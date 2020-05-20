@@ -22,7 +22,7 @@ import java.util.Date;
 
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
-    public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterConfig config) throws Exception {
+    public WinkkiPollingGraphUpdater(Config config) throws Exception {
         super(config);
     }
 

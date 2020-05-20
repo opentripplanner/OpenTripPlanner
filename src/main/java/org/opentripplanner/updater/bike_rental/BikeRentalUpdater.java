@@ -20,7 +20,6 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,7 +43,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private String network = "default";
 
-    public BikeRentalUpdater(BikeRentalUpdaterConfig config) throws Exception {
+    public BikeRentalUpdater(Config config) throws Exception {
         super(config);
 
         // Set data source type from config JSON
@@ -195,7 +194,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         }
     }
 
-    public interface BikeRentalUpdaterConfig extends PollingGraphUpdaterConfig {
+    public interface Config extends PollingGraphUpdaterConfig {
         String getNetwork();
         String getNetworks();
         String getApiKey();

@@ -5,7 +5,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class OVFietsKMLDataSource extends GenericXmlBikeRentalDataSource {
-    public OVFietsKMLDataSource(GenericXmlBikeRentalDataSourceConfig config) {
+    public OVFietsKMLDataSource(Config config) {
         super(config,"//*[name()='Placemark']");
     }
 

@@ -39,7 +39,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
     private static Map<String, String> requestHeaders = new HashMap<>();
 
-    public SiriETHttpTripUpdateSource(SiriETHttpTripUpdateSourceConfig config) {
+    public SiriETHttpTripUpdateSource(Config config) {
         String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
@@ -123,7 +123,7 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         return this.feedId;
     }
 
-    public interface SiriETHttpTripUpdateSourceConfig {
+    public interface Config {
         String getUrl();
         String getRequestorRef();
         String getFeedId();

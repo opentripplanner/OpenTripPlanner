@@ -17,7 +17,7 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
     private String networkName;
 
     public NextBikeRentalDataSource(
-        GenericXmlBikeRentalDataSourceConfig config,
+        Config config,
         String networkName
     ) {
         super(config,"//city/place");

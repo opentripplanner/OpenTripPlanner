@@ -14,14 +14,15 @@ import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
  * Each updater defines an inner interface with its required attributes.
  */
 public class UpdaterConfig
-    implements WebsocketGtfsRealtimeUpdater.WebSocketGtfsRealTimeUpdaterConfig,
-    GtfsRealtimeAlertsUpdater.GtfsRealTimeAlertsUpdaterConfig,
-    PollingStoptimeUpdater.PollingStopTimeUpdaterConfig,
-    BikeRentalUpdater.BikeRentalUpdaterConfig,
-    SiriETUpdater.SiriETUpdaterConfig,
-    SiriVMUpdater.SiriVMUpdaterConfig,
-    SiriSXUpdater.SiriSXUpdaterConfig,
-    WFSNotePollingGraphUpdater.WFSNotePollingGraphUpdaterConfig {
+    implements WebsocketGtfsRealtimeUpdater.Config,
+    GtfsRealtimeAlertsUpdater.Config,
+    PollingStoptimeUpdater.Config,
+    BikeRentalUpdater.Config,
+    SiriETUpdater.Config,
+    SiriVMUpdater.Config,
+    SiriSXUpdater.Config,
+    WFSNotePollingGraphUpdater.Config
+{
 
   private final String url;
   private final int frequencySec;

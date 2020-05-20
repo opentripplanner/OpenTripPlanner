@@ -33,7 +33,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
 
     private List<BikePark> bikeParks;
 
-    public KmlBikeParkDataSource(KmlBikeParkDataSourceConfig config) {
+    public KmlBikeParkDataSource(Config config) {
         xmlDownloader = new XmlDataListDownloader<BikePark>();
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
@@ -96,7 +96,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
 
     public void setUrl (String url) {this.url = url;}
 
-    public interface KmlBikeParkDataSourceConfig {
+    public interface Config {
         String getUrl();
         String getNamePrefix();
         boolean zip();

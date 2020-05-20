@@ -17,7 +17,7 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class VCubDataSource extends GenericXmlBikeRentalDataSource {
 
-    public VCubDataSource(GenericXmlBikeRentalDataSourceConfig config) {
+    public VCubDataSource(Config config) {
         super(config,"//*[name()='bm:CI_VCUB_P']");
     }
 

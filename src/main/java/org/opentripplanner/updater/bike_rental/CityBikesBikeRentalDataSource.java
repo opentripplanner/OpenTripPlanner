@@ -30,7 +30,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     ArrayList<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
-    public CityBikesBikeRentalDataSource(CityBikesBikeRentalDataSourceConfig config) {
+    public CityBikesBikeRentalDataSource(Config config) {
         this.url = config.getUrl();
     }
 
@@ -105,7 +105,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
         return getClass().getName() + "(" + url + ")";
     }
 
-    public interface CityBikesBikeRentalDataSourceConfig {
+    public interface Config {
         String getUrl();
     }
 }

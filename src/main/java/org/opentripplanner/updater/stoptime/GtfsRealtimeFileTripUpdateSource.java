@@ -84,8 +84,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
         return this.feedId;
     }
 
-    public interface GtfsRealtimeFileTripUpdateSourceConfig extends
-        PollingStoptimeUpdater.PollingStopTimeUpdaterConfig {
+    public interface GtfsRealtimeFileTripUpdateSourceConfig extends PollingStoptimeUpdater.Config {
         String getFile();
     }
 }

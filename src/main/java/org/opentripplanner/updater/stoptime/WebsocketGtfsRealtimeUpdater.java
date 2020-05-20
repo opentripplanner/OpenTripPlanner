@@ -64,7 +64,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      */
     private int reconnectPeriodSec;
 
-    public WebsocketGtfsRealtimeUpdater(WebSocketGtfsRealTimeUpdaterConfig config) {
+    public WebsocketGtfsRealtimeUpdater(Config config) {
         url = config.getUrl();
         feedId = config.getFeedId();
         reconnectPeriodSec = config.getReconnectPeriodSec();
@@ -185,7 +185,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         return "WebsocketGtfsRealtimeUpdater";
     }
 
-    public interface WebSocketGtfsRealTimeUpdaterConfig {
+    public interface Config {
         String getUrl();
         String getFeedId();
         int getReconnectPeriodSec();

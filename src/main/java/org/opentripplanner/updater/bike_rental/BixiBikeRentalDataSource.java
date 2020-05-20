@@ -7,7 +7,7 @@ import org.opentripplanner.util.NonLocalizedString;
 
 public class BixiBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
     public BixiBikeRentalDataSource(
-        GenericXmlBikeRentalDataSource.GenericXmlBikeRentalDataSourceConfig config) {
+        Config config) {
         super(config,"//stations/station");
     }
 

@@ -18,7 +18,7 @@ public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSo
     private String networkName;
 
     public CitiBikeNycBikeRentalDataSource(
-        GenericJsonBikeRentalDataSource.GenericJsonBikeRentalDataSourceConfig config,
+        Config config,
         String networkName)
     {
         super(config, "stationBeanList");

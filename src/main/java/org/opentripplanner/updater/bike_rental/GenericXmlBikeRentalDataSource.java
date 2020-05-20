@@ -20,7 +20,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     private XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
-    public GenericXmlBikeRentalDataSource(GenericXmlBikeRentalDataSourceConfig config, String path) {
+    public GenericXmlBikeRentalDataSource(Config config, String path) {
         url = config.getUrl();
         xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
         xmlDownloader.setPath(path);
@@ -65,7 +65,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
         return getClass().getName() + "(" + url + ")";
     }
 
-    public interface GenericXmlBikeRentalDataSourceConfig {
+    public interface Config {
         String getUrl();
     }
 }

@@ -27,7 +27,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource (GbfsBikeRentalDataSourceConfig config, String networkName) {
+    public GbfsBikeRentalDataSource (Config config, String networkName) {
         setBaseUrl(config.getUrl());
         routeAsCar = config.routeAsCar();
         stationInformationSource = new GbfsStationDataSource(config);
@@ -89,7 +89,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationDataSource (GenericJsonBikeRentalDataSourceConfig config) {
+        public GbfsStationDataSource (Config config) {
             super(config, "data/stations");
         }
 
@@ -107,7 +107,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationStatusDataSource (GenericJsonBikeRentalDataSourceConfig config) {
+        public GbfsStationStatusDataSource (Config config) {
             super(config, "data/stations");
         }
 
@@ -124,7 +124,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsFloatingBikeDataSource (GenericJsonBikeRentalDataSourceConfig config) {
+        public GbfsFloatingBikeDataSource (Config config) {
             super(config, "data/bikes");
         }
 
@@ -144,8 +144,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    public interface GbfsBikeRentalDataSourceConfig extends
-        GenericJsonBikeRentalDataSource.GenericJsonBikeRentalDataSourceConfig {
+    public interface Config extends GenericJsonBikeRentalDataSource.Config {
         boolean routeAsCar();
     }
 }

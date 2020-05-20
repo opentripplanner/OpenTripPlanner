@@ -40,7 +40,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      *
      */
     public GenericJsonBikeRentalDataSource(
-        GenericJsonBikeRentalDataSourceConfig config,
+        Config config,
         String jsonPath
     ) {
         url = config.getUrl();
@@ -57,7 +57,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * @param headerValue header value
      */
     public GenericJsonBikeRentalDataSource(
-        GenericJsonBikeRentalDataSourceConfig config,
+        Config config,
         String jsonPath, String headerName,
         String headerValue
     ) {
@@ -183,7 +183,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         return getClass().getName() + "(" + url + ")";
     }
 
-    public interface GenericJsonBikeRentalDataSourceConfig {
+    public interface Config {
         String getUrl();
     }
 }

@@ -35,7 +35,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
 
     private static Map<String, String> requestHeaders = new HashMap<>();
 
-    public SiriVMHttpTripUpdateSource(SiriVMHttpTripUpdateSourceConfig config) {
+    public SiriVMHttpTripUpdateSource(Config config) {
         String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
@@ -109,7 +109,7 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
         return this.feedId;
     }
 
-    public interface SiriVMHttpTripUpdateSourceConfig {
+    public interface Config {
         String getUrl();
         String getRequestorRef();
         String getFeedId();

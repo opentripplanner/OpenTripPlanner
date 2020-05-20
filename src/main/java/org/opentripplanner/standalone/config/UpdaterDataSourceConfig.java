@@ -14,16 +14,15 @@ import org.opentripplanner.updater.bike_rental.GenericXmlBikeRentalDataSource;
  * This class is an object representation of the data source for a single real-time updater in
  * 'router-config.json' Each data source defines an inner interface with its required attributes.
  */
-public class UpdaterDataSourceConfig implements
-    BicimadBikeRentalDataSource.BicimadBikeRentalDataSourceConfig,
-    CityBikesBikeRentalDataSource.CityBikesBikeRentalDataSourceConfig,
-    GenericXmlBikeRentalDataSource.GenericXmlBikeRentalDataSourceConfig,
-    GbfsBikeRentalDataSource.GbfsBikeRentalDataSourceConfig,
-    GenericKmlBikeRentalDataSource.GenericKmlBikeRentalDataSourceConfig,
-    KmlBikeParkDataSource.KmlBikeParkDataSourceConfig,
-    SiriETHttpTripUpdateSource.SiriETHttpTripUpdateSourceConfig,
-    SiriVMHttpTripUpdateSource.SiriVMHttpTripUpdateSourceConfig,
-    GenericJsonBikeRentalDataSource.GenericJsonBikeRentalDataSourceConfig
+public class UpdaterDataSourceConfig implements BicimadBikeRentalDataSource.Config,
+    CityBikesBikeRentalDataSource.Config,
+    GenericXmlBikeRentalDataSource.Config,
+    GbfsBikeRentalDataSource.Config,
+    GenericKmlBikeRentalDataSource.Config,
+    KmlBikeParkDataSource.Config,
+    SiriETHttpTripUpdateSource.Config,
+    SiriVMHttpTripUpdateSource.Config,
+    GenericJsonBikeRentalDataSource.Config
 {
 
   private final String name;

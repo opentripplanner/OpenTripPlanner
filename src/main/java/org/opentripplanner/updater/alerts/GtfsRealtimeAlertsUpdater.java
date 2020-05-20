@@ -55,7 +55,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public GtfsRealtimeAlertsUpdater(GtfsRealTimeAlertsUpdaterConfig config) throws Exception {
+    public GtfsRealtimeAlertsUpdater(Config config) throws Exception {
         super(config);
 
         String url = config.getUrl();
@@ -128,7 +128,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
 
-    public interface GtfsRealTimeAlertsUpdaterConfig extends PollingGraphUpdaterConfig {
+    public interface Config extends PollingGraphUpdaterConfig {
         int getEarlyStartSec();
         String getFeedId();
         boolean fuzzyTripMatching();

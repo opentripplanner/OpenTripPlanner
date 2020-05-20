@@ -12,7 +12,7 @@ public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
     private String baseURL = null;
 
-    UIPBikeRentalDataSource(GenericJsonBikeRentalDataSourceConfig config, String apiKey) {
+    UIPBikeRentalDataSource(Config config, String apiKey) {
         super(config, "stations", "Client-Identifier", apiKey);
     }
 

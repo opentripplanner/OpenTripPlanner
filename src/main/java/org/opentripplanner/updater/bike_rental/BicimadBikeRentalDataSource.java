@@ -33,7 +33,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
 
         List<BikeRentalStation> stations = new ArrayList<>();
 
-        public BicimadBikeRentalDataSource(BicimadBikeRentalDataSourceConfig config) {
+        public BicimadBikeRentalDataSource(Config config) {
                 this.url = config.getUrl();
         }
 
@@ -156,7 +156,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
                 return getClass().getName() + "(" + url + ")";
         }
 
-        public interface BicimadBikeRentalDataSourceConfig {
+        public interface Config {
                 String getUrl();
         }
 }

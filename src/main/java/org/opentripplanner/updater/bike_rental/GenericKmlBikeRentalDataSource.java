@@ -25,7 +25,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private boolean allowDropoff = true;
 
-    public GenericKmlBikeRentalDataSource(GenericKmlBikeRentalDataSourceConfig config) {
+    public GenericKmlBikeRentalDataSource(Config config) {
         super(
             config,
             "//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']"
@@ -77,8 +77,8 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         return brStation;
     }
 
-    public interface GenericKmlBikeRentalDataSourceConfig
-        extends GenericXmlBikeRentalDataSourceConfig {
+    public interface Config
+        extends GenericXmlBikeRentalDataSource.Config {
         String getNamePrefix();
     }
 }

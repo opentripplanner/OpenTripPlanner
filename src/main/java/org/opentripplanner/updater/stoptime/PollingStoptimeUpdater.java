@@ -65,7 +65,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public PollingStoptimeUpdater(PollingStopTimeUpdaterConfig config) throws Exception {
+    public PollingStoptimeUpdater(Config config) throws Exception {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -157,7 +157,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         return "Streaming stoptime updater with update source = " + s;
     }
 
-    public interface PollingStopTimeUpdaterConfig extends PollingGraphUpdaterConfig {
+    public interface Config extends PollingGraphUpdaterConfig {
         String getFeedId();
         int getLogFrequency();
         int getMaxSnapshotFrequencyMs();

@@ -18,7 +18,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
     private String networkName;
 
     public BCycleBikeRentalDataSource(
-        GenericJsonBikeRentalDataSourceConfig config,
+        Config config,
         String apiKey,
         String networkName
     ) {

@@ -79,7 +79,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
-    public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterConfig config) throws Exception {
+    public WFSNotePollingGraphUpdater(Config config) throws Exception {
         super(config);
         url = new URL(config.getUrl());
         featureType = config.getFeatureType();
@@ -191,7 +191,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         return ret;
     }
 
-    public interface WFSNotePollingGraphUpdaterConfig extends PollingGraphUpdaterConfig {
+    public interface Config extends PollingGraphUpdaterConfig {
         String getFeatureType();
     }
 }
