@@ -16,8 +16,11 @@ public class SanFranciscoBayAreaBikeRentalDataSource extends GenericJsonBikeRent
 
     private String networkName;
 
-    public SanFranciscoBayAreaBikeRentalDataSource(String networkName) {
-        super("stationBeanList");
+    public SanFranciscoBayAreaBikeRentalDataSource(
+        GenericJsonBikeRentalDataSourceConfig config,
+        String networkName
+    ) {
+        super(config,"stationBeanList");
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {

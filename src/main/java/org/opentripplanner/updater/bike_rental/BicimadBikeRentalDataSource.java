@@ -4,8 +4,6 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -22,7 +20,7 @@ import java.util.List;
  *
  * @see BikeRentalDataSource
  */
-public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
 
         private static final Logger log = LoggerFactory
                 .getLogger(GenericJsonBikeRentalDataSource.class);
@@ -31,11 +29,12 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
 
         private static final String jsonInternalParsePath = "stations";
 
-        private String url;
+        private final String url;
 
         List<BikeRentalStation> stations = new ArrayList<>();
 
-        public BicimadBikeRentalDataSource() {
+        public BicimadBikeRentalDataSource(BicimadBikeRentalDataSourceConfig config) {
+                this.url = config.getUrl();
         }
 
         @Override public boolean update() {
@@ -138,10 +137,6 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
                 return url;
         }
 
-        public void setUrl(String url) {
-                this.url = url;
-        }
-
         public BikeRentalStation makeStation(JsonNode node) {
 
                 if (!node.path("activate").asText().equals("1")) {
@@ -161,17 +156,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
                 return getClass().getName() + "(" + url + ")";
         }
 
-        /**
-         * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
-         * from the JSON coming in from the update source.
-         */
-        @Override public void configure(JsonNode jsonNode) {
-                String url = jsonNode.path("url").asText(); // path() returns MissingNode not null.
-                if (url == null) {
-                        throw new IllegalArgumentException(
-                                "Missing mandatory 'url' configuration.");
-                }
-                this.url = url;
+        public interface BicimadBikeRentalDataSourceConfig {
+                String getUrl();
         }
-
 }

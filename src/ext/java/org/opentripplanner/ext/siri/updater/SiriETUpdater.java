@@ -71,12 +71,9 @@ public class SiriETUpdater extends PollingGraphUpdater {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
-        String sourceType = config.getSourceType();
+        String sourceType = config.getSource().getName();
 
-        SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource();
-        // Configure update source before we asign it to the member field witch is not
-        // configurable.
-        source.configure(config.getSource());
+        SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource(config.getSource());
         updateSource = source;
 
         int logFrequency = config.getLogFrequency();

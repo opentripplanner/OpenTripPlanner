@@ -11,8 +11,9 @@ public class TestShareBikeRentalStationSource extends TestCase {
 
     public void testShareBike() throws UnsupportedEncodingException, MalformedURLException {
 
-        ShareBikeRentalDataSource shareBikeSource = new ShareBikeRentalDataSource();
-        shareBikeSource.setUrl("file:src/test/resources/bike/share-bike.json?SystemID=dummyid");
+        ShareBikeRentalDataSource shareBikeSource =
+            new ShareBikeRentalDataSource(()
+                -> "file:src/test/resources/bike/share-bike.json?SystemID=dummyid");
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         assertEquals(17, rentalStations.size());
@@ -33,8 +34,8 @@ public class TestShareBikeRentalStationSource extends TestCase {
 
     public void testShareBikeMissingSystemIDParameter() throws UnsupportedEncodingException, MalformedURLException {
 
-        ShareBikeRentalDataSource shareBikeSource = new ShareBikeRentalDataSource();
-        shareBikeSource.setUrl("file:src/test/resources/bike/share-bike.json");
+        ShareBikeRentalDataSource shareBikeSource =
+            new ShareBikeRentalDataSource(() -> "file:src/test/resources/bike/share-bike.json");
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         BikeRentalStation prinsen = rentalStations.get(0);

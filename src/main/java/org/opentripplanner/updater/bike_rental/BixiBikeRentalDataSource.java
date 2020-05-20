@@ -6,8 +6,9 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class BixiBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
-    public BixiBikeRentalDataSource() {
-        super("//stations/station");
+    public BixiBikeRentalDataSource(
+        GenericXmlBikeRentalDataSource.GenericXmlBikeRentalDataSourceConfig config) {
+        super(config,"//stations/station");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {

@@ -10,8 +10,9 @@ public class TestBikeRentalStationSource extends TestCase {
 
     public void testKeolisRennes() {
 
-        KeolisRennesBikeRentalDataSource rennesSource = new KeolisRennesBikeRentalDataSource();
-        rennesSource.setUrl("file:src/test/resources/bike/keolis-rennes.xml");
+        KeolisRennesBikeRentalDataSource rennesSource =
+            new KeolisRennesBikeRentalDataSource(()
+                -> "file:src/test/resources/bike/keolis-rennes.xml");
         assertTrue(rennesSource.update());
         List<BikeRentalStation> rentalStations = rennesSource.getStations();
         assertEquals(4, rentalStations.size());
@@ -30,8 +31,8 @@ public class TestBikeRentalStationSource extends TestCase {
     }
 
     public void testSmoove() {
-        SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource();
-        source.setUrl("file:src/test/resources/bike/smoove.json");
+        SmooveBikeRentalDataSource source =
+            new SmooveBikeRentalDataSource(() -> "file:src/test/resources/bike/smoove.json");
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 

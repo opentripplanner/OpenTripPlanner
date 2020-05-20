@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
@@ -31,7 +30,6 @@ public class UpdaterConfig
   private final String requestorRef;
   private final int timeoutSec;
   private final int reconnectPeriodSec;
-  private final String sourceType;
   private final String apiKey;
   private final String network;
   private final String networks;
@@ -42,7 +40,7 @@ public class UpdaterConfig
   private final boolean purgeExpiredData;
   private final boolean blockReadinessUntilInitialized;
   private final String featureType;
-  private final JsonNode source;
+  private final UpdaterDataSourceConfig source;
 
   public UpdaterConfig(NodeAdapter c) {
     this.url = c.asText("url", null);
@@ -52,7 +50,6 @@ public class UpdaterConfig
     this.requestorRef = c.asText("requestorRef", null);
     this.timeoutSec = c.asInt("timoutSec", 0);
     this.reconnectPeriodSec = c.asInt("reconnectPeriodSec", 0);
-    this.sourceType = c.asText("sourceType", null);
     this.apiKey = c.asText("apiKey", null);
     this.network = c.asText("network", null);
     this.networks = c.asText("networks", "default");
@@ -63,7 +60,7 @@ public class UpdaterConfig
     this.purgeExpiredData = c.asBoolean("purgeExpiredData", true);
     this.blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
     this.featureType = c.asText("featureType", null);
-    this.source = c.asRawNode();
+    this.source = new UpdaterDataSourceConfig(c);
   }
 
   public String getUrl() {
@@ -92,10 +89,6 @@ public class UpdaterConfig
 
   public int getReconnectPeriodSec() {
     return reconnectPeriodSec;
-  }
-
-  public String getSourceType() {
-    return sourceType;
   }
 
   public String getApiKey() {
@@ -136,5 +129,5 @@ public class UpdaterConfig
 
   public String getFeatureType() { return featureType; }
 
-  public JsonNode getSource() { return source; }
+  public UpdaterDataSourceConfig getSource() { return source; }
 }

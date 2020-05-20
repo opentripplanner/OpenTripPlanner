@@ -3,28 +3,25 @@ package org.opentripplanner.updater.bike_rental;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericXmlBikeRentalDataSource.class);
 
-    private String url;
+    private final String url;
 
     List<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
     private XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
-    public GenericXmlBikeRentalDataSource(String path) {
+    public GenericXmlBikeRentalDataSource(GenericXmlBikeRentalDataSourceConfig config, String path) {
+        url = config.getUrl();
         xmlDownloader = new XmlDataListDownloader<BikeRentalStation>();
         xmlDownloader.setPath(path);
         xmlDownloader.setDataFactory(new XmlDataListDownloader.XmlDataFactory<BikeRentalStation>() {
@@ -61,23 +58,14 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
         xmlDownloader.setReadAttributes(readAttributes);
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     public abstract BikeRentalStation makeStation(Map<String, String> attributes);
 
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
     }
-    
-    @Override
-    public void configure(JsonNode config) {
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        }
-        setUrl(url);
+
+    public interface GenericXmlBikeRentalDataSourceConfig {
+        String getUrl();
     }
 }

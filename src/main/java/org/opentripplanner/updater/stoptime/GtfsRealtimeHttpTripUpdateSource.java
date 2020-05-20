@@ -4,10 +4,6 @@ import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-
-import org.opentripplanner.updater.JsonConfigurable;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -17,7 +13,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
-public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonConfigurable {
+public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeHttpTripUpdateSource.class);
 
@@ -30,18 +26,14 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource, JsonC
     /**
      * Feed id that is used to match trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    private String url;
+    private final String url;
 
-    @Override
-    public void configure(JsonNode config) throws Exception {
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
-        this.feedId = config.path("feedId").asText();
+    public GtfsRealtimeHttpTripUpdateSource(
+        PollingStoptimeUpdater.PollingStopTimeUpdaterConfig config) {
+        this.feedId = config.getFeedId();
+        this.url = config.getUrl();
     }
 
     @Override

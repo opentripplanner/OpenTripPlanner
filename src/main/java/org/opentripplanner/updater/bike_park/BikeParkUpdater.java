@@ -18,7 +18,6 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -51,18 +50,16 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public BikeParkUpdater(PollingGraphUpdaterConfig config) throws Exception {
         super(config);
         // Set source from preferences
-        String sourceType = config.getSourceType();
+        String sourceType = config.getSource().getName();
         BikeParkDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("kml-placemarks")) {
-                source = new KmlBikeParkDataSource();
+                source = new KmlBikeParkDataSource(config.getSource());
             }
         }
 
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(config.getSource());
         }
 
         // Configure updater

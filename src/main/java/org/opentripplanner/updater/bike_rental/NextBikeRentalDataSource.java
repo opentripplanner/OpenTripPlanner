@@ -16,8 +16,11 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
 
     private String networkName;
 
-    public NextBikeRentalDataSource(String networkName) {
-        super("//city/place");
+    public NextBikeRentalDataSource(
+        GenericXmlBikeRentalDataSourceConfig config,
+        String networkName
+    ) {
+        super(config,"//city/place");
         // this feed sets values on place node attributes, rather than in child elements
         this.setReadAttributes(true);
 

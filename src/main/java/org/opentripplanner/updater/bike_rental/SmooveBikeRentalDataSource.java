@@ -14,8 +14,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
-    public SmooveBikeRentalDataSource() {
-        super("result");
+    public SmooveBikeRentalDataSource(GenericJsonBikeRentalDataSourceConfig config) {
+        super(config,"result");
     }
 
     /**

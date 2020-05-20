@@ -17,8 +17,11 @@ public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSo
 
     private String networkName;
 
-    public CitiBikeNycBikeRentalDataSource(String networkName) {
-        super("stationBeanList");
+    public CitiBikeNycBikeRentalDataSource(
+        GenericJsonBikeRentalDataSource.GenericJsonBikeRentalDataSourceConfig config,
+        String networkName)
+    {
+        super(config, "stationBeanList");
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {

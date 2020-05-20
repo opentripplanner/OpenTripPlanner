@@ -9,8 +9,8 @@ public class TestBicimadBikeRentalStationSource extends TestCase {
 
         public void testBicimad() {
 
-                BicimadBikeRentalDataSource bicimadBikeRentalDataSource = new BicimadBikeRentalDataSource();
-                bicimadBikeRentalDataSource.setUrl("file:src/test/resources/bike/bicimad.json");
+                BicimadBikeRentalDataSource bicimadBikeRentalDataSource = new BicimadBikeRentalDataSource(
+                    () -> "file:src/test/resources/bike/bicimad.json");
                 assertTrue(bicimadBikeRentalDataSource.update());
                 List<BikeRentalStation> rentalStations = bicimadBikeRentalDataSource.getStations();
                 assertEquals(rentalStations.size(), 172);

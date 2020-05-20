@@ -5,7 +5,6 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -70,12 +69,14 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
-        String sourceType = config.getSourceType();
+        String sourceType = config.getSource().getName();
         if (sourceType != null) {
             if (sourceType.equals("gtfs-http")) {
-                updateSource = new GtfsRealtimeHttpTripUpdateSource();
+                updateSource = new GtfsRealtimeHttpTripUpdateSource(config);
             } else if (sourceType.equals("gtfs-file")) {
-                updateSource = new GtfsRealtimeFileTripUpdateSource();
+                updateSource = new GtfsRealtimeFileTripUpdateSource(
+                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceConfig) config
+                );
             }
         }
 
@@ -83,8 +84,6 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (updateSource == null) {
             throw new IllegalArgumentException(
                     "Unknown update streamer source type: " + sourceType);
-        } else if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(config.getSource());
         }
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...

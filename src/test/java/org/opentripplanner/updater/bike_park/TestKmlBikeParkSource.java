@@ -5,12 +5,13 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 
 public class TestKmlBikeParkSource extends TestCase {
 
     public void testKML() {
 
-        KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource();
+        KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new UpdaterDataSourceConfig());
         kmlDataSource.setUrl("file:src/test/resources/bike/NSFietsenstallingen.kml");
         assertTrue(kmlDataSource.update());
         List<BikePark> bikeParks = kmlDataSource.getBikeParks();
@@ -27,7 +28,7 @@ public class TestKmlBikeParkSource extends TestCase {
 
     public void testKMLWithFolder() {
 
-        KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource();
+        KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new UpdaterDataSourceConfig());
         kmlDataSource.setUrl("file:src/test/resources/bike/NSFietsenstallingen_folder.kml");
         assertTrue(kmlDataSource.update());
         List<BikePark> bikeParks = kmlDataSource.getBikeParks();

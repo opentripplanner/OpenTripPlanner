@@ -48,7 +48,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         super(config);
 
         // Set data source type from config JSON
-        String sourceType = config.getSourceType();
+        String sourceType = config.getSource().getName();
         String apiKey = config.getApiKey();
         // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
         // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
@@ -56,44 +56,42 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             if (sourceType.equals("jcdecaux")) {
-                source = new JCDecauxBikeRentalDataSource();
+                source = new JCDecauxBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("b-cycle")) {
-                source = new BCycleBikeRentalDataSource(apiKey, networkName);
+                source = new BCycleBikeRentalDataSource(config.getSource(), apiKey, networkName);
             } else if (sourceType.equals("bixi")) {
-                source = new BixiBikeRentalDataSource();
+                source = new BixiBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("keolis-rennes")) {
-                source = new KeolisRennesBikeRentalDataSource();
+                source = new KeolisRennesBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("ov-fiets")) {
-                source = new OVFietsKMLDataSource();
+                source = new OVFietsKMLDataSource(config.getSource());
             } else if (sourceType.equals("city-bikes")) {
-                source = new CityBikesBikeRentalDataSource();
+                source = new CityBikesBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("vcub")) {
-                source = new VCubDataSource();
+                source = new VCubDataSource(config.getSource());
             } else if (sourceType.equals("citi-bike-nyc")) {
-                source = new CitiBikeNycBikeRentalDataSource(networkName);
+                source = new CitiBikeNycBikeRentalDataSource(config.getSource(), networkName);
             } else if (sourceType.equals("next-bike")) {
-                source = new NextBikeRentalDataSource(networkName);
+                source = new NextBikeRentalDataSource(config.getSource(), networkName);
             } else if (sourceType.equals("kml")) {
-                source = new GenericKmlBikeRentalDataSource();
+                source = new GenericKmlBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("sf-bay-area")) {
-                source = new SanFranciscoBayAreaBikeRentalDataSource(networkName);
+                source = new SanFranciscoBayAreaBikeRentalDataSource(config.getSource(), networkName);
             } else if (sourceType.equals("share-bike")) {
-                source = new ShareBikeRentalDataSource();
+                source = new ShareBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("uip-bike")) {
-                source = new UIPBikeRentalDataSource(apiKey);
+                source = new UIPBikeRentalDataSource(config.getSource(), apiKey);
             } else if (sourceType.equals("gbfs")) {
-                source = new GbfsBikeRentalDataSource(networkName);
+                source = new GbfsBikeRentalDataSource(config.getSource(), networkName);
             } else if (sourceType.equals("smoove")) {
-                source = new SmooveBikeRentalDataSource();
+                source = new SmooveBikeRentalDataSource(config.getSource());
             } else if (sourceType.equals("bicimad")) {
-                source = new BicimadBikeRentalDataSource();
+                source = new BicimadBikeRentalDataSource(config.getSource());
             }
         }
 
         if (source == null) {
             throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(config.getSource());
         }
 
         // Configure updater

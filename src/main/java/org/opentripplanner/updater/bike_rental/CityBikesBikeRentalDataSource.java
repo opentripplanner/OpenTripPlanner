@@ -8,16 +8,13 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
 
 import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -25,16 +22,16 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
-public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 
-    private String url;
+    private final String url;
 
     ArrayList<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
 
-    public CityBikesBikeRentalDataSource() {
-
+    public CityBikesBikeRentalDataSource(CityBikesBikeRentalDataSourceConfig config) {
+        this.url = config.getUrl();
     }
 
     @Override
@@ -103,22 +100,12 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
     }
-    
-    @Override
-    public void configure(JsonNode config) {
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        }
-        setUrl(url);
-    }
 
+    public interface CityBikesBikeRentalDataSourceConfig {
+        String getUrl();
+    }
 }

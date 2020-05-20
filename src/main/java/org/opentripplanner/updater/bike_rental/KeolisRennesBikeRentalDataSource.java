@@ -6,8 +6,8 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class KeolisRennesBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
-    public KeolisRennesBikeRentalDataSource() {
-        super("//opendata/answer/data/station");
+    public KeolisRennesBikeRentalDataSource(GenericXmlBikeRentalDataSourceConfig config) {
+        super(config,"//opendata/answer/data/station");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {

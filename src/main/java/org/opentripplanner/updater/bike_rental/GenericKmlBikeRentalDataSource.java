@@ -5,11 +5,8 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +19,18 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericKmlBikeRentalDataSource.class);
 
-    private String namePrefix = null;
+    private final String namePrefix;
 
     private Set<String> networks = null;
 
     private boolean allowDropoff = true;
 
-    /**
-     * @param namePrefix A string to prefix all station names coming from this source (for example:
-     *        "OV-fietspunt "). Please add a space at the end if needed.
-     */
-    public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
+    public GenericKmlBikeRentalDataSource(GenericKmlBikeRentalDataSourceConfig config) {
+        super(
+            config,
+            "//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']"
+        );
+        namePrefix = config.getNamePrefix();
     }
 
     /**
@@ -51,10 +48,6 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
      */
     public void setAllowDropoff(boolean allowDropoff) {
         this.allowDropoff = allowDropoff;
-    }
-
-    public GenericKmlBikeRentalDataSource() {
-        super("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {
@@ -84,10 +77,8 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         return brStation;
     }
 
-    @Override
-    public void configure(JsonNode config) {
-        super.configure(config);
-        setNamePrefix(config.path("namePrefix").asText());
+    public interface GenericKmlBikeRentalDataSourceConfig
+        extends GenericXmlBikeRentalDataSourceConfig {
+        String getNamePrefix();
     }
-
 }

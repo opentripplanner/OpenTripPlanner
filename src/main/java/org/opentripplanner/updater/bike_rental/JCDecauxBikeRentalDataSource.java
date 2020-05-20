@@ -13,8 +13,8 @@ import com.fasterxml.jackson.databind.JsonNode;
  */
 public class JCDecauxBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
-    public JCDecauxBikeRentalDataSource() {
-        super("");
+    public JCDecauxBikeRentalDataSource(GenericJsonBikeRentalDataSourceConfig config) {
+        super(config, "");
     }
 
     /**

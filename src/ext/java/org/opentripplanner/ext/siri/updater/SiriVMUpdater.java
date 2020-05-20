@@ -5,8 +5,8 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -81,17 +81,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
-        String sourceType = config.getSourceType();
 
-        updateSource = new SiriVMHttpTripUpdateSource();
-
-        // Configure update source
-        if (updateSource instanceof JsonConfigurable) {
-            ((JsonConfigurable) updateSource).configure(config.getSource());
-        } else {
-            throw new IllegalArgumentException(
-                    "Unknown update streamer source type: " + sourceType);
-        }
+        updateSource = new SiriVMHttpTripUpdateSource(config.getSource());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -185,5 +176,6 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         boolean purgeExpiredData();
         boolean fuzzyTripMatching();
         boolean blockReadinessUntilInitialized();
+        UpdaterDataSourceConfig getSource();
     }
 }

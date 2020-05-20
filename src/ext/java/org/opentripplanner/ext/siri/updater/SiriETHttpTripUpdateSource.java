@@ -1,9 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -15,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, JsonConfigurable {
+public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     private static final Logger LOG =
             LoggerFactory.getLogger(SiriETHttpTripUpdateSource.class);
 
@@ -42,26 +39,25 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
 
     private static Map<String, String> requestHeaders = new HashMap<>();
 
-    @Override
-    public void configure(JsonNode config) throws Exception {
-        String url = config.path("url").asText();
+    public SiriETHttpTripUpdateSource(SiriETHttpTripUpdateSourceConfig config) {
+        String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
 
-        this.requestorRef = config.path("requestorRef").asText();
+        this.requestorRef = config.getRequestorRef();
         if (requestorRef == null || requestorRef.isEmpty()) {
             requestorRef = "otp-"+ UUID.randomUUID().toString();
         }
-        this.feedId = config.path("feedId").asText();
+        this.feedId = config.getFeedId();
 
-        int timeoutSec = config.path("timeoutSec").asInt();
+        int timeoutSec = config.getTimeoutSec();
         if (timeoutSec > 0) {
             this.timeout = 1000*timeoutSec;
         }
 
-        int previewIntervalMinutes = config.path("previewIntervalMinutes").asInt();
+        int previewIntervalMinutes = config.getPreviewIntervalMinutes();
         if (previewIntervalMinutes > 0) {
             this.previewIntervalMillis = 1000*60*previewIntervalMinutes;
         }
@@ -125,5 +121,13 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource, Jso
     @Override
     public String getFeedId() {
         return this.feedId;
+    }
+
+    public interface SiriETHttpTripUpdateSourceConfig {
+        String getUrl();
+        String getRequestorRef();
+        String getFeedId();
+        int getTimeoutSec();
+        int getPreviewIntervalMinutes();
     }
 }

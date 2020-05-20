@@ -6,9 +6,7 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +21,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
  *
  * @see BikeRentalDataSource
  */
-public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     private String url;
@@ -41,7 +39,11 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      *        Separate path levels with '/' For example "d/list"
      *
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath) {
+    public GenericJsonBikeRentalDataSource(
+        GenericJsonBikeRentalDataSourceConfig config,
+        String jsonPath
+    ) {
+        url = config.getUrl();
         jsonParsePath = jsonPath;
         headerName = "Default";
         headerValue = null;
@@ -54,7 +56,12 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * @param headerName header name
      * @param headerValue header value
      */
-    public GenericJsonBikeRentalDataSource(String jsonPath, String headerName, String headerValue) {
+    public GenericJsonBikeRentalDataSource(
+        GenericJsonBikeRentalDataSourceConfig config,
+        String jsonPath, String headerName,
+        String headerValue
+    ) {
+        url = config.getUrl();
         jsonParsePath = jsonPath;
         this.headerName = headerName;
         this.headerValue = headerValue;
@@ -176,16 +183,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         return getClass().getName() + "(" + url + ")";
     }
 
-    /**
-     * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
-     * from the JSON coming in from the update source.
-     */
-    @Override
-    public void configure (JsonNode jsonNode) {
-        String url = jsonNode.path("url").asText(); // path() returns MissingNode not null.
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        }
-        this.url = url;
+    public interface GenericJsonBikeRentalDataSourceConfig {
+        String getUrl();
     }
 }
