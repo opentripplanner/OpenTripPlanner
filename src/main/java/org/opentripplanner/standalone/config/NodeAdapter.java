@@ -97,10 +97,6 @@ public class NodeAdapter {
         return param(paramName);
     }
 
-    public JsonNode asRawNode() {
-        return json;
-    }
-
     public boolean isEmpty() {
         return json.isMissingNode();
     }
