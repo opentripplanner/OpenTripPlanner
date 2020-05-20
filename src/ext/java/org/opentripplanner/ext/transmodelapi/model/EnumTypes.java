@@ -7,7 +7,7 @@ import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.trippattern.RealTimeState;
 
 import java.util.Arrays;

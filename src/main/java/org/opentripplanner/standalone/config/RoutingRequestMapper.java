@@ -1,10 +1,10 @@
 package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.request.RequestModes;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

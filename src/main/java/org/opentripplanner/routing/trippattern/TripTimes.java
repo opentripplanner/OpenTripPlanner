@@ -7,10 +7,10 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.model.BikeAccess;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

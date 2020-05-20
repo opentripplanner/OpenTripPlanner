@@ -1,6 +1,6 @@
 package org.opentripplanner.routing.core;
 
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import java.util.Set;
 
