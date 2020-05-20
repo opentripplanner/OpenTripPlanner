@@ -40,6 +40,11 @@ public class RentVehicleAnywhereEdge extends Edge {
         }
 
         if (s0.isCurrentlyRentingVehicle()) {
+            StateEditor stateEditor = s0.edit(this);
+            stateEditor.doneVehicleRenting(s0.getOptions());
+            return stateEditor.makeState();
+        } else if (s0.getOptions().reverseOptimizing) {
+            return null; // TODO AdamWiktor return something useful to enable reverse optimizing
             return doneVehicleRenting(s0);
         } else {
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
@@ -48,6 +53,9 @@ public class RentVehicleAnywhereEdge extends Edge {
 
             State previous = null;
             for (VehicleDescription rentableVehicle : rentableVehicles) {
+                StateEditor next = s0.edit(this);
+                next.beginVehicleRenting(rentableVehicle, s0.getOptions());
+                previous = next.makeState().addToExistingResultChain(previous);
                 previous = beginVehicleRenting(s0, rentableVehicle).addToExistingResultChain(previous);
             }
             return previous;

@@ -252,6 +252,7 @@ public class StateEditor {
             defectiveTraversal = true;
             return;
         }
+        incrementDistanceInCurrentVehicle(length);
         incrementDistanceTraversedInMode(length);
         child.traverseDistanceInMeters += length;
     }
@@ -392,16 +393,19 @@ public class StateEditor {
         child.stateData.currentTraverseMode = TraverseMode.WALK;
     }
 
-    public void beginVehicleRenting(VehicleDescription vehicleDescription) {
+    public void beginVehicleRenting(VehicleDescription vehicleDescription, RoutingRequest options) {
         cloneStateDataAsNeeded();
-        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        child.distanceTraversedInCurrentVehicle = 0;
+        incrementWeight(vehicleDescription.getRentTimeInSeconds() * options.rentingReluctance);
+        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
 
-    public void doneVehicleRenting() {
+    public void doneVehicleRenting(RoutingRequest options) {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * options.rentingReluctance);
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
@@ -617,6 +621,11 @@ public class StateEditor {
 
     public boolean usedNotRecommendedRoutes() {
         return child.usedNotRecommendedRoute;
+    }
+
+    private void incrementDistanceInCurrentVehicle (double distanceInMeters){
+        if (child.getCurrentVehicle() != null)
+            child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }
 
 }
