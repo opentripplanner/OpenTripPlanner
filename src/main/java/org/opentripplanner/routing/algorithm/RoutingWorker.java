@@ -26,15 +26,12 @@ import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
 import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
-import org.opentripplanner.transit.raptor.api.request.SearchParams;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.time.Duration;
 import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +43,7 @@ import java.util.List;
  * This class has a request scope, hence the "Worker" name.
  */
 public class RoutingWorker {
+    private static final int NOT_SET = -1;
 
     private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
@@ -59,8 +57,9 @@ public class RoutingWorker {
     private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
     private final RoutingRequest request;
-    private TripSearchMetadata responseMetadata = null;
     private Instant filterOnLatestDepartureTime = null;
+    private int searchWindowUsedInSeconds = NOT_SET;
+    private Itinerary firstRemovedItinerary = null;
 
     public RoutingWorker(RaptorConfig<TripSchedule> config, RoutingRequest request) {
         this.raptorService = new RaptorService<>(config);
@@ -92,9 +91,9 @@ public class RoutingWorker {
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
 
         return new RoutingResponse(
-                TripPlanMapper.mapTripPlan(request, itineraries),
-                responseMetadata,
-                routingErrors
+            TripPlanMapper.mapTripPlan(request, itineraries),
+            createTripSearchMetadata(),
+            routingErrors
         );
     }
 
@@ -146,7 +145,10 @@ public class RoutingWorker {
         );
 
         // Route transit
-        RaptorResponse<TripSchedule> transitResponse = raptorService.route(raptorRequest, requestTransitDataProvider);
+        RaptorResponse<TripSchedule> transitResponse = raptorService.route(
+            raptorRequest,
+            requestTransitDataProvider
+        );
 
         LOG.debug("Found {} transit itineraries", transitResponse.paths().size());
         LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
@@ -175,13 +177,6 @@ public class RoutingWorker {
             }
             itineraries.add(itinerary);
         }
-        itineraries = itineraries
-            .stream()
-            .filter(it -> isEffectiveItineraryForNonTransitMode(it, request))
-            .sorted(Comparator.comparing(i -> i.endTime()))
-            .limit(request.numItineraries)
-            .collect(Collectors.toList());
-        setResponseMetadata(requestTransitDataProvider, transitResponse);
 
         checkIfTransitConnectionExists(transitResponse);
 
@@ -189,9 +184,9 @@ public class RoutingWorker {
         // search. These itineraries is a result of timeshifting the access leg and is needed for
         // the raptor to prune the results. These itineraries are often not ideal, but if they
         // pareto optimal for the "next" window, they will appear when a "next" search is performed.
-        int win = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
-        if(!request.arriveBy && win > 0) {
-            filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + win);
+        searchWindowUsedInSeconds = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
+        if(!request.arriveBy && searchWindowUsedInSeconds > 0) {
+            filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
         }
 
         LOG.debug("Creating {} itineraries took {} ms",
@@ -203,11 +198,12 @@ public class RoutingWorker {
     }
 
     private ItineraryFilter filterChain() {
-        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder();
+        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
         builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
+        builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
 
         if(request.debugItineraryFilter) {
             builder.debug();
@@ -216,27 +212,6 @@ public class RoutingWorker {
         return builder.build();
     }
 
-    private void setResponseMetadata(
-            RaptorRoutingRequestTransitData transitData,
-            RaptorResponse<TripSchedule> response
-    ) {
-
-        SearchParams sp = response.requestUsed().searchParams();
-        int searchWindow = sp.searchWindowInSeconds();
-
-        // No results found or standard range-raptor search performed (not multi-criteria)
-        if(searchWindow <= 0) { return; }
-
-
-        ZonedDateTime time0 = transitData.getStartOfTime();
-        int timeOffset = request.arriveBy ? sp.latestArrivalTime() : sp.earliestDepartureTime();
-
-        responseMetadata = new TripSearchMetadata(
-                Duration.ofSeconds(searchWindow),
-                time0.plusSeconds(timeOffset - searchWindow).toInstant(),
-                time0.plusSeconds(timeOffset + searchWindow).toInstant()
-        );
-    }
 
     private boolean verifyEgressAccess(
             Collection<?> access,
@@ -254,8 +229,8 @@ public class RoutingWorker {
         if(!egressExist) { routingErrors.add(
             new RoutingError(RoutingErrorCode.NO_STOPS_IN_RANGE, InputField.TO_PLACE));
         }
-
-        throw new RoutingValidationException(routingErrors);
+        LOG.error("can't find any egress or access",routingErrors);
+        return false;
     }
 
     /**
@@ -284,5 +259,30 @@ public class RoutingWorker {
      */
     private boolean isEffectiveItineraryForNonTransitMode(Itinerary itinerary, RoutingRequest request) {
         return !(itinerary.nonTransitLimitExceeded && !request.modes.transitModes.isEmpty());
+
+    }
+    private TripSearchMetadata createTripSearchMetadata() {
+        if(searchWindowUsedInSeconds == NOT_SET) { return null; }
+
+        Instant reqTime = Instant.ofEpochSecond(request.dateTime);
+
+        if (request.arriveBy) {
+            return TripSearchMetadata.createForArriveBy(
+                reqTime,
+                searchWindowUsedInSeconds,
+                firstRemovedItinerary == null
+                    ? null
+                    : firstRemovedItinerary.endTime().toInstant()
+            );
+        }
+        else {
+            return TripSearchMetadata.createForDepartAfter(
+                reqTime,
+                searchWindowUsedInSeconds,
+                firstRemovedItinerary == null
+                    ? null
+                    : firstRemovedItinerary.startTime().toInstant()
+            );
+        }
     }
 }
