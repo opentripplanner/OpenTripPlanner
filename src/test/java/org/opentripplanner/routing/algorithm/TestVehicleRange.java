@@ -11,7 +11,6 @@ import org.opentripplanner.routing.core.vehicle_sharing.KickScooterDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -29,7 +28,7 @@ public class TestVehicleRange extends TestCase {
         new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 2500, StreetTraversalPermission.BICYCLE, false);
         new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 4500, StreetTraversalPermission.BICYCLE, false);
 //      Vehicle's range is smaller than combine length of the streets. It shouldn't be possible to find route.
-        KickScooterDescription kickScooterDescription = new KickScooterDescription("a",0,0, FuelType.ELECTRIC, Gearbox.AUTOMATIC,null,5*1000);
+        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 5 * 1000.);
 
         RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
         new RentVehicleAnywhereEdge(v3);
@@ -59,7 +58,7 @@ public class TestVehicleRange extends TestCase {
         new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 2500, StreetTraversalPermission.BICYCLE, false);
         new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 4500, StreetTraversalPermission.BICYCLE, false);
 //      Vehicle has enough range to traverse the whole route.
-        KickScooterDescription kickScooterDescription = new KickScooterDescription("a",0,0, FuelType.ELECTRIC, Gearbox.AUTOMATIC,null,7*1000);
+        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 7 * 1000.);
 
         RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
         new RentVehicleAnywhereEdge(v3);
