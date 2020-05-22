@@ -15,6 +15,10 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     private String tripShortName;
 
+    private String tripPublicCode;
+
+    private String tripPrivateCode;
+
     private String tripHeadsign;
 
     private String routeShortName;
@@ -110,6 +114,16 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         this.tripShortName = tripShortName;
     }
 
+    public String getTripPublicCode() { return tripPublicCode; }
+
+    public void setTripPublicCode(String tripPublicCode) { this.tripPublicCode = tripPublicCode; }
+
+    public String getTripPrivateCode() { return tripPrivateCode; }
+
+    public void setTripPrivateCode(String tripPrivateCode) {
+        this.tripPrivateCode = tripPrivateCode;
+    }
+
     public String getTripHeadsign() {
         return tripHeadsign;
     }
@@ -193,5 +207,4 @@ public final class Trip extends TransitEntity<FeedScopedId> {
     public void setFareId(String fareId) {
         this.fareId = fareId;
     }
-
 }
