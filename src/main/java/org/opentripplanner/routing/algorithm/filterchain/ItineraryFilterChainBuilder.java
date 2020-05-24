@@ -5,7 +5,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrap
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.LongTransitWalkingFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
@@ -28,6 +28,7 @@ public class ItineraryFilterChainBuilder {
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
+    private boolean removeTransitWithHigherCostThenWalkOnly = false;
     private boolean debug;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -94,6 +95,21 @@ public class ItineraryFilterChainBuilder {
     public void setMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
         this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
     }
+    /**
+     * The direct street search(walking) is not pruning the transit search, so in some cases we get
+     * "silly" transit itineraries that is marginally better on travel-duration compared with a
+     * walking-all-the-way itinerary. Calling this method will enable the filter witch remove all
+     * itineraries with a generalized-cost that is higher than the best on-street-all-the-way
+     * itinerary.
+     * <p>
+     * The default is NOT to include this filter.
+     * <p>
+     * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
+     * exist.
+     */
+    public void removeTransitWithHigherCostThenWalkOnly() {
+        this.removeTransitWithHigherCostThenWalkOnly = true;
+    }
 
     /**
      * This will NOT delete itineraries, but tag them as deleted using the
@@ -106,7 +122,9 @@ public class ItineraryFilterChainBuilder {
     public ItineraryFilter build() {
         List<ItineraryFilter> filters = new ArrayList<>();
 
-        filters.add(new LongTransitWalkingFilter());
+        if(removeTransitWithHigherCostThenWalkOnly) {
+            filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
+        }
 
         filters.add(new GroupByFilter<>(
                 "groupBy-legs-filter-on-cost",
@@ -124,7 +142,7 @@ public class ItineraryFilterChainBuilder {
 
         // Remove itineraries if max limit is exceeded
         if (maxLimit >= minLimit) {
-            filters.add(new MaxLimitFilter("MAX", maxLimit, maxLimitReachedSubscriber));
+            filters.add(new MaxLimitFilter("number-of-itineraries-filter", maxLimit, maxLimitReachedSubscriber));
         }
 
         if(debug) {

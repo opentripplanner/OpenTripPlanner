@@ -78,6 +78,10 @@ public class Itinerary {
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;
 
+    /** TRUE if mode is a non transit move from start ot end (all legs are non-transit). */
+    public final boolean streetOnly;
+
+
     /**
      * System notices is used to tag itineraries with system information. For example if you run the
      * itinerary-filter in debug mode, the filters would tag itineraries instead of deleting them
@@ -115,6 +119,7 @@ public class Itinerary {
         this.nonTransitDistanceMeters = totals.nonTransitDistanceMeters;
         this.waitingTimeSeconds = totals.waitingTimeSeconds;
         this.walkOnly = totals.walkOnly;
+        this.streetOnly = totals.streetOnly;
     }
 
     /**
@@ -145,6 +150,13 @@ public class Itinerary {
      */
     public boolean isWalkingAllTheWay() {
         return walkOnly;
+    }
+
+    /**
+     * Return {@code true} if all legs are WALKING.
+     */
+    public boolean isOnStreetAllTheWay() {
+        return streetOnly;
     }
 
     /** TRUE if alt least one leg is a transit leg. */

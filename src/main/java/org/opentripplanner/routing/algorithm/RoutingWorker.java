@@ -72,6 +72,7 @@ public class RoutingWorker {
             itineraries.addAll(routeTransit(router));
 
             long startTimeFiltering = System.currentTimeMillis();
+
             // Filter itineraries
             List<Itinerary> filteredItineraries = filterChain().filter(itineraries);
 
@@ -187,6 +188,10 @@ public class RoutingWorker {
         builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
         builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
+
+        // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
+        //           - exposed as a parameter in the APIs yet.
+        builder.removeTransitWithHigherCostThenWalkOnly();
 
         if(request.debugItineraryFilter) {
             builder.debug();

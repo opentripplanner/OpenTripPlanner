@@ -7,6 +7,7 @@ import java.util.List;
  * Calculate derived itinerary fields
  */
 class ItinerariesCalculateLegTotals {
+
     int totalDurationSeconds = 0;
     int transitTimeSeconds = 0;
     int nTransitLegs = 0;
@@ -14,6 +15,7 @@ class ItinerariesCalculateLegTotals {
     double nonTransitDistanceMeters = 0.0;
     int waitingTimeSeconds;
     boolean walkOnly = true;
+    boolean streetOnly = true;
 
     public ItinerariesCalculateLegTotals(List<Leg> legs) {
         calculate(legs);
@@ -38,6 +40,9 @@ class ItinerariesCalculateLegTotals {
             }
             if(!leg.isWalkingLeg()) {
                 walkOnly = false;
+            }
+            if(leg.isTransitLeg()) {
+              this.streetOnly = false;
             }
         }
         this.waitingTimeSeconds = totalDurationSeconds

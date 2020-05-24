@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import org.junit.Before;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 
@@ -14,7 +15,8 @@ import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestD
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.newTime;
 import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.toStr;
-import static org.opentripplanner.routing.core.TraverseMode.TRANSIT;
+import static org.opentripplanner.routing.core.TraverseMode.BUS;
+import static org.opentripplanner.routing.core.TraverseMode.RAIL;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class ItineraryFilterChainBuilderTest {
@@ -25,15 +27,22 @@ public class ItineraryFilterChainBuilderTest {
     private final Itinerary i1 = itinerary(leg(A, E, 6, 8, 5.0, WALK));
 
     // Not optimal, takes longer than walking
-    private final Itinerary i2 = itinerary(leg(A, E, 6, 9, 5.0, TRANSIT));
+    private final Itinerary i2 = itinerary(leg(A, E, 6, 9, 5.0, BUS));
 
     // Not optimal, departure is very late
-    private final Itinerary i3 = itinerary(leg(A, E, 50, 51, 5.0, TRANSIT));
+    private final Itinerary i3 = itinerary(leg(A, E, 50, 51, 5.0, RAIL));
 
+    @Before
+    public void setup() {
+        i1.generalizedCost = 240;
+        i2.generalizedCost = 300;
+        i3.generalizedCost = 180;
+    }
 
     @Test
-    public void testDefaultFilterChain() {
+    public void testFilterChainRemoveTransitWithHighCost() {
         // Given a default chain
+        builder.removeTransitWithHigherCostThenWalkOnly();
         ItineraryFilter chain = builder.build();
 
         assertEquals(List.of(i1, i3), chain.filter(List.of(i1, i2, i3)));
@@ -63,7 +72,7 @@ public class ItineraryFilterChainBuilderTest {
         assertTrue(i1.systemNotices.isEmpty());
         assertFalse(i2.systemNotices.isEmpty());
         assertFalse(i3.systemNotices.isEmpty());
-        assertEquals("transit-walking-filter", i2.systemNotices.get(0).tag);
+        assertEquals("transit-vs-street-filter", i2.systemNotices.get(0).tag);
         assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
     }
 
