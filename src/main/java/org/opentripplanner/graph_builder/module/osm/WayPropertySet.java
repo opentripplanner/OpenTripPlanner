@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,10 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
+import static java.util.Collections.sort;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -54,6 +59,10 @@ public class WayPropertySet {
 
     public WayPropertySetSource base;
 
+    private HashMap<String, WayProperties> wayPropertyLookup;
+
+    private HashSet<Object> possibleWayTagValues;
+
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -71,10 +80,42 @@ public class WayPropertySet {
     }
 
     /**
+     * Initializes lookups and Indexes various sets for quick lookup of applicable values
+     */
+    public void index() {
+        wayPropertyLookup = new HashMap<>();
+        possibleWayTagValues = new HashSet<>();
+        for (WayPropertyPicker wayProperty : wayProperties) {
+            for (P2<String> kvpair : wayProperty.getSpecifier().kvpairs) {
+                possibleWayTagValues.add(String.format("%s=%s", kvpair.first, kvpair.second));
+            }
+        }
+    }
+
+    /**
      * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
      * will have their safety values applied if they match at all.
      */
     public WayProperties getDataForWay(OSMWithTags way) {
+        // compute lookup key for way based on applicable tags/values
+        List<String> applicableTagValues = new ArrayList<>();
+        for (Entry<String, String> wayTagValue : way.getTags().entrySet()) {
+            // if tag/value exists in way properties, add to list of matches
+            String tagValue = String.format("%s=%s", wayTagValue.getKey(), wayTagValue.getValue());
+            String wildcardTag = String.format("%s=*", wayTagValue.getKey());
+            if (possibleWayTagValues.contains(tagValue) || possibleWayTagValues.contains(wildcardTag)) {
+                applicableTagValues.add(tagValue);
+            }
+        }
+        // sort values to make deterministic key
+        sort(applicableTagValues);
+        String wayPropertiesKey = String.join(";", applicableTagValues);
+
+        // check if lookup key found
+        if (wayPropertyLookup.containsKey(wayPropertiesKey)) {
+            return wayPropertyLookup.get(wayPropertiesKey);
+        }
+
         WayProperties leftResult = defaultProperties;
         WayProperties rightResult = defaultProperties;
         int bestLeftScore = 0;
@@ -123,6 +164,7 @@ public class WayPropertySet {
             String all_tags = dumpTags(way);
             LOG.debug("Used default permissions: " + all_tags);
         }
+        wayPropertyLookup.put(wayPropertiesKey, result);
         return result;
     }
 
