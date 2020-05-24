@@ -25,7 +25,7 @@ public class SortOnGeneralizedCost implements ItineraryFilter {
 
     @Override
     public String name() {
-        return "generalized-cost-filter";
+        return "sort-on-generalized-cost";
     }
 
     @Override
