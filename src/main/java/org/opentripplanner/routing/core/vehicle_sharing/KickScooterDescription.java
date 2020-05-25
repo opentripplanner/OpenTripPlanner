@@ -5,8 +5,8 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class KickScooterDescription extends VehicleDescription {
 
-    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 8;
-    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 5;
+    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 15. * (10. / 36.);
+    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 10. * (10. / 36.);
 
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.BICYCLE;
 
