@@ -43,7 +43,7 @@ public abstract class GraphUpdaterConfigurator {
 
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        updaters.addAll(createUpdatersFromConfig(graph, updaterConfigList));
+        updaters.addAll(createUpdatersFromConfig(updaterConfigList));
 
         setupUpdaters(graph, updaters);
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, updaters);
@@ -60,11 +60,9 @@ public abstract class GraphUpdaterConfigurator {
     }
 
     /**
-     * @param graph the graph that will be modified by these updaters
      * @return a GraphUpdaterManager containing all the created updaters
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
-        Graph graph,
         List<UpdaterConfig> configList
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
