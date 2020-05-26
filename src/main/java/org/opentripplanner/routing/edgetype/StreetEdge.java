@@ -54,6 +54,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     // TODO(flamholz): do something smarter with the car speed here.
     public static final float DEFAULT_CAR_SPEED = 11.2f;
+    public static final float MOTORBIKE_MAX_EDGE_TRAVERSE_SPEED_LOWER_BOUND = 22.2f;
 
     /** If you have more than 8 flags, increase flags to short or int */
     private static final int BACK_FLAG_INDEX = 0;
@@ -207,7 +208,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if (Objects.nonNull(vehicle)) {
             switch (vehicle.getVehicleType()) {
                 case MOTORBIKE:
-                    if (this.getMaxStreetTraverseSpeed() > 80 / 3.6f) {
+                    if (this.getMaxStreetTraverseSpeed() > MOTORBIKE_MAX_EDGE_TRAVERSE_SPEED_LOWER_BOUND) {
                         //If maximum traverse speed > 80 km/h, motorbikes are not allowed
                         return false;
                     }
