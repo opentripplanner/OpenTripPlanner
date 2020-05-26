@@ -11,6 +11,8 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
@@ -118,7 +120,85 @@ public class PlainStreetEdgeTest {
         modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
         assertTrue(e.canTraverse(modes));
     }
-    
+
+    @Test
+    public void testMotorbikeNotAllowedForMaxTraverseSpeed() {
+        // generate a very simple graph
+        Graph graph = new Graph();
+        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
+        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+
+        //Rent a vehicle (motorbike)
+        VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
+                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
+        rent1.getAvailableVehicles().add(vehicle);
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
+        options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
+        options.setRoutingContext(graph, v1, v2);
+        State s0 = new State(v1, options);
+        State s1 = rent1.traverse(s0);
+
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        //Set traverse speed limit to above 80 km/h
+        e1.setMaxStreetTraverseSpeed(81 / 3.6f);
+        //Motorbike should not be allowed to traverse this street
+        assertNull(e1.traverse(s1));
+    }
+
+    @Test
+    public void testCarAllowedForMaxTraverseSpeed() {
+        // generate a very simple graph
+        Graph graph = new Graph();
+        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
+        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+
+        //Rent a vehicle (car)
+        VehicleDescription vehicle = new CarDescription("1234", v1.getLat(), v1.getLon(),
+                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
+        rent1.getAvailableVehicles().add(vehicle);
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
+        options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
+        options.setRoutingContext(graph, v1, v2);
+        State s0 = new State(v1, options);
+        State s1 = rent1.traverse(s0);
+
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        //Set traverse speed limit to above 80 km/h
+        e1.setMaxStreetTraverseSpeed(81 / 3.6f);
+        //Car should be allowed to traverse this street
+        assertNotNull(e1.traverse(s1));
+    }
+
+    @Test
+    public void testMotorbikeAllowedForMaxTraverseSpeed() {
+        // generate a very simple graph
+        Graph graph = new Graph();
+        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
+        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+
+        //Rent a vehicle (motorbike)
+        VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
+                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
+        rent1.getAvailableVehicles().add(vehicle);
+        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
+        options.setStartingMode(TraverseMode.WALK);
+        options.setRentingAllowed(true);
+        options.setRoutingContext(graph, v1, v2);
+        State s0 = new State(v1, options);
+        State s1 = rent1.traverse(s0);
+
+        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
+        //Set traverse speed limit to 50 km/h
+        e1.setMaxStreetTraverseSpeed(50 / 3.6f);
+        //Motorbike should be allowed to traverse this street
+        assertNotNull(e1.traverse(s1));
+    }
+
     /**
      * Test the traversal of two edges with different traverse modes, with a focus on cycling.
      * This test will fail unless the following three conditions are met:
