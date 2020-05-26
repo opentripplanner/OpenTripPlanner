@@ -24,11 +24,14 @@ public abstract class VehicleDescription {
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider) {
-        this(providerVehicleId,longitude,latitude,fuelType,gearbox,provider,300*1000);
+        this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null);
     }
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
-                              Gearbox gearbox, Provider provider, double rangeInMeters) {
+                              Gearbox gearbox, Provider provider, Double rangeInMeters) {
+        if (rangeInMeters == null)
+            rangeInMeters = this.getDefaultRangeInMeters();
+
         this.providerVehicleId = providerVehicleId;
         this.longitude = longitude;
         this.latitude = latitude;
@@ -106,4 +109,6 @@ public abstract class VehicleDescription {
 
     @JsonSerialize
     public abstract VehicleType getVehicleType();
+
+    protected abstract double getDefaultRangeInMeters();
 }

@@ -5,8 +5,8 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 
 public class KickScooterDescription extends VehicleDescription {
 
-    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 8;
-    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 5;
+    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 15. * (10. / 36.);
+    private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 10. * (10. / 36.);
 
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.BICYCLE;
 
@@ -15,10 +15,11 @@ public class KickScooterDescription extends VehicleDescription {
     private static final int DROPOFF_TIME_IN_SECONDS = 30;
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.KICKSCOOTER;
+    private static final double DEFAULT_RANGE_IN_METERS = 16 * 1000;
 
     public KickScooterDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
-                                  Gearbox gearbox, Provider provider, double rangeInMeters) {
-        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider,  rangeInMeters);
+                                  Gearbox gearbox, Provider provider, Double rangeInMeters) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
     }
 
     public KickScooterDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
@@ -52,5 +53,10 @@ public class KickScooterDescription extends VehicleDescription {
     @Override
     public VehicleType getVehicleType() {
         return VEHICLE_TYPE;
+    }
+
+    @Override
+    protected double getDefaultRangeInMeters() {
+        return DEFAULT_RANGE_IN_METERS;
     }
 }
