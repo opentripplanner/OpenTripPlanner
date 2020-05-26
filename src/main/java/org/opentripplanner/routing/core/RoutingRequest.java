@@ -7,7 +7,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleDetailsSet;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleValidator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
@@ -111,7 +111,7 @@ public class RoutingRequest implements Cloneable, Serializable {
 
     public boolean rentingAllowed = false;
 
-    public VehicleDetailsSet vehiclesAllowedToRent = VehicleDetailsSet.allowingAll;
+    public VehicleValidator vehicleValidator = new VehicleValidator();
 
     /** The set of characteristics that the user wants to optimize for -- defaults to QUICK, or optimize for transit time. */
     public OptimizeType optimize = OptimizeType.QUICK;
@@ -1140,7 +1140,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && modes.equals(other.modes)
                 && startingMode == other.startingMode
                 && rentingAllowed == other.rentingAllowed
-                && vehiclesAllowedToRent.equals(other.vehiclesAllowedToRent)
+                && vehicleValidator.equals(other.vehicleValidator)
                 && wheelchairAccessible == other.wheelchairAccessible
                 && optimize.equals(other.optimize)
                 && maxWalkDistance == other.maxWalkDistance
@@ -1210,7 +1210,7 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + new Double(carSpeed).hashCode() + new Double(maxWeight).hashCode()
                 + (int) (worstTime & 0xffffffff) + modes.hashCode()
                 + startingMode.hashCode() + (rentingAllowed ? 3 : 0)
-                + vehiclesAllowedToRent.hashCode()
+                + vehicleValidator.hashCode()
                 + (arriveBy ? 8966786 : 0) + (wheelchairAccessible ? 731980 : 0)
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(maxTransferWalkDistance).hashCode()

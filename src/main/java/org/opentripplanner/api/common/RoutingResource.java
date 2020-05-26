@@ -5,10 +5,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.vehicle_sharing.FuelType;
-import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleDetailsSet;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
 import org.opentripplanner.standalone.Router;
@@ -207,6 +204,12 @@ public abstract class RoutingResource {
      */
     @QueryParam("gearboxesAllowed")
     protected Set<Gearbox> gearboxesAllowed;
+
+    /**
+     * Allows filtering vehicles for renting by providers. By default we accept renting all vehicles.
+     */
+    @QueryParam("providersAllowed")
+    protected Set<String> providersAllowed;
 
     /**
      * Allows filtering vehicles for renting by providers. By default we accept renting all vehicles.
@@ -649,11 +652,10 @@ public abstract class RoutingResource {
             request.startingMode = startingMode;
         }
 
-        if (rentingAllowed != null) {
-            request.rentingAllowed = rentingAllowed;
+        if (rentingAllowed != null && rentingAllowed) {
+            request.rentingAllowed = true;
+            buildVehicleValidator(request);
         }
-
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(fuelTypesAllowed, gearboxesAllowed, providersDisallowed, vehicleTypesAllowed);
 
         if (request.allowBikeRental && bikeSpeed == null) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
@@ -732,6 +734,31 @@ public abstract class RoutingResource {
         //getLocale function returns defaultLocale if locale is null
         request.locale = ResourceBundleSingleton.INSTANCE.getLocale(locale);
         return request;
+    }
+
+    private void buildVehicleValidator(RoutingRequest request) {
+        if (!providersAllowed.isEmpty() && !providersDisallowed.isEmpty()) {
+            throw new RuntimeException("Invalid parameters: " +
+                    "cannot specify both providersAllowed and providersDisallowed");
+        }
+
+        if (!fuelTypesAllowed.isEmpty()) {
+            request.vehicleValidator.addFilter(new FuelTypeFilter(fuelTypesAllowed));
+        }
+
+        if (!gearboxesAllowed.isEmpty()) {
+            request.vehicleValidator.addFilter(new GearboxFilter(gearboxesAllowed));
+        }
+
+        if (!vehicleTypesAllowed.isEmpty()) {
+            request.vehicleValidator.addFilter(new VehicleTypeFilter(vehicleTypesAllowed));
+        }
+
+        if (!providersAllowed.isEmpty()) {
+            request.vehicleValidator.addFilter(ProviderFilter.providersAllowedFilter(providersAllowed));
+        } else if (!providersDisallowed.isEmpty()) {
+            request.vehicleValidator.addFilter(ProviderFilter.providersDisallowedFilter(providersDisallowed));
+        }
     }
 
     /**
