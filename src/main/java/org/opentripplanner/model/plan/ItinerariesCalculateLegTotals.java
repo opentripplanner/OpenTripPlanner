@@ -1,5 +1,7 @@
 package org.opentripplanner.model.plan;
 
+import org.opentripplanner.routing.core.TraverseMode;
+
 import java.util.List;
 
 
@@ -30,6 +32,11 @@ class ItinerariesCalculateLegTotals {
         for (Leg leg : legs) {
             long dt = leg.getDuration();
 
+            // Ignore none moving leg
+            if(leg.mode == TraverseMode.LEG_SWITCH) {
+                continue;
+            }
+
             if (leg.isTransitLeg()) {
                 transitTimeSeconds += dt;
                 ++nTransitLegs;
@@ -38,11 +45,11 @@ class ItinerariesCalculateLegTotals {
                 nonTransitTimeSeconds += dt;
                 nonTransitDistanceMeters += leg.distanceMeters;
             }
-            if(!leg.isWalkingLeg()) {
+            if (!leg.isWalkingLeg()) {
                 walkOnly = false;
             }
-            if(leg.isTransitLeg()) {
-              this.streetOnly = false;
+            if (!leg.isOnStreetNonTransit()) {
+                this.streetOnly = false;
             }
         }
         this.waitingTimeSeconds = totalDurationSeconds
