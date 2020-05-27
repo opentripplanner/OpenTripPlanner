@@ -48,9 +48,6 @@ public class RentVehicleAnywhereEdge extends Edge {
 
             State previous = null;
             for (VehicleDescription rentableVehicle : rentableVehicles) {
-                StateEditor next = s0.edit(this);
-                next.beginVehicleRenting(rentableVehicle);
-                previous = next.makeState().addToExistingResultChain(previous);
                 previous = beginVehicleRenting(s0, rentableVehicle).addToExistingResultChain(previous);
             }
             return previous;
