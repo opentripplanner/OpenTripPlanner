@@ -81,6 +81,10 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
         return result;
     }
 
+    @Override
+    public boolean removeItineraries() {
+        return true;
+    }
 
     /**
      * Get a approximate max limit for each group so that the total

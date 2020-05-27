@@ -39,4 +39,9 @@ public class LongTransitWalkingFilter implements ItineraryFilter {
                 .filter(it -> it.effectiveDurationSeconds() <= bestWalkingDuration)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean removeItineraries() {
+        return true;
+    }
 }

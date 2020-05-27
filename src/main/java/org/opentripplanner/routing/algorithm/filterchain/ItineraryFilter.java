@@ -40,4 +40,17 @@ public interface ItineraryFilter {
      * </pre>
      */
     List<Itinerary> filter(List<Itinerary> itineraries);
+
+
+    /**
+     * Return {@code true} if the filter removes itineraries from the input list
+     * in the {@link #filter(List)} method, or {@code false} if no itineraries are
+     * deleted.
+     * <p>
+     * The default implementation returns {@code false}, make sure to override this in every
+     * filter that deletes itineraries from the given input list.
+     */
+    default boolean removeItineraries() {
+        return false;
+    }
 }

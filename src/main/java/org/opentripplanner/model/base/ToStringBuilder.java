@@ -160,6 +160,15 @@ public class ToStringBuilder {
         return addIfNotDefault(name, durationSeconds, null, TimeUtils::durationToStr);
     }
 
+    public ToStringBuilder addDuration(String name, Duration duration) {
+        return addIfNotDefault(
+            name,
+            duration,
+            null,
+            d -> TimeUtils.durationToStr((int)d.toSeconds())
+        );
+    }
+
     @Override
     public String toString() {
         if(!unsetFields.isEmpty()) { addIt("NOT_SET", unsetFields.toString()); }

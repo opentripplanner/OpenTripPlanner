@@ -2,6 +2,7 @@ package org.opentripplanner.model.base;
 
 import org.junit.Test;
 
+import java.time.Duration;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
@@ -205,5 +206,10 @@ public class ToStringBuilderTest {
                 "ToStringBuilderTest{d: 1d2h50m45s}",
                 subject().addDuration("d", (26 * 60 + 50) * 60 + 45).toString()
         );
+        assertEquals(
+            "ToStringBuilderTest{d:2m5s}",
+            subject().addDuration("d", Duration.ofSeconds(125)).toString()
+        );
+
     }
 }
