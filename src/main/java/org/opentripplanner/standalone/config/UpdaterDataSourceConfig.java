@@ -1,104 +1,89 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.ext.siri.updater.SiriETHttpTripUpdateSource;
-import org.opentripplanner.ext.siri.updater.SiriVMHttpTripUpdateSource;
-import org.opentripplanner.updater.bike_park.KmlBikeParkDataSource;
-import org.opentripplanner.updater.bike_rental.BicimadBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.CityBikesBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.GenericJsonBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.GenericKmlBikeRentalDataSource;
-import org.opentripplanner.updater.bike_rental.GenericXmlBikeRentalDataSource;
+import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceParameters;
+import org.opentripplanner.util.OtpAppException;
+
+import java.util.HashMap;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
  * This class is an object representation of the data source for a single real-time updater in
  * 'router-config.json' Each data source defines an inner interface with its required attributes.
  */
-public class UpdaterDataSourceConfig implements BicimadBikeRentalDataSource.Config,
-    CityBikesBikeRentalDataSource.Config,
-    GenericXmlBikeRentalDataSource.Config,
-    GbfsBikeRentalDataSource.Config,
-    GenericKmlBikeRentalDataSource.Config,
-    KmlBikeParkDataSource.Config,
-    SiriETHttpTripUpdateSource.Config,
-    SiriVMHttpTripUpdateSource.Config,
-    GenericJsonBikeRentalDataSource.Config
-{
+public class UpdaterDataSourceConfig {
 
-  private final String name;
-  private final String url;
-  private final boolean routeAsCar;
-  private final String namePrefix;
-  private final String file;
-  private final String feedId;
-  private final boolean zip;
-  private final String requestorRef;
-  private final int timeoutSec;
-  private final int previewIntervalMinutes;
+  public static final String JCDECAUX = "jcdecaux";
+  public static final String B_CYCLE = "b-cycle";
+  public static final String BIXI = "bixi";
+  public static final String KEOLIS_RENNES = "keolis-rennes";
+  public static final String OV_FIETS = "ov-fiets";
+  public static final String CITY_BIKES = "city-bikes";
+  public static final String VCUV = "vcub";
+  public static final String CITI_BIKE_NYC = "citi-bike-nyc";
+  public static final String NEXT_BIKE = "next-bike";
+  public static final String KML = "kml";
+  public static final String SF_BAY_AREA = "sf-bay-area";
+  public static final String SHARE_BIKE = "share-bike";
+  public static final String UIP_BIKE = "uip-bike";
+  public static final String GBFS = "gbfs";
+  public static final String SMOOVE = "smoove";
+  public static final String BICIMAD = "bicimad";
 
-  public UpdaterDataSourceConfig() {
-    name = null;
-    url = null;
-    routeAsCar = false;
-    namePrefix = null;
-    file = null;
-    feedId = null;
-    zip = false;
-    requestorRef = null;
-    timeoutSec = 0;
-    previewIntervalMinutes = 0;
+  public static final String SIRI_ET = "siri-et";
+  public static final String SIRI_VM = "siri-vm";
+  public static final String SIRI_SX = "siri-sx";
+  public static final String KML_BIKE_PARK = "kml-bike-park";
+
+  private static final Map<String, Function<NodeAdapter, UpdaterSourceParameters>> CONFIG_CREATORS
+      = new HashMap<>();
+
+  static {
+    CONFIG_CREATORS.put(JCDECAUX, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(B_CYCLE, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(BIXI, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(KEOLIS_RENNES, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(OV_FIETS, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(CITY_BIKES, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(VCUV, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(CITI_BIKE_NYC, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(NEXT_BIKE, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(KML, GenericKmlBikeRentalSourceParameters::new);
+    CONFIG_CREATORS.put(SF_BAY_AREA, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(SHARE_BIKE, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(UIP_BIKE, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(GBFS, GbfsSourceParameters::new);
+    CONFIG_CREATORS.put(SMOOVE, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(BICIMAD, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(SIRI_ET, SiriETHttpTripUpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(SIRI_VM, SiriVMHttpTripUpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(SIRI_SX, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(KML_BIKE_PARK, GenericKmlBikeRentalSourceParameters::new);
   }
 
-  public UpdaterDataSourceConfig(NodeAdapter c) {
-    this.name = c.asText("sourceType", null);
-    this.url = c.asText("url", null);
-    this.routeAsCar = c.asBoolean("routeAsCar", false);
-    this.namePrefix = c.asText("namePrefix", null);
-    this.file = c.asText("file", null);
-    this.feedId = c.asText("feedId", null);
-    this.zip = c.asBoolean("zip", false);
-    this.requestorRef = c.asText("requestorRef", null);
-    this.timeoutSec = c.asInt("timeoutSec", 0);
-    this.previewIntervalMinutes = c.asInt("previewIntervalMinutes", 0);
+  private final String type;
+
+  private final UpdaterSourceParameters updaterSourceParameters;
+
+  public UpdaterDataSourceConfig(NodeAdapter sourceConfig) {
+    String type = sourceConfig.asText("sourceType");
+    Function<NodeAdapter, UpdaterSourceParameters> factory = CONFIG_CREATORS.get(type);
+    if (factory == null) {
+      throw new OtpAppException("The updater config type is unknown: " + type);
+    }
+    this.type = type;
+    this.updaterSourceParameters = factory.apply(sourceConfig);
   }
 
-  public String getName() {
-    return name;
+  public String getType() {
+    return type;
   }
 
-  public String getUrl() {
-    return url;
-  }
-
-  public boolean routeAsCar() {
-    return routeAsCar;
-  }
-
-  public String getNamePrefix() {
-    return namePrefix;
-  }
-
-  public String getFile() {
-    return file;
-  }
-
-  public String getFeedId() {
-    return feedId;
-  }
-
-  public boolean zip() {
-    return zip;
-  }
-
-  public String getRequestorRef() {
-    return requestorRef;
-  }
-
-  public int getTimeoutSec() {
-    return timeoutSec;
-  }
-
-  public int getPreviewIntervalMinutes() {
-    return previewIntervalMinutes;
+  public UpdaterSourceParameters getUpdaterSourceParameters() {
+    return updaterSourceParameters;
   }
 }

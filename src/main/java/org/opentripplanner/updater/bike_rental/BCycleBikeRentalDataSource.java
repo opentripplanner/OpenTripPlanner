@@ -3,6 +3,7 @@ package org.opentripplanner.updater.bike_rental;
 import java.util.HashSet;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 import com.fasterxml.jackson.databind.JsonNode;
@@ -18,7 +19,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
     private String networkName;
 
     public BCycleBikeRentalDataSource(
-        Config config,
+        UpdaterDataSourceParameters config,
         String apiKey,
         String networkName
     ) {

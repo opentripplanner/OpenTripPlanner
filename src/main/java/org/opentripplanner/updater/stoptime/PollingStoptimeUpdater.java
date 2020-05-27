@@ -65,17 +65,17 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public PollingStoptimeUpdater(Parameters config) {
-        super(config);
+    public PollingStoptimeUpdater(Parameters parameters) {
+        super(parameters);
         // Create update streamer from preferences
-        feedId = config.getFeedId();
-        String sourceType = config.getSource().getName();
+        feedId = parameters.getFeedId();
+        String sourceType = parameters.getSourceConfig().getType();
         if (sourceType != null) {
             if (sourceType.equals("gtfs-http")) {
-                updateSource = new GtfsRealtimeHttpTripUpdateSource(config);
+                updateSource = new GtfsRealtimeHttpTripUpdateSource(parameters);
             } else if (sourceType.equals("gtfs-file")) {
                 updateSource = new GtfsRealtimeFileTripUpdateSource(
-                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceParameters) config
+                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceParameters) parameters
                 );
             }
         }
@@ -87,16 +87,16 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...
-        int logFrequency = config.getLogFrequency();
+        int logFrequency = parameters.getLogFrequency();
         if (logFrequency >= 0) {
             this.logFrequency = logFrequency;
         }
-        int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
+        int maxSnapshotFrequency = parameters.getMaxSnapshotFrequencyMs();
         if (maxSnapshotFrequency >= 0) {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
-        this.purgeExpiredData = config.purgeExpiredData();
-        this.fuzzyTripMatching = config.fuzzyTripMatching();
+        this.purgeExpiredData = parameters.purgeExpiredData();
+        this.fuzzyTripMatching = parameters.fuzzyTripMatching();
 
         LOG.info("Creating stop time updater running every {} seconds : {}", pollingPeriodSeconds, updateSource);
     }

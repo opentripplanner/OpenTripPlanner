@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
 
 public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
     implements SiriVMUpdater.Parameters {
@@ -13,7 +13,7 @@ public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
   private final boolean blockReadinessUntilInitialized;
-  private final UpdaterDataSourceConfig source;
+  private final SiriVMHttpTripUpdaterSourceParameters source;
 
   public SiriVMUpdaterParameters(NodeAdapter c) {
     super(c);
@@ -23,7 +23,7 @@ public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
     purgeExpiredData = c.asBoolean("purgeExpiredData", false);
     fuzzyTripMatching = c.asBoolean("fuzzyTripMatching", false);
     blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
-    source = new UpdaterDataSourceConfig(c);
+    source = new SiriVMHttpTripUpdaterSourceParameters(c);
   }
 
 
@@ -38,6 +38,4 @@ public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
   public boolean fuzzyTripMatching() { return fuzzyTripMatching; }
 
   public boolean blockReadinessUntilInitialized() { return blockReadinessUntilInitialized; }
-
-  public UpdaterDataSourceConfig getSource() { return source; }
 }

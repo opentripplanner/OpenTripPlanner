@@ -4,6 +4,7 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -33,7 +34,7 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
 
         List<BikeRentalStation> stations = new ArrayList<>();
 
-        public BicimadBikeRentalDataSource(Config config) {
+        public BicimadBikeRentalDataSource(UpdaterDataSourceParameters config) {
                 this.url = config.getUrl();
         }
 
@@ -154,9 +155,5 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource {
 
         @Override public String toString() {
                 return getClass().getName() + "(" + url + ")";
-        }
-
-        public interface Config {
-                String getUrl();
         }
 }

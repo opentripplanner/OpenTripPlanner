@@ -14,13 +14,13 @@ public class PollingGraphUpdaterParameters
   private final int frequencySec;
 
   public PollingGraphUpdaterParameters(NodeAdapter c) {
-    source = new UpdaterDataSourceConfig(c);
+    source = new org.opentripplanner.standalone.config.UpdaterDataSourceConfig(c);
     url = c.asText("url", null);
     frequencySec = c.asInt("frequencySec", 60);
   }
 
 
-  public UpdaterDataSourceConfig getSource() { return source; }
+  public UpdaterDataSourceConfig getSourceConfig() { return source; }
 
   public String getUrl() { return url; }
 

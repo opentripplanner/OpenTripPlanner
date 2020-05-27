@@ -47,23 +47,11 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService bikeService;
 
-    public BikeParkUpdater(PollingGraphUpdaterParameters config) {
-        super(config);
+    public BikeParkUpdater(PollingGraphUpdaterParameters parameters) {
+        super(parameters);
         // Set source from preferences
-        String sourceType = config.getSource().getName();
-        BikeParkDataSource source = null;
-        if (sourceType != null) {
-            if (sourceType.equals("kml-placemarks")) {
-                source = new KmlBikeParkDataSource(config.getSource());
-            }
-        }
+        source = new KmlBikeParkDataSource((KmlBikeParkDataSource.Parameters) parameters.getSourceConfig());
 
-        if (source == null) {
-            throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        }
-
-        // Configure updater
-        this.source = source;
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 

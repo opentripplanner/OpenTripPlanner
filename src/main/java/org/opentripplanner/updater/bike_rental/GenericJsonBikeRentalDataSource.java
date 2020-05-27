@@ -7,6 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -40,7 +41,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      *
      */
     public GenericJsonBikeRentalDataSource(
-        Config config,
+        UpdaterDataSourceParameters config,
         String jsonPath
     ) {
         url = config.getUrl();
@@ -57,7 +58,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * @param headerValue header value
      */
     public GenericJsonBikeRentalDataSource(
-        Config config,
+        UpdaterDataSourceParameters config,
         String jsonPath, String headerName,
         String headerValue
     ) {
@@ -181,9 +182,5 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
-    }
-
-    public interface Config {
-        String getUrl();
     }
 }

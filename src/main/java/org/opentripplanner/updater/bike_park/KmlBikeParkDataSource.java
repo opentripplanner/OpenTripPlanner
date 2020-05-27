@@ -4,6 +4,7 @@ import java.util.List;
 import java.util.Locale;
 
 import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,7 +33,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
 
     private List<BikePark> bikeParks;
 
-    public KmlBikeParkDataSource(Config config) {
+    public KmlBikeParkDataSource(Parameters config) {
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader
                 .setPath("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']|//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Folder']/*[local-name()='Placemark']");
@@ -92,8 +93,7 @@ public class KmlBikeParkDataSource implements BikeParkDataSource {
 
     public void setUrl (String url) {this.url = url;}
 
-    public interface Config {
-        String getUrl();
+    public interface Parameters extends UpdaterDataSourceParameters {
         String getNamePrefix();
         boolean zip();
     }

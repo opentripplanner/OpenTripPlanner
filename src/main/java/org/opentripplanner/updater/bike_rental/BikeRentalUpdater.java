@@ -20,8 +20,11 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import static org.opentripplanner.standalone.config.UpdaterDataSourceConfig.*;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -42,72 +45,73 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private final String network;
 
-    public BikeRentalUpdater(Parameters config) throws IllegalArgumentException {
-        super(config);
+    public BikeRentalUpdater(Parameters parameters) throws IllegalArgumentException {
+        super(parameters);
 
         // Set data source type from config JSON
-        String sourceType = config.getSource().getName();
-        String apiKey = config.getApiKey();
+        String sourceType = parameters.getSourceConfig().getType();
+        String apiKey = parameters.getApiKey();
         // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
         // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
-        String networkName = config.getNetwork();
+        String networkName = parameters.getNetwork();
+        UpdaterDataSourceParameters sourceParameters = parameters.getSourceConfig().getUpdaterSourceParameters();
         BikeRentalDataSource source = null;
         if (sourceType != null) {
             switch (sourceType) {
-                case "jcdecaux":
-                    source = new JCDecauxBikeRentalDataSource(config.getSource());
+                case JCDECAUX:
+                    source = new JCDecauxBikeRentalDataSource(sourceParameters);
                     break;
-                case "b-cycle":
+                case B_CYCLE:
                     source = new BCycleBikeRentalDataSource(
-                        config.getSource(),
+                        sourceParameters,
                         apiKey,
                         networkName
                     );
                     break;
-                case "bixi":
-                    source = new BixiBikeRentalDataSource(config.getSource());
+                case BIXI:
+                    source = new BixiBikeRentalDataSource(sourceParameters);
                     break;
-                case "keolis-rennes":
-                    source = new KeolisRennesBikeRentalDataSource(config.getSource());
+                case KEOLIS_RENNES:
+                    source = new KeolisRennesBikeRentalDataSource(sourceParameters);
                     break;
-                case "ov-fiets":
-                    source = new OVFietsKMLDataSource(config.getSource());
+                case OV_FIETS:
+                    source = new OVFietsKMLDataSource(sourceParameters);
                     break;
-                case "city-bikes":
-                    source = new CityBikesBikeRentalDataSource(config.getSource());
+                case CITY_BIKES:
+                    source = new CityBikesBikeRentalDataSource(sourceParameters);
                     break;
-                case "vcub":
-                    source = new VCubDataSource(config.getSource());
+                case VCUV:
+                    source = new VCubDataSource(sourceParameters);
                     break;
-                case "citi-bike-nyc":
-                    source = new CitiBikeNycBikeRentalDataSource(config.getSource(), networkName);
+                case CITI_BIKE_NYC:
+                    source = new CitiBikeNycBikeRentalDataSource(sourceParameters, networkName);
                     break;
-                case "next-bike":
-                    source = new NextBikeRentalDataSource(config.getSource(), networkName);
+                case NEXT_BIKE:
+                    source = new NextBikeRentalDataSource(sourceParameters, networkName);
                     break;
-                case "kml":
-                    source = new GenericKmlBikeRentalDataSource(config.getSource());
+                case KML:
+                    source = new GenericKmlBikeRentalDataSource((GenericKmlBikeRentalDataSource.Parameters) sourceParameters);
                     break;
-                case "sf-bay-area":
+                case SF_BAY_AREA:
                     source = new SanFranciscoBayAreaBikeRentalDataSource(
-                        config.getSource(),
+                        sourceParameters,
                         networkName
                     );
                     break;
-                case "share-bike":
-                    source = new ShareBikeRentalDataSource(config.getSource());
+                case SHARE_BIKE:
+                    source = new ShareBikeRentalDataSource(sourceParameters);
                     break;
-                case "uip-bike":
-                    source = new UIPBikeRentalDataSource(config.getSource(), apiKey);
+                case UIP_BIKE:
+                    source = new UIPBikeRentalDataSource(sourceParameters, apiKey);
                     break;
-                case "gbfs":
-                    source = new GbfsBikeRentalDataSource(config.getSource(), networkName);
+                case GBFS:
+                    source = new GbfsBikeRentalDataSource((GbfsBikeRentalDataSource.Parameters) sourceParameters, networkName);
                     break;
-                case "smoove":
-                    source = new SmooveBikeRentalDataSource(config.getSource());
+                case SMOOVE:
+                    source = new SmooveBikeRentalDataSource(sourceParameters);
                     break;
-                case "bicimad":
-                    source = new BicimadBikeRentalDataSource(config.getSource());
+                case BICIMAD:
+                    source = new BicimadBikeRentalDataSource(sourceParameters);
                     break;
             }
         }
@@ -119,7 +123,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         // Configure updater
         LOG.info("Setting up bike rental updater.");
         this.source = source;
-        this.network = config.getNetworks();
+        this.network = parameters.getNetworks();
         if (pollingPeriodSeconds <= 0) {
             LOG.info("Creating bike-rental updater running once only (non-polling): {}", source);
         } else {

@@ -50,7 +50,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** Shared configuration code for all polling graph updaters. */
     public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
         pollingPeriodSeconds = config.getFrequencySec();
-        type = config.getSource().getName();
+        type = config.getSourceConfig().getType();
     }
 
     @Override
@@ -102,7 +102,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      * config interfaces of child classes.
      */
     public interface PollingGraphUpdaterParameters {
-        UpdaterDataSourceConfig getSource();
+        UpdaterDataSourceConfig getSourceConfig();
         String getUrl();
         int getFrequencySec();
     }

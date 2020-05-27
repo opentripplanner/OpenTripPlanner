@@ -3,6 +3,7 @@ package org.opentripplanner.updater.bike_rental;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.*;
@@ -21,12 +22,12 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private final boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource (Config config, String networkName) {
-        setBaseUrl(config.getUrl());
-        routeAsCar = config.routeAsCar();
-        stationInformationSource = new GbfsStationDataSource(config);
-        stationStatusSource = new GbfsStationStatusDataSource(config);
-        floatingBikeSource = new GbfsFloatingBikeDataSource(config);
+    public GbfsBikeRentalDataSource (Parameters parameters, String networkName) {
+        routeAsCar = parameters.routeAsCar();
+        stationInformationSource = new GbfsStationDataSource(parameters);
+        stationStatusSource = new GbfsStationStatusDataSource(parameters);
+        floatingBikeSource = new GbfsFloatingBikeDataSource(parameters);
+        setBaseUrl(parameters.getUrl());
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {
@@ -83,7 +84,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationDataSource (Config config) {
+        public GbfsStationDataSource (Parameters config) {
             super(config, "data/stations");
         }
 
@@ -101,7 +102,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationStatusDataSource (Config config) {
+        public GbfsStationStatusDataSource (Parameters config) {
             super(config, "data/stations");
         }
 
@@ -118,7 +119,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsFloatingBikeDataSource (Config config) {
+        public GbfsFloatingBikeDataSource (Parameters config) {
             super(config, "data/bikes");
         }
 
@@ -138,7 +139,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    public interface Config extends GenericJsonBikeRentalDataSource.Config {
+    public interface Parameters extends UpdaterDataSourceParameters {
         boolean routeAsCar();
     }
 }

@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -14,7 +15,7 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
     private static final Logger log = LoggerFactory.getLogger(SmooveBikeRentalDataSource.class);
 
-    public SmooveBikeRentalDataSource(Config config) {
+    public SmooveBikeRentalDataSource(UpdaterDataSourceParameters config) {
         super(config,"result");
     }
 

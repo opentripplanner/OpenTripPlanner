@@ -5,7 +5,6 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -15,7 +14,6 @@ import uk.org.siri.siri20.Siri;
 import uk.org.siri.siri20.VehicleMonitoringDeliveryStructure;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -82,7 +80,8 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriVMHttpTripUpdateSource(config.getSource());
+        updateSource = new SiriVMHttpTripUpdateSource( (SiriVMHttpTripUpdateSource.Parameters)
+            config.getSourceConfig().getUpdaterSourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -106,7 +105,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         if (fuzzyTripMatching) {
             this.siriFuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         }
@@ -137,7 +136,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      * applies those updates to the graph.
      */
     @Override
-    public void runPolling() throws Exception {
+    public void runPolling() {
         boolean moreData = false;
         do {
             // Get update lists from update source
@@ -176,6 +175,5 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         boolean purgeExpiredData();
         boolean fuzzyTripMatching();
         boolean blockReadinessUntilInitialized();
-        UpdaterDataSourceConfig getSource();
     }
 }

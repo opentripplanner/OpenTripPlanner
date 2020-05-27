@@ -7,6 +7,7 @@ import java.util.Map;
 import java.util.Set;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,12 +26,12 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private boolean allowDropoff = true;
 
-    public GenericKmlBikeRentalDataSource(Config config) {
+    public GenericKmlBikeRentalDataSource(Parameters parameters) {
         super(
-            config,
+            parameters,
             "//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']"
         );
-        namePrefix = config.getNamePrefix();
+        namePrefix = parameters.getNamePrefix();
     }
 
     /**
@@ -77,8 +78,8 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         return brStation;
     }
 
-    public interface Config
-        extends GenericXmlBikeRentalDataSource.Config {
+    public interface Parameters
+        extends UpdaterDataSourceParameters {
         String getNamePrefix();
     }
 }

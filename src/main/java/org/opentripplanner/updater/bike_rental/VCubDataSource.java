@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
@@ -17,7 +18,7 @@ import org.opentripplanner.util.NonLocalizedString;
  */
 public class VCubDataSource extends GenericXmlBikeRentalDataSource {
 
-    public VCubDataSource(Config config) {
+    public VCubDataSource(UpdaterDataSourceParameters config) {
         super(config,"//*[name()='bm:CI_VCUB_P']");
     }
 

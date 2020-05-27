@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
@@ -17,7 +18,7 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
     private String networkName;
 
     public NextBikeRentalDataSource(
-        Config config,
+        UpdaterDataSourceParameters config,
         String networkName
     ) {
         super(config,"//city/place");

@@ -9,17 +9,15 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import javax.xml.parsers.ParserConfigurationException;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
 public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
@@ -30,7 +28,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     ArrayList<BikeRentalStation> stations = new ArrayList<>();
 
-    public CityBikesBikeRentalDataSource(Config config) {
+    public CityBikesBikeRentalDataSource(UpdaterDataSourceParameters config) {
         this.url = config.getUrl();
     }
 
@@ -97,9 +95,5 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
-    }
-
-    public interface Config {
-        String getUrl();
     }
 }

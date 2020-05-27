@@ -5,14 +5,25 @@ import java.util.List;
 import junit.framework.TestCase;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class TestBikeRentalStationSource extends TestCase {
 
     public void testKeolisRennes() {
 
         KeolisRennesBikeRentalDataSource rennesSource =
-            new KeolisRennesBikeRentalDataSource(()
-                -> "file:src/test/resources/bike/keolis-rennes.xml");
+            new KeolisRennesBikeRentalDataSource(new UpdaterDataSourceParameters() {
+                @Override
+                public String getUrl() {
+                    return "file:src/test/resources/bike/keolis-rennes.xml";
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+            }
+            );
         assertTrue(rennesSource.update());
         List<BikeRentalStation> rentalStations = rennesSource.getStations();
         assertEquals(4, rentalStations.size());
@@ -32,7 +43,17 @@ public class TestBikeRentalStationSource extends TestCase {
 
     public void testSmoove() {
         SmooveBikeRentalDataSource source =
-            new SmooveBikeRentalDataSource(() -> "file:src/test/resources/bike/smoove.json");
+            new SmooveBikeRentalDataSource(new UpdaterDataSourceParameters() {
+                @Override
+                public String getUrl() {
+                    return "file:src/test/resources/bike/smoove.json";
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+            });
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 

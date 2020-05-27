@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
@@ -9,11 +10,20 @@ import java.util.List;
 
 public class TestShareBikeRentalStationSource extends TestCase {
 
-    public void testShareBike() throws UnsupportedEncodingException, MalformedURLException {
+    public void testShareBike() {
 
         ShareBikeRentalDataSource shareBikeSource =
-            new ShareBikeRentalDataSource(()
-                -> "file:src/test/resources/bike/share-bike.json?SystemID=dummyid");
+            new ShareBikeRentalDataSource(new UpdaterDataSourceParameters() {
+                @Override
+                public String getUrl() {
+                    return "file:src/test/resources/bike/share-bike.json?SystemID=dummyid";
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+            });
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         assertEquals(17, rentalStations.size());
@@ -35,7 +45,17 @@ public class TestShareBikeRentalStationSource extends TestCase {
     public void testShareBikeMissingSystemIDParameter() throws UnsupportedEncodingException, MalformedURLException {
 
         ShareBikeRentalDataSource shareBikeSource =
-            new ShareBikeRentalDataSource(() -> "file:src/test/resources/bike/share-bike.json");
+            new ShareBikeRentalDataSource(new UpdaterDataSourceParameters() {
+                @Override
+                public String getUrl() {
+                    return "file:src/test/resources/bike/share-bike.json";
+                }
+
+                @Override
+                public String getName() {
+                    return null;
+                }
+            });
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         BikeRentalStation prinsen = rentalStations.get(0);

@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.xml.XmlDataListDownloader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +21,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     private final XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
-    public GenericXmlBikeRentalDataSource(Config config, String path) {
+    public GenericXmlBikeRentalDataSource(UpdaterDataSourceParameters config, String path) {
         url = config.getUrl();
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader.setPath(path);
@@ -58,9 +59,5 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
-    }
-
-    public interface Config {
-        String getUrl();
     }
 }
