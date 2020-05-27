@@ -6,16 +6,22 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
 
 
 /**
- * The multi-criteria Range Raptor need to keep all pareto-optimal boardings for each pattern
- * while possessing the stops in the pattern. This class keep the needed state for these
- * boardings to avoid recalculating each value more than once and to be able put then in a
+ * This class represent the STATE for one possible path up until the point where a given trip is
+ * boarded(onboard of a vehicle). It represent the STATE of riding a trip, having boarded at a
+ * given stop, but not yet alighted.
+ * <p>
+ * Instances of this class only exist in the context of a given pattern for a given round. Hence
+ * when comparing instances we may assume that they have the same number-of-transfers and the same
+ * Pattern. We take advantage of this by excluding all "constant" criteria from the on-board-pattern
+ * comparator used by the pareto-set of pattern boardings.
+ * <p>
+ * This implementation of the multi-criteria Range Raptor keep all pareto-optimal _boardings_ for
+ * each pattern while possessing each stops down the line. This class keep the needed state for
+ * these boardings to avoid recalculating each value more than once and to be able put then in a
  * {@link org.opentripplanner.transit.raptor.util.paretoset.ParetoSet}.
  * <p>
- * A boarding represent one path from the {@code origin} to a trip is boarded(onboard of a vehicle).
- * It represent the STATE of riding a trip, having boarded at a given stop, but not yet alighted.
- * <p>
  * We do not do this the same way as described in the original Raptor paper. The original McRaptor
- * algorithm keep a bag of stop-arrivals while traversing the pattern. We keep a "bag"
+ * algorithm keep a bag of stop-arrivals  while traversing the pattern. We keep a "bag"
  * ({@link McTransitWorker#patternBoardings}) of {@link Boarding}s for the given pattern. The main
  * differences are:
  * <ul>
@@ -27,10 +33,13 @@ import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
  *    calculation.
  *  </li>
  *  <li>
- *    We do NOT allow a boarding of one trip to exclude the boarding of another trip. Two
- *    {@link Boarding}s are both optimal, if they have boarded the same pattern, in the same round,
- *    but on different trips/vehicles. This have no measurable impact on performance, compared with
- *    allowing an earlier trip dominating a later one.
+ *    We do NOT allow a boarding of one trip to exclude the boarding of another trip in the
+ *    pareto-set. Two {@link Boarding}s are both optimal, if they have boarded the same pattern, in
+ *    the same round, but on different trips/vehicles. This have no measurable impact on
+ *    performance, compared with allowing an earlier trip dominating a later one. But, it allows
+ *    for a trip to be optimal at some stops, and another trip to be optimal at other stops. This
+ *    may happen if the generalized-cost is not <em>increasing</em> with the same amount for
+ *    each trip between each stop.
  *  </li>
  *  <li>
  *    We do not have to update all elements in the "pattern-bag" for every stop visited. The
