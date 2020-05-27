@@ -252,6 +252,7 @@ public class StateEditor {
             defectiveTraversal = true;
             return;
         }
+        incrementDistanceInCurrentVehicle(length);
         incrementDistanceTraversedInMode(length);
         child.traverseDistanceInMeters += length;
     }
@@ -394,14 +395,31 @@ public class StateEditor {
 
     public void beginVehicleRenting(VehicleDescription vehicleDescription) {
         cloneStateDataAsNeeded();
-        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        child.distanceTraversedInCurrentVehicle = 0;
+        incrementWeight(vehicleDescription.getRentTimeInSeconds() * child.getOptions().rentingReluctance);
+        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * child.getOptions().rentingReluctance);
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
+        child.stateData.currentVehicle = null;
+    }
+
+    public void reversedDoneVehicleRenting(VehicleDescription vehicleDescription) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentVehicle = vehicleDescription;
+        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+    }
+
+    public void reversedBeginVehicleRenting() {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(child.stateData.currentVehicle.getRentTimeInSeconds());
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
@@ -603,6 +621,11 @@ public class StateEditor {
 
     public boolean usedNotRecommendedRoutes() {
         return child.usedNotRecommendedRoute;
+    }
+
+    private void incrementDistanceInCurrentVehicle (double distanceInMeters){
+        if (child.getCurrentVehicle() != null)
+            child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }
 
 }

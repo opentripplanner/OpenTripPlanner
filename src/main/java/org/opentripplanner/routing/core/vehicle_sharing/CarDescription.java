@@ -15,6 +15,13 @@ public class CarDescription extends VehicleDescription {
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
 
+    private static final double DEFAULT_RANGE_IN_METERS = 200 * 1000;
+
+    public CarDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                          Gearbox gearbox, Provider provider, Double rangeInMeters) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
+    }
+
     public CarDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                           Gearbox gearbox, Provider provider) {
         super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
@@ -43,5 +50,10 @@ public class CarDescription extends VehicleDescription {
     @Override
     public VehicleType getVehicleType() {
         return VEHICLE_TYPE;
+    }
+
+    @Override
+    protected double getDefaultRangeInMeters() {
+        return DEFAULT_RANGE_IN_METERS;
     }
 }

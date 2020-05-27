@@ -33,13 +33,15 @@ public class VehiclePositionsDiff {
         FuelType fuelType = FuelType.fromString(vehicle.getFuelType());
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
         Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
+        Double rangeInMeters = vehicle.getRangeInMeters();
+
         switch (vehicle.getType()) {
             case CAR:
-                return new CarDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
+                return new CarDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
             case MOTORBIKE:
-                return new MotorbikeDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
+                return new MotorbikeDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
             case KICKSCOOTER:
-                return new KickScooterDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider);
+                return new KickScooterDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
             default:
                 LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
                 return null;

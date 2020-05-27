@@ -27,6 +27,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     private double lat;
     private double lon;
     private boolean transit;
+    private boolean rental;
     private double walkReluctance;
     private double maxStreetSpeed;
     private double maxTransitSpeed;
@@ -37,6 +38,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
         RoutingRequest req = options;
         Vertex target = req.rctx.target;
         this.transit = req.modes.isTransit();
+        this.rental = req.rentingAllowed;
         maxStreetSpeed = req.getStreetSpeedUpperBound();
         maxTransitSpeed = req.getTransitSpeedUpperBound();
 
@@ -69,7 +71,9 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
     public double estimateRemainingWeight (State s) {
         Vertex sv = s.getVertex();
         double euclideanDistance = SphericalDistanceLibrary.fastDistance(sv.getLat(), sv.getLon(), lat, lon);
-        if (transit) {
+
+//      If transit is enabled and rental is disabled we can put lower bound on distance that must be walked.
+        if (transit && !rental) {
             if (euclideanDistance < requiredWalkDistance) {
                 return walkReluctance * euclideanDistance / maxStreetSpeed;
             }

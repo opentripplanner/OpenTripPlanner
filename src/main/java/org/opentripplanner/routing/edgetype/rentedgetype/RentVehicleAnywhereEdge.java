@@ -53,23 +53,41 @@ public class RentVehicleAnywhereEdge extends Edge {
         }
 
         if (s0.isCurrentlyRentingVehicle() && canDropoffVehicleHere(s0.getCurrentVehicle())) {
-            StateEditor stateEditor = s0.edit(this);
-            stateEditor.doneVehicleRenting();
-            return stateEditor.makeState();
-        } else if (s0.getOptions().reverseOptimizing) {
-            return null; // TODO AdamWiktor return something useful to enable reverse optimizing
+            return doneVehicleRenting(s0);
         } else {
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
-                    .filter(v -> s0.getOptions().vehiclesAllowedToRent.isRentable(v))
+                    .filter(v -> s0.getOptions().vehicleValidator.isValid(v))
                     .collect(Collectors.toList());
 
             State previous = null;
             for (VehicleDescription rentableVehicle : rentableVehicles) {
-                StateEditor next = s0.edit(this);
-                next.beginVehicleRenting(rentableVehicle);
-                previous = next.makeState().addToExistingResultChain(previous);
+                previous = beginVehicleRenting(s0, rentableVehicle).addToExistingResultChain(previous);
             }
             return previous;
         }
+    }
+
+    public State reversedTraverseDoneRenting(State s0, VehicleDescription vehicle) {
+        StateEditor next = s0.edit(this);
+        next.reversedDoneVehicleRenting(vehicle);
+        return next.makeState();
+    }
+
+    public State reversedTraverseBeginRenting(State s0) {
+        StateEditor next = s0.edit(this);
+        next.reversedBeginVehicleRenting();
+        return next.makeState();
+    }
+
+    public State beginVehicleRenting(State s0, VehicleDescription vehicle) {
+        StateEditor next = s0.edit(this);
+        next.beginVehicleRenting(vehicle);
+        return next.makeState();
+    }
+
+    public State doneVehicleRenting(State s0) {
+        StateEditor stateEditor = s0.edit(this);
+        stateEditor.doneVehicleRenting();
+        return stateEditor.makeState();
     }
 }
