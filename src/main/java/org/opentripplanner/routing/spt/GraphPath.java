@@ -74,9 +74,9 @@ public class GraphPath {
         State lastState;
         walkDistance = s.getTraverseDistanceInMeters();
         if (back) {
-            lastState = optimize ? s.optimize() : s.reverse();
+            lastState = optimize ? s.reverseAndOptimize(false) : s.reverse();
         } else {
-            lastState = optimize ? s.optimize().optimize() : s;
+            lastState = optimize ? s.reverseAndOptimize(false).reverseAndOptimize(false) : s;
         }
         // DEBUG
         // lastState = s;

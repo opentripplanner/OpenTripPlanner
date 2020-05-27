@@ -393,19 +393,33 @@ public class StateEditor {
         child.stateData.currentTraverseMode = TraverseMode.WALK;
     }
 
-    public void beginVehicleRenting(VehicleDescription vehicleDescription, RoutingRequest options) {
+    public void beginVehicleRenting(VehicleDescription vehicleDescription) {
         cloneStateDataAsNeeded();
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
         child.distanceTraversedInCurrentVehicle = 0;
-        incrementWeight(vehicleDescription.getRentTimeInSeconds() * options.rentingReluctance);
+        incrementWeight(vehicleDescription.getRentTimeInSeconds() * child.getOptions().rentingReluctance);
         incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
 
-    public void doneVehicleRenting(RoutingRequest options) {
+    public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
-        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * options.rentingReluctance);
+        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * child.getOptions().rentingReluctance);
+        child.stateData.currentTraverseMode = TraverseMode.WALK;
+        child.stateData.currentVehicle = null;
+    }
+
+    public void reversedDoneVehicleRenting(VehicleDescription vehicleDescription) {
+        cloneStateDataAsNeeded();
+        child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
+        child.stateData.currentVehicle = vehicleDescription;
+        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+    }
+
+    public void reversedBeginVehicleRenting() {
+        cloneStateDataAsNeeded();
+        incrementTimeInSeconds(child.stateData.currentVehicle.getRentTimeInSeconds());
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }

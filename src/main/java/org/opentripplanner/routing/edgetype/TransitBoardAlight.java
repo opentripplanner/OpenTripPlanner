@@ -346,7 +346,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 s0.getLastNextArrivalDelta() <= bestWait &&
                 s0.getLastNextArrivalDelta() > -1) {
                 // it is re-reversed by optimize, so this still yields a forward tree
-                State optimized = s1.makeState().optimizeOrReverse(true, true);
+                State optimized = s1.makeState().reverseAndOptimize(true);
                 if (optimized == null) LOG.error("Null optimized state. This shouldn't happen.");
                 return optimized;
             }
