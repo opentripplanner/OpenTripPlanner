@@ -9,10 +9,9 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 /**
- * Filter itineraries based on duration, compared with a walk-all-the-way itinerary(if it exist).
- * If an itinerary is not faster than the walk-all-the-way minus a given slack, then the transit
- * itinerary is removed.
- *
+ * Filter itineraries based on generalizedCost, compared with a on-street-all-the-way itinerary(if
+ * it exist). If an itinerary is slower than the best all-the-way-on-street itinerary, then the
+ * transit itinerary is removed.
  */
 public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryFilter {
 
@@ -24,8 +23,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilter implements ItineraryFilter 
     @Override
     public List<Itinerary> filter(List<Itinerary> itineraries) {
         // Find the best walk-all-the-way option
-        Optional<Itinerary> bestStreetOp = itineraries
-                .stream()
+        Optional<Itinerary> bestStreetOp = itineraries.stream()
             .filter(Itinerary::isOnStreetAllTheWay)
             .min(Comparator.comparingInt(l -> l.generalizedCost));
 

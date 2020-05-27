@@ -28,7 +28,7 @@ public class ItineraryFilterChainBuilder {
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
-    private boolean removeTransitWithHigherCostThenWalkOnly = false;
+    private boolean removeTransitWithHigherCostThenWalkOnly = true;
     private boolean debug;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -96,19 +96,21 @@ public class ItineraryFilterChainBuilder {
         this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
     }
     /**
-     * The direct street search(walking) is not pruning the transit search, so in some cases we get
-     * "silly" transit itineraries that is marginally better on travel-duration compared with a
-     * walking-all-the-way itinerary. Calling this method will enable the filter witch remove all
-     * itineraries with a generalized-cost that is higher than the best on-street-all-the-way
-     * itinerary.
+     * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
+     * cases we get "silly" transit itineraries that is marginally better on travel-duration
+     * compared with a on-street-all-the-way itinerary. Use this method to turn this filter
+     * on/off.
      * <p>
-     * The default is NOT to include this filter.
+     * The filter remove all itineraries with a generalized-cost that is higher than the best
+     * on-street-all-the-way itinerary.
+     * <p>
+     * This filter is enabled by default.
      * <p>
      * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
      * exist.
      */
-    public void removeTransitWithHigherCostThenWalkOnly() {
-        this.removeTransitWithHigherCostThenWalkOnly = true;
+    public void removeTransitWithHigherCostThanBestOnStreetOnly(boolean value) {
+        this.removeTransitWithHigherCostThenWalkOnly = value;
     }
 
     /**

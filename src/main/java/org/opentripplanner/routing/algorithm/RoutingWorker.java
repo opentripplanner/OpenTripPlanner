@@ -191,7 +191,7 @@ public class RoutingWorker {
 
         // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
         //           - exposed as a parameter in the APIs yet.
-        builder.removeTransitWithHigherCostThenWalkOnly();
+        builder.removeTransitWithHigherCostThanBestOnStreetOnly(true);
 
         if(request.debugItineraryFilter) {
             builder.debug();
