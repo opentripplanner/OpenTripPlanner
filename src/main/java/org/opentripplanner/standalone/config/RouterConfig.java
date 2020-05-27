@@ -9,7 +9,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.List;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
@@ -34,7 +33,7 @@ public class RouterConfig implements Serializable {
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
-    private final List<UpdaterConfig> updaterConfigList;
+    private final UpdaterConfig updaterConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -45,7 +44,7 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterConfigList = adapter.asList("updaters", UpdaterConfig::new);
+        this.updaterConfig = new UpdaterConfig(adapter.path("updaters"));
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -78,7 +77,7 @@ public class RouterConfig implements Serializable {
         return transitConfig;
     }
 
-    public List<UpdaterConfig> updaterConfigList() { return updaterConfigList; }
+    public UpdaterConfig updaterConfig() { return updaterConfig; }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.

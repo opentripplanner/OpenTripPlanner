@@ -29,6 +29,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
@@ -59,8 +60,8 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      */
     private Map<T2<NoteMatcher, Alert>, MatcherAndAlert> uniqueMatchers;
 
-    private final URL url;
-    private final String featureType;
+    private URL url;
+    private String featureType;
     private Query query;
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
@@ -79,12 +80,17 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
-    public WFSNotePollingGraphUpdater(Config config) throws Exception {
+    public WFSNotePollingGraphUpdater(Config config) {
         super(config);
-        url = new URL(config.getUrl());
-        featureType = config.getFeatureType();
-        LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
+        try {
+            url = new URL(config.getUrl());
+            featureType = config.getFeatureType();
+            LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
                 pollingPeriodSeconds, url.toString(), featureType);
+        } catch (MalformedURLException e) {
+            // TODO Handle this in config loading
+            LOG.warn(e.toString());
+        }
     }
 
     /**

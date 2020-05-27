@@ -77,7 +77,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriVMUpdater(Config config) throws Exception {
+    public SiriVMUpdater(Config config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();

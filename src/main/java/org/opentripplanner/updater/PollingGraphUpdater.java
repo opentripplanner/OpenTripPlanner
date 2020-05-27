@@ -1,6 +1,5 @@
 package org.opentripplanner.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,6 +97,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         return type;
     }
 
+    /**
+     * This is named PollingGraphUpdaterConfig instead of Config in order to not conflict with the
+     * config interfaces of child classes.
+     */
     public interface PollingGraphUpdaterConfig {
         UpdaterDataSourceConfig getSource();
         String getUrl();

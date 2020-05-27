@@ -12,6 +12,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -274,8 +275,12 @@ public class NodeAdapterTest {
     public void objectAsList() {
         NodeAdapter subject  = newNodeAdapterForTest("{ key : [{ a: 'I' }, { a: '2' } ] }");
 
-        List<String> result = subject.asList("key", a -> a.asText("a"));
+        List<NodeAdapter> result = subject.path("key").asList();
 
-        assertEquals("[I, 2]", result.toString());
+        String content = result.stream().map(n ->
+            n.asText("a")).collect(Collectors.joining(", ")
+        );
+
+        assertEquals("I, 2", content);
     }
 }

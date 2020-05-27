@@ -7,6 +7,15 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.UpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -20,30 +29,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
- * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
- * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
- * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
- * called "updaters". Each child element represents one updater.
+ * Sets up and starts all the graph updaters.
  *
- * When a graph is unloaded, one must ensure the shutdownGraph() method is called to clean up all resources that may
- * have been used.
- *
- * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
- * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
- * provided) configuration takes complete precedence over the embedded one: childrens properties are
- * *not* merged.
+ * Updaters are instantiated based on the updater parameters contained in UpdaterConfig. Updaters
+ * are then setup by providing the graph as a parameter. Finally, the updaters are added to the
+ * GraphUpdaterManager.
  */
 public abstract class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    public static void setupGraph(Graph graph, List<UpdaterConfig> updaterConfigList) {
+    public static void setupGraph(Graph graph, UpdaterConfig updaterConfig) {
 
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        updaters.addAll(createUpdatersFromConfig(updaterConfigList));
+        updaters.addAll(createUpdatersFromConfig(updaterConfig));
 
         setupUpdaters(graph, updaters);
         GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, updaters);
@@ -63,61 +63,42 @@ public abstract class GraphUpdaterConfigurator {
      * @return a GraphUpdaterManager containing all the created updaters
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
-        List<UpdaterConfig> configList
+        UpdaterConfig config
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (UpdaterConfig configItem : configList) {
-
-            // For each sub-node, determine which kind of updater is being created.
-            String type = configItem.getType();
-            GraphUpdater updater = null;
-
-            try {
-                if (type != null) {
-                    switch (type) {
-                        case "bike-rental":
-                            updater = new BikeRentalUpdater(configItem);
-                            break;
-                        case "bike-park":
-                            updater = new BikeParkUpdater(configItem);
-                            break;
-                        case "stop-time-updater":
-                            updater = new PollingStoptimeUpdater(configItem);
-                            break;
-                        case "websocket-gtfs-rt-updater":
-                            updater = new WebsocketGtfsRealtimeUpdater(configItem);
-                            break;
-                        case "real-time-alerts":
-                            updater = new GtfsRealtimeAlertsUpdater(configItem);
-                            break;
-                        case "example-updater":
-                            updater = new ExampleGraphUpdater(configItem);
-                            break;
-                        case "example-polling-updater":
-                            updater = new ExamplePollingGraphUpdater(configItem);
-                            break;
-                        case "winkki-polling-updater":
-                            updater = new WinkkiPollingGraphUpdater(configItem);
-                            break;
-                        case "siri-et-updater":
-                            updater = new SiriETUpdater(configItem);
-                            break;
-                        case "siri-vm-updater":
-                            updater = new SiriVMUpdater(configItem);
-                            break;
-                        case "siri-sx-updater":
-                            updater = new SiriSXUpdater(configItem);
-                            break;
-                    }
-                }
-                if (updater != null) {
-                    updaters.add(updater);
-                }
-            }
-            catch (Exception e) {
-                LOG.error("Failed to configure graph updater:" + configItem.getType(), e);
-            }
+        for (BikeRentalUpdaterConfig configItem : config.getBikeRentalUpdaterConfigList()) {
+            updaters.add(new BikeRentalUpdater(configItem));
+        }
+        for (GtfsRealtimeAlertsUpdaterConfig configItem : config.getGtfsRealtimeAlertsUpdaterConfigList()) {
+            updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
+        }
+        for (PollingStoptimeUpdaterConfig configItem : config.getPollingStoptimeUpdaterConfigList()) {
+            updaters.add(new PollingStoptimeUpdater(configItem));
+        }
+        for (SiriETUpdaterConfig configItem : config.getSiriETUpdaterConfigList()) {
+            updaters.add(new SiriETUpdater(configItem));
+        }
+        for (SiriSXUpdaterConfig configItem : config.getSiriSXUpdaterConfigList()) {
+            updaters.add(new SiriSXUpdater(configItem));
+        }
+        for (SiriVMUpdaterConfig configItem : config.getSiriVMUpdaterConfigList()) {
+            updaters.add(new SiriVMUpdater(configItem));
+        }
+        for (WebsocketGtfsRealtimeUpdaterConfig configItem : config.getWebsocketGtfsRealtimeUpdaterConfigList()) {
+            updaters.add(new WebsocketGtfsRealtimeUpdater(configItem));
+        }
+        for (PollingGraphUpdaterConfig configItem : config.getBikeParkUpdaterConfigList()) {
+            updaters.add(new BikeParkUpdater(configItem));
+        }
+        for (PollingGraphUpdaterConfig configItem : config.getExampleGraphUpdaterConfigList()) {
+            updaters.add(new ExampleGraphUpdater(configItem));
+        }
+        for (PollingGraphUpdaterConfig configItem : config.getExamplePollingGraphUpdaterConfigList()) {
+            updaters.add(new ExamplePollingGraphUpdater(configItem));
+        }
+        for (WFSNotePollingGraphUpdaterConfig configItem : config.getWinkkiPollingGraphUpdaterConfigList()) {
+            updaters.add(new WinkkiPollingGraphUpdater(configItem));
         }
 
         return updaters;

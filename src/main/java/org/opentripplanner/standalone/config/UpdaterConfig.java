@@ -1,134 +1,117 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
+import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.util.OtpAppException;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 
 /**
- * This class is an object representation of a single real-time updater in 'router-config.json'.
- * Each updater defines an inner interface with its required attributes.
+ * This class maps between the JSON array of updaters and the concrete class implementations of
+ * each updater parameters. Some updaters use the same parameters, so a map is kept between the
+ * JSON updater type strings and the appropriate updater parameter class.
  */
-public class UpdaterConfig
-    implements WebsocketGtfsRealtimeUpdater.Config,
-    GtfsRealtimeAlertsUpdater.Config,
-    PollingStoptimeUpdater.Config,
-    BikeRentalUpdater.Config,
-    SiriETUpdater.Config,
-    SiriVMUpdater.Config,
-    SiriSXUpdater.Config,
-    WFSNotePollingGraphUpdater.Config
-{
+public class UpdaterConfig {
 
-  private final String url;
-  private final int frequencySec;
-  private final String feedId;
-  private final String type;
-  private final String requestorRef;
-  private final int timeoutSec;
-  private final int reconnectPeriodSec;
-  private final String apiKey;
-  private final String network;
-  private final String networks;
-  private final int earlyStartSec;
-  private final boolean fuzzyTripMatching;
-  private final int logFrequency;
-  private final int maxSnapshotFrequencyMs;
-  private final boolean purgeExpiredData;
-  private final boolean blockReadinessUntilInitialized;
-  private final String featureType;
-  private final UpdaterDataSourceConfig source;
+  private static final String BIKE_RENTAL = "bike-rental";
+  private static final String STOP_TIME_UPDATER = "stop-time-updater";
+  private static final String WEBSOCKET_GTFS_RT_UPDATER = "websocket-gtfs-rt-updater";
+  private static final String REAL_TIME_ALERTS = "real-time-alerts";
+  private static final String BIKE_PARK = "bike-park";
+  private static final String EXAMPLE_UPDATER = "example-updater";
+  private static final String EXAMPLE_POLLING_UPDATER = "example-polling-updater";
+  private static final String WINKKI_POLLING_UPDATER = "winkki-polling-updater";
+  private static final String SIRI_ET_UPDATER = "siri-et-updater";
+  private static final String SIRI_VM_UPDATER = "siri-vm-updater";
+  private static final String SIRI_SX_UPDATER = "siri-sx-updater";
 
-  public UpdaterConfig(NodeAdapter c) {
-    this.url = c.asText("url", null);
-    this.frequencySec = c.asInt("frequencySec", 60);
-    this.feedId = c.asText("feedId", null);
-    this.type = c.asText("type", null);
-    this.requestorRef = c.asText("requestorRef", null);
-    this.timeoutSec = c.asInt("timoutSec", 0);
-    this.reconnectPeriodSec = c.asInt("reconnectPeriodSec", 0);
-    this.apiKey = c.asText("apiKey", null);
-    this.network = c.asText("network", null);
-    this.networks = c.asText("networks", "default");
-    this.earlyStartSec = c.asInt("earlyStartSec", 0);
-    this.fuzzyTripMatching = c.asBoolean("fuzzyTripMatching", false);
-    this.logFrequency = c.asInt("logFrequency", -1);
-    this.maxSnapshotFrequencyMs = c.asInt("maxSnapshotFrequencyMs", -1);
-    this.purgeExpiredData = c.asBoolean("purgeExpiredData", true);
-    this.blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
-    this.featureType = c.asText("featureType", null);
-    this.source = new UpdaterDataSourceConfig(c);
+
+  private static final Map<String, Function<NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
+
+  static {
+    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
+    CONFIG_CREATORS.put(BIKE_PARK, PollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::new);
+    CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::new);
+    CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::new);
+    CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::new);
+    CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::new);
+    CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::new);
   }
 
-  public String getUrl() {
-    return url;
+  private final Multimap<String, Object> configList = ArrayListMultimap.create();
+
+  public UpdaterConfig(NodeAdapter updaterConfigList) {
+    for (NodeAdapter conf : updaterConfigList.asList()) {
+      String type = conf.asText("type");
+      Function<NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
+      if(factory == null) {
+        throw new OtpAppException("The updater config type is unknown: " + type);
+      }
+      configList.put(type, factory.apply(conf));
+    }
   }
 
-  public int getFrequencySec() {
-    return frequencySec;
+  public List<BikeRentalUpdaterConfig> getBikeRentalUpdaterConfigList() {
+    return getConfig(BIKE_RENTAL, BikeRentalUpdaterConfig.class);
   }
 
-  public String getFeedId() {
-    return feedId;
+  public List<GtfsRealtimeAlertsUpdaterConfig> getGtfsRealtimeAlertsUpdaterConfigList() {
+    return getConfig(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig.class);
   }
 
-  public String getType() {
-    return type;
+  public List<PollingStoptimeUpdaterConfig> getPollingStoptimeUpdaterConfigList() {
+    return getConfig(WINKKI_POLLING_UPDATER, PollingStoptimeUpdaterConfig.class);
   }
 
-  public String getRequestorRef() {
-    return requestorRef;
+  public List<SiriETUpdaterConfig> getSiriETUpdaterConfigList() {
+    return getConfig(SIRI_ET_UPDATER, SiriETUpdaterConfig.class);
   }
 
-  public int getTimeoutSec() {
-    return timeoutSec;
+  public List<SiriSXUpdaterConfig> getSiriSXUpdaterConfigList() {
+    return getConfig(SIRI_SX_UPDATER, SiriSXUpdaterConfig.class);
   }
 
-  public int getReconnectPeriodSec() {
-    return reconnectPeriodSec;
+  public List<SiriVMUpdaterConfig> getSiriVMUpdaterConfigList() {
+    return getConfig(SIRI_VM_UPDATER, SiriVMUpdaterConfig.class);
   }
 
-  public String getApiKey() {
-    return apiKey;
+  public List<WebsocketGtfsRealtimeUpdaterConfig> getWebsocketGtfsRealtimeUpdaterConfigList() {
+    return getConfig(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig.class);
   }
 
-  public String getNetwork() {
-    return network;
+  public List<PollingGraphUpdaterConfig> getBikeParkUpdaterConfigList() {
+    return getConfig(BIKE_PARK, PollingGraphUpdaterConfig.class);
   }
 
-  public String getNetworks() {
-    return networks;
+  public List<PollingGraphUpdaterConfig> getExampleGraphUpdaterConfigList() {
+    return getConfig(EXAMPLE_UPDATER, PollingGraphUpdaterConfig.class);
   }
 
-  public int getEarlyStartSec() {
-    return earlyStartSec;
+  public List<PollingGraphUpdaterConfig> getExamplePollingGraphUpdaterConfigList() {
+    return getConfig(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig.class);
   }
 
-  public boolean fuzzyTripMatching() {
-    return fuzzyTripMatching;
+  public List<WFSNotePollingGraphUpdaterConfig> getWinkkiPollingGraphUpdaterConfigList() {
+    return getConfig(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig.class);
   }
 
-  public int getLogFrequency() {
-    return logFrequency;
+  private <T> List<T> getConfig(String key, Class<T> type) {
+    return (List<T>) configList.get(key);
   }
-
-  public int getMaxSnapshotFrequencyMs() {
-    return maxSnapshotFrequencyMs;
-  }
-
-  public boolean purgeExpiredData() {
-    return purgeExpiredData;
-  }
-
-  public boolean blockReadinessUntilInitialized() {
-    return blockReadinessUntilInitialized;
-  }
-
-  public String getFeatureType() { return featureType; }
-
-  public UpdaterDataSourceConfig getSource() { return source; }
 }

@@ -76,14 +76,14 @@ public class NodeAdapter {
         this.contextPath = contextPath;
     }
 
-    public <T> List<T> asList(String paramName, Function<NodeAdapter, T> factory) {
-        List<T> result = new ArrayList<>();
+    public List<NodeAdapter> asList() {
+        List<NodeAdapter> result = new ArrayList<>();
         int i = 0;
-        for (JsonNode node : param(paramName)) {
-            String pName = paramName + "[" + i + "]";
+        for (JsonNode node : json) {
+            String pName = "[" + i + "]";
             NodeAdapter child = new NodeAdapter(node, source, fullPath(pName));
             children.add(child);
-            result.add(factory.apply(child));
+            result.add(child);
             ++i;
         }
         return result;
