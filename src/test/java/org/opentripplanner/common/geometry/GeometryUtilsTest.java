@@ -7,7 +7,6 @@ import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.model.P2;
-import org.opentripplanner.model.WgsCoordinate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -204,27 +203,5 @@ public class GeometryUtilsTest {
         sequence = coordinateSequenceFactory.create(referenceCoordinates[8][1]);
         geometry = new LineString(sequence, geometryFactory);
         assertEquals(geometry, results[8][1]);
-    }
-
-
-    @Test
-    public void calculateDistance() {
-        WgsCoordinate oslo = new WgsCoordinate(59.9110583, 10.7502691);
-        WgsCoordinate bergen = new WgsCoordinate(60.394608, 5.324994);
-        int expectedDistanceInMeters = 306_000;
-
-        // Distance from Oslo to Bergen
-        assertEquals(
-            expectedDistanceInMeters,
-            GeometryUtils.calculateDistance(oslo.asJtsCoordinate(), bergen.asJtsCoordinate()),
-            50.0
-        );
-
-        // Same distance from Bergen to Oslo
-        assertEquals(
-            expectedDistanceInMeters,
-            GeometryUtils.calculateDistance(bergen.asJtsCoordinate(), oslo.asJtsCoordinate()),
-            50.0
-        );
     }
 }
