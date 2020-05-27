@@ -45,9 +45,8 @@ public class DirectStreetRouter {
       List<Itinerary> response = GraphPathToItineraryMapper.mapItineraries(paths, request);
       ItinerariesHelper.decorateItinerariesWithRequestData(response, request);
       if(!response.isEmpty()){
-        double distance = getStreetDistance(request);
-        request.setMaxWalkDistance(distance);
-        request.maxTransferWalkDistance = distance;
+        request.setMaxWalkDistance(populateMinTransitWalk(response));
+        request.maxTransferWalkDistance = populateMinTransitWalk(response);
         request.setMaxPreTransitTime(populateMinTransitTime(response));
       }
       return response;
@@ -106,5 +105,12 @@ public class DirectStreetRouter {
         .mapToInt(it -> it.durationSeconds)
         .min()
         .getAsInt();
+  }
+
+  private static double populateMinTransitWalk(List<Itinerary> itineraries) {
+    return itineraries.stream()
+        .mapToDouble(it -> it.nonTransitDistanceMeters)
+        .min()
+        .getAsDouble();
   }
 }
