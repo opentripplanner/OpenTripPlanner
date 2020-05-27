@@ -27,7 +27,7 @@ public class GroupByFilterTest {
     private GroupByFilter<GroupByLongestLegsId> createFilter(int minLimit) {
         return new GroupByFilter<>("test",
                 i -> new GroupByLongestLegsId(i, .5),
-                new SortOnWalkingArrivalAndDeparture(),
+                new OtpDefaultSortOrder(false),
                 minLimit
         );
     }
