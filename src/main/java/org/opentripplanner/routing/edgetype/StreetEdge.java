@@ -54,6 +54,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     // TODO(flamholz): do something smarter with the car speed here.
     public static final float DEFAULT_CAR_SPEED = 11.2f;
+    public static final float MOTORBIKE_MAX_EDGE_TRAVERSE_SPEED_LOWER_BOUND = 22.2f;
 
     /** If you have more than 8 flags, increase flags to short or int */
     private static final int BACK_FLAG_INDEX = 0;
@@ -197,6 +198,30 @@ public class StreetEdge extends Edge implements Cloneable {
     }
 
     /**
+     * Checks if edge is accessible considering vehicle- and edge-specific features, which were not included
+     * as permissions. Placeholder for all similar additional limitations added in future.
+     *
+     * @param vehicle
+     * @return
+     */
+    private boolean canTraverse(VehicleDescription vehicle) {
+        if (Objects.nonNull(vehicle)) {
+            switch (vehicle.getVehicleType()) {
+                case MOTORBIKE:
+                    if (this.getMaxStreetTraverseSpeed() > MOTORBIKE_MAX_EDGE_TRAVERSE_SPEED_LOWER_BOUND) {
+                        //If maximum traverse speed > 80 km/h, motorbikes are not allowed
+                        return false;
+                    }
+                    break;
+                default:
+                    break;
+            }
+        }
+
+        return true;
+    }
+
+    /**
      * This checks if start or end vertex is bollard
      * If it is it creates intersection of street edge permissions
      * and from/to barriers.
@@ -273,8 +298,9 @@ public class StreetEdge extends Edge implements Cloneable {
         backWalkingBike &= TraverseMode.WALK.equals(backMode);
         walkingBike &= TraverseMode.WALK.equals(traverseMode);
 
-        /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike. */
-        if (!canTraverse(options, traverseMode) && !(canWalkBike(traverseMode, options))) {
+        /* Check whether this street allows the current mode. If not and we are biking, attempt to walk the bike.
+         * Then check, whether there are no vehicle-specific limitations for this street.*/
+        if ((!canTraverse(options, traverseMode) && !(canWalkBike(traverseMode, options))) || !canTraverse(s0.getCurrentVehicle())) {
             return null;
         }
         /* We have to check whether we have enough fuel left in our vehicle*/
