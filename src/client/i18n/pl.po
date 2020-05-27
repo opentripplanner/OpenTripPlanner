@@ -4,7 +4,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OpenTripPlanner 0.19.0\n"
 "Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2020-05-20 13:10+0200\n"
+"POT-Creation-Date: 2020-05-28 00:49+0200\n"
 "PO-Revision-Date: 2016-03-10 21:02+0100\n"
 "Last-Translator: Piotr Tekieli <p.s.tekieli@student.tudelft.nl>\n"
 "Language: pl\n"
@@ -17,59 +17,73 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.8.0\n"
 
-#: src/client/js/otp/config.js:297
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:296
 msgid "Transit"
 msgstr "komunikacją publiczną"
 
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
 #: src/client/js/otp/config.js:298
 msgid "Bus Only"
 msgstr "wyłącznie autobusami"
 
-#: src/client/js/otp/config.js:299
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:300
 msgid "Rail Only"
 msgstr "wyłącznie koleją"
 
-#: src/client/js/otp/config.js:300
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:302
 msgid "Airplane Only"
 msgstr ""
 
-#: src/client/js/otp/config.js:301
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:304
 msgid "Transit, No Airplane"
 msgstr ""
 
-#: src/client/js/otp/config.js:302
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:306
 msgid "Bicycle Only"
 msgstr "wyłącznie rowerem"
 
-#: src/client/js/otp/config.js:303
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:308
 msgid "Bicycle &amp; Transit"
 msgstr "rowerem & komunikacją publiczną"
 
-#: src/client/js/otp/config.js:304
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:310
 msgid "Walk Only"
 msgstr "wyłącznie pieszo"
 
-#: src/client/js/otp/config.js:305
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:312
 msgid "Drive Only"
 msgstr "wyłącznie osobistym pojazdem"
 
-#: src/client/js/otp/config.js:306
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:314
 msgid "Park and Ride"
 msgstr "schemat P+R (Park and Ride)"
 
-#: src/client/js/otp/config.js:307
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:316
 msgid "Kiss and Ride"
 msgstr "schemat K+R (Kiss and Ride)"
 
-#: src/client/js/otp/config.js:308
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:318
 msgid "Bike and Ride"
 msgstr "schemat B+R (Bike and Ride)"
 
-#: src/client/js/otp/config.js:313
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:324
 msgid "Rented Bicycle"
 msgstr "wypożyczonym rowerem"
 
-#: src/client/js/otp/config.js:314
+#. Travel by: mode of transport (Used in selection in Travel Options widgets)
+#: src/client/js/otp/config.js:326
 msgid "Transit & Rented Bicycle"
 msgstr "kom. publiczną & wypoż. rowerem"
 
@@ -1270,4 +1284,7 @@ msgstr "wypożyczonego roweru"
 #: src/client/js/otp/widgets/tripoptions/TripOptionsWidget.js:1134
 msgid "Plan Your Trip"
 msgstr "Zaplanuj swoją podróż"
+
+#~ msgid "Transit, No Airplane"
+#~ msgstr ""
 
