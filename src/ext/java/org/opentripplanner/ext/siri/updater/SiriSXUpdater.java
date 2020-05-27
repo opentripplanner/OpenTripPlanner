@@ -44,7 +44,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
-    public SiriSXUpdater(Config config) {
+    public SiriSXUpdater(Parameters config) {
         super(config);
         // TODO: add options to choose different patch services
         String url = config.getUrl();
@@ -168,7 +168,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         return "SiriSXUpdater (" + url + ")";
     }
 
-    public interface Config extends PollingGraphUpdaterConfig {
+    public interface Parameters extends PollingGraphUpdaterParameters {
         String getUrl();
         String getRequestorRef();
         int getEarlyStartSec();

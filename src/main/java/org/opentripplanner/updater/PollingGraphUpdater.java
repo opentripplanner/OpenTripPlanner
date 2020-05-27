@@ -48,7 +48,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     private String type;
 
     /** Shared configuration code for all polling graph updaters. */
-    public PollingGraphUpdater(PollingGraphUpdaterConfig config) {
+    public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
         pollingPeriodSeconds = config.getFrequencySec();
         type = config.getSource().getName();
     }
@@ -101,7 +101,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      * This is named PollingGraphUpdaterConfig instead of Config in order to not conflict with the
      * config interfaces of child classes.
      */
-    public interface PollingGraphUpdaterConfig {
+    public interface PollingGraphUpdaterParameters {
         UpdaterDataSourceConfig getSource();
         String getUrl();
         int getFrequencySec();

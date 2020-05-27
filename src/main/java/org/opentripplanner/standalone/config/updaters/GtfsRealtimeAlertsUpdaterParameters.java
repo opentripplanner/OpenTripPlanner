@@ -3,9 +3,9 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 
-public class GtfsRealtimeAlertsUpdaterConfig
-    extends PollingGraphUpdaterConfig
-    implements GtfsRealtimeAlertsUpdater.Config {
+public class GtfsRealtimeAlertsUpdaterParameters
+    extends PollingGraphUpdaterParameters
+    implements GtfsRealtimeAlertsUpdater.Parameters {
 
   private final int earlyStartSec;
 
@@ -13,7 +13,7 @@ public class GtfsRealtimeAlertsUpdaterConfig
 
   private final boolean fuzzyTripMatching;
 
-  public GtfsRealtimeAlertsUpdaterConfig(NodeAdapter c)
+  public GtfsRealtimeAlertsUpdaterParameters(NodeAdapter c)
   {
     super(c);
     earlyStartSec = c.asInt("earlyStartSec", 0);

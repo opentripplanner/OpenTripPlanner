@@ -4,7 +4,8 @@ import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 import org.opentripplanner.updater.PollingGraphUpdater;
 
-public class PollingGraphUpdaterConfig implements PollingGraphUpdater.PollingGraphUpdaterConfig {
+public class PollingGraphUpdaterParameters
+    implements PollingGraphUpdater.PollingGraphUpdaterParameters {
 
   private final UpdaterDataSourceConfig source;
 
@@ -12,7 +13,7 @@ public class PollingGraphUpdaterConfig implements PollingGraphUpdater.PollingGra
 
   private final int frequencySec;
 
-  public PollingGraphUpdaterConfig(NodeAdapter c) {
+  public PollingGraphUpdaterParameters(NodeAdapter c) {
     source = new UpdaterDataSourceConfig(c);
     url = c.asText("url", null);
     frequencySec = c.asInt("frequencySec", 60);

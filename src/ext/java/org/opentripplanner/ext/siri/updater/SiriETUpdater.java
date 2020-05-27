@@ -66,7 +66,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriETUpdater(Config config) {
+    public SiriETUpdater(Parameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -151,7 +151,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
         return "Polling SIRI ET updater with update source = " + s;
     }
 
-    public interface Config extends PollingGraphUpdaterConfig {
+    public interface Parameters extends PollingGraphUpdaterParameters {
         String getFeedId();
         int getLogFrequency();
         int getMaxSnapshotFrequencyMs();

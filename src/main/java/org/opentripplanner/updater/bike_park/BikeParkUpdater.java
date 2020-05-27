@@ -47,7 +47,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService bikeService;
 
-    public BikeParkUpdater(PollingGraphUpdaterConfig config) {
+    public BikeParkUpdater(PollingGraphUpdaterParameters config) {
         super(config);
         // Set source from preferences
         String sourceType = config.getSource().getName();

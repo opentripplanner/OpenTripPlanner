@@ -2,7 +2,6 @@ package org.opentripplanner.updater.street_notes;
 
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.Date;
@@ -23,7 +22,7 @@ import java.util.Date;
 
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
-    public WinkkiPollingGraphUpdater(Config config) {
+    public WinkkiPollingGraphUpdater(Parameters config) {
         super(config);
     }
 

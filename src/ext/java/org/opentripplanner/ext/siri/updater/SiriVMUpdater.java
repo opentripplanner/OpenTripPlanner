@@ -77,7 +77,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriVMUpdater(Config config) {
+    public SiriVMUpdater(Parameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -169,7 +169,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         return "Polling SIRI VM updater with update source = " + s;
     }
 
-    public interface Config extends PollingGraphUpdaterConfig {
+    public interface Parameters extends PollingGraphUpdaterParameters {
         String getFeedId();
         int getLogFrequency();
         int getMaxSnapshotFrequencyMs();

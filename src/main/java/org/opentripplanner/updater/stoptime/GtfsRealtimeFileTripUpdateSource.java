@@ -32,7 +32,7 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
      */
     private final String feedId;
 
-    public GtfsRealtimeFileTripUpdateSource(GtfsRealtimeFileTripUpdateSourceConfig config) {
+    public GtfsRealtimeFileTripUpdateSource(GtfsRealtimeFileTripUpdateSourceParameters config) {
         this.feedId = getFeedId();
         this.file = new File(config.getFile());
     }
@@ -84,7 +84,8 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
         return this.feedId;
     }
 
-    public interface GtfsRealtimeFileTripUpdateSourceConfig extends PollingStoptimeUpdater.Config {
+    public interface GtfsRealtimeFileTripUpdateSourceParameters
+        extends PollingStoptimeUpdater.Parameters {
         String getFile();
     }
 }

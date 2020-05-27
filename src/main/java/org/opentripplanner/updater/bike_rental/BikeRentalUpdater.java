@@ -42,7 +42,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private final String network;
 
-    public BikeRentalUpdater(Config config) throws IllegalArgumentException {
+    public BikeRentalUpdater(Parameters config) throws IllegalArgumentException {
         super(config);
 
         // Set data source type from config JSON
@@ -217,7 +217,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         }
     }
 
-    public interface Config extends PollingGraphUpdaterConfig {
+    public interface Parameters extends PollingGraphUpdaterParameters {
         String getNetwork();
         String getNetworks();
         String getApiKey();

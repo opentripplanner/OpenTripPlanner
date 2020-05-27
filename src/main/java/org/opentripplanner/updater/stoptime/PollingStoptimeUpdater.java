@@ -65,7 +65,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
      */
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    public PollingStoptimeUpdater(Config config) {
+    public PollingStoptimeUpdater(Parameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
@@ -75,7 +75,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
                 updateSource = new GtfsRealtimeHttpTripUpdateSource(config);
             } else if (sourceType.equals("gtfs-file")) {
                 updateSource = new GtfsRealtimeFileTripUpdateSource(
-                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceConfig) config
+                    (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceParameters) config
                 );
             }
         }
@@ -158,7 +158,7 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         return "Streaming stoptime updater with update source = " + s;
     }
 
-    public interface Config extends PollingGraphUpdaterConfig {
+    public interface Parameters extends PollingGraphUpdaterParameters {
         String getFeedId();
         int getLogFrequency();
         int getMaxSnapshotFrequencyMs();

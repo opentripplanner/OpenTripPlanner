@@ -2,15 +2,15 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriETUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
@@ -41,17 +41,17 @@ public class UpdaterConfig {
   private static final Map<String, Function<NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
-    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
-    CONFIG_CREATORS.put(BIKE_PARK, PollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::new);
-    CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::new);
-    CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::new);
-    CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::new);
-    CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::new);
-    CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::new);
+    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterParameters::new);
+    CONFIG_CREATORS.put(BIKE_PARK, PollingGraphUpdaterParameters::new);
+    CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterParameters::new);
+    CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterParameters::new);
+    CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterParameters::new);
+    CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterParameters::new);
+    CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterParameters::new);
+    CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterParameters::new);
+    CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterParameters::new);
+    CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterParameters::new);
+    CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterParameters::new);
   }
 
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
@@ -67,51 +67,51 @@ public class UpdaterConfig {
     }
   }
 
-  public List<BikeRentalUpdaterConfig> getBikeRentalUpdaterConfigList() {
-    return getConfig(BIKE_RENTAL, BikeRentalUpdaterConfig.class);
+  public List<BikeRentalUpdaterParameters> getBikeRentalParameters() {
+    return getParameters(BIKE_RENTAL, BikeRentalUpdaterParameters.class);
   }
 
-  public List<GtfsRealtimeAlertsUpdaterConfig> getGtfsRealtimeAlertsUpdaterConfigList() {
-    return getConfig(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig.class);
+  public List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters() {
+    return getParameters(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterParameters.class);
   }
 
-  public List<PollingStoptimeUpdaterConfig> getPollingStoptimeUpdaterConfigList() {
-    return getConfig(WINKKI_POLLING_UPDATER, PollingStoptimeUpdaterConfig.class);
+  public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
+    return getParameters(WINKKI_POLLING_UPDATER, PollingStoptimeUpdaterParameters.class);
   }
 
-  public List<SiriETUpdaterConfig> getSiriETUpdaterConfigList() {
-    return getConfig(SIRI_ET_UPDATER, SiriETUpdaterConfig.class);
+  public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
+    return getParameters(SIRI_ET_UPDATER, SiriETUpdaterParameters.class);
   }
 
-  public List<SiriSXUpdaterConfig> getSiriSXUpdaterConfigList() {
-    return getConfig(SIRI_SX_UPDATER, SiriSXUpdaterConfig.class);
+  public List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters() {
+    return getParameters(SIRI_SX_UPDATER, SiriSXUpdaterParameters.class);
   }
 
-  public List<SiriVMUpdaterConfig> getSiriVMUpdaterConfigList() {
-    return getConfig(SIRI_VM_UPDATER, SiriVMUpdaterConfig.class);
+  public List<SiriVMUpdaterParameters> getSiriVMUpdaterParameters() {
+    return getParameters(SIRI_VM_UPDATER, SiriVMUpdaterParameters.class);
   }
 
-  public List<WebsocketGtfsRealtimeUpdaterConfig> getWebsocketGtfsRealtimeUpdaterConfigList() {
-    return getConfig(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig.class);
+  public List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters() {
+    return getParameters(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterParameters.class);
   }
 
-  public List<PollingGraphUpdaterConfig> getBikeParkUpdaterConfigList() {
-    return getConfig(BIKE_PARK, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
+    return getParameters(BIKE_PARK, PollingGraphUpdaterParameters.class);
   }
 
-  public List<PollingGraphUpdaterConfig> getExampleGraphUpdaterConfigList() {
-    return getConfig(EXAMPLE_UPDATER, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
+    return getParameters(EXAMPLE_UPDATER, PollingGraphUpdaterParameters.class);
   }
 
-  public List<PollingGraphUpdaterConfig> getExamplePollingGraphUpdaterConfigList() {
-    return getConfig(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
+    return getParameters(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterParameters.class);
   }
 
-  public List<WFSNotePollingGraphUpdaterConfig> getWinkkiPollingGraphUpdaterConfigList() {
-    return getConfig(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig.class);
+  public List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters() {
+    return getParameters(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterParameters.class);
   }
 
-  private <T> List<T> getConfig(String key, Class<T> type) {
+  private <T> List<T> getParameters(String key, Class<T> type) {
     return (List<T>) configList.get(key);
   }
 }

@@ -31,7 +31,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     private final String url;
 
     public GtfsRealtimeHttpTripUpdateSource(
-        PollingStoptimeUpdater.Config config) {
+        PollingStoptimeUpdater.Parameters config) {
         this.feedId = config.getFeedId();
         this.url = config.getUrl();
     }

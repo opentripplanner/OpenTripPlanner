@@ -3,7 +3,8 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class SiriSXUpdaterConfig extends PollingGraphUpdaterConfig implements SiriSXUpdater.Config {
+public class SiriSXUpdaterParameters extends PollingGraphUpdaterParameters
+    implements SiriSXUpdater.Parameters {
 
   private final String url;
   private final String requestorRef;
@@ -12,7 +13,7 @@ public class SiriSXUpdaterConfig extends PollingGraphUpdaterConfig implements Si
   private final int timeoutSec;
   private final boolean blockReadinessUntilInitialized;
 
-  public SiriSXUpdaterConfig(NodeAdapter c) {
+  public SiriSXUpdaterParameters(NodeAdapter c) {
     super(c);
     url = c.asText("url", null);
     requestorRef = c.asText("requestorRef", null);
