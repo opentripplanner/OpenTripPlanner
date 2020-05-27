@@ -1,31 +1,41 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterChain;
+import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LongTransitWalkingFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnWalkingArrivalAndDeparture;
 import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.stream.Collectors;
 
 
 /**
  * Create a filter chain based on the given config.
  */
 public class ItineraryFilterChainBuilder {
+    private final boolean arriveBy;
     private double groupByP = 0.68;
     private int minLimit = 3;
     private int maxLimit = 20;
     private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
     private boolean debug;
+    private Consumer<Itinerary> maxLimitReachedSubscriber;
+
+
+    /** @param arriveBy Used to set the correct sort order.  */
+    public ItineraryFilterChainBuilder(boolean arriveBy) {
+        this.arriveBy = arriveBy;
+    }
 
     /**
      * Max departure time. This is a absolute filter on the itinerary departure time from the
@@ -72,6 +82,20 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
+     * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
+     * To get notified about this a subscriber can be added. The first itinerary removed by the
+     * {@code maxLimit} is retuned. The 'maxLimit' check is last thing happening in the
+     * filter-chain after the final sort. So, if another filter remove an itinerary, the
+     * itinerary is not considered with the respect to this feature.
+     *
+     * @param maxLimitReachedSubscriber the subscriber to notify in case any elements are removed.
+     *                                  Only the first element removed is passed to the subscriber.
+     */
+    public void setMaxLimitReachedSubscriber(Consumer<Itinerary> maxLimitReachedSubscriber) {
+        this.maxLimitReachedSubscriber = maxLimitReachedSubscriber;
+    }
+
+    /**
      * This will NOT delete itineraries, but tag them as deleted using the
      * {@link Itinerary#systemNotices}.
      */
@@ -80,7 +104,7 @@ public class ItineraryFilterChainBuilder {
     }
 
     public ItineraryFilter build() {
-        final List<ItineraryFilter> filters = new ArrayList<>();
+        List<ItineraryFilter> filters = new ArrayList<>();
 
         filters.add(new LongTransitWalkingFilter());
 
@@ -96,13 +120,25 @@ public class ItineraryFilterChainBuilder {
         }
 
         // Sort itineraries
-        filters.add(new SortOnWalkingArrivalAndDeparture());
+        filters.add(new OtpDefaultSortOrder(arriveBy));
 
         // Remove itineraries if max limit is exceeded
         if (maxLimit >= minLimit) {
-            filters.add(new MaxLimitFilter("MAX", maxLimit));
+            filters.add(new MaxLimitFilter("MAX", maxLimit, maxLimitReachedSubscriber));
         }
 
-        return debug ? new DebugFilterChain(filters) : new FilterChain(filters);
+        if(debug) {
+            filters = addDebugWrappers(filters);
+        }
+
+        return new FilterChain(filters);
+    }
+
+
+    /* private methods */
+
+    private List<ItineraryFilter> addDebugWrappers(List<ItineraryFilter> filters) {
+        final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
+        return filters.stream().map(factory::wrap).collect(Collectors.toList());
     }
 }

@@ -58,7 +58,7 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -67,12 +67,10 @@ import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.error.VertexNotFoundException;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.request.StreetMode;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TranslatedString;
@@ -97,9 +95,9 @@ import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.model.StopPattern.PICKDROP_COORDINATE_WITH_DRIVER;
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -2901,8 +2899,10 @@ public class TransmodelIndexGraphQLSchema {
                                                         .equalsIgnoreCase(environment.getArgument("authority")))
                                         .sorted(Comparator.comparing(s -> s.distance))
                                         .collect(Collectors.toList());
-                            } catch (VertexNotFoundException e) {
-                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
+                            } catch (RoutingValidationException e) {
+                                LOG.warn(
+                                    "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
+                                    e);
                                 stops = Collections.emptyList();
                             }
 
@@ -3995,8 +3995,15 @@ public class TransmodelIndexGraphQLSchema {
                 .description("Trips search metadata.")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("searchWindowUsed")
-                        .description("The search-window used in the current trip request. Unit: minutes.")
-                        .type(Scalars.GraphQLInt)
+                        .description(
+                            "The search-window used in the current trip request. Use the value in "
+                                + "the next request and set the request 'dateTime' to "
+                                + "'nextDateTime' or 'prevDateTime' to get the previous/next "
+                                + "\"window\" of results. No duplicate trips should be returned, "
+                                + "unless a trip is delayed and new realtime-data is available."
+                                + "Unit: minutes."
+                        )
+                        .type(new GraphQLNonNull(Scalars.GraphQLInt))
                         .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).searchWindowUsed.toMinutes())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -4005,9 +4012,7 @@ public class TransmodelIndexGraphQLSchema {
                                 "This is the suggested search time for the \"next page\" or time "
                                 + "window. Insert it together with the 'searchWindowUsed' in the "
                                 + "request to get a new set of trips following in the time-window "
-                                + "AFTER the current search. No duplicate trips should be "
-                                + "returned, unless a trip is delayed and new realtime-data is "
-                                + "available."
+                                + "AFTER the current search."
                         )
                         .type(dateTimeScalar)
                         .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).nextDateTime.toEpochMilli())
@@ -4018,9 +4023,7 @@ public class TransmodelIndexGraphQLSchema {
                                 "This is the suggested search time for the \"previous page\" or "
                                 + "time-window. Insert it together with the 'searchWindowUsed' in "
                                 + "the request to get a new set of trips preceding in the "
-                                + "time-window BEFORE the current search. No duplicate trips "
-                                + "should be returned, unless a trip is delayed and new "
-                                + "realtime-data is available."
+                                + "time-window BEFORE the current search."
                         )
                         .type(dateTimeScalar)
                         .dataFetcher(e -> ((TripSearchMetadata) e.getSource()).prevDateTime.toEpochMilli())
