@@ -207,7 +207,7 @@ public class ToStringBuilderTest {
                 subject().addDuration("d", (26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
-            "ToStringBuilderTest{d:2m5s}",
+            "ToStringBuilderTest{d: 2m5s}",
             subject().addDuration("d", Duration.ofSeconds(125)).toString()
         );
 

@@ -120,7 +120,12 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     }
 
     /**
-     * Calculate the relative cost of for two paths on-board a trip.
+     * Calculate a cost for riding a trip. It should include the cost from the beginning of the
+     * journey all the way until a trip is boarded. The cost is used to compare trips boarding
+     * the same pattern with the same number of transfers. It is ok for the cost to be relative
+     * to any point in place or time - as long as it can be used to compare to paths that started
+     * at the origin in the same iteration, having used the same number-of-rounds to board the same
+     * trip.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
      * @param boardWaitTime the wait-time at the board stop before boarding.
@@ -134,7 +139,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         int relativeTransitTime,
         int boardWaitTime
     ) {
-        return costCalculator.onTripRelativeCost(
+        return costCalculator.onTripRidingCost(
             prevArrival.cost(),
             boardWaitTime,
             relativeTransitTime,

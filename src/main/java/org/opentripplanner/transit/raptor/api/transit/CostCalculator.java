@@ -23,7 +23,7 @@ public interface CostCalculator {
      * @param boardStop The stop where the pattern is boarded
      *
      */
-    int onTripRelativeCost(
+    int onTripRidingCost(
         int prevStopArrivalCost, int boardWaitTime, int relativeTransitTime, int boardStop
     );
 
