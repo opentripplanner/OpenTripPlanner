@@ -13,6 +13,9 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import static java.util.Collections.emptySet;
 import static java.util.Collections.singleton;
 import static org.junit.Assert.*;
+import static org.mockito.Matchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 public class RentVehicleAnywhereEdgeTest {
 
@@ -80,7 +83,10 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singleton(FuelType.FOSSIL), emptySet(), emptySet(), emptySet());
+        request.vehicleValidator = mock(VehicleValidator.class);
+        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(false);
+        when(request.vehicleValidator.isValid(CAR_2)).thenReturn(true);
+
         // when
         State traversed = edge.traverse(s);
 
@@ -97,7 +103,9 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_1);
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
-        request.vehiclesAllowedToRent = new VehicleDetailsSet(singleton(FuelType.ELECTRIC), singleton(Gearbox.MANUAL), emptySet(), emptySet());
+        request.vehicleValidator = mock(VehicleValidator.class);
+        when(request.vehicleValidator.isValid(any())).thenReturn(false);
+
         // when
         State traversed = edge.traverse(s);
 
