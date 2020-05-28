@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.KmlBikeParkSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceParameters;
@@ -62,7 +63,7 @@ public class UpdaterDataSourceConfig {
     CONFIG_CREATORS.put(SIRI_ET, SiriETHttpTripUpdaterSourceParameters::new);
     CONFIG_CREATORS.put(SIRI_VM, SiriVMHttpTripUpdaterSourceParameters::new);
     CONFIG_CREATORS.put(SIRI_SX, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(KML_BIKE_PARK, GenericKmlBikeRentalSourceParameters::new);
+    CONFIG_CREATORS.put(KML_BIKE_PARK, KmlBikeParkSourceParameters::new);
   }
 
   private final String type;
