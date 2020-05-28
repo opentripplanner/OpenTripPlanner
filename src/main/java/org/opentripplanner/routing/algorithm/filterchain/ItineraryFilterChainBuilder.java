@@ -7,6 +7,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByLegDista
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
+import org.opentripplanner.routing.algorithm.filterchain.filters.ReduceTimeTableVariationFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 
 import java.time.Instant;
@@ -20,12 +21,19 @@ import java.util.stream.Collectors;
  * Create a filter chain based on the given config.
  */
 public class ItineraryFilterChainBuilder {
+    /**
+     * Use a BIG negative number as unset value to prevent collisions with real values and
+     * accidental overflow.
+      */
+    private static final int NOT_SET = -999_999;
+
     private final boolean arriveBy;
     private double groupByP = 0.68;
     private int minLimit = 3;
     private int maxLimit = 20;
     private Instant latestDepartureTimeLimit = null;
     private boolean removeTransitWithHigherCostThenWalkOnly = true;
+    private int shortTransitSlackInSeconds = NOT_SET;
     private boolean debug;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -103,6 +111,27 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
+     * If the time-table-view is enabled, the result may contain similar itineraries where only the
+     * first and/or last legs are different. This can happen by walking to/from another stop,
+     * saving some time, but getting a higher generalized-cost; Or, by taking a short ride.
+     * Setting the {@code shortTransitSlackInSeconds} will remove these itineraries an keep only
+     * the itineraries with the lowest generalized-cost.
+     * <p>
+     * When the {@code shortTransitSlackInSeconds} is set, itineraries are grouped by the "main"
+     * transit legs. The first and/or last leg is skipped if the duration is less than the given
+     * value. Than for each group of itineraries the itinerary with the lowest generalized-cost
+     * is kept. All other itineraries are dropped.
+     * <p>
+     * The default is NOT_SET(any negative number), witch will disable the filter.
+     * <p>
+     * Normally, we want some variation, so a good value to use for this parameter is the combined
+     * cost of board- and alight-cost including indirect cost from board- and alight-slack.
+     */
+    public void setShortTransitSlackInSeconds(int shortTransitSlackInSeconds) {
+        this.shortTransitSlackInSeconds = shortTransitSlackInSeconds;
+    }
+
+    /**
      * This will NOT delete itineraries, but tag them as deleted using the
      * {@link Itinerary#systemNotices}.
      */
@@ -115,6 +144,10 @@ public class ItineraryFilterChainBuilder {
 
         if(removeTransitWithHigherCostThenWalkOnly) {
             filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
+        }
+
+        if(shortTransitSlackInSeconds > 0) {
+            filters.add(new ReduceTimeTableVariationFilter(shortTransitSlackInSeconds));
         }
 
         filters.add(new GroupByLegDistanceFilter(groupByP, minLimit, arriveBy));
