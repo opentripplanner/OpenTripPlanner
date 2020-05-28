@@ -3,13 +3,11 @@ package org.opentripplanner.routing.algorithm.filterchain;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
-import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByLegDistanceFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
-import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
-import org.opentripplanner.routing.algorithm.filterchain.filters.SortOnGeneralizedCost;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
+import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
 
 import java.time.Instant;
 import java.util.ArrayList;
@@ -26,7 +24,6 @@ public class ItineraryFilterChainBuilder {
     private double groupByP = 0.68;
     private int minLimit = 3;
     private int maxLimit = 20;
-    private int groupByTransferCost = 10 * 60;
     private Instant latestDepartureTimeLimit = null;
     private boolean removeTransitWithHigherCostThenWalkOnly = true;
     private boolean debug;
@@ -75,14 +72,6 @@ public class ItineraryFilterChainBuilder {
     }
 
     /**
-     * The group-by-legs filter filter each group based on 'generalized-cost' and
-     * 'transfer-cost'. The unit is equivalent to the cost of "one transit second".
-     */
-    public void setGroupByTransferCost(int cost) {
-        groupByTransferCost = cost;
-    }
-
-    /**
      * If the maximum number of itineraries is exceeded, then the excess itineraries are removed.
      * To get notified about this a subscriber can be added. The first itinerary removed by the
      * {@code maxLimit} is retuned. The 'maxLimit' check is last thing happening in the
@@ -128,12 +117,7 @@ public class ItineraryFilterChainBuilder {
             filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
         }
 
-        filters.add(new GroupByFilter<>(
-                "groupBy-legs-filter-on-cost",
-                it -> new GroupByLongestLegsId(it, groupByP),
-                new SortOnGeneralizedCost(groupByTransferCost),
-                minLimit
-        ));
+        filters.add(new GroupByLegDistanceFilter(groupByP, minLimit, arriveBy));
 
         if (latestDepartureTimeLimit != null) {
             filters.add(new LatestDepartureTimeFilter(latestDepartureTimeLimit));

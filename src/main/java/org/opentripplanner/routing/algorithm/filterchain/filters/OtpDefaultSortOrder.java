@@ -39,15 +39,8 @@ public class OtpDefaultSortOrder implements ItineraryFilter {
    * with walking/bicycle/car from origin all the way to the destination, than it will be sorted
    * before any itineraries with one or more transit legs.
    */
-  static final Comparator<Itinerary> STREET_ONLY_FIRST = (a, b) -> {
-    boolean i1 = a.isOnStreetAllTheWay();
-    boolean i2 = b.isOnStreetAllTheWay();
-
-        if (i1 && !i2) { return -1; }
-        if (!i1 && i2) { return 1; }
-
-    return 0;
-  };
+  static final Comparator<Itinerary> STREET_ONLY_FIRST
+      = (a, b) -> Boolean.compare(b.isOnStreetAllTheWay(), a.isOnStreetAllTheWay());
 
   /** Sort latest arrival-time first */
   static final Comparator<Itinerary> ARRIVAL_TIME = Comparator.comparing(Itinerary::endTime);
@@ -66,15 +59,18 @@ public class OtpDefaultSortOrder implements ItineraryFilter {
         NUM_OF_TRANSFERS,
         arriveBy ? ARRIVAL_TIME : DEPARTURE_TIME
     );
-    }
+  }
 
-    @Override
-    public String name() {
+  @Override
+  public String name() {
         return "otp-default-sort-order";
     }
 
-    @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
+  @Override
+  public List<Itinerary> filter(List<Itinerary> itineraries) {
     return itineraries.stream().sorted(sortComparator).collect(Collectors.toList());
-    }
+  }
+
+  @Override
+  public boolean removeItineraries() { return false; }
 }

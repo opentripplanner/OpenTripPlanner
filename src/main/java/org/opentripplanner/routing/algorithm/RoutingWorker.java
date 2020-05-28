@@ -74,7 +74,7 @@ public class RoutingWorker {
             long startTimeFiltering = System.currentTimeMillis();
 
             // Filter itineraries
-            List<Itinerary> filteredItineraries = filterChain().filter(itineraries);
+            List<Itinerary> filteredItineraries = filterItineraries(itineraries);
 
             LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
             LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
@@ -181,11 +181,10 @@ public class RoutingWorker {
         return itineraries;
     }
 
-    private ItineraryFilter filterChain() {
+    private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
         ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
-        builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
         builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
 
@@ -197,7 +196,9 @@ public class RoutingWorker {
             builder.debug();
         }
 
-        return builder.build();
+        ItineraryFilter filterChain = builder.build();
+
+        return filterChain.filter(itineraries);
     }
 
     private void verifyEgressAccess(

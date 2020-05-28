@@ -29,8 +29,6 @@ public class LatestDepartureTimeFilter implements ItineraryFilter {
     }
 
     @Override
-    public boolean removeItineraries() {
-        return true;
-    }
+    public boolean removeItineraries() { return true; }
 
 }

@@ -44,12 +44,10 @@ public interface ItineraryFilter {
     /**
      * Return {@code true} if the filter removes itineraries from the input list
      * in the {@link #filter(List)} method, or {@code false} if no itineraries are
-     * deleted.
+     * deleted. Filters that sort the list or chane the itineraries should return
+     * {@code false}.
      * <p>
-     * The default implementation returns {@code false}, make sure to override this in every
-     * filter that deletes itineraries from the given input list.
+     * This is used by the debug functionality, each
      */
-    default boolean removeItineraries() {
-        return false;
-    }
+    boolean removeItineraries();
 }
