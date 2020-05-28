@@ -60,7 +60,7 @@ public abstract class GraphUpdaterConfigurator {
     }
 
     /**
-     * @return a GraphUpdaterManager containing all the created updaters
+     * @return a list of GraphUpdaters created from the configuration
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
         UpdaterConfig config
