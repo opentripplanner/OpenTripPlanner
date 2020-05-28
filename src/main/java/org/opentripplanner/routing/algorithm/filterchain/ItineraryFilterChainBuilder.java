@@ -165,7 +165,7 @@ public class ItineraryFilterChainBuilder {
         }
 
         if(debug) {
-            filters = addDebugWrppers(filters);
+            filters = addDebugWrappers(filters);
         }
 
         return new FilterChain(filters);
@@ -174,7 +174,7 @@ public class ItineraryFilterChainBuilder {
 
     /* private methods */
 
-    private List<ItineraryFilter> addDebugWrppers(List<ItineraryFilter> filters) {
+    private List<ItineraryFilter> addDebugWrappers(List<ItineraryFilter> filters) {
         final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
         return filters.stream().map(factory::wrap).collect(Collectors.toList());
     }

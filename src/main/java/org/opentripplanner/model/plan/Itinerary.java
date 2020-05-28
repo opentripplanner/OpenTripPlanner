@@ -184,7 +184,7 @@ public class Itinerary {
      * response if explicit asked for in the request.
      * <p>
      * For example when tuning or manually testing the itinerary-filter-chain it you can enable
-     * the {@link org.opentripplanner.routing.request.RoutingRequest#debugItineraryFilter} and instead
+     * the {@link org.opentripplanner.routing.api.request.RoutingRequest#debugItineraryFilter} and instead
      * of removing itineraries from the result the itineraries would be tagged by the filters
      * instead. This enable investigating, why an expected itinerary is missing from the result
      * set.

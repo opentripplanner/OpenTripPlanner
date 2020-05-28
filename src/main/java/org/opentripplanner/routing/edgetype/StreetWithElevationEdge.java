@@ -79,6 +79,8 @@ public class StreetWithElevationEdge extends StreetEdge {
         );
     }
 
+    public boolean hasPackedElevationProfile () { return packedElevationProfile != null; }
+
     @Override
     public boolean isElevationFlattened() {
         return flattened;

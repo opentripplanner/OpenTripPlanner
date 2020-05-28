@@ -1,6 +1,7 @@
 package org.opentripplanner.model.routing;
 
 import org.junit.Test;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 import java.time.Duration;
 import java.time.Instant;

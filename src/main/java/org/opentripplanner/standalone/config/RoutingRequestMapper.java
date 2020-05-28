@@ -1,10 +1,10 @@
 package org.opentripplanner.standalone.config;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.request.RequestModes;
-import org.opentripplanner.routing.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.request.StreetMode;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -60,7 +60,7 @@ public class RoutingRequestMapper {
         request.elevatorHopTime = c.asInt("elevatorHopTime", dft.elevatorHopTime);
         request.geoidElevation = c.asBoolean("geoidElevation", dft.geoidElevation);
         request.ignoreRealtimeUpdates = c.asBoolean("ignoreRealtimeUpdates", dft.ignoreRealtimeUpdates);
-        request.kissAndRide = c.asBoolean("kissAndRide", dft.kissAndRide);
+        request.carPickup = c.asBoolean("kissAndRide", dft.carPickup);
         request.locale = c.asLocale("locale", dft.locale);
         request.maxHours = c.asDouble("maxHours", dft.maxHours);
         request.maxPreTransitTime = c.asInt("maxPreTransitTime", dft.maxPreTransitTime);
