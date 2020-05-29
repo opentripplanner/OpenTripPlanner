@@ -108,7 +108,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stop iff it is optimal.
      */
     final void transitToStop(
-            final Boarding<T> boarding,
+            final PatternRide<T> ride,
             final int alightStop,
             final int alightTime,
             final int alightSlack
@@ -118,22 +118,22 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
         // Calculate wait time before and after the transit leg
-        final int waitTime = boarding.boardWaitTime + alightSlack;
+        final int waitTime = ride.boardWaitTime + alightSlack;
 
         final int costTransitLeg = costCalculator.transitArrivalCost(
             waitTime,
-            alightTime - boarding.boardTime,
-            boarding.boardStopIndex,
+            alightTime - ride.boardTime,
+            ride.boardStopIndex,
             alightStop
         );
 
         arrivalsCache.add(
                 new TransitStopArrival<>(
-                        boarding.prevArrival,
+                        ride.prevArrival,
                         alightStop,
                         stopArrivalTime,
                         costTransitLeg,
-                        boarding.trip
+                        ride.trip
                 )
         );
     }

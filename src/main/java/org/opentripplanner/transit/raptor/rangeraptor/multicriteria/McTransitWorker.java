@@ -24,7 +24,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     private final TransitCalculator calculator;
     private final CostCalculator costCalculator;
     private final SlackProvider slackProvider;
-    private final ParetoSet<Boarding<T>> patternBoardings = new ParetoSet<>(Boarding.paretoComparatorRelativeCost());
+    private final ParetoSet<PatternRide<T>> patternRides = new ParetoSet<>(PatternRide.paretoComparatorRelativeCost());
 
     private RaptorTripPattern pattern;
     private TripScheduleSearch<T> tripSearch;
@@ -45,7 +45,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
     public void prepareForTransitWith(RaptorTripPattern pattern, TripScheduleSearch<T> tripSearch) {
         this.pattern = pattern;
         this.tripSearch = tripSearch;
-        this.patternBoardings.clear();
+        this.patternRides.clear();
         slackProvider.setCurrentPattern(pattern);
     }
 
@@ -55,11 +55,11 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
 
         // Alight at boardStopPos
         if (pattern.alightingPossibleAt(stopPos)) {
-            for (Boarding<T> boarding : patternBoardings) {
+            for (PatternRide<T> ride : patternRides) {
                 state.transitToStop(
-                    boarding,
+                    ride,
                     stopIndex,
-                    boarding.trip.arrival(stopPos),
+                    ride.trip.arrival(stopPos),
                     slackProvider.alightSlack()
                 );
             }
@@ -103,8 +103,8 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                     boardWaitTime
                 );
 
-                patternBoardings.add(
-                    new Boarding<>(
+                patternRides.add(
+                    new PatternRide<>(
                         prevArrival,
                         stopIndex,
                         stopPos,
