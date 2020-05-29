@@ -6,6 +6,8 @@ import org.opentripplanner.standalone.config.updaters.sources.KmlBikeParkSourceP
 import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceParameters;
+import org.opentripplanner.updater.UpdaterDataSourceConfig;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.OtpAppException;
 
 import java.util.HashMap;
@@ -16,7 +18,7 @@ import java.util.function.Function;
  * This class is an object representation of the data source for a single real-time updater in
  * 'router-config.json' Each data source defines an inner interface with its required attributes.
  */
-public class UpdaterDataSourceConfig {
+public class DefaultUpdaterDataSourceConfig implements UpdaterDataSourceConfig {
 
   public static final String JCDECAUX = "jcdecaux";
   public static final String B_CYCLE = "b-cycle";
@@ -70,7 +72,7 @@ public class UpdaterDataSourceConfig {
 
   private final UpdaterSourceParameters updaterSourceParameters;
 
-  public UpdaterDataSourceConfig(NodeAdapter sourceConfig) {
+  public DefaultUpdaterDataSourceConfig(NodeAdapter sourceConfig) {
     String type = sourceConfig.asText("sourceType");
     Function<NodeAdapter, UpdaterSourceParameters> factory = CONFIG_CREATORS.get(type);
     if (factory == null) {
@@ -80,11 +82,13 @@ public class UpdaterDataSourceConfig {
     this.updaterSourceParameters = factory.apply(sourceConfig);
   }
 
+  @Override
   public String getType() {
     return type;
   }
 
-  public UpdaterSourceParameters getUpdaterSourceParameters() {
+  @Override
+  public UpdaterDataSourceParameters getUpdaterSourceParameters() {
     return updaterSourceParameters;
   }
 }

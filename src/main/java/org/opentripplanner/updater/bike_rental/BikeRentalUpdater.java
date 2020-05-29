@@ -24,7 +24,7 @@ import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.opentripplanner.standalone.config.UpdaterDataSourceConfig.*;
+import static org.opentripplanner.standalone.config.DefaultUpdaterDataSourceConfig.*;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.

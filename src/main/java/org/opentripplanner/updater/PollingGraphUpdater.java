@@ -1,6 +1,5 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.standalone.config.UpdaterDataSourceConfig;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
