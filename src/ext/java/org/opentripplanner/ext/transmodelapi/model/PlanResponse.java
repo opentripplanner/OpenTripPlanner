@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.model.plan.TripPlan;
-import org.opentripplanner.model.routing.TripSearchMetadata;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
 import java.util.ArrayList;

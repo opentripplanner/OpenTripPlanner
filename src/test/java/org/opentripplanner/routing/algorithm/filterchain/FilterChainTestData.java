@@ -37,6 +37,17 @@ public class FilterChainTestData {
         return leg;
     }
 
+    public static Leg leg(String legName, int t0, int t1, double distanceMeters, TraverseMode mode) {
+        Leg leg = new Leg();
+        leg.mode = mode;
+        leg.from = place(legName, 1.0, 2.0);
+        leg.to = place("", 3.0, 4.0);
+        leg.startTime = newTime(t0);
+        leg.endTime = newTime(t1);
+        leg.distanceMeters = distanceMeters;
+        return leg;
+    }
+
     public static GregorianCalendar newTime(int minutes) {
         return new GregorianCalendar(2020, FEBRUARY, 2, 12, minutes);
     }

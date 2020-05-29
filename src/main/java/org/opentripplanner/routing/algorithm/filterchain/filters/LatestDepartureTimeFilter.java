@@ -27,4 +27,10 @@ public class LatestDepartureTimeFilter implements ItineraryFilter {
                 .filter(it -> it.startTime().getTimeInMillis() <= limitMs)
                 .collect(Collectors.toList());
     }
+
+    @Override
+    public boolean removeItineraries() {
+        return true;
+    }
+
 }
