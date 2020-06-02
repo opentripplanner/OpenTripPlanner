@@ -8,6 +8,11 @@ These properties changed names from:
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
+ ## Router config
+ 
+ - All updaters that require data sources now require you to specify a `sourceType`, even if that
+ particular updater only has one possible data source.
+ 
 ## Command line
  The command line parameters are changed. Use the `--help` option to get the current documentation,
   and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 

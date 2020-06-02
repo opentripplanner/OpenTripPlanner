@@ -1,9 +1,7 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -14,7 +12,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
 
-public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, JsonConfigurable {
+public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     private static final Logger LOG =
             LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
 
@@ -27,32 +25,31 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     /**
      * Feed id that is used to match trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    private String url;
+    private final String url;
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
     private String requestorRef;
     private int timeout;
 
-    private static Map<String, String> requestHeaders = new HashMap<>();
+    private static final Map<String, String> requestHeaders = new HashMap<>();
 
-    @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
-        String url = config.path("url").asText();
+    public SiriVMHttpTripUpdateSource(Parameters parameters) {
+        String url = parameters.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
 
-        this.requestorRef = config.path("requestorRef").asText();
+        this.requestorRef = parameters.getRequestorRef();
         if (requestorRef == null || requestorRef.isEmpty()) {
             requestorRef = "otp-"+UUID.randomUUID().toString();
         }
-        this.feedId = config.path("feedId").asText();
+        this.feedId = parameters.getFeedId();
 
-        int timeoutSec = config.path("timeoutSec").asInt();
+        int timeoutSec = parameters.getTimeoutSec();
         if (timeoutSec > 0) {
             this.timeout = 1000*timeoutSec;
         }
@@ -111,5 +108,11 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource, Json
     @Override
     public String getFeedId() {
         return this.feedId;
+    }
+
+    public interface Parameters extends UpdaterDataSourceParameters {
+        String getRequestorRef();
+        String getFeedId();
+        int getTimeoutSec();
     }
 }

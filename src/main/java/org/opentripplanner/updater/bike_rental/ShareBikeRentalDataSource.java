@@ -2,6 +2,7 @@ package org.opentripplanner.updater.bike_rental;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,8 +21,9 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
 	private Map<String, List<String>> urlParameters = new HashMap<>();
 
-	public ShareBikeRentalDataSource() throws UnsupportedEncodingException, MalformedURLException {
-		super("result/LiveStationData");
+	public ShareBikeRentalDataSource(UpdaterDataSourceParameters config) {
+		super(config, "result/LiveStationData");
+		setUrl(config.getUrl());
 	}
 
 	/**

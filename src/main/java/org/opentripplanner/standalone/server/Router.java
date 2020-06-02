@@ -93,7 +93,7 @@ public class Router {
         }
 
         /* Create Graph updater modules from JSON config. */
-        GraphUpdaterConfigurator.setupGraph(this.graph, routerConfig.rawJson);
+        GraphUpdaterConfigurator.setupGraph(this.graph, routerConfig.updaterConfig());
 
         /* Compute ellipsoidToGeoidDifference for this Graph */
         try {
