@@ -130,11 +130,6 @@ final class ReverseTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final IntIterator patternStopIterator(int onTripStopPos, int nStopsInPattern) {
-        return IntIterators.intDecIterator(onTripStopPos, 0);
-    }
-
-    @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             RaptorTimeTable<T> timeTable
     ) {

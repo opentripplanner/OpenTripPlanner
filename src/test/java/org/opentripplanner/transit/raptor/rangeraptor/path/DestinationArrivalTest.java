@@ -2,6 +2,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.path;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AccessStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 
@@ -32,35 +33,25 @@ public class DestinationArrivalTest {
      * Setup a simple journey with an access leg, one transit and a egress leg.
      */
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_STOP,
             ACCESS_DEPARTURE_TIME,
-            ACCESS_DURATION_TIME,
             ACCESS_COST,
-            null
+            new TestRaptorTransfer(ACCESS_STOP, ACCESS_DURATION_TIME)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
-            ACCESS_ARRIVAL,
+            ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_STOP,
             TRANSIT_ALIGHT_TIME,
-            TRANSIT_BOARD_TIME,
-            A_TRIP,
-            ACCESS_DURATION_TIME + BOARD_SLACK + TRANSIT_ALIGHT_TIME - TRANSIT_BOARD_TIME,
-            TRANSIT_COST
+            TRANSIT_COST,
+            A_TRIP
     );
 
     private final DestinationArrival<RaptorTripSchedule> subject = new DestinationArrival<>(
-            null,
+            new TestRaptorTransfer(TRANSIT_STOP, DESTINATION_DURATION_TIME),
             TRANSIT_ARRIVAL,
-            TRANSIT_ALIGHT_TIME,
             TRANSIT_ALIGHT_TIME + DESTINATION_DURATION_TIME,
             DESTINATION_COST
     );
-
-    @Test
-    public void departureTime() {
-        assertEquals(TRANSIT_ARRIVAL.arrivalTime(), subject.departureTime());
-    }
 
     @Test
     public void arrivalTime() {
@@ -73,8 +64,8 @@ public class DestinationArrivalTest {
     }
 
     @Test
-    public void numberOfTransfers() {
-        assertEquals(0, subject.numberOfTransfers());
+    public void round() {
+        assertEquals(1, subject.round());
     }
 
     @Test
@@ -84,6 +75,9 @@ public class DestinationArrivalTest {
 
     @Test
     public void testToString() {
-        assertEquals("DestinationArrival { From stop: 101, Time: 8:14:50 (8:14), Cost: 1120 }", subject.toString());
+        assertEquals(
+            "Egress { round: 1, from-stop: 101, duration: 50s, arrival-time: 8:14:50, cost: 1120 }",
+            subject.toString()
+        );
     }
 }

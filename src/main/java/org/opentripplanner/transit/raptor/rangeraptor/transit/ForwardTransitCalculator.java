@@ -114,12 +114,6 @@ final class ForwardTransitCalculator implements TransitCalculator {
     }
 
     @Override
-    public final IntIterator patternStopIterator(int onTripStopPos, int nStopsInPattern) {
-        // We need to add one, because the input trip is the boarded stop position
-        return IntIterators.intIncIterator(onTripStopPos + 1, nStopsInPattern);
-    }
-
-    @Override
     public final <T extends RaptorTripSchedule> TripScheduleSearch<T> createTripSearch(
             RaptorTimeTable<T> timeTable
     ) {

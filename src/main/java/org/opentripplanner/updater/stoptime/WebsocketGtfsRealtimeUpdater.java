@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.stoptime;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.protobuf.InvalidProtocolBufferException;
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
@@ -41,9 +40,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
      */
     private static final int CHECK_CONNECTION_PERIOD_SEC = 1;
 
-    private static final int DEFAULT_RECONNECT_PERIOD_SEC = 300; // Five minutes
-
-    private static Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WebsocketGtfsRealtimeUpdater.class);
 
     /**
      * Parent update manager. Is used to execute graph writer runnables.
@@ -53,17 +50,23 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     /**
      * Url of the websocket server
      */
-    private String url;
+    private final String url;
 
     /**
      * The ID for the static feed to which these TripUpdates are applied
      */
-    private String feedId;
+    private final String feedId;
 
     /**
      * The number of seconds to wait before reconnecting after a failed connection.
      */
-    private int reconnectPeriodSec;
+    private final int reconnectPeriodSec;
+
+    public WebsocketGtfsRealtimeUpdater(Parameters parameters) {
+        url = parameters.getUrl();
+        feedId = parameters.getFeedId();
+        reconnectPeriodSec = parameters.getReconnectPeriodSec();
+    }
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -71,14 +74,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
-        url = config.path("url").asText();
-        feedId = config.path("feedId").asText("");
-        reconnectPeriodSec = config.path("reconnectPeriodSec").asInt(DEFAULT_RECONNECT_PERIOD_SEC);
-    }
-
-    @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
         graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
     }
@@ -144,8 +140,8 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     private class Listener extends DefaultWebSocketListener {
         @Override
         public void onMessage(byte[] message) {
-            FeedMessage feedMessage = null;
-            List<FeedEntity> feedEntityList = null;
+            FeedMessage feedMessage;
+            List<FeedEntity> feedEntityList;
             List<TripUpdate> updates = null;
             boolean fullDataset = true;
             try {
@@ -162,7 +158,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
                 }
                 
                 // Create List of TripUpdates
-                updates = new ArrayList<TripUpdate>(feedEntityList.size());
+                updates = new ArrayList<>(feedEntityList.size());
                 for (FeedEntity feedEntity : feedEntityList) {
                     if (feedEntity.hasTripUpdate()) {
                         updates.add(feedEntity.getTripUpdate());
@@ -185,5 +181,11 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
     @Override
     public String getName() {
         return "WebsocketGtfsRealtimeUpdater";
+    }
+
+    public interface Parameters {
+        String getUrl();
+        String getFeedId();
+        int getReconnectPeriodSec();
     }
 }

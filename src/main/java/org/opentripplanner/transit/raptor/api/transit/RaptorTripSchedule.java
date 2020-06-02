@@ -27,17 +27,6 @@ public interface RaptorTripSchedule {
     int departure(int stopPosInPattern);
 
     /**
-     * The implementation should provide a very short description with enough information to identify
-     * the the trip. This is used for debugging and logging.
-     * <p/>
-     * In a GTFS world this would be <em>pattern index/id</em> and <em>trip index</em>. Use something like this:
-     * <p/>
-     * {@code "P-5_T-12"}
-     */
-    String debugInfo();
-
-
-    /**
      * Return the pattern for this trip.
      */
     RaptorTripPattern pattern();

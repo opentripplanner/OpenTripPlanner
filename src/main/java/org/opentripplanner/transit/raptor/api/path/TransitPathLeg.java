@@ -52,6 +52,6 @@ public final class TransitPathLeg<T extends RaptorTripSchedule> extends Intermed
 
     @Override
     public String toString() {
-        return trip.debugInfo() + " " + asString(toStop());
+        return trip.pattern().debugInfo() + " " + asString(toStop());
     }
 }

@@ -1,6 +1,5 @@
 package org.opentripplanner.updater.street_notes;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
 import org.locationtech.jts.geom.Geometry;
@@ -30,11 +29,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.prefs.Preferences;
 
 /**
  * A graph updater that reads a WFS-interface and updates a DynamicStreetNotesSource.
@@ -66,7 +65,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     private Query query;
 
     private FeatureSource<SimpleFeatureType, SimpleFeature> featureSource;
-    private DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
+    private final DynamicStreetNotesSource notesSource = new DynamicStreetNotesSource();
 
     // How much should the geometries be padded with in order to be sure they intersect with graph edges
     private static final double SEARCH_RADIUS_M = 1;
@@ -75,19 +74,23 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     // Set the matcher type for the notes, can be overridden in extending classes
     private static final NoteMatcher NOTE_MATCHER = StreetNotesService.ALWAYS_MATCHER;
 
-    private static Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(WFSNotePollingGraphUpdater.class);
 
     /**
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        url = new URL(config.path("url").asText());
-        featureType = config.path("featureType").asText();
-        this.graph = graph;
-        LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
+    public WFSNotePollingGraphUpdater(Parameters config) {
+        super(config);
+        try {
+            url = new URL(config.getUrl());
+            featureType = config.getFeatureType();
+            LOG.info("Configured WFS polling updater: frequencySec={}, url={} and featureType={}",
                 pollingPeriodSeconds, url.toString(), featureType);
+        } catch (MalformedURLException e) {
+            // TODO Handle this in config loading
+            LOG.warn(e.toString());
+        }
     }
 
     /**
@@ -103,6 +106,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      */
     @Override
     public void setup(Graph graph) throws IOException, FactoryException {
+        this.graph = graph;
         LOG.info("Setup WFS polling updater");
         HashMap<String, Object> connectionParameters = new HashMap<>();
         connectionParameters.put(WFSDataStoreFactory.URL.key, url);
@@ -192,4 +196,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         return ret;
     }
 
+    public interface Parameters extends PollingGraphUpdaterParameters {
+        String getFeatureType();
+    }
 }

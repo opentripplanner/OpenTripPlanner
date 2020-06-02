@@ -153,7 +153,7 @@ public final class Path<T extends RaptorTripSchedule> {
                 buf.stop(transitLeg.fromStop())
                     .sep()
                     .transit(
-                        transitLeg.trip().pattern().modeInfo(),
+                        transitLeg.trip().pattern().debugInfo(),
                         transitLeg.fromTime(),
                         transitLeg.toTime()
                     );

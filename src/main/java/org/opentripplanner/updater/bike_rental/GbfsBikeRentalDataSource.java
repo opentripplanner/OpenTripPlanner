@@ -3,36 +3,31 @@ package org.opentripplanner.updater.bike_rental;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
 /**
  * Created by demory on 2017-03-14.
  */
-public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
-    private static final Logger LOG = LoggerFactory.getLogger(GbfsBikeRentalDataSource.class);
+    private final GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
+    private final GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
+    private final GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
 
-    private GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
-    private GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
-    private GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
-
-    private String baseUrl;
-
-    private String networkName;
+    private final String networkName;
 
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
-    private boolean routeAsCar;
+    private final boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource (String networkName) {
-        stationInformationSource = new GbfsStationDataSource();
-        stationStatusSource = new GbfsStationStatusDataSource();
-        floatingBikeSource = new GbfsFloatingBikeDataSource();
+    public GbfsBikeRentalDataSource (Parameters parameters, String networkName) {
+        routeAsCar = parameters.routeAsCar();
+        stationInformationSource = new GbfsStationDataSource(parameters);
+        stationStatusSource = new GbfsStationStatusDataSource(parameters);
+        floatingBikeSource = new GbfsFloatingBikeDataSource(parameters);
+        setBaseUrl(parameters.getUrl());
         if (networkName != null && !networkName.isEmpty()) {
             this.networkName = networkName;
         } else {
@@ -40,8 +35,8 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         }
     }
 
-    public void setBaseUrl (String url) {
-        baseUrl = url;
+    private void setBaseUrl (String url) {
+        String baseUrl = url;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
         stationInformationSource.setUrl(baseUrl + "station_information.json");
         stationStatusSource.setUrl(baseUrl + "station_status.json");
@@ -87,28 +82,10 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
         return stations;
     }
 
-    /**
-     * Note that the JSON being passed in here is for configuration of the OTP component, it's completely separate
-     * from the JSON coming in from the update source.
-     */
-    @Override
-    public void configure (Graph graph, JsonNode jsonNode) {
-        // path() returns MissingNode not null, allowing chained function calls.
-        String url = jsonNode.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        }
-        this.setBaseUrl(url);
-        this.routeAsCar = jsonNode.path("routeAsCar").asBoolean(false);
-        if (routeAsCar) {
-            LOG.info("This 'bike rental' system will be treated as a car rental system.");
-        }
-    }
-
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationDataSource () {
-            super("data/stations");
+        public GbfsStationDataSource (Parameters config) {
+            super(config, "data/stations");
         }
 
         @Override
@@ -125,8 +102,8 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationStatusDataSource () {
-            super("data/stations");
+        public GbfsStationStatusDataSource (Parameters config) {
+            super(config, "data/stations");
         }
 
         @Override
@@ -142,8 +119,8 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
 
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsFloatingBikeDataSource () {
-            super("data/bikes");
+        public GbfsFloatingBikeDataSource (Parameters config) {
+            super(config, "data/bikes");
         }
 
         @Override
@@ -160,5 +137,9 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource, JsonConfi
             brstation.isCarStation = routeAsCar;
             return brstation;
         }
+    }
+
+    public interface Parameters extends UpdaterDataSourceParameters {
+        boolean routeAsCar();
     }
 }

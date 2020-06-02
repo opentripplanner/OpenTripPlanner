@@ -8,33 +8,28 @@ import java.io.Reader;
 import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.prefs.Preferences;
-
-import javax.xml.parsers.ParserConfigurationException;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
-public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, JsonConfigurable {
+public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 
-    private String url;
+    private final String url;
 
-    ArrayList<BikeRentalStation> stations = new ArrayList<BikeRentalStation>();
+    ArrayList<BikeRentalStation> stations = new ArrayList<>();
 
-    public CityBikesBikeRentalDataSource() {
-
+    public CityBikesBikeRentalDataSource(UpdaterDataSourceParameters config) {
+        this.url = config.getUrl();
     }
 
     @Override
@@ -60,18 +55,12 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
         } catch (IOException e) {
             log.warn("Error reading bike rental feed from " + url, e);
             return false;
-        } catch (ParserConfigurationException e) {
-            throw new RuntimeException(e);
-        } catch (SAXException e) {
-            log.warn("Error parsing bike rental feed from " + url + "(bad XML of some sort)", e);
-            return false;
         }
         return true;
     }
 
-    private void parseJson(String data) throws ParserConfigurationException, SAXException,
-            IOException {
-        ArrayList<BikeRentalStation> out = new ArrayList<BikeRentalStation>();
+    private void parseJson(String data) throws IOException {
+        ArrayList<BikeRentalStation> out = new ArrayList<>();
 
         // Jackson ObjectMapper to read in JSON
         // TODO: test against real data
@@ -85,7 +74,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
             brStation.name = new NonLocalizedString(stationNode.get("name").textValue());
             brStation.bikesAvailable = stationNode.get("bikes").intValue();
             brStation.spacesAvailable = stationNode.get("free").intValue();
-            if (brStation != null && brStation.id != null) {
+            if (brStation.id != null) {
                 out.add(brStation);
             }
         }
@@ -103,22 +92,8 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource, Json
         return url;
     }
 
-    public void setUrl(String url) {
-        this.url = url;
-    }
-
     @Override
     public String toString() {
         return getClass().getName() + "(" + url + ")";
     }
-    
-    @Override
-    public void configure(Graph graph, JsonNode config) {
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' configuration.");
-        }
-        setUrl(url);
-    }
-
 }

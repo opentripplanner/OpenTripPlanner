@@ -133,7 +133,7 @@ The `transitServiceStart` and `transitServiceEnd` parameters are set using an ab
 
 ## Reaching a subway platform
 
-The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
+The ride locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform the passenger. For
 example, this helps avoid suggesting short bus rides between two subway rides as a way to improve travel time. You can
 specify how long it takes to reach a subway platform
@@ -544,10 +544,10 @@ performance may suffer.
 
 ## Boarding and alighting times
 
-Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
-where the check-in process needs to be done in good time before boarding. The boarding time is added to the time when going
+Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as airplanes or ferries,
+where the check-in process needs to be done in good time before ride. The ride time is added to the time when going
 from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
-seconds needed for the boarding and alighting processes in `router-config.json` as follows:
+seconds needed for the ride and alighting processes in `router-config.json` as follows:
 
 ```JSON
 {

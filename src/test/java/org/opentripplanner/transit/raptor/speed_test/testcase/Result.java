@@ -112,8 +112,8 @@ class Result implements Comparable<Result> {
                 durationAsStr(),
                 cost,
                 walkDistance,
-                startTimeAsStr(),
-                endTimeAsStr(),
+                TimeUtils.timeToStrCompact(startTime),
+                TimeUtils.timeToStrCompact(endTime),
                 details
         );
     }
@@ -131,14 +131,6 @@ class Result implements Comparable<Result> {
 
     public String durationAsStr() {
         return TimeUtils.durationToStr(duration);
-    }
-
-    public String startTimeAsStr() {
-        return TimeUtils.timeToStrCompact(startTime, -1);
-    }
-
-    public String endTimeAsStr() {
-        return TimeUtils.timeToStrCompact(endTime, -1);
     }
 
     static <T> int compare(List<T> a, List<T> b, Comparator<T> comparator) {
