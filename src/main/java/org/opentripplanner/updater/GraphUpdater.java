@@ -12,7 +12,7 @@ import org.opentripplanner.routing.graph.Graph;
  * 
  * Example implementations can be found in ExampleGraphUpdater and ExamplePollingGraphUpdater.
  */
-public interface GraphUpdater extends JsonConfigurable {
+public interface GraphUpdater {
 
     /**
      * Graph updaters must be aware of their manager to be able to execute GraphWriterRunnables.
