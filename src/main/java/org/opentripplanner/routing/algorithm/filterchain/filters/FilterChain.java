@@ -25,4 +25,7 @@ public class FilterChain implements ItineraryFilter {
         }
         return result;
     }
+
+    @Override
+    public boolean removeItineraries() { return false; }
 }

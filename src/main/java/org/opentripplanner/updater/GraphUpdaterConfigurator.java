@@ -1,12 +1,21 @@
 package org.opentripplanner.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.UpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriETUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -16,36 +25,29 @@ import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Upon loading a Graph, configure/decorate it using a JSON tree from Jackson. This mainly involves starting
- * graph updater processes (GTFS-RT, bike rental, etc.), hence the class name.
- * 
- * When a Graph is loaded, one should call setupGraph() with the JSON tree containing configuration for the Graph.
- * That method creates "graph updaters" according to the given JSON, which should contain an array or object field
- * called "updaters". Each child element represents one updater.
+ * Sets up and starts all the graph updaters.
  *
- * When a graph is unloaded, one must ensure the shutdownGraph() method is called to clean up all resources that may
- * have been used.
- *
- * If an embedded configuration is present in the graph, we also try to use it. In case of conflicts
- * between two child nodes in both configs (two childs node with the same name) the dynamic (ie
- * provided) configuration takes complete precedence over the embedded one: childrens properties are
- * *not* merged.
+ * Updaters are instantiated based on the updater parameters contained in UpdaterConfig. Updaters
+ * are then setup by providing the graph as a parameter. Finally, the updaters are added to the
+ * GraphUpdaterManager.
  */
 public abstract class GraphUpdaterConfigurator {
 
     private static Logger LOG = LoggerFactory.getLogger(GraphUpdaterConfigurator.class);
 
-    public static void setupGraph(Graph graph, JsonNode mainConfig) {
+    public static void setupGraph(Graph graph, UpdaterConfig updaterConfig) {
 
-        // Look for embedded config if it exists
-        // TODO figure out how & when we will use embedded config in absence of main config.
-        JsonNode embeddedConfig = null; // graph.routerConfig;
-        LOG.info("Using configurations: " + (mainConfig == null ? "" : "[main]") + " "
-                + (embeddedConfig == null ? "" : "[embedded]"));
+        List<GraphUpdater> updaters = new ArrayList<>();
 
-        // Create a updater manager for this graph, and create updaters according to the JSON configuration.
-        GraphUpdaterManager updaterManager = createManagerFromConfig(graph, mainConfig);
+        updaters.addAll(createUpdatersFromConfig(updaterConfig));
+
+        setupUpdaters(graph, updaters);
+        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph, updaters);
+        updaterManager.startUpdaters();
 
         // Stop the updater manager if it contains nothing
         if (updaterManager.size() == 0) {
@@ -58,75 +60,48 @@ public abstract class GraphUpdaterConfigurator {
     }
 
     /**
-     * @param graph the graph that will be modified by these updaters
-     * @return a GraphUpdaterManager containing all the created updaters
+     * @return a list of GraphUpdaters created from the configuration
      */
-    private static GraphUpdaterManager createManagerFromConfig(Graph graph, JsonNode config) {
+    private static List<GraphUpdater> createUpdatersFromConfig(
+        UpdaterConfig config
+    ) {
+        List<GraphUpdater> updaters = new ArrayList<>();
 
-        GraphUpdaterManager updaterManager = new GraphUpdaterManager(graph);
-        for (JsonNode configItem : config.path("updaters")) {
-
-            // For each sub-node, determine which kind of updater is being created.
-            String type = configItem.path("type").asText();
-            GraphUpdater updater = null;
-            if (type != null) {
-                if (type.equals("bike-rental")) {
-                    updater = new BikeRentalUpdater();
-                }
-                else if (type.equals("bike-park")) {
-                    updater = new BikeParkUpdater();
-                }
-                else if (type.equals("stop-time-updater")) {
-                    updater = new PollingStoptimeUpdater();
-                }
-                else if (type.equals("websocket-gtfs-rt-updater")) {
-                    updater = new WebsocketGtfsRealtimeUpdater();
-                }
-                else if (type.equals("real-time-alerts")) {
-                    updater = new GtfsRealtimeAlertsUpdater();
-                }
-                else if (type.equals("example-updater")) {
-                    updater = new ExampleGraphUpdater();
-                }
-                else if (type.equals("example-polling-updater")) {
-                    updater = new ExamplePollingGraphUpdater();
-                }
-                else if (type.equals("winkki-polling-updater")) {
-                    updater = new WinkkiPollingGraphUpdater();
-                }
-                else if (type.equals("siri-et-updater")) {
-                    updater = new SiriETUpdater();
-                }
-                else if (type.equals("siri-vm-updater")) {
-                    updater = new SiriVMUpdater();
-                }
-                else if (type.equals("siri-sx-updater")) {
-                    updater = new SiriSXUpdater();
-                }
-            }
-
-            if (updater == null) {
-                LOG.error("Unknown updater type: " + type);
-            } else {
-                try {
-                    // Inform the GraphUpdater of its parent Manager so the updater can enqueue write operations.
-                    // Perhaps this should be done in "addUpdater" below, to ensure the link is reciprocal.
-                    updater.setGraphUpdaterManager(updaterManager);
-                    // All GraphUpdaters are JsonConfigurable - send them their config information.
-                    updater.configure(graph, configItem);
-                    // Perform any initial setup in a single-threaded manner to avoid concurrent reads/writes.
-                    updater.setup(graph);
-                    // Add graph updater to manager.
-                    updaterManager.addUpdater(updater);
-                    LOG.info("Configured GraphUpdater: {}", updater);
-                } catch (Exception e) {
-                    LOG.error("Failed to configure graph updater:" + configItem.asText(), e);
-                }
-            }
+        for (BikeRentalUpdaterParameters configItem : config.getBikeRentalParameters()) {
+            updaters.add(new BikeRentalUpdater(configItem));
         }
-        // Now that all the updaters are configured, kick them all off in their own threads.
-        updaterManager.startUpdaters();
-        return updaterManager;
+        for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
+            updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
+        }
+        for (PollingStoptimeUpdaterParameters configItem : config.getPollingStoptimeUpdaterParameters()) {
+            updaters.add(new PollingStoptimeUpdater(configItem));
+        }
+        for (SiriETUpdaterParameters configItem : config.getSiriETUpdaterParameters()) {
+            updaters.add(new SiriETUpdater(configItem));
+        }
+        for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
+            updaters.add(new SiriSXUpdater(configItem));
+        }
+        for (SiriVMUpdaterParameters configItem : config.getSiriVMUpdaterParameters()) {
+            updaters.add(new SiriVMUpdater(configItem));
+        }
+        for (WebsocketGtfsRealtimeUpdaterParameters configItem : config.getWebsocketGtfsRealtimeUpdaterParameters()) {
+            updaters.add(new WebsocketGtfsRealtimeUpdater(configItem));
+        }
+        for (PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
+            updaters.add(new BikeParkUpdater(configItem));
+        }
+        for (PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {
+            updaters.add(new ExampleGraphUpdater(configItem));
+        }
+        for (PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
+            updaters.add(new ExamplePollingGraphUpdater(configItem));
+        }
+        for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
+            updaters.add(new WinkkiPollingGraphUpdater(configItem));
+        }
+
+        return updaters;
     }
 
     public static void shutdownGraph(Graph graph) {
@@ -134,6 +109,16 @@ public abstract class GraphUpdaterConfigurator {
         if (updaterManager != null) {
             LOG.info("Stopping updater manager with " + updaterManager.size() + " updaters.");
             updaterManager.stop();
+        }
+    }
+
+    public static void setupUpdaters(Graph graph, List<GraphUpdater> updaters) {
+        for (GraphUpdater updater : updaters) {
+            try {
+                updater.setup(graph);
+            } catch (Exception e) {
+                LOG.warn("Failed to setup updater {}", updater.getName());
+            }
         }
     }
 }

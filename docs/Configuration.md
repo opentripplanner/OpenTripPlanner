@@ -133,7 +133,7 @@ The `transitServiceStart` and `transitServiceEnd` parameters are set using an ab
 
 ## Reaching a subway platform
 
-The boarding locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
+The ride locations for some modes of transport such as subways and airplanes can be slow to reach from the street.
 When planning a trip, we need to allow additional time to reach these locations to properly inform the passenger. For
 example, this helps avoid suggesting short bus rides between two subway rides as a way to improve travel time. You can
 specify how long it takes to reach a subway platform
@@ -544,10 +544,10 @@ performance may suffer.
 
 ## Boarding and alighting times
 
-Sometimes there is a need to configure a longer boarding or alighting times for specific modes, such as airplanes or ferries,
-where the check-in process needs to be done in good time before boarding. The boarding time is added to the time when going
+Sometimes there is a need to configure a longer ride or alighting times for specific modes, such as airplanes or ferries,
+where the check-in process needs to be done in good time before ride. The ride time is added to the time when going
 from the stop (offboard) vertex to the onboard vertex, and the alight time is added vice versa. The times are configured as
-seconds needed for the boarding and alighting processes in `router-config.json` as follows:
+seconds needed for the ride and alighting processes in `router-config.json` as follows:
 
 ```JSON
 {
@@ -661,7 +661,7 @@ he search window is rounded of to the closest multiplication of N minutes. If N=
 
 
 ### transit.stopTransferCost.<TransferPriority>
-Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
+Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. 
 
 This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
 
@@ -671,7 +671,7 @@ If not set the `stopTransferCost` is ignored. This is only available for NeTEx i
 
 **Value Type:**  `int` 
 
-**Value Unit:** Scalar, equvivalent to one second of transit. 
+**Value Unit:** Scalar, equivalent to one second of transit. 
 
 **Value Range:** `[0 .. 100,000]`
 

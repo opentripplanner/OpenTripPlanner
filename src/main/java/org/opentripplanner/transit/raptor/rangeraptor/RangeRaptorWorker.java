@@ -202,22 +202,13 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             // Prepare for transit
             transitWorker.prepareForTransitWith(pattern, tripSearch);
 
-            // perform transit
-            performTransitForRoundAndEachStopInPattern(pattern);
+            // perform transit - iterate over given pattern and calculate transit for each stop.
+            IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
+            while (it.hasNext()) {
+                transitWorker.routeTransitAtStop(it.next());
+            }
         }
         lifeCycle.transitsForRoundComplete();
-    }
-
-    /**
-     * Iterate over given pattern and calculate transit for each stop.
-     * <p/>
-     * This is protected to allow reverse search to override and step backwards.
-     */
-    private void performTransitForRoundAndEachStopInPattern(final RaptorTripPattern pattern) {
-        IntIterator it = calculator.patternStopIterator(pattern.numberOfStopsInPattern());
-        while (it.hasNext()) {
-            transitWorker.routeTransitAtStop(it.next());
-        }
     }
 
     private void transfersForRound() {

@@ -66,7 +66,6 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
         DestinationArrival<T> destArrival = new DestinationArrival<>(
             egressLeg,
             egressStopArrival,
-            departureTime, // TODO: What about NoWaitTransitWorker
             arrivalTime,
             additionalCost + costCalculator.waitCost(waitTimeInSeconds)
         );

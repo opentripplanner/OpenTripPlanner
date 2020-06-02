@@ -20,7 +20,10 @@ public class PathStringBuilderTest {
 
     @Test
     public void transit() {
-        assertEquals("BUS 10:46:05 10:55", new PathStringBuilder().transit(MODE, T_10_46_05, T_10_55).toString());
+        assertEquals(
+            "BUS 10:46:05 10:55",
+            new PathStringBuilder().transit(MODE, T_10_46_05, T_10_55).toString()
+        );
     }
 
     @Test
@@ -38,9 +41,10 @@ public class PathStringBuilderTest {
         assertEquals(
             "Walk 37s ~ 227 ~ BUS 10:46:05 10:55 ~ 112 ~ Walk 1h37m7s",
             new PathStringBuilder()
-                        .walk(37).sep().stop(227).sep()
-                        .transit(MODE, T_10_46_05, T_10_55).sep().stop(112).sep()
-                        .walk(3600 + 37 * 60 + 7).toString()
+                    .walk(37).sep().stop(227).sep()
+                    .transit(MODE, T_10_46_05, T_10_55).sep().stop(112).sep()
+                    .walk(3600 + 37 * 60 + 7)
+                    .toString()
         );
     }
 

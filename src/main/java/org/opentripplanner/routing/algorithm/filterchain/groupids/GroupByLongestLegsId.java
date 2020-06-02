@@ -29,8 +29,8 @@ public class GroupByLongestLegsId implements GroupId<GroupByLongestLegsId> {
     }
 
     @Override
-    public boolean orderHigherOrEq(GroupByLongestLegsId other) {
-        return longLegs.size() <= other.longLegs.size();
+    public GroupByLongestLegsId merge(GroupByLongestLegsId other) {
+        return longLegs.size() <= other.longLegs.size() ? this : other;
     }
 
     @Override

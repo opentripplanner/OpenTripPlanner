@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -13,7 +13,6 @@ import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
 import java.util.List;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Update OTP stop time tables from some (realtime) source
@@ -40,7 +39,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
     /**
      * Update streamer
      */
-    private EstimatedTimetableSource updateSource;
+    private final EstimatedTimetableSource updateSource;
 
     /**
      * Property to set on the RealtimeDataSnapshotSource
@@ -55,12 +54,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
     /**
      * Property to set on the RealtimeDataSnapshotSource
      */
-    private Boolean purgeExpiredData;
+    private final Boolean purgeExpiredData;
 
     /**
      * Feed id that is used for the trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
     /**
      * The place where we'll record the incoming realtime timetables to make them available to the router in a thread
@@ -68,40 +67,36 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
+    public SiriETUpdater(Parameters config) {
+        super(config);
+        // Create update streamer from preferences
+        feedId = config.getFeedId();
+
+        updateSource = new SiriETHttpTripUpdateSource((SiriETHttpTripUpdaterSourceParameters)
+            config.getSourceConfig().getUpdaterSourceParameters());
+
+        int logFrequency = config.getLogFrequency();
+        if (logFrequency >= 0) {
+            this.logFrequency = logFrequency;
+        }
+        int maxSnapshotFrequency = config.getMaxSnapshotFrequencyMs();
+        if (maxSnapshotFrequency >= 0) {
+            this.maxSnapshotFrequency = maxSnapshotFrequency;
+        }
+        this.purgeExpiredData = config.purgeExpiredData();
+
+        blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+
+        LOG.info("Creating stop time updater (SIRI ET) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
+    }
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
     @Override
-    public void configurePolling(Graph graph, JsonNode config) throws Exception {
-        // Create update streamer from preferences
-        feedId = config.path("feedId").asText("");
-        String sourceType = config.path("sourceType").asText();
-
-        SiriETHttpTripUpdateSource source = new SiriETHttpTripUpdateSource();
-        // Configure update source before we asign it to the member field witch is not
-        // configurable.
-        source.configure(graph, config);
-        updateSource = source;
-
-        int logFrequency = config.path("logFrequency").asInt(-1);
-        if (logFrequency >= 0) {
-            this.logFrequency = logFrequency;
-        }
-        int maxSnapshotFrequency = config.path("maxSnapshotFrequencyMs").asInt(-1);
-        if (maxSnapshotFrequency >= 0) {
-            this.maxSnapshotFrequency = maxSnapshotFrequency;
-        }
-        this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
-
-        blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
-
-        LOG.info("Creating stop time updater (SIRI ET) running every {} seconds : {}", pollingPeriodSeconds, updateSource);
-    }
-
-    @Override
-    public void setup(Graph graph) throws InterruptedException, ExecutionException {
+    public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
         // TODO OTP2 - This is thread safe, but only because updater setup methods are called sequentially.
         //           - Ideally we should inject the snapshotSource on this class.
@@ -127,7 +122,7 @@ public class SiriETUpdater extends PollingGraphUpdater {
      * applies those updates to the graph.
      */
     @Override
-    public void runPolling() throws Exception {
+    public void runPolling() {
         boolean moreData = false;
         do {
             Siri updates = updateSource.getUpdates();
@@ -156,5 +151,13 @@ public class SiriETUpdater extends PollingGraphUpdater {
     public String toString() {
         String s = (updateSource == null) ? "NONE" : updateSource.toString();
         return "Polling SIRI ET updater with update source = " + s;
+    }
+
+    public interface Parameters extends PollingGraphUpdaterParameters {
+        String getFeedId();
+        int getLogFrequency();
+        int getMaxSnapshotFrequencyMs();
+        boolean purgeExpiredData();
+        boolean blockReadinessUntilInitialized();
     }
 }

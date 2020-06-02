@@ -36,6 +36,9 @@ public class DebugFilterWrapper implements ItineraryFilter {
     return itineraries;
   }
 
+  @Override
+  public boolean removeItineraries() { return false; }
+
   private List<Itinerary> remindingItineraries(List<Itinerary> originalList) {
     return originalList.stream()
         .filter(it -> !deletedItineraries.contains(it))
@@ -57,6 +60,7 @@ public class DebugFilterWrapper implements ItineraryFilter {
   /* private methods */
 
   private void markItineraryAsDeleted(Itinerary itinerary) {
+    deletedItineraries.add(itinerary);
     itinerary.addSystemNotice(new SystemNotice(
         delegate.name(),
         "This itinerary is marked as deleted by the " + delegate.name() + " filter. "

@@ -36,12 +36,12 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
     }
 
     @Override
-    public String name() {
+    public final String name() {
         return name;
     }
 
     @Override
-    public List<Itinerary> filter(List<Itinerary> itineraries) {
+    public final List<Itinerary> filter(List<Itinerary> itineraries) {
         if(itineraries.size() <= minLimit) { return itineraries; }
 
         List<Entry<T>> groups = new ArrayList<>();
@@ -51,6 +51,9 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
             Entry<T> matchFound = null;
 
             for (Entry<T> e : groups) {
+                // ignore empty groups - they are merged into another group
+                if(e.itineraries.isEmpty()) { continue; }
+
                 if (e.match(groupId)) {
                     if(matchFound == null) {
                         e.merge(groupId, it);
@@ -82,7 +85,7 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
     }
 
     @Override
-    public boolean removeItineraries() {
+    public final boolean removeItineraries() {
         return true;
     }
 
@@ -107,25 +110,14 @@ public class GroupByFilter<T extends GroupId<T>> implements ItineraryFilter {
         }
 
         void merge(T groupId, Itinerary itinerary) {
-            mergeGroupId(groupId);
+            this.groupId = this.groupId.merge(groupId);
             itineraries.add(itinerary);
         }
 
         void merge(Entry<T> other) {
-            mergeGroupId(other.groupId);
-            itineraries.addAll(other.itineraries);
+            this.groupId = this.groupId.merge(other.groupId);
+            this.itineraries.addAll(other.itineraries);
             other.itineraries.clear();
-        }
-
-        private void mergeGroupId(T groupId) {
-            if (!this.groupId.match(groupId)) {
-                throw new IllegalArgumentException("Not allowed to merge groups witch do not match.");
-            }
-            // If a new "higher" order group is found
-            // switch to the highest order groupId
-            if (!this.groupId.orderHigherOrEq(groupId)) {
-                this.groupId = groupId;
-            }
         }
 
         boolean match(T groupId) {

@@ -36,6 +36,14 @@ public interface RaptorTripPattern {
      */
     int numberOfStopsInPattern();
 
-    /** The transit mode for this pattern, used for debugging purposes only. */
-    String modeInfo();
+    /**
+     * Pattern debug info, return transit mode and route name. This is  used for debugging purposes
+     * only. The implementation should provide a short description with enough information for
+     * humans to identify the the trip/route. This is is used in a context where information about
+     * agency and stop is known, so there is no need to include agency or geographical region
+     * information.
+     * <p/>
+     * The recommended string to return is: {@code [MODE] [SHORT_ROUTE_DESCRIPTION]}.
+     */
+    String debugInfo();
 }

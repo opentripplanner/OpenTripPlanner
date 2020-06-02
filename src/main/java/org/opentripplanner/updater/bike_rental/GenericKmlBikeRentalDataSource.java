@@ -5,11 +5,9 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import java.util.prefs.Preferences;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,18 +20,18 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericKmlBikeRentalDataSource.class);
 
-    private String namePrefix = null;
+    private final String namePrefix;
 
     private Set<String> networks = null;
 
     private boolean allowDropoff = true;
 
-    /**
-     * @param namePrefix A string to prefix all station names coming from this source (for example:
-     *        "OV-fietspunt "). Please add a space at the end if needed.
-     */
-    public void setNamePrefix(String namePrefix) {
-        this.namePrefix = namePrefix;
+    public GenericKmlBikeRentalDataSource(Parameters parameters) {
+        super(
+            parameters,
+            "//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']"
+        );
+        namePrefix = parameters.getNamePrefix();
     }
 
     /**
@@ -41,7 +39,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
      *        the dataSource. Default to null (compatible with all).
      */
     public void setNetworks(String networks) {
-        this.networks = new HashSet<String>();
+        this.networks = new HashSet<>();
         this.networks.addAll(Arrays.asList(networks.split(",")));
     }
 
@@ -51,10 +49,6 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
      */
     public void setAllowDropoff(boolean allowDropoff) {
         this.allowDropoff = allowDropoff;
-    }
-
-    public GenericKmlBikeRentalDataSource() {
-        super("//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {
@@ -84,10 +78,8 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         return brStation;
     }
 
-    @Override
-    public void configure(Graph graph, JsonNode config) {
-        super.configure(graph, config);
-        setNamePrefix(config.path("namePrefix").asText());
+    public interface Parameters
+        extends UpdaterDataSourceParameters {
+        String getNamePrefix();
     }
-
 }

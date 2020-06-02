@@ -86,6 +86,14 @@ public class GraphUpdaterManager {
         updaterPool = Executors.newCachedThreadPool(threadFactory);
     }
 
+    public GraphUpdaterManager(Graph graph, List<GraphUpdater> updaters) {
+        this(graph);
+        for (GraphUpdater updater : updaters) {
+            this.addUpdater(updater);
+            updater.setGraphUpdaterManager(this);
+        }
+    }
+
     public void stop() {
         // TODO: find a better way to stop these threads
 
