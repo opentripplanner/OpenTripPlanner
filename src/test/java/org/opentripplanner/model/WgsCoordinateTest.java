@@ -3,6 +3,7 @@ package org.opentripplanner.model;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
 
 import static org.junit.Assert.assertEquals;
 
@@ -31,5 +32,20 @@ public class WgsCoordinateTest {
 
         Assert.assertTrue(a.sameLocation(sameLongitude));
         Assert.assertFalse(a.sameLocation(differentLongitude));
+    }
+
+    @Test
+    public void asJtsCoordinate() {
+        // Given a well known location in Oslo
+        double latitude = 59.9110583;
+        double longitude = 10.7502691;
+        WgsCoordinate c = new WgsCoordinate(latitude, longitude);
+
+        // The convert to JTS:
+        Coordinate jts = c.asJtsCoordinate();
+
+        // Assert latitude is y, and longitude is x coordinate
+        Assert.assertEquals(latitude, jts.y, 1E-7);
+        Assert.assertEquals(longitude, jts.x, 1E-7);
     }
 }

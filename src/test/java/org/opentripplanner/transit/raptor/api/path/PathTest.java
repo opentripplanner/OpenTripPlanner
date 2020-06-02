@@ -60,8 +60,8 @@ public class PathTest {
     @Test
     public void testToString() {
         Assert.assertEquals(
-                "Walk 3m ~ 1 ~ BUS 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
-                        + "BUS 11:00 11:23 ~ 4 ~ BUS 11:40 11:52 ~ 5 ~ Walk 7m "
+                "Walk 3m ~ 1 ~ BUS T1 10:05 10:35 ~ 2 ~ Walk 3m ~ 3 ~ "
+                        + "BUS T2 11:00 11:23 ~ 4 ~ BUS T3 11:40 11:52 ~ 5 ~ Walk 7m "
                         + "[10:00:00 12:00:00 2h, cost: 60]",
                 subject.toString()
         );

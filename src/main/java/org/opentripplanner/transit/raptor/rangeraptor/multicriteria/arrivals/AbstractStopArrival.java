@@ -36,7 +36,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      */
     private final int paretoRound;
     private final int stop;
-    private final int departureTime;
     private final int arrivalTime;
     private final int travelDuration;
     private final int cost;
@@ -46,30 +45,26 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
      *
      * @param previous the previous arrival visited for the current trip
      * @param stop stop index for this arrival
-     * @param departureTime the departure time from the previous stop
      * @param arrivalTime the arrival time for this stop index
-     * @param travelDuration the time duration is seconds for the entire trip found
      * @param additionalCost the accumulated cost at this stop arrival
      */
-    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int departureTime, int arrivalTime, int travelDuration, int additionalCost) {
+    AbstractStopArrival(AbstractStopArrival<T> previous, int stop, int arrivalTime, int additionalCost) {
         this.previous = previous;
         this.paretoRound = previous.paretoRound + (isTransitFollowedByTransit() ? 2 : 1);
         this.stop = stop;
-        this.departureTime = departureTime;
         this.arrivalTime = arrivalTime;
-        this.travelDuration = travelDuration;
+        this.travelDuration = previous.travelDuration + (arrivalTime - previous.arrivalTime);
         this.cost = previous.cost + additionalCost;
     }
 
     /**
      * Initial state - first stop visited.
      */
-    AbstractStopArrival(int stop, int departureTime, int arrivalTime, int travelDuration, int initialCost) {
+    AbstractStopArrival(int stop, int departureTime, int travelDuration, int initialCost) {
         this.previous = null;
         this.paretoRound = 0;
         this.stop = stop;
-        this.departureTime = departureTime;
-        this.arrivalTime = arrivalTime;
+        this.arrivalTime = departureTime + travelDuration;
         this.travelDuration = travelDuration;
         this.cost = initialCost;
     }
@@ -86,17 +81,16 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     }
 
     @Override
-    public int departureTime() {
-        return departureTime;
-    }
-
-    @Override
     public final int arrivalTime() {
         return arrivalTime;
     }
 
     public int travelDuration() {
         return travelDuration;
+    }
+
+    public AbstractStopArrival<T> timeShiftNewArrivalTime(int newArrivalTime) {
+        throw new UnsupportedOperationException("No accessEgress for transfer stop arrival");
     }
 
     /**

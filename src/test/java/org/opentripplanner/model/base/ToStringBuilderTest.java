@@ -51,16 +51,16 @@ public class ToStringBuilderTest {
 
     @Test
     public void addNum() {
-        assertEquals("ToStringBuilderTest{num:3.0}", subject().addNum("num", 3.0000000d).toString());
-        assertEquals("ToStringBuilderTest{num:30,000.0}", subject().addNum("num", 30_000.00f).toString());
-        assertEquals("ToStringBuilderTest{num:3}", subject().addNum("num", 3).toString());
-        assertEquals("ToStringBuilderTest{num:3}", subject().addNum("num", 3L).toString());
+        assertEquals("ToStringBuilderTest{num: 3.0}", subject().addNum("num", 3.0000000d).toString());
+        assertEquals("ToStringBuilderTest{num: 30,000.0}", subject().addNum("num", 30_000.00f).toString());
+        assertEquals("ToStringBuilderTest{num: 3}", subject().addNum("num", 3).toString());
+        assertEquals("ToStringBuilderTest{num: 3}", subject().addNum("num", 3L).toString());
     }
 
     @Test
     public void testAddNumWithDefaults() {
         assertEquals(
-                "ToStringBuilderTest{b:3.0, NOT_SET:[a, c]}",
+                "ToStringBuilderTest{b: 3.0, NOT_SET: [a, c]}",
                 subject()
                         .addNum("a", 3d, 3d)
                         .addNum("b", 3d, 2d)
@@ -72,7 +72,7 @@ public class ToStringBuilderTest {
     @Test
     public void testAddNumWithUnit() {
         assertEquals(
-                "ToStringBuilderTest{a:3,000s, b:7m}",
+                "ToStringBuilderTest{a: 3,000s, b: 7m}",
                 subject()
                         .addNum("a", 3000, "s")
                         .addNum("b", 7, "m")
@@ -83,7 +83,7 @@ public class ToStringBuilderTest {
     @Test
     public void addBool() {
         assertEquals(
-                "ToStringBuilderTest{a:true, b:false}",
+                "ToStringBuilderTest{a: true, b: false}",
                 subject()
                         .addBool("a", true)
                         .addBool("b", false)
@@ -93,23 +93,23 @@ public class ToStringBuilderTest {
 
     @Test
     public void addStr() {
-        assertEquals("ToStringBuilderTest{a:'text'}", subject().addStr("a", "text").toString());
+        assertEquals("ToStringBuilderTest{a: 'text'}", subject().addStr("a", "text").toString());
     }
 
     @Test
     public void addEnum() {
-        assertEquals("ToStringBuilderTest{a:A}", subject().addEnum("a", AEnum.A).toString());
-        assertEquals("ToStringBuilderTest{NOT_SET:[b]}", subject().addEnum("b", null).toString());
+        assertEquals("ToStringBuilderTest{a: A}", subject().addEnum("a", AEnum.A).toString());
+        assertEquals("ToStringBuilderTest{NOT_SET: [b]}", subject().addEnum("b", null).toString());
     }
 
     @Test
     public void addObj() {
         assertEquals(
-                "ToStringBuilderTest{obj:Foo{a:5, b:'X'}}",
+                "ToStringBuilderTest{obj: Foo{a: 5, b: 'X'}}",
                 subject().addObj("obj", new Foo(5, "X")).toString()
         );
         assertEquals(
-                "ToStringBuilderTest{obj:Foo{NOT_SET:[a, b]}}",
+                "ToStringBuilderTest{obj: Foo{NOT_SET: [a, b]}}",
                 subject().addObj("obj", new Foo(0, null)).toString()
         );
     }
@@ -119,15 +119,15 @@ public class ToStringBuilderTest {
         Foo defaultFoo = new Foo(5, "X");
 
         assertEquals(
-                "ToStringBuilderTest{obj:Foo{a:6, b:'X'}}",
+                "ToStringBuilderTest{obj: Foo{a: 6, b: 'X'}}",
                 subject().addObj("obj", new Foo(6, "X"), defaultFoo).toString()
         );
         assertEquals(
-                "ToStringBuilderTest{NOT_SET:[obj]}",
+                "ToStringBuilderTest{NOT_SET: [obj]}",
                 subject().addObj("obj", defaultFoo, defaultFoo).toString()
         );
         assertEquals(
-                "ToStringBuilderTest{NOT_SET:[obj]}",
+                "ToStringBuilderTest{NOT_SET: [obj]}",
                 subject().addObj("obj", new Foo(5, "X"), defaultFoo).toString()
         );
     }
@@ -135,7 +135,7 @@ public class ToStringBuilderTest {
     @Test
     public void addIntArray() {
         assertEquals(
-                "ToStringBuilderTest{a:[1, 2, 3]}",
+                "ToStringBuilderTest{a: [1, 2, 3]}",
                 subject().addInts("a", new int[] { 1, 2, 3}).toString()
         );
     }
@@ -143,7 +143,7 @@ public class ToStringBuilderTest {
     @Test
     public void addCollection() {
         assertEquals(
-                "ToStringBuilderTest{c:[1, 3.0, true]}",
+                "ToStringBuilderTest{c: [1, 3.0, true]}",
                 subject().addCol("c", List.of(1, 3d, true)).toString()
         );
     }
@@ -151,11 +151,11 @@ public class ToStringBuilderTest {
     @Test
     public void addCollectionWithLimit() {
         assertEquals(
-                "ToStringBuilderTest{c:[1, 2, 3]}",
+                "ToStringBuilderTest{c: [1, 2, 3]}",
                 subject().addColLimited("c", List.of(1, 2, 3), 2).toString()
         );
         assertEquals(
-                "ToStringBuilderTest{c(2/4):[1, 2, ..]}",
+                "ToStringBuilderTest{c(2/4): [1, 2, ..]}",
                 subject().addColLimited("c", List.of(1, 2, 3, 4), 2).toString()
         );
     }
@@ -169,7 +169,7 @@ public class ToStringBuilderTest {
                 )
         );
         assertEquals(
-                "ToStringBuilderTest{c:23:45:12}",
+                "ToStringBuilderTest{c: 23:45:12}",
                 subject().addCalTime("c", c).toString()
         );
     }
@@ -179,7 +179,7 @@ public class ToStringBuilderTest {
         // 02:30:04 in seconds is:
         int seconds = 2 * 3600 + 30 * 60 + 4;
         assertEquals(
-                "ToStringBuilderTest{t:02:30:04}",
+                "ToStringBuilderTest{t: 2:30:04}",
                 subject().addServiceTime("t", seconds, -1).toString()
         );
     }
@@ -187,7 +187,7 @@ public class ToStringBuilderTest {
     @Test
     public void addCoordinate() {
         assertEquals(
-                "ToStringBuilderTest{lat:60.98766, lon:11.98, r:0.0}",
+                "ToStringBuilderTest{lat: 60.98766, lon: 11.98, r: 0.0}",
                 subject()
                         .addCoordinate("lat", 60.9876599999999d)
                         .addCoordinate("lon", 11.98d)
@@ -199,15 +199,15 @@ public class ToStringBuilderTest {
     @Test
     public void addDuration() {
         assertEquals(
-                "ToStringBuilderTest{d:35s}",
+                "ToStringBuilderTest{d: 35s}",
                 subject().addDuration("d", 35).toString()
         );
         assertEquals(
-                "ToStringBuilderTest{d:1d2h50m45s}",
+                "ToStringBuilderTest{d: 1d2h50m45s}",
                 subject().addDuration("d", (26 * 60 + 50) * 60 + 45).toString()
         );
         assertEquals(
-            "ToStringBuilderTest{d:2m5s}",
+            "ToStringBuilderTest{d: 2m5s}",
             subject().addDuration("d", Duration.ofSeconds(125)).toString()
         );
 

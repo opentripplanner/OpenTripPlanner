@@ -1,6 +1,5 @@
 package org.opentripplanner.ext.siri.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriAlertsUpdateHandler;
 import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
@@ -29,15 +28,13 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusWeeks(1);
 
-    private String url;
+    private final String url;
 
-    private String feedId;
-
-    private SiriFuzzyTripMatcher fuzzyTripMatcher;
+    private final String feedId;
 
     private AlertPatchService alertPatchService;
 
-    private long earlyStart;
+    private final long earlyStart;
 
     private SiriAlertsUpdateHandler updateHandler = null;
 
@@ -45,8 +42,37 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private int timeout;
 
-    private static Map<String, String> requestHeaders = new HashMap<>();
+    private static final Map<String, String> requestHeaders = new HashMap<>();
 
+    public SiriSXUpdater(Parameters config) {
+        super(config);
+        // TODO: add options to choose different patch services
+        String url = config.getUrl();
+        if (url == null) {
+            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
+        }
+
+        this.requestorRef = config.getRequestorRef();
+        if (requestorRef == null || requestorRef.isEmpty()) {
+            requestorRef = "otp-"+UUID.randomUUID().toString();
+        }
+
+        this.url = url;// + uniquenessParameter;
+        this.earlyStart = config.getEarlyStartSec();
+        this.feedId = config.getFeedId();
+
+
+        int timeoutSec = config.getTimeoutSec();
+        if (timeoutSec > 0) {
+            this.timeout = 1000*timeoutSec;
+        }
+
+        blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
+
+        requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
+
+        LOG.info("Creating real-time alert updater (SIRI SX) running every {} seconds : {}", pollingPeriodSeconds, url);
+    }
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -54,7 +80,9 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws Exception {
+    public void setup(Graph graph) {
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler(feedId);
         }
@@ -65,41 +93,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     }
 
     @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
-        this.alertPatchService = alertPatchService;
-        String url = config.path("url").asText();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-
-        this.requestorRef = config.path("requestorRef").asText();
-        if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-"+UUID.randomUUID().toString();
-        }
-
-        this.url = url;// + uniquenessParameter;
-        this.earlyStart = config.path("earlyStartSec").asInt(0);
-        this.feedId = config.path("feedId").asText();
-
-
-        int timeoutSec = config.path("timeoutSec").asInt();
-        if (timeoutSec > 0) {
-            this.timeout = 1000*timeoutSec;
-        }
-
-        blockReadinessUntilInitialized = config.path("blockReadinessUntilInitialized").asBoolean(false);
-
-        this.fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
-
-        requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-SX"));
-
-        LOG.info("Creating real-time alert updater (SIRI SX) running every {} seconds : {}", pollingPeriodSeconds, url);
-    }
-
-    @Override
-    protected void runPolling() throws Exception {
+    protected void runPolling() {
         boolean moreData = false;
         do {
             Siri updates = getUpdates();
@@ -172,5 +166,14 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     public String toString() {
         return "SiriSXUpdater (" + url + ")";
+    }
+
+    public interface Parameters extends PollingGraphUpdaterParameters {
+        String getUrl();
+        String getRequestorRef();
+        int getEarlyStartSec();
+        String getFeedId();
+        int getTimeoutSec();
+        boolean blockReadinessUntilInitialized();
     }
 }

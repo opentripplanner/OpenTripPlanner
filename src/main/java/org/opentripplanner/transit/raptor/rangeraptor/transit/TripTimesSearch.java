@@ -4,17 +4,19 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripPattern;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 /**
- * This class is used to find the board and alight time for a known trip,
- * where you now the board-stop, alight-stop and either earliest-board-time or latest-alight-time.
+ * This class is used to find the board and alight time for a known trip, where you now the
+ * board-stop and the alight-stop. You must also specify either a earliest-board-time or a
+ * latest-alight-time - this is done to avoid boarding at the correct stop, but at the wrong time.
+ * This can happen for patterns goes in a loop, visit the same stop more than once.
  * <p>
- * This class is needed to find board and alight times for transfer legs when mapping to
- * stop-arrivals to paths. The board and alight times are not stored in the stop-arrival state
- * to save memory and to speed up the search. Searching for this after the search is done to
- * create paths is ok, since the number of paths are a very small number compared to stop-arrivals
- * during the search.
+ * This class is used to find board- and alight-times for transfer legs when mapping stop-arrivals
+ * to paths. The board and alight times are not stored in the stop-arrival state to save memory and
+ * to speed up the search. Searching for this after the search is done to create paths is ok, since
+ * the number of paths are a very small number compared to stop-arrivals during the search.
  */
 public class TripTimesSearch<T extends RaptorTripSchedule> {
     private final T schedule;
@@ -28,30 +30,38 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
     }
 
     /**
-     * Search for board- and alight-times for the trip matching the given trip-schedule,
-     * from-/to-stop AFTER the given earliest-departure-time. This is safe to use even
-     * for trips that has been time-shifted BACKWARD in time, but not if the trip is running in a
-     * loop and manage to do a hole loop within the time-shift.
+     * Search for board- and alight-times for the trip matching the given stop-arrival
+     * when searching FORWARD. Hence, searching in the same direction as the trip travel
+     * direction.
      */
-    public static <S extends RaptorTripSchedule> Result searchAfterEDT(
-            S schedule, int fromStop, int toStop, int earliestDepartureTime
+    public static <S extends RaptorTripSchedule> BoarAlightTimes findTripForwardSearch(
+        ArrivalView<S> arrival
     ) {
-        return new TripTimesSearch<>(schedule, fromStop, toStop).searchAfterEDT(earliestDepartureTime);
+        S trip = arrival.transitLeg().trip();
+        int fromStop = arrival.previous().stop();
+        int toStop = arrival.stop();
+        int latestArrivalTime = arrival.arrivalTime();
+
+        return new TripTimesSearch<>(trip, fromStop, toStop).findTripBefore(latestArrivalTime);
     }
 
     /**
-     * Search for board- and alight-times for the trip matching the given trip-schedule,
-     * from-/to-stop BEFORE the given latest-arrival-time. This is safe to use even
-     * for trips that has been time-shifted FORWARD in time, but not if the trip is running in a
-     * loop and manage to do a hole loop within the time-shift.
+     * Search for board- and alight-times for the trip matching the given stop-arrival
+     * when searching in REVERSE. Hence, searching in the opposite direction of the trip
+     * travel direction.
      */
-    public static <S extends RaptorTripSchedule> Result searchBeforeLAT(
-            S schedule, int fromStop, int toStop, int latestArrivalTime
+    public static <S extends RaptorTripSchedule> BoarAlightTimes findTripReverseSearch(
+        ArrivalView<S> arrival
     ) {
-        return new TripTimesSearch<>(schedule, fromStop, toStop).searchBeforeLAT(latestArrivalTime);
+        S trip = arrival.transitLeg().trip();
+        int fromStop = arrival.stop();
+        int toStop = arrival.previous().stop();
+        int earliestBoardTime = arrival.arrivalTime();
+
+        return new TripTimesSearch<>(trip, fromStop, toStop).findTripAfter(earliestBoardTime);
     }
 
-    private Result searchAfterEDT(int earliestDepartureTime) {
+    private BoarAlightTimes findTripAfter(int earliestDepartureTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
         int i = 0;
@@ -61,14 +71,20 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
         if(i == size) {
             throw noFoundException(
-                    "No departures after earliest-departure-time", "EDT", earliestDepartureTime
+                    "No departures after 'earliestDepartureTime'",
+                    "earliestDepartureTime",
+                    earliestDepartureTime
             );
         }
 
         while (i < size && p.stopIndex(i) != fromStop) { ++i; }
 
         if(i == size) {
-            throw noFoundException("No stops matching 'fromStop'", "EDT", earliestDepartureTime);
+            throw noFoundException(
+                "No stops matching 'fromStop'",
+                "earliestDepartureTime",
+                earliestDepartureTime
+            );
         }
 
         int departureTime = schedule.departure(i);
@@ -82,15 +98,19 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         }
 
         if(i == size) {
-            throw noFoundException("No stops matching 'toStop'", "EDT", earliestDepartureTime);
+            throw noFoundException(
+                "No stops matching 'toStop'",
+                "earliestDepartureTime",
+                earliestDepartureTime
+            );
         }
 
         int arrivalTime = schedule.arrival(i);
 
-        return new Result(departureTime, arrivalTime);
+        return new BoarAlightTimes(departureTime, arrivalTime);
     }
 
-    private Result searchBeforeLAT(int latestArrivalTime) {
+    private BoarAlightTimes findTripBefore(int latestArrivalTime) {
         RaptorTripPattern p = schedule.pattern();
         final int size = p.numberOfStopsInPattern();
         int i = size-1;
@@ -102,14 +122,20 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
 
         if(i < 0) {
             throw noFoundException(
-                    "No arrivals before latest-arrival-time", "LAT", latestArrivalTime
+                    "No arrivals before 'latestArrivalTime'",
+                    "latestArrivalTime",
+                    latestArrivalTime
             );
         }
 
         while (i >= 0 && p.stopIndex(i) != toStop) { --i; }
 
         if(i < 0) {
-            throw noFoundException("No stops matching 'toStop'", "LAT", latestArrivalTime);
+            throw noFoundException(
+                    "No stops matching 'toStop'",
+                    "latestArrivalTime",
+                    latestArrivalTime
+            );
         }
 
         int arrivalTime = schedule.arrival(i);
@@ -123,12 +149,16 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
         }
 
         if(i < 0) {
-            throw noFoundException("No stops matching 'fromStop'", "LAT", latestArrivalTime);
+            throw noFoundException(
+                    "No stops matching 'fromStop'",
+                    "latestArrivalTime",
+                    latestArrivalTime
+            );
         }
 
         int departureTime = schedule.departure(i);
 
-        return new Result(departureTime, arrivalTime);
+        return new BoarAlightTimes(departureTime, arrivalTime);
     }
 
     private IllegalStateException noFoundException(String hint, String lbl, int time) {
@@ -137,22 +167,22 @@ public class TripTimesSearch<T extends RaptorTripSchedule> {
                         + " [FromStop: " + fromStop
                         + ", toStop: " + toStop
                         + ", " + lbl + ": " + TimeUtils.timeToStrLong(time)
-                        + ", schedule: " + schedule.debugInfo() + "]"
+                        + ", pattern: " + schedule.pattern().debugInfo() + "]"
         );
     }
 
-    public static class Result {
+    public static class BoarAlightTimes {
         public final int boardTime;
         public final int alightTime;
 
-        private Result(int boardTime, int alightTime) {
+        private BoarAlightTimes(int boardTime, int alightTime) {
             this.boardTime = boardTime;
             this.alightTime = alightTime;
         }
 
         @Override
         public String toString() {
-            return ToStringBuilder.of(Result.class)
+            return ToStringBuilder.of(BoarAlightTimes.class)
                     .addServiceTime("boardTime", boardTime, -1)
                     .addServiceTime("alightTime", alightTime, -1)
                     .toString();

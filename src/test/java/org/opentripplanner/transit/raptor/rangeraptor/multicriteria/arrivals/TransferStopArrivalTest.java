@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 import org.junit.Test;
 import org.opentripplanner.transit.raptor._shared.TestLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 import org.opentripplanner.transit.raptor.rangeraptor.transit.TransitCalculator;
 
 import static org.junit.Assert.assertEquals;
@@ -37,24 +38,20 @@ public class TransferStopArrivalTest {
 
     private static final TransitCalculator TRANSIT_CALCULATOR = TransitCalculator.testDummyCalculator(true);
     private static final AccessStopArrival<RaptorTripSchedule> ACCESS_ARRIVAL = new AccessStopArrival<>(
-            ACCESS_TO_STOP,
-            ACCESS_DEPARTURE_TIME,
-            ACCESS_DURATION,
-            ACCESS_COST,
-            null
+        ACCESS_DEPARTURE_TIME,
+        ACCESS_COST,
+        new TestRaptorTransfer(ACCESS_TO_STOP, ACCESS_DURATION)
     );
 
     private static final TransitStopArrival<RaptorTripSchedule> TRANSIT_ARRIVAL = new TransitStopArrival<>(
-            ACCESS_ARRIVAL,
+            ACCESS_ARRIVAL.timeShiftNewArrivalTime(TRANSIT_BOARD_TIME - BOARD_SLACK),
             TRANSIT_TO_STOP,
             TRANSIT_ALIGHT_TIME,
-            TRANSIT_BOARD_TIME,
-            TRANSIT_TRIP,
-            ACCESS_DURATION + BOARD_SLACK + TRANSIT_LEG_DURATION,
-            TRANSIT_COST
+            TRANSIT_COST,
+            TRANSIT_TRIP
     );
 
-    private TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
+    private final TransferStopArrival<RaptorTripSchedule> subject = new TransferStopArrival<>(
             TRANSIT_ARRIVAL,
             new TestLeg(TRANSFER_TO_STOP,TRANSFER_LEG_DURATION),
             TRANSFER_ALIGHT_TIME,
@@ -71,11 +68,6 @@ public class TransferStopArrivalTest {
     }
 
     @Test
-    public void transferFromStop() {
-        assertEquals(TRANSIT_TO_STOP, subject.transferFromStop());
-    }
-
-    @Test
     public void stop() {
         assertEquals(TRANSFER_TO_STOP, subject.stop());
     }
@@ -83,11 +75,6 @@ public class TransferStopArrivalTest {
     @Test
     public void arrivalTime() {
         assertEquals(TRANSFER_ALIGHT_TIME, subject.arrivalTime());
-    }
-
-    @Test
-    public void departureTime() {
-        assertEquals(TRANSIT_ALIGHT_TIME, subject.departureTime());
     }
 
     @Test
@@ -116,7 +103,7 @@ public class TransferStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "TransferStopArrival { Rnd: 1, Stop: 102, Time: 9:26 (9:20), Cost: 1100 }",
+                "Walk { round: 1, stop: 102, arrival-time: 9:26, cost: 1100 }",
                 subject.toString()
         );
     }

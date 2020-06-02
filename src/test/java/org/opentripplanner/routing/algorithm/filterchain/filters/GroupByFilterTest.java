@@ -9,18 +9,15 @@ import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongest
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.A;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.B;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.C;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.D;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.E;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.F;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.itinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.toStr;
+import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.D;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.F;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter.groupMaxLimit;
-import static org.opentripplanner.routing.core.TraverseMode.TRANSIT;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class GroupByFilterTest {
 
@@ -34,21 +31,23 @@ public class GroupByFilterTest {
 
     @Test
     public void groupByTheLongestItineraryAndTwoGroups() {
-        GroupByFilter<GroupByLongestLegsId> subject;
         List<Itinerary> result;
 
         // Group 1
-        Itinerary i1 = itinerary(leg(A, C, 6, 19, 9.0, WALK));
+        Itinerary i1 = newItinerary(A, 6)
+            .walk(240, C)
+            .build();
 
-        // Group 2, with 3 itineraries
-        Itinerary i2 = itinerary(
-                leg(A, B, 6, 12, 8.0, TRANSIT),
-                leg(B, C, 13, 14, 2.0, TRANSIT)
-        );
-        Itinerary i3 = itinerary(
-                leg(A, B, 6, 12, 8.0, TRANSIT),
-                leg(B, C, 13, 15, 1.0, TRANSIT)
-        );
+        // Group 2, with 2 itineraries
+        Itinerary i2 = newItinerary(A)
+            .bus(1, 0, 50, B)
+            .bus(11, 52, 100, C)
+            .build();
+        Itinerary i3 = newItinerary(A)
+            // Rail is 2x faster then bus, witch give us 12:2 in distance (84.6/15.4)
+            .rail(1, 0, 50, B)
+            .bus(12, 51, 100, C)
+            .build();
 
         List<Itinerary> list = List.of(i1, i2, i3);
 
@@ -60,7 +59,7 @@ public class GroupByFilterTest {
         result = createFilter(2).filter(list);
         assertEquals(toStr(List.of(i1, i2)), toStr(result));
 
-        // With min Limit = 3, still one from each group
+        // With min Limit = 3, we get all 3 itineraries
         result = createFilter(3).filter(list);
         assertEquals(toStr(List.of(i1, i2, i3)), toStr(result));
     }
@@ -69,30 +68,45 @@ public class GroupByFilterTest {
     public void groupByTheLongestItineraryWithHigherOrderGroups() {
         List<Itinerary> result;
 
-        Leg legAB = leg(A, B, 6, 12, 6.0, TRANSIT);
-        Leg legBC = leg(B, C, 13, 14, 10.0, TRANSIT);
+        Leg legAB = newItinerary(A).bus(21, 6, 12, B).build().firstLeg();
+        Leg legBC = newItinerary(B).rail(31, 13, 18, C).build().firstLeg();
 
-        // GroupId: [legBC, legAB]  Distance: 10 + 6 > 50% of total(6+10+5 = 21)
-        Itinerary it1 = itinerary(legAB, legBC, leg(C, D, 14, 15, 5.0, TRANSIT));
+        //Leg legAB = leg(A, B, 6, 12, 6.0, TRANSIT);
+        // Leg legBC = leg(B, C, 13, 14, 10.0, TRANSIT);
+
+        // GroupId: [legBC, legAB]  Distance: 6 + 2*5 > 50% of total(6+10+5 = 21)
+        Itinerary it1 = newItinerary(A)
+            .bus(1, 6, 12, B)
+            .rail(110, 13, 18, C)
+            .bus(51, 19, 24, D)
+            .build();
 
         // GroupId: [legBC, legEF, legFD]  Distance: 10 + 9 + 8 > 50% of 6+10+7+9+8 = 40
-        Itinerary it2 = itinerary(
-                legAB,
-                legBC,
-                leg(C, E, 14, 16, 7.0, TRANSIT),
-                leg(E, F, 17, 18, 9.0, TRANSIT),
-                leg(F, D, 19, 20, 8.0, TRANSIT)
-        );
+        Itinerary it2 = newItinerary(A)
+            .bus(2, 6, 12, B)
+            .rail(110, 13, 18, C)
+            .bus(31,19, 26, D)
+            .bus(41, 27, 36, E)
+            .bus(51, 37, 45, F)
+            .build();
 
         // GroupId: [legBC]  Distance: 10 > 50% of total(6+10+3 = 19)
-        Itinerary it3 = itinerary(legAB, legBC, leg(C, D, 14, 30, 3.0, WALK));
+        Itinerary it3 = newItinerary(A)
+            .bus(3, 6, 12, B)
+            .rail(110, 13, 18, C)
+            .bus(21, 19, 22, D)
+            .build();
 
         // GroupId: [legBC, legCD]  Distance: 10 + 9 > 50% of total(6+10+9 = 25)
-        Itinerary it4 = itinerary(legAB, legBC, leg(C, D, 14, 18, 9.0, TRANSIT));
+        Itinerary it4 = newItinerary(A)
+            .bus(4, 6, 12, B)
+            .rail(110, 13, 18, C)
+            .bus(31, 19, 28, D)
+            .build();
 
         // Expected order:
-        String exp1 = toStr(List.of(it1));
-        String exp2 = toStr(List.of(it1, it4));
+        String exp1 = toStr(List.of(it3));
+        String exp2 = toStr(List.of(it3, it1));
         String exp4 = toStr(List.of(it1, it2, it3, it4));
 
         // Assert all itineraries is put in the same group - expect just one result back

@@ -4,6 +4,7 @@ import java.util.HashSet;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 /**
@@ -16,8 +17,11 @@ public class NextBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
 
     private String networkName;
 
-    public NextBikeRentalDataSource(String networkName) {
-        super("//city/place");
+    public NextBikeRentalDataSource(
+        UpdaterDataSourceParameters config,
+        String networkName
+    ) {
+        super(config,"//city/place");
         // this feed sets values on place node attributes, rather than in child elements
         this.setReadAttributes(true);
 

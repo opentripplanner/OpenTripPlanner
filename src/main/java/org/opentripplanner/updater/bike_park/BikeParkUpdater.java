@@ -8,7 +8,6 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Set;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -19,7 +18,6 @@ import org.opentripplanner.routing.vertextype.BikeParkVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -49,39 +47,20 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private BikeRentalStationService bikeService;
 
-    public BikeParkUpdater() {
+    public BikeParkUpdater(PollingGraphUpdaterParameters parameters) {
+        super(parameters);
+        // Set source from preferences
+        source = new KmlBikeParkDataSource((KmlBikeParkDataSource.Parameters) parameters.getSourceConfig());
+
+        LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
-    @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        // Set source from preferences
-        String sourceType = config.path("sourceType").asText();
-        BikeParkDataSource source = null;
-        if (sourceType != null) {
-            if (sourceType.equals("kml-placemarks")) {
-                source = new KmlBikeParkDataSource();
-            }
-        }
-
-        if (source == null) {
-            throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        } else if (source instanceof JsonConfigurable) {
-            ((JsonConfigurable) source).configure(graph, config);
-        }
-
-        // Configure updater
-        this.graph = graph;
-        this.source = source;
-        LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
-    }
-
-    @Override
     public void setup(Graph graph) {
+        this.graph = graph;
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike park station service needs a graph writer runnable
@@ -102,7 +81,6 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         updaterManager.execute(graphWriterRunnable);
     }
 
-    @Override
     public void teardown() {
     }
 

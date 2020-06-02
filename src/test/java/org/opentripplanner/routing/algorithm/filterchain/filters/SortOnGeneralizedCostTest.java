@@ -6,32 +6,26 @@ import org.opentripplanner.model.plan.Itinerary;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.A;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.B;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.E;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.itinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.toStr;
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
-import static org.opentripplanner.routing.core.TraverseMode.RAIL;
-import static org.opentripplanner.routing.core.TraverseMode.WALK;
+import static org.opentripplanner.model.plan.Itinerary.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class SortOnGeneralizedCostTest {
-
-    public static final int TRANSFER_COST = 300;
-    public static final double A_DISTANCE = 3_000d;
 
     @Test
     public void sortOnCostWorksWithOneOrEmptyList() {
         // Expect sort to no fail on an empty list
-        assertEquals(List.of(), new SortOnGeneralizedCost(TRANSFER_COST).filter(List.of()));
+        assertEquals(List.of(), new SortOnGeneralizedCost().filter(List.of()));
 
 
         // Given a list with one itinerary
-        List<Itinerary> list = List.of(itinerary(leg(A, E, 0, 30, A_DISTANCE, BUS)));
+        List<Itinerary> list = List.of(newItinerary(A).bus(31, 0, 30, E).build());
 
         // Then: expect nothing to happen to it
-        assertEquals(toStr(list), toStr(new SortOnGeneralizedCost(TRANSFER_COST).filter(list)));
+        assertEquals(toStr(list), toStr(new SortOnGeneralizedCost().filter(list)));
     }
 
     @Test
@@ -39,9 +33,9 @@ public class SortOnGeneralizedCostTest {
         List<Itinerary> result;
 
         // Given: a walk(50m), bus(30m) and rail(20m) alternatives without generalizedCost or transfers
-        Itinerary walk = itinerary(leg(A, E, 0, 50, A_DISTANCE, WALK));
-        Itinerary bus = itinerary(leg(A, E, 0, 30, A_DISTANCE, BUS));
-        Itinerary rail = itinerary(leg(A, E, 0, 20, A_DISTANCE, RAIL));
+        Itinerary walk = newItinerary(A, 0).walk(50, E).build();
+        Itinerary bus = newItinerary(A).bus(21, 0, 30, E).build();
+        Itinerary rail = newItinerary(A).rail(110, 0, 20, E).build();
 
         // Add some cost - we prioritize walking
         walk.generalizedCost = 600;
@@ -49,41 +43,37 @@ public class SortOnGeneralizedCostTest {
         rail.generalizedCost = 600 + 1;
 
         // When: sorting
-        result = new SortOnGeneralizedCost(TRANSFER_COST).filter(List.of(walk, bus, rail));
+        result = new SortOnGeneralizedCost().filter(List.of(walk, bus, rail));
 
         // Then: expect rail(1/3 of walk time), bus(2/3 of walk time) and walk
-        assertEquals(toStr(List.of(walk, rail, bus)), toStr(result));
+        assertEquals(Itinerary.toStr(List.of(walk, rail, bus)), Itinerary.toStr(result));
     }
 
     @Test
     public void sortOnCostAndNumOfTransfers() {
         List<Itinerary> result;
 
-        // Given: a walk and bus with the same q = duration + C * Transfers (transfer cost is 5 min)
-        Itinerary walk = itinerary(leg(A, E, 0, 50, 3_000d, WALK));
-        Itinerary bus = itinerary(
-                leg(A, B, 0, 10, A_DISTANCE, BUS),
-                leg(B, E, 30, 45, A_DISTANCE, BUS)
-        );
+        // Given: 3 itineraries with 0, 1, and 2 number-of-transfers and the same cost
+        Itinerary walk = newItinerary(A, 0).walk(50, E).build();
+        Itinerary bus1 = newItinerary(A)
+            .bus(21, 0, 10, B)
+            .bus(31, 30, 45, E)
+            .build();
+        Itinerary bus2 = newItinerary(A)
+            .bus(21, 0, 10, B)
+            .bus(31, 30, 45, C)
+            .bus(41, 30, 45, E)
+            .build();
 
         // Add some cost - we prioritize bus with the lowest cost
-        walk.generalizedCost = 300 + 1;
-        bus.generalizedCost = 0;
+        walk.generalizedCost = 300;
+        bus1.generalizedCost = 300;
+        bus2.generalizedCost = 300;
 
         // When: sorting
-        result = new SortOnGeneralizedCost(TRANSFER_COST).filter(List.of(walk, bus));
+        result = new SortOnGeneralizedCost().filter(List.of(bus2, walk, bus1));
 
         // Then: expect bus to be better than walking
-        assertEquals(toStr(List.of(bus, walk)), toStr(result));
-
-        // Add some cost - we prioritize walking with the lowest cost
-        walk.generalizedCost = 300;
-        bus.generalizedCost = 1;
-
-        // When: sorting
-        result = new SortOnGeneralizedCost(TRANSFER_COST).filter(List.of(walk, bus));
-
-        // Then: expect walking to be better than bus
-        assertEquals(toStr(List.of(walk, bus)), toStr(result));
+        assertEquals(toStr(List.of(walk, bus1, bus2)), toStr(result));
     }
 }

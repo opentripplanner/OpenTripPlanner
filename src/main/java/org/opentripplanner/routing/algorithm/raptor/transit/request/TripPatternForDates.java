@@ -69,7 +69,9 @@ public class TripPatternForDates implements RaptorRoute<TripSchedule>,
     }
 
     @Override
-    public String modeInfo() { return tripPattern.getTransitMode().name(); }
+    public String debugInfo() {
+        return tripPattern.getTransitMode().name() + " " + tripPattern.getPattern().route.getShortName();
+    }
 
     // Implementing RaptorTimeTable
 

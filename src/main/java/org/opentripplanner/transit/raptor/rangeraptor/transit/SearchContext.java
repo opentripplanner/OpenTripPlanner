@@ -227,8 +227,8 @@ public class SearchContext<T extends RaptorTripSchedule> {
             WorkerLifeCycle lifeCycle
     ) {
         return request.searchDirection().isForward()
-                ? new ForwardPathMapper<>(request.slackProvider(), lifeCycle)
-                : new ReversePathMapper<>(request.slackProvider(), lifeCycle);
+                ? new ForwardPathMapper<>(lifeCycle)
+                : new ReversePathMapper<>(lifeCycle);
     }
 
     private static CostCalculator createCostCalculator(int[] stopVisitCost, McCostParams f, WorkerLifeCycle lifeCycle) {
