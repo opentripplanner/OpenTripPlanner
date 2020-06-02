@@ -84,7 +84,9 @@ public class RoutingWorker {
 
         // Filter itineraries
         long startTimeFiltering = System.currentTimeMillis();
-        itineraries = filterChain().filter(itineraries);
+
+        // Filter itineraries
+        itineraries = filterItineraries(itineraries);
         LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
 
@@ -128,11 +130,8 @@ public class RoutingWorker {
         );
         verifyEgressAccess(accessTransfers, egressTransfers);
 
-        /* Prepare transit search */
-
+        // Prepare transit search
         double startTimeRouting = System.currentTimeMillis();
-
-
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
@@ -150,7 +149,7 @@ public class RoutingWorker {
         LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
         LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
 
-        /* Create itineraries */
+        // Create itineraries
 
         double startItineraries = System.currentTimeMillis();
 
@@ -193,19 +192,33 @@ public class RoutingWorker {
         return itineraries;
     }
 
-    private ItineraryFilter filterChain() {
+    private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
+        int minDurationInSeconds = itineraries.stream().mapToInt(it -> it.durationSeconds).min().orElse(0);
+
         ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
-        builder.setGroupByTransferCost(request.walkBoardCost + request.transferCost);
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
         builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
+
+        // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
+        //           - exposed as a parameter in the APIs yet.
+        {
+        builder.removeTransitWithHigherCostThanBestOnStreetOnly(true);
+
+            // Remove short transit legs(< 10% duration) in the start or end of a journey;
+            // Calculate 10% of travel time, round down to closest minute
+            int partOfTravelTime = (6 * minDurationInSeconds) / 60;
+            builder.setShortTransitSlackInSeconds(partOfTravelTime);
+        }
 
         if(request.debugItineraryFilter) {
             builder.debug();
         }
 
-        return builder.build();
+        ItineraryFilter filterChain = builder.build();
+
+        return filterChain.filter(itineraries);
     }
 
     private void verifyEgressAccess(

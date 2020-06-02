@@ -2,85 +2,139 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.TraverseMode;
 
+import java.util.Arrays;
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.itinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.toStr;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.D;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.G;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class OtpDefaultSortOrderTest {
-    private final Itinerary I1 = itinerary(leg("I1", 6, 7, 1.0, TraverseMode.WALK));
-    private final Itinerary I2 = itinerary(leg("I2", 7, 9, 1.0, TraverseMode.WALK));
-    private final Itinerary I3 = itinerary(leg("I3", 4, 9, 1.0, TraverseMode.WALK));
-    private final Itinerary I4 = itinerary(leg("I4", 7, 8, 1.0, TraverseMode.WALK));
-    private final Itinerary I5 = itinerary(leg("I5", 6, 8, 1.0, TraverseMode.TRANSIT));
-    private final Itinerary I6 = itinerary(leg("I6", 7, 9, 1.0, TraverseMode.TRANSIT));
-    private final Itinerary I7 = itinerary(leg("I7", 4, 9, 1.0, TraverseMode.TRANSIT));
-    private final Itinerary I8 = itinerary(leg("I8", 7, 8, 1.0, TraverseMode.TRANSIT));
 
-    private OtpDefaultSortOrder subject;
+    private List<Itinerary> result;
+
 
     @Test
-    public void sortSetOfWalkingItinerariesUsingDepartAfter() {
-        subject = departAfterSort();
-        List<Itinerary> result;
+    public void sortStreetBeforeTransitThenTime() {
+        Itinerary walk = newItinerary(A, 0).walk(5, G).build();
+        Itinerary bicycle = newItinerary(B).bicycle(4, 6, G).build();
+        Itinerary bus  = newItinerary(C).bus(21, 1, 4, G).build();
+        Itinerary rail  = newItinerary(D).rail(21, 3, 7, G).build();
 
-        result = subject.filter(List.of(I2, I1, I4, I3));
-        assertEquals(toStr(List.of(I1, I4, I2, I3)), toStr(result));
+        // Eliminate cost
+        walk.generalizedCost = bicycle.generalizedCost = bus.generalizedCost = rail.generalizedCost = 0;
 
-        result = subject.filter(List.of(I4, I2, I3, I1));
-        assertEquals(toStr(List.of(I1, I4, I2, I3)), toStr(result));
+        // Depart-after-sort
+        result = departAfterSort().filter(List.of(walk, bicycle, bus, rail));
+        assertEquals(toStr(walk, bicycle, bus, rail), toStr(result));
+
+        // Arrive-by-sort
+        result = arriveBySort().filter(List.of(walk, bicycle, bus, rail));
+        assertEquals(toStr(bicycle, walk, rail, bus), toStr(result));
     }
 
     @Test
-    public void sortSetOfWalkingItinerariesUsingArriveBy() {
-        // Arrive by sort order
-        subject = arriveBySort();
-        List<Itinerary> result;
+    public void sortOnTime() {
+        Itinerary iA = newItinerary(A).bus(21, 1, 5, G).build();
+        Itinerary iB = newItinerary(B).bus(21, 0, 5, G).build();
+        Itinerary iC = newItinerary(C).bus(21, 1, 6, G).build();
+        Itinerary iD = newItinerary(D).bus(21, 0, 6, G).build();
 
-        result = subject.filter(List.of(I2, I4, I3, I1));
-        assertEquals(toStr(List.of(I4, I2, I1, I3)), toStr(result));
+        // Eliminate cost
+        iA.generalizedCost = iB.generalizedCost = iC.generalizedCost = iD.generalizedCost = 0;
 
-        // Repeat test with different initial order
-        result = subject.filter(List.of(I3, I1, I2, I4));
-        assertEquals(toStr(List.of(I4, I2, I1, I3)), toStr(result));
+        // Depart-after-sort
+        result = departAfterSort().filter(List.of(iD, iB, iA, iC));
+        assertEquals(toStr(iA, iB, iC, iD), toStr(result));
+
+        // Arrive-by-sort
+        result = arriveBySort().filter(List.of(iB, iD, iC, iA));
+        assertEquals(toStr(iA, iC, iB, iD), toStr(result));
     }
 
     @Test
-    public void sortSetOfTransitItineraries() {
-        List<Itinerary> itinerariesRndOrder = List.of(I5, I7, I6, I8);
-        List<Itinerary> result;
+    public void sortOnGeneralizedCostVsTime() {
+        Itinerary iA = newItinerary(A).bus(21, 0, 20, G).build();
+        iA.generalizedCost = 1;
 
-        // depart after
-        result = departAfterSort().filter(itinerariesRndOrder);
-        assertEquals(toStr(List.of(I8, I5, I6, I7)), toStr(result));
+        // Better on arrival-time, but worse on cost
+        Itinerary iB = newItinerary(B).bus(21, 0, 10, G).build();
+        iB.generalizedCost = 100;
 
-        // arrive by
-        result = arriveBySort().filter(itinerariesRndOrder);
-        assertEquals(toStr(List.of(I8, I6, I5, I7)), toStr(result));
+        // Better on departure-time, but worse on cost
+        Itinerary iC = newItinerary(C).bus(21, 10, 20, G).build();
+        iC.generalizedCost = 100;
 
+        // Verify depart-after sort on arrival-time, then cost
+        assertEquals(toStr(iB, iA, iC), toStr(departAfterSort().filter(List.of(iB, iA, iC))));
+
+        // Verify arrive-by sort on departure-time, then cost
+        assertEquals(toStr(iC, iA, iB), toStr(arriveBySort().filter(List.of(iB, iA, iC))));
     }
 
     @Test
-    public void verifyWalkingArrivalTimeAndDepartureTime() {
-        // Then sort, insert in random order
-        List<Itinerary> input = List.of(I7, I3, I8, I4, I2, I5, I6, I1);
-        List<Itinerary> result;
+    public void sortOnGeneralizedCostVsNumberOfTransfers() {
+        // Best cost, 1 transfer
+        Itinerary iA = newItinerary(A)
+            .bus(11, 0, 20, C)
+            .bus(21, 22, 40, G)
+            .build();
+        iA.generalizedCost = 1;
 
-        // departAfter
-        result = departAfterSort().filter(input);
-        // The expected sort order is the WALK leg first, then
-        assertEquals(toStr(result), toStr(List.of(I1, I4, I2, I3, I8, I5, I6, I7)), toStr(result));
+        // Same cost, more transfers (2 transfers)
+        Itinerary iB = newItinerary(B)
+            .bus(11, 0, 10, C)
+            .bus(21, 12, 20, D)
+            .bus(31, 22, 40, G)
+            .build();
+        iB.generalizedCost = 1;
 
-        // arriveBy
-        result = arriveBySort().filter(input);
-        // The expected sort order is the WALK leg first, then
-        assertEquals(toStr(result), toStr(List.of(I4, I2, I1, I3, I8, I6, I5, I7)), toStr(result));
+        // Worse on cost, better on transfers
+        Itinerary iC = newItinerary(C).bus(11, 0, 40, G).build();
+        iC.generalizedCost = 100;
+
+        // Verify depart-after sort on generalized-cost, then transfers
+        assertEquals(toStr(iA, iB, iC), toStr(departAfterSort().filter(List.of(iB, iC, iA))));
+
+        // Verify arrive-by sort on generalized-cost, then transfers
+        assertEquals(toStr(iA, iB, iC), toStr(arriveBySort().filter(List.of(iC, iA, iB))));
     }
 
+    @Test
+    public void sortOnTransfersVsTime() {
+        Itinerary iA = newItinerary(A).bus(21, 0, 20, G).build();
+        iA.generalizedCost = 1;
+
+        // Better on arrival-time, but worse on transfers
+        Itinerary iB = newItinerary(B)
+            .bus(21, 0, 5, B)
+            .bus(21, 7, 10, G)
+            .build();
+        iB.generalizedCost = 100;
+
+        // Better on departure-time, but worse on transfers
+        Itinerary iC = newItinerary(A).bus(21, 10, 20, G).build();
+        iC.generalizedCost = 100;
+
+        // Verify depart-after sort on arrival-time, then cost
+        assertEquals(toStr(iB, iA, iC), toStr(departAfterSort().filter(List.of(iB, iA, iC))));
+
+        // Verify arrive-by sort on departure-time, then cost
+        assertEquals(toStr(iC, iA, iB), toStr(arriveBySort().filter(List.of(iB, iA, iC))));
+    }
+
+    private String toStr(Itinerary ... list) {
+        return Itinerary.toStr(Arrays.asList(list));
+    }
+
+    private String toStr(List<Itinerary> list) {
+        return Itinerary.toStr(list);
+    }
 
     private OtpDefaultSortOrder arriveBySort() {
         return new OtpDefaultSortOrder(true);

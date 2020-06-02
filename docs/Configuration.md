@@ -661,7 +661,7 @@ he search window is rounded of to the closest multiplication of N minutes. If N=
 
 
 ### transit.stopTransferCost.<TransferPriority>
-Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to ride and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is otional, but if listed all values must be set. 
+Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. 
 
 This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
 
@@ -671,7 +671,7 @@ If not set the `stopTransferCost` is ignored. This is only available for NeTEx i
 
 **Value Type:**  `int` 
 
-**Value Unit:** Scalar, equvivalent to one second of transit. 
+**Value Unit:** Scalar, equivalent to one second of transit. 
 
 **Value Range:** `[0 .. 100,000]`
 

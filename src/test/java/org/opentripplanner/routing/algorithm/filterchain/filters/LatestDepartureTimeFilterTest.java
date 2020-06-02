@@ -2,24 +2,22 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.core.TraverseMode;
 
 import java.time.Instant;
 import java.util.List;
 
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.A;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.E;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.itinerary;
-import static org.opentripplanner.routing.algorithm.filterchain.FilterChainTestData.leg;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 
 public class LatestDepartureTimeFilterTest {
 
     @Test
-    public void filterAwayNothingIfNoWalking() {
+    public void filterOnLatestDepartureTime() {
         // Given:
-        Itinerary it = itinerary(leg(A, E, 0, 60, 5.0, TraverseMode.TRANSIT));
+        Itinerary it = newItinerary(A).bus(32, 0, 60, E).build();
         Instant time = it.firstLeg().startTime.toInstant();
 
         // When:
