@@ -7,6 +7,7 @@ import org.opentripplanner.datastore.configure.DataStoreFactory;
 import org.opentripplanner.graph_builder.GraphBuilder;
 import org.opentripplanner.graph_builder.GraphBuilderDataSources;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.standalone.GraphService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.opentripplanner.standalone.server.GrizzlyServer;
 import org.opentripplanner.standalone.server.OTPApplication;
@@ -65,8 +66,8 @@ public class OTPAppConstruction {
      * Create a new Grizzly server - call this method once, the new instance is created
      * every time this method is called.
      */
-    public GrizzlyServer createGrizzlyServer(Router router) {
-        return new GrizzlyServer(config.getCli(), createApplication(router));
+    public GrizzlyServer createGrizzlyServer(GraphService service) {
+        return new GrizzlyServer(config.getCli(), createApplication(service));
     }
 
     public void validateConfigAndDataSources() {
@@ -113,9 +114,9 @@ public class OTPAppConstruction {
      * <p>
      * The method is {@code public} to allow test access.
      */
-    public OTPServer server(Router router) {
+    public OTPServer server(GraphService service) {
         if (server == null) {
-            server = new OTPServer(config.getCli(), router);
+            server = new OTPServer(config.getCli(), service);
         }
         return server;
     }
@@ -136,7 +137,7 @@ public class OTPAppConstruction {
         OTPFeature.logFeatureSetup();
     }
 
-    private Application createApplication(Router router) {
-        return new OTPApplication(server(router), !config.getCli().insecure);
+    private Application createApplication(GraphService service) {
+        return new OTPApplication(server(service), !config.getCli().insecure);
     }
 }

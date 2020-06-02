@@ -139,7 +139,7 @@ public class OTPMain {
         // This would also avoid the awkward call to set the router on the appConstruction after it's constructed.
         // However, currently the server runs in a blocking way and waits for shutdown, so has to run last.
         if (params.doServe()) {
-            GrizzlyServer grizzlyServer = app.createGrizzlyServer(router);
+            GrizzlyServer grizzlyServer = app.createGrizzlyServer(service);
             // Loop to restart server on uncaught fatal exceptions.
             while (true) {
                 try {

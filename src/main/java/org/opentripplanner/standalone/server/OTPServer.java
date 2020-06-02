@@ -4,6 +4,7 @@ import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.glassfish.hk2.utilities.binding.AbstractBinder;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.standalone.GraphService;
 import org.opentripplanner.standalone.config.CommandLineParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,12 +21,12 @@ public class OTPServer {
 
     public final CommandLineParameters params;
 
-    private final Router router;
+    private final GraphService service;
 
-    public OTPServer (CommandLineParameters params, Router router) {
+    public OTPServer (CommandLineParameters params, GraphService service) {
         LOG.info("Wiring up and configuring server.");
         this.params = params;
-        this.router = router;
+        this.service = service;
     }
 
     /**
@@ -39,7 +40,7 @@ public class OTPServer {
     }
 
     public Router getRouter() {
-        return router;
+        return service.getRouter();
     }
 
     /**
@@ -49,7 +50,7 @@ public class OTPServer {
      * will not be visible to the request.
      */
     public RoutingService createRoutingRequestService() {
-        return new RoutingService(router.graph);
+        return new RoutingService(getRouter().graph);
     }
 
     /**
