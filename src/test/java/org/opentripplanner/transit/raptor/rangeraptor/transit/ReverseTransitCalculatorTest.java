@@ -104,7 +104,6 @@ public class ReverseTransitCalculatorTest {
     @Test
     public void patternStopIterator() {
         assertIntIterator(create().patternStopIterator(2), 1, 0);
-        assertIntIterator(create().patternStopIterator(3, 6), 2, 1, 0);
     }
 
 
