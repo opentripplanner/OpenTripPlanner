@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
@@ -7,21 +8,19 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
-import org.locationtech.jts.geom.LineString;
-
 import java.util.List;
 import java.util.Locale;
 
 /**
  * Represents a transfer between stops that does not take the street network into account.
- *
+ * <p>
  * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
  */
 public class SimpleTransfer extends Edge {
     private static final long serialVersionUID = 20140408L;
 
     private double distance;
-    
+
     private LineString geometry;
     private List<Edge> edges;
 
@@ -45,7 +44,7 @@ public class SimpleTransfer extends Edge {
         if (s0.backEdge instanceof StreetTransitLink) {
             return null;
         }
-        if(distance > s0.getOptions().maxTransferWalkDistance) {
+        if (distance > s0.getOptions().maxTransferWalkDistance) {
             return null;
         }
         // Don't allow SimpleTransfer right after a call-and-ride or deviated-route dropoff - in that case we need to transfer at the same stop
@@ -59,7 +58,7 @@ public class SimpleTransfer extends Edge {
         se.setBackMode(TraverseMode.WALK);
         int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
         se.incrementTimeInSeconds(time);
-        se.incrementWeight(time * rr.walkReluctance);
+        se.incrementWeight(time * rr.getModeVehicleReluctance(s0.getCurrentVehicleType(), s0.getNonTransitMode()));
         se.incrementWalkDistanceInMeters(distance);
         return se.makeState();
     }
@@ -68,7 +67,7 @@ public class SimpleTransfer extends Edge {
     public String getName() {
         return fromv.getName() + " => " + tov.getName();
     }
-    
+
     @Override
     public String getName(Locale locale) {
         //TODO: localize
@@ -77,22 +76,24 @@ public class SimpleTransfer extends Edge {
 
     @Override
     public double weightLowerBound(RoutingRequest rr) {
-        int time = (int) (distance / rr.walkSpeed); 
-        return (time * rr.walkReluctance);
+        int time = (int) (distance / rr.walkSpeed);
+        return (time * rr.getModeVehicleReluctance(null, TraverseMode.WALK));
     }
-    
-    @Override
-    public double getDistanceInMeters(){
-    	return this.distance;
-    }
-    
-    
-    @Override
-    public LineString getGeometry(){
-	   return this.geometry;
-   }
 
-    public List<Edge> getEdges() { return this.edges; }
+    @Override
+    public double getDistanceInMeters() {
+        return this.distance;
+    }
+
+
+    @Override
+    public LineString getGeometry() {
+        return this.geometry;
+    }
+
+    public List<Edge> getEdges() {
+        return this.edges;
+    }
 
     @Override
     public String toString() {

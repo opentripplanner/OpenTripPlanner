@@ -5,6 +5,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -658,6 +659,7 @@ public class State implements Cloneable {
             return false;
         }
     }
+
     /**
      * Reverse the path implicit in the given state, re-traversing all edges in the opposite
      * direction so as to remove any unnecessary waiting in the resulting itinerary. This produces a
@@ -861,6 +863,13 @@ public class State implements Cloneable {
 
     public VehicleDescription getCurrentVehicle() {
         return stateData.currentVehicle;
+    }
+
+    public VehicleType getCurrentVehicleType() {
+        if (stateData.currentVehicle != null)
+            return stateData.currentVehicle.getVehicleType();
+        else
+            return null;
     }
 
     public double getDistanceInWalk() {
