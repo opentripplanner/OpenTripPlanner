@@ -25,10 +25,10 @@ public class TestVehicleRange extends TestCase {
         StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.857, "v2");
         StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858, "v3");
 
-        new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 2500, StreetTraversalPermission.BICYCLE, false);
-        new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 4500, StreetTraversalPermission.BICYCLE, false);
+        new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 1500, StreetTraversalPermission.BICYCLE, false);
+        new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 2200, StreetTraversalPermission.BICYCLE, false);
 //      Vehicle's range is smaller than combine length of the streets. It shouldn't be possible to find route.
-        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 5 * 1000.);
+        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 3 * 1000.);
 
         RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
         new RentVehicleAnywhereEdge(v3);
@@ -47,18 +47,17 @@ public class TestVehicleRange extends TestCase {
     }
 
 
-
     public void testInRange() {
         Graph graph = new Graph();
 
         StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.856, "v1");
         StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.857, "v2");
         StreetVertex v3 = new IntersectionVertex(graph, "v3", -77.0492, 38.858, "v3");
-
-        new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 2500, StreetTraversalPermission.BICYCLE, false);
-        new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 4500, StreetTraversalPermission.BICYCLE, false);
+//      Kickscooters range is capped at 4km.
+        new StreetEdge(v1, v2, GeometryUtils.makeLineString(0, 0, 0, 0), "", 1500, StreetTraversalPermission.BICYCLE, false);
+        new StreetEdge(v2, v3, GeometryUtils.makeLineString(0, 0, 0, 0), "s", 2200, StreetTraversalPermission.BICYCLE, false);
 //      Vehicle has enough range to traverse the whole route.
-        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 7 * 1000.);
+        KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 3700.);
 
         RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
         new RentVehicleAnywhereEdge(v3);
@@ -73,7 +72,7 @@ public class TestVehicleRange extends TestCase {
         ShortestPathTree tree = aStar.getShortestPathTree(options);
         GraphPath path = tree.getPath(v3, false);
         assertNotNull(path);
-        assertEquals(path.states.size(),5);
+        assertEquals(path.states.size(), 5);
 
     }
 }
