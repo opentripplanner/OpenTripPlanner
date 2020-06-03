@@ -114,10 +114,17 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         this.tripShortName = tripShortName;
     }
 
+    /**
+     * Public code or identifier for the journey
+     */
     public String getTripPublicCode() { return tripPublicCode; }
 
     public void setTripPublicCode(String tripPublicCode) { this.tripPublicCode = tripPublicCode; }
 
+    /**
+     * Internal code (non-public identifier) for the journey (e.g. train- or trip number from
+     * the planners' tool)
+     */
     public String getTripPrivateCode() { return tripPrivateCode; }
 
     public void setTripPrivateCode(String tripPrivateCode) {
