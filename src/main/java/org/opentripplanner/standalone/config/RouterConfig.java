@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.node.MissingNode;
+import org.opentripplanner.ext.updater_endpoint_fetcher.GBFSUpdaterEndpointFetcher;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
@@ -31,6 +32,7 @@ public class RouterConfig implements Serializable {
 
     private final String requestLogFile;
     private final double streetRoutingTimeoutSeconds;
+    private final String bikeShareUpdaterEndpoint;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
     private final UpdaterConfig updaterConfig;
@@ -41,6 +43,9 @@ public class RouterConfig implements Serializable {
         this.requestLogFile = adapter.asText("requestLogFile", null);
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
+        );
+        this.bikeShareUpdaterEndpoint = adapter.asText(
+            "bikeShareUpdaterEndpoint", null
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
@@ -63,6 +68,10 @@ public class RouterConfig implements Serializable {
      */
     public double streetRoutingTimeoutSeconds() {
         return streetRoutingTimeoutSeconds;
+    }
+
+    public String getBikeShareUpdaterEndpoint() {
+        return bikeShareUpdaterEndpoint;
     }
 
     public RoutingRequest routingRequestDefaults() {
