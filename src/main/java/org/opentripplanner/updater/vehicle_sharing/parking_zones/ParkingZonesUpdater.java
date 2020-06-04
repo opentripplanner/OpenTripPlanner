@@ -1,7 +1,9 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.apache.commons.lang3.tuple.Pair;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.Point;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Graph;
@@ -14,6 +16,7 @@ import org.slf4j.LoggerFactory;
 import java.util.*;
 
 import static java.util.Collections.emptyList;
+import static java.util.stream.Collectors.toList;
 
 public class ParkingZonesUpdater extends PollingGraphUpdater {
 
@@ -32,24 +35,33 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
                 .orElse(null);
     }
 
-    private List<Pair<RentVehicleAnywhereEdge, List<SingleParkingZone>>> getNewParkingZones(ParkingZones parkingZones) {
+    private List<SingleParkingZone> getParkingZonesForRentEdge(RentVehicleAnywhereEdge e, List<GeometryParkingZone> geometryParkingZones) {
+        Geometry g;
+        g.contains(GeometryFactory.(e.getFromVertex().getLon(), e.getFromVertex().getLat()));
+    }
+
+    private Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> getNewParkingZones(List<GeometryParkingZone> geometryParkingZones) {
         graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull);
+
         return emptyList(); // TODO AdamWiktor
     }
 
-    private List<SingleParkingZone> getNewParkingZonesEnabled(ParkingZones parkingZones) {
-        return emptyList(); // TODO AdamWiktor
+    private List<SingleParkingZone> getNewParkingZonesEnabled(List<GeometryParkingZone> geometryParkingZones) {
+        return geometryParkingZones.stream()
+                .map(gpz ->  new SingleParkingZone(gpz.getProviderId(), gpz.getVehicleType()))
+                .distinct()
+                .collect(toList());
     }
 
     @Override
     protected void runPolling() {
         LOG.info("Polling parking zones from API");
-        ParkingZones parkingZones = parkingZonesGetter.getParkingZones(graph, url);
-        List<SingleParkingZone> parkingZonesEnabled = getNewParkingZonesEnabled(parkingZones);
-        List<Pair<RentVehicleAnywhereEdge, List<SingleParkingZone>>> parkingZonesPerVertex =
-                getNewParkingZones(parkingZones);
+        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url);
+        List<SingleParkingZone> parkingZonesEnabled = getNewParkingZonesEnabled(geometryParkingZones);
+        Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex =
+                getNewParkingZones(geometryParkingZones);
 
         ParkingZonesGraphWriterRunnable graphWriterRunnable =
                 new ParkingZonesGraphWriterRunnable(parkingZonesPerVertex, parkingZonesEnabled);

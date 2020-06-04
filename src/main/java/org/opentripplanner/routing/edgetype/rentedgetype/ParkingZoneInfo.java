@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ParkingZoneInfo {
 
@@ -30,8 +31,24 @@ public class ParkingZoneInfo {
             this.vehicleType = vehicleType;
         }
 
+
+
         private boolean appliesToThisVehicle(VehicleDescription vehicle) {
             return vehicle.getProviderId() == providerId && vehicle.getVehicleType().equals(vehicleType);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(providerId, vehicleType);
+        }
+
+        @Override
+        public boolean equals(Object other) {
+            if (other instanceof SingleParkingZone) {
+                return providerId == ((SingleParkingZone) other).providerId
+                        && vehicleType == ((SingleParkingZone) other).vehicleType;
+            }
+            return false;
         }
     }
 }

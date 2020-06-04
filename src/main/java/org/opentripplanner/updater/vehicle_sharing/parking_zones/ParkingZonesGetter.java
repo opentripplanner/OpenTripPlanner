@@ -1,10 +1,31 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
-import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class ParkingZonesGetter {
 
-    public ParkingZones getParkingZones(Graph graph, String url) {
-        return null;
+    private static final Logger LOG = LoggerFactory.getLogger(ParkingZonesGetter.class);
+
+    private static final String QUERY =
+            "{\"query\": \"query GetParkingZones {\n" +
+                    "  parking_zones {\n" +
+                    "    providerId\n" +
+                    "    vehicleType\n" +
+                    "    isAllowed\n" +
+                    "    polygons\n" +
+                    "  }" +
+                    "}\"" +
+                    "}";
+
+    private final ParkingZonesMapper mapper = new ParkingZonesMapper();
+
+    public List<GeometryParkingZone> getParkingZones(String url) {
+        ParkingZonesApiResponse response = HttpUtils.postData(url, QUERY, ParkingZonesApiResponse.class);
+        LOG.info("Got parking zones from API");
+        return mapper.map(response.getData().getParking_zones());
     }
 }
