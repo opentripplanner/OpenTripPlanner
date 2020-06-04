@@ -195,9 +195,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      * of not wanting to walk too much without asking for totally ridiculous itineraries, but this
      * observation should in no way be taken as scientific or definitive. Your mileage may vary.
      */
-    public double walkReluctance = 10.0;
+    public double walkReluctance = 2.5;
 
-    private double kickScooterReluctance = 3.0;
+    private double kickScooterReluctance = 1.5;
     /**
      * Used instead of walk reluctance for stairs
      */
