@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.SiriETUpdaterParameters;
@@ -19,6 +20,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
@@ -87,6 +89,9 @@ public abstract class GraphUpdaterConfigurator {
         }
         for (WebsocketGtfsRealtimeUpdaterParameters configItem : config.getWebsocketGtfsRealtimeUpdaterParameters()) {
             updaters.add(new WebsocketGtfsRealtimeUpdater(configItem));
+        }
+        for (MqttGtfsRealtimeUpdaterParameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
+            updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
         for (PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
             updaters.add(new BikeParkUpdater(configItem));
