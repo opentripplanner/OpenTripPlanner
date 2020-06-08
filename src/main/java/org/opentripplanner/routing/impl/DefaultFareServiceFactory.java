@@ -9,7 +9,6 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.routing.bike_rental.TimeBasedBikeRentalFareServiceFactory;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.StandardFareType;
 import org.opentripplanner.routing.services.FareService;
@@ -154,7 +153,7 @@ public class DefaultFareServiceFactory implements FareServiceFactory {
         FareServiceFactory retval;
         try {
             retval = ComponentAnnotationConfigurator.getInstance()
-                .getComponentInstance(type, ServiceType.ServiceFactory);
+                .getConstructorDescriptor(type, ServiceType.ServiceFactory).newInstance(null);
             retval.configure(config);
             return retval;
         } catch (Exception e) {

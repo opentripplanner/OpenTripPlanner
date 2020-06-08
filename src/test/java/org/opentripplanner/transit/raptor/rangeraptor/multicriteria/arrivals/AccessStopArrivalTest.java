@@ -2,9 +2,11 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
 import org.junit.Test;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTransfer;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 
 public class AccessStopArrivalTest {
@@ -16,14 +18,10 @@ public class AccessStopArrivalTest {
     private static final int COST = 500;
 
     private final AccessStopArrival<RaptorTripSchedule> subject = new AccessStopArrival<>(
-        ALIGHT_STOP,
         DEPARTURE_TIME,
-        LEG_DURATION,
         COST,
-        null
+        new TestRaptorTransfer(ALIGHT_STOP, LEG_DURATION)
     );
-
-
 
     @Test
     public void arrivedByAccessLeg() {
@@ -40,11 +38,6 @@ public class AccessStopArrivalTest {
     @Test
     public void arrivalTime() {
         assertEquals(ALIGHT_TIME, subject.arrivalTime());
-    }
-
-    @Test
-    public void departureTime() {
-        assertEquals(DEPARTURE_TIME, subject.departureTime());
     }
 
     @Test
@@ -77,8 +70,52 @@ public class AccessStopArrivalTest {
     @Test
     public void testToString() {
         assertEquals(
-                "AccessStopArrival { Rnd: 0, Stop: 100, Time: 8:10 (8:00), Cost: 500 }",
+                "Access { stop: 100, duration: 10m, arrival-time: 8:10, cost: 500 }",
                 subject.toString()
         );
+    }
+
+    @Test
+    public void timeShiftDefaultBehaviour() {
+        final int dTime = 60;
+        AbstractStopArrival<RaptorTripSchedule> result = subject.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
+
+        assertEquals(result.arrivalTime(), ALIGHT_TIME + dTime);
+        assertEquals(subject.cost(), result.cost());
+        assertEquals(subject.travelDuration(), result.travelDuration());
+        assertEquals(subject.round(), result.round());
+        assertEquals(subject.stop(), result.stop());
+        assertSame(subject.accessLeg().access(), result.accessLeg().access());
+        assertEquals(subject.arrivedByAccessLeg(), result.arrivedByAccessLeg());
+    }
+
+    @Test
+    public void timeShiftNotAllowed() {
+        AbstractStopArrival<RaptorTripSchedule> original, result;
+        TestRaptorTransfer access = new TestRaptorTransfer(ALIGHT_STOP, LEG_DURATION) {
+            @Override public int latestArrivalTime(int time) { return -1; }
+        };
+        original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
+
+        final int dTime = 60;
+        result = original.timeShiftNewArrivalTime(ALIGHT_TIME + dTime);
+
+        assertSame(original, result);
+    }
+
+    @Test
+    public void timeShiftPartiallyAllowed() {
+        final int dTime = 60;
+        AbstractStopArrival<RaptorTripSchedule> original, result;
+
+        // Allow time-shift, but only by dTime
+        TestRaptorTransfer access = new TestRaptorTransfer(ALIGHT_STOP, LEG_DURATION) {
+            @Override public int latestArrivalTime(int time) { return ALIGHT_TIME + dTime; }
+        };
+        original = new AccessStopArrival<>(DEPARTURE_TIME, COST, access);
+
+        result = original.timeShiftNewArrivalTime(ALIGHT_TIME + 7200);
+
+        assertEquals(ALIGHT_TIME + dTime, result.arrivalTime());
     }
 }

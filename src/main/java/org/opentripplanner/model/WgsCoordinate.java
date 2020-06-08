@@ -1,5 +1,6 @@
 package org.opentripplanner.model;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.model.base.ValueObjectToStringBuilder;
 
 import java.io.Serializable;
@@ -51,6 +52,12 @@ public final class WgsCoordinate implements Serializable {
 
     public double longitude() {
         return longitude;
+    }
+
+
+    /** Return OTP domain coordinate as JTS GeoTools Library coordinate. */
+    public Coordinate asJtsCoordinate() {
+        return new Coordinate(longitude, latitude);
     }
 
     /**

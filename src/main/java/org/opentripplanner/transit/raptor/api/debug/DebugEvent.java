@@ -1,6 +1,8 @@
 package org.opentripplanner.transit.raptor.api.debug;
 
 
+import org.opentripplanner.model.base.ToStringBuilder;
+
 /**
  * Debug events hold information about an internal event in the Raptor Algorithm. The element
  * may be a stop arrivals, a destination arrival or path.
@@ -96,6 +98,17 @@ public class DebugEvent<E> {
         return reason == null ? "" : reason;
     }
 
+    @Override
+    public String toString() {
+        return ToStringBuilder.of(DebugEvent.class)
+            .addEnum("action", action)
+            .addServiceTime("iterationStartTime", iterationStartTime, -9999)
+            .addObj("element", element)
+            .addObj("rejectedDroppedByElement", rejectedDroppedByElement)
+            .addStr("reason", reason)
+            .toString();
+    }
+
     /** The event action type */
     public enum Action {
         /** Element is accepted */
@@ -108,7 +121,8 @@ public class DebugEvent<E> {
          * element is no longer part of the state.
          */
         DROP("Drop");
-        private String description;
+        private final String description;
+
         Action(String description) { this.description = description; }
         @Override
         public String toString() { return description; }

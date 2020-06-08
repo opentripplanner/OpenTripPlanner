@@ -135,13 +135,13 @@ public class ToStringBuilder {
      * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
      */
     public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int defaultValue) {
-        return addIfNotDefault(name, timeSecondsPastMidnight, defaultValue, TimeUtils::timeToStrLong);
+        return addIfNotDefault(name, timeSecondsPastMidnight, defaultValue, TimeUtils::timeToStrCompact);
     }
 
     /**
      * Add times in seconds since midnight. Format:  hh:mm. Ignore default values.
      */
-    public <T> ToStringBuilder addAsHhMm(String name, int[] intArray) {
+    public <T> ToStringBuilder addServiceTimeSchedule(String name, int[] intArray) {
         return addIfNotNull(
                 name,
                 intArray,
@@ -202,7 +202,7 @@ public class ToStringBuilder {
         if (first) { first = false; }
         else { sb.append(FIELD_SEPARATOR); }
 
-        sb.append(name).append(":");
+        sb.append(name).append(": ");
         sb.append(value);
         return this;
     }

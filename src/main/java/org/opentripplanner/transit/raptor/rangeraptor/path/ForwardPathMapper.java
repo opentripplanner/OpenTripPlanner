@@ -7,7 +7,7 @@ import org.opentripplanner.transit.raptor.api.path.PathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransferPathLeg;
 import org.opentripplanner.transit.raptor.api.path.TransitPathLeg;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
-import org.opentripplanner.transit.raptor.api.transit.RaptorSlackProvider;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
@@ -21,15 +21,8 @@ import org.opentripplanner.transit.raptor.rangeraptor.transit.TripTimesSearch;
 public final class ForwardPathMapper<T extends RaptorTripSchedule> implements PathMapper<T> {
     private int iterationDepartureTime = -1;
 
-    /**
-     * Note! This is not the Raptor internal SlackProvider, but the slack-provider
-     * submitted by the transit layer.
-     */
-    private final RaptorSlackProvider transitLayerSlackProvider;
 
-
-    public ForwardPathMapper(RaptorSlackProvider slackProvider, WorkerLifeCycle lifeCycle) {
-        this.transitLayerSlackProvider = slackProvider;
+    public ForwardPathMapper(WorkerLifeCycle lifeCycle) {
         lifeCycle.onSetupIteration(this::setRangeRaptorIterationDepartureTime);
     }
 
@@ -39,67 +32,79 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     @Override
     public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-        ArrivalView<T> from;
-        ArrivalView<T> to;
+        ArrivalView<T> arrival;
         PathLeg<T> lastLeg;
         TransitPathLeg<T> transitLeg;
 
-        from = destinationArrival.previous();
-        lastLeg = new EgressPathLeg<>(
-                destinationArrival.accessEgress(),
-                from.stop(),
-                destinationArrival.departureTime(),
-                destinationArrival.arrivalTime()
-        );
+        arrival = destinationArrival.previous();
+        lastLeg = createEgressPathLeg(destinationArrival);
 
         do {
-            to = from;
-            from = from.previous();
+            transitLeg = createTransitLeg(arrival, lastLeg);
+            arrival = arrival.previous();
 
-            TripTimesSearch.Result r = TripTimesSearch.searchAfterEDT(
-                    to.trip(),
-                    from.stop(),
-                    to.stop(),
-                    from.arrivalTime()
-            );
-
-            transitLeg = new TransitPathLeg<>(
-                    from.stop(),
-                    r.boardTime,
-                    to.stop(),
-                    r.alightTime,
-                    to.trip(),
-                    lastLeg
-            );
-
-            if (from.arrivedByTransfer()) {
-                to = from;
-                from = from.previous();
-
-                lastLeg = new TransferPathLeg<>(
-                        from.stop(),
-                        to.departureTime(),
-                        to.stop(),
-                        to.arrivalTime(),
-                        transitLeg
-                );
-            } else {
+            if (arrival.arrivedByTransfer()) {
+                lastLeg = createTransferLeg(arrival, transitLeg);
+                arrival = arrival.previous();
+            }
+            else {
                 lastLeg = transitLeg;
             }
         }
-        while (from.arrivedByTransit());
+        while (arrival.arrivedByTransit());
 
-        AccessPathLeg<T> accessLeg = createAccessPathLeg(from, transitLeg);
+        AccessPathLeg<T> accessLeg = createAccessPathLeg(arrival, transitLeg);
 
         return new Path<>(iterationDepartureTime, accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
     }
 
-    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {
-        int boardSlack = transitLayerSlackProvider.boardSlack(nextLeg.trip().pattern());
-        int arrivalTime = nextLeg.fromTime() - boardSlack;
-        int timeShift = arrivalTime - from.arrivalTime();
-        int departureTime = from.departureTime() + timeShift;
+    private EgressPathLeg<T> createEgressPathLeg(DestinationArrival<T> destinationArrival) {
+        RaptorTransfer egress = destinationArrival.egressLeg().egress();
+        int departureTime = destinationArrival.arrivalTime() - egress.durationInSeconds();
 
-        return new AccessPathLeg<>(from.accessEgress(), from.stop(), departureTime, arrivalTime, nextLeg);
+        return new EgressPathLeg<>(
+            egress,
+            destinationArrival.previous().stop(),
+            departureTime,
+            destinationArrival.arrivalTime()
+        );
+    }
+
+    private TransitPathLeg<T> createTransitLeg(ArrivalView<T> arrival, PathLeg<T> lastLeg) {
+        TripTimesSearch.BoarAlightTimes r = TripTimesSearch.findTripForwardSearch(arrival);
+
+        return new TransitPathLeg<>(
+                arrival.previous().stop(),
+                r.boardTime,
+                arrival.stop(),
+                r.alightTime,
+                arrival.transitLeg().trip(),
+                lastLeg
+        );
+    }
+
+    private TransferPathLeg<T> createTransferLeg(ArrivalView<T> arrival, TransitPathLeg<T> transitLeg) {
+        int departureTime = arrival.arrivalTime() - arrival.transferLeg().durationInSeconds();
+
+        return new TransferPathLeg<>(
+                arrival.previous().stop(),
+                departureTime,
+                arrival.stop(),
+                arrival.arrivalTime(),
+                transitLeg
+        );
+    }
+
+    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {
+        RaptorTransfer access = from.accessLeg().access();
+        int departureTime = from.arrivalTime() - access.durationInSeconds();
+
+        return new AccessPathLeg<>(
+            access,
+            from.stop(),
+            departureTime,
+            from.arrivalTime(),
+            nextLeg
+        );
     }
 }

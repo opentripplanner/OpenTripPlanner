@@ -1,14 +1,16 @@
 package org.opentripplanner.transit.raptor.speed_test.testcase;
 
-import java.util.Arrays;
+import org.opentripplanner.transit.raptor.util.TimeUtils;
+import org.opentripplanner.util.TableFormatter;
+
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Center;
-import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Left;
-import static org.opentripplanner.transit.raptor.speed_test.testcase.OutputTable.Align.Right;
+import static org.opentripplanner.util.TableFormatter.Align.Center;
+import static org.opentripplanner.util.TableFormatter.Align.Left;
+import static org.opentripplanner.util.TableFormatter.Align.Right;
 
 
 /**
@@ -24,7 +26,7 @@ public class TableTestReport {
 
         Collections.sort(results);
 
-        OutputTable table = newTable();
+        TableFormatter table = newTable();
         for (Result it : results) {
             addTo(table, it);
         }
@@ -34,21 +36,21 @@ public class TableTestReport {
 
     /* private methods */
 
-    private static OutputTable newTable() {
-        return new OutputTable(
-                        Arrays.asList(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
-                        Arrays.asList("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
+    private static TableFormatter newTable() {
+        return new TableFormatter(
+                        List.of(Center, Right, Right, Right, Right, Right, Center, Center, Left, Left, Left),
+                        List.of("STATUS", "TF", "Duration", "Cost",  "Start", "End", "Modes", "Agencies", "Routes", "Stops", "Legs")
                 );
     }
 
-    private static void addTo(OutputTable table, Result result) {
+    private static void addTo(TableFormatter table, Result result) {
         table.addRow(
                 result.status.label,
                 result.transfers,
                 result.durationAsStr(),
                 result.cost,
-                result.startTimeAsStr(),
-                result.endTimeAsStr(),
+                TimeUtils.timeToStrLong(result.startTime),
+                TimeUtils.timeToStrLong(result.endTime),
                 toStr(result.modes),
                 toStr(result.agencies),
                 toStr(result.routes),

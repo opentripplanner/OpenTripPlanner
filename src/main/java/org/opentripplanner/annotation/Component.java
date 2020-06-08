@@ -14,4 +14,6 @@ public @interface Component {
   String key();
 
   ServiceType type();
+
+  Class<?> init() default Void.class;
 }

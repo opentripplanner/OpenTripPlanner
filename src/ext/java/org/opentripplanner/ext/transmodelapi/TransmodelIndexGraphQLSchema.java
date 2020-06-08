@@ -244,8 +244,7 @@ public class TransmodelIndexGraphQLSchema {
 
         mappingUtil = new TransmodelMappingUtil(fixedAgencyId, graph.getTimeZone());
         tripTimeShortHelper = new TripTimeShortHelper();
-        dateTimeScalar = DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(
-            graph.getTimeZone());
+        dateTimeScalar = DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(graph.getTimeZone());
         timeType = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
         dateScalar = DateScalarFactory.createSecondsSinceEpochAsDateStringScalar(graph.getTimeZone());
         localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();

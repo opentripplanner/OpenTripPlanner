@@ -1,5 +1,6 @@
 package org.opentripplanner.annotation;
 
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertTrue;
 
@@ -13,6 +14,8 @@ import org.junit.Test;
 import org.opentripplanner.annotation.StaticClassComponent.FinalStaticClassComponent;
 import org.opentripplanner.routing.impl.NycFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
+import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.updater.GraphUpdater;
 
 public class ComponentAnnotationConfiguratorTest {
@@ -25,7 +28,7 @@ public class ComponentAnnotationConfiguratorTest {
       throws InstantiationException, IllegalAccessException {
     configurator.scanPackages(Collections.singletonList("org.opentripplanner.annotation"));
     GraphUpdater component = configurator
-        .getComponentInstance("test.compoent", ServiceType.GraphUpdater);
+        .getConstructorDescriptor("test.compoent", ServiceType.GraphUpdater).newInstance(null);
     assertNotNull(component);
     assertTrue(TestComponent.class.isAssignableFrom(component.getClass()));
   }
@@ -34,7 +37,8 @@ public class ComponentAnnotationConfiguratorTest {
   public void testStaticInnerClass() throws InstantiationException, IllegalAccessException {
     configurator.scanPackages(Collections.singletonList("org.opentripplanner.annotation"));
     GraphUpdater component = configurator
-        .getComponentInstance("test.staticClassComponent", ServiceType.GraphUpdater);
+        .getConstructorDescriptor("test.staticClassComponent", ServiceType.GraphUpdater)
+        .newInstance(null);
     assertNotNull(component);
     assertTrue(StaticClassComponent.class.isAssignableFrom(component.getClass()));
     assertTrue(FinalStaticClassComponent.class.isAssignableFrom(component.getClass()));
@@ -47,15 +51,28 @@ public class ComponentAnnotationConfiguratorTest {
         .readTree(new File("./src/test/resources/", "build-config.json"));
     ComponentAnnotationConfigurator.getInstance().fromConfig(builderConfig);
     GraphUpdater component = configurator
-        .getComponentInstance("external.updater", ServiceType.GraphUpdater);
+        .getConstructorDescriptor("external.updater", ServiceType.GraphUpdater).newInstance(null);
     assertNotNull(component);
     assertTrue(GraphUpdater.class.isAssignableFrom(component.getClass()));
     assertTrue(ExternalGraphUpdater.class.isAssignableFrom(component.getClass()));
 
     FareServiceFactory factory = configurator
-        .getComponentInstance("new-york", ServiceType.ServiceFactory);
+        .getConstructorDescriptor("new-york", ServiceType.ServiceFactory).newInstance(null);
     assertNotNull(factory);
     assertTrue(NycFareServiceFactory.class.isAssignableFrom(factory.getClass()));
     assertTrue(FareServiceFactory.class.isAssignableFrom(factory.getClass()));
+  }
+
+  @Test
+  public void testUpdaterConfig() throws IOException {
+    configurator.scanPackages(Collections.singletonList("org.opentripplanner.annotation"));
+
+    JsonNode routerConfig = objectMapper
+        .readTree(new File("./src/test/resources/", "router-config.json"));
+    NodeAdapter adapter = new NodeAdapter(routerConfig,"test");
+
+    UpdaterConfig config = new UpdaterConfig(adapter.path("updaters"));
+    assertEquals(1,config.getTypes().size());
+    assertEquals("test.compoent",config.getTypes().toArray()[0]);
   }
 }

@@ -1,15 +1,14 @@
 package org.opentripplanner.common.geometry;
 
-import static org.junit.Assert.assertEquals;
-
 import org.junit.Test;
-import org.opentripplanner.common.model.P2;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.CoordinateSequenceFactory;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.model.P2;
+
+import static org.junit.Assert.assertEquals;
 
 public class GeometryUtilsTest {
     @Test

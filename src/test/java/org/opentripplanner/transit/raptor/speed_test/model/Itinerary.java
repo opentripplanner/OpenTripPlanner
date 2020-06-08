@@ -94,7 +94,7 @@ public class Itinerary {
                 buf.walk(it.getDuration());
             }
             else if(it.isTransitLeg()) {
-                buf.transit(it.mode.name(), it.startTime, it.endTime);
+                buf.transit(it.mode.name() + " " + it.routeShortName, it.startTime, it.endTime);
             }
         }
         return buf.toString();

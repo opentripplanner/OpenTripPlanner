@@ -121,8 +121,8 @@ public interface PathLeg<T extends RaptorTripSchedule> {
     }
 
     default String asString() {
-        return TimeUtils.timeToStrShort(fromTime()) + "-" +
-                TimeUtils.timeToStrShort(toTime()) +
+        return TimeUtils.timeToStrCompact(fromTime()) + "-" +
+                TimeUtils.timeToStrCompact(toTime()) +
                 "(" + TimeUtils.durationToStr(duration()) + ")"
                 ;
     }

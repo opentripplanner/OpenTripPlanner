@@ -79,6 +79,20 @@ public class Place {
         return stopId != null && stopId.equals(other.stopId);
     }
 
+    /**
+     * Return a short versio to be used in other classes toStringMethods. Should return
+     * just the necessary information for a human to identify the place in a given the context.
+     */
+    public String toStringShort() {
+        StringBuilder buf = new StringBuilder(name);
+        if(stopId != null) {
+            buf.append(", ").append(stopId);
+        }
+        buf.append(" ").append(coordinate.toString());
+
+        return buf.toString();
+    }
+
     @Override
     public String toString() {
         return ToStringBuilder.of(Place.class)

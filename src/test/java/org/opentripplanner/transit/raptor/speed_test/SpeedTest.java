@@ -60,14 +60,14 @@ public class SpeedTest {
     private SpeedTestProfile routeProfile;
     private SpeedTestProfile heuristicProfile;
     private final EgressAccessRouter streetRouter;
-    private List<Integer> numOfPathsFound = new ArrayList<>();
-    private Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
-    private Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
+    private final List<Integer> numOfPathsFound = new ArrayList<>();
+    private final Map<SpeedTestProfile, List<Integer>> workerResults = new HashMap<>();
+    private final Map<SpeedTestProfile, List<Integer>> totalResults = new HashMap<>();
 
     /**
      * Init profile used by the HttpServer
      */
-    private RaptorService<TripSchedule> service;
+    private final RaptorService<TripSchedule> service;
 
 
     private SpeedTest(SpeedTestCmdLineOpts opts) {
