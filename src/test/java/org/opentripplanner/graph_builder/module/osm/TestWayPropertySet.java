@@ -5,6 +5,8 @@ import org.opentripplanner.openstreetmap.model.OSMWithTags;
 
 import junit.framework.TestCase;
 
+import java.util.HashMap;
+
 /**
  * Test the WayPropertySet 
  * @author mattwigway
@@ -49,6 +51,7 @@ public class TestWayPropertySet extends TestCase {
        WayPropertySet wps = new WayPropertySet();
        DefaultWayPropertySetSource source = new DefaultWayPropertySetSource();
        source.populateProperties(wps);
+       wps.index();
        
        OSMWithTags way;
        
@@ -83,6 +86,11 @@ public class TestWayPropertySet extends TestCase {
        way.addTag("maxspeed", "35 mph");
        assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, false), epsilon));
        assertTrue(within(kmhAsMs(35 * 1.609f), wps.getCarSpeedForWay(way, true), epsilon));
+
+       // make sure the car speed cache has been populated with some values along the way
+       HashMap<String, Float> carSpeedLookup = wps.getCarSpeedLookup();
+       assertTrue(within(kmhAsMs(20), carSpeedLookup.get("maxspeed:forward=80;maxspeed:reverse=20;maxspeed=40;back==true"), epsilon));
+       assertTrue(within(kmhAsMs(80), carSpeedLookup.get("maxspeed:forward=80;maxspeed:reverse=20;maxspeed=40;back==false"), epsilon));
        
        // test with no maxspeed tags
        wps = new WayPropertySet();
@@ -90,6 +98,7 @@ public class TestWayPropertySet extends TestCase {
        wps.addSpeedPicker(getSpeedPicker("highway=*", kmhAsMs(35)));
        wps.addSpeedPicker(getSpeedPicker("surface=gravel", kmhAsMs(10)));
        wps.defaultSpeed = kmhAsMs(25);
+       wps.index();
        
        way = new OSMWithTags();
      
