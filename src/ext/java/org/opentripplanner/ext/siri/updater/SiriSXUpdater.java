@@ -82,6 +82,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) {
         AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        this.alertPatchService = alertPatchService;
         SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler(feedId);
