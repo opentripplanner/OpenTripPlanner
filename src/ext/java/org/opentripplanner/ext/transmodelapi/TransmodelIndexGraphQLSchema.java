@@ -1164,7 +1164,6 @@ public class TransmodelIndexGraphQLSchema {
                             }
                         })
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("advice")
                         .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
@@ -1181,7 +1180,6 @@ public class TransmodelIndexGraphQLSchema {
                             }
                         })
                         .build())
-                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("infoLink")
                         .type(Scalars.GraphQLString)
@@ -1847,14 +1845,12 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Whether this call has been updated with real time information.")
                         .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("predictionInaccurate")
                         .type(Scalars.GraphQLBoolean)
-                        .description("Whether the updated estimates are expected to be inaccurate.")
-                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).predictionInaccurate)
+                        .description("Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED")
+                        .dataFetcher(environment -> false)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtimeState")
                         .type(EnumTypes.REALTIME_STATE)
