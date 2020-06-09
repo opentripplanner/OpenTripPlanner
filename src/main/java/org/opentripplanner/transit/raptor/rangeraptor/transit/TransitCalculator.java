@@ -119,16 +119,6 @@ public interface TransitCalculator {
     IntIterator patternStopIterator(int nStopsInPattern);
 
     /**
-     * Return an iterator, iterating over the stop positions in a pattern.
-     * Iterate from 'onTripStopPos + 1' to 'nStopsInPattern-1' in a forward search
-     * and from 'onTripStopPos - 1' to 0 in a reverse search.
-     *
-     * @param onTripStopPos the iterator will start here(exclusive)
-     * @param nStopsInPattern the number of stops in the trip pattern
-     */
-    IntIterator patternStopIterator(int onTripStopPos, int nStopsInPattern);
-
-    /**
      * Create a trip search, to use to find the correct trip to board/alight for
      * a given pattern. This is used to to inject a forward or reverse
      * search into the worker (strategy design pattern).

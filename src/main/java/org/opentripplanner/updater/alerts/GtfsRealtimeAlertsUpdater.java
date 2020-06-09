@@ -2,15 +2,14 @@ package org.opentripplanner.updater.alerts;
 
 import java.io.InputStream;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.util.HttpUtils;
@@ -32,7 +31,7 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
  * myalert.feedId = TA
  * </pre>
  */
-@Component(key = "real-time-alerts",type = ServiceType.GraphUpdater)
+@Component(key = "real-time-alerts",type = ServiceType.GraphUpdater, init = GtfsRealtimeAlertsUpdaterParameters.class)
 public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(GtfsRealtimeAlertsUpdater.class);
 
@@ -40,43 +39,48 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private Long lastTimestamp = Long.MIN_VALUE;
 
-    private String url;
+    private final String url;
 
-    private String feedId;
+    private final String feedId;
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     private AlertPatchService alertPatchService;
 
-    private long earlyStart;
+    private final long earlyStart;
 
     private AlertsUpdateHandler updateHandler = null;
+
+    private final boolean fuzzyTripMatching;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
-    @Override
-    protected void configurePolling(Graph graph, JsonNode config) throws Exception {
-        // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
-        this.alertPatchService = alertPatchService;
-        String url = config.path("url").asText();
+    public GtfsRealtimeAlertsUpdater(Parameters config) {
+        super(config);
+
+        String url = config.getUrl();
         if (url == null) {
             throw new IllegalArgumentException("Missing mandatory 'url' parameter");
         }
         this.url = url;
-        this.earlyStart = config.path("earlyStartSec").asInt(0);
-        this.feedId = config.path("feedId").asText();
-        if (config.path("fuzzyTripMatching").asBoolean(false)) {
-            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
-        }
+        this.earlyStart = config.getEarlyStartSec();
+        this.feedId = config.getFeedId();
+        this.fuzzyTripMatching = config.fuzzyTripMatching();
+
         LOG.info("Creating real-time alert updater running every {} seconds : {}", pollingPeriodSeconds, url);
     }
 
     @Override
     public void setup(Graph graph) {
+        // TODO: add options to choose different patch services
+        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        if (fuzzyTripMatching) {
+            this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
+        }
+        this.alertPatchService = alertPatchService;
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }
@@ -106,12 +110,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
             }
 
             // Handle update in graph writer runnable
-            updaterManager.execute(new GraphWriterRunnable() {
-                @Override
-                public void run(Graph graph) {
-                    updateHandler.update(feed);
-                }
-            });
+            updaterManager.execute(graph -> updateHandler.update(feed));
 
             lastTimestamp = feedTimestamp;
         } catch (Exception e) {
@@ -125,5 +124,11 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     public String toString() {
         return "GtfsRealtimeUpdater(" + url + ")";
+    }
+
+    public interface Parameters extends PollingGraphUpdaterParameters {
+        int getEarlyStartSec();
+        String getFeedId();
+        boolean fuzzyTripMatching();
     }
 }

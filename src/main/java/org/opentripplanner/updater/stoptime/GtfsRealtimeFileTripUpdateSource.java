@@ -5,10 +5,7 @@ import java.io.FileInputStream;
 import java.io.InputStream;
 import java.util.ArrayList;
 import java.util.List;
-import com.fasterxml.jackson.databind.JsonNode;
 
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.updater.JsonConfigurable;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -18,11 +15,11 @@ import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 
 /** Reads the GTFS-RT from a local file. */
-public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonConfigurable {
+public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource {
     private static final Logger LOG =
             LoggerFactory.getLogger(GtfsRealtimeFileTripUpdateSource.class);
 
-    private File file;
+    private final File file;
 
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -33,12 +30,11 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     /**
      * Default agency id that is used for the trip ids in the TripUpdates
      */
-    private String feedId;
+    private final String feedId;
 
-    @Override
-    public void configure(Graph graph, JsonNode config) throws Exception {
-        this.feedId = config.path("feedId").asText();
-        this.file = new File(config.path("file").asText(""));
+    public GtfsRealtimeFileTripUpdateSource(GtfsRealtimeFileTripUpdateSourceParameters config) {
+        this.feedId = getFeedId();
+        this.file = new File(config.getFile());
     }
 
     @Override
@@ -86,5 +82,10 @@ public class GtfsRealtimeFileTripUpdateSource implements TripUpdateSource, JsonC
     @Override
     public String getFeedId() {
         return this.feedId;
+    }
+
+    public interface GtfsRealtimeFileTripUpdateSourceParameters
+        extends PollingStoptimeUpdater.Parameters {
+        String getFile();
     }
 }

@@ -12,18 +12,16 @@ import java.time.format.DateTimeParseException;
 import java.util.TimeZone;
 
 public class DateScalarFactory {
+    private static final String DOCUMENTATION =
+        "Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`.";
 
-    private static final String EXAMPLE_DATE = "2017-04-23";
-    private static final String DATE_PATTERN = "yyyy-MM-dd";
-    private static final String DATE_SCALAR_DESCRIPTION = "Date  using the format: " + DATE_PATTERN + ". Example: " + EXAMPLE_DATE;
-
-    private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(DATE_PATTERN);
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_LOCAL_DATE;
 
     private DateScalarFactory() {
     }
 
     public static GraphQLScalarType createSecondsSinceEpochAsDateStringScalar(TimeZone timeZone) {
-        return new GraphQLScalarType("Date", DATE_SCALAR_DESCRIPTION, new Coercing() {
+        return new GraphQLScalarType("Date", DOCUMENTATION, new Coercing<>() {
             @Override
             public String serialize(Object input) {
                 if (input instanceof Long) {

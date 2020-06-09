@@ -78,9 +78,7 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
     public void setInitialTimeForIteration(RaptorTransfer accessLeg, int departureTime) {
         addStopArrival(
                 new AccessStopArrival<>(
-                        accessLeg.stop(),
                         departureTime,
-                        accessLeg.durationInSeconds(),
                         costCalculator.walkCost(accessLeg.durationInSeconds()),
                         accessLeg
                 )
@@ -110,40 +108,32 @@ final public class McRangeRaptorWorkerState<T extends RaptorTripSchedule> implem
      * Set the time at a transit stop iff it is optimal.
      */
     final void transitToStop(
-            final AbstractStopArrival<T> previousStopArrival,
-            final int stop,
+            final PatternRide<T> ride,
+            final int alightStop,
             final int alightTime,
-            final int alightSlack,
-            final int boardTime,
-            final T trip
+            final int alightSlack
     ) {
-        final int prevStopArrivalTime = previousStopArrival.arrivalTime();
         final int stopArrivalTime = alightTime + alightSlack;
 
         if (exceedsTimeLimit(stopArrivalTime)) { return; }
 
         // Calculate wait time before and after the transit leg
-        int waitTime = (boardTime - prevStopArrivalTime) + alightSlack;
+        final int waitTime = ride.boardWaitTime + alightSlack;
 
-        int cost = costCalculator.transitArrivalCost(
+        final int costTransitLeg = costCalculator.transitArrivalCost(
             waitTime,
-            alightTime - boardTime,
-            previousStopArrival.stop(),
-            stop
+            alightTime - ride.boardTime,
+            ride.boardStopIndex,
+            alightStop
         );
-
-        int totalTravelTime = previousStopArrival.travelDuration()
-                + (stopArrivalTime - prevStopArrivalTime);
 
         arrivalsCache.add(
                 new TransitStopArrival<>(
-                        previousStopArrival,
-                        stop,
+                        ride.prevArrival,
+                        alightStop,
                         stopArrivalTime,
-                        boardTime,
-                        trip,
-                        totalTravelTime,
-                        cost
+                        costTransitLeg,
+                        ride.trip
                 )
         );
     }

@@ -1,0 +1,8 @@
+{
+  "updaters": [
+    {
+      "type": "test.compoent",
+      "example": "Example"
+    }
+  ]
+}

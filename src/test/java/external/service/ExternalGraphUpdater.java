@@ -1,6 +1,5 @@
 package external.service;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.graph.Graph;
@@ -35,8 +34,4 @@ public class ExternalGraphUpdater implements GraphUpdater {
     return this.getClass().getName();
   }
 
-  @Override
-  public void configure(Graph graph, JsonNode jsonNode) throws Exception {
-
-  }
 }

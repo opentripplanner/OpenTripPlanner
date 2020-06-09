@@ -40,9 +40,5 @@ public abstract class StaticClassComponent implements GraphUpdater {
       return getClass().getName();
     }
 
-    @Override
-    public void configure(Graph graph, JsonNode jsonNode) throws Exception {
-
-    }
   }
 }

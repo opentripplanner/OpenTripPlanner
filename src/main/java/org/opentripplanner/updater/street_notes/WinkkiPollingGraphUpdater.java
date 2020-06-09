@@ -4,6 +4,7 @@ import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.Date;
@@ -22,8 +23,12 @@ import java.util.Date;
  * </pre>
  */
 
-@Component(key = "winkki-polling-updater",type = ServiceType.GraphUpdater)
+@Component(key = "winkki-polling-updater",type = ServiceType.GraphUpdater,init = WFSNotePollingGraphUpdaterParameters.class)
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
+    public WinkkiPollingGraphUpdater(Parameters config) {
+        super(config);
+    }
+
     protected Alert getNote(SimpleFeature feature) {
         Alert alert = Alert.createSimpleAlerts("winkki:" + feature.getAttribute("licence_type"));
         alert.alertDescriptionText = feature.getAttribute("event_description") == null ?

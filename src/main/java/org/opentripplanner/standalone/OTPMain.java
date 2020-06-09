@@ -84,7 +84,10 @@ public class OTPMain {
      * @throws RuntimeException if an error occurs while loading the graph.
      */
     private static void startOTPServer(CommandLineParameters params) {
-        LOG.info("Searching for configuration and input files in {}", params.getBaseDirectory());
+        LOG.info(
+            "Searching for configuration and input files in {}",
+            params.getBaseDirectory().getAbsolutePath()
+        );
 
         Graph graph = null;
         GraphService service = null;

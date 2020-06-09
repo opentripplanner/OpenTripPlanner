@@ -103,7 +103,6 @@ public class ForwardTransitCalculatorTest {
     @Test
     public void patternStopIterator() {
         assertIntIterator(create().patternStopIterator(2), 0, 1);
-        assertIntIterator(create().patternStopIterator(3, 6), 4, 5);
     }
 
 

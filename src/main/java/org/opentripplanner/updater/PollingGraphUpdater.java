@@ -1,7 +1,5 @@
 package org.opentripplanner.updater;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -28,9 +26,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      */
     abstract protected void runPolling() throws Exception;
 
-    /** Mirrors GraphUpdater.configure method. */
-    abstract protected void configurePolling(Graph graph, JsonNode config) throws Exception;
-
     /** How long to wait after polling to poll again. */
     protected Integer pollingPeriodSeconds;
 
@@ -50,6 +45,12 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      *        deserialize into, they should probably not survive into those Java objects themselves.
      */
     private String type;
+
+    /** Shared configuration code for all polling graph updaters. */
+    public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
+        pollingPeriodSeconds = config.getFrequencySec();
+        type = config.getSourceConfig().getType();
+    }
 
     @Override
     final public void run() {
@@ -81,15 +82,6 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         }
     }
 
-    /** Shared configuration code for all polling graph updaters. */
-    @Override
-    final public void configure (Graph graph, JsonNode config) throws Exception {
-        pollingPeriodSeconds = config.path("frequencySec").asInt(60);
-        type = config.path("type").asText("");
-        // Additional configuration for the concrete subclass
-        configurePolling(graph, config);
-    }
-
     /**
      * Allow clients to wait for all realtime data to be loaded before submitting any travel plan requests.
      * This does not block use of the OTP server. The client must voluntarily hit an endpoint and wait for readiness.
@@ -102,5 +94,15 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
 
     public String getName() {
         return type;
+    }
+
+    /**
+     * This is named PollingGraphUpdaterConfig instead of Config in order to not conflict with the
+     * config interfaces of child classes.
+     */
+    public interface PollingGraphUpdaterParameters {
+        UpdaterDataSourceConfig getSourceConfig();
+        String getUrl();
+        int getFrequencySec();
     }
 }

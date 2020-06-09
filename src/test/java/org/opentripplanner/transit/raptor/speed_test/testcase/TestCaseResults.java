@@ -17,10 +17,10 @@ import java.util.List;
  * </ul>
  */
 class TestCaseResults {
-    private String testCaseId;
-    private List<Result> matchedResults = new ArrayList<>();
-    private List<Result> expected = new ArrayList<>();
-    private List<Result> actual = new ArrayList<>();
+    private final String testCaseId;
+    private final List<Result> matchedResults = new ArrayList<>();
+    private final List<Result> expected = new ArrayList<>();
+    private final List<Result> actual = new ArrayList<>();
     private TestStatus status = TestStatus.NA;
 
     TestCaseResults(String testCaseId) {

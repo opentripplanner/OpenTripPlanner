@@ -4,11 +4,13 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.model.SystemNotice;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.transit.raptor.util.PathStringBuilder;
 
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 /**
  * An Itinerary is one complete way of getting from the start location to the end location.
@@ -78,6 +80,10 @@ public class Itinerary {
      /** TRUE if mode is WALK from start ot end (all legs are walking). */
     public final boolean walkOnly;
 
+    /** TRUE if mode is a non transit move from start ot end (all legs are non-transit). */
+    public final boolean streetOnly;
+
+
     /**
      * System notices is used to tag itineraries with system information. For example if you run the
      * itinerary-filter in debug mode, the filters would tag itineraries instead of deleting them
@@ -115,6 +121,7 @@ public class Itinerary {
         this.nonTransitDistanceMeters = totals.nonTransitDistanceMeters;
         this.waitingTimeSeconds = totals.waitingTimeSeconds;
         this.walkOnly = totals.walkOnly;
+        this.streetOnly = totals.streetOnly;
     }
 
     /**
@@ -145,6 +152,13 @@ public class Itinerary {
      */
     public boolean isWalkingAllTheWay() {
         return walkOnly;
+    }
+
+    /**
+     * Return {@code true} if all legs are WALKING.
+     */
+    public boolean isOnStreetAllTheWay() {
+        return streetOnly;
     }
 
     /** TRUE if alt least one leg is a transit leg. */
@@ -212,6 +226,10 @@ public class Itinerary {
     @Override
     public String toString() {
         return ToStringBuilder.of(Itinerary.class)
+                .addStr("from", firstLeg().from.toStringShort())
+                .addStr("to", lastLeg().to.toStringShort())
+                .addCalTime("start", firstLeg().startTime)
+                .addCalTime("end", lastLeg().startTime)
                 .addNum("nTransfers", nTransfers, -1)
                 .addDuration("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)
@@ -226,5 +244,51 @@ public class Itinerary {
                 .addCol("legs", legs)
                 .addObj("fare", fare)
                 .toString();
+    }
+
+    /**
+     * Used to convert a list of itineraries to a SHORT human readable string.
+     * @see #toStr()
+     * <p>
+     * It is great for comparing lists of itineraries in a test:
+     * {@code assertEquals(toStr(List.of(it1)), toStr(result))}.
+     */
+    public static String toStr(List<Itinerary> list) {
+        return list.stream().map(Itinerary::toStr).collect(Collectors.joining(", "));
+    }
+
+    /**
+     * Used to convert an itinerary to a SHORT human readable string - including just a few of
+     * the most important fields. It is much shorter and easier to read then the
+     * {@link Itinerary#toString()}.
+     * <p>
+     * It is great for comparing to itineraries in a test:
+     * {@code assertEquals(toStr(it1), toStr(it2))}.
+     * <p>
+     * Example: {@code A ~ Walk 2m ~ B ~ BUS 55 12:04 12:14 ~ C [cost: 1066]}
+     * <p>
+     * Reads: Start at A, walk 2 minutes to stop B, take bus 55, board at 12:04 and alight at
+     * 12:14 ...
+     */
+    public String toStr() {
+        PathStringBuilder buf = new PathStringBuilder();
+        buf.stop(firstLeg().from.name);
+
+        for (Leg leg : legs) {
+            buf.sep();
+            if(leg.isWalkingLeg()) {
+                buf.walk((int)leg.getDuration());
+            }
+            else if(leg.isTransitLeg()) {
+                buf.transit(leg.mode, leg.tripId.getId(), leg.startTime, leg.endTime);
+            }
+            else {
+                buf.other(leg.mode, leg.startTime, leg.endTime);
+            }
+
+            buf.sep();
+            buf.stop(leg.to.name);
+        }
+        return buf.toString() + " [cost: " + generalizedCost + "]";
     }
 }

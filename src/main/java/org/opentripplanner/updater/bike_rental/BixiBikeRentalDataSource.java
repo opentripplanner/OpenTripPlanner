@@ -3,11 +3,13 @@ package org.opentripplanner.updater.bike_rental;
 import java.util.Map;
 
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class BixiBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
-    public BixiBikeRentalDataSource() {
-        super("//stations/station");
+    public BixiBikeRentalDataSource(
+        UpdaterDataSourceParameters config) {
+        super(config,"//stations/station");
     }
 
     public BikeRentalStation makeStation(Map<String, String> attributes) {

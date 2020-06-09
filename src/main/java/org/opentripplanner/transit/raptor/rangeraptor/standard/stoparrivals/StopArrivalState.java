@@ -123,7 +123,7 @@ public class StopArrivalState<T extends RaptorTripSchedule> {
                 IntUtils.intToString(boardStop, NOT_SET),
                 TimeUtils.timeToStrCompact(boardTime, NOT_SET),
                 TimeUtils.timeToStrCompact(transitArrivalTime, NOT_SET),
-                trip == null ? "" : trip.debugInfo(),
+                trip == null ? "" : trip.pattern().debugInfo(),
                 IntUtils.intToString(transferFromStop, NOT_SET),
                 TimeUtils.durationToStr(accessOrTransferDuration, NOT_SET)
         );

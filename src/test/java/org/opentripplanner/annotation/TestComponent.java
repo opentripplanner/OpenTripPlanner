@@ -2,12 +2,15 @@ package org.opentripplanner.annotation;
 
 import static org.opentripplanner.annotation.ServiceType.GraphUpdater;
 
-import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 
-@Component(key = "test.compoent", type = GraphUpdater)
+@Component(key = "test.compoent", type = GraphUpdater, init = TestParameter.class)
 public class TestComponent implements org.opentripplanner.updater.GraphUpdater {
+
+  public TestComponent(TestParameter testParameter) {
+    //nothing
+  }
 
   @Override
   public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -36,10 +39,5 @@ public class TestComponent implements org.opentripplanner.updater.GraphUpdater {
 
   public boolean isPrimed() {
     return false;
-  }
-
-  @Override
-  public void configure(Graph graph, JsonNode jsonNode) throws Exception {
-
   }
 }

@@ -11,34 +11,26 @@ import java.time.OffsetDateTime;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
 import java.time.format.DateTimeParseException;
 import java.time.temporal.TemporalAccessor;
 import java.util.TimeZone;
 
-public class DateTimeScalarFactory {
+public final class DateTimeScalarFactory {
 
-    private static final String EXAMPLE_DATE_TIME = "2017-04-23T18:25:43+0100";
-    private static final String DATE_TIME_PATTERN = "yyyy-MM-dd'T'HH:mm:ssXXXX";
-    private static final String PARSE_DATE_TIME_PATTERN = "[yyyyMMdd][yyyy-MM-dd][yyyy-DDD]['T'[HHmmss][HHmm][HH:mm:ss][HH:mm][.SSSSSSSSS][.SSSSSS][.SSS][.SS][.S]][OOOO][O][z][XXXXX][XXXX]['['VV']']";
+    private static final String DOCUMENTATION =
+        "DateTime format accepting ISO 8601 dates with time zone offset.\n\n"
+        + "Format:  `YYYY-MM-DD'T'hh:mm[:ss](Z|±01:00)`\n\n"
+        + "Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`";
 
-    private static final String DATE_SCALAR_DESCRIPTION = "DateTime format accepting ISO dates. Return values on format: " + DATE_TIME_PATTERN + ". Example: " + EXAMPLE_DATE_TIME;
-
-    public static final DateTimeFormatter PARSER = new DateTimeFormatterBuilder()
-            .appendPattern(PARSE_DATE_TIME_PATTERN)
-            .toFormatter();
-
-    private static final DateTimeFormatter FORMATTER = new DateTimeFormatterBuilder()
-            .appendPattern(DATE_TIME_PATTERN)
-            .toFormatter();
-
+    private static final DateTimeFormatter PARSER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ISO_OFFSET_DATE_TIME;
 
     private DateTimeScalarFactory() {
     }
 
     public static GraphQLScalarType createMillisecondsSinceEpochAsDateTimeStringScalar(TimeZone timeZone) {
 
-        return new GraphQLScalarType("DateTime", DATE_SCALAR_DESCRIPTION, new Coercing() {
+        return new GraphQLScalarType("DateTime", DOCUMENTATION, new Coercing<>() {
             @Override
             public String serialize(Object input) {
                 if (input instanceof Long) {
