@@ -29,7 +29,7 @@ public class ParkingZonesMapper {
     private Geometry deserializeGeometry(JsonObject jsonObject) {
         try {
             return geometryJSON.read(jsonObject.toString());
-        } catch (IOException e) {
+        } catch (Exception e) {
             LOG.warn("Failed to deserialize GeometryJSON", e);
             return null;
         }

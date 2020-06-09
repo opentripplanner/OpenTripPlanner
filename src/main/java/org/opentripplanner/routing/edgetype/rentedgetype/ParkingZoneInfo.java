@@ -2,6 +2,7 @@ package org.opentripplanner.routing.edgetype.rentedgetype;
 
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
+import org.opentripplanner.updater.vehicle_sharing.parking_zones.GeometryParkingZone;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -31,7 +32,10 @@ public class ParkingZoneInfo {
             this.vehicleType = vehicleType;
         }
 
-
+        public boolean sameProviderIdAndVehicleType(GeometryParkingZone geometryParkingZone) {
+            return providerId == geometryParkingZone.getProviderId()
+                    && vehicleType.equals(geometryParkingZone.getVehicleType());
+        }
 
         private boolean appliesToThisVehicle(VehicleDescription vehicle) {
             return vehicle.getProviderId() == providerId && vehicle.getVehicleType().equals(vehicleType);

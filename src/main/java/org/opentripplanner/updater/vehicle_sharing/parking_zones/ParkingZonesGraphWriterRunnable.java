@@ -7,13 +7,14 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphWriterRunnable;
 
 import java.util.List;
+import java.util.Map;
 
 class ParkingZonesGraphWriterRunnable implements GraphWriterRunnable {
 
-    private final List<Pair<RentVehicleAnywhereEdge, List<SingleParkingZone>>> parkingZonesPerVertex;
+    private final Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex;
     private final List<SingleParkingZone> parkingZonesEnabled;
 
-    public ParkingZonesGraphWriterRunnable(List<Pair<RentVehicleAnywhereEdge, List<SingleParkingZone>>> parkingZonesPerVertex,
+    public ParkingZonesGraphWriterRunnable(Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex,
                                            List<SingleParkingZone> parkingZonesEnabled) {
         this.parkingZonesPerVertex = parkingZonesPerVertex;
         this.parkingZonesEnabled = parkingZonesEnabled;
@@ -22,8 +23,6 @@ class ParkingZonesGraphWriterRunnable implements GraphWriterRunnable {
     @Override
     public void run(Graph graph) {
         graph.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
-        for (Pair<RentVehicleAnywhereEdge, List<SingleParkingZone>> p : parkingZonesPerVertex) {
-            p.getLeft().getParkingZones().updateParkingZones(p.getRight());
-        }
+        parkingZonesPerVertex.forEach((edge, parkingZones) -> edge.getParkingZones().updateParkingZones(parkingZones));
     }
 }
