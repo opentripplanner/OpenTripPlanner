@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -23,7 +24,8 @@ public class ParkingZonesGetter {
 
     private final ParkingZonesMapper mapper = new ParkingZonesMapper();
 
-    public List<GeometryParkingZone> getParkingZones(String url) {
+    public List<GeometryParkingZone> getParkingZones(String url, Graph graph) {
+        // TODO AdamWiktor add filtering parking zones for current graph to request
         ParkingZonesApiResponse response = HttpUtils.postData(url, QUERY, ParkingZonesApiResponse.class);
         LOG.info("Got parking zones from API");
         return mapper.map(response.getData().getParking_zones());

@@ -90,14 +90,15 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling parking zones from API");
-        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url);
+        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url, graph);
+        LOG.info("Grouping parking zones");
         List<SingleParkingZone> parkingZonesEnabled = getNewParkingZonesEnabled(geometryParkingZones);
+        LOG.info("Calculating parking zones for each vertex");
         Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex =
                 getNewParkingZones(geometryParkingZones, parkingZonesEnabled);
-
         ParkingZonesGraphWriterRunnable graphWriterRunnable =
                 new ParkingZonesGraphWriterRunnable(parkingZonesPerVertex, parkingZonesEnabled);
-        LOG.info("Got new parking zones");
+        LOG.info("Executing parking zones update");
         graphUpdaterManager.execute(graphWriterRunnable);
         LOG.info("Finished updating parking zones");
     }
