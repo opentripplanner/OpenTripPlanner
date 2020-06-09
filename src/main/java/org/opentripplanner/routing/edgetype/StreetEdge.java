@@ -480,7 +480,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options)) {
 
             // if we're using a soft walk-limit
-            if( options.softWalkLimiting ){
+            if(options.isSoftWalkLimitEnabled()){
                 // just slap a penalty for the overage onto s1
                 weight += calculateOverageWeight(s0.getTraverseDistanceInMeters(), s1.getTraverseDistance(),
                         options.getMaxWalkDistance(), options.softWalkPenalty,

@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleValidator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -891,18 +891,18 @@ public class RoutingRequest implements Cloneable, Serializable {
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-
-    /**
-     * @return the (soft) maximum walk distance
-     */
-    // If transit is not to be used and this is a point to point search
-    // or one with soft walk limiting, disable walk limit.
+    
+    /** @return the maximum walk distance */
     public double getMaxWalkDistance() {
-        if (modes.isTransit() || (batch && !softWalkLimiting)) {
-            return maxWalkDistance;
-        } else {
-            return Double.MAX_VALUE;
-        }
+        return maxWalkDistance;
+    }
+
+    public boolean isSoftWalkLimitEnabled() {
+        return softWalkLimiting;
+    }
+
+    public void setSoftWalkLimit(boolean softWalkLimitEnabled){
+        this.softWalkLimiting = softWalkLimitEnabled;
     }
 
     public void setWalkBoardCost(int walkBoardCost) {
