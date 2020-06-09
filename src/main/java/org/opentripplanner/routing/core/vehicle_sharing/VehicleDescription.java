@@ -119,6 +119,4 @@ public abstract class VehicleDescription {
     protected Double getMaximumRangeInMeters() {
         return Double.MAX_VALUE;
     }
-
-    ;
 }
