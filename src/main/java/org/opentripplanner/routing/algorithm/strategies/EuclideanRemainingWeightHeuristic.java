@@ -6,6 +6,7 @@ import org.opentripplanner.routing.algorithm.GenericDijkstra;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.FreeEdge;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.graph.Edge;
@@ -52,7 +53,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
         lat = target.getLat();
         lon = target.getLon();
         requiredWalkDistance = determineRequiredWalkDistance(req);
-        walkReluctance = req.walkReluctance;
+        walkReluctance = req.getModeVehicleReluctance(null, TraverseMode.WALK);
     }
 
     /**
