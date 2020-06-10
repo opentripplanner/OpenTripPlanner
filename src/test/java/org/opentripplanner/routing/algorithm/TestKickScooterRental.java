@@ -12,6 +12,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.KickScooterDescription;
 import org.opentripplanner.routing.core.vehicle_sharing.Provider;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -21,6 +22,8 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class TestKickScooterRental extends TestCase {
+
+    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
 
     public void testIsRoutable() throws Exception {
         // generate a very simple graph
@@ -49,9 +52,9 @@ public class TestKickScooterRental extends TestCase {
 
         // so we add renting edges
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3);
+        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
 
         // we add a kickscooter
         rent1.getAvailableVehicles().add(scooterDescription);
@@ -96,10 +99,10 @@ public class TestKickScooterRental extends TestCase {
 
         // so we add renting kickscooter
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
 //        Used to droppoff kickscooter
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3);
+        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
         // we add a kickscooter
         rent1.getAvailableVehicles().add(scooterDescription);
 

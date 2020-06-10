@@ -6,6 +6,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -19,6 +20,8 @@ import java.util.List;
 import static java.util.Collections.singletonList;
 
 public class SharedVehiclesUpdaterTest extends TestCase {
+
+    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
 
     public void testProjectingVehicles() {
         float long1 = (float) -77.0;
@@ -50,8 +53,8 @@ public class SharedVehiclesUpdaterTest extends TestCase {
                 long3, lat3), "e2", 87, StreetTraversalPermission.CAR, false);
 
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
-        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
+        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2, EMPTY_PARKING_ZONES);
 
         SharedVehiclesUpdater sharedVehiclesUpdater = new SharedVehiclesUpdater();
 

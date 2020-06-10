@@ -19,11 +19,6 @@ public class RentVehicleAnywhereEdge extends Edge {
 
     private final ParkingZoneInfo parkingZonesEnabled;
 
-    public RentVehicleAnywhereEdge(Vertex v) {
-        super(v, v);
-        this.parkingZonesEnabled = null;
-    }
-
     public RentVehicleAnywhereEdge(Vertex v, ParkingZoneInfo parkingZonesEnabled) {
         super(v, v);
         this.parkingZonesEnabled = parkingZonesEnabled;

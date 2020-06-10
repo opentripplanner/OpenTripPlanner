@@ -10,8 +10,9 @@ import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
-import static java.util.Collections.emptySet;
-import static java.util.Collections.singleton;
+import java.util.List;
+
+import static java.util.Collections.*;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -22,6 +23,7 @@ public class RentVehicleAnywhereEdgeTest {
     private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK"));
     private static final CarDescription CAR_2 = new CarDescription("2", 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, new Provider(2, "PANEK"));
 
+    private ParkingZoneInfo parkingZonesEnabled;
     private RentVehicleAnywhereEdge edge;
     private RoutingRequest request;
     private State s;
@@ -30,7 +32,8 @@ public class RentVehicleAnywhereEdgeTest {
     public void setUp() {
         Graph graph = new Graph();
         IntersectionVertex v = new IntersectionVertex(graph, "v_name", 0, 0);
-        edge  = new RentVehicleAnywhereEdge(v);
+        parkingZonesEnabled = new ParkingZoneInfo();
+        edge  = new RentVehicleAnywhereEdge(v, parkingZonesEnabled);
         request = new RoutingRequest();
         request.setDummyRoutingContext(graph);
         request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR));
@@ -105,6 +108,21 @@ public class RentVehicleAnywhereEdgeTest {
         request.rentingAllowed = true;
         request.vehicleValidator = mock(VehicleValidator.class);
         when(request.vehicleValidator.isValid(any())).thenReturn(false);
+
+        // when
+        State traversed = edge.traverse(s);
+
+        // then
+        assertNull(traversed);
+    }
+
+    @Test
+    public void shouldNotAllowToDropoffVehicleOutsideParkingZone() {
+        // TODO AdamWiktor write tests
+        // given
+        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
+        parkingZonesEnabled.updateParkingZones(singleParkingZone);
+
 
         // when
         State traversed = edge.traverse(s);

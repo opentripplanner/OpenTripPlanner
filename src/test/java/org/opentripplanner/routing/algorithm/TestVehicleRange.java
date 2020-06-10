@@ -10,6 +10,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.Gearbox;
 import org.opentripplanner.routing.core.vehicle_sharing.KickScooterDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -18,6 +19,9 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class TestVehicleRange extends TestCase {
+
+    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
+
     public void testToFar() {
         Graph graph = new Graph();
 
@@ -30,8 +34,8 @@ public class TestVehicleRange extends TestCase {
 //      Vehicle's range is smaller than combine length of the streets. It shouldn't be possible to find route.
         KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 3 * 1000.);
 
-        RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
-        new RentVehicleAnywhereEdge(v3);
+        RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
         rentVehicleAnywhereEdge.getAvailableVehicles().add(kickScooterDescription);
 
         AStar aStar = new AStar();
@@ -59,8 +63,8 @@ public class TestVehicleRange extends TestCase {
 //      Vehicle has enough range to traverse the whole route.
         KickScooterDescription kickScooterDescription = new KickScooterDescription("a", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, null, 3700.);
 
-        RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1);
-        new RentVehicleAnywhereEdge(v3);
+        RentVehicleAnywhereEdge rentVehicleAnywhereEdge = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
         rentVehicleAnywhereEdge.getAvailableVehicles().add(kickScooterDescription);
 
         AStar aStar = new AStar();
