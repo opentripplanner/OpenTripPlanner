@@ -10,12 +10,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.vertextype.BarrierVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OsmVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.BitSetUtils;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -376,8 +371,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
-            // TODO: this is being applied even when biking or driving.
-            weight *= options.walkReluctance;
+            weight *= options.getModeVehicleReluctance(s0.getCurrentVehicleType(), traverseMode);
         }
 
         StateEditor s1 = s0.edit(this);
@@ -486,7 +480,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if (s1.weHaveWalkedTooFar(options)) {
 
             // if we're using a soft walk-limit
-            if( options.softWalkLimiting ){
+            if(options.isSoftWalkLimitEnabled()){
                 // just slap a penalty for the overage onto s1
                 weight += calculateOverageWeight(s0.getTraverseDistanceInMeters(), s1.getTraverseDistance(),
                         options.getMaxWalkDistance(), options.softWalkPenalty,
@@ -541,7 +535,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        return timeLowerBound(options) * options.walkReluctance;
+        return timeLowerBound(options) * options.getModeVehicleReluctance(null, TraverseMode.WALK);
     }
 
     @Override
