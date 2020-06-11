@@ -15,8 +15,6 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     private String tripShortName;
 
-    private String tripPublicCode;
-
     private String tripPrivateCode;
 
     private String tripHeadsign;
@@ -69,7 +67,6 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         this.id = id;
     }
 
-
     /**
      * Operator running the trip. Returns operator of this trip, if it exist, or else the route operator.
      */
@@ -106,6 +103,10 @@ public final class Trip extends TransitEntity<FeedScopedId> {
         this.serviceId = serviceId;
     }
 
+    /**
+     * Public code or identifier for the journey. Equal to NeTEx PublicCode. GTFS and NeTEx have
+     * additional constraints on this fields that are not enforced in OTP.
+     */
     public String getTripShortName() {
         return tripShortName;
     }
@@ -113,13 +114,6 @@ public final class Trip extends TransitEntity<FeedScopedId> {
     public void setTripShortName(String tripShortName) {
         this.tripShortName = tripShortName;
     }
-
-    /**
-     * Public code or identifier for the journey
-     */
-    public String getTripPublicCode() { return tripPublicCode; }
-
-    public void setTripPublicCode(String tripPublicCode) { this.tripPublicCode = tripPublicCode; }
 
     /**
      * Internal code (non-public identifier) for the journey (e.g. train- or trip number from

@@ -66,7 +66,7 @@ class TripMapper {
           trip.setTripPrivateCode(serviceJourney.getPrivateCode().getValue());
         }
         if (serviceJourney.getPublicCode() != null) {
-          trip.setTripPublicCode(serviceJourney.getPublicCode());
+          trip.setTripShortName(serviceJourney.getPublicCode());
         }
 
         return trip;
