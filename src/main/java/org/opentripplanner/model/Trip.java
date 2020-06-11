@@ -15,7 +15,7 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     private String tripShortName;
 
-    private String tripPrivateCode;
+    private String internalPlanningCode;
 
     private String tripHeadsign;
 
@@ -117,12 +117,13 @@ public final class Trip extends TransitEntity<FeedScopedId> {
 
     /**
      * Internal code (non-public identifier) for the journey (e.g. train- or trip number from
-     * the planners' tool)
+     * the planners' tool). This is kept to ensure compatibility with legacy planning systems.
+     * There is no GTFS equivalent.
      */
-    public String getTripPrivateCode() { return tripPrivateCode; }
+    public String getInternalPlanningCode() { return internalPlanningCode; }
 
-    public void setTripPrivateCode(String tripPrivateCode) {
-        this.tripPrivateCode = tripPrivateCode;
+    public void setInternalPlanningCode(String internalPlanningCode) {
+        this.internalPlanningCode = internalPlanningCode;
     }
 
     public String getTripHeadsign() {

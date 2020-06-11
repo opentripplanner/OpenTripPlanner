@@ -63,7 +63,7 @@ class TripMapper {
         trip.setServiceId(idFactory.createId(serviceId));
         trip.setShapeId(getShapeId(serviceJourney));
         if (serviceJourney.getPrivateCode() != null) {
-          trip.setTripPrivateCode(serviceJourney.getPrivateCode().getValue());
+          trip.setInternalPlanningCode(serviceJourney.getPrivateCode().getValue());
         }
         if (serviceJourney.getPublicCode() != null) {
           trip.setTripShortName(serviceJourney.getPublicCode());

@@ -1999,7 +1999,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("privateCode")
                         .type(Scalars.GraphQLString)
                         .description("For internal use by operators.")
-                        .dataFetcher(environment -> (((Trip) environment.getSource()).getTripPrivateCode()))
+                        .dataFetcher(environment -> (((Trip) environment.getSource()).getInternalPlanningCode()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("linePublicCode")
