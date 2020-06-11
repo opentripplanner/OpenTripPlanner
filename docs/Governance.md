@@ -9,9 +9,10 @@ OpenTripPlanner is a member project of the [Software Freedom Conservancy](https:
 | Andrew Byrd       | Conveyal                    |
 | Thomas Craig      | Trillium                    |
 | Drew Dara-Abrams  | Interline                   |
-| David Emory       | MARTA (Atlanta, Georgia)    |
+| David Emory       | MARTA (Atlanta, Georgia USA)|
 | Thomas Gran       | Ruter & Entur (Norway)      |
 | Tuukka Hastrup    | Maanteeamet (Estonia)       |
+| Joel Lappalainan  | Digitransit (Finland)       |
 | Frank Purcell     | TriMet (Portland, Oregon)   |
 | Evan Siroky       | IBI Group                   |
 | David Turner      | ex-OpenPlans                |
