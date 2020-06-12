@@ -14,7 +14,7 @@ import java.util.List;
 
 /**
  * Fetches GBFS endpoints from the Bikeservice component located at
- * https://github.com/entur/bikeservice
+ * https://github.com/entur/bikeservice, which is an API for aggregating GBFS endpoints.
  */
 public class GBFSUpdaterEndpointFetcher {
 
