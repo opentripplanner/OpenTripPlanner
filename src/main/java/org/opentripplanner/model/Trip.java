@@ -118,7 +118,7 @@ public final class Trip extends TransitEntity<FeedScopedId> {
     /**
      * Internal code (non-public identifier) for the journey (e.g. train- or trip number from
      * the planners' tool). This is kept to ensure compatibility with legacy planning systems.
-     * There is no GTFS equivalent.
+     * In NeTEx this maps to privateCode, there is no GTFS equivalent.
      */
     public String getInternalPlanningCode() { return internalPlanningCode; }
 
