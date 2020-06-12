@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.InputStream;
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,14 +25,14 @@ public class GBFSUpdaterEndpointFetcher {
 
   private static final String GBFS_JSON_FILENAME = "gbfs.json";
 
-  public static List<GraphUpdater> createUpdatersFromEndpoint(String url) {
+  public static List<GraphUpdater> createUpdatersFromEndpoint(URI url) {
 
     LOG.info("Fetching list of updaters from {}", url);
 
     List<GraphUpdater> updaters = new ArrayList<>();
 
     try {
-      InputStream is = HttpUtils.getData(url);
+      InputStream is = HttpUtils.getData(url.toString());
       JsonNode node = (new ObjectMapper()).readTree(is);
       for (JsonNode operator : node.get("operators")) {
         String network = operator.get("name").asText();

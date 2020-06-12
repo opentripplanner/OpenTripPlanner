@@ -9,6 +9,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
+import java.net.URI;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
@@ -31,7 +32,7 @@ public class RouterConfig implements Serializable {
 
     private final String requestLogFile;
     private final double streetRoutingTimeoutSeconds;
-    private final String bikeShareUpdaterEndpoint;
+    private final URI bikeShareUpdaterEndpoint;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
     private final UpdaterConfig updaterConfig;
@@ -43,7 +44,7 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-        this.bikeShareUpdaterEndpoint = adapter.asText(
+        this.bikeShareUpdaterEndpoint = adapter.asUri(
             "bikeShareUpdaterEndpoint", null
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
@@ -69,7 +70,7 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
-    public String getBikeShareUpdaterEndpoint() {
+    public URI getBikeShareUpdaterEndpoint() {
         return bikeShareUpdaterEndpoint;
     }
 

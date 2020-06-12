@@ -26,6 +26,7 @@ import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -43,7 +44,7 @@ public abstract class GraphUpdaterConfigurator {
     public static void setupGraph(
         Graph graph,
         UpdaterConfig updaterConfig,
-        String bikeShareEndpoint
+        URI bikeShareEndpoint
     ) {
 
         List<GraphUpdater> updaters = new ArrayList<>(createUpdatersFromConfig(updaterConfig));
