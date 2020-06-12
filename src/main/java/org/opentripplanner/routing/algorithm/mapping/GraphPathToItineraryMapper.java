@@ -30,7 +30,6 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -80,6 +79,7 @@ public abstract class GraphPathToItineraryMapper {
                     request.disableAlertFiltering,
                     request.locale
             );
+            if (itinerary.legs.isEmpty()) { continue; }
             itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
@@ -203,7 +203,7 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         if (trivial) {
-            throw new TrivialPathException();
+            return new State[][]{};
         }
 
         int[] legIndexPairs = {0, states.length - 1};
