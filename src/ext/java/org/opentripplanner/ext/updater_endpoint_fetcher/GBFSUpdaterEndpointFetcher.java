@@ -51,8 +51,7 @@ public class GBFSUpdaterEndpointFetcher {
       }
     }
     catch (java.io.IOException e) {
-      LOG.warn(
-          "Error fetching list of bike rental endpoints from {}", url);
+      LOG.warn("Error fetching list of bike rental endpoints from {}", url, e);
     }
 
     LOG.info("{} updaters fetched", updaters.size());
