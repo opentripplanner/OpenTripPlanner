@@ -15,7 +15,7 @@ public class KickScooterDescription extends VehicleDescription {
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.KICKSCOOTER;
 
-    private static final double DEFAULT_RANGE_IN_METERS = 4 * 1000;
+    private static final double DEFAULT_RANGE_IN_METERS = 16 * 1000;
 
     public KickScooterDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                                   Gearbox gearbox, Provider provider, Double rangeInMeters) {
