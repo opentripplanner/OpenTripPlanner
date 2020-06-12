@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.updater_endpoint_fetcher;
+package org.opentripplanner.ext.updaterendpointfetcher;
 
 import org.opentripplanner.updater.UpdaterDataSourceConfig;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;

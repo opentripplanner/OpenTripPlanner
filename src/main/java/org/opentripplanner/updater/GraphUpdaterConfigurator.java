@@ -5,7 +5,7 @@ import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
-import org.opentripplanner.ext.updater_endpoint_fetcher.GBFSUpdaterEndpointFetcher;
+import org.opentripplanner.ext.updaterendpointfetcher.GBFSUpdaterEndpointFetcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
@@ -23,7 +23,6 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
-import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
