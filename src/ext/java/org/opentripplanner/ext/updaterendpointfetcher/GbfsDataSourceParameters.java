@@ -2,13 +2,13 @@ package org.opentripplanner.ext.updaterendpointfetcher;
 
 import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
 
-public class GbfsDataSource implements GbfsBikeRentalDataSource.Parameters {
+public class GbfsDataSourceParameters implements GbfsBikeRentalDataSource.Parameters {
 
   private final String url;
 
   private final String name;
 
-  public GbfsDataSource(String url, String name) {
+  public GbfsDataSourceParameters(String url, String name) {
     this.url = url;
     this.name = name;
   }

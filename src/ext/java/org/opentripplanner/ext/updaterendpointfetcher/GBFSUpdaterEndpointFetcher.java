@@ -37,7 +37,7 @@ public class GBFSUpdaterEndpointFetcher {
         String network = operator.get("name").asText();
         String updaterUrl = adjustUrlForUpdater(operator.get("url").asText());
 
-        GbfsDataSource dataSource = new GbfsDataSource(updaterUrl, network);
+        GbfsDataSourceParameters dataSource = new GbfsDataSourceParameters(updaterUrl, network);
         GbfsUpdaterSourceConfig gbfsUpdaterSourceConfig = new GbfsUpdaterSourceConfig(dataSource);
         BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
             gbfsUpdaterSourceConfig,
