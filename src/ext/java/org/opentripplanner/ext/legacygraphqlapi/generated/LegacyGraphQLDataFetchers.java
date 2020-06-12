@@ -22,7 +22,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPickupDropoffType;
-import org.opentripplanner.model.routing.RoutingResponse;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;

@@ -20,6 +20,9 @@ import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.routing.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -212,7 +215,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<Alert>> alerts() {
+  public DataFetcher<Iterable<AlertPatch>> alerts() {
     return null;
   }
 

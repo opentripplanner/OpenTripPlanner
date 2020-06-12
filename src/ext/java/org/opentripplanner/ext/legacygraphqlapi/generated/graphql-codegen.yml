@@ -1,4 +1,4 @@
-schema: ../schema.graphqls
+schema: ../../../../../../resources/legacygraphqlapi/schema.graphqls
 
 generates:
   LegacyGraphQLTypes.java:
@@ -50,7 +50,7 @@ config:
     placeAtDistance: Object
     placeAtDistanceConnection: Object
     placeAtDistanceEdge: Object
-    Plan: org.opentripplanner.model.routing.RoutingResponse#RoutingResponse
+    Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
     RealtimeState: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState#LegacyGraphQLRealtimeState
     Route: org.opentripplanner.model.Route#Route
     serviceTimeRange: Object
