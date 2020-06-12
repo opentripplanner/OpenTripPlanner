@@ -593,6 +593,7 @@ public class StateEditor {
     public void endCarRenting() {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedCar = false;
+        child.stateData.backMode = TraverseMode.WALK;
         child.stateData.nonTransitMode = TraverseMode.WALK;
     }
 
@@ -636,6 +637,7 @@ public class StateEditor {
     public void endVehicleRenting() {
         cloneStateDataAsNeeded();
         child.stateData.usingRentedVehicle = false;
+        child.stateData.backMode = TraverseMode.WALK;
         child.stateData.nonTransitMode = TraverseMode.WALK;
     }
 

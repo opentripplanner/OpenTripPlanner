@@ -76,6 +76,10 @@ public class StateData implements Cloneable {
 
     protected ServiceDay serviceDay;
 
+    /**
+     * The mode of transit to use when not traveling on transit. This should be updated each time transitions happen to
+     * other modes such as during parking a car at a park and ride or dropping off a bike rental.
+     */
     protected TraverseMode nonTransitMode;
 
     /**
@@ -93,7 +97,7 @@ public class StateData implements Cloneable {
     protected int lastNextArrivalDelta;
 
     /**
-     * The mode that was used to traverse the backEdge
+     * The mode that was used to traverse the state's backEdge
      */
     protected TraverseMode backMode;
 
