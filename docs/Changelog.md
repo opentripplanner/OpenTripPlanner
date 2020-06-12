@@ -34,7 +34,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
 - Make agency id feed scoped (#3035)
 - Refactor kiss and ride to a more general car pickup mode (#3063)
-- Add publicCode/privateCode to the Trip class in the OTP model (#3088)
+- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
