@@ -2,7 +2,6 @@ package org.opentripplanner.ext.updater_endpoint_fetcher;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.apache.commons.lang3.StringUtils;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.util.HttpUtils;
@@ -22,6 +21,8 @@ public class GBFSUpdaterEndpointFetcher {
   private static final Logger LOG = LoggerFactory.getLogger(GBFSUpdaterEndpointFetcher.class);
 
   private static final int DEFAULT_FREQUENCY_SEC = 15;
+
+  private static final String GBFS_JSON_FILENAME = "gbfs.json";
 
   public static List<GraphUpdater> createUpdatersFromEndpoint(String url) {
 
@@ -66,8 +67,8 @@ public class GBFSUpdaterEndpointFetcher {
    * expects.
    */
   private static String adjustUrlForUpdater(String url) {
-    return url.endsWith("gbfs.json")
-        ? StringUtils.substring(url, 0, url.length() - 9)
+    return url.endsWith(GBFS_JSON_FILENAME)
+        ? url.substring(0, url.length() - GBFS_JSON_FILENAME.length())
         : url;
   }
 }
