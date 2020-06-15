@@ -34,7 +34,7 @@ public class ParkingZonesApiResponse {
         private int providerId;
         private String vehicleType;
         private boolean isAllowed;
-        private List<Feature> polygons;
+        private Area area;
 
         public int getProviderId() {
             return providerId;
@@ -60,12 +60,26 @@ public class ParkingZonesApiResponse {
             isAllowed = allowed;
         }
 
-        public List<Feature> getPolygons() {
-            return polygons;
+        public Area getArea() {
+            return area;
         }
 
-        public void setPolygons(List<Feature> polygons) {
-            this.polygons = polygons;
+        public void setArea(Area area) {
+            this.area = area;
+        }
+    }
+
+    public static class Area {
+
+        private List<Feature> features;
+
+
+        public List<Feature> getFeatures() {
+            return features;
+        }
+
+        public void setFeatures(List<Feature> features) {
+            this.features = features;
         }
     }
 

@@ -37,7 +37,8 @@ public class ParkingZonesMapper {
 
     private List<Geometry> mapToGeometries(List<ParkingZone> parkingZones) {
         return parkingZones.stream()
-                .map(ParkingZone::getPolygons)
+                .map(ParkingZone::getArea)
+                .map(ParkingZonesApiResponse.Area::getFeatures)
                 .flatMap(Collection::stream)
                 .map(Feature::getGeometry)
                 .map(this::deserializeGeometry)

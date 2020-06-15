@@ -17,7 +17,7 @@ public class ParkingZonesGetter {
                     "    providerId\n" +
                     "    vehicleType\n" +
                     "    isAllowed\n" +
-                    "    polygons\n" +
+                    "    area\n" +
                     "  }" +
                     "}\"" +
                     "}";
