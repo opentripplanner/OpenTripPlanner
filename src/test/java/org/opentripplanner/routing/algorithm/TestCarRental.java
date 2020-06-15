@@ -23,8 +23,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class TestCarRental extends TestCase {
 
-    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
-
     public void testBasic() throws Exception {
         // generate a very simple graph
         Graph graph = new Graph();
@@ -63,8 +61,8 @@ public class TestCarRental extends TestCase {
 
         // so we add renting cars
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
-        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
 
         // but the are no cars so we still fail
         options = new RoutingRequest();
@@ -92,7 +90,7 @@ public class TestCarRental extends TestCase {
 
         // we add a parking at v3
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge car3 = new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge car3 = new RentVehicleAnywhereEdge(v3);
 
         // now we succeed!
         options = new RoutingRequest();

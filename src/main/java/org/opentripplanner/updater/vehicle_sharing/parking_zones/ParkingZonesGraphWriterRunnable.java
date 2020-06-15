@@ -22,7 +22,6 @@ class ParkingZonesGraphWriterRunnable implements GraphWriterRunnable {
 
     @Override
     public void run(Graph graph) {
-        graph.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
-        parkingZonesPerVertex.forEach((edge, parkingZones) -> edge.getParkingZones().updateParkingZones(parkingZones));
+        parkingZonesPerVertex.forEach((edge, parkingZones) -> edge.updateParkingZones(parkingZonesEnabled, parkingZones));
     }
 }

@@ -213,8 +213,6 @@ public class Graph implements Serializable {
     /** Areas for flex service */
     public Map<FeedScopedId, Geometry> flexAreasById = new HashMap<>();
 
-    public final ParkingZoneInfo parkingZonesEnabled = new ParkingZoneInfo();
-
     public Graph(Graph basedOn) {
         this();
         this.bundle = basedOn.getBundle();

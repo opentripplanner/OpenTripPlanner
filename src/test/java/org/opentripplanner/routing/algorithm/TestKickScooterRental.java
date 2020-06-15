@@ -23,8 +23,6 @@ import org.opentripplanner.routing.vertextype.StreetVertex;
 
 public class TestKickScooterRental extends TestCase {
 
-    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
-
     public void testIsRoutable() throws Exception {
         // generate a very simple graph
         Graph graph = new Graph();
@@ -52,9 +50,9 @@ public class TestKickScooterRental extends TestCase {
 
         // so we add renting edges
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3);
 
         // we add a kickscooter
         rent1.getAvailableVehicles().add(scooterDescription);
@@ -99,10 +97,10 @@ public class TestKickScooterRental extends TestCase {
 
         // so we add renting kickscooter
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
 //        Used to droppoff kickscooter
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent3 = new RentVehicleAnywhereEdge(v3);
         // we add a kickscooter
         rent1.getAvailableVehicles().add(scooterDescription);
 

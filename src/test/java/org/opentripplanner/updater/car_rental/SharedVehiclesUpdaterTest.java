@@ -21,8 +21,6 @@ import static java.util.Collections.singletonList;
 
 public class SharedVehiclesUpdaterTest extends TestCase {
 
-    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
-
     public void testProjectingVehicles() {
         float long1 = (float) -77.0;
         float long2 = (float) -77.0005;
@@ -53,8 +51,8 @@ public class SharedVehiclesUpdaterTest extends TestCase {
                 long3, lat3), "e2", 87, StreetTraversalPermission.CAR, false);
 
         @SuppressWarnings("unused")
-        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
-        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge car1 = new RentVehicleAnywhereEdge(v1);
+        RentVehicleAnywhereEdge car2 = new RentVehicleAnywhereEdge(v2);
 
         SharedVehiclesUpdater sharedVehiclesUpdater = new SharedVehiclesUpdater();
 

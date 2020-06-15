@@ -14,7 +14,7 @@ public class VehicleSharingBuilderModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         for (Vertex vertex : graph.getVertices()) {
             if (vertex.getIncoming().stream().anyMatch(e -> e instanceof StreetEdge)) {
-                new RentVehicleAnywhereEdge(vertex, graph.parkingZonesEnabled);
+                new RentVehicleAnywhereEdge(vertex);
             }
         }
     }

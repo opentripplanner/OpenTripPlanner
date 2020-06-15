@@ -20,7 +20,6 @@ public class RentVehicleAnywhereEdgeTest {
     private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK"));
     private static final CarDescription CAR_2 = new CarDescription("2", 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, new Provider(2, "PANEK"));
 
-    private ParkingZoneInfo parkingZonesEnabled;
     private RentVehicleAnywhereEdge edge;
     private RoutingRequest request;
     private State state, rentingState;
@@ -29,8 +28,7 @@ public class RentVehicleAnywhereEdgeTest {
     public void setUp() {
         Graph graph = new Graph();
         IntersectionVertex v = new IntersectionVertex(graph, "v_name", 0, 0);
-        parkingZonesEnabled = new ParkingZoneInfo();
-        edge = new RentVehicleAnywhereEdge(v, parkingZonesEnabled);
+        edge = new RentVehicleAnywhereEdge(v);
         request = new RoutingRequest();
         request.setDummyRoutingContext(graph);
         request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR));
@@ -120,7 +118,7 @@ public class RentVehicleAnywhereEdgeTest {
     public void shouldNotAllowToDropoffVehicleOutsideParkingZone() {
         // given
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
-        parkingZonesEnabled.updateParkingZones(singleParkingZone);
+        edge.updateParkingZones(singleParkingZone, emptyList());
 
         // when
         State traversed = edge.traverse(rentingState);
@@ -134,7 +132,7 @@ public class RentVehicleAnywhereEdgeTest {
         // given
         request.rentingAllowed = true;
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
-        parkingZonesEnabled.updateParkingZones(singleParkingZone);
+        edge.updateParkingZones(singleParkingZone, singleParkingZone);
         edge.getParkingZones().updateParkingZones(singleParkingZone);
 
         // when
@@ -149,7 +147,7 @@ public class RentVehicleAnywhereEdgeTest {
         // given
         request.rentingAllowed = true;
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.MOTORBIKE));
-        parkingZonesEnabled.updateParkingZones(singleParkingZone);
+        edge.updateParkingZones(singleParkingZone, emptyList());
 
         // when
         State traversed = edge.traverse(rentingState);

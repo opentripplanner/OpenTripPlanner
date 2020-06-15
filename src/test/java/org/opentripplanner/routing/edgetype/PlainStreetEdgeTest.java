@@ -23,8 +23,6 @@ import org.locationtech.jts.geom.LineString;
 
 public class PlainStreetEdgeTest {
 
-    private static final ParkingZoneInfo EMPTY_PARKING_ZONES = new ParkingZoneInfo();
-
     private Graph graph;
     private IntersectionVertex v0, v1, v2;
     private RoutingRequest proto;
@@ -134,7 +132,7 @@ public class PlainStreetEdgeTest {
         //Rent a vehicle (motorbike)
         VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
                 FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
         rent1.getAvailableVehicles().add(vehicle);
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
         options.setStartingMode(TraverseMode.WALK);
@@ -160,7 +158,7 @@ public class PlainStreetEdgeTest {
         //Rent a vehicle (car)
         VehicleDescription vehicle = new CarDescription("1234", v1.getLat(), v1.getLon(),
                 FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
         rent1.getAvailableVehicles().add(vehicle);
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
         options.setStartingMode(TraverseMode.WALK);
@@ -186,7 +184,7 @@ public class PlainStreetEdgeTest {
         //Rent a vehicle (motorbike)
         VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
                 FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1, EMPTY_PARKING_ZONES);
+        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
         rent1.getAvailableVehicles().add(vehicle);
         RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
         options.setStartingMode(TraverseMode.WALK);

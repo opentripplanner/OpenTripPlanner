@@ -17,11 +17,10 @@ public class RentVehicleAnywhereEdge extends Edge {
 
     private final ParkingZoneInfo parkingZones = new ParkingZoneInfo();
 
-    private final ParkingZoneInfo parkingZonesEnabled;
+    private final ParkingZoneInfo parkingZonesEnabled = new ParkingZoneInfo();
 
-    public RentVehicleAnywhereEdge(Vertex v, ParkingZoneInfo parkingZonesEnabled) {
+    public RentVehicleAnywhereEdge(Vertex v) {
         super(v, v);
-        this.parkingZonesEnabled = parkingZonesEnabled;
     }
 
     public List<VehicleDescription> getAvailableVehicles() {
@@ -44,6 +43,11 @@ public class RentVehicleAnywhereEdge extends Edge {
 
     private boolean canDropoffVehicleHere(VehicleDescription vehicle) {
         return !parkingZonesEnabled.appliesToVehicle(vehicle) || parkingZones.appliesToVehicle(vehicle);
+    }
+
+    public void updateParkingZones(List<ParkingZoneInfo.SingleParkingZone> parkingZonesEnabled, List<ParkingZoneInfo.SingleParkingZone> parkingZones) {
+        this.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
+        this.parkingZones.updateParkingZones(parkingZones);
     }
 
     @Override
