@@ -119,9 +119,6 @@ public class RentVehicleAnywhereEdgeTest {
     @Test
     public void shouldNotAllowToDropoffVehicleOutsideParkingZone() {
         // given
-        request.rentingAllowed = true;
-        request.vehicleValidator = mock(VehicleValidator.class);
-        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(true);
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
         parkingZonesEnabled.updateParkingZones(singleParkingZone);
 
@@ -136,11 +133,23 @@ public class RentVehicleAnywhereEdgeTest {
     public void shouldAllowToDropoffVehicleInsideParkingZone() {
         // given
         request.rentingAllowed = true;
-        request.vehicleValidator = mock(VehicleValidator.class);
-        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(true);
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
         parkingZonesEnabled.updateParkingZones(singleParkingZone);
         edge.getParkingZones().updateParkingZones(singleParkingZone);
+
+        // when
+        State traversed = edge.traverse(rentingState);
+
+        // then
+        assertNotNull(traversed);
+    }
+
+    @Test
+    public void shouldAllowToDropoffVehicleWhenParkingZonesDontApplyToIt() {
+        // given
+        request.rentingAllowed = true;
+        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.MOTORBIKE));
+        parkingZonesEnabled.updateParkingZones(singleParkingZone);
 
         // when
         State traversed = edge.traverse(rentingState);
