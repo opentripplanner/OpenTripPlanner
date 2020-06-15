@@ -3,6 +3,8 @@ package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
 
 /**
@@ -10,7 +12,7 @@ import org.opentripplanner.transit.raptor.rangeraptor.WorkerLifeCycle;
  * <P/>
  * This class is immutable and thread safe.
  */
-public class DefaultCostCalculator implements CostCalculator {
+public class DefaultCostCalculator<T extends RaptorTripSchedule> implements CostCalculator<T> {
     private final int boardCost;
     private final int walkFactor;
     private final int waitFactor;
@@ -20,7 +22,8 @@ public class DefaultCostCalculator implements CostCalculator {
     /**
      * We only apply the wait factor between transits, not between access and transit;
      * Hence we start with 0 (zero) and after the first round we set this to the
-     * provided {@link #waitFactor}.
+     * provided {@link #waitFactor}. We assume we can time-shift the access to get rid
+     * of the wait time.
      */
     private int waitFactorApplied = 0;
 
@@ -42,27 +45,39 @@ public class DefaultCostCalculator implements CostCalculator {
 
     @Override
     public int onTripRidingCost(
-        int prevStopArrivalCost,
-        int boardWaitTime,
-        int relativeTransitTime,
-        int boardStop
+        ArrivalView<T> previousArrival,
+        int waitTime,
+        int boardTime,
+        T trip
     ) {
-        int cost = prevStopArrivalCost
-            + waitFactorApplied * boardWaitTime
+        // The relative-transit-ime is time spent on transit. We do not know the alight-stop, so
+        // it is impossible to calculate the "correct" time. But the only thing that maters is that
+        // the relative difference between to boardings are correct, assuming riding the same trip.
+        // So, we can use the negative board time as relative-transit-time.
+        final int relativeTransitTime =  - boardTime;
+
+        int cost = previousArrival.cost()
+            + waitFactorApplied * waitTime
             + transitFactor * relativeTransitTime
             + boardCost;
 
         if(stopVisitCost != null) {
-            cost += stopVisitCost[boardStop];
+            cost += stopVisitCost[previousArrival.stop()];
         }
         return cost;
     }
 
     @Override
-    public int transitArrivalCost(int waitTime, int transitTime, int fromStop, int toStop) {
+    public int transitArrivalCost(
+        ArrivalView<T> previousArrival,
+        int waitTime,
+        int transitTime,
+        int toStop,
+        T trip
+    ) {
         int cost = waitFactorApplied * waitTime + transitFactor * transitTime + boardCost;
         if(stopVisitCost != null) {
-            cost += stopVisitCost[fromStop] + stopVisitCost[toStop];
+            cost += stopVisitCost[previousArrival.stop()] + stopVisitCost[toStop];
         }
         return cost;
     }

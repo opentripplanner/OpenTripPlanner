@@ -45,7 +45,7 @@ class StopArrivalParetoSet<T extends RaptorTripSchedule> extends ParetoSetWithMa
      */
     static <T extends RaptorTripSchedule> StopArrivalParetoSet<T> createEgressStopArrivalSet(
             Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
-            CostCalculator costCalculator,
+            CostCalculator<T> costCalculator,
             DestinationArrivalPaths<T> destinationArrivals,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
