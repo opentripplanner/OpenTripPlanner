@@ -13,7 +13,11 @@ import java.util.stream.Collectors;
 
 public class RentVehicleAnywhereEdge extends Edge {
 
-    private List<VehicleDescription> availableVehicles = new ArrayList<>();
+    private final List<VehicleDescription> availableVehicles = new ArrayList<>();
+
+    private final ParkingZoneInfo parkingZones = new ParkingZoneInfo();
+
+    private final ParkingZoneInfo parkingZonesEnabled = new ParkingZoneInfo();
 
     public RentVehicleAnywhereEdge(Vertex v) {
         super(v, v);
@@ -21,6 +25,10 @@ public class RentVehicleAnywhereEdge extends Edge {
 
     public List<VehicleDescription> getAvailableVehicles() {
         return availableVehicles;
+    }
+
+    public ParkingZoneInfo getParkingZones() {
+        return parkingZones;
     }
 
     @Override
@@ -33,13 +41,22 @@ public class RentVehicleAnywhereEdge extends Edge {
         return "Rent vehicle in node " + getToVertex().getName(locale);
     }
 
+    private boolean canDropoffVehicleHere(VehicleDescription vehicle) {
+        return !parkingZonesEnabled.appliesToVehicle(vehicle) || parkingZones.appliesToVehicle(vehicle);
+    }
+
+    public void updateParkingZones(List<ParkingZoneInfo.SingleParkingZone> parkingZonesEnabled, List<ParkingZoneInfo.SingleParkingZone> parkingZones) {
+        this.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
+        this.parkingZones.updateParkingZones(parkingZones);
+    }
+
     @Override
     public State traverse(State s0) {
         if (!s0.getOptions().rentingAllowed) {
             return null;
         }
 
-        if (s0.isCurrentlyRentingVehicle()) {
+        if (s0.isCurrentlyRentingVehicle() && canDropoffVehicleHere(s0.getCurrentVehicle())) {
             return doneVehicleRenting(s0);
         } else {
             List<VehicleDescription> rentableVehicles = availableVehicles.stream()
