@@ -2,10 +2,7 @@ package org.opentripplanner.routing.edgetype.rentedgetype;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
@@ -26,25 +23,28 @@ public class RentVehicleAnywhereEdgeTest {
     private ParkingZoneInfo parkingZonesEnabled;
     private RentVehicleAnywhereEdge edge;
     private RoutingRequest request;
-    private State s;
+    private State state, rentingState;
 
     @Before
     public void setUp() {
         Graph graph = new Graph();
         IntersectionVertex v = new IntersectionVertex(graph, "v_name", 0, 0);
         parkingZonesEnabled = new ParkingZoneInfo();
-        edge  = new RentVehicleAnywhereEdge(v, parkingZonesEnabled);
+        edge = new RentVehicleAnywhereEdge(v, parkingZonesEnabled);
         request = new RoutingRequest();
         request.setDummyRoutingContext(graph);
         request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.CAR));
         request.setStartingMode(TraverseMode.WALK);
-        s = new State(v, request);
+        state = new State(v, request);
+        StateEditor se = state.edit(edge);
+        se.beginVehicleRenting(CAR_1);
+        rentingState = se.makeState();
     }
 
     @Test
     public void shouldNotTraverseWhenRentingNotAllowed() {
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(state);
 
         // then
         assertNull(traversed);
@@ -56,7 +56,7 @@ public class RentVehicleAnywhereEdgeTest {
         request.rentingAllowed = true;
 
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(state);
 
         // then
         assertNull(traversed);
@@ -69,7 +69,7 @@ public class RentVehicleAnywhereEdgeTest {
         edge.getAvailableVehicles().add(CAR_2);
         request.rentingAllowed = true;
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(state);
 
         // then
         assertNotNull(traversed);
@@ -91,7 +91,7 @@ public class RentVehicleAnywhereEdgeTest {
         when(request.vehicleValidator.isValid(CAR_2)).thenReturn(true);
 
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(state);
 
         // then
         assertNotNull(traversed);
@@ -110,7 +110,7 @@ public class RentVehicleAnywhereEdgeTest {
         when(request.vehicleValidator.isValid(any())).thenReturn(false);
 
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(state);
 
         // then
         assertNull(traversed);
@@ -118,16 +118,34 @@ public class RentVehicleAnywhereEdgeTest {
 
     @Test
     public void shouldNotAllowToDropoffVehicleOutsideParkingZone() {
-        // TODO AdamWiktor write tests
         // given
+        request.rentingAllowed = true;
+        request.vehicleValidator = mock(VehicleValidator.class);
+        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(true);
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
         parkingZonesEnabled.updateParkingZones(singleParkingZone);
 
-
         // when
-        State traversed = edge.traverse(s);
+        State traversed = edge.traverse(rentingState);
 
         // then
         assertNull(traversed);
+    }
+
+    @Test
+    public void shouldAllowToDropoffVehicleInsideParkingZone() {
+        // given
+        request.rentingAllowed = true;
+        request.vehicleValidator = mock(VehicleValidator.class);
+        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(true);
+        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
+        parkingZonesEnabled.updateParkingZones(singleParkingZone);
+        edge.getParkingZones().updateParkingZones(singleParkingZone);
+
+        // when
+        State traversed = edge.traverse(rentingState);
+
+        // then
+        assertNotNull(traversed);
     }
 }
