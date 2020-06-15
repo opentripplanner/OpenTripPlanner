@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
+import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
@@ -176,7 +177,7 @@ public class RoutingWorker {
         checkIfTransitConnectionExists(transitResponse);
 
         // Filter itineraries away that depart after the latest-departure-time for depart after
-        // search. These itineraries is a result of timeshifting the access leg and is needed for
+        // search. These itineraries is a result of time-shifting the access leg and is needed for
         // the raptor to prune the results. These itineraries are often not ideal, but if they
         // pareto optimal for the "next" window, they will appear when a "next" search is performed.
         searchWindowUsedInSeconds = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
@@ -193,28 +194,29 @@ public class RoutingWorker {
     }
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
-        int minDurationInSeconds = itineraries.stream().mapToInt(it -> it.durationSeconds).min().orElse(0);
+        // Keep 'minLimit' itineraries if 68% similar transit legs
+        int minLimit = Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES);
 
-        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
-        builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
-        builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
-        builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
-        builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
+        // TODO OTP2 - Configuring the itineraries filter should be possible in the router.config
+        //           - and on a per request bases. I will fix this in a separate commit
+        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(new FilterChainParameters() {
+            @Override public boolean arriveBy() { return request.arriveBy; }
+            @Override public List<GroupBySimilarity> groupBySimilarity() {
+                return List.of(
+                    // Keep 1 itinerary if a group of itineraries is 85% similar
+                    new GroupBySimilarity(0.85, 1),
+                    // Keep 'minLimit' itineraries if a group of itineraries is 68% similar
+                    new GroupBySimilarity(0.68, minLimit)
+                );
+            }
+            @Override public int maxNumberOfItineraries() {
+                return Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES);
+            }
+            @Override public boolean debug() { return request.debugItineraryFilter; }
+        });
 
-        // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
-        //           - exposed as a parameter in the APIs yet.
-        {
-        builder.removeTransitWithHigherCostThanBestOnStreetOnly(true);
-
-            // Remove short transit legs(< 10% duration) in the start or end of a journey;
-            // Calculate 10% of travel time, round down to closest minute
-            int partOfTravelTime = (6 * minDurationInSeconds) / 60;
-            builder.setShortTransitSlackInSeconds(partOfTravelTime);
-        }
-
-        if(request.debugItineraryFilter) {
-            builder.debug();
-        }
+        builder.withLatestDepartureTimeLimit(filterOnLatestDepartureTime);
+        builder.withMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
 
         ItineraryFilter filterChain = builder.build();
 
