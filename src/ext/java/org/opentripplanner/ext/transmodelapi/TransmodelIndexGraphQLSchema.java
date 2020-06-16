@@ -24,6 +24,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequest;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -155,7 +156,9 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType systemNoticeType = new GraphQLTypeReference("SystemNotice");
 
-    private GraphQLInputObjectType locationType;
+  private GraphQLOutputType serverInfoType = new GraphQLTypeReference("OtpVersion");
+
+  private GraphQLInputObjectType locationType;
 
     private GraphQLInputObjectType modesInputType;
 
@@ -473,6 +476,40 @@ public class TransmodelIndexGraphQLSchema {
                         .type(coordinateInputType)
                         .build())
                 .build();
+
+        serverInfoType = GraphQLObjectType.newObject()
+            .name("ServerInfo")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("version")
+                .description("Maven version")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.version)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("buildTime")
+                .description("OTP Build timestamp")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.buildTime)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitBranch")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.branch)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitCommit")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.commit)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitCommitTime")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.commitTime)
+                .build())
+            .build();
 
         modesInputType = GraphQLInputObjectType.newInputObject()
             .name("Modes")
@@ -3368,6 +3405,12 @@ public class TransmodelIndexGraphQLSchema {
                             return alerts;
                         })
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("serverInfo")
+                    .description("Get OTP server information")
+                    .type(new GraphQLNonNull(serverInfoType))
+                    .dataFetcher(e -> MavenVersion.VERSION)
+                    .build())
                 .build();
 
         Set<GraphQLType> dictionary = new HashSet<>();
