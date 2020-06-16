@@ -34,6 +34,8 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
 - Make agency id feed scoped (#3035)
 - Refactor kiss and ride to a more general car pickup mode (#3063)
+- Add MQTT transport for the GTFS-RT trip update updater (#3094)
+- Add FinlandWayPropertySetSource (#3096)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
