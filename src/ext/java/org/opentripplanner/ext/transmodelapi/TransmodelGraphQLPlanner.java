@@ -5,6 +5,7 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.model.error.PlannerError;
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
@@ -63,6 +64,10 @@ public class TransmodelGraphQLPlanner {
             for (RoutingError routingError : res.getRoutingErrors()) {
                 response.messages.add(PlannerErrorMapper.mapMessage(routingError).message);
             }
+
+            DebugOutput debugOutput = res.getDebugOutput();
+            debugOutput.finishedRendering();
+            response.debugOutput = debugOutput;
         }
         catch (Exception e) {
             LOG.warn("System error");
@@ -70,10 +75,6 @@ public class TransmodelGraphQLPlanner {
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.messages.add(error.message);
-        } finally {
-            if (request != null && request.rctx != null) {
-                response.debugOutput = request.rctx.debugOutput;
-            }
         }
         return response;
     }

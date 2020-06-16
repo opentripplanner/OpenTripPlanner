@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
@@ -49,6 +50,9 @@ public class RoutingWorker {
 
     private final RaptorService<TripSchedule> raptorService;
 
+    /** An object that accumulates profiling and debugging info for inclusion in the response. */
+    public DebugOutput debugOutput = new DebugOutput();
+
     private final RoutingRequest request;
     private Instant filterOnLatestDepartureTime = null;
     private int searchWindowUsedInSeconds = NOT_SET;
@@ -63,6 +67,8 @@ public class RoutingWorker {
         List<Itinerary> itineraries = new ArrayList<>();
         List<RoutingError> routingErrors = new ArrayList<>();
 
+        this.debugOutput.startedCalculating();
+
         // Direct street routing
         try {
             itineraries.addAll(DirectStreetRouter.route(router, request));
@@ -70,12 +76,16 @@ public class RoutingWorker {
             routingErrors.addAll(e.getRoutingErrors());
         }
 
+        this.debugOutput.finishedDirectStreetRouter();
+
         // Transit routing
         try {
             itineraries.addAll(routeTransit(router));
         } catch (RoutingValidationException e) {
             routingErrors.addAll(e.getRoutingErrors());
         }
+
+        this.debugOutput.foundPath();
 
         // Filter itineraries
         long startTimeFiltering = System.currentTimeMillis();
@@ -85,10 +95,13 @@ public class RoutingWorker {
         LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
 
+        this.debugOutput.finishedFiltering();
+
         return new RoutingResponse(
             TripPlanMapper.mapTripPlan(request, itineraries),
             createTripSearchMetadata(),
-            routingErrors
+            routingErrors,
+            debugOutput
         );
     }
 
