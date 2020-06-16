@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_sharing;
+package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.slf4j.Logger;
@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
 
 public class VehiclePositionsDiff {
 
-    private static Logger LOG = LoggerFactory.getLogger(VehiclePositionsDiff.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionsDiff.class);
 
     private static final String CAR = "car";
     private static final String MOTORBIKE = "scooter";
@@ -34,8 +34,12 @@ public class VehiclePositionsDiff {
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
         Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
         Double rangeInMeters = vehicle.getRangeInMeters();
-
-        switch (vehicle.getType()) {
+        VehicleType vehicleType = VehicleType.fromString(vehicle.getType());
+        if (vehicleType == null) {
+            LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
+            return null;
+        }
+        switch (vehicleType) {
             case CAR:
                 return new CarDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
             case MOTORBIKE:
@@ -43,7 +47,8 @@ public class VehiclePositionsDiff {
             case KICKSCOOTER:
                 return new KickScooterDescription(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
             default:
-                LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
+                // this should never happen
+                LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicleType);
                 return null;
         }
     }

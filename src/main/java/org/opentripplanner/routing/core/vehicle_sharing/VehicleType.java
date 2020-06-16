@@ -1,8 +1,34 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 public enum VehicleType {
 
     CAR,
     MOTORBIKE,
-    KICKSCOOTER
+    KICKSCOOTER;
+
+    private static final String _CAR = "car";
+    private static final String _MOTORBIKE = "scooter";
+    private static final String _KICKSCOOTER = "un-pedal-scooter";
+
+    private static final Logger LOG = LoggerFactory.getLogger(VehicleType.class);
+
+    public static VehicleType fromString(String vehicleType) {
+        if (vehicleType == null) {
+            return null;
+        }
+        switch (vehicleType) {
+            case _CAR:
+                return VehicleType.CAR;
+            case _MOTORBIKE:
+                return VehicleType.MOTORBIKE;
+            case _KICKSCOOTER:
+                return VehicleType.KICKSCOOTER;
+            default:
+                LOG.warn("Cannot create parking zone - unknown vehicle type {}", vehicleType);
+                return null;
+        }
+    }
 }

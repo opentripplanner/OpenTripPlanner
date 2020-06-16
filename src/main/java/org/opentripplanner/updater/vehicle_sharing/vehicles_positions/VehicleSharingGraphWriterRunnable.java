@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_sharing;
+package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;

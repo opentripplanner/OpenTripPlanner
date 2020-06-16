@@ -1,4 +1,4 @@
-package org.opentripplanner.updater.vehicle_sharing;
+package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
@@ -7,7 +7,7 @@ import org.slf4j.LoggerFactory;
 
 public class VehiclePositionsGetter {
 
-    private static Logger LOG = LoggerFactory.getLogger(VehiclePositionsGetter.class);
+    private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionsGetter.class);
 
     private static final String QUERY =
             "{\"query\": \"query VehiclesForArea($latMin: float8, $lonMin: float8, $latMax: float8, $lonMax: float8) {\n" +
