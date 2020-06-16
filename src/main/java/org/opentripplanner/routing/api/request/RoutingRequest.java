@@ -4,10 +4,11 @@ import org.opentripplanner.api.common.LocationStringParser;
 import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
 import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
@@ -666,9 +667,24 @@ public class RoutingRequest implements Cloneable, Serializable {
 
 
     /**
-     * Switch on to return all itineraries and mark filtered itineraried as deleted.
+     * Switch on to return all itineraries and mark filtered itineraries as deleted.
      */
     public boolean debugItineraryFilter = false;
+
+    /**
+     * Keep ONE itinerary for each group with at least this part of the legs in common.
+     * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
+     * @see FilterChainParameters#groupBySimilarity()
+     */
+    public Double groupBySimilarityKeepOne = 0.85;
+
+    /**
+     * Keep {@link #numItineraries} itineraries for each group with at least this part of the legs
+     * in common.
+     * Default value is 0.68 (68%), use a value less than 0.50 to turn off.
+     * @see FilterChainParameters#groupBySimilarity()
+     */
+    public Double groupBySimilarityKeepNumOfItineraries = 0.68;
 
     /** Saves split edge which can be split on origin/destination search
      *

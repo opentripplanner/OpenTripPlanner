@@ -1,15 +1,10 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
-import org.opentripplanner.routing.api.response.InputField;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainParametersMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
@@ -19,6 +14,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
@@ -48,12 +48,6 @@ public class RoutingWorker {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     private final RaptorService<TripSchedule> raptorService;
-
-    /** Filter itineraries down to this limit, but not below. */
-    private static final int MIN_NUMBER_OF_ITINERARIES = 3;
-
-    /** Never return more that this limit of itineraries. */
-    private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
     private final RoutingRequest request;
     private Instant filterOnLatestDepartureTime = null;
@@ -194,31 +188,12 @@ public class RoutingWorker {
     }
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
-        // Keep 'minLimit' itineraries if 68% similar transit legs
-        int minLimit = Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES);
-
-        // TODO OTP2 - Configuring the itineraries filter should be possible in the router.config
-        //           - and on a per request bases. I will fix this in a separate commit
-        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(new FilterChainParameters() {
-            @Override public boolean arriveBy() { return request.arriveBy; }
-            @Override public List<GroupBySimilarity> groupBySimilarity() {
-                return List.of(
-                    // Keep 1 itinerary if a group of itineraries is 85% similar
-                    new GroupBySimilarity(0.85, 1),
-                    // Keep 'minLimit' itineraries if a group of itineraries is 68% similar
-                    new GroupBySimilarity(0.68, minLimit)
-                );
-            }
-            @Override public int maxNumberOfItineraries() {
-                return Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES);
-            }
-            @Override public boolean debug() { return request.debugItineraryFilter; }
-        });
-
-        builder.withLatestDepartureTimeLimit(filterOnLatestDepartureTime);
-        builder.withMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
-
-        ItineraryFilter filterChain = builder.build();
+        ItineraryFilter filterChain = new ItineraryFilterChainBuilder(
+            RoutingRequestToFilterChainParametersMapper.mapRequestToFilterChainParameters(request)
+        )
+            .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
+            .withMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it)
+            .build();
 
         return filterChain.filter(itineraries);
     }
