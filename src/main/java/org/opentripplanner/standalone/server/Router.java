@@ -5,6 +5,7 @@ import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.FileAppender;
+import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.inspector.TileRendererManager;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
@@ -70,6 +71,8 @@ public class Router {
     public void startup() {
         this.tileRendererManager = new TileRendererManager(this.graph);
         this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
+
+        TransmodelAPI.setUp(routerConfig.transmodelApiHideFeedId(), graph.getAgencies());
 
         if (routerConfig.requestLogFile() != null) {
             this.requestLogger = createLogger(routerConfig.requestLogFile());

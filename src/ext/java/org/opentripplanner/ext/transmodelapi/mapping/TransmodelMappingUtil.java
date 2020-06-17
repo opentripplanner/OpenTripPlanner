@@ -8,13 +8,17 @@ import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 import java.util.TimeZone;
 import java.util.stream.Collectors;
 
@@ -23,28 +27,71 @@ import java.util.stream.Collectors;
  */
 public class TransmodelMappingUtil {
 
+    private static final Logger LOG = LoggerFactory.getLogger(TransmodelMappingUtil.class);
     private static final String LIST_VALUE_SEPARATOR = ",";
 
-    private String fixedAgencyId;
+    private static String fixedFeedId;
+    private final TimeZone timeZone;
 
-    private TimeZone timeZone;
-
-    public TransmodelMappingUtil(String fixedAgencyId, TimeZone timeZone) {
-        this.fixedAgencyId = fixedAgencyId;
+    public TransmodelMappingUtil(TimeZone timeZone) {
         this.timeZone = timeZone;
     }
 
+    /**
+     * This initialize the 'fixedFeedId', before this is done the GraphQL API will use the
+     * full id including the feedId.
+     *
+     * @param entities The entities to pick the feedId from, if more than one feedID exist,
+     *                 the feedId with the most occurrences will be used. This is done to prevent
+     *                 a few "cases" of wrongly set feedIds to block the entire API from working.
+     * @return the fixedFeedId - used to unit test this method.
+     */
+    public static String setupFixedFeedId(Collection<? extends TransitEntity<FeedScopedId>> entities) {
+        fixedFeedId = "UNKNOWN_FEED";
+
+        // Count each feedId
+        Map<String, Integer> feedIds = entities
+            .stream()
+            .map(a -> a.getId().getFeedId())
+            .collect(
+                Collectors.groupingBy(
+                    it -> it,
+                    Collectors.reducing(0, i -> 1, Integer::sum)
+                )
+            );
+
+        if(feedIds.isEmpty()) {
+            LOG.warn("No data, unable to resolve fixedFeedScope to use in the Transmodel GraphQL API.");
+        }
+        else if(feedIds.size() == 1) {
+            fixedFeedId = feedIds.keySet().iterator().next();
+        }
+        else {
+            //noinspection OptionalGetWithoutIsPresent
+            fixedFeedId = feedIds
+                .entrySet()
+                .stream()
+                .max(Map.Entry.comparingByValue())
+                .get()
+                .getKey();
+            LOG.warn("More than one feedId exist in the list of agencies. The feed-id used by"
+                + "most agencies will be picked.");
+        }
+        LOG.info("Starting Transmodel GraphQL Schema with fixed FeedId: '" + fixedFeedId +
+            "'. All FeedScopedIds in API will be assumed to belong to this agency.");
+        return fixedFeedId;
+    }
 
     public String toIdString(FeedScopedId id) {
-        if (fixedAgencyId != null) {
+        if (fixedFeedId != null) {
             return id.getId();
         }
         return id.toString();
     }
 
     public FeedScopedId fromIdString(String id) {
-        if (fixedAgencyId != null) {
-            return new FeedScopedId(fixedAgencyId, id);
+        if (fixedFeedId != null) {
+            return new FeedScopedId(fixedFeedId, id);
         }
         return FeedScopedId.parseId(id);
     }
@@ -81,10 +128,10 @@ public class TransmodelMappingUtil {
     }
 
     public String prepareFeedScopedId(String id, String separator) {
-        if (fixedAgencyId != null && id != null) {
+        if (fixedFeedId != null && id != null) {
             return separator == null
-                           ? FeedScopedId.concatenateId(fixedAgencyId, id)
-                           : fixedAgencyId + separator + id;
+                           ? FeedScopedId.concatenateId(fixedFeedId, id)
+                           : fixedFeedId + separator + id;
         }
         return id;
     }

@@ -1,6 +1,9 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -20,6 +23,7 @@ import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -31,9 +35,9 @@ import java.util.concurrent.Future;
 
 @Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
-public class TransmodelIndexAPI {
+public class TransmodelAPI {
     @SuppressWarnings("unused")
-    private static final Logger LOG = LoggerFactory.getLogger(TransmodelIndexAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
 
     private final Router router;
     private final TransmodelGraphIndex index;
@@ -46,9 +50,22 @@ public class TransmodelIndexAPI {
     @Deprecated @PathParam("ignoreRouterId")
     private String ignoreRouterId;
 
-    public TransmodelIndexAPI(@Context OTPServer otpServer) {
+    public TransmodelAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
-        index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
+        this.index = new TransmodelGraphIndex(
+            router.graph,
+            router.defaultRoutingRequest,
+            new TransmodelMappingUtil(router.graph.getTimeZone())
+        );
+    }
+
+    public static void setUp(
+        boolean hideFeedId,
+        Collection<? extends TransitEntity<FeedScopedId>> entities
+    ) {
+        if(hideFeedId) {
+            TransmodelMappingUtil.setupFixedFeedId(entities);
+        }
     }
 
     /**

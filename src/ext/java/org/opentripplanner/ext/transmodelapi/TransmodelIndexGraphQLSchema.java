@@ -20,7 +20,6 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
@@ -232,17 +231,10 @@ public class TransmodelIndexGraphQLSchema {
     }
 
     @SuppressWarnings("unchecked")
-    public TransmodelIndexGraphQLSchema(Graph graph, RoutingRequest defaultRequest) {
+    public TransmodelIndexGraphQLSchema(Graph graph, RoutingRequest defaultRequest, TransmodelMappingUtil mappingUtil) {
+        this.mappingUtil = mappingUtil;
         this.routing = new DefaultRoutingRequest(defaultRequest);
 
-        String fixedAgencyIdPropValue = System.getProperty("transmodel.graphql.api.agency.id");
-        if (!StringUtils.isEmpty(fixedAgencyIdPropValue)) {
-            fixedAgencyId = fixedAgencyIdPropValue;
-            LOG.info("Starting Transmodel GraphQL Schema with fixed AgencyID:'" + fixedAgencyId +
-                    "'. All FeedScopedIds in API will be assumed to belong to this agency.");
-        }
-
-        mappingUtil = new TransmodelMappingUtil(fixedAgencyId, graph.getTimeZone());
         tripTimeShortHelper = new TripTimeShortHelper();
         dateTimeScalar = DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(graph.getTimeZone());
         timeType = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
