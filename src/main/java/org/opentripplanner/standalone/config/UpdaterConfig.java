@@ -4,6 +4,7 @@ import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.SiriETUpdaterParameters;
@@ -28,6 +29,7 @@ public class UpdaterConfig {
   private static final String BIKE_RENTAL = "bike-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
   private static final String WEBSOCKET_GTFS_RT_UPDATER = "websocket-gtfs-rt-updater";
+  private static final String MQTT_GTFS_RT_UPDATER = "mqtt-gtfs-rt-updater";
   private static final String REAL_TIME_ALERTS = "real-time-alerts";
   private static final String BIKE_PARK = "bike-park";
   private static final String EXAMPLE_UPDATER = "example-updater";
@@ -45,6 +47,7 @@ public class UpdaterConfig {
     CONFIG_CREATORS.put(BIKE_PARK, PollingGraphUpdaterParameters::new);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterParameters::new);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterParameters::new);
+    CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterParameters::new);
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterParameters::new);
     CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterParameters::new);
     CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterParameters::new);
@@ -93,6 +96,10 @@ public class UpdaterConfig {
 
   public List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters() {
     return getParameters(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterParameters.class);
+  }
+
+  public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
+    return getParameters(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterParameters.class);
   }
 
   public List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
