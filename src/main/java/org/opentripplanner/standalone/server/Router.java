@@ -96,7 +96,7 @@ public class Router {
         GraphUpdaterConfigurator.setupGraph(
             this.graph,
             routerConfig.updaterConfig(),
-            routerConfig.getBikeShareUpdaterEndpoint()
+            routerConfig.getBikeRentalServiceDirectoryUrl()
         );
 
         /* Compute ellipsoidToGeoidDifference for this Graph */

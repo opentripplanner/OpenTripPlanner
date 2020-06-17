@@ -32,7 +32,7 @@ public class RouterConfig implements Serializable {
 
     private final String requestLogFile;
     private final double streetRoutingTimeoutSeconds;
-    private final URI bikeShareUpdaterEndpoint;
+    private final URI bikeRentalServiceDirectoryUrl;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
     private final UpdaterConfig updaterConfig;
@@ -44,8 +44,8 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-        this.bikeShareUpdaterEndpoint = adapter.asUri(
-            "bikeShareUpdaterEndpoint", null
+        this.bikeRentalServiceDirectoryUrl = adapter.asUri(
+            "bikeRentalServiceDirectoryUrl", null
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
@@ -70,8 +70,8 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
-    public URI getBikeShareUpdaterEndpoint() {
-        return bikeShareUpdaterEndpoint;
+    public URI getBikeRentalServiceDirectoryUrl() {
+        return bikeRentalServiceDirectoryUrl;
     }
 
     public RoutingRequest routingRequestDefaults() {

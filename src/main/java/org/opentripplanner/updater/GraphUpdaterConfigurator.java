@@ -5,7 +5,7 @@ import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
-import org.opentripplanner.ext.updaterendpointfetcher.GBFSUpdaterEndpointFetcher;
+import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
@@ -44,13 +44,14 @@ public abstract class GraphUpdaterConfigurator {
     public static void setupGraph(
         Graph graph,
         UpdaterConfig updaterConfig,
-        URI bikeShareEndpoint
+        URI bikeRentalServiceDirectoryUrl
     ) {
 
         List<GraphUpdater> updaters = new ArrayList<>(createUpdatersFromConfig(updaterConfig));
 
-        if (bikeShareEndpoint != null) {
-            updaters.addAll(GBFSUpdaterEndpointFetcher.createUpdatersFromEndpoint(bikeShareEndpoint));
+        if (bikeRentalServiceDirectoryUrl != null) {
+            updaters.addAll(BikeRentalServiceDirectoryFetcher
+                .createUpdatersFromEndpoint(bikeRentalServiceDirectoryUrl));
         }
 
         setupUpdaters(graph, updaters);

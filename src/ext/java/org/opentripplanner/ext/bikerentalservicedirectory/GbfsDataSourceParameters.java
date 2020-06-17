@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.updaterendpointfetcher;
+package org.opentripplanner.ext.bikerentalservicedirectory;
 
 import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
 
