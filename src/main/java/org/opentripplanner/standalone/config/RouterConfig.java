@@ -70,6 +70,10 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
+    /**
+     * This is the endpoint url used for the BikeRentalServiceDirectory sandbox feature.
+     * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
+     */
     public URI getBikeRentalServiceDirectoryUrl() {
         return bikeRentalServiceDirectoryUrl;
     }
