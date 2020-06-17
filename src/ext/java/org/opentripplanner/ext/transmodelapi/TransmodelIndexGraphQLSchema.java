@@ -69,6 +69,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
@@ -1786,14 +1787,12 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Whether this call has been updated with real time information.")
                         .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("predictionInaccurate")
                         .type(Scalars.GraphQLBoolean)
-                        .description("Whether the updated estimates are expected to be inaccurate.")
-                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).predictionInaccurate)
+                        .description("Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED")
+                        .dataFetcher(environment -> false)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtimeState")
                         .type(EnumTypes.REALTIME_STATE)
@@ -3076,11 +3075,25 @@ public class TransmodelIndexGraphQLSchema {
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalStations")
-                        .description("Get a single bike rental station based on its id")
-                        .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
-                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getBikerentalStationService().getBikeRentalStations()))
+                    .name("bikeRentalStations")
+                    .description("Get all bike rental stations")
+                    .argument(GraphQLArgument.newArgument()
+                        .name("ids")
+                        .type(new GraphQLList(Scalars.GraphQLString))
                         .build())
+                    .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
+                    .dataFetcher(environment -> {
+                        Collection<BikeRentalStation> all =
+                            new ArrayList<>(getRoutingService(environment)
+                                .getBikerentalStationService()
+                                .getBikeRentalStations());
+                        List<String> filterByIds = environment.getArgument("ids");
+                        if (!CollectionUtils.isEmpty(filterByIds)) {
+                            return all.stream().filter(station -> filterByIds.contains(station.id)).collect(Collectors.toList());
+                        }
+                        return all;
+                    })
+                .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikeRentalStation")
                         .description("Get all bike rental stations")
