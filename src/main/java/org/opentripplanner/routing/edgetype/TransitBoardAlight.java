@@ -1,19 +1,10 @@
 package org.opentripplanner.routing.edgetype;
 
-import java.util.BitSet;
-
-import java.util.Locale;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.StateEditor;
-import org.opentripplanner.routing.core.TransferTable;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.routing.vertextype.PatternStopVertex;
 import org.opentripplanner.routing.vertextype.TransitStopArrive;
@@ -21,7 +12,8 @@ import org.opentripplanner.routing.vertextype.TransitStopDepart;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import org.locationtech.jts.geom.LineString;
+import java.util.BitSet;
+import java.util.Locale;
 
 /**
  * Models boarding or alighting a vehicle - that is to say, traveling from a state off 
@@ -178,13 +170,13 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 if (boardingTime != 0) {
                     // When traveling backwards the time travels also backwards
                     s1.incrementTimeInSeconds(boardingTime);
-                    s1.incrementWeight(boardingTime * options.waitReluctance);
+                    s1.incrementWeight(boardingTime * options.routingReluctances.getWaitReluctance());
                 }
             } else {
                 int alightTime = options.getAlightTime(this.getPattern().mode);
                 if (alightTime != 0) {
                     s1.incrementTimeInSeconds(alightTime);
-                    s1.incrementWeight(alightTime * options.waitReluctance);
+                    s1.incrementWeight(alightTime * options.routingReluctances.getWaitReluctance());
                     // TODO: should we have different cost for alighting and boarding compared to regular waiting?
                 }
             }
@@ -196,7 +188,7 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
                 
                 s1.incrementTimeInSeconds(wait);
                 // this should only occur at the beginning
-                s1.incrementWeight(wait * options.waitAtBeginningFactor);
+                s1.incrementWeight(wait * options.routingReluctances.getWaitAtBeginningFactor());
 
                 s1.setInitialWaitTimeSeconds(wait);
 
@@ -304,10 +296,10 @@ public class TransitBoardAlight extends TablePatternEdge implements OnboardEdge 
             double wait_cost = bestWait;
 
             if (!s0.isEverBoarded() && !options.reverseOptimizing) {
-                wait_cost *= options.waitAtBeginningFactor;
+                wait_cost *= options.routingReluctances.getWaitAtBeginningFactor();
                 s1.setInitialWaitTimeSeconds(bestWait);
             } else {
-                wait_cost *= options.waitReluctance;
+                wait_cost *= options.routingReluctances.getWaitReluctance();
             }
 
             long preferences_penalty = options.preferencesPenaltyForRoute(getPattern().route);

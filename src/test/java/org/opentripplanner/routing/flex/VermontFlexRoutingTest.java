@@ -228,8 +228,8 @@ public class VermontFlexRoutingTest {
         // defaults in vermont router-config.json
         options.setMaxWalkDistance(maxWalkDistance);
         options.flexCallAndRideReluctance = callAndRideReluctance;
-        options.walkReluctance = walkReluctance;
-        options.waitAtBeginningFactor = waitAtBeginningFactor;
+        options.routingReluctances.setWalkReluctance(walkReluctance);
+        options.routingReluctances.setWaitAtBeginningFactor(waitAtBeginningFactor);
         options.transferPenalty = transferPenalty;
 
         // for testing

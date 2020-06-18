@@ -1,19 +1,13 @@
 package org.opentripplanner.routing.algorithm;
 
-import static org.junit.Assert.*;
-
-import java.util.List;
-
 import org.junit.Before;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.ConstantIntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -23,8 +17,10 @@ import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import java.util.List;
+
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
 
 public class TurnCostTest {
 
@@ -93,7 +89,7 @@ public class TurnCostTest {
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 1.0;
         proto.turnReluctance = (1.0);
-        proto.setWalkReluctance(1.0);
+        proto.routingReluctances.setWalkReluctance(1.0);
         proto.stairsReluctance = (1.0);
         
         // Turn costs are all 0 by default.

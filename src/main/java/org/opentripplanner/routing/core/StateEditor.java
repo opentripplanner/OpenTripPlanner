@@ -393,14 +393,14 @@ public class StateEditor {
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
         child.distanceTraversedInCurrentVehicle = 0;
-        incrementWeight(vehicleDescription.getRentTimeInSeconds() * child.getOptions().rentingReluctance);
+        incrementWeight(vehicleDescription.getRentTimeInSeconds() * child.getOptions().routingReluctances.getRentingReluctance());
         incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
         incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
-        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * child.getOptions().rentingReluctance);
+        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * child.getOptions().routingReluctances.getRentingReluctance());
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }

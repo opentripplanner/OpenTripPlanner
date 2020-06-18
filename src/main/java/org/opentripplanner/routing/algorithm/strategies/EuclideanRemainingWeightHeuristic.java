@@ -53,7 +53,7 @@ public class EuclideanRemainingWeightHeuristic implements RemainingWeightHeurist
         lat = target.getLat();
         lon = target.getLon();
         requiredWalkDistance = determineRequiredWalkDistance(req);
-        walkReluctance = req.getModeVehicleReluctance(null, TraverseMode.WALK);
+        walkReluctance = req.routingReluctances.getModeVehicleReluctance(null, TraverseMode.WALK);
     }
 
     /**

@@ -5,6 +5,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.routing_parametrizations.RoutingDelays;
+import org.opentripplanner.routing.core.routing_parametrizations.RoutingReluctances;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.request.BannedStopSet;
 import org.opentripplanner.standalone.OTPServer;
@@ -563,6 +565,8 @@ public abstract class RoutingResource {
     protected RoutingRequest buildRequest() throws ParameterException {
         Router router = otpServer.getRouter(routerId);
         RoutingRequest request = router.defaultRoutingRequest.clone();
+        request.routingReluctances = new RoutingReluctances();
+        request.routingDelays = new RoutingDelays();
         request.routerId = routerId;
         // The routing request should already contain defaults, which are set when it is initialized or in the JSON
         // router configuration and cloned. We check whether each parameter was supplied before overwriting the default.
@@ -617,25 +621,25 @@ public abstract class RoutingResource {
             request.setMaxPreTransitTime(maxPreTransitTime);
 
         if (walkReluctance != null)
-            request.setWalkReluctance(walkReluctance);
+            request.routingReluctances.setWalkReluctance(walkReluctance);
 
         if (waitReluctance != null)
-            request.setWaitReluctance(waitReluctance);
+            request.routingReluctances.setWaitReluctance(waitReluctance);
 
         if (kickscooterReluctance != null)
-            request.setKickScooterReluctance(kickscooterReluctance);
+            request.routingReluctances.setKickScooterReluctance(kickscooterReluctance);
 
         if (carReluctance != null)
-            request.setCarReluctance(carReluctance);
+            request.routingReluctances.setCarReluctance(carReluctance);
 
         if (motorbikeReluctance != null)
-            request.setMotorbikeReluctance(motorbikeReluctance);
+            request.routingReluctances.setMotorbikeReluctance(motorbikeReluctance);
 
         if (rentingReluctance != null)
-            request.setRentingReluctance(rentingReluctance);
+            request.routingReluctances.setRentingReluctance(rentingReluctance);
 
         if (waitAtBeginningFactor != null)
-            request.setWaitAtBeginningFactor(waitAtBeginningFactor);
+            request.routingReluctances.setWaitAtBeginningFactor(waitAtBeginningFactor);
 
         if (walkSpeed != null)
             request.walkSpeed = walkSpeed;

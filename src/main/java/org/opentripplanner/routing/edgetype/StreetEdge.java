@@ -371,7 +371,7 @@ public class StreetEdge extends Edge implements Cloneable {
         if (isStairs()) {
             weight *= options.stairsReluctance;
         } else {
-            weight *= options.getModeVehicleReluctance(s0.getCurrentVehicleType(), traverseMode);
+            weight *= options.routingReluctances.getModeVehicleReluctance(s0.getCurrentVehicleType(), traverseMode);
         }
 
         StateEditor s1 = s0.edit(this);
@@ -535,7 +535,7 @@ public class StreetEdge extends Edge implements Cloneable {
 
     @Override
     public double weightLowerBound(RoutingRequest options) {
-        return timeLowerBound(options) * options.getModeVehicleReluctance(null, TraverseMode.WALK);
+        return timeLowerBound(options) * options.routingReluctances.getModeVehicleReluctance(null, TraverseMode.WALK);
     }
 
     @Override

@@ -1,23 +1,18 @@
 package org.opentripplanner;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import com.google.transit.realtime.GtfsRealtime.FeedEntity;
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import junit.framework.TestCase;
-
-import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.model.Leg;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.resource.GraphPathToTripPlanConverter;
 import org.opentripplanner.common.model.GenericLocation;
+import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
 import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.model.GtfsBundle;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -30,9 +25,12 @@ import org.opentripplanner.standalone.Router;
 import org.opentripplanner.updater.alerts.AlertsUpdateHandler;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 
-import com.google.transit.realtime.GtfsRealtime.FeedEntity;
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
-import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
 /** Common base class for many test classes which need to load a GTFS feed in preparation for tests. */
 public abstract class GtfsTest extends TestCase {
@@ -141,7 +139,7 @@ public abstract class GtfsTest extends TestCase {
         // As long as boarding has a very low cost, waiting should not be "better" than riding
         // since this makes interlining _worse_ than alighting and re-boarding the same line.
         // TODO rethink whether it makes sense to weight waiting to board _less_ than 1.
-        routingRequest.setWaitReluctance(1);
+        routingRequest.routingReluctances.setWaitReluctance(1);
         routingRequest.setWalkBoardCost(30);
 
         List<GraphPath> paths = new GraphPathFinder(router).getPaths(routingRequest);
