@@ -753,7 +753,7 @@ public class Graph implements Serializable {
         CsvWriter writer = new CsvWriter(file.getName());
         String[] csvEntryData;
         for (Route route:transitService.getAllRoutes()) {
-            csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(),route.getShortName()};
+            csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(), route.getShortName(), route.getAgency().getName()};
             try {
                 writer.writeRecord(csvEntryData);
             } catch (IOException e) {
