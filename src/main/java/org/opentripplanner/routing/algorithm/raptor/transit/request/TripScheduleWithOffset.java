@@ -47,6 +47,19 @@ public class TripScheduleWithOffset implements TripSchedule {
         return pattern.getTripPattern().getPattern();
     }
 
+    @Override
+    public int findStopPosInPattern(int stopIndex, int time, boolean departure) {
+        for (int i=0; i < pattern.numberOfStopsInPattern(); ++i) {
+            if(pattern.stopIndex(i) != stopIndex) { continue; }
+            int t = departure ? departure(i) : arrival(i);
+            if(t == time) { return i; }
+        }
+        throw new IllegalStateException(
+            "No stop position(index) in pattern found. StopIndex=" + stopIndex + ", time=" + time +
+                ", departure=" + departure + "."
+        );
+    }
+
     public int getSecondsOffset() {
         return secondsOffset;
     }
