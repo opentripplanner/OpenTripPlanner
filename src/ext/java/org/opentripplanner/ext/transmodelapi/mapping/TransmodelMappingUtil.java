@@ -2,19 +2,16 @@ package org.opentripplanner.ext.transmodelapi.mapping;
 
 import com.google.common.base.Function;
 import com.google.common.base.Joiner;
-import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.PlaceType;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.MultiModalStation;
-import org.opentripplanner.model.Station;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Date;
 import java.util.List;
@@ -82,20 +79,33 @@ public class TransmodelMappingUtil {
         return fixedFeedId;
     }
 
-    public String toIdString(FeedScopedId id) {
+    public String mapEntityToApiId(TransitEntity<FeedScopedId> entity) {
+        return mapToApi(entity.getId());
+    }
+
+    public String mapToApi(FeedScopedId id) {
         if (fixedFeedId != null) {
             return id.getId();
         }
         return id.toString();
     }
 
-    public FeedScopedId fromIdString(String id) {
+    public FeedScopedId mapIdToDomain(String id) {
+        if(id == null) { return null; }
         if (fixedFeedId != null) {
             return new FeedScopedId(fixedFeedId, id);
         }
         return FeedScopedId.parseId(id);
     }
 
+    public List<FeedScopedId> mapToDomain(Collection<String> ids) {
+        if(ids == null) { return null; }
+        List<FeedScopedId> list = new ArrayList<>();
+        for (String id : ids) {
+            list.add(mapIdToDomain(id));
+        }
+        return list;
+    }
 
     /**
      * Add agency id prefix to vertexIds if fixed agency is set.
@@ -162,29 +172,13 @@ public class TransmodelMappingUtil {
     }
 
 
-    public List<PlaceType> mapPlaceTypes(List<TransmodelPlaceType> inputTypes) {
-        if (inputTypes == null) {
-            return null;
-        }
-
-        return inputTypes.stream().map(pt -> mapPlaceType(pt)).distinct().collect(Collectors.toList());
-    }
-
-    public MonoOrMultiModalStation getMonoOrMultiModalStation(
-        String idString,
-        RoutingService routingService
-    ) {
-        FeedScopedId id = fromIdString(idString);
-        Station station = routingService.getStationById(id);
-        if (station != null) {
-            return new MonoOrMultiModalStation(station, routingService.getMultiModalStationForStations().get(station));
-        }
-        MultiModalStation multiModalStation = routingService.getMultiModalStationById(id);
-        if (multiModalStation != null) {
-            return new MonoOrMultiModalStation(multiModalStation);
-        }
-        return null;
-    }
+    // public List<PlaceType> mapPlaceTypes(List<TransmodelPlaceType> inputTypes) {
+    //     if (inputTypes == null) {
+    //         return null;
+    //     }
+    //
+    //     return inputTypes.stream().map(pt -> mapPlaceType(pt)).distinct().collect(Collectors.toList());
+    // }
 
     private PlaceType mapPlaceType(TransmodelPlaceType transmodelType){
         if (transmodelType!=null) {

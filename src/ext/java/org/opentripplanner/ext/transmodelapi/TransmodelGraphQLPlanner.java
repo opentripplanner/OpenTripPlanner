@@ -127,7 +127,7 @@ public class TransmodelGraphQLPlanner {
         }
 
         String placeRef = (String) m.get("place");
-        FeedScopedId stopId = placeRef == null ? null : mappingUtil.fromIdString(placeRef);
+        FeedScopedId stopId = placeRef == null ? null : mappingUtil.mapIdToDomain(placeRef);
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
@@ -302,7 +302,7 @@ public class TransmodelGraphQLPlanner {
     }
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
-        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds.stream().map(mappingUtil::fromIdString).collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
+        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds.stream().map(mappingUtil::mapIdToDomain).collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
         return new HashMap<>(bannedTrips);
     }
 

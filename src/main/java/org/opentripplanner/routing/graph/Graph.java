@@ -22,6 +22,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -38,6 +39,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
@@ -54,7 +56,6 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -1036,8 +1037,17 @@ public class Graph implements Serializable {
         return stationById.values();
     }
 
-    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
-        return multiModalStationById.get(feedScopedId);
+    @SuppressWarnings({"unused", "UsedBy @Delegate"})
+    public MonoOrMultiModalStation getMonoOrMultiModalStation(FeedScopedId id) {
+        Station station = getStationById(id);
+        if (station != null) {
+            return new MonoOrMultiModalStation(station, index.getMultiModalStationForStations().get(station));
+        }
+        MultiModalStation multiModalStation = multiModalStationById.get(id);
+        if (multiModalStation != null) {
+            return new MonoOrMultiModalStation(multiModalStation);
+        }
+        return null;
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {
