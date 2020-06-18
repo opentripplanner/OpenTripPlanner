@@ -2,6 +2,7 @@ package org.opentripplanner.routing.graph;
 
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
+import com.csvreader.CsvWriter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -23,13 +24,9 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
@@ -37,7 +34,6 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.kryo.HashBiMapSerializer;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
@@ -749,6 +745,23 @@ public class Graph implements Serializable {
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
+    }
+
+    public void saveTransitLines(File file) throws IOException {
+        LOG.info("Writing transit lines to csv " + file.getAbsolutePath() + " ...");
+        OtpTransitService transitService = getService(OtpTransitService.class);
+        CsvWriter writer = new CsvWriter(file.getName());
+        String[] csvEntryData;
+        for (Route route:transitService.getAllRoutes()) {
+            csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(),route.getShortName()};
+            try {
+                writer.writeRecord(csvEntryData);
+            } catch (IOException e) {
+                file.delete();
+                throw e;
+            }
+        }
+        writer.close();
     }
 
     public void save(File file) throws IOException {

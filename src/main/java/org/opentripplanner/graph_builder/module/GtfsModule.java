@@ -106,6 +106,7 @@ public class GtfsModule implements GraphBuilderModule {
                 }
 
                 OtpTransitService transitService = mapGtfsDaoToOTPTransitService(loadBundle(gtfsBundle));
+                graph.putService(OtpTransitService.class, transitService);
 
                 GtfsContext context = GtfsLibrary
                         .createContext(gtfsBundle.getFeedId(), transitService, calendarService);

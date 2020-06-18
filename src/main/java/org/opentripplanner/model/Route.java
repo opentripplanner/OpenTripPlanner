@@ -3,6 +3,8 @@ package org.opentripplanner.model;
 
 public final class Route extends IdentityBean<FeedScopedId> {
 
+    public enum RouteType {TRAM, SUBWAY, TRAIN, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR}
+
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;
