@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleValidator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -196,6 +196,10 @@ public class RoutingRequest implements Cloneable, Serializable {
      * observation should in no way be taken as scientific or definitive. Your mileage may vary.
      */
     public double walkReluctance = 2.5;
+
+    private double carReluctance = 1.0;
+
+    private double motorbikeReluctance = 1.0;
 
     private double kickScooterReluctance = 1.5;
     /**
@@ -891,8 +895,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-    
-    /** @return the maximum walk distance */
+
+    /**
+     * @return the maximum walk distance
+     */
     public double getMaxWalkDistance() {
         return maxWalkDistance;
     }
@@ -901,7 +907,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         return softWalkLimiting;
     }
 
-    public void setSoftWalkLimit(boolean softWalkLimitEnabled){
+    public void setSoftWalkLimit(boolean softWalkLimitEnabled) {
         this.softWalkLimiting = softWalkLimitEnabled;
     }
 
@@ -1192,6 +1198,10 @@ public class RoutingRequest implements Cloneable, Serializable {
             return walkReluctance;
         } else if (vehicleType == VehicleType.KICKSCOOTER) {
             return kickScooterReluctance;
+        } else if (vehicleType == VehicleType.MOTORBIKE) {
+            return motorbikeReluctance;
+        } else if (vehicleType == VehicleType.CAR) {
+            return carReluctance;
         } else {
             return 1.;
         }
@@ -1515,6 +1525,30 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setWaitReluctance(double waitReluctance) {
         if (waitReluctance > 0) {
             this.waitReluctance = waitReluctance;
+        }
+    }
+
+    public void setKickScooterReluctance(double kickScooterReluctance) {
+        if (kickScooterReluctance > 0) {
+            this.kickScooterReluctance = kickScooterReluctance;
+        }
+    }
+
+    public void setCarReluctance(double carReluctance) {
+        if (carReluctance > 0) {
+            this.carReluctance = carReluctance;
+        }
+    }
+
+    public void setMotorbikeReluctance(double motorbikeReluctance) {
+        if (motorbikeReluctance > 0) {
+            this.motorbikeReluctance = motorbikeReluctance;
+        }
+    }
+
+    public void setRentingReluctance(double rentingReluctance) {
+        if (rentingReluctance > 0) {
+            this.rentingReluctance = rentingReluctance;
         }
     }
 
