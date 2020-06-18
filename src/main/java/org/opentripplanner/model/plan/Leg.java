@@ -245,7 +245,8 @@ public class Leg {
 
     /**
      * Return {@code true} if to legs ride the same trip(same tripId) and at least part of the
-     * rides overlap in time.
+     * rides overlap. Two legs overlap is they have at least one segment(from one stop to the next)
+     * in common.
      */
     public boolean isPartiallySameTransitLeg(Leg other) {
       // Assert both legs are transit legs
@@ -254,9 +255,8 @@ public class Leg {
       // If NOT the same trip, return false
       if(!tripId.equals(other.tripId)) { return false; }
 
-      // If not riding at least part of the same stretch of the trip.
-      // If a pattern goes in a loop, this make sure two legs are riding the trip in the same loop.
-      return startTime.before(other.endTime) && endTime.after(other.startTime);
+      // Return true if legs overlap
+      return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
     }
 
   /** Should be used for debug logging only */

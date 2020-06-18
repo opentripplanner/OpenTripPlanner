@@ -15,6 +15,7 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.BUS_SPEED;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.D;
+import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.WALK_SPEED;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByTripIdAndDistance.calculateTotalDistance;
@@ -157,22 +158,22 @@ public class GroupByTripIdAndDistanceTest {
     @Test
     public void matchDifferentTransitKeySet() {
         GroupByTripIdAndDistance g_11 = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(11, 0, 5, B).build(),0.9
+            newItinerary(A).bus(11, 0, 5, E).build(),0.9
         );
         GroupByTripIdAndDistance g_21 = new GroupByTripIdAndDistance(
-            newItinerary(A).bus(21, 0, 5, B).build(),0.9
+            newItinerary(A).bus(21, 0, 5, E).build(),0.9
         );
         GroupByTripIdAndDistance g_11_21 = new GroupByTripIdAndDistance(
             newItinerary(A)
-                .bus(11, 0, 3, B)
-                .bus(21, 4, 6, B)
+                .bus(11, 0, 3, D)
+                .bus(21, 4, 6, E)
                 .build(),
             0.9
         );
         GroupByTripIdAndDistance g_31_11 = new GroupByTripIdAndDistance(
             newItinerary(A)
                 .bus(31, 0, 3, B)
-                .bus(11, 4, 6, B)
+                .bus(11, 4, 6, E)
                 .build(),
             0.9
         );
@@ -195,11 +196,11 @@ public class GroupByTripIdAndDistanceTest {
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalRangeForPUpperBound() {
-        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, B).build(), 0.991);
+        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, E).build(), 0.991);
     }
 
     @Test(expected = IllegalArgumentException.class)
     public void illegalRangeForPLowerBound() {
-        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, B).build(), 0.499);
+        new GroupByTripIdAndDistance(newItinerary(A).bus(21, 1, 2, E).build(), 0.499);
     }
 }

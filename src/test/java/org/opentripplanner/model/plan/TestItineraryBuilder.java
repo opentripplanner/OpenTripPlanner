@@ -14,13 +14,13 @@ import static org.opentripplanner.routing.core.TraverseMode.RAIL;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 public class TestItineraryBuilder {
-  public static final Place A = place("A", 5.0, 8.0);
-  public static final Place B = place("B", 6.0, 8.5);
-  public static final Place C = place("C", 7.0, 9.0);
-  public static final Place D = place("D", 8.0, 9.5);
-  public static final Place E = place("E", 9.0, 10.0);
-  public static final Place F = place("F", 9.0, 10.5);
-  public static final Place G = place("G", 9.5, 11.0);
+  public static final Place A = place("A", 5.0, 8.0, 1);
+  public static final Place B = place("B", 6.0, 8.5, 2);
+  public static final Place C = place("C", 7.0, 9.0, 3);
+  public static final Place D = place("D", 8.0, 9.5, 4);
+  public static final Place E = place("E", 9.0, 10.0, 5);
+  public static final Place F = place("F", 9.0, 10.5, 6);
+  public static final Place G = place("G", 9.5, 11.0, 7);
 
   private static final int NOT_SET = -999_999;
   public static final int BOARD_COST = 120;
@@ -161,9 +161,10 @@ public class TestItineraryBuilder {
     return lastEndTime == NOT_SET ? fallbackTime : lastEndTime;
   }
 
-  private static Place place(String name, double lat, double lon) {
+  private static Place place(String name, double lat, double lon, int stopIndex) {
     Place p = new Place(lat, lon, name);
     p.stopId = new FeedScopedId("S", name);
+    p.stopIndex = stopIndex;
     return p;
   }
 }
