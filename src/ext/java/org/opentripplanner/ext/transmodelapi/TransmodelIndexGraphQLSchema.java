@@ -152,9 +152,9 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType systemNoticeType = new GraphQLTypeReference("SystemNotice");
 
-  private GraphQLOutputType serverInfoType = new GraphQLTypeReference("OtpVersion");
+    private GraphQLOutputType serverInfoType = new GraphQLTypeReference("OtpVersion");
 
-  private GraphQLInputObjectType locationType;
+    private GraphQLInputObjectType locationType;
 
     private GraphQLInputObjectType modesInputType;
 
@@ -174,20 +174,19 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLInputObjectType allowedModesType;
 
-    private TransmodelMappingUtil mapper;
+    private final TransmodelMappingUtil mapper;
 
-    private TripTimeShortHelper tripTimeShortHelper;
-    private String fixedAgencyId;
+    private final TripTimeShortHelper tripTimeShortHelper;
 
-    private GraphQLScalarType dateTimeScalar;
-    private GraphQLObjectType timeType;
-    private GraphQLScalarType dateScalar;
-    private GraphQLObjectType destinationDisplayType;
-    private GraphQLScalarType localTimeScalar;
+    private final GraphQLScalarType dateTimeScalar;
+    private final GraphQLObjectType timeType;
+    private final GraphQLScalarType dateScalar;
+    private final GraphQLObjectType destinationDisplayType;
+    private final GraphQLScalarType localTimeScalar;
 
     public GraphQLSchema indexSchema;
 
-    private Relay relay = new Relay();
+    private final Relay relay = new Relay();
 
 
     private GraphQLInterfaceType placeInterface = GraphQLInterfaceType.newInterface()
@@ -225,10 +224,6 @@ public class TransmodelIndexGraphQLSchema {
                     return null;
             }
             ).build();
-
-    private Agency getAgency(FeedScopedId agencyId, RoutingService routingService) {
-        return routingService.getAgencyForId(agencyId);
-    }
 
     @SuppressWarnings("unchecked")
     public TransmodelIndexGraphQLSchema(Graph graph, RoutingRequest defaultRequest, TransmodelMappingUtil mapper) {
@@ -314,41 +309,39 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        /*
-        brandingType = GraphQLObjectType.newObject()
-                .name("Branding")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("id")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(
-                                environment -> ((Branding) environment.getSource()).getId().getId())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("name")
-                        .description("Full name to be used for branding.")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((Branding) environment.getSource()).getName())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("description")
-                        .description("Description of branding.")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((Branding) environment.getSource()).getDescription())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("url")
-                        .description("URL to be used for branding")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((Branding) environment.getSource()).getUrl())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("image")
-                        .description("URL to an image be used for branding")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((Branding) environment.getSource()).getImage())
-                        .build())
-                .build();
-         */
+//        brandingType = GraphQLObjectType.newObject()
+//                .name("Branding")
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("id")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(
+//                                environment -> ((Branding) environment.getSource()).getId().getId())
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("name")
+//                        .description("Full name to be used for branding.")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(environment -> ((Branding) environment.getSource()).getName())
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("description")
+//                        .description("Description of branding.")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(environment -> ((Branding) environment.getSource()).getDescription())
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("url")
+//                        .description("URL to be used for branding")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(environment -> ((Branding) environment.getSource()).getUrl())
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("image")
+//                        .description("URL to an image be used for branding")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(environment -> ((Branding) environment.getSource()).getImage())
+//                        .build())
+//                .build();
 
         contactType = GraphQLObjectType.newObject()
                               .name("Contact")
@@ -382,25 +375,21 @@ public class TransmodelIndexGraphQLSchema {
 
         bookingArrangementType = GraphQLObjectType.newObject()
                                          .name("BookingArrangement")
-            /*
-                                         .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                        .name("bookingAccess")
-                                                        .description("Who has access to book service?")
-                                                        .type(bookingAccessEnum)
-                                                        .build())
-             */
+//                                         .field(GraphQLFieldDefinition.newFieldDefinition()
+//                                                        .name("bookingAccess")
+//                                                        .description("Who has access to book service?")
+//                                                        .type(bookingAccessEnum)
+//                                                        .build())
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("bookingMethods")
                                                         .description("How should service be booked?")
                                                         .type(Scalars.GraphQLString)
                                                         .build())
-            /*
-                                         .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                        .name("bookWhen")
-                                                        .description("When should service be booked?")
-                                                        .type(purchaseWhenEnum)
-                                                        .build())
-             */
+//                                         .field(GraphQLFieldDefinition.newFieldDefinition()
+//                                                        .name("bookWhen")
+//                                                        .description("When should service be booked?")
+//                                                        .type(purchaseWhenEnum)
+//                                                        .build())
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("latestBookingTime")
                                                         .description("Latest time service can be booked. ISO 8601 timestamp")
@@ -416,14 +405,12 @@ public class TransmodelIndexGraphQLSchema {
                                                         .description("Textual description of booking arrangement for service")
                                                         .type(Scalars.GraphQLString)
                                                         .build())
-                /*
-                                         .field(GraphQLFieldDefinition.newFieldDefinition()
-                                                        .name("buyWhen")
-                                                        .description("When should ticket be purchased?")
-                                                        .type(new GraphQLList(purchaseMomentEnum))
-                                                        .build())
-
-                 */
+//                                         .field(GraphQLFieldDefinition.newFieldDefinition()
+//                                                        .name("buyWhen")
+//                                                        .description("When should ticket be purchased?")
+//                                                        .type(new GraphQLList(purchaseMomentEnum))
+//                                                        .build())
+//
                                          .field(GraphQLFieldDefinition.newFieldDefinition()
                                                         .name("bookingContact")
                                                         .description("Who should ticket be contacted for booking")
@@ -438,7 +425,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("frontText")
                         .description("Name of destination to show on front of vehicle.")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> environment.getSource())
+                        .dataFetcher(DataFetchingEnvironment::getSource)
                         .build())
                 .build();
 
@@ -871,20 +858,18 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLBoolean)
                         .defaultValue(routing.request.ignoreRealtimeUpdates)
                         .build())
-                /*
-                .argument(GraphQLArgument.newArgument()
-                        .name("includePlannedCancellations")
-                        .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
-                        .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.defaults.includePlannedCancellations)
-                        .build())
-                .argument(GraphQLArgument.newArgument()
-                        .name("ignoreInterchanges")
-                        .description("DEPRECATED - For debugging only. Ignores interchanges defined in timetable data.")
-                        .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.defaults.ignoreInterchanges)
-                        .build())
-                 */
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("includePlannedCancellations")
+//                        .description("When true, service journeys cancelled in scheduled route data will be included during this search.")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .defaultValue(defaultRoutingRequest.defaults.includePlannedCancellations)
+//                        .build())
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("ignoreInterchanges")
+//                        .description("DEPRECATED - For debugging only. Ignores interchanges defined in timetable data.")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .defaultValue(defaultRoutingRequest.defaults.ignoreInterchanges)
+//                        .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("locale")
                         .type(EnumTypes.LOCALE)
@@ -908,14 +893,12 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLInt)
                         .defaultValue(routing.request.maxPreTransitTime)
                         .build())
-                /*
-                .argument(GraphQLArgument.newArgument()
-                        .name("preTransitReluctance")
-                        .description("How much worse driving before and after transit is than riding on transit. Applies to ride and kiss, kiss and ride and park and ride.")
-                        .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.defaults.preTransitReluctance)
-                        .build())
-                */
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("preTransitReluctance")
+//                        .description("How much worse driving before and after transit is than riding on transit. Applies to ride and kiss, kiss and ride and park and ride.")
+//                        .type(Scalars.GraphQLFloat)
+//                        .defaultValue(defaultRoutingRequest.defaults.preTransitReluctance)
+//                        .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("maxPreTransitWalkDistance")
                         .description("Max walk distance for access/egress legs. NOT IMPLEMENTED")
@@ -926,37 +909,33 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLBoolean)
                         .description("NOT IMPLEMENTED")
                         .build())
-                /*
-                .argument(GraphQLArgument.newArgument()
-                        .name("banFirstServiceJourneysFromReuseNo")
-                        .description("How many service journeys used in a tripPatterns should be banned from inclusion in successive tripPatterns. Counting from start of tripPattern.")
-                        .type(Scalars.GraphQLInt)
-                        .defaultValue(defaultRoutingRequest.defaults.banFirstTripsFromReuseNo)
-                        .build())
-                 */
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("banFirstServiceJourneysFromReuseNo")
+//                        .description("How many service journeys used in a tripPatterns should be banned from inclusion in successive tripPatterns. Counting from start of tripPattern.")
+//                        .type(Scalars.GraphQLInt)
+//                        .defaultValue(defaultRoutingRequest.defaults.banFirstTripsFromReuseNo)
+//                        .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("walkReluctance")
                         .description("Walk cost is multiplied by this value. This is the main parameter to use for limiting walking.")
                         .type(Scalars.GraphQLFloat)
                         .defaultValue(routing.request.walkReluctance)
                         .build())
-                /*
-                .argument(GraphQLArgument.newArgument()
-                        .name("ignoreMinimumBookingPeriod")
-                        .description("Ignore the MinimumBookingPeriod defined on the ServiceJourney and allow itineraries to start immediately after the current time.")
-                        .type(Scalars.GraphQLBoolean)
-                        .defaultValue(defaultRoutingRequest.defaults.ignoreDrtAdvanceBookMin)
-                        .build())
-                .argument(GraphQLArgument.newArgument()
-                        .name("transitDistanceReluctance")
-                        .description("The extra cost per meter that is travelled by transit. This is a cost point peter meter, so it should in most\n" +
-                                "cases be a very small fraction. The purpose of assigning a cost to distance is often because it correlates with\n" +
-                                "fare prices and you want to avoid situations where you take detours or travel back again even if it is\n" +
-                                "technically faster. Setting this value to 0 turns off the feature altogether.")
-                        .type(Scalars.GraphQLFloat)
-                        .defaultValue(defaultRoutingRequest.defaults.transitDistanceReluctance)
-                        .build())
-                */
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("ignoreMinimumBookingPeriod")
+//                        .description("Ignore the MinimumBookingPeriod defined on the ServiceJourney and allow itineraries to start immediately after the current time.")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .defaultValue(defaultRoutingRequest.defaults.ignoreDrtAdvanceBookMin)
+//                        .build())
+//                .argument(GraphQLArgument.newArgument()
+//                        .name("transitDistanceReluctance")
+//                        .description("The extra cost per meter that is travelled by transit. This is a cost point peter meter, so it should in most\n" +
+//                                "cases be a very small fraction. The purpose of assigning a cost to distance is often because it correlates with\n" +
+//                                "fare prices and you want to avoid situations where you take detours or travel back again even if it is\n" +
+//                                "technically faster. Setting this value to 0 turns off the feature altogether.")
+//                        .type(Scalars.GraphQLFloat)
+//                        .defaultValue(defaultRoutingRequest.defaults.transitDistanceReluctance)
+//                        .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("debugItineraryFilter")
                         .description("Debug the itinerary-filter-chain. The filters will mark itineraries as deleted, but NOT delete them when this is enabled.")
@@ -1081,37 +1060,35 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("lines")
                         .type(new GraphQLNonNull(new GraphQLList(lineType)))
-                        .dataFetcher(environment -> wrapInListUnlessNull(getRoutingService(environment)
+                        .dataFetcher(environment -> listOfNullSafe(getRoutingService(environment)
                             .getRouteForId(((AlertPatch) environment.getSource()).getRoute())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("serviceJourneys")
                         .type(new GraphQLNonNull(new GraphQLList(serviceJourneyType)))
-                        .dataFetcher(environment -> wrapInListUnlessNull(getRoutingService(environment)
+                        .dataFetcher(environment -> listOfNullSafe(getRoutingService(environment)
                             .getTripForId().get(((AlertPatch) environment.getSource()).getTrip())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quays")
                         .type(new GraphQLNonNull(new GraphQLList(quayType)))
                         .dataFetcher(environment ->
-                                wrapInListUnlessNull(getRoutingService(environment).getStopForId(((AlertPatch) environment.getSource()).getStop()))
+                                listOfNullSafe(getRoutingService(environment).getStopForId(((AlertPatch) environment.getSource()).getStop()))
                         )
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("stopPlaces")
-                        .type(new GraphQLNonNull(new GraphQLList(stopPlaceType)))
-                        .dataFetcher(environment ->
-                                wrapInListUnlessNull(index.stationForId.get(((AlertPatch) environment.getSource()).getStop()))
-                        )
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("journeyPatterns")
-                        .description("Get all journey patterns for this situation element")
-                        .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
-                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("stopPlaces")
+//                        .type(new GraphQLNonNull(new GraphQLList(stopPlaceType)))
+//                        .dataFetcher(environment ->
+//                                wrapInListUnlessNull(index.stationForId.get(((AlertPatch) environment.getSource()).getStop()))
+//                        )
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("journeyPatterns")
+//                        .description("Get all journey patterns for this situation element")
+//                        .type(new GraphQLNonNull(new GraphQLList(journeyPatternType)))
+//                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getTripPatterns())
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("summary")
                         .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
@@ -1122,7 +1099,7 @@ public class TransmodelIndexGraphQLSchema {
                             if (alert.alertHeaderText instanceof TranslatedString) {
                                 return ((TranslatedString) alert.alertHeaderText).getTranslations();
                             } else if (alert.alertHeaderText != null) {
-                                return Arrays.asList(new AbstractMap.SimpleEntry<>(null, alert.alertHeaderText.toString()));
+                                return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertHeaderText.toString()));
                             } else {
                                 return emptyList();
                             }
@@ -1138,7 +1115,7 @@ public class TransmodelIndexGraphQLSchema {
                             if (alert.alertDescriptionText instanceof TranslatedString) {
                                 return ((TranslatedString) alert.alertDescriptionText).getTranslations();
                             } else if (alert.alertDescriptionText != null) {
-                                return Arrays.asList(new AbstractMap.SimpleEntry<>(null, alert.alertDescriptionText.toString()));
+                                return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertDescriptionText.toString()));
                             } else {
                                 return emptyList();
                             }
@@ -1154,7 +1131,7 @@ public class TransmodelIndexGraphQLSchema {
                             if (alert.alertAdviceText instanceof TranslatedString) {
                                 return ((TranslatedString) alert.alertAdviceText).getTranslations();
                             } else if (alert.alertAdviceText != null) {
-                                return Arrays.asList(new AbstractMap.SimpleEntry<>(null, alert.alertAdviceText.toString()));
+                                return List.of(new AbstractMap.SimpleEntry<>(null, alert.alertAdviceText.toString()));
                             } else {
                                 return emptyList();
                             }
@@ -1189,14 +1166,12 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Operator's internal id for this situation")
                         .dataFetcher(environment -> null)
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("severity")
-                        .type(severityEnum)
-                        .description("Severity of this situation ")
-                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().severity)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("severity")
+//                        .type(severityEnum)
+//                        .description("Severity of this situation ")
+//                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().severity)
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("reportAuthority")
                         .type(authorityType)
@@ -1236,18 +1211,16 @@ public class TransmodelIndexGraphQLSchema {
                         .deprecate("Id is not referable or meaningful and will be removed")
                         .dataFetcher(environment -> relay.toGlobalId(placeAtDistanceType.getName(), "N/A"))
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("place")
-                        .type(placeInterface)
-                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).place)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("distance")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).distance)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("place")
+//                        .type(placeInterface)
+//                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).place)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("distance")
+//                        .type(Scalars.GraphQLInt)
+//                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).distance)
+//                        .build())
                 .build();
 
         stopPlaceType = GraphQLObjectType.newObject()
@@ -1308,14 +1281,12 @@ public class TransmodelIndexGraphQLSchema {
                         .type(TRANSPORT_SUBMODE)
                         .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("adjacentSites")
-                        .description("This stop place's adjacent sites")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getAdjacentSites())
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("adjacentSites")
+//                        .description("This stop place's adjacent sites")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getAdjacentSites())
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("timezone")
                         .type(new GraphQLNonNull(Scalars.GraphQLString))
@@ -1396,8 +1367,8 @@ public class TransmodelIndexGraphQLSchema {
 
                             MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
 
-                            Set<String> authorityIds = new HashSet();
-                            Set<FeedScopedId> lineIds = new HashSet();
+                            Set<String> authorityIds = new HashSet<>();
+                            Set<FeedScopedId> lineIds = new HashSet<>();
                             Map<String, List<String>> whiteList = environment.getArgument("whiteListed");
                             if (whiteList != null) {
                                 List<String> authorityIdList = whiteList.get("authorities");
@@ -1407,11 +1378,11 @@ public class TransmodelIndexGraphQLSchema {
 
                                 List<String> lineIdList = whiteList.get("lines");
                                 if (lineIdList != null) {
-                                    lineIds.addAll(lineIdList.stream().map(id -> mapper.mapIdToDomain(id)).collect(Collectors.toSet()));
+                                    lineIds.addAll(lineIdList.stream().map(mapper::mapIdToDomain).collect(Collectors.toSet()));
                                 }
                             }
 
-                            Long startTimeMs = environment.getArgument("startTime") == null ? 0l : environment.getArgument("startTime");
+                            Long startTimeMs = environment.getArgument("startTime") == null ? 0L : environment.getArgument("startTime");
                             Long startTimeSeconds = startTimeMs / 1000;
 
                             return monoOrMultiModalStation.getChildStops()
@@ -1431,7 +1402,7 @@ public class TransmodelIndexGraphQLSchema {
                                     )
                                     .sorted(TripTimeShort.compareByDeparture())
                                     .distinct()
-                                    .limit((long) numberOfDepartures)
+                                    .limit(numberOfDepartures)
                                     .collect(Collectors.toList());
                         })
                         .build())
@@ -1565,8 +1536,8 @@ public class TransmodelIndexGraphQLSchema {
                             int timeRange = environment.getArgument("timeRange");
                             Stop stop = environment.getSource();
 
-                            Set<String> authorityIds = new HashSet();
-                            Set<FeedScopedId> lineIds = new HashSet();
+                            Set<String> authorityIds = new HashSet<>();
+                            Set<FeedScopedId> lineIds = new HashSet<>();
                             Map<String, List<String>> whiteList = environment.getArgument("whiteListed");
 
                             if (whiteList != null) {
@@ -1577,11 +1548,11 @@ public class TransmodelIndexGraphQLSchema {
 
                                 List<String> lineIdList = whiteList.get("lines");
                                 if (lineIdList != null) {
-                                    lineIds.addAll(lineIdList.stream().map(id -> mapper.mapIdToDomain(id)).collect(Collectors.toSet()));
+                                    lineIds.addAll(lineIdList.stream().map(mapper::mapIdToDomain).collect(Collectors.toSet()));
                                 }
                             }
 
-                            Long startTimeMs = environment.getArgument("startTime") == null ? 0l : environment.getArgument("startTime");
+                            Long startTimeMs = environment.getArgument("startTime") == null ? 0L : environment.getArgument("startTime");
                             Long startTimeSeconds = startTimeMs / 1000;
 
                             return getTripTimesForStop(
@@ -1597,7 +1568,7 @@ public class TransmodelIndexGraphQLSchema {
                             )
                                 .sorted(TripTimeShort.compareByDeparture())
                                 .distinct()
-                                .limit((long)numberOfDepartures)
+                                .limit(numberOfDepartures)
                                 .collect(Collectors.toList());
                         })
                         .build())
@@ -1608,13 +1579,11 @@ public class TransmodelIndexGraphQLSchema {
                     .dataFetcher(env -> getRoutingService(env).getSiriAlertPatchService()
                         .getStopPatches(((Stop)env.getSource()).getId()))
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("stopType")
-                        .type(stopTypeEnum)
-                        .dataFetcher(environment -> (((Stop) environment.getSource()).getStopType()))
-                        .build())
-                */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("stopType")
+//                        .type(stopTypeEnum)
+//                        .dataFetcher(environment -> (((Stop) environment.getSource()).getStopType()))
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("flexibleArea")
                         .description("Geometry for flexible area.")
@@ -1691,8 +1660,8 @@ public class TransmodelIndexGraphQLSchema {
                         .name("notices")
                         .type(new GraphQLNonNull(new GraphQLList(noticeType)))
                         .dataFetcher(environment -> {
-                            TripTimeShort tripTimeShort = environment.getSource();
                             // TODO OTP2 - fix this
+                            // TripTimeShort tripTimeShort = environment.getSource();
                             return null; //index.getNoticesByEntity(tripTimeShort.);
                         })
                         .build())
@@ -1869,15 +1838,13 @@ public class TransmodelIndexGraphQLSchema {
                          .dataFetcher(environment ->  null)
                          .type(bookingArrangementType)
                          .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("flexible")
-                        .type(Scalars.GraphQLBoolean)
-                        .description("Whether this call is part of a flexible trip. This means that arrival or departure " +
-                                "times are not scheduled but estimated within specified operating hours.")
-                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isFlexible())
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("flexible")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .description("Whether this call is part of a flexible trip. This means that arrival or departure " +
+//                                "times are not scheduled but estimated within specified operating hours.")
+//                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).isFlexible())
+//                        .build())
                 .build();
 
         serviceJourneyType = GraphQLObjectType.newObject()
@@ -1899,17 +1866,15 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(new GraphQLList(dateScalar)))
                         .dataFetcher(environment -> getRoutingService(environment).getCalendarService()
                                 .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
-                                .stream().map(serviceDate -> mapper.serviceDateToSecondsSinceEpoch(serviceDate)).sorted().collect(Collectors.toList())
+                                .stream().map(mapper::serviceDateToSecondsSinceEpoch).sorted().collect(Collectors.toList())
                         )
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("serviceAlteration")
-                        .type(serviceAlterationEnum)
-                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
-                        .dataFetcher(environment -> (((Trip) environment.getSource()).getServiceAlteration()))
-                        .build())
-                        */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("serviceAlteration")
+//                        .type(serviceAlterationEnum)
+//                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
+//                        .dataFetcher(environment -> (((Trip) environment.getSource()).getServiceAlteration()))
+//                        .build())
 
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportSubmode")
@@ -2021,19 +1986,17 @@ public class TransmodelIndexGraphQLSchema {
                             getRoutingService(environment).getSiriAlertPatchService().getTripPatches(
                             environment.getSource()))
                     .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("keyValues")
-                        .description("List of keyValue pairs for the service journey.")
-                        .type(new GraphQLList(keyValueType))
-                        .dataFetcher(environment -> ((Trip) environment.getSource()).getKeyValues())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("flexibleServiceType")
-                        .description("Type of flexible service, or null if service is not flexible.")
-                        .type(flexibleServiceTypeEnum)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("keyValues")
+//                        .description("List of keyValue pairs for the service journey.")
+//                        .type(new GraphQLList(keyValueType))
+//                        .dataFetcher(environment -> ((Trip) environment.getSource()).getKeyValues())
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("flexibleServiceType")
+//                        .description("Type of flexible service, or null if service is not flexible.")
+//                        .type(flexibleServiceTypeEnum)
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bookingArrangements")
                         .description("Booking arrangements for flexible services.")
@@ -2189,7 +2152,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("presentation")
                         .type(presentationType)
-                        .dataFetcher(environment -> environment.getSource())
+                        .dataFetcher(DataFetchingEnvironment::getSource)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikesAllowed")
@@ -2323,13 +2286,11 @@ public class TransmodelIndexGraphQLSchema {
                         .name("phone")
                         .type(Scalars.GraphQLString)
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("branding")
-                        .description("Branding for operator.")
-                        .type(brandingType)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("branding")
+//                        .description("Branding for operator.")
+//                        .type(brandingType)
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("lines")
                         .type(new GraphQLNonNull(new GraphQLList(lineType)))
@@ -2361,13 +2322,11 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(Scalars.GraphQLString))
                         .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).getName())
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("description")
-                        .type(Scalars.GraphQLString)
-                        .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).description)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("description")
+//                        .type(Scalars.GraphQLString)
+//                        .dataFetcher(environment -> ((BikeRentalStation) environment.getSource()).description)
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikesAvailable")
                         .type(Scalars.GraphQLInt)
@@ -2440,76 +2399,74 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        /*
-        carParkType = GraphQLObjectType.newObject()
-                .name("CarPark")
-                .withInterface(placeInterface)
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("id")
-                        .type(new GraphQLNonNull(Scalars.GraphQLID))
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).id)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("name")
-                        .type(new GraphQLNonNull(Scalars.GraphQLString))
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).name)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("capacity")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).maxCapacity)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("spacesAvailable")
-                        .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).spacesAvailable)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("realtimeOccupancyAvailable")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).realTimeData)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("longitude")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).x)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("latitude")
-                        .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> ((CarPark) environment.getSource()).y)
-                        .build())
-                .build();
-         */
+//        carParkType = GraphQLObjectType.newObject()
+//                .name("CarPark")
+//                .withInterface(placeInterface)
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("id")
+//                        .type(new GraphQLNonNull(Scalars.GraphQLID))
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).id)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("name")
+//                        .type(new GraphQLNonNull(Scalars.GraphQLString))
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).name)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("capacity")
+//                        .type(Scalars.GraphQLInt)
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).maxCapacity)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("spacesAvailable")
+//                        .type(Scalars.GraphQLInt)
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).spacesAvailable)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("realtimeOccupancyAvailable")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).realTimeData)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("longitude")
+//                        .type(Scalars.GraphQLFloat)
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).x)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("latitude")
+//                        .type(Scalars.GraphQLFloat)
+//                        .dataFetcher(environment -> ((CarPark) environment.getSource()).y)
+//                        .build())
+//                .build();
 
-        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
-                .name("InputFilters")
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("quays")
-                        .description("Quays to include by id.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("lines")
-                        .description("Lines to include by id.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("bikeRentalStations")
-                        .description("Bike rentals to include by id.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("bikeParks")
-                        .description("Bike parks to include by id.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("carParks")
-                        .description("Car parks to include by id.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .build();
+//        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
+//                .name("InputFilters")
+//                .field(GraphQLInputObjectField.newInputObjectField()
+//                        .name("quays")
+//                        .description("Quays to include by id.")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .build())
+//                .field(GraphQLInputObjectField.newInputObjectField()
+//                        .name("lines")
+//                        .description("Lines to include by id.")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .build())
+//                .field(GraphQLInputObjectField.newInputObjectField()
+//                        .name("bikeRentalStations")
+//                        .description("Bike rentals to include by id.")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .build())
+//                .field(GraphQLInputObjectField.newInputObjectField()
+//                        .name("bikeParks")
+//                        .description("Bike parks to include by id.")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .build())
+//                .field(GraphQLInputObjectField.newInputObjectField()
+//                        .name("carParks")
+//                        .description("Car parks to include by id.")
+//                        .type(new GraphQLList(Scalars.GraphQLString))
+//                        .build())
+//                .build();
 
 
         queryType = GraphQLObjectType.newObject()
@@ -2606,17 +2563,15 @@ public class TransmodelIndexGraphQLSchema {
                                 }
                                 return stations.distinct().collect(Collectors.toList());
 
-                                /*
-                                String multiModalMode=environment.getArgument("multiModalMode");
-                                if ("parent".equals(multiModalMode)){
-                                    stops = stops.map(s -> getParentStopPlace(s).orElse(s));
-                                }
-                                List<Stop> stopList=stops.distinct().collect(Collectors.toList());
-                                if ("all".equals(multiModalMode)) {
-                                    stopList.addAll(stopList.stream().map(s -> getParentStopPlace(s).orElse(null)).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-                                }
-                                return stopList;
-                                */
+//                                String multiModalMode=environment.getArgument("multiModalMode");
+//                                if ("parent".equals(multiModalMode)){
+//                                    stops = stops.map(s -> getParentStopPlace(s).orElse(s));
+//                                }
+//                                List<Stop> stopList=stops.distinct().collect(Collectors.toList());
+//                                if ("all".equals(multiModalMode)) {
+//                                    stopList.addAll(stopList.stream().map(s -> getParentStopPlace(s).orElse(null)).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
+//                                }
+//                                return stopList;
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2660,13 +2615,11 @@ public class TransmodelIndexGraphQLSchema {
                             if (environment.getArgument("name") == null) {
                                 return getRoutingService(environment).getAllStops();
                             }
-                            /*
-                            else {
-                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)
-                                        .stream()
-                                        .map(result -> index.stopForId.get(mapper.fromIdString(result.id)));
-                            }
-                             */
+//                            else {
+//                                return index.getLuceneIndex().query(environment.getArgument("name"), true, true, false)
+//                                        .stream()
+//                                        .map(result -> index.stopForId.get(mapper.fromIdString(result.id)));
+//                            }
                             return emptyList();
                         })
                         .build())
@@ -2762,125 +2715,123 @@ public class TransmodelIndexGraphQLSchema {
                             return new SimpleListConnection<>(stops).get(environment);
                         })
                         .build())
-            /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("nearest")
-                        .description(
-                                "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
-                        .type(relay.connectionType("placeAtDistance",
-                                relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
-                                new ArrayList<>()))
-                        .argument(GraphQLArgument.newArgument()
-                                .name("latitude")
-                                .description("Latitude of the location")
-                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("longitude")
-                                .description("Longitude of the location")
-                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("maximumDistance")
-                                .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
-                                .defaultValue(2000)
-                                .type(Scalars.GraphQLInt)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("maximumResults")
-                                .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
-                                .defaultValue(20)
-                                .type(Scalars.GraphQLInt)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("filterByPlaceTypes")
-                                .description("Only include places of given types if set. Default accepts all types")
-                                .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
-                                .type(new GraphQLList(filterPlaceTypeEnum))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("filterByModes")
-                                .description("Only include places that include this mode. Only checked for places with mode i.e. quays, departures.")
-                                .type(new GraphQLList(modeEnum))
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("filterByInUse")
-                                .description("Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included.")
-                                .type(Scalars.GraphQLBoolean)
-                                .defaultValue(Boolean.FALSE)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("filterByIds")
-                                .description("Only include places that match one of the given ids.")
-                                .type(filterInputType)
-                                .build())
-                        .argument(GraphQLArgument.newArgument()
-                                .name("multiModalMode")
-                                .type(multiModalModeEnum)
-                                .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-                                                     " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace")
-                                .defaultValue("parent")
-                                .build())
-                        .argument(relay.getConnectionFieldArguments())
-                        .dataFetcher(environment -> {
-                            List<FeedScopedId> filterByStops = null;
-                            List<FeedScopedId> filterByRoutes = null;
-                            List<String> filterByBikeRentalStations = null;
-                            List<String> filterByBikeParks = null;
-                            List<String> filterByCarParks = null;
-                            @SuppressWarnings("rawtypes")
-                            Map filterByIds = environment.getArgument("filterByIds");
-                            if (filterByIds != null) {
-                                filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
-                                filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
-                                filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
-                                filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
-                                filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
-                            }
-
-                            List<TraverseMode> filterByTransportModes = environment.getArgument("filterByModes");
-                            List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
-                            if (CollectionUtils.isEmpty(placeTypes)) {
-                                placeTypes = Arrays.asList(TransmodelPlaceType.values());
-                            }
-                            List<GraphIndex.PlaceType> filterByPlaceTypes = mapper.mapPlaceTypes(placeTypes);
-
-                            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
-                            int orgMaxResults = environment.getArgument("maximumResults");
-                            int maxResults = orgMaxResults;
-                            if (placeTypes != null && placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-                                maxResults *= 5;
-                            }
-
-                            List<GraphIndex.PlaceAndDistance> places;
-                            try {
-                                places = index.findClosestPlacesByWalking(
-                                        environment.getArgument("latitude"),
-                                        environment.getArgument("longitude"),
-                                        environment.getArgument("maximumDistance"),
-                                        maxResults,
-                                        filterByTransportModes,
-                                        filterByPlaceTypes,
-                                        filterByStops,
-                                        filterByRoutes,
-                                        filterByBikeRentalStations,
-                                        filterByBikeParks,
-                                        filterByCarParks,
-                                        environment.getArgument("filterByInUse")
-                                );
-                            } catch (VertexNotFoundException e) {
-                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
-                                places = Collections.emptyList();
-                            }
-
-                            places = convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode")).stream().limit(orgMaxResults).collect(Collectors.toList());
-                            if (CollectionUtils.isEmpty(places)) {
-                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
-                            }
-                            return new SimpleListConnection(places).get(environment);
-                        })
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("nearest")
+//                        .description(
+//                                "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
+//                        .type(relay.connectionType("placeAtDistance",
+//                                relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
+//                                new ArrayList<>()))
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("latitude")
+//                                .description("Latitude of the location")
+//                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("longitude")
+//                                .description("Longitude of the location")
+//                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("maximumDistance")
+//                                .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
+//                                .defaultValue(2000)
+//                                .type(Scalars.GraphQLInt)
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("maximumResults")
+//                                .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
+//                                .defaultValue(20)
+//                                .type(Scalars.GraphQLInt)
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("filterByPlaceTypes")
+//                                .description("Only include places of given types if set. Default accepts all types")
+//                                .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
+//                                .type(new GraphQLList(filterPlaceTypeEnum))
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("filterByModes")
+//                                .description("Only include places that include this mode. Only checked for places with mode i.e. quays, departures.")
+//                                .type(new GraphQLList(modeEnum))
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("filterByInUse")
+//                                .description("Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included.")
+//                                .type(Scalars.GraphQLBoolean)
+//                                .defaultValue(Boolean.FALSE)
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("filterByIds")
+//                                .description("Only include places that match one of the given ids.")
+//                                .type(filterInputType)
+//                                .build())
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("multiModalMode")
+//                                .type(multiModalModeEnum)
+//                                .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
+//                                                     " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace")
+//                                .defaultValue("parent")
+//                                .build())
+//                        .argument(relay.getConnectionFieldArguments())
+//                        .dataFetcher(environment -> {
+//                            List<FeedScopedId> filterByStops = null;
+//                            List<FeedScopedId> filterByRoutes = null;
+//                            List<String> filterByBikeRentalStations = null;
+//                            List<String> filterByBikeParks = null;
+//                            List<String> filterByCarParks = null;
+//                            @SuppressWarnings("rawtypes")
+//                            Map filterByIds = environment.getArgument("filterByIds");
+//                            if (filterByIds != null) {
+//                                filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
+//                                filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
+//                                filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
+//                                filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
+//                                filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
+//                            }
+//
+//                            List<TraverseMode> filterByTransportModes = environment.getArgument("filterByModes");
+//                            List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
+//                            if (CollectionUtils.isEmpty(placeTypes)) {
+//                                placeTypes = Arrays.asList(TransmodelPlaceType.values());
+//                            }
+//                            List<GraphIndex.PlaceType> filterByPlaceTypes = mapper.mapPlaceTypes(placeTypes);
+//
+//                            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
+//                            int orgMaxResults = environment.getArgument("maximumResults");
+//                            int maxResults = orgMaxResults;
+//                            if (placeTypes != null && placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
+//                                maxResults *= 5;
+//                            }
+//
+//                            List<GraphIndex.PlaceAndDistance> places;
+//                            try {
+//                                places = index.findClosestPlacesByWalking(
+//                                        environment.getArgument("latitude"),
+//                                        environment.getArgument("longitude"),
+//                                        environment.getArgument("maximumDistance"),
+//                                        maxResults,
+//                                        filterByTransportModes,
+//                                        filterByPlaceTypes,
+//                                        filterByStops,
+//                                        filterByRoutes,
+//                                        filterByBikeRentalStations,
+//                                        filterByBikeParks,
+//                                        filterByCarParks,
+//                                        environment.getArgument("filterByInUse")
+//                                );
+//                            } catch (VertexNotFoundException e) {
+//                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
+//                                places = Collections.emptyList();
+//                            }
+//
+//                            places = convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode")).stream().limit(orgMaxResults).collect(Collectors.toList());
+//                            if (CollectionUtils.isEmpty(places)) {
+//                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
+//                            }
+//                            return new SimpleListConnection(places).get(environment);
+//                        })
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("authority")
                         .description("Get an authority by ID")
@@ -2961,11 +2912,12 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .dataFetcher(environment -> {
                             if ((environment.getArgument("ids") instanceof List)) {
-                                if (environment.getArguments().entrySet()
-                                        .stream()
-                                        .filter(stringObjectEntry -> stringObjectEntry.getValue() != null)
-                                        .collect(Collectors.toList())
-                                        .size() != 1) {
+                                if (environment
+                                    .getArguments()
+                                    .entrySet()
+                                    .stream()
+                                    .filter(it -> it.getValue() != null)
+                                    .count() != 1) {
                                     throw new IllegalArgumentException("Unable to combine other filters with ids");
                                 }
                                 return ((List<String>) environment.getArgument("ids"))
@@ -2988,7 +2940,7 @@ public class TransmodelIndexGraphQLSchema {
                                         .filter(route -> route.getShortName().equals(environment.getArgument("publicCode")));
                             }
                             if (environment.getArgument("publicCodes") instanceof List) {
-                                Set<String> publicCodes = new HashSet<>((List)environment.getArgument("publicCodes"));
+                                Set<String> publicCodes = Set.copyOf(environment.getArgument("publicCodes"));
                                 stream = stream
                                                  .filter(route -> route.getShortName() != null)
                                                  .filter(route -> publicCodes.contains(route.getShortName()));
@@ -2998,6 +2950,7 @@ public class TransmodelIndexGraphQLSchema {
                                 Set<TraverseMode> modes = ((List<TraverseMode>) environment.getArgument("transportModes")).stream()
                                         .filter(TraverseMode::isTransit)
                                         .collect(Collectors.toSet());
+                                // TODO OTP2 - FIX THIS, THIS IS A BUG
                                 stream = stream
                                         .filter(route -> modes.contains(route.getMode()));
                             }
@@ -3005,7 +2958,7 @@ public class TransmodelIndexGraphQLSchema {
                                 Collection<String> authorityIds = environment.getArgument("authorities");
                                 stream = stream
                                         .filter(route ->
-                                                route.getAgency() != null && authorityIds.contains(route.getAgency().getId()));
+                                                route.getAgency() != null && authorityIds.contains(route.getAgency().getId().getId()));
                             }
                             return stream.collect(Collectors.toList());
                         })
@@ -3049,11 +3002,12 @@ public class TransmodelIndexGraphQLSchema {
                                 List<String> lineIds=environment.getArgument("lines");
                                 //List<String> privateCodes=environment.getArgument("privateCodes");
                                 List<Long> activeDates=environment.getArgument("activeDates");
+                                // TODO OTP2 - Use FeedScoped ID
                                 List<String> authorities=environment.getArgument("authorities");
                                 return getRoutingService(environment).getTripForId().values().stream()
                                         .filter(t -> CollectionUtils.isEmpty(lineIds) || lineIds.contains(t.getRoute().getId().getId()))
                                         //.filter(t -> CollectionUtils.isEmpty(privateCodes) || privateCodes.contains(t.getTripPrivateCode()))
-                                        .filter(t -> CollectionUtils.isEmpty(authorities) || authorities.contains(t.getRoute().getAgency().getId()))
+                                        .filter(t -> CollectionUtils.isEmpty(authorities) || authorities.contains(t.getRoute().getAgency().getId().getId()))
                                         .filter(t -> CollectionUtils.isEmpty(activeDates) || getRoutingService(environment).getCalendarService().getServiceDatesForServiceId(t.getServiceId()).stream().anyMatch(sd -> activeDates.contains(mapper.serviceDateToSecondsSinceEpoch(sd))))
                                         .collect(Collectors.toList());
                         })
@@ -3137,56 +3091,52 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(new GraphQLList(bikeParkType)))
                         .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getBikerentalStationService().getBikeParks()))
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carPark")
-                        .description("Get a single car park based on its id")
-                        .type(carParkType)
-                        .argument(GraphQLArgument.newArgument()
-                                .name("id")
-                                .type(new GraphQLNonNull(Scalars.GraphQLString))
-                                .build())
-                        .dataFetcher(environment -> index.graph.getService(CarParkService.class)
-                                .getCarParks()
-                                .stream()
-                                .filter(carPark -> carPark.id.equals(environment.getArgument("id")))
-                                .findFirst()
-                                .orElse(null))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carParks")
-                        .description("Get all car parks")
-                        .type(new GraphQLNonNull(new GraphQLList(carParkType)))
-                        .argument(GraphQLArgument.newArgument()
-                                .name("ids")
-                                .type(new GraphQLList(Scalars.GraphQLString))
-                                .build())
-                        .dataFetcher(environment -> {
-                            if ((environment.getArgument("ids") instanceof List)) {
-                                Map<String, CarPark> carParks = index.graph.getService(CarParkService.class).getCarParkById();
-                                return ((List<String>) environment.getArgument("ids"))
-                                        .stream()
-                                        .map(carParks::get)
-                                        .collect(Collectors.toList());
-                            }
-                            return new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks());
-                        })
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("carPark")
+//                        .description("Get a single car park based on its id")
+//                        .type(carParkType)
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("id")
+//                                .type(new GraphQLNonNull(Scalars.GraphQLString))
+//                                .build())
+//                        .dataFetcher(environment -> index.graph.getService(CarParkService.class)
+//                                .getCarParks()
+//                                .stream()
+//                                .filter(carPark -> carPark.id.equals(environment.getArgument("id")))
+//                                .findFirst()
+//                                .orElse(null))
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("carParks")
+//                        .description("Get all car parks")
+//                        .type(new GraphQLNonNull(new GraphQLList(carParkType)))
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("ids")
+//                                .type(new GraphQLList(Scalars.GraphQLString))
+//                                .build())
+//                        .dataFetcher(environment -> {
+//                            if ((environment.getArgument("ids") instanceof List)) {
+//                                Map<String, CarPark> carParks = index.graph.getService(CarParkService.class).getCarParkById();
+//                                return ((List<String>) environment.getArgument("ids"))
+//                                        .stream()
+//                                        .map(carParks::get)
+//                                        .collect(Collectors.toList());
+//                            }
+//                            return new ArrayList<>(index.graph.getService(CarParkService.class).getCarParks());
+//                        })
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("routingParameters")
                         .description("Get default routing parameters.")
                         .type(this.routing.graphQLType)
                         .dataFetcher(environment -> routing.request)
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("notices")
-                        .description("Get all notices")
-                        .type(new GraphQLNonNull(new GraphQLList(noticeType)))
-                        .dataFetcher(environment -> index.getNoticesByEntity().values())
-                        .build())
-                */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("notices")
+//                        .description("Get all notices")
+//                        .type(new GraphQLNonNull(new GraphQLList(noticeType)))
+//                        .dataFetcher(environment -> index.getNoticesByEntity().values())
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("situations")
                         .description("Get all active situations.")
@@ -3231,24 +3181,21 @@ public class TransmodelIndexGraphQLSchema {
                 .build(dictionary);
     }
 
-    /*
-    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
-        Trip trip = index.tripForId.get(tripTimeShort.tripId);
-        if (trip == null) {
-            return null;
-        }
-        TripPattern tripPattern = index.patternForTrip.get(trip);
-        if (tripPattern == null || tripPattern.stopPattern == null) {
-            return null;
-        }
-        return tripPattern.stopPattern.bookingArrangements[tripTimeShort.stopIndex];
-    }
-    */
+//    private BookingArrangement getBookingArrangementForTripTimeShort(TripTimeShort tripTimeShort) {
+//        Trip trip = index.tripForId.get(tripTimeShort.tripId);
+//        if (trip == null) {
+//            return null;
+//        }
+//        TripPattern tripPattern = index.patternForTrip.get(trip);
+//        if (tripPattern == null || tripPattern.stopPattern == null) {
+//            return null;
+//        }
+//        return tripPattern.stopPattern.bookingArrangements[tripTimeShort.stopIndex];
+//    }
 
     /**
      * Resolves all AlertPatches that are relevant for the supplied TripTimeShort.
      */
-
     private Collection<AlertPatch> getAllRelevantAlerts(
         TripTimeShort tripTimeShort,
         RoutingService routingService
@@ -3325,48 +3272,46 @@ public class TransmodelIndexGraphQLSchema {
     }
 
 
-    /**
-     * Create PlaceAndDistance objects for all unique stopPlaces according to specified multiModalMode if client has requested stopPlace type.
-     *
-     * Necessary because nearest does not support StopPlace (stations), so we need to fetch quays instead and map the response.
-     *
-     * Remove PlaceAndDistance objects for quays if client has not requested these.
-     */
-    /*
-    private List<GraphIndex.PlaceAndDistance> convertQuaysToStopPlaces(List<TransmodelPlaceType> placeTypes, List<GraphIndex.PlaceAndDistance> places, String multiModalMode) {
-        if (placeTypes==null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-            // Convert quays to stop places
-            List<GraphIndex.PlaceAndDistance> stations = places.stream().filter(p -> p.place instanceof Stop)
-                                                                 .map(p -> new GraphIndex.PlaceAndDistance(index.stationForId.get(((Stop) p.place).getParentStationId()), p.distance))
-                                                                 .filter(Objects::nonNull).collect(Collectors.toList());
-
-            if ("parent".equals(multiModalMode)) {
-                // Replace monomodal children with their multimodal parents
-                stations = stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse((Stop) p.place), p.distance)).collect(Collectors.toList());
-            }
-            if ("all".equals(multiModalMode)) {
-                // Add multimodal parents in addition to their monomodal children
-                places.addAll(stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse(null), p.distance)).filter(p -> p.place != null).collect(Collectors.toList()));
-            }
-
-            places.addAll(stations);
-
-            if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
-                // Remove quays if only stop places are requested
-                places = places.stream().filter(p -> !(p.place instanceof Stop && ((Stop) p.place).getLocationType() == 0)).collect(Collectors.toList());
-            }
-
-        }
-        Collections.sort(places, Comparator.comparing(GraphIndex.PlaceAndDistance::getDistance));
-
-        Set<Object> uniquePlaces= new HashSet<>();
-        return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
-    }
-     */
+//    /**
+//     * Create PlaceAndDistance objects for all unique stopPlaces according to specified multiModalMode if client has requested stopPlace type.
+//     *
+//     * Necessary because nearest does not support StopPlace (stations), so we need to fetch quays instead and map the response.
+//     *
+//     * Remove PlaceAndDistance objects for quays if client has not requested these.
+//     */
+//    private List<GraphIndex.PlaceAndDistance> convertQuaysToStopPlaces(List<TransmodelPlaceType> placeTypes, List<GraphIndex.PlaceAndDistance> places, String multiModalMode) {
+//        if (placeTypes==null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
+//            // Convert quays to stop places
+//            List<GraphIndex.PlaceAndDistance> stations = places.stream().filter(p -> p.place instanceof Stop)
+//                                                                 .map(p -> new GraphIndex.PlaceAndDistance(index.stationForId.get(((Stop) p.place).getParentStationId()), p.distance))
+//                                                                 .filter(Objects::nonNull).collect(Collectors.toList());
+//
+//            if ("parent".equals(multiModalMode)) {
+//                // Replace monomodal children with their multimodal parents
+//                stations = stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse((Stop) p.place), p.distance)).collect(Collectors.toList());
+//            }
+//            if ("all".equals(multiModalMode)) {
+//                // Add multimodal parents in addition to their monomodal children
+//                places.addAll(stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse(null), p.distance)).filter(p -> p.place != null).collect(Collectors.toList()));
+//            }
+//
+//            places.addAll(stations);
+//
+//            if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
+//                // Remove quays if only stop places are requested
+//                places = places.stream().filter(p -> !(p.place instanceof Stop && ((Stop) p.place).getLocationType() == 0)).collect(Collectors.toList());
+//            }
+//
+//        }
+//        Collections.sort(places, Comparator.comparing(GraphIndex.PlaceAndDistance::getDistance));
+//
+//        Set<Object> uniquePlaces= new HashSet<>();
+//        return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
+//    }
 
     private List<FeedScopedId> toIdList(List<String> ids) {
         if (ids == null) return Collections.emptyList();
-        return ids.stream().map(id -> mapper.mapIdToDomain(id)).collect(Collectors.toList());
+        return ids.stream().map(mapper::mapIdToDomain).collect(Collectors.toList());
     }
 
     private void createPlanType() {
@@ -3417,34 +3362,32 @@ public class TransmodelIndexGraphQLSchema {
                                         .orElse(null)
                                 : null)
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikePark")
-                        .type(bikeParkType)
-                        .description("The bike parking related to the place")
-                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
-                                index.graph.getService(BikeRentalStationService.class)
-                                        .getBikeParks()
-                                        .stream()
-                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
-                                        .findFirst()
-                                        .orElse(null)
-                                : null)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("carPark")
-                        .type(carParkType)
-                        .description("The car parking related to the place")
-                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
-                                index.graph.getService(CarParkService.class)
-                                        .getCarParks()
-                                        .stream()
-                                        .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
-                                        .findFirst()
-                                        .orElse(null)
-                                : null)
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("bikePark")
+//                        .type(bikeParkType)
+//                        .description("The bike parking related to the place")
+//                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.BIKEPARK) ?
+//                                index.graph.getService(BikeRentalStationService.class)
+//                                        .getBikeParks()
+//                                        .stream()
+//                                        .filter(bikePark -> bikePark.id.equals(((Place) environment.getSource()).bikeParkId))
+//                                        .findFirst()
+//                                        .orElse(null)
+//                                : null)
+//                        .build())
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("carPark")
+//                        .type(carParkType)
+//                        .description("The car parking related to the place")
+//                        .dataFetcher(environment -> ((Place) environment.getSource()).vertexType.equals(VertexType.PARKANDRIDE) ?
+//                                index.graph.getService(CarParkService.class)
+//                                        .getCarParks()
+//                                        .stream()
+//                                        .filter(carPark -> carPark.id.equals(((Place) environment.getSource()).carParkId))
+//                                        .findFirst()
+//                                        .orElse(null)
+//                                : null)
+//                        .build())
                 .build();
 
 
@@ -3511,19 +3454,17 @@ public class TransmodelIndexGraphQLSchema {
                         .type(Scalars.GraphQLFloat)
                         .dataFetcher(environment -> ((WalkStep) environment.getSource()).startLocation.longitude())
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("legStepText")
-                        .description("Direction information as readable text.")
-                        .type(Scalars.GraphQLString)
-                        .argument(GraphQLArgument.newArgument()
-                                .name("locale")
-                                .type(localeEnum)
-                                .defaultValue("no")
-                                .build())
-                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).getLegStepText(environment))
-                        .build())
-                 */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("legStepText")
+//                        .description("Direction information as readable text.")
+//                        .type(Scalars.GraphQLString)
+//                        .argument(GraphQLArgument.newArgument()
+//                                .name("locale")
+//                                .type(localeEnum)
+//                                .defaultValue("no")
+//                                .build())
+//                        .dataFetcher(environment -> ((WalkStep) environment.getSource()).getLegStepText(environment))
+//                        .build())
                 .build();
 
         final GraphQLObjectType legType = GraphQLObjectType.newObject()
@@ -3698,14 +3639,12 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
                         .dataFetcher(environment -> tripTimeShortHelper.getAllTripTimeShortsForLegsTrip(environment.getSource(), getRoutingService(environment)))
                         .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("via")
-                        .description("Do we continue from a specified via place")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).intermediatePlace)
-                        .build())
-                */
+//                .field(GraphQLFieldDefinition.newFieldDefinition()
+//                        .name("via")
+//                        .description("Do we continue from a specified via place")
+//                        .type(Scalars.GraphQLBoolean)
+//                        .dataFetcher(environment -> ((Leg) environment.getSource()).intermediatePlace)
+//                        .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("situations")
                         .description("All relevant situations for this leg")
@@ -3964,11 +3903,11 @@ public class TransmodelIndexGraphQLSchema {
         return trip == null ?  t.headsign :  trip.getRoute().getId() + "|" + t.headsign;
     }
 
-    private <T> List<T> wrapInListUnlessNull(T element) {
+    private <T> List<T> listOfNullSafe(T element) {
         if (element == null) {
             return emptyList();
         }
-        return Arrays.asList(element);
+        return List.of(element);
     }
 
     private int directIdStringToInt(String directionId) {
@@ -3979,14 +3918,13 @@ public class TransmodelIndexGraphQLSchema {
         }
     }
 
-    private <T extends Object> List<String> reverseMapEnumVals(GraphQLEnumType enumType, Collection<T> otpVals) {
-        return enumType.getValues().stream().filter(e -> otpVals.contains(e.getValue())).map(e -> e.getName()).collect(Collectors.toList());
-    }
+    //private <T extends Object> List<String> reverseMapEnumVals(GraphQLEnumType enumType, Collection<T> otpVals) {
+    //    return enumType.getValues().stream().filter(e -> otpVals.contains(e.getValue())).map(e -> e.getName()).collect(Collectors.toList());
+    //}
 
     private String reverseMapEnumVal(GraphQLEnumType enumType, Object otpVal) {
         return enumType.getValues().stream().filter(e -> e.getValue().equals(otpVal)).findFirst().get().getName();
     }
-
 
     private Stream<TripTimeShort> whiteListAuthoritiesAndOrLines(
         Stream<TripTimeShort> stream,
@@ -4025,12 +3963,16 @@ public class TransmodelIndexGraphQLSchema {
     }
 
     private boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
-        for (Stop quay: station.getChildStops()) {
-            if (!routingService.getPatternsForStop(quay,true).isEmpty()) {
+        for (Stop quay : station.getChildStops()) {
+            if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
                 return true;
             }
         }
         return false;
+    }
+
+    private Agency getAgency(FeedScopedId agencyId, RoutingService routingService) {
+        return routingService.getAgencyForId(agencyId);
     }
 
     private RoutingService getRoutingService(DataFetchingEnvironment environment) {
