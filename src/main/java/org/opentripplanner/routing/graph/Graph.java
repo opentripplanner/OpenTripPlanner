@@ -61,6 +61,9 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -85,6 +88,8 @@ public class Graph implements Serializable {
     private long transitServiceEnds = 0;
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
+
+    private Collection<Route> transitRoutes = new ArrayList<>();
 
     private TransferTable transferTable = new TransferTable();
 
@@ -433,6 +438,15 @@ public class Graph implements Serializable {
         return t;
     }
 
+    public void addTransitRoutes(Collection<Route> routes){
+        this.transitRoutes = Stream.of(this.transitRoutes, routes)
+                .flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    public Collection<Route> getTransitRoutes(){
+        return transitRoutes;
+    }
+
     public void remove(Vertex vertex) {
         vertices.remove(vertex.getLabel());
     }
@@ -749,10 +763,9 @@ public class Graph implements Serializable {
 
     public void saveTransitLines(File file) throws IOException {
         LOG.info("Writing transit lines to csv " + file.getAbsolutePath() + " ...");
-        OtpTransitService transitService = getService(OtpTransitService.class);
         CsvWriter writer = new CsvWriter(file.getName());
         String[] csvEntryData;
-        for (Route route:transitService.getAllRoutes()) {
+        for (Route route:getTransitRoutes()) {
             csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(), route.getShortName(), route.getAgency().getName()};
             try {
                 writer.writeRecord(csvEntryData);
