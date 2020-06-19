@@ -565,6 +565,8 @@ public abstract class RoutingResource {
     protected RoutingRequest buildRequest() throws ParameterException {
         Router router = otpServer.getRouter(routerId);
         RoutingRequest request = router.defaultRoutingRequest.clone();
+
+        request.vehicleValidator = new VehicleValidator();
         request.routingReluctances = new RoutingReluctances();
         request.routingDelays = new RoutingDelays();
         request.routerId = routerId;

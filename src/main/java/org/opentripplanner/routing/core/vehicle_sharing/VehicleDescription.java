@@ -6,6 +6,8 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
+import static java.lang.Double.min;
+
 public abstract class VehicleDescription {
 
     private final String providerVehicleId;
@@ -31,6 +33,8 @@ public abstract class VehicleDescription {
                               Gearbox gearbox, Provider provider, Double rangeInMeters) {
         if (rangeInMeters == null)
             rangeInMeters = this.getDefaultRangeInMeters();
+
+        rangeInMeters = min(rangeInMeters, getMaximumRangeInMeters());
 
         this.providerVehicleId = providerVehicleId;
         this.longitude = longitude;
@@ -105,4 +109,8 @@ public abstract class VehicleDescription {
     public abstract VehicleType getVehicleType();
 
     protected abstract double getDefaultRangeInMeters();
+
+    protected Double getMaximumRangeInMeters() {
+        return Double.MAX_VALUE;
+    }
 }
