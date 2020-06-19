@@ -629,8 +629,8 @@ public class State implements Cloneable {
         }
         newState.stateData.usingRentedVehicle = stateData.usingRentedVehicle;
         // if the original request options was depart At, there is a chance that the new reversed state could
-        // immediately begin renting a car even if it didn't end that way. If the original trip didn't end this way, the
-        // car rental must be undone.
+        // immediately begin renting a vehicle even if it didn't end that way. If the original trip didn't end this way,
+        // the vehicle rental must be undone.
         if (!stateData.opt.arriveBy && !stateData.usingRentedVehicle) {
             newState.stateData.nonTransitMode = TraverseMode.WALK;
             newState.stateData.hasRentedVehiclePreTransit = false;
