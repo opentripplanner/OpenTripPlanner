@@ -24,6 +24,7 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -764,21 +765,15 @@ public class Graph implements Serializable {
     public void saveTransitLines(File file) throws IOException {
         LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
         CsvWriter writer = new CsvWriter(file.getName());
-        String[] csvEntryData;
         for (Route route:getTransitRoutes()) {
-            if(route.getType() < 100){
-                csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(), route.getShortName(), route.getAgency().getName()};
-            }
-            else{
-                //route type is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
-                Route.HVTRouteType routeType = Route.HVTRouteType.fromHVTCode(route.getType());
-                if(routeType == Route.HVTRouteType.UNSUPPORTED){
-                    LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), route.getShortName(), route.getAgency().getName());
-                }
-                csvEntryData = new String[]{routeType.name(), route.getShortName(), route.getAgency().getName()};
-            }
+            String routeTypeName = "UNSUPPORTED";
             try {
-                writer.writeRecord(csvEntryData);
+                routeTypeName = GtfsLibrary.getTraverseMode(route).name();
+            }catch(IllegalArgumentException e) {
+                LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), route.getShortName(), route.getAgency().getName());
+            }
+            try{
+                writer.writeRecord(new String[]{routeTypeName, route.getShortName(), route.getAgency().getName()});
             } catch (IOException e) {
                 file.delete();
                 throw e;
