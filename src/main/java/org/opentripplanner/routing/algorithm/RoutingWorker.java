@@ -43,6 +43,12 @@ import java.util.List;
 public class RoutingWorker {
     private static final int NOT_SET = -1;
 
+    /**
+     * The number of dates considered when filtering trips for this search, starting from the search
+     * date. Yesterday's date is always included, to account for trips crossing midnight. A value
+     * below 2 is not advised, because searches late in the day will not include departures starting
+     * just after midnight.
+     */
     private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 

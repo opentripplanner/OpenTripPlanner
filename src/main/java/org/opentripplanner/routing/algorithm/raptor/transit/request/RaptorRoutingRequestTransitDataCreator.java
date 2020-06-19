@@ -70,7 +70,7 @@ class RaptorRoutingRequestTransitDataCreator {
 
     // Start at yesterdays date to account for trips that cross midnight. This is also
     // accounted for in TripPatternForDates.
-    for (int d = -1; d < dayRange - 1; ++d) {
+    for (int d = -1; d < dayRange; ++d) {
       tripPatternForDates.add(
         filterActiveTripPatterns(
           transitLayer,
