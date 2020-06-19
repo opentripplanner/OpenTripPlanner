@@ -5,6 +5,9 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 
 import java.util.Objects;
 
+/**
+ * Describes how bad time spend on specified actions is.
+ */
 public class RoutingReluctances {
     /**
      * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle

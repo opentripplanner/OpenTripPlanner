@@ -10,10 +10,6 @@ public class MotorbikeDescription extends VehicleDescription {
 
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.CAR;
 
-    private static final int RENT_TIME_IN_SECONDS = 60;
-
-    private static final int DROPOFF_TIME_IN_SECONDS = 60 * 2;
-
     private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;
 
     public MotorbikeDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
@@ -34,16 +30,6 @@ public class MotorbikeDescription extends VehicleDescription {
     @Override
     public TraverseMode getTraverseMode() {
         return TRAVERSE_MODE;
-    }
-
-    @Override
-    public int getRentTimeInSeconds() {
-        return RENT_TIME_IN_SECONDS;
-    }
-
-    @Override
-    public int getDropoffTimeInSeconds() {
-        return DROPOFF_TIME_IN_SECONDS;
     }
 
     @Override

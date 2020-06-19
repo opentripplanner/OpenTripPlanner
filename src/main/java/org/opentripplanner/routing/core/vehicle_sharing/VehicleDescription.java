@@ -101,12 +101,6 @@ public abstract class VehicleDescription {
     @JsonIgnore
     public abstract TraverseMode getTraverseMode();
 
-    @JsonIgnore
-    public abstract int getRentTimeInSeconds();
-
-    @JsonIgnore
-    public abstract int getDropoffTimeInSeconds();
-
     @JsonSerialize
     public abstract VehicleType getVehicleType();
 

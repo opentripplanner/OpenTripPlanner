@@ -9,10 +9,6 @@ public class CarDescription extends VehicleDescription {
 
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.CAR;
 
-    private static final int RENT_TIME_IN_SECONDS = 90;
-
-    private static final int DROPOFF_TIME_IN_SECONDS = 60 * 4;
-
     private static final VehicleType VEHICLE_TYPE = VehicleType.CAR;
 
     private static final double DEFAULT_RANGE_IN_METERS = 200 * 1000;
@@ -35,16 +31,6 @@ public class CarDescription extends VehicleDescription {
     @Override
     public TraverseMode getTraverseMode() {
         return TRAVERSE_MODE;
-    }
-
-    @Override
-    public int getRentTimeInSeconds() {
-        return RENT_TIME_IN_SECONDS;
-    }
-
-    @Override
-    public int getDropoffTimeInSeconds() {
-        return DROPOFF_TIME_IN_SECONDS;
     }
 
     @Override

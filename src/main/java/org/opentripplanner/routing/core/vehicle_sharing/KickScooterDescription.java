@@ -11,10 +11,6 @@ public class KickScooterDescription extends VehicleDescription {
 
     private static final TraverseMode TRAVERSE_MODE = TraverseMode.BICYCLE;
 
-    private static final int RENT_TIME_IN_SECONDS = 30;
-
-    private static final int DROPOFF_TIME_IN_SECONDS = 30;
-
     private static final VehicleType VEHICLE_TYPE = VehicleType.KICKSCOOTER;
     //  We don't want to return routes with long kickscooter legs.
     private static final double DEFAULT_RANGE_IN_METERS = 4 * 1000;
@@ -40,16 +36,6 @@ public class KickScooterDescription extends VehicleDescription {
     @Override
     public TraverseMode getTraverseMode() {
         return TRAVERSE_MODE;
-    }
-
-    @Override
-    public int getRentTimeInSeconds() {
-        return RENT_TIME_IN_SECONDS;
-    }
-
-    @Override
-    public int getDropoffTimeInSeconds() {
-        return DROPOFF_TIME_IN_SECONDS;
     }
 
     @Override

@@ -2,6 +2,9 @@ package org.opentripplanner.routing.core.routing_parametrizations;
 
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 
+/**
+ * Describes how long specified actions take.
+ */
 public class RoutingDelays {
 
     private int kickScooterRentingTime = 30;

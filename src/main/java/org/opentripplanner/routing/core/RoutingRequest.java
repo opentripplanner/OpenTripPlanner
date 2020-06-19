@@ -711,6 +711,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Constructor for options; modes defaults to walk and transit
      */
     public RoutingRequest() {
+        routingDelays = new RoutingDelays();
+        routingReluctances = new RoutingReluctances();
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
@@ -1158,7 +1160,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     }
 
 
-
     public void setRoutingContext(Graph graph) {
         setRoutingContext(graph, null);
     }
@@ -1465,8 +1466,6 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
         }
     }
-
-
 
 
     public void banTrip(FeedScopedId trip) {
