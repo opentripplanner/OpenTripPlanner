@@ -5,6 +5,27 @@ public final class Route extends IdentityBean<FeedScopedId> {
 
     public enum RouteType {TRAM, SUBWAY, TRAIN, BUS, FERRY, CABLE_CAR, GONDOLA, FUNICULAR}
 
+    public enum HVTRouteType {
+        UNSUPPORTED(-1), TRAIN(100), SUBWAY(400), BUS(700), TROLLEYBUS(800), TRAM(900);
+
+        public final int hvtCode;
+
+        HVTRouteType(int hvtCode) {
+            this.hvtCode = hvtCode;
+        }
+
+        public static HVTRouteType fromHVTCode(int hvtCode){
+            HVTRouteType result = UNSUPPORTED;
+            for(HVTRouteType type:HVTRouteType.values()){
+                if(type.hvtCode == hvtCode){
+                    result = type;
+                    break;
+                }
+            }
+            return result;
+        }
+    }
+
     private static final long serialVersionUID = 1L;
 
     private static final int MISSING_VALUE = -999;

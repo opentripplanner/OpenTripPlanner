@@ -766,7 +766,13 @@ public class Graph implements Serializable {
         CsvWriter writer = new CsvWriter(file.getName());
         String[] csvEntryData;
         for (Route route:getTransitRoutes()) {
-            csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(), route.getShortName(), route.getAgency().getName()};
+            if(route.getType() < 100){
+                csvEntryData = new String[]{Route.RouteType.values()[route.getType()].name(), route.getShortName(), route.getAgency().getName()};
+            }
+            else{
+                //route type is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
+                csvEntryData = new String[]{Route.HVTRouteType.fromHVTCode(route.getType()).name(), route.getShortName(), route.getAgency().getName()};
+            }
             try {
                 writer.writeRecord(csvEntryData);
             } catch (IOException e) {
