@@ -39,8 +39,11 @@ public class RentAVehicleOffEdge extends RentAVehicleAbstractEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        // check if the current state would allow a vehicle dropoff
-        if (!s0.isVehicleRentalDropoffAllowed(!station.isBorderDropoff)) {
+        // check if the current state would allow a vehicle dropoff. In certain cases, RentAVehicleOffEdges can be
+        // created when creating border drop-off stations. In these cases we still want to specify that the vehicle is
+        // being dropped off at a designated area in order for reverse optimization searches to recognize the station
+        // when approaching from the out-of-boundary side.
+        if (!s0.isVehicleRentalDropoffAllowed(true)) {
             // something about the current state makes dropping off a vehicle not possible, return null.
             return null;
         }

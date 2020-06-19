@@ -7,6 +7,7 @@ import org.opentripplanner.routing.algorithm.NegativeWeightException;
 import org.opentripplanner.routing.car_rental.CarRentalStationService;
 import org.opentripplanner.routing.edgetype.OnboardEdge;
 import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
+import org.opentripplanner.routing.edgetype.RentAVehicleAbstractEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TablePatternEdge;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
@@ -186,7 +187,7 @@ public class State implements Cloneable {
                     // begin the search with a rented vehicle in use.
                     beginVehicleRenting(0, firstStreetEdge.getVehicleNetworks(), true);
                 } else {
-                    // not possible to have rented a car, start out in walk mode
+                    // not possible to have rented a vehicle, start out in walk mode
                     stateData.nonTransitMode = TraverseMode.WALK;
                 }
             } else {
@@ -242,8 +243,13 @@ public class State implements Cloneable {
     }
 
     public String toString() {
-        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] "
-            + (isBikeRenting() ? "BIKE_RENT " : "") + (isCarParked() ? "CAR_PARKED " : "")
+        return "<State " + new Date(getTimeInMillis()) + " [" + weight + "] " +
+            (isBikeRenting() ? "BIKE_RENT " : "") +
+            (isCarParked() ? "CAR_PARKED " : "") +
+            (isUsingHailedCar() ? "CAR_HAIL " : "") +
+            (isCarRenting() ? "CAR_RENT " : "") +
+            (isVehicleRenting() ? "VEHICLE_RENT " : "") +
+            " " + (getBackMode() != null ? getBackMode() : "") + " "
             + vertex + ">";
     }
 
@@ -595,9 +601,47 @@ public class State implements Cloneable {
         newState.stateData.usingRentedBike = stateData.usingRentedBike;
         newState.stateData.carParked = stateData.carParked;
         newState.stateData.bikeParked = stateData.bikeParked;
+        // set to whatever the final TNC state was
         newState.stateData.usingHailedCar = stateData.usingHailedCar;
+        // if the original request options was depart At, there is a chance that the new reversed state could
+        // immediately board a TNC even if it didn't end that way. If the original trip didn't end this way, the TNC
+        // boarding must be undone.
+        if (!stateData.opt.arriveBy && !stateData.usingHailedCar) {
+            newState.stateData.hasHailedCarPreTransit = false;
+            newState.stateData.backMode = TraverseMode.WALK;
+            newState.stateData.nonTransitMode = TraverseMode.WALK;
+            if (stateData.opt.transportationNetworkCompanyEtaAtOrigin > -1) {
+                newState.time -= stateData.opt.transportationNetworkCompanyEtaAtOrigin * 1000;
+            }
+        }
         newState.stateData.usingRentedCar = stateData.usingRentedCar;
+        // if the original request options was depart At, there is a chance that the new reversed state could
+        // immediately begin renting a car even if it didn't end that way. If the original trip didn't end this way, the
+        // car rental must be undone.
+        if (!stateData.opt.arriveBy && !stateData.usingRentedCar) {
+            newState.stateData.nonTransitMode = TraverseMode.WALK;
+            newState.stateData.hasRentedCarPreTransit = false;
+        }
+        // If the original trip was depart at and did end with dropping off the car at the destination, we need to
+        // immediately set the back mode to match the final state of the original trip
+        else if (!stateData.opt.arriveBy && stateData.usingRentedCar) {
+            newState.stateData.backMode = TraverseMode.CAR;
+        }
         newState.stateData.usingRentedVehicle = stateData.usingRentedVehicle;
+        // if the original request options was depart At, there is a chance that the new reversed state could
+        // immediately begin renting a car even if it didn't end that way. If the original trip didn't end this way, the
+        // car rental must be undone.
+        if (!stateData.opt.arriveBy && !stateData.usingRentedVehicle) {
+            newState.stateData.nonTransitMode = TraverseMode.WALK;
+            newState.stateData.hasRentedVehiclePreTransit = false;
+        }
+        // If the original trip was depart at and did end with dropping off the vehicle at the destination, we need to
+        // immediately set the back mode to match the final state of the original trip
+        else if (!stateData.opt.arriveBy && stateData.usingRentedVehicle) {
+            newState.stateData.backMode = TraverseMode.MICROMOBILITY;
+        }
+        // begin with the same non-transit mode that the end state had
+        newState.stateData.nonTransitMode = stateData.nonTransitMode;
         return newState;
     }
 
@@ -807,13 +851,33 @@ public class State implements Cloneable {
                     ret = edge.traverse(ret);
                 }
 
-                if (ret != null && ret.getBackMode() != null && orig.getBackMode() != null &&
-                    ret.getBackMode() != orig.getBackMode()) {
+                // Sometimes states are forked, so we have to find the proper forked state to continue reverse
+                // optimization.
+                while (
+                    // avoid non-reverse-traversable edges
+                    ret != null &&
+                        // make sure the backmode is not null (can occur on first/last states)
+                        ret.getBackMode() != null &&
+                        orig.getBackMode() != null &&
+                        // make sure the modes are the same
+                        (ret.getBackMode() != orig.getBackMode() ||
+                            // Also make sure vehicle rental states are the same if the mode is the same. The rental
+                            // states can differ despite the modes being the same when a vehicle rental is ended on an
+                            // edge like steps that requires walking
+                            (ret.getBackMode() == orig.getBackMode() &&
+                                ret.isVehicleRenting() != orig.isVehicleRenting() &&
+                                // Only take into consideration edge traversals that were not on
+                                // RentAVehicleAbstractEdges as the rented vehicle state differs on arriveBy vs departAt
+                                // queries
+                                !(edge instanceof RentAVehicleAbstractEdge)
+                            )
+                        )
+                ) {
                     ret = ret.next; // Keep the mode the same as on the original graph path (in K+R)
                 }
 
                 if (ret == null) {
-                    LOG.warn("Cannot reverse path at edge: " + edge + ", returning unoptimized "
+                    LOG.error("Cannot reverse path at edge: " + edge + ", returning unoptimized "
                         + "path. If this edge is a PatternInterlineDwell, or if there is a "
                         + "time-dependent turn restriction here, or if there is no transit leg "
                         + "in a K+R result, this is not totally unexpected. Otherwise, you "
@@ -1022,6 +1086,7 @@ public class State implements Cloneable {
     public void boardHailedCar(double initialEdgeDistance) {
         stateData.usingHailedCar = true;
         stateData.nonTransitMode = TraverseMode.CAR;
+        stateData.backMode = TraverseMode.CAR;
         RoutingRequest options = getOptions();
         if (isEverBoarded()) {
             if (options.arriveBy) {
