@@ -54,7 +54,7 @@ public class GraphBuilder implements Runnable {
 
     private final File graphFile;
 
-    private final String transitLinesFileName;
+    private final File transitLineFile;
     
     private boolean _alwaysRebuild = true;
 
@@ -69,7 +69,7 @@ public class GraphBuilder implements Runnable {
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
         graphFile = new File(path, "Graph.obj");
-        transitLinesFileName = "linie_"+System.currentTimeMillis()+".csv";
+        transitLineFile = new File(path, "linie_"+System.currentTimeMillis()+".csv");
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
 
@@ -146,7 +146,7 @@ public class GraphBuilder implements Runnable {
         if (serializeGraph) {
             try {
                 graph.save(graphFile);
-                graph.saveTransitLines(new File(transitLinesFileName));
+                graph.saveTransitLines(transitLineFile);
             } catch (Exception ex) {
                 throw new IllegalStateException(ex);
             }

@@ -764,7 +764,7 @@ public class Graph implements Serializable {
 
     public void saveTransitLines(File file) throws IOException {
         LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
-        CsvWriter writer = new CsvWriter(file.getName());
+        CsvWriter writer = new CsvWriter(file.getPath());
         for (Route route:getTransitRoutes()) {
             String routeTypeName = "UNSUPPORTED";
             try {
