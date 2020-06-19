@@ -69,7 +69,7 @@ public class GraphBuilder implements Runnable {
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
         graphFile = new File(path, "Graph.obj");
-        transitLinesFileName = "linie.csv";
+        transitLinesFileName = "linie_"+System.currentTimeMillis()+".csv";
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
 
