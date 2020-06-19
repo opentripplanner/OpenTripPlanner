@@ -762,7 +762,7 @@ public class Graph implements Serializable {
     }
 
     public void saveTransitLines(File file) throws IOException {
-        LOG.info("Writing transit lines to csv " + file.getAbsolutePath() + " ...");
+        LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
         CsvWriter writer = new CsvWriter(file.getName());
         String[] csvEntryData;
         for (Route route:getTransitRoutes()) {
@@ -771,7 +771,11 @@ public class Graph implements Serializable {
             }
             else{
                 //route type is coded using the Hierarchical Vehicle Type (HVT) codes from the European TPEG standard
-                csvEntryData = new String[]{Route.HVTRouteType.fromHVTCode(route.getType()).name(), route.getShortName(), route.getAgency().getName()};
+                Route.HVTRouteType routeType = Route.HVTRouteType.fromHVTCode(route.getType());
+                if(routeType == Route.HVTRouteType.UNSUPPORTED){
+                    LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), route.getShortName(), route.getAgency().getName());
+                }
+                csvEntryData = new String[]{routeType.name(), route.getShortName(), route.getAgency().getName()};
             }
             try {
                 writer.writeRecord(csvEntryData);
