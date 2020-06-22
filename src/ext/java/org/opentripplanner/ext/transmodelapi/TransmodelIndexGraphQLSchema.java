@@ -25,6 +25,7 @@ import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.tuple.Pair;
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequest;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
@@ -69,6 +70,7 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
@@ -114,8 +116,6 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType noticeType = new GraphQLTypeReference("Notice");
 
-    private GraphQLOutputType organisationType = new GraphQLTypeReference("Organisation");
-
     private GraphQLOutputType authorityType = new GraphQLTypeReference("Authority");
 
     private GraphQLOutputType operatorType = new GraphQLTypeReference("Operator");
@@ -156,7 +156,9 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType systemNoticeType = new GraphQLTypeReference("SystemNotice");
 
-    private GraphQLInputObjectType locationType;
+  private GraphQLOutputType serverInfoType = new GraphQLTypeReference("OtpVersion");
+
+  private GraphQLInputObjectType locationType;
 
     private GraphQLInputObjectType modesInputType;
 
@@ -475,6 +477,40 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
+        serverInfoType = GraphQLObjectType.newObject()
+            .name("ServerInfo")
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("version")
+                .description("Maven version")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.version)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("buildTime")
+                .description("OTP Build timestamp")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.buildTime)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitBranch")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.branch)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitCommit")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.commit)
+                .build())
+            .field(GraphQLFieldDefinition.newFieldDefinition()
+                .name("gitCommitTime")
+                .description("")
+                .type(Scalars.GraphQLString)
+                .dataFetcher(e -> MavenVersion.VERSION.commitTime)
+                .build())
+            .build();
+
         modesInputType = GraphQLInputObjectType.newInputObject()
             .name("Modes")
             .description("Input format for specifying which modes will be allowed for this search. "
@@ -568,12 +604,6 @@ public class TransmodelIndexGraphQLSchema {
                         .defaultValue(new ArrayList<>())
                         .build())
                 .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("organisations")
-                        .description("Deprecated! Use 'authorities' instead.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .defaultValue(new ArrayList<>())
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
                         .name("otherThanPreferredLinesPenalty")
                         .description("Penalty added for using a line that is not preferred if user has set any line as preferred. In number of seconds that user is willing to wait for preferred line.")
                         .type(Scalars.GraphQLInt)
@@ -596,12 +626,6 @@ public class TransmodelIndexGraphQLSchema {
                         .type(new GraphQLList(Scalars.GraphQLString))
                         .defaultValue(new ArrayList<>())
                         .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("organisations")
-                        .description("Deprecated! Use 'authorities' instead.")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .defaultValue(new ArrayList<>())
-                        .build())
                 .build();
 
         GraphQLInputObjectType bannedInputType = GraphQLInputObjectType.newInputObject()
@@ -619,12 +643,6 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("authorities")
                         .description("Set of ids for authorities that should not be used")
-                        .defaultValue(new ArrayList<>())
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("organisations")
-                        .description("Deprecated! Use 'authorities' instead.")
                         .defaultValue(new ArrayList<>())
                         .type(new GraphQLList(Scalars.GraphQLString))
                         .build())
@@ -669,11 +687,6 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("authorities")
                         .description("Set of ids for authorities that should be used")
-                        .type(new GraphQLList(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLInputObjectField.newInputObjectField()
-                        .name("organisations")
-                        .description("Deprecated! Use 'authorities' instead.")
                         .type(new GraphQLList(Scalars.GraphQLString))
                         .build())
                 .build();
@@ -1077,12 +1090,6 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> getAgency(((AlertPatch) environment.getSource()).getAgency(), getRoutingService(environment)))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("organisation")
-                        .deprecate("Use 'authority' instead.")
-                        .type(organisationType)
-                        .dataFetcher(environment -> getAgency(((AlertPatch) environment.getSource()).getAgency(), getRoutingService(environment)))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("lines")
                         .type(new GraphQLNonNull(new GraphQLList(lineType)))
                         .dataFetcher(environment -> wrapInListUnlessNull(getRoutingService(environment)
@@ -1149,24 +1156,6 @@ public class TransmodelIndexGraphQLSchema {
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("detail")
-                        .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
-                        .description("Details of situation in all different translations available")
-                        .deprecate("Not allowed according to profile. Use ´advice´ instead.")
-                        .dataFetcher(environment -> {
-                            AlertPatch alertPatch = environment.getSource();
-                            Alert alert = alertPatch.getAlert();
-                            if (alert.alertDetailText instanceof TranslatedString) {
-                                return ((TranslatedString) alert.alertDetailText).getTranslations();
-                            } else if (alert.alertDetailText != null) {
-                                return Arrays.asList(new AbstractMap.SimpleEntry<>(null, alert.alertDetailText.toString()));
-                            } else {
-                                return emptyList();
-                            }
-                        })
-                        .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("advice")
                         .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(multilingualStringType))))
                         .description("Advice of situation in all different translations available")
@@ -1181,14 +1170,6 @@ public class TransmodelIndexGraphQLSchema {
                                 return emptyList();
                             }
                         })
-                        .build())
-                 */
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("infoLink")
-                        .type(Scalars.GraphQLString)
-                        .deprecate("Use the attribute infoLinks instead.")
-                        .description("Url with more information")
-                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertUrl)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("infoLinks")
@@ -1213,15 +1194,6 @@ public class TransmodelIndexGraphQLSchema {
                     .description("ReportType of this situation")
                     .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().alertType)
                     .build())
-                /*
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("stopConditions")
-                        .type(new GraphQLNonNull(new GraphQLList(stopConditionEnum)))
-                        .deprecate("Temporary attribute used for data-verification.")
-                        .description("StopConditions of this situation")
-                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getStopConditions())
-                        .build())
-                */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("situationNumber")
                         .type(Scalars.GraphQLString)
@@ -1805,38 +1777,6 @@ public class TransmodelIndexGraphQLSchema {
                                        environment -> null)
                                .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("aimedArrival")
-                        .deprecate("Use aimedArrivalTime")
-                        .description("Scheduled time of arrival at quay. Not affected by read time updated")
-                        .type(timeType)
-                        .dataFetcher(
-                                environment -> ((TripTimeShort) environment.getSource()).scheduledArrival)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("expectedArrival")
-                        .deprecate("Use expectedArrivalTime")
-                        .type(timeType)
-                        .description("Expected time of arrival at quay. Updated with real time information if available")
-                        .dataFetcher(
-                                environment -> ((TripTimeShort) environment.getSource()).realtimeArrival)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("aimedDeparture")
-                        .deprecate("Use aimedDepartureTime")
-                        .description("Scheduled time of departure from quay. Not affected by read time updated")
-                        .type(timeType)
-                        .dataFetcher(
-                                environment -> ((TripTimeShort) environment.getSource()).scheduledDeparture)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("expectedDeparture")
-                        .deprecate("Use expectedDepartureTime")
-                        .type(timeType)
-                        .description("Expected time of departure from quay. Updated with real time information if available")
-                        .dataFetcher(
-                                environment -> ((TripTimeShort) environment.getSource()).realtimeDeparture)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("timingPoint")
                         .type(Scalars.GraphQLBoolean)
                         .description("Whether this is a timing point or not. Boarding and alighting is not allowed at timing points.")
@@ -1848,14 +1788,12 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Whether this call has been updated with real time information.")
                         .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).realtime)
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("predictionInaccurate")
                         .type(Scalars.GraphQLBoolean)
-                        .description("Whether the updated estimates are expected to be inaccurate.")
-                        .dataFetcher(environment -> ((TripTimeShort) environment.getSource()).predictionInaccurate)
+                        .description("Whether the updated estimates are expected to be inaccurate. NOT IMPLEMENTED")
+                        .dataFetcher(environment -> false)
                         .build())
-                 */
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtimeState")
                         .type(EnumTypes.REALTIME_STATE)
@@ -1993,23 +1931,14 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("publicCode")
                         .type(Scalars.GraphQLString)
-                        .description("Publicly announced code for service journey, differentiating it from other service journeys for the same line. NOT IMPLEMENTED")
-                        .dataFetcher(environment -> "")
+                        .description("Publicly announced code for service journey, differentiating it from other service journeys for the same line.")
+                        .dataFetcher(environment -> (((Trip) environment.getSource()).getTripShortName()))
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("privateCode")
                         .type(Scalars.GraphQLString)
                         .description("For internal use by operators.")
-                        .dataFetcher(environment -> (((Trip) environment.getSource()).getTripPrivateCode()))
-                        .build())
-                 */
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("linePublicCode")
-                        .type(Scalars.GraphQLString)
-                        .deprecate("Use line.publicCode instead.")
-                        .description("Publicly announced code for line, differentiating it from other lines for the same operator.")
-                        .dataFetcher(environment -> (((Trip) environment.getSource()).getRoute().getShortName()))
+                        .dataFetcher(environment -> (((Trip) environment.getSource()).getInternalPlanningCode()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("operator")
@@ -2146,12 +2075,6 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> ((TripPattern) environment.getSource()).name)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("destinationDisplay")
-                        .type(destinationDisplayType)
-                        .deprecate("Get destinationDisplay from estimatedCall or timetabledPassingTime instead. DestinationDisplay from JourneyPattern is not correct according to model, will give misleading results in some cases and will be removed!")
-                        .dataFetcher(environment -> ((TripPattern) environment.getSource()).getDirection())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("serviceJourneys")
                         .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(serviceJourneyType))))
                         .dataFetcher(environment -> ((TripPattern) environment.getSource()).getTrips())
@@ -2242,12 +2165,6 @@ public class TransmodelIndexGraphQLSchema {
                         .name("operator")
                         .type(operatorType)
                         .dataFetcher(environment -> (((Route) environment.getSource()).getOperator()))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("organisation")
-                        .deprecate("Use 'authority' instead.")
-                        .type(organisationType)
-                        .dataFetcher(environment -> (((Route) environment.getSource()).getAgency()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("publicCode")
@@ -2344,56 +2261,6 @@ public class TransmodelIndexGraphQLSchema {
                     .type(bookingArrangementType)
                     .dataFetcher(environment -> null)
                     .build())
-                .build();
-
-        organisationType = GraphQLObjectType.newObject()
-                .name("Organisation")
-                .description("Deprecated! Replaced by authority and operator.")
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("id")
-                        .description("Organisation id")
-                        .type(new GraphQLNonNull(Scalars.GraphQLID))
-                        .dataFetcher(environment -> ((Agency) environment.getSource()).getId())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("name")
-                        .type(new GraphQLNonNull(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("url")
-                        .type(Scalars.GraphQLString)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("timezone")
-                        .type(new GraphQLNonNull(Scalars.GraphQLString))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lang")
-                        .type(Scalars.GraphQLString)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("phone")
-                        .type(Scalars.GraphQLString)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("fareUrl")
-                        .type(Scalars.GraphQLString)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("lines")
-                        .type(new GraphQLNonNull(new GraphQLList(lineType)))
-                        .dataFetcher(environment -> getRoutingService(environment).getAllRoutes()
-                                .stream()
-                                .filter(route -> route.getAgency() == environment.getSource())
-                                .collect(Collectors.toList()))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("situations")
-                        .description("Get all situations active for the organisation.")
-                        .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                    .dataFetcher(environment -> getRoutingService(environment).getSiriAlertPatchService().getAgencyPatches(
-                        ((Agency)environment.getSource()).getId()))
-                        .build())
                 .build();
 
         authorityType = GraphQLObjectType.newObject()
@@ -3070,25 +2937,6 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAllOperators()))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("organisation")
-                        .deprecate("Use 'authority' instead.")
-                        .type(organisationType)
-                        .argument(GraphQLArgument.newArgument()
-                                .name("id")
-                                .type(new GraphQLNonNull(Scalars.GraphQLString))
-                                .build())
-                        .dataFetcher(environment ->
-                                getRoutingService(environment).getAgencyForId(
-                                        mappingUtil.fromIdString(environment.getArgument("id"))
-                                ))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("organisations")
-                        .deprecate("Use 'authorities' instead.")
-                        .type(new GraphQLNonNull(new GraphQLList(organisationType)))
-                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getAgencies()))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("line")
                         .description("Get a single line based on its id")
                         .type(lineType)
@@ -3228,11 +3076,25 @@ public class TransmodelIndexGraphQLSchema {
                         })
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("bikeRentalStations")
-                        .description("Get a single bike rental station based on its id")
-                        .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
-                        .dataFetcher(environment -> new ArrayList<>(getRoutingService(environment).getBikerentalStationService().getBikeRentalStations()))
+                    .name("bikeRentalStations")
+                    .description("Get all bike rental stations")
+                    .argument(GraphQLArgument.newArgument()
+                        .name("ids")
+                        .type(new GraphQLList(Scalars.GraphQLString))
                         .build())
+                    .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
+                    .dataFetcher(environment -> {
+                        Collection<BikeRentalStation> all =
+                            new ArrayList<>(getRoutingService(environment)
+                                .getBikerentalStationService()
+                                .getBikeRentalStations());
+                        List<String> filterByIds = environment.getArgument("ids");
+                        if (!CollectionUtils.isEmpty(filterByIds)) {
+                            return all.stream().filter(station -> filterByIds.contains(station.id)).collect(Collectors.toList());
+                        }
+                        return all;
+                    })
+                .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("bikeRentalStation")
                         .description("Get all bike rental stations")
@@ -3369,6 +3231,12 @@ public class TransmodelIndexGraphQLSchema {
                             return alerts;
                         })
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("serverInfo")
+                    .description("Get OTP server information")
+                    .type(new GraphQLNonNull(serverInfoType))
+                    .dataFetcher(e -> MavenVersion.VERSION)
+                    .build())
                 .build();
 
         Set<GraphQLType> dictionary = new HashSet<>();
@@ -3681,20 +3549,6 @@ public class TransmodelIndexGraphQLSchema {
                 .name("Leg")
                 .description("Part of a trip pattern. Either a ride on a public transport vehicle or access or path link to/from/between places")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("startTime")
-                        .description("The date and time this leg begins.")
-                        .deprecate("Replaced with expectedStartTime")
-                        .type(dateTimeScalar)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).startTime.getTime().getTime())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("endTime")
-                        .description("The date and time this leg ends.")
-                        .deprecate("Replaced with expectedEndTime")
-                        .type(dateTimeScalar)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).endTime.getTime().getTime())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("aimedStartTime")
                         .description("The aimed date and time this leg starts.")
                         .type(dateTimeScalar)
@@ -3771,20 +3625,6 @@ public class TransmodelIndexGraphQLSchema {
                                         .getTripForId().get(tripId).getOperator();
                                 }
                         )
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("organisation")
-                        .description("For ride legs, the transit organisation that operates the service used for this legs. For non-ride legs, null.")
-                        .deprecate("Use 'authority' instead.")
-                        .type(organisationType)
-                        .dataFetcher(environment -> getAgency(((Leg) environment.getSource()).agencyId, getRoutingService(environment)))
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("realTime")
-                        .description("Whether there is real-time data about this leg")
-                        .type(Scalars.GraphQLBoolean)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).realTime)
-                        .deprecate("Should not be camelCase. Use realtime instead.")
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtime")
