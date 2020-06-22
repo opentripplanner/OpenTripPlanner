@@ -29,7 +29,6 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 
-import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -66,7 +65,7 @@ public class LegacyGraphQLQueryTypeImpl
   //TODO
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
-    return null;
+    return environment -> null;
   }
 
   @Override
@@ -133,19 +132,19 @@ public class LegacyGraphQLQueryTypeImpl
   //TODO
   @Override
   public DataFetcher<Object> stopsByRadius() {
-    return null;
+    return environment -> null;
   }
 
   //TODO
   @Override
   public DataFetcher<Object> nearest() {
-    return null;
+    return environment -> null;
   }
 
   //TODO
   @Override
   public DataFetcher<Object> departureRow() {
-    return null;
+    return environment -> null;
   }
 
   @Override
@@ -290,7 +289,7 @@ public class LegacyGraphQLQueryTypeImpl
   // TODO
   @Override
   public DataFetcher<Iterable<TripTimeShort>> cancelledTripTimes() {
-    return null;
+    return environment -> null;
   }
 
   @Override
@@ -313,13 +312,13 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<Object> cluster() {
-    return null;
+    return environment -> null;
   }
 
   //TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return null;
+    return environment -> null;
   }
 
   @Override

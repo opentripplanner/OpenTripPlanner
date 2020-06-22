@@ -38,7 +38,7 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
     //TODO:
     @Override
     public DataFetcher<String> state() {
-        return null;
+        return environment -> null;
     }
 
     @Override

@@ -25,9 +25,23 @@ class IntrospectionTypeWiring {
             .filter(isMethodPublic)
             .filter(isMethodReturnTypeDataFetcher)
             .collect(Collectors.toMap(Method::getName, method -> {
-              try { return (DataFetcher) method.invoke(instance); }
-              catch (IllegalAccessException | InvocationTargetException ignored) {}
-              return null;
+              try {
+                DataFetcher dataFetcher = (DataFetcher) method.invoke(instance);
+                if (dataFetcher == null) {
+                  throw new RuntimeException(String.format(
+                      "Data fetcher %s for type %s is null",
+                      method.getName(),
+                      clazz.getSimpleName()
+                  ));
+                }
+                return dataFetcher;
+              } catch (IllegalAccessException | InvocationTargetException error) {
+                throw new RuntimeException(String.format(
+                    "Data fetcher %s for type %s threw error",
+                    method.getName(),
+                    clazz.getSimpleName()
+                ), error);
+              }
             })))
         .build();
   }

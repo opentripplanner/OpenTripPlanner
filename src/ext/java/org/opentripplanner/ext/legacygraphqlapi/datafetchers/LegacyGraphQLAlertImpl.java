@@ -58,7 +58,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   }
 
   @Override
-  public DataFetcher<Stop> stop() {
+  public DataFetcher<Object> stop() {
     return environment -> getRoutingService(environment)
         .getStopForId(getSource(environment).getStop());
   }
@@ -94,7 +94,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   //TODO
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations() {
-    return null;
+    return environment -> null;
   }
 
   @Override
@@ -106,19 +106,19 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   //TODO
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations() {
-    return null;
+    return environment -> null;
   }
 
   //TODO
   @Override
   public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType> alertEffect() {
-    return null;
+    return environment -> null;
   }
 
   //TODO
   @Override
   public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> alertCause() {
-    return null;
+    return environment -> null;
   }
 
   @Override

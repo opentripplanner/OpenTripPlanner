@@ -39,7 +39,7 @@ public class LegacyGraphQLAPI {
   private final ObjectMapper deserializer = new ObjectMapper();
 
   public LegacyGraphQLAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
-    this.router = otpServer.getRouter(routerId);
+    this.router = otpServer.getRouter();
   }
 
   @POST
