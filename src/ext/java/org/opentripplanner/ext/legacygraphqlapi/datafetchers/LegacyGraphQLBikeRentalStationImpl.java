@@ -2,34 +2,40 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
+import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 
 public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLBikeRentalStation {
     @Override
     public DataFetcher<Relay.ResolvedGlobalId> id() {
-        return null;
+        return environment -> new Relay.ResolvedGlobalId(
+                "BikeRentalStation",
+                getSource(environment).id
+        );
     }
 
     @Override
     public DataFetcher<String> stationId() {
-        return null;
+        return environment -> getSource(environment).id;
     }
 
     @Override
     public DataFetcher<String> name() {
-        return null;
+        return environment -> getSource(environment).getName();
     }
 
     @Override
     public DataFetcher<Integer> bikesAvailable() {
-        return null;
+        return environment -> getSource(environment).bikesAvailable;
     }
 
     @Override
     public DataFetcher<Integer> spacesAvailable() {
-        return null;
+        return environment -> getSource(environment).spacesAvailable;
     }
 
+    //TODO:
     @Override
     public DataFetcher<String> state() {
         return null;
@@ -37,26 +43,30 @@ public class LegacyGraphQLBikeRentalStationImpl implements LegacyGraphQLDataFetc
 
     @Override
     public DataFetcher<Boolean> realtime() {
-        return null;
+        return environment -> getSource(environment).realTimeData;
     }
 
     @Override
     public DataFetcher<Boolean> allowDropoff() {
-        return null;
+        return environment -> getSource(environment).allowDropoff;
     }
 
     @Override
     public DataFetcher<Iterable<String>> networks() {
-        return null;
+        return environment -> getSource(environment).networks;
     }
 
     @Override
     public DataFetcher<Double> lon() {
-        return null;
+        return environment -> getSource(environment).x;
     }
 
     @Override
     public DataFetcher<Double> lat() {
-        return null;
+        return environment -> getSource(environment).y;
+    }
+
+    private BikeRentalStation getSource(DataFetchingEnvironment environment) {
+        return environment.getSource();
     }
 }
