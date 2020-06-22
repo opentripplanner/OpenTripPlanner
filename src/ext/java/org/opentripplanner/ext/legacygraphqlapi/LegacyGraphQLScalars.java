@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
 import graphql.language.StringValue;
-import graphql.schema.Coercing;
-import graphql.schema.GraphQLScalarType;
+import graphql.relay.Relay;
+import graphql.schema.*;
 
 public class LegacyGraphQLScalars {
 
@@ -26,6 +26,37 @@ public class LegacyGraphQLScalars {
         public String parseLiteral(Object input) {
           if (!(input instanceof StringValue)) { return null; }
           return ((StringValue) input).getValue();
+        }
+      })
+      .build();
+
+  public static GraphQLScalarType graphQLIDScalar = GraphQLScalarType
+      .newScalar()
+      .name("ID")
+      .coercing(new Coercing<Relay.ResolvedGlobalId, String>() {
+        @Override
+        public String serialize(Object dataFetcherResult) throws CoercingSerializeException {
+          if (dataFetcherResult instanceof Relay.ResolvedGlobalId) {
+            Relay.ResolvedGlobalId globalId = (Relay.ResolvedGlobalId) dataFetcherResult;
+            return new Relay().toGlobalId(globalId.getType(), globalId.getId());
+          }
+          throw new CoercingSerializeException("Unknown type " + dataFetcherResult.getClass().getSimpleName());
+        }
+
+        @Override
+        public Relay.ResolvedGlobalId parseValue(Object input) throws CoercingParseValueException {
+          if (input instanceof String) {
+            return new Relay().fromGlobalId((String) input);
+          }
+          throw new CoercingParseValueException("Unexpected type " + input.getClass().getSimpleName());
+        }
+
+        @Override
+        public Relay.ResolvedGlobalId parseLiteral(Object input) throws CoercingParseLiteralException {
+          if (input instanceof StringValue) {
+            return new Relay().fromGlobalId(((StringValue) input).getValue());
+          }
+          throw new CoercingParseLiteralException("Unexpected type " + input.getClass().getSimpleName());
         }
       })
       .build();
