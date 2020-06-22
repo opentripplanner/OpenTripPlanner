@@ -444,7 +444,6 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<LegacyGraphQLPickupDropoffType> dropoffType();
     public DataFetcher<Long> serviceDay();
     public DataFetcher<Trip> trip();
-    public DataFetcher<String> stopHeadsign();
     public DataFetcher<String> headsign();
   }
   

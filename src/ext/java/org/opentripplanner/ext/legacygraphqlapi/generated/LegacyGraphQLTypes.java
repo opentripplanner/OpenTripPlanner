@@ -406,8 +406,7 @@ public class LegacyGraphQLTypes {
     Safe("SAFE"),
     Flat("FLAT"),
     Greenways("GREENWAYS"),
-    Triangle("TRIANGLE"),
-    Transfers("TRANSFERS");
+    Triangle("TRIANGLE");
     
     public final String label;
      
@@ -430,17 +429,14 @@ public class LegacyGraphQLTypes {
   
   
   public static class LegacyGraphQLPatternTripsForDateArgs {
-    private String _serviceDay;
     private String _serviceDate;
   
     public LegacyGraphQLPatternTripsForDateArgs(Map<String, Object> args) {
       if (args != null) {
-        this._serviceDay = (String) args.get("serviceDay");
         this._serviceDate = (String) args.get("serviceDate");
       }
     }
   
-    public String getLegacyGraphQLServiceDay() { return this._serviceDay; }
     public String getLegacyGraphQLServiceDate() { return this._serviceDate; }
   }
   public enum LegacyGraphQLPickupDropoffType {
@@ -544,7 +540,6 @@ public class LegacyGraphQLTypes {
     private Double _minLon;
     private Double _maxLat;
     private Double _maxLon;
-    private String _agency;
     private Iterable<String> _feeds;
   
     public LegacyGraphQLQueryTypeStopsByBboxArgs(Map<String, Object> args) {
@@ -553,7 +548,6 @@ public class LegacyGraphQLTypes {
         this._minLon = (Double) args.get("minLon");
         this._maxLat = (Double) args.get("maxLat");
         this._maxLon = (Double) args.get("maxLon");
-        this._agency = (String) args.get("agency");
         this._feeds = (Iterable<String>) args.get("feeds");
       }
     }
@@ -562,14 +556,12 @@ public class LegacyGraphQLTypes {
     public Double getLegacyGraphQLMinLon() { return this._minLon; }
     public Double getLegacyGraphQLMaxLat() { return this._maxLat; }
     public Double getLegacyGraphQLMaxLon() { return this._maxLon; }
-    public String getLegacyGraphQLAgency() { return this._agency; }
     public Iterable<String> getLegacyGraphQLFeeds() { return this._feeds; }
   }
   public static class LegacyGraphQLQueryTypeStopsByRadiusArgs {
     private Double _lat;
     private Double _lon;
     private Integer _radius;
-    private String _agency;
     private Iterable<String> _feeds;
     private String _before;
     private String _after;
@@ -581,7 +573,6 @@ public class LegacyGraphQLTypes {
         this._lat = (Double) args.get("lat");
         this._lon = (Double) args.get("lon");
         this._radius = (Integer) args.get("radius");
-        this._agency = (String) args.get("agency");
         this._feeds = (Iterable<String>) args.get("feeds");
         this._before = (String) args.get("before");
         this._after = (String) args.get("after");
@@ -593,7 +584,6 @@ public class LegacyGraphQLTypes {
     public Double getLegacyGraphQLLat() { return this._lat; }
     public Double getLegacyGraphQLLon() { return this._lon; }
     public Integer getLegacyGraphQLRadius() { return this._radius; }
-    public String getLegacyGraphQLAgency() { return this._agency; }
     public Iterable<String> getLegacyGraphQLFeeds() { return this._feeds; }
     public String getLegacyGraphQLBefore() { return this._before; }
     public String getLegacyGraphQLAfter() { return this._after; }
@@ -698,7 +688,6 @@ public class LegacyGraphQLTypes {
     private Iterable<String> _ids;
     private Iterable<String> _feeds;
     private String _name;
-    private String _modes;
     private Iterable<LegacyGraphQLMode> _transportModes;
   
     public LegacyGraphQLQueryTypeRoutesArgs(Map<String, Object> args) {
@@ -706,7 +695,6 @@ public class LegacyGraphQLTypes {
         this._ids = (Iterable<String>) args.get("ids");
         this._feeds = (Iterable<String>) args.get("feeds");
         this._name = (String) args.get("name");
-        this._modes = (String) args.get("modes");
         if (args.get("transportModes") != null) {
           this._transportModes = ((List<String>) args.get("transportModes")).stream().map(LegacyGraphQLMode::valueOfLabel).collect(Collectors.toList());
         }
@@ -716,7 +704,6 @@ public class LegacyGraphQLTypes {
     public Iterable<String> getLegacyGraphQLIds() { return this._ids; }
     public Iterable<String> getLegacyGraphQLFeeds() { return this._feeds; }
     public String getLegacyGraphQLName() { return this._name; }
-    public String getLegacyGraphQLModes() { return this._modes; }
     public Iterable<LegacyGraphQLMode> getLegacyGraphQLTransportModes() { return this._transportModes; }
   }
   public static class LegacyGraphQLQueryTypeRouteArgs {
@@ -934,7 +921,6 @@ public class LegacyGraphQLTypes {
     private LegacyGraphQLInputBannedInput _banned;
     private Integer _transferPenalty;
     private Boolean _batch;
-    private String _modes;
     private Iterable<LegacyGraphQLTransportModeInput> _transportModes;
     private LegacyGraphQLInputModeWeightInput _modeWeight;
     private Boolean _allowBikeRental;
@@ -951,7 +937,6 @@ public class LegacyGraphQLTypes {
     private Boolean _ignoreRealtimeUpdates;
     private Boolean _disableRemainingWeightHeuristic;
     private String _locale;
-    private String _ticketTypes;
     private Iterable<String> _allowedTicketTypes;
     private Integer _heuristicStepsPerMainStep;
     private Boolean _compactLegsByReversedSearch;
@@ -996,7 +981,6 @@ public class LegacyGraphQLTypes {
         this._banned = new LegacyGraphQLInputBannedInput((Map<String, Object>) args.get("banned"));
         this._transferPenalty = (Integer) args.get("transferPenalty");
         this._batch = (Boolean) args.get("batch");
-        this._modes = (String) args.get("modes");
         if (args.get("transportModes") != null) {
           this._transportModes = ((List<Map<String, Object>>) args.get("transportModes")).stream().map(LegacyGraphQLTransportModeInput::new).collect(Collectors.toList());
         }
@@ -1015,7 +999,6 @@ public class LegacyGraphQLTypes {
         this._ignoreRealtimeUpdates = (Boolean) args.get("ignoreRealtimeUpdates");
         this._disableRemainingWeightHeuristic = (Boolean) args.get("disableRemainingWeightHeuristic");
         this._locale = (String) args.get("locale");
-        this._ticketTypes = (String) args.get("ticketTypes");
         this._allowedTicketTypes = (Iterable<String>) args.get("allowedTicketTypes");
         this._heuristicStepsPerMainStep = (Integer) args.get("heuristicStepsPerMainStep");
         this._compactLegsByReversedSearch = (Boolean) args.get("compactLegsByReversedSearch");
@@ -1054,7 +1037,6 @@ public class LegacyGraphQLTypes {
     public LegacyGraphQLInputBannedInput getLegacyGraphQLBanned() { return this._banned; }
     public Integer getLegacyGraphQLTransferPenalty() { return this._transferPenalty; }
     public Boolean getLegacyGraphQLBatch() { return this._batch; }
-    public String getLegacyGraphQLModes() { return this._modes; }
     public Iterable<LegacyGraphQLTransportModeInput> getLegacyGraphQLTransportModes() { return this._transportModes; }
     public LegacyGraphQLInputModeWeightInput getLegacyGraphQLModeWeight() { return this._modeWeight; }
     public Boolean getLegacyGraphQLAllowBikeRental() { return this._allowBikeRental; }
@@ -1071,7 +1053,6 @@ public class LegacyGraphQLTypes {
     public Boolean getLegacyGraphQLIgnoreRealtimeUpdates() { return this._ignoreRealtimeUpdates; }
     public Boolean getLegacyGraphQLDisableRemainingWeightHeuristic() { return this._disableRemainingWeightHeuristic; }
     public String getLegacyGraphQLLocale() { return this._locale; }
-    public String getLegacyGraphQLTicketTypes() { return this._ticketTypes; }
     public Iterable<String> getLegacyGraphQLAllowedTicketTypes() { return this._allowedTicketTypes; }
     public Integer getLegacyGraphQLHeuristicStepsPerMainStep() { return this._heuristicStepsPerMainStep; }
     public Boolean getLegacyGraphQLCompactLegsByReversedSearch() { return this._compactLegsByReversedSearch; }
@@ -1258,17 +1239,14 @@ public class LegacyGraphQLTypes {
     public String getLegacyGraphQLServiceDate() { return this._serviceDate; }
   }
   public static class LegacyGraphQLTripStoptimesForDateArgs {
-    private String _serviceDay;
     private String _serviceDate;
   
     public LegacyGraphQLTripStoptimesForDateArgs(Map<String, Object> args) {
       if (args != null) {
-        this._serviceDay = (String) args.get("serviceDay");
         this._serviceDate = (String) args.get("serviceDate");
       }
     }
   
-    public String getLegacyGraphQLServiceDay() { return this._serviceDay; }
     public String getLegacyGraphQLServiceDate() { return this._serviceDate; }
   }
   public enum LegacyGraphQLVertexType {

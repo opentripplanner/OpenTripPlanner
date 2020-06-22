@@ -875,11 +875,6 @@ enum OptimizeType {
     **TRIANGLE** optimization type can be used to set relative preferences of optimization factors. See argument `triangle`.
     """
     TRIANGLE
-
-    """
-    Deprecated, use argument `transferPenalty` to optimize for less transfers.
-    """
-    TRANSFERS
 }
 
 """Information about pagination in a connection."""
@@ -934,9 +929,6 @@ type Pattern implements Node {
 
     """Trips which run on this pattern on the specified date"""
     tripsForDate(
-        """Deprecated, please switch to serviceDate instead"""
-        serviceDay: String
-
         """Return trips of the pattern active on this date. Format: YYYYMMDD"""
         serviceDate: String
     ): [Trip!]
@@ -1158,9 +1150,6 @@ type QueryType {
         """Eastern bound of the bounding box"""
         maxLon: Float!
 
-        """Deprecated, use argument `feeds` instead"""
-        agency: String
-
         """List of feed ids from which stops are returned"""
         feeds: [String!]
     ): [Stop]
@@ -1183,9 +1172,6 @@ type QueryType {
         is walking distance along streets and paths rather than a geographic distance.
         """
         radius: Int!
-
-        """Deprecated, use argument `feeds` instead"""
-        agency: String
 
         """List of feed ids from which stops are returned"""
         feeds: [String!]
@@ -1275,9 +1261,6 @@ type QueryType {
 
         """Query routes by this name"""
         name: String
-
-        """Deprecated, use argument `transportModes` instead."""
-        modes: String
 
         """Only include routes, which use one of these modes"""
         transportModes: [Mode]
@@ -1641,12 +1624,6 @@ type QueryType {
         batch: Boolean
 
         """
-        Deprecated, use `transportModes` instead.
-        ~~The set of TraverseModes that a user is willing to use. Default value: WALK | TRANSIT.~~
-        """
-        modes: String
-
-        """
         List of transportation modes that the user is willing to use. Default: `["WALK","TRANSIT"]`
         """
         transportModes: [TransportMode]
@@ -1743,12 +1720,6 @@ type QueryType {
         translations, it is sometimes possible that returned text uses a mixture of two languages.
         """
         locale: String
-
-        """
-        **Deprecated:** Use `allowedTicketTypes` instead.
-        A comma-separated list of allowed ticket types.
-        """
-        ticketTypes: String
 
         """
         List of ticket types that are allowed to be used in itineraries.
@@ -2158,7 +2129,6 @@ type Stoptime {
 
     """Trip which this stoptime is for"""
     trip: Trip
-    stopHeadsign: String @deprecated(reason: "Use headsign instead, will be removed in the future")
 
     """
     Vehicle headsign of the trip on this stop. Trip headsigns can change during
@@ -2291,9 +2261,6 @@ type Trip implements Node {
         serviceDate: String
     ): Stoptime
     stoptimesForDate(
-        """Deprecated, please switch to serviceDate instead"""
-        serviceDay: String
-
         """Date for which stoptimes are returned. Format: YYYYMMDD"""
         serviceDate: String
     ): [Stoptime]
