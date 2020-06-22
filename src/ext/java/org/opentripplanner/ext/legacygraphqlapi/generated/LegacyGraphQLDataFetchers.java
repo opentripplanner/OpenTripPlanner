@@ -26,7 +26,6 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -60,7 +59,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Agency> agency();
     public DataFetcher<Route> route();
     public DataFetcher<Trip> trip();
-    public DataFetcher<Stop> stop();
+    public DataFetcher<Object> stop();
     public DataFetcher<Iterable<TripPattern>> patterns();
     public DataFetcher<String> alertHeaderText();
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations();
@@ -120,7 +119,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> name();
     public DataFetcher<Double> lat();
     public DataFetcher<Double> lon();
-    public DataFetcher<Iterable<Stop>> stops();
+    public DataFetcher<Iterable<Object>> stops();
   }
   
   public interface LegacyGraphQLCoordinates {
@@ -143,7 +142,7 @@ public class LegacyGraphQLDataFetchers {
    */
   public interface LegacyGraphQLDepartureRow {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
-    public DataFetcher<Stop> stop();
+    public DataFetcher<Object> stop();
     public DataFetcher<Double> lat();
     public DataFetcher<Double> lon();
     public DataFetcher<TripPattern> pattern();
@@ -213,7 +212,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Route> route();
     public DataFetcher<Trip> trip();
     public DataFetcher<String> serviceDate();
-    public DataFetcher<Iterable<Stop>> intermediateStops();
+    public DataFetcher<Iterable<Object>> intermediateStops();
     public DataFetcher<Iterable<Object>> intermediatePlaces();
     public DataFetcher<Boolean> intermediatePlace();
     public DataFetcher<Iterable<WalkStep>> steps();
@@ -246,7 +245,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> headsign();
     public DataFetcher<Iterable<Trip>> trips();
     public DataFetcher<Iterable<Trip>> tripsForDate();
-    public DataFetcher<Iterable<Stop>> stops();
+    public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Coordinate>> geometry();
     public DataFetcher<EncodedPolylineBean> patternGeometry();
     public DataFetcher<String> semanticHash();
@@ -260,7 +259,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> lon();
     public DataFetcher<Long> arrivalTime();
     public DataFetcher<Long> departureTime();
-    public DataFetcher<Stop> stop();
+    public DataFetcher<Object> stop();
     public DataFetcher<BikeRentalStation> bikeRentalStation();
     public DataFetcher<BikePark> bikePark();
     public DataFetcher<Object> carPark();
@@ -307,14 +306,14 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Iterable<FareRuleSet>> ticketTypes();
     public DataFetcher<Agency> agency();
-    public DataFetcher<Iterable<Stop>> stops();
-    public DataFetcher<Iterable<Stop>> stopsByBbox();
+    public DataFetcher<Iterable<Object>> stops();
+    public DataFetcher<Iterable<Object>> stopsByBbox();
     public DataFetcher<Object> stopsByRadius();
     public DataFetcher<Object> nearest();
     public DataFetcher<Object> departureRow();
-    public DataFetcher<Stop> stop();
-    public DataFetcher<Stop> station();
-    public DataFetcher<Iterable<Stop>> stations();
+    public DataFetcher<Object> stop();
+    public DataFetcher<Object> station();
+    public DataFetcher<Iterable<Object>> stations();
     public DataFetcher<Iterable<Route>> routes();
     public DataFetcher<Route> route();
     public DataFetcher<Iterable<Trip>> trips();
@@ -358,7 +357,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> textColor();
     public DataFetcher<LegacyGraphQLBikesAllowed> bikesAllowed();
     public DataFetcher<Iterable<TripPattern>> patterns();
-    public DataFetcher<Iterable<Stop>> stops();
+    public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Trip>> trips();
     public DataFetcher<Iterable<AlertPatch>> alerts();
   }
@@ -393,7 +392,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> zoneId();
     public DataFetcher<String> url();
     public DataFetcher<Object> locationType();
-    public DataFetcher<Stop> parentStation();
+    public DataFetcher<Object> parentStation();
     public DataFetcher<Object> wheelchairBoarding();
     public DataFetcher<String> direction();
     public DataFetcher<String> timezone();
@@ -401,7 +400,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<LegacyGraphQLMode> vehicleMode();
     public DataFetcher<String> platformCode();
     public DataFetcher<Object> cluster();
-    public DataFetcher<Iterable<Stop>> stops();
+    public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Route>> routes();
     public DataFetcher<Iterable<TripPattern>> patterns();
     public DataFetcher<Iterable<StopAtDistance>> transfers();
@@ -413,7 +412,7 @@ public class LegacyGraphQLDataFetchers {
   
   public interface LegacyGraphQLStopAtDistance {
     public DataFetcher<graphql.relay.Relay.ResolvedGlobalId> id();
-    public DataFetcher<Stop> stop();
+    public DataFetcher<Object> stop();
     public DataFetcher<Integer> distance();
   }
   
@@ -431,7 +430,7 @@ public class LegacyGraphQLDataFetchers {
   
   /** Stoptime represents the time when a specific trip arrives to or departs from a specific stop. */
   public interface LegacyGraphQLStoptime {
-    public DataFetcher<Stop> stop();
+    public DataFetcher<Object> stop();
     public DataFetcher<Integer> scheduledArrival();
     public DataFetcher<Integer> realtimeArrival();
     public DataFetcher<Integer> arrivalDelay();
@@ -486,7 +485,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Object> wheelchairAccessible();
     public DataFetcher<LegacyGraphQLBikesAllowed> bikesAllowed();
     public DataFetcher<TripPattern> pattern();
-    public DataFetcher<Iterable<Stop>> stops();
+    public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<String> semanticHash();
     public DataFetcher<Iterable<TripTimeShort>> stoptimes();
     public DataFetcher<TripTimeShort> departureStoptime();

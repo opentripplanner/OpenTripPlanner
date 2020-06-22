@@ -37,6 +37,7 @@ import java.util.stream.StreamSupport;
 public class LegacyGraphQLQueryTypeImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
 
+  //TODO
   @Override
   public DataFetcher<Object> node() {
     return environment -> {
@@ -60,6 +61,7 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> getRoutingService(environment).getAgencies();
   }
 
+  //TODO
   @Override
   public DataFetcher<Iterable<FareRuleSet>> ticketTypes() {
     return null;
@@ -75,7 +77,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<Stop>> stops() {
+  public DataFetcher<Iterable<Object>> stops() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsArgs(environment.getArguments());
 
@@ -104,7 +106,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<Stop>> stopsByBbox() {
+  public DataFetcher<Iterable<Object>> stopsByBbox() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByBboxArgs(environment.getArguments());
 
@@ -138,13 +140,14 @@ public class LegacyGraphQLQueryTypeImpl
     return null;
   }
 
+  //TODO
   @Override
   public DataFetcher<Object> departureRow() {
     return null;
   }
 
   @Override
-  public DataFetcher<Stop> stop() {
+  public DataFetcher<Object> stop() {
     return environment -> getRoutingService(environment)
         .getStopForId(FeedScopedId.parseId(
             new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopArgs(environment.getArguments())
@@ -152,7 +155,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Station> station() {
+  public DataFetcher<Object> station() {
     return environment -> getRoutingService(environment)
         .getStationById(FeedScopedId.parseId(
             new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStationArgs(environment.getArguments())
@@ -160,7 +163,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<Stop>> stations() {
+  public DataFetcher<Iterable<Object>> stations() {
     return null;
   }
 
