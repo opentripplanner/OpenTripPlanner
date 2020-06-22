@@ -8,13 +8,13 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
+import graphql.relay.Relay;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
 import graphql.schema.idl.SchemaParser;
 import graphql.schema.idl.TypeDefinitionRegistry;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLAgencyImpl;
-import org.opentripplanner.ext.legacygraphqlapi.datafetchers.LegacyGraphQLQueryTypeImpl;
+import org.opentripplanner.ext.legacygraphqlapi.datafetchers.*;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -49,12 +49,17 @@ class LegacyGraphQLIndex {
       RuntimeWiring runtimeWiring = RuntimeWiring
           .newRuntimeWiring()
           .scalar(LegacyGraphQLScalars.polylineScalar)
+          .scalar(LegacyGraphQLScalars.graphQLIDScalar)
           //TODO
           .type("Node", type -> type.typeResolver(node -> null))
           //TODO
           .type("PlaceInterface", type -> type.typeResolver(node -> null))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAgencyImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLAlertImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeParkImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeRentalStationImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLQueryTypeImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLServiceTimeRangeImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
