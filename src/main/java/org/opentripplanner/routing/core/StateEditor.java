@@ -393,28 +393,32 @@ public class StateEditor {
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
         child.distanceTraversedInCurrentVehicle = 0;
-        incrementWeight(vehicleDescription.getRentTimeInSeconds() * child.getOptions().rentingReluctance);
-        incrementTimeInSeconds(vehicleDescription.getRentTimeInSeconds());
+        int rentingTime = child.getOptions().routingDelays.getRentingTime(vehicleDescription);
+        incrementWeight(rentingTime * child.getOptions().routingReluctances.getRentingReluctance());
+        incrementTimeInSeconds(rentingTime);
     }
 
     public void doneVehicleRenting() {
         cloneStateDataAsNeeded();
-        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
-        incrementWeight(child.stateData.currentVehicle.getDropoffTimeInSeconds() * child.getOptions().rentingReluctance);
+        int droppingTime = child.getOptions().routingDelays.getDropoffTime(child.getCurrentVehicle());
+        incrementTimeInSeconds(droppingTime);
+        incrementWeight(droppingTime * child.getOptions().routingReluctances.getRentingReluctance());
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
 
     public void reversedDoneVehicleRenting(VehicleDescription vehicleDescription) {
         cloneStateDataAsNeeded();
+        int droppingTime = child.getOptions().routingDelays.getDropoffTime(child.getCurrentVehicle());
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
-        incrementTimeInSeconds(child.stateData.currentVehicle.getDropoffTimeInSeconds());
+        incrementTimeInSeconds(droppingTime);
     }
 
     public void reversedBeginVehicleRenting() {
         cloneStateDataAsNeeded();
-        incrementTimeInSeconds(child.stateData.currentVehicle.getRentTimeInSeconds());
+        int rentingTime = child.getOptions().routingDelays.getRentingTime(child.stateData.currentVehicle);
+        incrementTimeInSeconds(rentingTime);
         child.stateData.currentTraverseMode = TraverseMode.WALK;
         child.stateData.currentVehicle = null;
     }
@@ -618,7 +622,7 @@ public class StateEditor {
         return child.usedNotRecommendedRoute;
     }
 
-    private void incrementDistanceInCurrentVehicle (double distanceInMeters){
+    private void incrementDistanceInCurrentVehicle(double distanceInMeters) {
         if (child.getCurrentVehicle() != null)
             child.distanceTraversedInCurrentVehicle += distanceInMeters;
     }

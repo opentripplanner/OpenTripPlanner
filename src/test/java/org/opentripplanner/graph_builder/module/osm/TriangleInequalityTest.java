@@ -1,11 +1,5 @@
 package org.opentripplanner.graph_builder.module.osm;
 
-import static org.junit.Assert.*;
-
-import java.io.File;
-import java.util.HashMap;
-import java.net.URLDecoder;
-
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -21,6 +15,12 @@ import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+
+import java.io.File;
+import java.net.URLDecoder;
+import java.util.HashMap;
+
+import static org.junit.Assert.*;
 
 public class TriangleInequalityTest {
     
@@ -78,7 +78,7 @@ public class TriangleInequalityTest {
         
         // All reluctance terms are 1.0 so that duration is monotonically increasing in weight.
         prototypeOptions.stairsReluctance = (1.0);
-        prototypeOptions.setWalkReluctance(1.0);
+        prototypeOptions.routingReluctances.setWalkReluctance(1.0);
         prototypeOptions.turnReluctance = (1.0);
         prototypeOptions.carSpeed = 1.0;
         prototypeOptions.walkSpeed = 1.0;

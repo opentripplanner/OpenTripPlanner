@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.edgetype;
 
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -8,7 +9,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.ParkAndRideVertex;
 
-import org.locationtech.jts.geom.LineString;
 import java.util.Locale;
 
 /**
@@ -47,7 +47,7 @@ public class ParkAndRideEdge extends Edge {
                 throw new IllegalStateException("Stolen car?");
             }
             StateEditor s1 = s0.edit(this);
-            int time = request.carDropoffTime;
+            int time = request.routingDelays.getCarDropoffTime();
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(false);
@@ -64,7 +64,7 @@ public class ParkAndRideEdge extends Edge {
                 throw new IllegalStateException("Can't drive 2 cars");
             }
             StateEditor s1 = s0.edit(this);
-            int time = request.carDropoffTime;
+            int time = request.routingDelays.getCarDropoffTime();
             s1.incrementWeight(time);
             s1.incrementTimeInSeconds(time);
             s1.setCarParked(true);

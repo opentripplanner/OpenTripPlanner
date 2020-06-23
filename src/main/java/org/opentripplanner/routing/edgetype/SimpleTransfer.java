@@ -58,7 +58,7 @@ public class SimpleTransfer extends Edge {
         se.setBackMode(TraverseMode.WALK);
         int time = (int) Math.ceil(distance / walkspeed) + 2 * StreetTransitLink.STL_TRAVERSE_COST;
         se.incrementTimeInSeconds(time);
-        se.incrementWeight(time * rr.getModeVehicleReluctance(s0.getCurrentVehicleType(), s0.getNonTransitMode()));
+        se.incrementWeight(time * rr.routingReluctances.getModeVehicleReluctance(s0.getCurrentVehicleType(), s0.getNonTransitMode()));
         se.incrementWalkDistanceInMeters(distance);
         return se.makeState();
     }
@@ -77,7 +77,7 @@ public class SimpleTransfer extends Edge {
     @Override
     public double weightLowerBound(RoutingRequest rr) {
         int time = (int) (distance / rr.walkSpeed);
-        return (time * rr.getModeVehicleReluctance(null, TraverseMode.WALK));
+        return (time * rr.routingReluctances.getModeVehicleReluctance(null, TraverseMode.WALK));
     }
 
     @Override

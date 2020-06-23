@@ -1,20 +1,18 @@
 package org.opentripplanner.routing.edgetype;
 
 import junit.framework.TestCase;
-
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.util.SlopeCosts;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
-
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.GeometryFactory;
-import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.util.NonLocalizedString;
 
 public class TestTriangle extends TestCase {
@@ -51,7 +49,7 @@ public class TestTriangle extends TestCase {
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
         options.optimize = OptimizeType.TRIANGLE;
         options.bikeSpeed = 6.0;
-        options.walkReluctance = 1;
+        options.routingReluctances.setWalkReluctance(1);
 
         options.setTriangleSafetyFactor(0);
         options.setTriangleSlopeFactor(0);

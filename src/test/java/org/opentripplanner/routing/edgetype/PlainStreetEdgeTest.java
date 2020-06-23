@@ -1,10 +1,10 @@
 package org.opentripplanner.routing.edgetype;
 
-import static org.junit.Assert.*;
-
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.core.RoutingRequest;
@@ -17,8 +17,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.LineString;
+import static org.junit.Assert.*;
 
 public class PlainStreetEdgeTest {
 
@@ -39,7 +38,7 @@ public class PlainStreetEdgeTest {
         proto.carSpeed = 15.0f;
         proto.walkSpeed = 1.0;
         proto.bikeSpeed = 5.0f;
-        proto.setWalkReluctance(1.0);
+        proto.routingReluctances.setWalkReluctance(1.0);
         proto.stairsReluctance = (1.0);
         proto.turnReluctance = (1.0);
         proto.setModes(TraverseModeSet.allModes());

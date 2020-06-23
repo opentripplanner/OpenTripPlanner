@@ -1,13 +1,14 @@
 package org.opentripplanner.routing.core;
 
 import com.google.common.base.Objects;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.routing.core.routing_parametrizations.RoutingDelays;
+import org.opentripplanner.routing.core.routing_parametrizations.RoutingReluctances;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleValidator;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -190,23 +191,9 @@ public class RoutingRequest implements Cloneable, Serializable {
     public int transferPenalty = 0;
 
     /**
-     * A multiplier for how bad walking is, compared to being in transit for equal lengths of time.
-     * Defaults to 2. Empirically, values between 10 and 20 seem to correspond well to the concept
-     * of not wanting to walk too much without asking for totally ridiculous itineraries, but this
-     * observation should in no way be taken as scientific or definitive. Your mileage may vary.
-     */
-    public double walkReluctance = 2.5;
-
-    private double kickScooterReluctance = 1.5;
-    /**
      * Used instead of walk reluctance for stairs
      */
     public double stairsReluctance = 2.0;
-
-    /**
-     * How much we hate picking up a vehicle/dropping it off
-     */
-    public double rentingReluctance = 3.0;
 
     /**
      * Multiplicative factor on expected turning time.
@@ -277,29 +264,9 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public int bikeParkCost = 120;
 
-    /**
-     * Time to park a car in a park and ride, w/o taking into account driving and walking cost
-     * (time to park, switch off, pick your stuff, lock the car, etc...)
-     */
-    public int carDropoffTime = 120;
+    public RoutingDelays routingDelays;
 
-    /**
-     * How much worse is waiting for a transit vehicle than being on a transit vehicle, as a multiplier. The default value treats wait and on-vehicle
-     * time as the same.
-     * <p>
-     * It may be tempting to set this higher than walkReluctance (as studies often find this kind of preferences among
-     * riders) but the planner will take this literally and walk down a transit line to avoid waiting at a stop.
-     * This used to be set less than 1 (0.95) which would make waiting offboard preferable to waiting onboard in an
-     * interlined trip. That is also undesirable.
-     * <p>
-     * If we only tried the shortest possible transfer at each stop to neighboring stop patterns, this problem could disappear.
-     */
-    public double waitReluctance = 1.0;
-
-    /**
-     * How much less bad is waiting at the beginning of the trip (replaces waitReluctance on the first boarding)
-     */
-    public double waitAtBeginningFactor = 0.4;
+    public RoutingReluctances routingReluctances;
 
     /**
      * This prevents unnecessary transfers by adding a cost for boarding a vehicle.
@@ -744,6 +711,8 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Constructor for options; modes defaults to walk and transit
      */
     public RoutingRequest() {
+        routingDelays = new RoutingDelays();
+        routingReluctances = new RoutingReluctances();
         // http://en.wikipedia.org/wiki/Walking
         walkSpeed = 1.33; // 1.33 m/s ~ 3mph, avg. human speed
         bikeSpeed = 5; // 5 m/s, ~11 mph, a random bicycling speed
@@ -811,6 +780,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     public void setModes(TraverseModeSet modes) {
         this.modes = modes;
         if (modes.getBicycle()) {
+//            TODO decide if we want to keep this piece of logic. It might be totally redundant and obsolete.
             // This alternate routing request is used when we get off a bike to take a shortcut and are
             // walking alongside the bike. FIXME why are we only copying certain fields instead of cloning the request?
             bikeWalkingOptions = new RoutingRequest();
@@ -818,7 +788,7 @@ public class RoutingRequest implements Cloneable, Serializable {
             bikeWalkingOptions.maxWalkDistance = maxWalkDistance;
             bikeWalkingOptions.maxPreTransitTime = maxPreTransitTime;
             bikeWalkingOptions.walkSpeed = walkSpeed * 0.8; // walking bikes is slow
-            bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
+//            bikeWalkingOptions.walkReluctance = walkReluctance * 2.7; // and painful
             bikeWalkingOptions.optimize = optimize;
             bikeWalkingOptions.modes = modes.clone();
             bikeWalkingOptions.modes.setBicycle(false);
@@ -891,8 +861,10 @@ public class RoutingRequest implements Cloneable, Serializable {
     public IntersectionTraversalCostModel getIntersectionTraversalCostModel() {
         return traversalCostModel;
     }
-    
-    /** @return the maximum walk distance */
+
+    /**
+     * @return the maximum walk distance
+     */
     public double getMaxWalkDistance() {
         return maxWalkDistance;
     }
@@ -901,7 +873,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         return softWalkLimiting;
     }
 
-    public void setSoftWalkLimit(boolean softWalkLimitEnabled){
+    public void setSoftWalkLimit(boolean softWalkLimitEnabled) {
         this.softWalkLimiting = softWalkLimitEnabled;
     }
 
@@ -1187,15 +1159,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public double getModeVehicleReluctance(VehicleType vehicleType, TraverseMode traverseMode) {
-        if (traverseMode == TraverseMode.WALK) {
-            return walkReluctance;
-        } else if (vehicleType == VehicleType.KICKSCOOTER) {
-            return kickScooterReluctance;
-        } else {
-            return 1.;
-        }
-    }
 
     public void setRoutingContext(Graph graph) {
         setRoutingContext(graph, null);
@@ -1281,9 +1244,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 && maxPreTransitTime == other.maxPreTransitTime
                 && transferPenalty == other.transferPenalty
                 && maxSlope == other.maxSlope
-                && walkReluctance == other.walkReluctance
-                && waitReluctance == other.waitReluctance
-                && waitAtBeginningFactor == other.waitAtBeginningFactor
+                && routingReluctances.equals(other.routingReluctances)
+                && routingDelays.equals(other.routingDelays)
                 && walkBoardCost == other.walkBoardCost
                 && bikeBoardCost == other.bikeBoardCost
                 && bannedRoutes.equals(other.bannedRoutes)
@@ -1348,8 +1310,8 @@ public class RoutingRequest implements Cloneable, Serializable {
                 + optimize.hashCode() + new Double(maxWalkDistance).hashCode()
                 + new Double(maxTransferWalkDistance).hashCode()
                 + new Double(transferPenalty).hashCode() + new Double(maxSlope).hashCode()
-                + new Double(walkReluctance).hashCode() + new Double(waitReluctance).hashCode()
-                + new Double(waitAtBeginningFactor).hashCode() * 15485863
+                + routingReluctances.hashCode()
+                + routingDelays.hashCode() * 15485863
                 + walkBoardCost + bikeBoardCost + bannedRoutes.hashCode()
                 + bannedTrips.hashCode() * 1373 + transferSlack * 20996011
                 + (int) nonpreferredTransferPenalty + (int) transferPenalty * 163013803
@@ -1505,24 +1467,6 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setWalkReluctance(double walkReluctance) {
-        if (walkReluctance > 0) {
-            this.walkReluctance = walkReluctance;
-            // Do not set bikeWalkingOptions.walkReluctance here, because that needs a higher value.
-        }
-    }
-
-    public void setWaitReluctance(double waitReluctance) {
-        if (waitReluctance > 0) {
-            this.waitReluctance = waitReluctance;
-        }
-    }
-
-    public void setWaitAtBeginningFactor(double waitAtBeginningFactor) {
-        if (waitAtBeginningFactor > 0) {
-            this.waitAtBeginningFactor = waitAtBeginningFactor;
-        }
-    }
 
     public void banTrip(FeedScopedId trip) {
         bannedTrips.put(trip, BannedStopSet.ALL);
