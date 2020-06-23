@@ -45,7 +45,7 @@ public class RoutingDelays {
             case KICKSCOOTER:
                 return kickScooterDropoffTime;
             default:
-                return 0;
+                throw new IllegalArgumentException("Dropoff time is not specified for this vehicle type");
         }
     }
 
