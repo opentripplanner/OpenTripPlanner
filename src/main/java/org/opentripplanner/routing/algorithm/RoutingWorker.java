@@ -85,7 +85,7 @@ public class RoutingWorker {
             routingErrors.addAll(e.getRoutingErrors());
         }
 
-        this.debugOutput.foundPath();
+        this.debugOutput.finishedTransitRouter();
 
         // Filter itineraries
         long startTimeFiltering = System.currentTimeMillis();
@@ -124,22 +124,24 @@ public class RoutingWorker {
                 request.rctx.bannedRoutes,
                 request.walkSpeed
         );
-        LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
+        long tripPatternFilterTime = System.currentTimeMillis() - startTime;
+        this.debugOutput.transitRouterTimes.tripPatternFilterTime = tripPatternFilterTime;
+        LOG.debug("Filtering tripPatterns took {} ms", tripPatternFilterTime);
 
         /* Prepare access/egress transfers */
 
-        double startTimeAccessEgress = System.currentTimeMillis();
+        long startTimeAccessEgress = System.currentTimeMillis();
 
         Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
         Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
 
-        LOG.debug("Access/egress routing took {} ms",
-                System.currentTimeMillis() - startTimeAccessEgress
-        );
+        long accessEgressTime = System.currentTimeMillis() - startTimeAccessEgress;
+        this.debugOutput.transitRouterTimes.accessEgressTime = accessEgressTime;
+        LOG.debug("Access/egress routing took {} ms", accessEgressTime);
         verifyEgressAccess(accessTransfers, egressTransfers);
 
         // Prepare transit search
-        double startTimeRouting = System.currentTimeMillis();
+        long startTimeRouting = System.currentTimeMillis();
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
@@ -155,11 +157,13 @@ public class RoutingWorker {
 
         LOG.debug("Found {} transit itineraries", transitResponse.paths().size());
         LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
-        LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
+        long raptorSearchTime = System.currentTimeMillis() - startTimeRouting;
+        this.debugOutput.transitRouterTimes.raptorSearchTime = raptorSearchTime;
+        LOG.debug("Main routing took {} ms", raptorSearchTime);
 
         // Create itineraries
 
-        double startItineraries = System.currentTimeMillis();
+        long startItineraries = System.currentTimeMillis();
 
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 transitLayer,
@@ -192,9 +196,11 @@ public class RoutingWorker {
             filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
         }
 
+        long itineraryCreationTime = System.currentTimeMillis() - startItineraries;
+        this.debugOutput.transitRouterTimes.itineraryCreationTime = itineraryCreationTime;
         LOG.debug("Creating {} itineraries took {} ms",
                 itineraries.size(),
-                System.currentTimeMillis() - startItineraries
+                itineraryCreationTime
         );
 
         return itineraries;

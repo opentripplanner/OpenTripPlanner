@@ -24,6 +24,8 @@ public class DebugOutput {
     public long renderingTime;
     public long totalTime;
 
+    public TransitRouterTimes transitRouterTimes = new TransitRouterTimes();
+
     /**
      * Record the time when we first began calculating a path for this request. Note that timings will not
      * include network and server request queue overhead, which is what we want.
@@ -38,7 +40,7 @@ public class DebugOutput {
     }
 
     /** Record the time when we finished the tranist router search */
-    public void foundPath() {
+    public void finishedTransitRouter() {
         finishedTransitRouter = System.currentTimeMillis();
     }
 
@@ -60,5 +62,12 @@ public class DebugOutput {
         filteringTime = finishedFiltering - finishedTransitRouter;
         renderingTime = finishedRendering - finishedFiltering;
         totalTime = finishedRendering - startedCalculating;
+    }
+
+    public class TransitRouterTimes {
+        public long tripPatternFilterTime;
+        public long accessEgressTime;
+        public long raptorSearchTime;
+        public long itineraryCreationTime;
     }
 }
