@@ -22,7 +22,7 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
+import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;

@@ -17,6 +17,7 @@ import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.LoggerFactory;
@@ -72,8 +73,6 @@ public class Router {
         this.tileRendererManager = new TileRendererManager(this.graph);
         this.defaultRoutingRequest = routerConfig.routingRequestDefaults();
 
-        TransmodelAPI.setUp(routerConfig.transmodelApiHideFeedId(), graph.getAgencies());
-
         if (routerConfig.requestLogFile() != null) {
             this.requestLogger = createLogger(routerConfig.requestLogFile());
             LOG.info("Logging incoming requests at '{}'", routerConfig.requestLogFile());
@@ -110,6 +109,14 @@ public class Router {
             LOG.info("Computed ellipsoid/geoid offset at (" + lat + ", " + lon + ") as " + graph.ellipsoidToGeoidDifference);
         } catch (Exception e) {
             LOG.error("Error computing ellipsoid/geoid difference");
+        }
+
+        if(OTPFeature.SandboxAPITransmodelApi.isOn()) {
+            TransmodelAPI.setUp(
+                routerConfig.transmodelApiHideFeedId(),
+                graph,
+                defaultRoutingRequest
+            );
         }
     }
 

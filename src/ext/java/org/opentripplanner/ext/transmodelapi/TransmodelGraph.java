@@ -7,10 +7,7 @@ import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
 import graphql.schema.GraphQLSchema;
-import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,19 +22,19 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.stream.Collectors;
 
-class TransmodelGraphIndex {
+class TransmodelGraph {
 
-    static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphIndex.class);
+    static final Logger LOG = LoggerFactory.getLogger(TransmodelGraph.class);
 
     private final GraphQLSchema indexSchema;
 
     final ExecutorService threadPool;
 
-    TransmodelGraphIndex(Graph graph, RoutingRequest defaultRoutingRequest, TransmodelMappingUtil mappingUtil) {
-        threadPool = Executors.newCachedThreadPool(
+    TransmodelGraph(GraphQLSchema schema) {
+        this.threadPool = Executors.newCachedThreadPool(
                 new ThreadFactoryBuilder().setNameFormat("GraphQLExecutor-%d").build()
         );
-        indexSchema = new TransmodelIndexGraphQLSchema(graph, defaultRoutingRequest, mappingUtil).indexSchema;
+        this.indexSchema = schema;
     }
 
     HashMap<String, Object> getGraphQLExecutionResult(
@@ -109,5 +106,4 @@ class TransmodelGraphIndex {
             return response;
         }).collect(Collectors.toList());
     }
-
 }

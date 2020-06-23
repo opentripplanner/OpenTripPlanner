@@ -13,7 +13,7 @@
  * limitations under the Licence.
  */
 
-package org.opentripplanner.ext.transmodelapi.model.scalars;
+package org.opentripplanner.ext.transmodelapi.model.base.scalars;
 
 import graphql.language.ArrayValue;
 import graphql.language.FloatValue;
@@ -27,10 +27,10 @@ import java.util.List;
 public class GeoJSONCoordinatesScalar {
 
     public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
-        return GraphQLGeoJSONCoordinates;
+        return INSTANCE;
     }
 
-    private static GraphQLScalarType GraphQLGeoJSONCoordinates = new GraphQLScalarType("Coordinates", null, new Coercing() {
+    private final static GraphQLScalarType INSTANCE = new GraphQLScalarType("Coordinates", null, new Coercing() {
         @Override
         public List<List<Double>> serialize(Object input) {
             if (input instanceof Coordinate[]) {
