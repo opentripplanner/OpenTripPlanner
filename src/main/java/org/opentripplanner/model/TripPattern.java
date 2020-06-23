@@ -159,7 +159,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public void setHopGeometriesFromPattern(TripPattern other) {
         this.hopGeometries = new byte[this.getStops().size() - 1][];
-        for (int i = 0; i < other.getStops().size() - 1; i++) {
+
+        // Gets the size of the shortest of the two trip patterns
+        int sizeOfShortestPattern = Math.min(this.getStops().size(), other.getStops().size());
+
+        for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
             if (other.getHopGeometry(i) != null
                 && other.getStop(i).equals(this.getStop(i))
                 && other.getStop(i + 1).equals(this.getStop(i + 1))) {
