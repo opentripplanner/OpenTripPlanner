@@ -20,7 +20,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -396,7 +396,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Route>> routes();
     public DataFetcher<Iterable<TripPattern>> patterns();
-    public DataFetcher<Iterable<StopAtDistance>> transfers();
+    public DataFetcher<Iterable<StopFinder.StopAndDistance>> transfers();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
     public DataFetcher<Iterable<TripTimeShort>> stoptimesWithoutPatterns();
@@ -417,7 +417,7 @@ public class LegacyGraphQLDataFetchers {
   
   /** An edge in a connection. */
   public interface LegacyGraphQLStopAtDistanceEdge {
-    public DataFetcher<StopAtDistance> node();
+    public DataFetcher<StopFinder.StopAndDistance> node();
     public DataFetcher<String> cursor();
   }
   

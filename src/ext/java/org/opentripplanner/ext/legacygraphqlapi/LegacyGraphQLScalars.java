@@ -2,7 +2,11 @@ package org.opentripplanner.ext.legacygraphqlapi;
 
 import graphql.language.StringValue;
 import graphql.relay.Relay;
-import graphql.schema.*;
+import graphql.schema.Coercing;
+import graphql.schema.CoercingParseLiteralException;
+import graphql.schema.CoercingParseValueException;
+import graphql.schema.CoercingSerializeException;
+import graphql.schema.GraphQLScalarType;
 
 public class LegacyGraphQLScalars {
 

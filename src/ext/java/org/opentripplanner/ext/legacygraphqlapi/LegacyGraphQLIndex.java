@@ -8,7 +8,6 @@ import graphql.ExecutionResult;
 import graphql.GraphQL;
 import graphql.GraphQLError;
 import graphql.analysis.MaxQueryComplexityInstrumentation;
-import graphql.relay.Relay;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.idl.RuntimeWiring;
 import graphql.schema.idl.SchemaGenerator;
@@ -50,10 +49,8 @@ class LegacyGraphQLIndex {
           .newRuntimeWiring()
           .scalar(LegacyGraphQLScalars.polylineScalar)
           .scalar(LegacyGraphQLScalars.graphQLIDScalar)
-          //TODO
-          .type("Node", type -> type.typeResolver(node -> null))
-          //TODO
-          .type("PlaceInterface", type -> type.typeResolver(node -> null))
+          .type("Node", type -> type.typeResolver(new LegacyGraphQLNodeTypeResolver()))
+          .type("PlaceInterface", type -> type.typeResolver(new LegacyGraphQLPlaceInterfaceTypeResolver()))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAgencyImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAlertImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeParkImpl.class))

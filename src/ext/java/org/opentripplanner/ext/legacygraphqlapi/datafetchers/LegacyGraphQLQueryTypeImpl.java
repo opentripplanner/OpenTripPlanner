@@ -1,23 +1,30 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Sets;
-import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.ParameterException;
-import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.parameter.QualifiedMode;
 import org.opentripplanner.api.parameter.QualifiedModeSet;
-import org.opentripplanner.api.parameter.Qualifier;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
@@ -26,12 +33,15 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Date;
+import java.util.List;
+import java.util.Map;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -40,15 +50,65 @@ import java.util.stream.StreamSupport;
 public class LegacyGraphQLQueryTypeImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLQueryType {
 
-  //TODO
   @Override
   public DataFetcher<Object> node() {
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeNodeArgs(environment.getArguments());
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
+      RoutingService routingService = environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
 
-      return null;
+      switch (type) {
+        case "Agency":
+          return routingService.getAgencyForId(FeedScopedId.parseId(id));
+        case "Alert":
+          return null; //TODO
+        case "BikePark":
+          return routingService
+              .getBikerentalStationService()
+              .getBikeParks()
+              .stream()
+              .filter(bikePark -> bikePark.id.equals(id))
+              .findAny()
+              .orElse(null);
+        case "BikeRentalStation":
+          return routingService
+              .getBikerentalStationService()
+              .getBikeRentalStations()
+              .stream()
+              .filter(bikeRentalStation -> bikeRentalStation.id.equals(id))
+              .findAny()
+              .orElse(null);
+        case "CarPark":
+          return null; //TODO
+        case "Cluster":
+          return null; //TODO
+        case "DepartureRow":
+          return null; //TODO
+        case "Pattern":
+          return routingService.getTripPatternForId(FeedScopedId.parseId(id));
+        case "placeAtDistance":
+          return null; //TODO
+        case "Route":
+          return routingService.getRouteForId(FeedScopedId.parseId(id));
+        case "Stop":
+          return routingService.getStopForId(FeedScopedId.parseId(id));
+        case "Stoptime":
+          return null; //TODO
+        case "stopAtDistance":
+          String[] parts = id.split(";");
+          Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
+
+          new StopFinder.StopAndDistance(stop, Integer.parseInt(parts[0]));
+          //TODO fix type
+          return null;
+        case "TicketType":
+          return null; //TODO
+        case "Trip":
+          return routingService.getTripForId().get(FeedScopedId.parseId(id));
+        default:
+          return null;
+      }
     };
   }
 

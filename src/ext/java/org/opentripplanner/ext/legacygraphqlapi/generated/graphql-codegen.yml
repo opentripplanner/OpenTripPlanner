@@ -56,7 +56,7 @@ config:
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
     Stop: Object # Can be either Stop or Station
-    stopAtDistance: org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance#StopAtDistance
+    stopAtDistance: org.opentripplanner.routing.StopFinder#StopFinder.StopAndDistance
     stopAtDistanceConnection: Object
     stopAtDistanceEdge: Object
     Stoptime: org.opentripplanner.model.TripTimeShort#TripTimeShort

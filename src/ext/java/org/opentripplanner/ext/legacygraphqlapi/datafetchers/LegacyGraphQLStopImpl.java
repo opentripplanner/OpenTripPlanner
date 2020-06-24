@@ -7,13 +7,22 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
-import org.opentripplanner.model.*;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Station;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 import java.text.ParseException;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.List;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -157,13 +166,26 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   //TODO
   @Override
-  public DataFetcher<Iterable<NearbyStopFinder.StopAtDistance>> transfers() {
-    return environment -> null;
-    // getValue(
-    //     environment,
-    //     stop -> getRoutingService(environment).getTransfersByStop(stop).stream().filter().collect(),
-    //     station -> null
-    // )
+  public DataFetcher<Iterable<StopFinder.StopAndDistance>> transfers() {
+    return environment -> getValue(
+        environment,
+        stop -> {
+          Integer maxDistance = new LegacyGraphQLTypes
+              .LegacyGraphQLStopTransfersArgs(environment.getArguments())
+              .getLegacyGraphQLMaxDistance();
+
+          return getRoutingService(environment)
+              .getTransfersByStop(stop)
+              .stream()
+              .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
+              .map(transfer -> new StopFinder.StopAndDistance(
+                  transfer.to,
+                  (int) transfer.getDistanceMeters()
+              ))
+              .collect(Collectors.toList());
+        },
+        station -> null
+    );
   }
 
   @Override
