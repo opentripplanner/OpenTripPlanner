@@ -129,6 +129,12 @@ public class RoutingRequest implements Cloneable, Serializable {
     public double maxTransferWalkDistance = Double.MAX_VALUE;
 
     /**
+     * This is customized parameter for Connected-Journeys
+     * feel free if you want to delete it
+     */
+    public int maxWaitingTime = 2 * 60 * 60;
+
+    /**
      * The maximum time (in seconds) of pre-transit travel when using drive-to-transit (park and
      * ride or kiss and ride). By default limited to 30 minutes driving, because if it's unlimited on
      * large graphs the search becomes very slow.
