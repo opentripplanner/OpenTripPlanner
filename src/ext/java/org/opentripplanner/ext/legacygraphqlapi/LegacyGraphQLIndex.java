@@ -76,6 +76,11 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLServiceTimeRangeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStepImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLStopImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStopAtDistanceImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimeImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLStoptimesInPatternImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLTranslatedStringImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLTripImpl.class))
           .build();
       SchemaGenerator schemaGenerator = new SchemaGenerator();
       return schemaGenerator.makeExecutableSchema(typeRegistry, runtimeWiring);
