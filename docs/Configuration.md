@@ -1,6 +1,7 @@
 # Configuring OpenTripPlanner
 
 ## Base directory
+**TODO OTP2** - This need to be revised.
 
 The OTP *base directory* defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration,
 input files and storage directories
@@ -12,6 +13,7 @@ In these cases one should use the basePath switch when starting up OTP to overri
 `--basePath C:\Users\username\otp` in Windows.
 
 ## Routers
+**TODO OTP2** - No support for multiple routers any more.
 
 A single OTP instance can handle several regions independently. Each of these separate (but potentially geographically overlapping)
 services is called a *router* and is referred to by a short unique ID such as 'newyork' or 'paris'. Each router has its
@@ -479,7 +481,7 @@ such as:
 There is currently only one custom naming module called `portland` (which has no parameters).
 
 
-# Runtime router configuration
+# Router configuration
 
 This section covers all options that can be set for each router using the `router-config.json` file.
 These options can be applied by the OTP server without rebuilding the graph.
@@ -513,7 +515,43 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+## Tuning itinerary filtering
+Nested inside `routingDefaults {...}` in `router-config.json`.
+
+OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the returned itineraries.
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`debugItineraryFilter` | Enable this to attach a system notice to itineraries instead of removing them. Some filters are not configurable, byt will show up in the system-notice if debugging is enabled. | boolean | `false`
+`groupBySimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
+`groupBySimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+
+
+### Group-by-filters
+
+The group-by-filter is a bit complex, but should be simple to use. Set `debugItineraryFilter=true` 
+and experiment with `searchWindow` and the two group-by parameters(`debugItineraryFilter` and 
+`groupBySimilarityKeepNumOfItineraries`). 
+
+The group-by-filter work by grouping itineraries together and then reducing the number of 
+itineraries in each group, keeping the itinerary/itineraries with the best _generalized-cost_. The 
+group-by function first pick all transit legs that account for more than N% of the itinerary based 
+on distance traveled. This become the group-key. To keys are the same if all legs in one of the keys
+also exist in the other. Note, one key may have a lager set of legs than the other, but they can 
+still be the same. When comparing to legs we compare the `tripId` and make sure the legs overlap in
+place and time. Two legs are the same if both legs ride at least a common subsection of the same 
+trip. The `groupBySimilarityKeepOne` filter will keep ONE itinerary in each group. The 
+`groupBySimilarityKeepNumOfItineraries` is a bit more complex, because it uses the 
+`numOfItineraries` request parameter to estimate a maxLimit for each group. For example, if the 
+`numOfItineraries` is 5 elements and there is 3 groups, we set the _max-limit_ for each group
+to 2, returning between 4 and 6 elements depending on the distribution. The _max-limit_ can never 
+be less than 1.
+
+
 ## Routing modes
+
+TODO OTP2 - This need to be updated. Why is this even here, does it make sence to configure this and is it possible?
+          - Is this API documentation? Move to proper place.
 
 The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
 of routes.
@@ -662,71 +700,49 @@ Finally, for each itinerary returned to the user, there is a travel duration in 
 
 
 ## Tuning transit routing
+Nested inside `transit {...}` in `router-config.json`.
 
 Some of these parameters for tuning transit routing is only available through configuration and cannot be set in the routing request. These parameters work together with the default routing request and the actual routing request.
 
-### transit.maxNumberOfTransfers
-This parameter is used to allocate enough memory space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network.
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`maxNumberOfTransfers` | Use this parameter to allocate enough space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network. The memory overhead of setting this higher than the maximum number of transfers is very little so it is better to set it too high then to low. | int | `12`
+`scheduledTripBinarySearchThreshold` | The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent. | int | `50`
+`iterationDepartureStepInSeconds` | Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds. | int | `60`
+`searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
+`dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
+`stopTransferCost` | Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | object | `null`
 
-**Type:** `int`  **Default value:** 12
+### Tuning transit routing - Dynamic search window
+Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
 
-### transit.scheduledTripBinarySearchThreshold
-The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent.
-
-**Type:** `int`  **Default value:** 50
-
-### transit.iterationDepartureStepInSeconds
-Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds.
-
-**Type:** `int`  **Default value:** 60
-
-### transit.searchThreadPoolSize
-Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread.
-
-**Type:** `int`  **Default value:** 0
-
-### transit.dynamicSearchWindow
-The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
-
-#### transit.dynamicSearchWindow.minTripTimeCoefficient
-The coefficient to multiply with minimum travel time found using a heuristic search. This 
- value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give 
- ok results.
-
-**Type:** `double`  **Default value:** 0.3
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`minTripTimeCoefficient` | The coefficient to multiply with minimum travel time found using a heuristic search. This value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give ok results. | double | `0.75`
+`minWinTimeMinutes` | The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment. | int | `40`
+`maxWinTimeMinutes` | Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time. | int | `180` (3 hours)
+`stepMinutes` | The search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes. | int | `10`
+`` |  | int | ``
 
 
-#### transit.dynamicSearchWindow.minWinTimeMinutes
-The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment.
-**Type:** `int`  **Default value:** 40
 
-#### transit.dynamicSearchWindow.maxWinTimeMinutes
-Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time.
-
-**Type:** `int`  **Default value:** 180 (3 timer) 
-
-#### transit.dynamicSearchWindow.stepMinutes
-he search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.
-
-**Type:** `int`  **Default value:** 10 
-
-
-### transit.stopTransferCost.<TransferPriority>
-Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. 
+### Tuning transit routing - Stop transfer cost
+Nested inside `transit : { stopTransferCost : { ... } }` in `router-config.json`.
 
 This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
 
-If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops. 
 
-**Key type:** DISCOURAGED, ALLOWED, RECOMMENDED or PREFERRED 
+The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
 
-**Value Type:**  `int` 
+config key | description | value type 
+---------- | ----------- | ---------- 
+`DISCOURAGED` | Use a very high cost like `72 000` to eliminate transfers ath the stop if not the only option. | int
+`ALLOWED` | Allowed, but not recommended. Use something like `150`. | int 
+`RECOMMENDED` | Use a small cost penalty like `60`. | int
+`PREFERRED` | The best place to do transfers. Should be set to `0`(zero). | int 
 
-**Value Unit:** Scalar, equivalent to one second of transit. 
-
-**Value Range:** `[0 .. 100,000]`
-
-**All key/value pairs are required if specified.** 
+Use values in a range from `0` to `100 000`. **All key/value pairs are required if the `stopTransferCost` is listed.** 
 
 
 ### Transit example section from router-config.json
