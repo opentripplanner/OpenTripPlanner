@@ -88,42 +88,93 @@ This table lists the possible settings that can be defined in a `build-config.js
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
-`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
-`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
-`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
-`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
-`stopClusterMode` | Stop clusters can be built in one of two ways, either by geographical proximity and name, or according to a parent/child station topology, if it exists | enum | `proximity` | options: `proximity`, `parentStation`
-`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
-`streets` | Include street input files (OSM/PBF) | boolean | true | 
-`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
+`` |  TODO | boolean | false |
 `areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
-`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
-`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
-`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
-`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
-`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
-`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
-`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
-`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
-`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
-`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
-`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
-`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
-`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
-`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
 `banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
-`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
+`distanceBetweenElevationSamples` | TODO OTP2 | double | 10 |
+`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
+`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
+`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
+`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
+`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
+`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
+`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
+`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
+`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
+`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
+`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
+`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
+`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
+`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
+`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
+`streets` | Include street input files (OSM/PBF) | boolean | true | 
+`storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
+`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | Date or Period (ISO 8601) | `-P1Y` | `2020-01-01`, `-P1M3D`, `-P3W`
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | Date or Period (ISO 8601) | `P3Y` | `2022-12-31`, `P1Y6M10D`, `P12W`
+`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
+`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+
+
+## Storage
+Nested inside `storage {...}` in `build-config.json`.
+
+Using other data-sources than the local file system is new in OTP2. This allow for access to cloud 
+based storage as well as using local disk. If you run OTP in the cloud you might get faster start-up 
+and build times if you use the cloud storage instead of copying the files, it also simplefy the 
+deplyment. Nested `storage` build-config. 
+
+See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
+for up-to-date detailed description of each config parameter. Here is an overview:
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`gsCredentials` | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`. | string | `null`
+`graph` | Absolute path to the graph file. | URI | `null`
+`streetGraph` | Absolute path to the street-graph file. | URI | `null`
+`osm` | List of absolute paths of Open Street Map files to build. | URI array | `null`
+`dem` | List of absolute paths of Elevation DEM files to build. | URI array | `null`
+`gtfs` | List of GTFS transit data files to build. | URI array | `null`
+`netex` | List of NeTEx transit data files to build. | URI array | `null`
+`buildReportDir` | Path to directory for the build issue report generated by OTP. | URI | `null`
+`localFileNamePatterns` | Patterns to use for auto resolving local filenames to input data types. | object | `null`
+
+### Local Filename Patterns
+Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.json`.
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf|\.osm|\.osm\.xml)$` 
+`dem` | Pattern used to match Elevation DEM files on local disk | Regexp Pattern | `(?i)\.tiff?$` 
+`gtfs` | Pattern used to match GTFS files on local disk | Regexp Pattern | `(?i)gtfs` 
+`netex` | Pattern used to match NeTEx files on local disk | Regexp Pattern | `(?i)netex` 
+
+### Storage example:
+```
+storage : {
+  // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
+  gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
+  streetGraph: "file:///Users/kelvin/otp/streetGraph.obj",
+  osm: ["gs://bucket-name/shared-osm-file.pbf"]
+  localFileNamePatterns: {
+    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
+    gtfs : "^g-.*\.zip$", 
+  }
+}
+```
+
 
 ## Limit the transit service period
 
