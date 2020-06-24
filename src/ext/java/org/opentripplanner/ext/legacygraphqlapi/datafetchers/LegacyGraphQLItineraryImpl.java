@@ -53,7 +53,7 @@ public class LegacyGraphQLItineraryImpl
   @Override
   public DataFetcher<Iterable<Map<String, Object>>> fares() {
     return environment -> {
-      Fare fare = ((Itinerary) environment.getSource()).fare;
+      Fare fare = getSource(environment).fare;
       if (fare == null) {
         return null;
       }

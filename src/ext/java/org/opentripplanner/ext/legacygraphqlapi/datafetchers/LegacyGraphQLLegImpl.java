@@ -87,13 +87,19 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<Place> from() {
-    return environment -> getSource(environment).from;
+  public DataFetcher<StopArrival> from() {
+    return environment -> {
+      Leg source = getSource(environment);
+      return new StopArrival(source.from, source.startTime, source.startTime);
+    };
   }
 
   @Override
-  public DataFetcher<Place> to() {
-    return environment -> getSource(environment).to;
+  public DataFetcher<StopArrival> to() {
+    return environment -> {
+      Leg source = getSource(environment);
+      return new StopArrival(source.to, source.endTime, source.endTime);
+    };
   }
 
   @Override
@@ -128,12 +134,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<Iterable<Place>> intermediatePlaces() {
-    return environment -> {
-      List<StopArrival> intermediateStops = getSource(environment).intermediateStops;
-      if (intermediateStops == null) return null;
-      return intermediateStops.stream().map(stopArrival -> stopArrival.place).collect(Collectors.toList());
-    };
+  public DataFetcher<Iterable<StopArrival>> intermediatePlaces() {
+    return environment -> getSource(environment).intermediateStops;
   }
 
   // TODO

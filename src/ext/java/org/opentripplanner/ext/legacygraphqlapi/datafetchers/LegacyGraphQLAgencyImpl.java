@@ -63,7 +63,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
     return environment -> getRoutingService(environment)
         .getAllRoutes()
         .stream()
-        .filter(route -> route.getAgency().equals(environment.getSource()))
+        .filter(route -> route.getAgency().equals(getSource(environment)))
         .collect(Collectors.toList());
   }
 
