@@ -6,6 +6,7 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupByLegDistanceFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDepartureTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.MaxWaitingTimeFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.ReduceTimeTableVariationFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
@@ -36,7 +37,7 @@ public class ItineraryFilterChainBuilder {
     private int shortTransitSlackInSeconds = NOT_SET;
     private boolean debug;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
-
+    private int maxWaitingTime = NOT_SET;
 
     /** @param arriveBy Used to set the correct sort order.  */
     public ItineraryFilterChainBuilder(boolean arriveBy) {
@@ -150,6 +151,10 @@ public class ItineraryFilterChainBuilder {
             filters.add(new ReduceTimeTableVariationFilter(shortTransitSlackInSeconds));
         }
 
+        if(maxWaitingTime >0){
+            filters.add(new MaxWaitingTimeFilter("max-waitingtime-filter",maxWaitingTime));
+        }
+
         filters.add(new GroupByLegDistanceFilter(groupByP, minLimit, arriveBy));
 
         if (latestDepartureTimeLimit != null) {
@@ -177,5 +182,9 @@ public class ItineraryFilterChainBuilder {
     private List<ItineraryFilter> addDebugWrappers(List<ItineraryFilter> filters) {
         final DebugFilterWrapper.Factory factory = new DebugFilterWrapper.Factory();
         return filters.stream().map(factory::wrap).collect(Collectors.toList());
+    }
+
+    public void setMaxWaitingTime(int maxWaitingTime) {
+        this.maxWaitingTime = maxWaitingTime;
     }
 }

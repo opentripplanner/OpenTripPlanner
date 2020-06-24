@@ -1,7 +1,5 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Comparator;
-import java.util.stream.Collectors;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
@@ -203,6 +201,7 @@ public class RoutingWorker {
         builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
         builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
         builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
+        builder.setMaxWaitingTime(request.maxWaitingTime);
         builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
 
         // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
