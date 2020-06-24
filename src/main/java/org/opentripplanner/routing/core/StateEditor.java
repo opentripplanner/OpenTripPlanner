@@ -409,9 +409,9 @@ public class StateEditor {
 
     public void reversedDoneVehicleRenting(VehicleDescription vehicleDescription) {
         cloneStateDataAsNeeded();
-        int droppingTime = child.getOptions().routingDelays.getDropoffTime(child.getCurrentVehicle());
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        int droppingTime = child.getOptions().routingDelays.getDropoffTime(child.getCurrentVehicle());
         incrementTimeInSeconds(droppingTime);
     }
 
