@@ -1,8 +1,11 @@
 package org.opentripplanner.transit.raptor.rangeraptor.transit;
 
 import org.junit.Test;
+import org.opentripplanner.transit.raptor._shared.Access;
+import org.opentripplanner.transit.raptor._shared.TestRaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
 import org.opentripplanner.transit.raptor.api.transit.RaptorCostConverter;
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleEventPublisher;
 import org.opentripplanner.transit.raptor.rangeraptor.workerlifecycle.LifeCycleSubscriptions;
 
@@ -14,10 +17,10 @@ public class CostCalculatorTest {
     private static final double WALK_RELUCTANCE_FACTOR = 2.0;
     private static final double WAIT_RELUCTANCE_FACTOR = 0.5;
 
-    private LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
+    private final LifeCycleSubscriptions lifeCycleSubscriptions = new LifeCycleSubscriptions();
 
 
-    private CostCalculator subject = new DefaultCostCalculator(
+    private final CostCalculator<TestRaptorTripSchedule> subject = new DefaultCostCalculator<>(
             new int[] { 0, 25 },
             BOARD_COST,
             WALK_RELUCTANCE_FACTOR,
@@ -27,17 +30,21 @@ public class CostCalculatorTest {
 
     @Test
     public void transitArrivalCost() {
+        ArrivalView<TestRaptorTripSchedule> prev = new Access(0, 0, 2);
+        assertEquals(1000, prev.cost());
+
         LifeCycleEventPublisher lifeCycle = new LifeCycleEventPublisher(lifeCycleSubscriptions);
-        assertEquals("Board cost", 500, subject.transitArrivalCost(0, 0, 0, 0));
-        assertEquals("Transit + board cost", 600, subject.transitArrivalCost(0, 1, 0, 0));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(prev, 0, 0, 0, null));
+        assertEquals("Board + transit cost", 600, subject.transitArrivalCost(prev, 0, 1, 0, null));
+        assertEquals("Board + transit + stop cost", 625, subject.transitArrivalCost(prev, 0, 1, 1, null));
         // There is no wait cost for the first transit leg
-        assertEquals("Board cost", 500, subject.transitArrivalCost(1, 0, 0, 0));
+        assertEquals("Board cost", 500, subject.transitArrivalCost(prev, 1, 0, 0, null));
 
         // Simulate round 2
         lifeCycle.prepareForNextRound(2);
         // There is a small cost (2-1) * 0.5 * 100 = 50 added for the second transit leg
-        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(1, 0, 0, 0));
-        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(1, 2, 0, 0));
+        assertEquals("Wait + board cost", 550, subject.transitArrivalCost(prev,1, 0, 0, null));
+        assertEquals("wait + board + transit", 750, subject.transitArrivalCost(prev, 1, 2, 0, null));
     }
 
     @Test

@@ -1,14 +1,10 @@
 package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.response.InputField;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
+import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainParametersMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
@@ -18,6 +14,11 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.InputField;
+import org.opentripplanner.routing.api.response.RoutingError;
+import org.opentripplanner.routing.api.response.RoutingErrorCode;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
@@ -47,12 +48,6 @@ public class RoutingWorker {
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     private final RaptorService<TripSchedule> raptorService;
-
-    /** Filter itineraries down to this limit, but not below. */
-    private static final int MIN_NUMBER_OF_ITINERARIES = 3;
-
-    /** Never return more that this limit of itineraries. */
-    private static final int MAX_NUMBER_OF_ITINERARIES = 200;
 
     private final RoutingRequest request;
     private Instant filterOnLatestDepartureTime = null;
@@ -176,7 +171,7 @@ public class RoutingWorker {
         checkIfTransitConnectionExists(transitResponse);
 
         // Filter itineraries away that depart after the latest-departure-time for depart after
-        // search. These itineraries is a result of timeshifting the access leg and is needed for
+        // search. These itineraries is a result of time-shifting the access leg and is needed for
         // the raptor to prune the results. These itineraries are often not ideal, but if they
         // pareto optimal for the "next" window, they will appear when a "next" search is performed.
         searchWindowUsedInSeconds = transitResponse.requestUsed().searchParams().searchWindowInSeconds();
@@ -193,30 +188,12 @@ public class RoutingWorker {
     }
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
-        int minDurationInSeconds = itineraries.stream().mapToInt(it -> it.durationSeconds).min().orElse(0);
-
-        ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(request.arriveBy);
-        builder.setApproximateMinLimit(Math.min(request.numItineraries, MIN_NUMBER_OF_ITINERARIES));
-        builder.setMaxLimit(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES));
-        builder.setLatestDepartureTimeLimit(filterOnLatestDepartureTime);
-        builder.setMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it);
-
-        // TODO OTP2 - Only set these if timetable view is enabled. The time-table-view is not
-        //           - exposed as a parameter in the APIs yet.
-        {
-        builder.removeTransitWithHigherCostThanBestOnStreetOnly(true);
-
-            // Remove short transit legs(< 10% duration) in the start or end of a journey;
-            // Calculate 10% of travel time, round down to closest minute
-            int partOfTravelTime = (6 * minDurationInSeconds) / 60;
-            builder.setShortTransitSlackInSeconds(partOfTravelTime);
-        }
-
-        if(request.debugItineraryFilter) {
-            builder.debug();
-        }
-
-        ItineraryFilter filterChain = builder.build();
+        ItineraryFilter filterChain = new ItineraryFilterChainBuilder(
+            RoutingRequestToFilterChainParametersMapper.mapRequestToFilterChainParameters(request)
+        )
+            .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
+            .withMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it)
+            .build();
 
         return filterChain.filter(itineraries);
     }

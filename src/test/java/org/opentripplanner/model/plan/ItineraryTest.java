@@ -25,12 +25,12 @@ public class ItineraryTest {
         assertTrue(result.walkOnly);
 
         // Expected fields on walking leg set
-        assertEquals(TestItineraryBuilder.A, result.firstLeg().from);
+        assertSameLocation(TestItineraryBuilder.A, result.firstLeg().from);
         assertEquals(newTime(7), result.firstLeg().startTime);
         assertEquals(newTime(12), result.firstLeg().endTime);
         assertEquals(TraverseMode.WALK, result.firstLeg().mode);
         assertEquals(420.0d, result.firstLeg().distanceMeters, 1E-3);
-        assertEquals(TestItineraryBuilder.B, result.lastLeg().to);
+        assertSameLocation(TestItineraryBuilder.B, result.lastLeg().to);
 
         assertEquals("A ~ Walk 5m ~ B [cost: 600]", result.toStr());
     }
@@ -50,8 +50,8 @@ public class ItineraryTest {
         assertFalse(result.walkOnly);
 
         // Expected fields on bus leg set
-        assertEquals(TestItineraryBuilder.A, result.firstLeg().from);
-        assertEquals(TestItineraryBuilder.B, result.firstLeg().to);
+        assertSameLocation(TestItineraryBuilder.A, result.firstLeg().from);
+        assertSameLocation(TestItineraryBuilder.B, result.firstLeg().to);
         assertEquals(newTime(10), result.firstLeg().startTime);
         assertEquals(newTime(20), result.firstLeg().endTime);
         assertEquals(TraverseMode.BUS, result.firstLeg().mode);
@@ -76,8 +76,8 @@ public class ItineraryTest {
         assertFalse(result.walkOnly);
 
         // Expected fields on bus leg set
-        assertEquals(TestItineraryBuilder.A, result.firstLeg().from);
-        assertEquals(TestItineraryBuilder.B, result.firstLeg().to);
+        assertSameLocation(TestItineraryBuilder.A, result.firstLeg().from);
+        assertSameLocation(TestItineraryBuilder.B, result.firstLeg().to);
         assertEquals(newTime(5), result.firstLeg().startTime);
         assertEquals(newTime(15), result.firstLeg().endTime);
         assertEquals(TraverseMode.RAIL, result.firstLeg().mode);
@@ -149,13 +149,19 @@ public class ItineraryTest {
         assertEquals(660, result.waitingTimeSeconds);
         assertEquals(720 + 528 + 360 + 2040, result.generalizedCost);
         assertFalse(result.walkOnly);
-        assertEquals(TestItineraryBuilder.A, result.firstLeg().from);
-        assertEquals(TestItineraryBuilder.G, result.lastLeg().to);
+        assertSameLocation(TestItineraryBuilder.A, result.firstLeg().from);
+        assertSameLocation(TestItineraryBuilder.G, result.lastLeg().to);
 
         assertEquals(
             "A ~ Walk 2m ~ B ~ BUS 55 12:04 12:14 ~ C ~ BUS 21 12:16 12:20 ~ D "
                 + "~ Walk 3m ~ E ~ RAIL 20 12:30 12:50 ~ F ~ Walk 1m ~ G [cost: 3648]",
             result.toStr()
         );
+    }
+
+    private void assertSameLocation(Place expected, Place actual) {
+        assertTrue(
+            "Same location? Expected: " + expected + ", actual: " + actual,
+            expected.sameLocation(actual));
     }
 }
