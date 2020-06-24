@@ -38,6 +38,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Add MQTT transport for the GTFS-RT trip update updater (#3094)
 - Add FinlandWayPropertySetSource (#3096)
 - Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
+- Reading and writing files(CONFIG, GRAPH, DEM, OSM, GTFS, NETEX, DATA_IMPORT_ISSUES) is changed. All files, except configuration files, are read from a data source. We support Google Cloud Storage and the local file system data sources for now, but plan to add at least support for AWS S3 (#2891)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
