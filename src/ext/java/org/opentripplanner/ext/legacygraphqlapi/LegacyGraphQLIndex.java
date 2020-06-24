@@ -58,6 +58,11 @@ class LegacyGraphQLIndex {
           .type(IntrospectionTypeWiring.build(LegacyGraphQLAlertImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeParkImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLBikeRentalStationImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLCoordinatesImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLDebugOutputImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLItineraryImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLLegImpl.class))
+          .type(IntrospectionTypeWiring.build(LegacyGraphQLPlanImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLQueryTypeImpl.class))
           .type(IntrospectionTypeWiring.build(LegacyGraphQLServiceTimeRangeImpl.class))
           .build();

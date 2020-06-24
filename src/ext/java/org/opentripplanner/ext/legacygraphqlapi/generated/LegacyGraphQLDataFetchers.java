@@ -13,7 +13,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.Leg
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.Fare;
+import java.util.Map;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -22,6 +22,7 @@ import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLMode;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPickupDropoffType;
+import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState;
 import org.opentripplanner.model.Route;
@@ -188,7 +189,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Long> walkTime();
     public DataFetcher<Double> walkDistance();
     public DataFetcher<Iterable<Leg>> legs();
-    public DataFetcher<Iterable<Fare>> fares();
+    public DataFetcher<Iterable<Map<String, Object>>> fares();
     public DataFetcher<Double> elevationGained();
     public DataFetcher<Double> elevationLost();
   }
@@ -207,13 +208,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Double> distance();
     public DataFetcher<Boolean> transitLeg();
     public DataFetcher<Boolean> rentedBike();
-    public DataFetcher<Object> from();
-    public DataFetcher<Object> to();
+    public DataFetcher<Place> from();
+    public DataFetcher<Place> to();
     public DataFetcher<Route> route();
     public DataFetcher<Trip> trip();
     public DataFetcher<String> serviceDate();
     public DataFetcher<Iterable<Object>> intermediateStops();
-    public DataFetcher<Iterable<Object>> intermediatePlaces();
+    public DataFetcher<Iterable<Place>> intermediatePlaces();
     public DataFetcher<Boolean> intermediatePlace();
     public DataFetcher<Iterable<WalkStep>> steps();
   }
@@ -292,8 +293,8 @@ public class LegacyGraphQLDataFetchers {
   
   public interface LegacyGraphQLPlan {
     public DataFetcher<Long> date();
-    public DataFetcher<Object> from();
-    public DataFetcher<Object> to();
+    public DataFetcher<Place> from();
+    public DataFetcher<Place> to();
     public DataFetcher<Iterable<Itinerary>> itineraries();
     public DataFetcher<Iterable<String>> messageEnums();
     public DataFetcher<Iterable<String>> messageStrings();

@@ -822,7 +822,7 @@ public abstract class RoutingResource {
      * TODO Improve Javadoc. What does this even mean? Why are there so many colons and numbers?
      * Convert to a Map from trip --> set of int.
      */
-    private HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
+    public HashMap<FeedScopedId, BannedStopSet> makeBannedTripMap(String banned) {
         if (banned == null) {
             return null;
         }

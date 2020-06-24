@@ -16,6 +16,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.util.TranslatedString;
 
 import java.util.Collections;
+import java.util.Date;
 import java.util.Map;
 
 public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLAlert {
@@ -129,12 +130,20 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Long> effectiveStartDate() {
-    return environment -> getSource(environment).getAlert().effectiveStartDate.getTime();
+    return environment -> {
+      Date effectiveStartDate = getSource(environment).getAlert().effectiveStartDate;
+      if (effectiveStartDate == null) return null;
+      return effectiveStartDate.getTime() / 1000;
+    };
   }
 
   @Override
   public DataFetcher<Long> effectiveEndDate() {
-    return environment -> getSource(environment).getAlert().effectiveEndDate.getTime();
+    return environment -> {
+      Date effectiveEndDate = getSource(environment).getAlert().effectiveEndDate;
+      if (effectiveEndDate == null) return null;
+      return effectiveEndDate.getTime() / 1000;
+    };
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

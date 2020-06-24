@@ -36,7 +36,7 @@ config:
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
     DepartureRow: Object
     elevationProfileComponent: org.opentripplanner.common.geometry.PackedCoordinateSequence#PackedCoordinateSequence
-    fare: org.opentripplanner.routing.core.Fare#Fare
+    fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
     Feed: org.opentripplanner.model.FeedInfo#FeedInfo
     Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
@@ -46,7 +46,7 @@ config:
     PageInfo: Object
     Pattern: org.opentripplanner.model.TripPattern#TripPattern
     PickupDropoffType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPickupDropoffType#LegacyGraphQLPickupDropoffType
-    Place: Object
+    Place: org.opentripplanner.model.plan.Place#Place
     placeAtDistance: Object
     placeAtDistanceConnection: Object
     placeAtDistanceEdge: Object
