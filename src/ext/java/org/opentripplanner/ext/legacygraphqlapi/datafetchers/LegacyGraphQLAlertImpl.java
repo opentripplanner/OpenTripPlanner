@@ -8,7 +8,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
@@ -112,20 +111,19 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   //TODO
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertEffectType> alertEffect() {
+  public DataFetcher<String> alertEffect() {
     return environment -> null;
   }
 
   //TODO
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertCauseType> alertCause() {
+  public DataFetcher<String> alertCause() {
     return environment -> null;
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel() {
-    return environment -> LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType.valueOfLabel(
-        getSource(environment).getAlert().severity);
+  public DataFetcher<String> alertSeverityLevel() {
+    return environment -> getSource(environment).getAlert().severity;
   }
 
   @Override

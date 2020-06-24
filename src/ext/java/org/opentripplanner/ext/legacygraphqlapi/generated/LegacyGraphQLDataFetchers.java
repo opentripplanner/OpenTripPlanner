@@ -4,12 +4,8 @@ package org.opentripplanner.ext.legacygraphqlapi.generated;
 
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLBikesAllowed;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
@@ -19,12 +15,9 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLMode;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPickupDropoffType;
 import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder.StopAtDistance;
@@ -33,7 +26,6 @@ import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.routing.core.FareRuleSet;
 import java.util.Map;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType;
 import graphql.schema.TypeResolver;
 import graphql.schema.DataFetcher;
 
@@ -68,9 +60,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertDescriptionTextTranslations();
     public DataFetcher<String> alertUrl();
     public DataFetcher<Iterable<Map.Entry<String, String>>> alertUrlTranslations();
-    public DataFetcher<LegacyGraphQLAlertEffectType> alertEffect();
-    public DataFetcher<LegacyGraphQLAlertCauseType> alertCause();
-    public DataFetcher<LegacyGraphQLAlertSeverityLevelType> alertSeverityLevel();
+    public DataFetcher<String> alertEffect();
+    public DataFetcher<String> alertCause();
+    public DataFetcher<String> alertSeverityLevel();
     public DataFetcher<Long> effectiveStartDate();
     public DataFetcher<Long> effectiveEndDate();
   }
@@ -199,12 +191,12 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Long> endTime();
     public DataFetcher<Integer> departureDelay();
     public DataFetcher<Integer> arrivalDelay();
-    public DataFetcher<LegacyGraphQLMode> mode();
+    public DataFetcher<String> mode();
     public DataFetcher<Double> duration();
     public DataFetcher<EncodedPolylineBean> legGeometry();
     public DataFetcher<Agency> agency();
     public DataFetcher<Boolean> realTime();
-    public DataFetcher<LegacyGraphQLRealtimeState> realtimeState();
+    public DataFetcher<String> realtimeState();
     public DataFetcher<Double> distance();
     public DataFetcher<Boolean> transitLeg();
     public DataFetcher<Boolean> rentedBike();
@@ -255,7 +247,7 @@ public class LegacyGraphQLDataFetchers {
   
   public interface LegacyGraphQLPlace {
     public DataFetcher<String> name();
-    public DataFetcher<LegacyGraphQLVertexType> vertexType();
+    public DataFetcher<String> vertexType();
     public DataFetcher<Double> lat();
     public DataFetcher<Double> lon();
     public DataFetcher<Long> arrivalTime();
@@ -350,13 +342,13 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Agency> agency();
     public DataFetcher<String> shortName();
     public DataFetcher<String> longName();
-    public DataFetcher<LegacyGraphQLMode> mode();
+    public DataFetcher<String> mode();
     public DataFetcher<Integer> type();
     public DataFetcher<String> desc();
     public DataFetcher<String> url();
     public DataFetcher<String> color();
     public DataFetcher<String> textColor();
-    public DataFetcher<LegacyGraphQLBikesAllowed> bikesAllowed();
+    public DataFetcher<String> bikesAllowed();
     public DataFetcher<Iterable<TripPattern>> patterns();
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Trip>> trips();
@@ -398,7 +390,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> direction();
     public DataFetcher<String> timezone();
     public DataFetcher<Integer> vehicleType();
-    public DataFetcher<LegacyGraphQLMode> vehicleMode();
+    public DataFetcher<String> vehicleMode();
     public DataFetcher<String> platformCode();
     public DataFetcher<Object> cluster();
     public DataFetcher<Iterable<Object>> stops();
@@ -440,9 +432,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Integer> departureDelay();
     public DataFetcher<Boolean> timepoint();
     public DataFetcher<Boolean> realtime();
-    public DataFetcher<LegacyGraphQLRealtimeState> realtimeState();
-    public DataFetcher<LegacyGraphQLPickupDropoffType> pickupType();
-    public DataFetcher<LegacyGraphQLPickupDropoffType> dropoffType();
+    public DataFetcher<String> realtimeState();
+    public DataFetcher<String> pickupType();
+    public DataFetcher<String> dropoffType();
     public DataFetcher<Long> serviceDay();
     public DataFetcher<Trip> trip();
     public DataFetcher<String> headsign();
@@ -483,7 +475,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<String> blockId();
     public DataFetcher<String> shapeId();
     public DataFetcher<Object> wheelchairAccessible();
-    public DataFetcher<LegacyGraphQLBikesAllowed> bikesAllowed();
+    public DataFetcher<String> bikesAllowed();
     public DataFetcher<TripPattern> pattern();
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<String> semanticHash();

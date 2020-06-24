@@ -24,12 +24,12 @@ config:
   mappers:
     Agency: org.opentripplanner.model.Agency#Agency
     Alert: org.opentripplanner.routing.alertpatch.AlertPatch#AlertPatch
-    AlertCauseType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertCauseType#LegacyGraphQLAlertCauseType
-    AlertEffectType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertEffectType#LegacyGraphQLAlertEffectType
-    AlertSeverityLevelType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLAlertSeverityLevelType#LegacyGraphQLAlertSeverityLevelType
+    AlertCauseType: String
+    AlertEffectType: String
+    AlertSeverityLevelType: String
     BikePark: org.opentripplanner.routing.bike_park.BikePark#BikePark
     BikeRentalStation: org.opentripplanner.routing.bike_rental.BikeRentalStation#BikeRentalStation
-    BikesAllowed: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLBikesAllowed#LegacyGraphQLBikesAllowed
+    BikesAllowed: String
     CarPark: Object
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
@@ -42,16 +42,16 @@ config:
     Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg
-    Mode: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLMode#LegacyGraphQLMode
+    Mode: String
     PageInfo: Object
     Pattern: org.opentripplanner.model.TripPattern#TripPattern
-    PickupDropoffType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLPickupDropoffType#LegacyGraphQLPickupDropoffType
+    PickupDropoffType: String
     Place: org.opentripplanner.model.plan.Place#Place
     placeAtDistance: Object
     placeAtDistanceConnection: Object
     placeAtDistanceEdge: Object
     Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
-    RealtimeState: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLRealtimeState#LegacyGraphQLRealtimeState
+    RealtimeState: String
     Route: org.opentripplanner.model.Route#Route
     serviceTimeRange: Object
     step: org.opentripplanner.model.plan.WalkStep#WalkStep
@@ -64,4 +64,4 @@ config:
     TicketType: org.opentripplanner.routing.core.FareRuleSet#FareRuleSet
     TranslatedString: java.util.Map#Map.Entry<String, String>
     Trip: org.opentripplanner.model.Trip#Trip
-    VertexType: org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes.LegacyGraphQLVertexType#LegacyGraphQLVertexType
+    VertexType: String

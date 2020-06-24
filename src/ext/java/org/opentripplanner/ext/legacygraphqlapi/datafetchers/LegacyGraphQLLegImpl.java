@@ -4,7 +4,6 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
@@ -42,8 +41,8 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   }
 
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLMode> mode() {
-    return environment -> LegacyGraphQLTypes.LegacyGraphQLMode.valueOfLabel(getSource(environment).mode.name());
+  public DataFetcher<String> mode() {
+    return environment -> getSource(environment).mode.name();
   }
 
   @Override
@@ -68,7 +67,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   // TODO
   @Override
-  public DataFetcher<LegacyGraphQLTypes.LegacyGraphQLRealtimeState> realtimeState() {
+  public DataFetcher<String> realtimeState() {
     return environment -> null;
   }
 
