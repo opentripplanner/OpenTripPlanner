@@ -15,7 +15,7 @@ https://developer.entur.org/stops-and-timetable-data
 
 We use the [Entire Norway](https://storage.googleapis.com/marduk-production/outbound/netex/rb_norway-aggregated-netex.zip) file. 
 
-In the past the file did not contain the stops, so they needed to be downloaded separably (Entire Norway (Current stops) - Latest valid version of all country stops) and inserted into the Netex-file. Unpack the stops zipfile, rename the stops file to `_stops.xml`. Unpack the netex file and move the ´_stops.xml` into the netex directory. Copy the netex directory and config files into the same directory and start OTP with it as the base directory.
+In the past the file did not contain the stops, so they needed to be downloaded separably (Entire Norway (Current stops) - Latest valid version of all country stops) and inserted into the Netex-file. Unpack the stops zipfile, rename the stops file to `_stops.xml`. Unpack the netex file and move the `_stops.xml` into the netex directory. Copy the netex directory and config files into the same directory and start OTP with it as the base directory.
  
 We also build with elevation data, witch is not available on the internet without transformation. Send us a request, and we will find a way to share it.  
 

@@ -1,37 +1,28 @@
 {
   "dataImportReport": true,
-  // Changed from false
   "transit": true,
   "useTransfersTxt": false,
   "parentStopLinking": true,
-  // Changed from false
   "stationTransfers": false,
   "subwayAccessTime": 0,
-  // Changed from 2.0
   "streets": true,
   "embedRouterConfig": true,
   "areaVisibility": true,
-  // Changed from false
   "platformEntriesLinking": true,
-  // Changed from false
   "matchBusRoutesToStreets": false,
   "fetchElevationUS": false,
   "osmWayPropertySet": "norway",
-  // Changed from default
   "staticBikeRental": false,
   "staticParkAndRide": true,
   "staticBikeParkAndRide": true,
-  // Changed from false
   "maxDataImportIssuesPerFile": 1000,
   "maxInterlineDistance": 200,
   "islandWithoutStopsMaxSize": 5,
-  // Changed from 40
   "islandWithStopsMaxSize": 5,
   "banDiscouragedWalking": false,
   "banDiscouragedBiking": false,
   "maxTransferDistance": 2000,
   "extraEdgesStopPlatformLink": true,
-  // Changed from false
   "distanceBetweenElevationSamples": 25,
   "multiThreadElevationCalculations": true,
   "netex": {
