@@ -2,6 +2,7 @@ package org.opentripplanner.routing.graph;
 
 import com.conveyal.kryo.TIntArrayListSerializer;
 import com.conveyal.kryo.TIntIntHashMapSerializer;
+import com.csvreader.CsvWriter;
 import com.esotericsoftware.kryo.Kryo;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
@@ -23,13 +24,10 @@ import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.gtfs.GtfsLibrary;
+import org.opentripplanner.model.*;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
 import org.opentripplanner.common.MavenVersion;
@@ -37,7 +35,6 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
 import org.opentripplanner.kryo.HashBiMapSerializer;
-import org.opentripplanner.model.GraphBundle;
 import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
@@ -65,6 +62,9 @@ import java.io.*;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
+
 /**
  * A graph is really just one or more indexes into a set of vertexes. It used to keep edgelists for each vertex, but those are in the vertex now.
  */
@@ -89,6 +89,8 @@ public class Graph implements Serializable {
     private long transitServiceEnds = 0;
 
     private Map<Class<?>, Object> _services = new HashMap<Class<?>, Object>();
+
+    private Collection<Route> transitRoutes = new ArrayList<>();
 
     private TransferTable transferTable = new TransferTable();
 
@@ -437,6 +439,15 @@ public class Graph implements Serializable {
         return t;
     }
 
+    public void addTransitRoutes(Collection<Route> routes){
+        this.transitRoutes = Stream.of(this.transitRoutes, routes)
+                .flatMap(Collection::stream).collect(Collectors.toList());
+    }
+
+    public Collection<Route> getTransitRoutes(){
+        return transitRoutes;
+    }
+
     public void remove(Vertex vertex) {
         vertices.remove(vertex.getLabel());
     }
@@ -749,6 +760,26 @@ public class Graph implements Serializable {
         // strategy. The nesting below specifies the Java approach as a fallback strategy to the default strategy.
         kryo.setInstantiatorStrategy(new Kryo.DefaultInstantiatorStrategy(new SerializingInstantiatorStrategy()));
         return kryo;
+    }
+
+    public void saveTransitLines(File file) throws IOException {
+        LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
+        CsvWriter writer = new CsvWriter(file.getPath());
+        for (Route route:getTransitRoutes()) {
+            String routeTypeName = "UNSUPPORTED";
+            try {
+                routeTypeName = GtfsLibrary.getTraverseMode(route).name();
+            }catch(IllegalArgumentException e) {
+                LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), route.getShortName(), route.getAgency().getName());
+            }
+            try{
+                writer.writeRecord(new String[]{routeTypeName, route.getShortName(), route.getAgency().getName()});
+            } catch (IOException e) {
+                file.delete();
+                throw e;
+            }
+        }
+        writer.close();
     }
 
     public void save(File file) throws IOException {
