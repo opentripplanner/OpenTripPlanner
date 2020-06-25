@@ -375,19 +375,23 @@ public class StreetVertexIndex {
     public Vertex findClosestVertex(Coordinate coordinate) {
         Vertex vertex = getIntersectionAt(coordinate);
         if (vertex != null) {
+            //this means this location is connected to edges
             return vertex;
         } else {
             Envelope env = new Envelope(coordinate);
-            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(2000, coordinate.y),
-                SphericalDistanceLibrary.metersToDegrees(2000));
+            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(20, coordinate.y),
+                SphericalDistanceLibrary.metersToDegrees(20));
             List<Vertex> vertices = verticesTree.query(env);
-            Optional<Vertex> closest = vertices.stream().filter(v -> v instanceof OsmVertex).min(
-                (v1, v2) -> (int) (v1.getCoordinate().distance(coordinate) - v2.getCoordinate()
-                    .distance(coordinate)));
-            if (closest.isPresent()) {
-                return closest.get();
+            double minDistance = Double.MAX_VALUE;
+            Vertex closest = null;
+            for(Vertex v: vertices){
+                double distance = v.getCoordinate().distance(coordinate);
+                if(distance<minDistance){
+                    minDistance = distance;
+                    closest = v;
+                }
             }
-            return null;
+            return closest;
         }
     }
 }

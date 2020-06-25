@@ -173,7 +173,6 @@ public class Router {
     public GenericLocation findClosest(GenericLocation location) {
         Vertex vertex = graph.streetIndex
             .findClosestVertex(location.getCoordinate());
-        //this means this location is connected to edges
         if (vertex != null) {
             return new GenericLocation(vertex.getLat(), vertex.getLon());
         }
