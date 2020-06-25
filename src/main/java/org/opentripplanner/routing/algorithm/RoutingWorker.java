@@ -67,8 +67,10 @@ public class RoutingWorker {
     public RoutingResponse route(Router router) {
         List<Itinerary> itineraries = new ArrayList<>();
         List<RoutingError> routingErrors = new ArrayList<>();
-
+        //TODO:: better to
         // Direct street routing
+        request.from = router.findClosest(request.from);
+        request.to = router.findClosest(request.to);
         try {
             itineraries.addAll(DirectStreetRouter.route(router, request));
         } catch (RoutingValidationException e) {

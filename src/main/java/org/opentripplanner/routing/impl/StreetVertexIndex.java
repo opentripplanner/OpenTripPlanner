@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.impl;
 
 
+import java.util.Optional;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.LineString;
@@ -25,6 +26,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
@@ -39,7 +41,7 @@ import java.util.Set;
 /**
  * Indexes all edges and transit vertices of the graph spatially. Has a variety of query methods
  * used during network linking and trip planning.
- * 
+ *
  * Creates a TemporaryStreetLocation representing a location on a street that's not at an
  * intersection, based on input latitude and longitude. Instantiating this class is expensive,
  * because it creates a spatial index of all of the intersections in the graph.
@@ -201,7 +203,7 @@ public class StreetVertexIndex {
              * index transit edges as we do not need them and some GTFS do not have shape data, so
              * long straight lines between 2 faraway stations will wreck performance on a hash grid
              * spatial index.
-             * 
+             *
              * If one need to store transit edges in the index, we could improve the hash grid
              * rasterizing splitting long segments.
              */
@@ -368,5 +370,24 @@ public class StreetVertexIndex {
         }
 
         return null;
+    }
+
+    public Vertex findClosestVertex(Coordinate coordinate) {
+        Vertex vertex = getIntersectionAt(coordinate);
+        if (vertex != null) {
+            return vertex;
+        } else {
+            Envelope env = new Envelope(coordinate);
+            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(2000, coordinate.y),
+                SphericalDistanceLibrary.metersToDegrees(2000));
+            List<Vertex> vertices = verticesTree.query(env);
+            Optional<Vertex> closest = vertices.stream().filter(v -> v instanceof OsmVertex).min(
+                (v1, v2) -> (int) (v1.getCoordinate().distance(coordinate) - v2.getCoordinate()
+                    .distance(coordinate)));
+            if (closest.isPresent()) {
+                return closest.get();
+            }
+            return null;
+        }
     }
 }

@@ -6,17 +6,30 @@ import ch.qos.logback.classic.encoder.PatternLayoutEncoder;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.ConsoleAppender;
 import ch.qos.logback.core.FileAppender;
+import java.util.List;
+import java.util.stream.Collectors;
 import org.opentripplanner.inspector.TileRendererManager;
+import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.routing.algorithm.astar.AStar;
+import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.TemporaryStreetLocation;
+import org.opentripplanner.routing.spt.DominanceFunction;
+import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.OsmVertex;
 import org.opentripplanner.standalone.config.RouterConfig;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.util.ElevationUtils;
+import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.WorldEnvelope;
 import org.opentripplanner.visualizer.GraphVisualizer;
 import org.slf4j.LoggerFactory;
@@ -155,5 +168,15 @@ public class Router {
 
     public double streetRoutingTimeoutSeconds() {
         return  routerConfig.streetRoutingTimeoutSeconds();
+    }
+
+    public GenericLocation findClosest(GenericLocation location) {
+        Vertex vertex = graph.streetIndex
+            .findClosestVertex(location.getCoordinate());
+        //this means this location is connected to edges
+        if (vertex != null) {
+            return new GenericLocation(vertex.getLat(), vertex.getLon());
+        }
+        return location;
     }
 }
