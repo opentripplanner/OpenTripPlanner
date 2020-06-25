@@ -134,7 +134,7 @@ public class BuildConfig {
     /**
      * Custom OSM way properties
      */
-    public final WayPropertySetSource wayPropertySet;
+    public final WayPropertySetSource osmWayPropertySet;
 
     /**
      * When loading OSM data, the input is streamed 3 times - one phase for processing RELATIONS,
@@ -299,45 +299,48 @@ public class BuildConfig {
     public BuildConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter c = new NodeAdapter(node, source);
         rawJson = node;
-        dataImportReport = c.asBoolean("dataImportReport", false);
-        transit = c.asBoolean("transit", true);
-        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
-        parentStopLinking = c.asBoolean("parentStopLinking", false);
-        stationTransfers = c.asBoolean("stationTransfers", false);
-        subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
-        streets = c.asBoolean("streets", true);
-        embedRouterConfig = c.asBoolean("embedRouterConfig", true);
+
+        // Keep this list of BASIC parameters sorted alphabetically on config PARAMETER name
         areaVisibility = c.asBoolean("areaVisibility", false);
-        platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
-        matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
-        fetchElevationUS = c.asBoolean("fetchElevationUS", false);
-        elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
-        elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
-        fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
-        customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
-        wayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
-        osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
-        staticBikeRental = c.asBoolean("staticBikeRental", false);
-        staticParkAndRide = c.asBoolean("staticParkAndRide", true);
-        staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
-        maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
-        maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
-        pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);
-        pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
         banDiscouragedWalking = c.asBoolean("banDiscouragedWalking", false);
         banDiscouragedBiking = c.asBoolean("banDiscouragedBiking", false);
-        maxTransferDistance = c.asDouble("maxTransferDistance", 2000d);
-        extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
+        dataImportReport = c.asBoolean("dataImportReport", false);
         distanceBetweenElevationSamples = c.asDouble("distanceBetweenElevationSamples",
-                CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
+            CompactElevationProfile.DEFAULT_DISTANCE_BETWEEN_SAMPLES_METERS
         );
-        readCachedElevations = c.asBoolean("readCachedElevations", true);
-        writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        elevationBucket = S3BucketConfig.fromConfig(c.path("elevationBucket"));
+        elevationUnitMultiplier = c.asDouble("elevationUnitMultiplier", 1);
+        embedRouterConfig = c.asBoolean("embedRouterConfig", true);
+        extraEdgesStopPlatformLink = c.asBoolean("extraEdgesStopPlatformLink", false);
+        fetchElevationUS = c.asBoolean("fetchElevationUS", false);
         includeEllipsoidToGeoidDifference = c.asBoolean("includeEllipsoidToGeoidDifference", false);
+        pruningThresholdIslandWithStops = c.asInt("islandWithStopsMaxSize", 5);
+        pruningThresholdIslandWithoutStops = c.asInt("islandWithoutStopsMaxSize", 40);
+        matchBusRoutesToStreets = c.asBoolean("matchBusRoutesToStreets", false);
+        maxDataImportIssuesPerFile = c.asInt("maxDataImportIssuesPerFile", 1000);
+        maxInterlineDistance = c.asInt("maxInterlineDistance", 200);
+        maxTransferDistance = c.asDouble("maxTransferDistance", 2000d);
         multiThreadElevationCalculations = c.asBoolean("multiThreadElevationCalculations", false);
+        osmCacheDataInMem = c.asBoolean("osmCacheDataInMem", false);
+        osmWayPropertySet = WayPropertySetSource.fromConfig(c.asText("osmWayPropertySet", "default"));
+        parentStopLinking = c.asBoolean("parentStopLinking", false);
+        platformEntriesLinking = c.asBoolean("platformEntriesLinking", false);
+        readCachedElevations = c.asBoolean("readCachedElevations", true);
+        staticBikeParkAndRide = c.asBoolean("staticBikeParkAndRide", false);
+        staticBikeRental = c.asBoolean("staticBikeRental", false);
+        staticParkAndRide = c.asBoolean("staticParkAndRide", true);
+        stationTransfers = c.asBoolean("stationTransfers", false);
+        streets = c.asBoolean("streets", true);
+        subwayAccessTime = c.asDouble("subwayAccessTime", DEFAULT_SUBWAY_ACCESS_TIME_MINUTES);
+        transit = c.asBoolean("transit", true);
         transitServiceStart = c.asDateOrRelativePeriod("transitServiceStart", "-P1Y");
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
+        useTransfersTxt = c.asBoolean("useTransfersTxt", false);
+        writeCachedElevations = c.asBoolean("writeCachedElevations", false);
 
+        // List of complex parameters
+        fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
+        customNamer = CustomNamer.CustomNamerFactory.fromConfig(c.asRawNode("osmNaming"));
         netex = new NetexConfig(c.path("netex"));
         storage = new StorageConfig(c.path("storage"));
 
