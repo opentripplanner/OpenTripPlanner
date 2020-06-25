@@ -8,12 +8,10 @@ import java.text.DecimalFormat;
 import java.text.DecimalFormatSymbols;
 import java.text.SimpleDateFormat;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
-import java.util.List;
 import java.util.Locale;
 import java.util.function.Function;
 import java.util.stream.Collectors;
@@ -21,9 +19,10 @@ import java.util.stream.Collectors;
 /**
  * This toString builder witch add elements to a compact string of the form:
  * <p>
- * {@code ClassName{field1:value, field2:value, ..., NOT_SET:[fieldX, ...]}}
+ * {@code ClassName{field1:value, field2:value, ...}}
  * <p>
- * The {@code NOT_SET} list of fields are all field witch is null or have the default value.
+ * Fields equals to 'ignoreValue' is NOT added to the result string. This produces a short and easy
+ * to read result. You should use {@code null} as 'ignoreValue' if the field is nullable.
  * <p>
  * The naming of the 'add' methods should give a hint to witch type the value have, this make it
  * easier to choose the right method and less error prune as compared with relaying on pure
@@ -37,12 +36,11 @@ public class ToStringBuilder {
     private static final DecimalFormatSymbols DECIMAL_SYMBOLS = DecimalFormatSymbols.getInstance(Locale.US);
 
     private final StringBuilder sb = new StringBuilder();
-    private final List<String> unsetFields = new ArrayList<>();
 
     private DecimalFormat integerFormat;
     private DecimalFormat decimalFormat;
     private DecimalFormat coordinateFormat;
-    private SimpleDateFormat calTimeFormater;
+    private SimpleDateFormat calendarTimeFormat;
     boolean first = true;
 
     private ToStringBuilder(String name) {
@@ -64,8 +62,8 @@ public class ToStringBuilder {
         return addIfNotNull(name, num, this::formatNumber);
     }
 
-    public ToStringBuilder addNum(String name, Number value, Number defaultValue) {
-        return addIfNotDefault(name, value, defaultValue, this::formatNumber);
+    public ToStringBuilder addNum(String name, Number value, Number ignoreValue) {
+        return addIfNotIgnored(name, value, ignoreValue, this::formatNumber);
     }
 
     public ToStringBuilder addNum(String name, Number num, String unit) {
@@ -88,10 +86,6 @@ public class ToStringBuilder {
         return addIfNotNull(name, obj);
     }
 
-    public ToStringBuilder addObj(String name, Object obj, Object defaultValue) {
-        return addIfNotDefault(name, obj, defaultValue);
-    }
-
     public <T> ToStringBuilder addInts(String name, int[] intArray) {
         return addIfNotNull(name, intArray, Arrays::toString);
     }
@@ -101,7 +95,7 @@ public class ToStringBuilder {
     }
 
     public ToStringBuilder addColLimited(String name, Collection<?> c, int limit) {
-        if(c == null) { return unset(name); }
+        if(c == null) { return this; }
         if(c.size() > limit+1) {
             String value = c.stream()
                     .limit(limit)
@@ -125,7 +119,7 @@ public class ToStringBuilder {
 
     /**
      * Add the TIME part in the local system timezone using 24 hours. Format:  HH:mm:ss.
-     * Note! The DATE is not printed.
+     * Note! The DATE is not printed. {@code null} value is ignored.
      */
     public ToStringBuilder addCalTime(String name, Calendar time) {
         return addIfNotNull(name, time, t -> formatTime(t.getTime()));
@@ -134,17 +128,17 @@ public class ToStringBuilder {
     /**
      * Add time in seconds since midnight. Format:  hh:mm:ss. Ignore default values.
      */
-    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int defaultValue) {
-        return addIfNotDefault(name, timeSecondsPastMidnight, defaultValue, TimeUtils::timeToStrCompact);
+    public ToStringBuilder addServiceTime(String name, int timeSecondsPastMidnight, int ignoreValue) {
+        return addIfNotIgnored(name, timeSecondsPastMidnight, ignoreValue, TimeUtils::timeToStrCompact);
     }
 
     /**
-     * Add times in seconds since midnight. Format:  hh:mm. Ignore default values.
+     * Add times in seconds since midnight. Format:  hh:mm. {@code null} value is ignored.
      */
-    public <T> ToStringBuilder addServiceTimeSchedule(String name, int[] intArray) {
+    public <T> ToStringBuilder addServiceTimeSchedule(String name, int[] value) {
         return addIfNotNull(
                 name,
-                intArray,
+                value,
                 a -> Arrays.stream(a)
                         .mapToObj(TimeUtils::timeToStrShort)
                         .collect(Collectors.joining(", ", "[", "]"))
@@ -157,11 +151,11 @@ public class ToStringBuilder {
      * {@link Duration#toString()}, but without the 'PT' prefix. {@code null} value is ignored.
      */
     public ToStringBuilder addDuration(String name, Integer durationSeconds) {
-        return addIfNotDefault(name, durationSeconds, null, TimeUtils::durationToStr);
+        return addIfNotIgnored(name, durationSeconds, null, TimeUtils::durationToStr);
     }
 
     public ToStringBuilder addDuration(String name, Duration duration) {
-        return addIfNotDefault(
+        return addIfNotIgnored(
             name,
             duration,
             null,
@@ -171,8 +165,6 @@ public class ToStringBuilder {
 
     @Override
     public String toString() {
-        if(!unsetFields.isEmpty()) { addIt("NOT_SET", unsetFields.toString()); }
-
         return sb.append("}").toString();
     }
 
@@ -180,20 +172,16 @@ public class ToStringBuilder {
     /** private methods */
 
     private <T> ToStringBuilder addIfNotNull(String name, T value) {
-        return addIfNotDefault(name, value, null);
+        return addIfNotIgnored(name, value, null, Object::toString);
     }
 
     private <T> ToStringBuilder addIfNotNull(String name, T value, Function<T, String> vToString) {
-        return addIfNotDefault(name, value, null, vToString);
+        return addIfNotIgnored(name, value, null, vToString);
     }
 
-    private <T> ToStringBuilder addIfNotDefault(String name, T value, T defaultValue) {
-        return addIfNotDefault(name, value, defaultValue, Object::toString);
-    }
-
-    private <T> ToStringBuilder addIfNotDefault(String name, T value, T defaultValue, Function<T, String> mapToString) {
-        if(value == defaultValue) { return unset(name); }
-        if(defaultValue != null && defaultValue.equals(value)) { return unset(name); }
+    private <T> ToStringBuilder addIfNotIgnored(String name, T value, T ignoreValue, Function<T, String> mapToString) {
+        if(value == ignoreValue) { return this; }
+        if(ignoreValue != null && ignoreValue.equals(value)) { return this; }
         if(value == null) { return addIt(name, "null"); }
         return addIt(name, mapToString.apply(value));
     }
@@ -207,16 +195,11 @@ public class ToStringBuilder {
         return this;
     }
 
-    private ToStringBuilder unset(String name) {
-        unsetFields.add(name);
-        return this;
-    }
-
     private String formatTime(Date time) {
-        if(calTimeFormater == null) {
-            calTimeFormater = new SimpleDateFormat("HH:mm:ss");
+        if(calendarTimeFormat == null) {
+            calendarTimeFormat = new SimpleDateFormat("HH:mm:ss");
         }
-        return calTimeFormater.format(time.getTime());
+        return calendarTimeFormat.format(time.getTime());
     }
 
     String formatCoordinate(Number value) {
@@ -243,5 +226,4 @@ public class ToStringBuilder {
         }
         return decimalFormat.format(value);
     }
-
 }

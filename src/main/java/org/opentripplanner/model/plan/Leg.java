@@ -244,19 +244,22 @@ public class Leg {
     }
 
     /**
-     * Compare to legs to determine if they start and end at the same place and time.
-     *
-     * Note! Properties like mode and trip is NOT considered.
+     * Return {@code true} if to legs ride the same trip(same tripId) and at least part of the
+     * rides overlap. Two legs overlap is they have at least one segment(from one stop to the next)
+     * in common.
      */
-    public boolean sameStartAndEnd(Leg other) {
-        if (this == other) { return true; }
-        return startTime.equals(other.startTime)
-                && endTime.equals(other.endTime)
-                && from.sameLocation(other.from)
-                && to.sameLocation(other.to);
+    public boolean isPartiallySameTransitLeg(Leg other) {
+      // Assert both legs are transit legs
+      if(!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
+
+      // If NOT the same trip, return false
+      if(!tripId.equals(other.tripId)) { return false; }
+
+      // Return true if legs overlap
+      return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
     }
 
-    /** Should be used for debug logging only */
+  /** Should be used for debug logging only */
     @Override
     public String toString() {
         return ToStringBuilder.of(Leg.class)
