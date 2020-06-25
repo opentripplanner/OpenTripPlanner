@@ -7,7 +7,6 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.UpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
@@ -28,7 +27,6 @@ import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,15 +43,14 @@ public abstract class GraphUpdaterConfigurator {
 
     public static void setupGraph(
         Graph graph,
-        UpdaterConfig updaterConfig,
-        URI bikeRentalServiceDirectoryUrl
+        UpdaterParameters updaterParameters
     ) {
 
-        List<GraphUpdater> updaters = new ArrayList<>(createUpdatersFromConfig(updaterConfig));
+        List<GraphUpdater> updaters = new ArrayList<>(createUpdatersFromConfig(updaterParameters));
 
-        if (bikeRentalServiceDirectoryUrl != null) {
+        if (updaterParameters.bikeRentalServiceDirectoryUrl() != null) {
             updaters.addAll(BikeRentalServiceDirectoryFetcher
-                .createUpdatersFromEndpoint(bikeRentalServiceDirectoryUrl));
+                .createUpdatersFromEndpoint(updaterParameters.bikeRentalServiceDirectoryUrl()));
         }
 
         setupUpdaters(graph, updaters);
@@ -74,7 +71,7 @@ public abstract class GraphUpdaterConfigurator {
      * @return a list of GraphUpdaters created from the configuration
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
-        UpdaterConfig config
+        UpdaterParameters config
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 

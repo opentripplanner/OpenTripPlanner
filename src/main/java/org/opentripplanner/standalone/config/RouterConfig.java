@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.updater.UpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -32,10 +33,9 @@ public class RouterConfig implements Serializable {
 
     private final String requestLogFile;
     private final double streetRoutingTimeoutSeconds;
-    private final URI bikeRentalServiceDirectoryUrl;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
-    private final UpdaterConfig updaterConfig;
+    private final UpdaterParameters updaterParameters;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
@@ -44,12 +44,12 @@ public class RouterConfig implements Serializable {
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
-        this.bikeRentalServiceDirectoryUrl = adapter.asUri(
-            "bikeRentalServiceDirectoryUrl", null
-        );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterConfig = new UpdaterConfig(adapter.path("updaters"));
+        this.updaterParameters = new UpdaterConfig(
+            adapter.path("updaters"),
+            adapter.asUri("bikeRentalServiceDirectoryUrl", null)
+        );
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -70,14 +70,6 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
-    /**
-     * This is the endpoint url used for the BikeRentalServiceDirectory sandbox feature.
-     * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
-     */
-    public URI getBikeRentalServiceDirectoryUrl() {
-        return bikeRentalServiceDirectoryUrl;
-    }
-
     public RoutingRequest routingRequestDefaults() {
         return routingRequestDefaults;
     }
@@ -90,7 +82,7 @@ public class RouterConfig implements Serializable {
         return transitConfig;
     }
 
-    public UpdaterConfig updaterConfig() { return updaterConfig; }
+    public UpdaterParameters updaterConfig() { return updaterParameters; }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.
