@@ -32,8 +32,9 @@ public class BikeRentalServiceDirectoryFetcher {
     List<GraphUpdater> updaters = new ArrayList<>();
 
     try {
-      InputStream is = HttpUtils.getData(url.toString());
+      InputStream is = HttpUtils.getData(url);
       JsonNode node = (new ObjectMapper()).readTree(is);
+
       for (JsonNode operator : node.get("operators")) {
         String network = operator.get("name").asText();
         String updaterUrl = adjustUrlForUpdater(operator.get("url").asText());

@@ -10,7 +10,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.net.URI;
 
 import static org.opentripplanner.standalone.config.RoutingRequestMapper.mapRoutingRequest;
 
@@ -46,10 +45,7 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterParameters = new UpdaterConfig(
-            adapter.path("updaters"),
-            adapter.asUri("bikeRentalServiceDirectoryUrl", null)
-        );
+        this.updaterParameters = new UpdaterConfig(adapter);
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);

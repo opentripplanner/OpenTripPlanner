@@ -61,8 +61,12 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
 
   private final URI bikeRentalServiceDirectoryUrl;
 
-  public UpdaterConfig(NodeAdapter updaterConfigList, URI bikeRentalServiceDirectoryUrl) {
-    for (NodeAdapter conf : updaterConfigList.asList()) {
+  public UpdaterConfig(NodeAdapter rootAdapter) {
+    this.bikeRentalServiceDirectoryUrl = rootAdapter.asUri("bikeRentalServiceDirectoryUrl", null);
+
+    List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
+
+    for (NodeAdapter conf : updaters) {
       String type = conf.asText("type");
       Function<NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
       if(factory == null) {
@@ -70,7 +74,6 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
       }
       configList.put(type, factory.apply(conf));
     }
-    this.bikeRentalServiceDirectoryUrl = bikeRentalServiceDirectoryUrl;
   }
 
   /**
