@@ -708,18 +708,23 @@ public class State implements Cloneable {
     }
 
     private State reverseOptimizeRentingVehicles(RentVehicleAnywhereEdge edge, State ret, State orig) {
-        if (ret.stateData.opt.reverseOptimizing) {
-            if (ret.isCurrentlyRentingVehicle()) {
-                return edge.reversedTraverseBeginRenting(ret);
+        try {
+            if (ret.stateData.opt.reverseOptimizing) {
+                if (ret.isCurrentlyRentingVehicle()) {
+                    return edge.reversedTraverseBeginRenting(ret);
+                } else {
+                    return edge.reversedTraverseDoneRenting(ret, orig.getBackState().getCurrentVehicle());
+                }
             } else {
-                return edge.reversedTraverseDoneRenting(ret, orig.getBackState().getCurrentVehicle());
+                if (ret.isCurrentlyRentingVehicle()) {
+                    return edge.doneVehicleRenting(ret);
+                } else {
+                    return edge.beginVehicleRenting(ret, orig.getBackState().getCurrentVehicle());
+                }
             }
-        } else {
-            if (ret.isCurrentlyRentingVehicle()) {
-                return edge.doneVehicleRenting(ret);
-            } else {
-                return edge.beginVehicleRenting(ret, orig.getBackState().getCurrentVehicle());
-            }
+        } catch (Exception e) {
+            LOG.error("Failed to reverse traverse renting vehicles edge", e);
+            return null;
         }
     }
 

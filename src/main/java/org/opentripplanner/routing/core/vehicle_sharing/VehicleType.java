@@ -17,6 +17,7 @@ public enum VehicleType {
 
     public static VehicleType fromString(String vehicleType) {
         if (vehicleType == null) {
+            LOG.warn("Cannot create vehicle type enum from null");
             return null;
         }
         switch (vehicleType) {
@@ -27,7 +28,7 @@ public enum VehicleType {
             case _KICKSCOOTER:
                 return VehicleType.KICKSCOOTER;
             default:
-                LOG.warn("Cannot create parking zone - unknown vehicle type {}", vehicleType);
+                LOG.warn("Cannot create vehicle type enum - unknown vehicle type {}", vehicleType);
                 return null;
         }
     }
