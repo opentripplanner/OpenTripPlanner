@@ -931,6 +931,17 @@ url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
 
+#### Bike Rental Service Directory configuration (sandbox feature)
+
+To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServiceDirectory.md).
+
+```JSON
+// router-config.json
+{
+  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes"
+}
+```
+
 # Configure using command-line arguments
 
 Certain settings can be provided on the command line, when starting OpenTripPlanner. See the `CommandLineParameters` class for [a full list of arguments](http://dev.opentripplanner.org/javadoc/1.4.0/org/opentripplanner/standalone/CommandLineParameters.html).
