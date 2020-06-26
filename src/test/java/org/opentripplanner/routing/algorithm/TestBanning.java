@@ -60,10 +60,12 @@ public class TestBanning {
         route3.setId(new FeedScopedId("RB", "RUT:Route:3"));
         route3.setLongName("");
 
-        Agency agency1 = new Agency();
-        agency1.setId(new FeedScopedId("RB", "RUT:Agency:1"));
-        Agency agency2 = new Agency();
-        agency2.setId(new FeedScopedId("RB", "RUT:Agency:2"));
+        Agency agency1 = new Agency(
+            new FeedScopedId("RB", "RUT:Agency:1"), "A", "Europe/Paris"
+        );
+        Agency agency2 = new Agency(
+            new FeedScopedId("RB", "RUT:Agency:2"), "B", "Europe/Paris"
+        );
 
         route1.setAgency(agency1);
         route2.setAgency(agency1);

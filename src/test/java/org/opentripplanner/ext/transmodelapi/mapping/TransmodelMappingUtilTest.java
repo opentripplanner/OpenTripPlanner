@@ -34,9 +34,11 @@ public class TransmodelMappingUtilTest {
   }
 
   Agency agency(String feedScope, int id) {
-    Agency agency = new Agency();
-    agency.setId(new FeedScopedId(feedScope, Integer.toString(id)));
-    agency.setName("Agency " + id);
+    Agency agency = new Agency(
+        new FeedScopedId(feedScope, Integer.toString(id)),
+        "Agency " + id,
+        "Europe/Paris"
+        );
     return agency;
   }
 }

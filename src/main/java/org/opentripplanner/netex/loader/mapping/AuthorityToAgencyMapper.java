@@ -12,7 +12,7 @@ import static org.opentripplanner.netex.support.NetexObjectDecorator.withOptiona
  */
 class AuthorityToAgencyMapper {
 
-    private FeedScopedIdFactory idFactory;
+    private final FeedScopedIdFactory idFactory;
     private final String timeZone;
 
     /**
@@ -32,11 +32,11 @@ class AuthorityToAgencyMapper {
      * Map authority and time zone to OTP agency.
      */
     Agency mapAuthorityToAgency(Authority source){
-        Agency target = new Agency();
-
-        target.setId(idFactory.createId(source.getId()));
-        target.setName(source.getName().getValue());
-        target.setTimezone(timeZone);
+        Agency target = new Agency(
+            idFactory.createId(source.getId()),
+            source.getName().getValue(),
+            timeZone
+        );
 
         withOptional(source.getContactDetails(), c -> {
             target.setUrl(c.getUrl());
@@ -50,10 +50,11 @@ class AuthorityToAgencyMapper {
      * "N/A" and id set to {@code "Dummy-" + timeZone}.
      */
     Agency createDummyAgency(){
-        Agency agency = new Agency();
-        agency.setId(idFactory.createId(dummyAgencyId));
-        agency.setName("N/A");
-        agency.setTimezone(timeZone);
+        Agency agency = new Agency(
+            idFactory.createId(dummyAgencyId),
+            "N/A",
+            timeZone
+        );
         agency.setUrl("N/A");
         agency.setPhone("N/A");
         return agency;

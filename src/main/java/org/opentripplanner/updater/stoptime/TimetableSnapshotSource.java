@@ -571,9 +571,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
                 route.setId(new FeedScopedId(feedId, tripId));
             }
             // Create dummy agency for added trips
-            Agency dummyAgency = new Agency();
-            dummyAgency.setId(new FeedScopedId(feedId, ""));
-            dummyAgency.setName("");
+            Agency dummyAgency = new Agency(
+                new FeedScopedId(feedId, "Dummy"),
+                "Dummy",
+                "Europe/Paris"
+            );
             route.setAgency(dummyAgency);
             // Guess the route type as it doesn't exist yet in the specifications
             // Bus. Used for short- and long-distance bus routes.

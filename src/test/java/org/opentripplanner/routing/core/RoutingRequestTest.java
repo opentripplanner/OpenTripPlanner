@@ -5,7 +5,6 @@ import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 
 import static org.junit.Assert.assertEquals;
@@ -56,14 +55,12 @@ public class RoutingRequestTest {
     @Test
     public void testPreferencesPenaltyForRoute() {
         FeedScopedId id = new FeedScopedId("feedId", "1");
-        Agency agency = new Agency();
+        Agency agency = new Agency(new FeedScopedId("feedId", "A"), "A", "Europe/Paris");
         Route route = new Route();
-        Trip trip = new Trip();
         RoutingRequest routingRequest = new RoutingRequest();
 
-        trip.setRoute(route);
         route.setId(id);
         route.setAgency(agency);
-        assertEquals(0, routingRequest.preferencesPenaltyForRoute(trip.getRoute()));
+        assertEquals(0, routingRequest.preferencesPenaltyForRoute(route));
     }
 }
