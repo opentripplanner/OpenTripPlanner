@@ -48,7 +48,7 @@ public class ParkingZonesMapper {
     private GeometryParkingZone mapToGeometryParkingZones(
             Map.Entry<String, List<ParkingZone>> vehicleTypeToParkingZones, int providerId
     ) {
-        VehicleType vehicleType = VehicleType.fromString(vehicleTypeToParkingZones.getKey());
+        VehicleType vehicleType = VehicleType.fromDatabaseVehicleType(vehicleTypeToParkingZones.getKey());
         if (vehicleType == null) {
             return null;
         }

@@ -34,7 +34,7 @@ public class VehiclePositionsDiff {
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
         Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
         Double rangeInMeters = vehicle.getRangeInMeters();
-        VehicleType vehicleType = VehicleType.fromString(vehicle.getType());
+        VehicleType vehicleType = VehicleType.fromDatabaseVehicleType(vehicle.getType());
         if (vehicleType == null) {
             LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicle.getType());
             return null;
