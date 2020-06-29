@@ -379,8 +379,8 @@ public class StreetVertexIndex {
             return vertex;
         } else {
             Envelope env = new Envelope(coordinate);
-            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(20, coordinate.y),
-                SphericalDistanceLibrary.metersToDegrees(20));
+            env.expandBy(SphericalDistanceLibrary.metersToLonDegrees(500, coordinate.y),
+                SphericalDistanceLibrary.metersToDegrees(500));
             List<Vertex> vertices = verticesTree.query(env);
             double minDistance = Double.MAX_VALUE;
             Vertex closest = null;
