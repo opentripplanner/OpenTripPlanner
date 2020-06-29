@@ -1,6 +1,8 @@
 package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import com.google.common.collect.Lists;
+import graphql.relay.Connection;
+import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.locationtech.jts.geom.Coordinate;
@@ -193,14 +195,14 @@ public class LegacyGraphQLQueryTypeImpl
 
   //TODO
   @Override
-  public DataFetcher<Object> stopsByRadius() {
-    return environment -> null;
+  public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius() {
+    return new SimpleListConnection<StopFinder.StopAndDistance>(Collections.EMPTY_LIST, "stopsByRadius");
   }
 
   //TODO
   @Override
-  public DataFetcher<Object> nearest() {
-    return environment -> null;
+  public DataFetcher<Connection<Object>> nearest() {
+    return new SimpleListConnection<Object>(Collections.EMPTY_LIST, "Nearest");
   }
 
   //TODO
@@ -496,19 +498,6 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("modeWeight.FUNICULAR", (Double v) -> request.setModeWeight(TraverseMode.FUNICULAR, v));
       // callWith.argument("modeWeight.AIRPLANE", (Double v) -> request.setModeWeight(TraverseMode.AIRPLANE, v));
 
-      OptimizeType optimize = environment.getArgument("optimize");
-
-      if (optimize == OptimizeType.TRIANGLE) {
-        callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
-        callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
-        callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
-        try {
-          RoutingRequest.assertTriangleParameters(request.bikeTriangleSafetyFactor, request.bikeTriangleTimeFactor, request.bikeTriangleSlopeFactor);
-        } catch (ParameterException e) {
-          throw new RuntimeException(e);
-        }
-      }
-
       callWith.argument("arriveBy", request::setArriveBy);
       request.showIntermediateStops = true;
       callWith.argument("intermediatePlaces", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(LegacyGraphQLQueryTypeImpl::toGenericLocation).collect(Collectors.toList()));
@@ -528,13 +517,34 @@ public class LegacyGraphQLQueryTypeImpl
       callWith.argument("transferPenalty", (Integer v) -> request.transferCost = v);
       // callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
-      if (optimize == OptimizeType.TRANSFERS) {
-        optimize = OptimizeType.QUICK;
-        request.transferCost += 1800;
-      }
 
-      if (optimize != null) {
-        request.optimize = optimize;
+      if (environment.getArgument("optimize") != null) {
+        OptimizeType optimize = OptimizeType.valueOf(environment.getArgument("optimize"));
+
+        if (optimize == OptimizeType.TRIANGLE) {
+          callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
+          callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
+          callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
+          try {
+            RoutingRequest.assertTriangleParameters(
+                request.bikeTriangleSafetyFactor,
+                request.bikeTriangleTimeFactor,
+                request.bikeTriangleSlopeFactor
+            );
+          }
+          catch (ParameterException e) {
+            throw new RuntimeException(e);
+          }
+        }
+
+        if (optimize == OptimizeType.TRANSFERS) {
+          optimize = OptimizeType.QUICK;
+          request.transferCost += 1800;
+        }
+
+        if (optimize != null) {
+          request.optimize = optimize;
+        }
       }
 
 

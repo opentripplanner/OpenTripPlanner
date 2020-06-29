@@ -41,7 +41,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   //TODO
   @Override
   public DataFetcher<Iterable<TripTimeShort>> stopTimesForPattern() {
-    return null;
+    return environment -> null;
   }
 
   @Override
@@ -283,7 +283,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   // TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return null;
+    return environment -> null;
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

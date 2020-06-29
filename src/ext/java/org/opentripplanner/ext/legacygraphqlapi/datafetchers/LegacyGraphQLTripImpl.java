@@ -274,7 +274,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   //TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return null;
+    return environment -> null;
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
