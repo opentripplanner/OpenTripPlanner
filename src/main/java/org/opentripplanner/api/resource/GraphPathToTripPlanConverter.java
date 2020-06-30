@@ -388,11 +388,7 @@ public abstract class GraphPathToTripPlanConverter {
         Edge[] edges = new Edge[states.length - 1];
 
         leg.startTime = makeCalendar(states[0]);
-        leg.endTime = makeCalendar(
-            states[states.length - 1].backEdge instanceof TransitBoardAlight
-                ? states[states.length - 2]
-                : states[states.length - 1]
-        );
+        leg.endTime = makeCalendar(getLastOnboardTransitState(states));
 
         // Calculate leg distance and fill array of edges
         leg.distance = 0.0;
@@ -808,19 +804,15 @@ public abstract class GraphPathToTripPlanConverter {
         if (trip != null) {
             Route route = trip.getRoute();
             Agency agency = route.getAgency();
-            // in some states, the final state might be a TransitBoardAlight edge type, where instead we may want a
-            // pattern edge instead. Find the right index to use in these cases.
-            int lastTransitStateIndex = states[states.length - 1].backEdge instanceof TransitBoardAlight
-                ? states.length - 2
-                : states.length - 1;
-            ServiceDay serviceDay = states[lastTransitStateIndex].getServiceDay();
+            State lastOnboardTransitState = getLastOnboardTransitState(states);
+            ServiceDay serviceDay = lastOnboardTransitState.getServiceDay();
 
             leg.agencyId = agency.getId();
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
             leg.agencyBrandingUrl = agency.getBrandingUrl();
             leg.headsign = states[1].getBackDirection();
-            leg.route = states[lastTransitStateIndex].getBackEdge().getName(requestedLocale);
+            leg.route = lastOnboardTransitState.getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
             leg.routeId = route.getId();
             leg.routeLongName = route.getLongName();
@@ -845,14 +837,14 @@ public abstract class GraphPathToTripPlanConverter {
                 leg.headsign = trip.getTripHeadsign();
             }
 
-            Edge edge = states[lastTransitStateIndex].backEdge;
+            Edge edge = lastOnboardTransitState.backEdge;
             if (edge instanceof TemporaryDirectPatternHop) {
                 leg.callAndRide = true;
             }
             if (edge instanceof PartialPatternHop) {
                 PartialPatternHop hop = (PartialPatternHop) edge;
                 int directTime = hop.getDirectVehicleTime();
-                TripTimes tt = states[lastTransitStateIndex].getTripTimes();
+                TripTimes tt = lastOnboardTransitState.getTripTimes();
                 int maxTime = tt.getDemandResponseMaxTime(directTime);
                 int avgTime = tt.getDemandResponseAvgTime(directTime);
                 int delta = maxTime - avgTime;
@@ -894,10 +886,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
         leg.from.arrival = null;
-        int lastTransitStateIndex = states[states.length - 1].backEdge instanceof TransitBoardAlight
-            ? states.length - 2
-            : states.length - 1;
-        leg.to = makePlace(states[lastTransitStateIndex], lastVertex, null, lastStop, tripTimes, requestedLocale);
+        leg.to = makePlace(getLastOnboardTransitState(states), lastVertex, null, lastStop, tripTimes, requestedLocale);
         leg.to.departure = null;
 
         if (showIntermediateStops) {
@@ -925,6 +914,19 @@ public abstract class GraphPathToTripPlanConverter {
                 leg.stop.add(makePlace(states[i], vertex, edges[i], currentStop, tripTimes, requestedLocale));
             }
         }
+    }
+
+    /**
+     * In some leg states, the final state might be a TransitBoardAlight edge type, where instead we may want a pattern
+     * edge instead. This method will find and return the correct state to use for calculating items for a leg.
+     *
+     * @param states An array of states representing a leg
+     */
+    private static State getLastOnboardTransitState(State[] states) {
+        int lastTransitStateIndex = states[states.length - 1].backEdge instanceof TransitBoardAlight
+            ? states.length - 2
+            : states.length - 1;
+        return states[lastTransitStateIndex];
     }
 
     /**
