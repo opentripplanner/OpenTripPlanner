@@ -917,8 +917,9 @@ public abstract class GraphPathToTripPlanConverter {
     }
 
     /**
-     * In some leg states, the final state might be a TransitBoardAlight edge type, where instead we may want a pattern
-     * edge instead. This method will find and return the correct state to use for calculating items for a leg.
+     * In some leg states, the final state might be a TransitBoardAlight edge type, where instead we may want an edge
+     * containing information about the transit route/pattern/etc. This method will find and return the correct state to
+     * use for calculating transit-related items for a leg.
      *
      * @param states An array of states representing a leg
      */
@@ -963,6 +964,7 @@ public abstract class GraphPathToTripPlanConverter {
             place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getZoneId();
             place.stopIndex = ((OnboardEdge) edge).getStopIndex();
+            // TransitBoardAlight edges don't advance the stopIndex, so don't increment if one is encountered at the end
             if (endOfLeg && !(edge instanceof TransitBoardAlight)) place.stopIndex++;
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
