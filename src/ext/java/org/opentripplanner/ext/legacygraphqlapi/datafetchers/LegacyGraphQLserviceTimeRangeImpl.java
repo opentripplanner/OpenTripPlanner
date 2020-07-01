@@ -6,7 +6,7 @@ import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.routing.RoutingService;
 
-public class LegacyGraphQLServiceTimeRangeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLServiceTimeRange {
+public class LegacyGraphQLserviceTimeRangeImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLServiceTimeRange {
     @Override
     public DataFetcher<Long> start() {
         return environment -> getRoutingService(environment).getTransitServiceStarts();

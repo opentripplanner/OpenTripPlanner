@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
-public class LegacyGraphQLElevationProfileComponentImpl
+public class LegacyGraphQLelevationProfileComponentImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLElevationProfileComponent {
 
   @Override

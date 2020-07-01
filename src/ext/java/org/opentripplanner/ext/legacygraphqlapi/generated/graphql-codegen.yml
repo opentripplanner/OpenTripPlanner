@@ -34,7 +34,7 @@ config:
     Cluster: Object
     Coordinates: org.locationtech.jts.geom.Coordinate#Coordinate
     debugOutput: org.opentripplanner.api.resource.DebugOutput#DebugOutput
-    DepartureRow: Object
+    DepartureRow: org.opentripplanner.routing.StopFinder#StopFinder.DepartureRow
     elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
@@ -47,9 +47,9 @@ config:
     Pattern: org.opentripplanner.model.TripPattern#TripPattern
     PickupDropoffType: String
     Place: org.opentripplanner.model.plan.StopArrival#StopArrival
-    placeAtDistance: Object
-    placeAtDistanceConnection: graphql.relay.Connection#Connection<Object>
-    placeAtDistanceEdge: graphql.relay.Edge#Edge<Object>
+    placeAtDistance: org.opentripplanner.routing.StopFinder#StopFinder.PlaceAndDistance
+    placeAtDistanceConnection: graphql.relay.Connection#Connection<StopFinder.PlaceAndDistance>
+    placeAtDistanceEdge: graphql.relay.Edge#Edge<StopFinder.PlaceAndDistance>
     Plan: org.opentripplanner.routing.api.response.RoutingResponse#RoutingResponse
     RealtimeState: String
     Route: org.opentripplanner.model.Route#Route

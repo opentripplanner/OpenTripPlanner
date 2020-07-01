@@ -2,9 +2,11 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import com.google.common.collect.Lists;
 import graphql.relay.Connection;
+import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import graphql.schema.DataFetchingEnvironmentImpl;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.api.common.ParameterException;
@@ -26,19 +28,21 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.StopFinder;
-import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Date;
@@ -86,24 +90,34 @@ public class LegacyGraphQLQueryTypeImpl
         case "Cluster":
           return null; //TODO
         case "DepartureRow":
-          return null; //TODO
+          return StopFinder.DepartureRow.fromId(routingService, id);
         case "Pattern":
           return routingService.getTripPatternForId(FeedScopedId.parseId(id));
-        case "placeAtDistance":
-          return null; //TODO
+        case "placeAtDistance": {
+          String[] parts = id.split(";");
+
+          Relay.ResolvedGlobalId internalId = new Relay().fromGlobalId(parts[1]);
+
+          Object place = node().get(DataFetchingEnvironmentImpl
+              .newDataFetchingEnvironment(environment)
+              .source(new Object())
+              .arguments(Map.of("id", internalId))
+              .build());
+
+          return new StopFinder.PlaceAndDistance(place, Integer.parseInt(parts[0]));
+        }
         case "Route":
           return routingService.getRouteForId(FeedScopedId.parseId(id));
         case "Stop":
           return routingService.getStopForId(FeedScopedId.parseId(id));
         case "Stoptime":
           return null; //TODO
-        case "stopAtDistance":
+        case "stopAtDistance": {
           String[] parts = id.split(";");
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
-          new StopFinder.StopAndDistance(stop, Integer.parseInt(parts[0]));
-          //TODO fix type
-          return null;
+          return new StopFinder.StopAndDistance(stop, Integer.parseInt(parts[0]));
+        }
         case "TicketType":
           return null; //TODO
         case "Trip":
@@ -196,18 +210,83 @@ public class LegacyGraphQLQueryTypeImpl
   //TODO
   @Override
   public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius() {
-    return new SimpleListConnection<StopFinder.StopAndDistance>(Collections.EMPTY_LIST, "stopsByRadius");
+    return new SimpleListConnection<StopFinder.StopAndDistance>(
+        Collections.EMPTY_LIST,
+        "stopsByRadius"
+    );
+  }
+
+  @Override
+  public DataFetcher<Connection<StopFinder.PlaceAndDistance>> nearest() {
+    return environment -> {
+      List<FeedScopedId> filterByStops = null;
+      List<FeedScopedId> filterByRoutes = null;
+      List<String> filterByBikeRentalStations = null;
+      List<String> filterByBikeParks = null;
+      List<String> filterByCarParks = null;
+
+      LegacyGraphQLTypes.LegacyGraphQLQueryTypeNearestArgs args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeNearestArgs(
+          environment.getArguments());
+
+      LegacyGraphQLTypes.LegacyGraphQLInputFiltersInput filterByIds = args.getLegacyGraphQLFilterByIds();
+
+      if (filterByIds != null) {
+        filterByStops = filterByIds.getLegacyGraphQLStops() != null ? StreamSupport
+            .stream(filterByIds.getLegacyGraphQLStops().spliterator(), false)
+            .map(FeedScopedId::parseId)
+            .collect(Collectors.toList()) : null;
+        filterByRoutes = filterByIds.getLegacyGraphQLRoutes() != null ? StreamSupport
+            .stream(filterByIds.getLegacyGraphQLRoutes().spliterator(), false)
+            .map(FeedScopedId::parseId)
+            .collect(Collectors.toList()) : null;
+        filterByBikeRentalStations = filterByIds.getLegacyGraphQLBikeRentalStations() != null
+            ? Lists.newArrayList(filterByIds.getLegacyGraphQLBikeRentalStations())
+            : null;
+        filterByBikeParks = filterByIds.getLegacyGraphQLBikeParks() != null ? Lists.newArrayList(
+            filterByIds.getLegacyGraphQLBikeParks()) : null;
+        filterByCarParks = filterByIds.getLegacyGraphQLCarParks() != null ? Lists.newArrayList(
+            filterByIds.getLegacyGraphQLCarParks()) : null;
+      }
+
+      List<TransitMode> filterByModes = args.getLegacyGraphQLFilterByModes() != null ? StreamSupport
+          .stream(args.getLegacyGraphQLFilterByModes().spliterator(), false)
+          .map(mode -> mode.label)
+          .map(TransitMode::valueOf)
+          .collect(Collectors.toList()) : null;
+      List<StopFinder.PlaceType> filterByPlaceTypes =
+          args.getLegacyGraphQLFilterByPlaceTypes() != null ? StreamSupport
+              .stream(args.getLegacyGraphQLFilterByPlaceTypes().spliterator(), false)
+              .map(placeType -> placeType.label)
+              .map(StopFinder.PlaceType::valueOf)
+              .collect(Collectors.toList()) : null;
+
+      List<StopFinder.PlaceAndDistance> places;
+      try {
+        places = new ArrayList<>(getRoutingService(environment).findClosestPlacesByWalking(
+            args.getLegacyGraphQLLat(),
+            args.getLegacyGraphQLLon(),
+            args.getLegacyGraphQLMaxDistance(),
+            args.getLegacyGraphQLMaxResults(),
+            filterByModes,
+            filterByPlaceTypes,
+            filterByStops,
+            filterByRoutes,
+            filterByBikeRentalStations,
+            filterByBikeParks,
+            filterByCarParks
+        ));
+      }
+      catch (RoutingValidationException e) {
+        places = Collections.emptyList();
+      }
+
+      return new SimpleListConnection<>(places).get(environment);
+    };
   }
 
   //TODO
   @Override
-  public DataFetcher<Connection<Object>> nearest() {
-    return new SimpleListConnection<Object>(Collections.EMPTY_LIST, "Nearest");
-  }
-
-  //TODO
-  @Override
-  public DataFetcher<Object> departureRow() {
+  public DataFetcher<StopFinder.DepartureRow> departureRow() {
     return environment -> null;
   }
 

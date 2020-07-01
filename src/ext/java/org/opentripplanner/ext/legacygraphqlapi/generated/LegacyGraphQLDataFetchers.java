@@ -2,36 +2,34 @@
 
 package org.opentripplanner.ext.legacygraphqlapi.generated;
 
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.bike_park.BikePark;
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import graphql.relay.Connection;
+import graphql.relay.Edge;
+import graphql.schema.DataFetcher;
+import graphql.schema.TypeResolver;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
-import java.util.Map;
-import org.opentripplanner.routing.core.FareComponent;
+import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
-import org.opentripplanner.util.model.EncodedPolylineBean;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.plan.StopArrival;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
-import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.StopFinder;
-import graphql.relay.Connection;
-import graphql.relay.Edge;
-import org.opentripplanner.model.TripTimeShort;
-import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.util.model.EncodedPolylineBean;
+
 import java.util.Map;
-import org.opentripplanner.model.Trip;
-import graphql.schema.TypeResolver;
-import graphql.schema.DataFetcher;
 
 public class LegacyGraphQLDataFetchers {
   /** A public transport agency */
@@ -270,13 +268,13 @@ public class LegacyGraphQLDataFetchers {
   
   /** A connection to a list of items. */
   public interface LegacyGraphQLPlaceAtDistanceConnection {
-    public DataFetcher<Iterable<Edge<Object>>> edges();
+    public DataFetcher<Iterable<Edge<StopFinder.PlaceAndDistance>>> edges();
     public DataFetcher<Object> pageInfo();
   }
   
   /** An edge in a connection. */
   public interface LegacyGraphQLPlaceAtDistanceEdge {
-    public DataFetcher<Object> node();
+    public DataFetcher<StopFinder.PlaceAndDistance> node();
     public DataFetcher<String> cursor();
   }
   
@@ -306,8 +304,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Object>> stopsByBbox();
     public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius();
-    public DataFetcher<Connection<Object>> nearest();
-    public DataFetcher<Object> departureRow();
+    public DataFetcher<Connection<StopFinder.PlaceAndDistance>> nearest();
+    public DataFetcher<StopFinder.DepartureRow> departureRow();
     public DataFetcher<Object> stop();
     public DataFetcher<Object> station();
     public DataFetcher<Iterable<Object>> stations();

@@ -6,7 +6,7 @@ import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.plan.WalkStep;
 
-public class LegacyGraphQLStepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
+public class LegacyGraphQLstepImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLStep {
 
   @Override
   public DataFetcher<Double> distance() {

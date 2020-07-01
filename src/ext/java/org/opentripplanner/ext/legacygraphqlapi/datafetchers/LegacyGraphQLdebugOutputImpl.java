@@ -5,7 +5,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 
-public class LegacyGraphQLDebugOutputImpl
+public class LegacyGraphQLdebugOutputImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLDebugOutput {
 
   @Override

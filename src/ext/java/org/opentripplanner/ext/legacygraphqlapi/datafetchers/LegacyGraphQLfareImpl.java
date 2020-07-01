@@ -8,7 +8,7 @@ import org.opentripplanner.routing.core.Money;
 
 import java.util.Map;
 
-public class LegacyGraphQLFareImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFare {
+public class LegacyGraphQLfareImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLFare {
 
   @Override
   public DataFetcher<String> type() {

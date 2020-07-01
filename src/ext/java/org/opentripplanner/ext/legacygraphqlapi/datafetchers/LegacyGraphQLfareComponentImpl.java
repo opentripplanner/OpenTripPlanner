@@ -10,7 +10,7 @@ import org.opentripplanner.routing.core.FareComponent;
 
 import java.util.stream.Collectors;
 
-public class LegacyGraphQLFareComponentImpl
+public class LegacyGraphQLfareComponentImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLFareComponent {
 
   @Override

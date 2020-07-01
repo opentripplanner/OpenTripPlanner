@@ -6,12 +6,12 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 
-public class LegacyGraphQLStopAtDistanceImpl
+public class LegacyGraphQLstopAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLStopAtDistance {
 
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
-    return environment -> new Relay.ResolvedGlobalId("StopAtDistance",
+    return environment -> new Relay.ResolvedGlobalId("stopAtDistance",
         getSource(environment).distance + ";" + getSource(environment).tstop.getId().toString());
   }
 

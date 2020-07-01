@@ -1,24 +1,29 @@
 package org.opentripplanner.routing;
 
 import lombok.experimental.Delegate;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.TimetableSnapshot;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.algorithm.RoutingWorker;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.standalone.server.Router;
 
 import java.util.Calendar;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
+
+import static java.lang.Integer.min;
 
 /**
  * This is the entry point of all API requests towards the OTP graph. A new instance of this class
@@ -52,7 +57,32 @@ public class RoutingService {
     public List<StopFinder.StopAndDistance> findClosestStopsByWalking(
             double lat, double lon, int radius
     ) {
-        return StopFinder.findClosestStopsByWalking(graph, lat, lon, radius);
+        StopFinder.StopFinderTraverseVisitor visitor = new StopFinder.StopFinderTraverseVisitor();
+        StopFinder.findClosestByWalking(graph, lat, lon, radius, visitor, null);
+        return visitor.stopsFound;
+    }
+
+    public List<StopFinder.PlaceAndDistance> findClosestPlacesByWalking(
+        double lat,
+        double lon,
+        int maxDistance,
+        int maxResults,
+        List<TransitMode> filterByModes,
+        List<StopFinder.PlaceType> filterByPlaceTypes,
+        List<FeedScopedId> filterByStops,
+        List<FeedScopedId> filterByRoutes,
+        List<String> filterByBikeRentalStations,
+        List<String> filterByBikeParks,
+        List<String> filterByCarParks) {
+        StopFinder.PlaceFinderTraverseVisitor visitor = new StopFinder.PlaceFinderTraverseVisitor(
+            this, filterByModes, filterByPlaceTypes, filterByStops, filterByRoutes,
+            filterByBikeRentalStations, maxResults
+        );
+        StopFinder.PlaceFinderTraverseVisitor.PlaceFinderSearchTerminationStrategy terminationStrategy = visitor.getSearchTerminationStrategy();
+        StopFinder.findClosestByWalking(graph, lat, lon, maxDistance, visitor, terminationStrategy);
+        List<StopFinder.PlaceAndDistance> results = visitor.placesFound;
+        results.sort(Comparator.comparingInt(pad -> pad.distance));
+        return results.subList(0, min(results.size(), maxResults));
     }
 
     /**
