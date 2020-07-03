@@ -52,7 +52,7 @@ public class StopFinder {
     AStar astar = new AStar();
     rr.setNumItineraries(1);
     astar.setTraverseVisitor(visitor);
-    astar.getShortestPathTree(rr, 100, terminationStrategy); // timeout in seconds
+    astar.getShortestPathTree(rr, 1, terminationStrategy); // timeout in seconds
     // Destroy the routing context, to clean up the temporary edges & vertices
     rr.rctx.destroy();
   }
