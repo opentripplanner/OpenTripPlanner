@@ -23,7 +23,6 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -127,9 +126,8 @@ public class StopFinder {
         boolean omitNonPickups,
         boolean omitCanceled)
     {
-      return Collections.EMPTY_LIST;
-      // TODO
-      // return routingService.stopTimesForPattern(stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups, omitCanceled);
+      return routingService.stopTimesForPatternAtStop(
+              stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups);
     }
 
     public static PatternAtStop fromId(RoutingService routingService, String id) {

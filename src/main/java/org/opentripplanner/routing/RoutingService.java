@@ -126,6 +126,36 @@ public class RoutingService {
         return StopTimesHelper.getStopTimesForStop(this, stop, serviceDate, omitNonPickups);
     }
 
+
+    /**
+     * Fetch upcoming vehicle departures from a stop for a specific pattern, passing the stop
+     * for the previous, current and next service date. It uses a priority queue to keep track of
+     * the next departures. The queue is shared between all dates, as services from the previous
+     * service date can visit the stop later than the current service date's services.
+     * <p>
+     * TODO: Add frequency based trips
+     *
+     * @param stop               Stop object to perform the search for
+     * @param pattern            Pattern object to perform the search for
+     * @param startTime          Start time for the search. Seconds from UNIX epoch
+     * @param timeRange          Searches forward for timeRange seconds from startTime
+     * @param numberOfDepartures Number of departures to fetch per pattern
+     * @param omitNonPickups     If true, do not include vehicles that will not pick up passengers.
+     */
+    public List<TripTimeShort> stopTimesForPatternAtStop(
+            Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
+    ) {
+        return StopTimesHelper.stopTimesForPatternAtStop(this,
+                lazyGetTimeTableSnapShot(),
+                stop,
+                pattern,
+                startTime,
+                timeRange,
+                numberOfDepartures,
+                omitNonPickups
+        );
+    }
+
     /**
      * Returns all the patterns for a specific stop. If includeRealtimeUpdates is set, new patterns
      * added by realtime updates are added to the collection.
