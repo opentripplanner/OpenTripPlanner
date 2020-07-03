@@ -6,7 +6,7 @@ import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.graph_builder.module.NearbyStopFinder;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -38,10 +38,30 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     );
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<TripTimeShort>> stopTimesForPattern() {
-    return environment -> null;
+    return environment -> getValue(
+        environment,
+        stop -> {
+          RoutingService routingService = getRoutingService(environment);
+          LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs args = new LegacyGraphQLTypes.LegacyGraphQLStopStopTimesForPatternArgs(environment.getArguments());
+          TripPattern pattern = routingService.getTripPatternForId(FeedScopedId.parseId(args.getLegacyGraphQLId()));
+
+          if (pattern == null) { return null; };
+          
+          // TODO: use args.getLegacyGraphQLOmitCanceled()
+
+          return routingService.stopTimesForPatternAtStop(
+              stop,
+              pattern,
+              args.getLegacyGraphQLStartTime(),
+              args.getLegacyGraphQLTimeRange(),
+              args.getLegacyGraphQLNumberOfDepartures(),
+              args.getLegacyGraphQLOmitNonPickups()
+          );
+        },
+        station -> null
+    );
   }
 
   @Override
