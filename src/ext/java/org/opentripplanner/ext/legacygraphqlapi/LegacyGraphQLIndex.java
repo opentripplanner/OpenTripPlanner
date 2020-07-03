@@ -25,6 +25,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -92,7 +93,7 @@ class LegacyGraphQLIndex {
 
   static HashMap<String, Object> getGraphQLExecutionResult(
       String query, Router router, Map<String, Object> variables, String operationName,
-      int maxResolves
+      int maxResolves, Locale locale
   ) {
     MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(
         maxResolves);
@@ -114,6 +115,7 @@ class LegacyGraphQLIndex {
         .context(requestContext)
         .root(router)
         .variables(variables)
+        .locale(locale)
         .build();
     HashMap<String, Object> content = new HashMap<>();
     ExecutionResult executionResult;
@@ -135,7 +137,7 @@ class LegacyGraphQLIndex {
 
   static Response getGraphQLResponse(
       String query, Router router, Map<String, Object> variables, String operationName,
-      int maxResolves
+      int maxResolves, Locale locale
   ) {
     Response.ResponseBuilder res = Response.status(Response.Status.OK);
     HashMap<String, Object> content = getGraphQLExecutionResult(
@@ -143,7 +145,8 @@ class LegacyGraphQLIndex {
         router,
         variables,
         operationName,
-        maxResolves
+        maxResolves,
+        locale
     );
     return res.entity(content).build();
   }

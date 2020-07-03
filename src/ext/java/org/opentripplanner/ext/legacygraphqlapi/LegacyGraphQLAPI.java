@@ -14,12 +14,14 @@ import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
+import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.Callable;
 import java.util.concurrent.CancellationException;
@@ -47,7 +49,8 @@ public class LegacyGraphQLAPI {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
       HashMap<String, Object> queryParameters,
-      @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves
+      @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+      @Context HttpHeaders headers
   ) {
     if (queryParameters == null || !queryParameters.containsKey("query")) {
       LOG.debug("No query found in body");
@@ -57,6 +60,10 @@ public class LegacyGraphQLAPI {
           .entity("No query found in body")
           .build();
     }
+
+    Locale locale = headers.getAcceptableLanguages().size() > 0
+        ? headers.getAcceptableLanguages().get(0)
+        : router.defaultRoutingRequest.locale;
 
     String query = (String) queryParameters.get("query");
     Object queryVariables = queryParameters.getOrDefault("variables", null);
@@ -85,7 +92,8 @@ public class LegacyGraphQLAPI {
         router,
         variables,
         operationName,
-        maxResolves
+        maxResolves,
+        locale
     );
   }
 
@@ -93,9 +101,14 @@ public class LegacyGraphQLAPI {
   @Path("/")
   @Consumes("application/graphql")
   public Response getGraphQL(
-      String query, @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves
+      String query,
+      @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+      @Context HttpHeaders headers
   ) {
-    return LegacyGraphQLIndex.getGraphQLResponse(query, router, null, null, maxResolves);
+    Locale locale = headers.getAcceptableLanguages().size() > 0
+        ? headers.getAcceptableLanguages().get(0)
+        : router.defaultRoutingRequest.locale;
+    return LegacyGraphQLIndex.getGraphQLResponse(query, router, null, null, maxResolves, locale);
   }
 
   @POST
@@ -104,10 +117,15 @@ public class LegacyGraphQLAPI {
   public Response getGraphQLBatch(
       List<HashMap<String, Object>> queries,
       @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout,
-      @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves
+      @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
+      @Context HttpHeaders headers
   ) {
     List<Map<String, Object>> responses = new ArrayList<>();
     List<Callable<Map>> futures = new ArrayList();
+
+    Locale locale = headers.getAcceptableLanguages().size() > 0
+        ? headers.getAcceptableLanguages().get(0)
+        : router.defaultRoutingRequest.locale;
 
     for (HashMap<String, Object> query : queries) {
       Map<String, Object> variables;
@@ -136,7 +154,8 @@ public class LegacyGraphQLAPI {
           router,
           variables,
           operationName,
-          maxResolves
+          maxResolves,
+          locale
       ));
     }
 

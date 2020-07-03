@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -367,14 +368,11 @@ public class LegacyGraphQLQueryTypeImpl
 
       if (args.getLegacyGraphQLName() != null) {
         String name = args.getLegacyGraphQLName().toLowerCase(environment.getLocale());
-        routeStream = routeStream.filter(route -> route
-                .getShortName()
-                .toLowerCase(environment.getLocale())
-                .startsWith(name)
-                || route
-                .getLongName()
-                .toLowerCase(environment.getLocale())
-                .startsWith(name));
+        routeStream = routeStream.filter(route -> Stream
+            .of(route.getShortName(), route.getLongName())
+            .filter(Objects::nonNull)
+            .map(s -> s.toLowerCase(environment.getLocale()))
+            .anyMatch(s -> s.startsWith(name)));
       }
 
       return routeStream.collect(Collectors.toList());
