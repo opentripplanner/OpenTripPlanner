@@ -208,13 +208,25 @@ public class LegacyGraphQLQueryTypeImpl
     };
   }
 
-  //TODO
   @Override
   public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius() {
-    return new SimpleListConnection<StopFinder.StopAndDistance>(
-        Collections.EMPTY_LIST,
-        "stopsByRadius"
-    );
+    return environment -> {
+      LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs(environment.getArguments());
+
+      List<StopFinder.StopAndDistance> stops;
+      try {
+        stops = getRoutingService(environment).findClosestStopsByWalking(
+            args.getLegacyGraphQLLat(),
+            args.getLegacyGraphQLLon(),
+            args.getLegacyGraphQLRadius()
+        );
+      }
+      catch (RoutingValidationException e) {
+        stops = Collections.emptyList();
+      }
+
+      return new SimpleListConnection<>(stops).get(environment);
+    };
   }
 
   @Override
