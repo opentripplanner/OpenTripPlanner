@@ -91,7 +91,7 @@ public class LegacyGraphQLQueryTypeImpl
         case "Cluster":
           return null; //TODO
         case "DepartureRow":
-          return StopFinder.DepartureRow.fromId(routingService, id);
+          return StopFinder.PatternAtStop.fromId(routingService, id);
         case "Pattern":
           return routingService.getTripPatternForId(FeedScopedId.parseId(id));
         case "placeAtDistance": {
@@ -287,7 +287,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   //TODO
   @Override
-  public DataFetcher<StopFinder.DepartureRow> departureRow() {
+  public DataFetcher<StopFinder.PatternAtStop> departureRow() {
     return environment -> null;
   }
 

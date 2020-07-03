@@ -305,7 +305,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stopsByBbox();
     public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius();
     public DataFetcher<Connection<StopFinder.PlaceAndDistance>> nearest();
-    public DataFetcher<StopFinder.DepartureRow> departureRow();
+    public DataFetcher<StopFinder.PatternAtStop> departureRow();
     public DataFetcher<Object> stop();
     public DataFetcher<Object> station();
     public DataFetcher<Iterable<Object>> stations();

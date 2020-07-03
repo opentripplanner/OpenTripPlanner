@@ -58,7 +58,7 @@ public class LegacyGraphQLDepartureRowImpl
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
-  private StopFinder.DepartureRow getSource(DataFetchingEnvironment environment) {
+  private StopFinder.PatternAtStop getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

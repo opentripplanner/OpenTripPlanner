@@ -104,12 +104,12 @@ public class StopFinder {
     }
   }
 
-  public static class DepartureRow {
+  public static class PatternAtStop {
     public String id;
     public Stop stop;
     public TripPattern pattern;
 
-    public DepartureRow(Stop stop, TripPattern pattern) {
+    public PatternAtStop(Stop stop, TripPattern pattern) {
       this.id = toId(stop, pattern);
       this.stop = stop;
       this.pattern = pattern;
@@ -132,11 +132,11 @@ public class StopFinder {
       // return routingService.stopTimesForPattern(stop, pattern, startTime, timeRange, numberOfDepartures, omitNonPickups, omitCanceled);
     }
 
-    public static DepartureRow fromId(RoutingService routingService, String id) {
+    public static PatternAtStop fromId(RoutingService routingService, String id) {
       String[] parts = id.split(";", 2);
       FeedScopedId stopId = FeedScopedId.parseId(parts[0]);
       FeedScopedId patternId = FeedScopedId.parseId(parts[1]);
-      return new DepartureRow(
+      return new PatternAtStop(
           routingService.getStopForId(stopId),
           routingService.getTripPatternForId(patternId)
       );
@@ -151,11 +151,11 @@ public class StopFinder {
     private Set<FeedScopedId> filterByStops;
     private Set<FeedScopedId> filterByRoutes;
     private Set<String> filterByBikeRentalStation;
-    private Set<String> seenDepartureRows = new HashSet<>();
+    private Set<String> seenPatternAtStops = new HashSet<>();
     private Set<FeedScopedId> seenStops = new HashSet<>();
     private Set<String> seenBicycleRentalStations = new HashSet<>();
     private boolean includeStops;
-    private boolean includeDepartureRows;
+    private boolean includePatternAtStops;
     private boolean includeBikeShares;
     private int maxResults;
     private PlaceFinderSearchTerminationStrategy searchTerminationStrategy;
@@ -176,7 +176,7 @@ public class StopFinder {
       this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
 
       includeStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.STOP);
-      includeDepartureRows = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.DEPARTURE_ROW);
+      includePatternAtStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.DEPARTURE_ROW);
       includeBikeShares = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
       this.maxResults = maxResults;
     }
@@ -204,7 +204,7 @@ public class StopFinder {
       if (vertex instanceof TransitStopVertex) {
         Stop stop = ((TransitStopVertex)vertex).getStop();
         handleStop(stop, distance);
-        handleDepartureRows(stop, distance);
+        handlePatternsAtStop(stop, distance);
       } else if (vertex instanceof BikeRentalStationVertex) {
         handleBikeRentalStation(((BikeRentalStationVertex)vertex).getStation(), distance);
       }
@@ -221,8 +221,8 @@ public class StopFinder {
       }
     }
 
-    private void handleDepartureRows(Stop stop, int distance) {
-      if (includeDepartureRows) {
+    private void handlePatternsAtStop(Stop stop, int distance) {
+      if (includePatternAtStops) {
         List<TripPattern> patterns = routingService.getPatternsForStop(stop)
             .stream()
             .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
@@ -232,11 +232,11 @@ public class StopFinder {
 
         for (TripPattern pattern : patterns) {
           String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
-          if (!seenDepartureRows.contains(seenKey)) {
-            DepartureRow row = new DepartureRow(stop, pattern);
+          if (!seenPatternAtStops.contains(seenKey)) {
+            PatternAtStop row = new PatternAtStop(stop, pattern);
             PlaceAndDistance place = new PlaceAndDistance(row, distance);
             placesFound.add(place);
-            seenDepartureRows.add(seenKey);
+            seenPatternAtStops.add(seenKey);
           }
         }
       }
