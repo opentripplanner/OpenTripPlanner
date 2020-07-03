@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -13,6 +14,8 @@ import java.util.HashSet;
 public final class Stop extends StationElement {
 
   private static final long serialVersionUID = 2L;
+
+  private final String platformCode;
 
   /**
    * Used for GTFS fare information.
@@ -24,6 +27,10 @@ public final class Stop extends StationElement {
    */
   private final String url;
 
+  private final TimeZone timeZone;
+
+  private final TransitMode vehicleType;
+
   private HashSet<BoardingArea> boardingAreas;
 
   public Stop(
@@ -34,12 +41,18 @@ public final class Stop extends StationElement {
       WgsCoordinate coordinate,
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
+      String platformCode,
       String zone,
-      String url
+      String url,
+      TimeZone timeZone,
+      TransitMode vehicleType
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    this.platformCode = platformCode;
     this.zone = zone;
     this.url = url;
+    this.timeZone = timeZone;
+    this.vehicleType = vehicleType;
   }
 
   /**
@@ -53,6 +66,9 @@ public final class Stop extends StationElement {
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
+        null,
+        null,
+        null,
         null,
         null,
         null,
@@ -73,12 +89,24 @@ public final class Stop extends StationElement {
     return "<Stop " + this.id + ">";
   }
 
+  public String getPlatformCode() {
+    return platformCode;
+  }
+
   public String getZone() {
     return zone;
   }
 
   public String getUrl() {
     return url;
+  }
+
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
+
+  public TransitMode getVehicleType() {
+    return vehicleType;
   }
 
   public Collection<BoardingArea> getBoardingAreas() {

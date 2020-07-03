@@ -6,6 +6,7 @@ import org.opentripplanner.util.MapUtils;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.TimeZone;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
@@ -38,8 +39,11 @@ class StopMapper {
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
+        gtfsStop.getPlatformCode(),
         gtfsStop.getZoneId(),
-        gtfsStop.getUrl()
+        gtfsStop.getUrl(),
+        gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
+        gtfsStop.isVehicleTypeSet() ? TransitModeMapper.mapMode(gtfsStop.getVehicleType()) : null
     );
   }
 }

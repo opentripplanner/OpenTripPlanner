@@ -297,10 +297,12 @@ public class LegacyGraphQLQueryTypeImpl
     };
   }
 
-  //TODO
   @Override
   public DataFetcher<StopFinder.PatternAtStop> departureRow() {
-    return environment -> null;
+    return environment -> StopFinder.PatternAtStop.fromId(
+        getRoutingService(environment),
+        new LegacyGraphQLTypes.LegacyGraphQLQueryTypeDepartureRowArgs(environment.getArguments()).getLegacyGraphQLId()
+    );
   }
 
   @Override

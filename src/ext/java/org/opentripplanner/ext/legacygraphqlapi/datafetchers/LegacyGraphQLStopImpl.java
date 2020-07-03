@@ -23,6 +23,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -129,10 +130,13 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> null;
   }
 
-  // TODO
   @Override
   public DataFetcher<String> timezone() {
-    return environment -> null;
+    return environment -> getValue(
+        environment,
+        stop -> stop.getTimeZone().toString(),
+        station -> station.getTimezone().toString()
+    );
   }
 
   // TODO
@@ -141,16 +145,44 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     return environment -> null;
   }
 
-  // TODO
   @Override
   public DataFetcher<String> vehicleMode() {
-    return environment -> null;
+    return environment -> getValue(
+        environment,
+        stop -> {
+          if (stop.getVehicleType() != null) { return stop.getVehicleType().name(); }
+          return getRoutingService(environment).getPatternsForStop(stop)
+              .stream()
+              .map(TripPattern::getMode)
+              .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+              .entrySet()
+              .stream()
+              .max(Map.Entry.comparingByValue())
+              .map(Map.Entry::getKey)
+              .map(Enum::toString)
+              .orElse(null);
+        },
+        station -> {
+          RoutingService routingService = getRoutingService(environment);
+          return station.getChildStops().stream()
+              .flatMap(stop -> routingService
+                  .getPatternsForStop(stop)
+                  .stream()
+                  .map(TripPattern::getMode))
+              .collect(Collectors.groupingBy(Function.identity(), Collectors.counting()))
+              .entrySet()
+              .stream()
+              .max(Map.Entry.comparingByValue())
+              .map(Map.Entry::getKey)
+              .map(Enum::toString)
+              .orElse(null);
+        }
+    );
   }
 
-  // TODO
   @Override
   public DataFetcher<String> platformCode() {
-    return environment -> null;
+    return environment -> getValue(environment, Stop::getPlatformCode, station -> null);
   }
 
   @Override
@@ -184,7 +216,6 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
     );
   }
 
-  //TODO
   @Override
   public DataFetcher<Iterable<StopFinder.StopAndDistance>> transfers() {
     return environment -> getValue(
