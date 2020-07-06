@@ -10,11 +10,11 @@ import java.util.Locale;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
-    private final AlertMapper alertMapper;
+    private final StreetNoteMaperMapper streetNoteMaperMapper;
 
     public LegMapper(Locale locale) {
         this.walkStepMapper = new WalkStepMapper(locale);
-        this.alertMapper = new AlertMapper(locale);
+        this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
     }
 
     public List<ApiLeg> mapLegs(List<Leg> domain) {
@@ -73,7 +73,7 @@ public class LegMapper {
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;
         api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
-        api.alerts = alertMapper.mapToApi(domain.alerts);
+        api.alerts = streetNoteMaperMapper.mapToApi(domain.streetNotes);
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;

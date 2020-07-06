@@ -23,7 +23,7 @@ import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.shapefile.FeatureSourceFactory;
 import org.opentripplanner.graph_builder.services.shapefile.SimpleFeatureConverter;
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Graph;
@@ -205,12 +205,20 @@ public class ShapefileStreetModule implements GraphBuilderModule {
                 backStreet.shareData(street);
 
                 if (noteConverter != null) {
-                	String note = noteConverter.convert(feature);
-                	if (note != null && note.length() > 0) {
-				Alert noteAlert = Alert.createSimpleAlerts(note);
-				graph.streetNotesService.addStaticNote(street, noteAlert, StreetNotesService.ALWAYS_MATCHER);
-				graph.streetNotesService.addStaticNote(backStreet, noteAlert, StreetNotesService.ALWAYS_MATCHER);
-                	}
+                    String note = noteConverter.convert(feature);
+                    if (note != null && note.length() > 0) {
+                        StreetNote noteAlert = new StreetNote(note);
+                        graph.streetNotesService.addStaticNote(
+                            street,
+                            noteAlert,
+                            StreetNotesService.ALWAYS_MATCHER
+                        );
+                        graph.streetNotesService.addStaticNote(
+                            backStreet,
+                            noteAlert,
+                            StreetNotesService.ALWAYS_MATCHER
+                        );
+                    }
                 }
 
                 boolean slopeOverride = slopeOverrideCoverter.convert(feature);

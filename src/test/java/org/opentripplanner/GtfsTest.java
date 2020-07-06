@@ -168,11 +168,11 @@ public abstract class GtfsTest extends TestCase {
             assertNull(leg.from.stopId);
         }
         if (alert != null) {
-            assertNotNull(leg.alerts);
-            assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.iterator().next().alertHeaderText.toString());
+            assertNotNull(leg.streetNotes);
+            assertEquals(1, leg.streetNotes.size());
+            assertEquals(alert, leg.streetNotes.iterator().next().note.toString());
         } else {
-            assertNull(leg.alerts);
+            assertNull(leg.streetNotes);
         }
     }
 }

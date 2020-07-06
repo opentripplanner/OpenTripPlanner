@@ -8,4 +8,5 @@ public class ApiAlert {
     public String alertUrl;
     /** null means unknown */
     public Date effectiveStartDate;
+    public Date effectiveEndDate;
 }

@@ -10,6 +10,7 @@ import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.WgsCoordinate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -17,7 +18,6 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
@@ -410,16 +410,16 @@ public abstract class GraphPathToItineraryMapper {
     private static void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
-            Set<Alert> alerts = graph.streetNotesService.getNotes(state);
+            Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
             Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode;
             }
 
-            if (alerts != null) {
-                for (Alert alert : alerts) {
-                    leg.addAlert(alert);
+            if (streetNotes != null) {
+                for (StreetNote streetNote : streetNotes) {
+                    leg.addStretNote(streetNote);
                 }
             }
         }
@@ -766,7 +766,7 @@ public abstract class GraphPathToItineraryMapper {
 
             // increment the total length for this step
             step.distance += edge.getDistanceMeters();
-            step.addAlerts(graph.streetNotesService.getNotes(forwardState));
+            step.addStreetNotes(graph.streetNotesService.getNotes(forwardState));
             lastAngle = DirectionUtils.getLastAngle(geom);
 
             step.edges.add(edge);
@@ -813,7 +813,7 @@ public abstract class GraphPathToItineraryMapper {
         step.elevation = encodeElevationProfile(s.getBackEdge(), 0,
                 s.getOptions().geoidElevation ? -graph.ellipsoidToGeoidDifference : 0);
         step.bogusName = en.hasBogusName();
-        step.addAlerts(graph.streetNotesService.getNotes(s));
+        step.addStreetNotes(graph.streetNotesService.getNotes(s));
         step.angle = DirectionUtils.getFirstAngle(s.getBackEdge().getGeometry());
         if (s.getBackEdge() instanceof AreaEdge) {
             step.area = true;
