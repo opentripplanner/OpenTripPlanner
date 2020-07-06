@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WheelChairBoarding;
@@ -44,7 +43,7 @@ public class TransitStopVertex extends Vertex {
      * @param modes Set of modes for all Routes using this stop. If {@code null} an empty set is used.
      */
     public TransitStopVertex (Graph graph, Stop stop, Set<TransitMode> modes) {
-        super(graph, GtfsLibrary.convertIdToString(stop.getId()), stop.getLon(), stop.getLat());
+        super(graph, stop.getId().toString(), stop.getLon(), stop.getLat());
         this.stop = stop;
         this.modes = modes != null ? modes : new HashSet<>();
         this.wheelchairEntrance = stop.getWheelchairBoarding() != WheelChairBoarding.NOT_POSSIBLE;

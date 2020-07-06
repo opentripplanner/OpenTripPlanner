@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.PathwayNode;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
@@ -25,7 +24,7 @@ public class TransitPathwayNodeVertex extends Vertex {
   public TransitPathwayNodeVertex(Graph graph, PathwayNode node) {
     super(
         graph,
-        GtfsLibrary.convertIdToString(node.getId()),
+        node.getId().toString(),
         node.getLon(),
         node.getLat()
     );
