@@ -18,9 +18,8 @@ import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -74,12 +73,7 @@ public abstract class GraphPathToItineraryMapper {
 
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
-            Itinerary itinerary = generateItinerary(
-                    path,
-                    request.showIntermediateStops,
-                    request.disableAlertFiltering,
-                    request.locale
-            );
+            Itinerary itinerary = generateItinerary(path, request.locale);
             itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
@@ -111,10 +105,9 @@ public abstract class GraphPathToItineraryMapper {
      * rest of the itinerary is generated based on the complete state array.
      *
      * @param path The graph path to base the itinerary on
-     * @param showIntermediateStops Whether to include intermediate stops in the itinerary or not
      * @return The generated itinerary
      */
-    public static Itinerary generateItinerary(GraphPath path, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+    public static Itinerary generateItinerary(GraphPath path, Locale requestedLocale) {
 
         State[] states = new State[path.states.size()];
         State lastState = path.states.getLast();
@@ -129,7 +122,7 @@ public abstract class GraphPathToItineraryMapper {
 
         List<Leg> legs = new ArrayList<>();
         for (State[] legStates : legsStates) {
-            legs.add(generateLeg(graph, legStates, showIntermediateStops, disableAlertFiltering, requestedLocale));
+            legs.add(generateLeg(graph, legStates, requestedLocale));
         }
 
         addWalkSteps(graph, legs, legsStates, requestedLocale);
@@ -257,10 +250,9 @@ public abstract class GraphPathToItineraryMapper {
      * Generate one leg of an itinerary from a {@link State} array.
      *
      * @param states The array of states to base the leg on
-     * @param showIntermediateStops Whether to include intermediate stops in the leg or not
      * @return The generated leg
      */
-    private static Leg generateLeg(Graph graph, State[] states, boolean showIntermediateStops, boolean disableAlertFiltering, Locale requestedLocale) {
+    private static Leg generateLeg(Graph graph, State[] states, Locale requestedLocale) {
         Leg leg = new Leg();
 
         Edge[] edges = new Edge[states.length - 1];
@@ -293,7 +285,7 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states, disableAlertFiltering);
+        addModeAndAlerts(graph, leg, states);
 
         return leg;
     }
@@ -415,7 +407,7 @@ public abstract class GraphPathToItineraryMapper {
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states, boolean disableAlertFiltering) {
+    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
@@ -428,23 +420,6 @@ public abstract class GraphPathToItineraryMapper {
             if (alerts != null) {
                 for (Alert alert : alerts) {
                     leg.addAlert(alert);
-                }
-            }
-
-            for (AlertPatch alertPatch : graph.getAlertPatches(edge)) {
-                if (disableAlertFiltering || alertPatch.displayDuring(state)) {
-                    if (alertPatch.hasTrip()) {
-                        // If the alert patch contains a trip and that trip match this leg only add the alert for
-                        // this leg.
-                        if (alertPatch.getTrip().equals(leg.tripId)) {
-                            leg.addAlert(alertPatch.getAlert());
-                            leg.addAlertPatch(alertPatch);
-                        }
-                    } else {
-                        // If we are not matching a particular trip add all known alerts for this trip pattern.
-                        leg.addAlert(alertPatch.getAlert());
-                        leg.addAlertPatch(alertPatch);
-                    }
                 }
             }
         }
