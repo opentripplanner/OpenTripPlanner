@@ -4,7 +4,6 @@ import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
@@ -62,7 +61,6 @@ public class OTPApplication extends Application {
 
         /* Features and Filters: extend Jersey, manipulate requests and responses. */
         classes.add(CorsFilter.class);
-        classes.add(MultiPartFeature.class);
 
         return classes;
     }
