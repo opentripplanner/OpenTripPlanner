@@ -90,9 +90,7 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
             response.elevationMetadata.geoidElevation = request.geoidElevation;
 
-            DebugOutput debugOutput = res.getDebugOutput();
-            debugOutput.finishedRendering();
-            response.debugOutput = debugOutput;
+            response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
         catch (Exception e) {
             LOG.error("System error", e);

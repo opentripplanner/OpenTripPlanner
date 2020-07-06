@@ -5,20 +5,19 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,9 +64,7 @@ public class TransmodelGraphQLPlanner {
                 response.messages.add(PlannerErrorMapper.mapMessage(routingError).message);
             }
 
-            DebugOutput debugOutput = res.getDebugOutput();
-            debugOutput.finishedRendering();
-            response.debugOutput = debugOutput;
+            response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
         catch (Exception e) {
             LOG.warn("System error");

@@ -1,7 +1,7 @@
 package org.opentripplanner.routing.api.response;
 
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.model.plan.TripPlan;
+import org.opentripplanner.routing.framework.DebugAggregator;
 
 import java.util.List;
 import java.util.StringJoiner;
@@ -10,18 +10,18 @@ public class RoutingResponse {
     private final TripPlan tripPlan;
     private final TripSearchMetadata metadata;
     private final List<RoutingError> routingErrors;
-    private final DebugOutput debugOutput;
+    private final DebugAggregator debugAggregator;
 
     public RoutingResponse(
         TripPlan tripPlan,
         TripSearchMetadata metadata,
         List<RoutingError> routingErrors,
-        DebugOutput debugOutput
+        DebugAggregator debugAggregator
     ) {
         this.tripPlan = tripPlan;
         this.metadata = metadata;
         this.routingErrors = routingErrors;
-        this.debugOutput = debugOutput;
+        this.debugAggregator = debugAggregator;
     }
 
     public TripPlan getTripPlan() {
@@ -32,8 +32,8 @@ public class RoutingResponse {
         return metadata;
     }
 
-    public DebugOutput getDebugOutput() {
-        return debugOutput;
+    public DebugAggregator getDebugAggregator() {
+        return debugAggregator;
     }
 
     public List<RoutingError> getRoutingErrors() { return routingErrors; }
