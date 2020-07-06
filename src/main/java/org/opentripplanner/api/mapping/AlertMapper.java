@@ -1,6 +1,6 @@
 package org.opentripplanner.api.mapping;
 
-import org.opentripplanner.api.model.alertpatch.ApiAlert;
+import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.routing.alertpatch.Alert;
 
 import java.util.List;

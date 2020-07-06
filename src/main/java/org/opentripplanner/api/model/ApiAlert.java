@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model.alertpatch;
+package org.opentripplanner.api.model;
 
 import java.util.Date;
 
