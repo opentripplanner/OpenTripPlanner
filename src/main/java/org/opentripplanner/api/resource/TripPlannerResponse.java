@@ -5,7 +5,6 @@ import org.opentripplanner.api.model.ApiTripSearchMetadata;
 import org.opentripplanner.api.model.error.PlannerError;
 
 import javax.ws.rs.core.UriInfo;
-import javax.xml.bind.annotation.XmlElement;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;

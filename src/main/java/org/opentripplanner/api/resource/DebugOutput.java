@@ -1,14 +1,10 @@
 package org.opentripplanner.api.resource;
 
-import java.util.List;
-
-import javax.xml.bind.annotation.XmlRootElement;
-
-import org.opentripplanner.routing.graph.Graph;
+import com.google.common.collect.Lists;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.common.collect.Lists;
+import java.util.List;
 
 /**
  * Holds information to be included in the REST Response for debugging and profiling purposes.

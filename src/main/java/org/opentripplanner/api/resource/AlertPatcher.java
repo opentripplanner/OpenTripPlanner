@@ -1,6 +1,5 @@
 package org.opentripplanner.api.resource;
 
-import static org.opentripplanner.api.resource.ServerInfo.Q;
 
 import java.util.Collection;
 
@@ -13,7 +12,6 @@ import javax.ws.rs.Produces;
 import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import javax.xml.bind.annotation.XmlRootElement;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.api.model.alertpatch.AlertPatchCreationResponse;
@@ -23,7 +21,6 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.services.AlertPatchService;
 
 @Path("/patch")
-@XmlRootElement
 public class AlertPatcher {
 
     @Context AlertPatchService alertPatchService; // FIXME inject Application
@@ -36,8 +33,8 @@ public class AlertPatcher {
      */
     @GET
     @Path("/stopPatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public AlertPatchResponse getStopPatches(@QueryParam("agency") String agency,
+    @Produces({ MediaType.APPLICATION_JSON })
             @QueryParam("id") String id) {
 
         AlertPatchResponse response = new AlertPatchResponse();
@@ -56,8 +53,8 @@ public class AlertPatcher {
      */
     @GET
     @Path("/routePatches")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
     public AlertPatchResponse getRoutePatches(@QueryParam("agency") String agency,
+    @Produces({ MediaType.APPLICATION_JSON })
             @QueryParam("id") String id) {
 
         AlertPatchResponse response = new AlertPatchResponse();
@@ -72,8 +69,6 @@ public class AlertPatcher {
     @RolesAllowed("user")
     @POST
     @Path("/patch")
-    @Produces({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML + Q, MediaType.TEXT_XML + Q })
-    @Consumes({ MediaType.APPLICATION_JSON, MediaType.APPLICATION_XML, MediaType.TEXT_XML })
     public AlertPatchCreationResponse createPatches(AlertPatchSet alertPatches) {
         AlertPatchCreationResponse response = new AlertPatchCreationResponse();
         for (AlertPatch alertPatch : alertPatches.alertPatches) {

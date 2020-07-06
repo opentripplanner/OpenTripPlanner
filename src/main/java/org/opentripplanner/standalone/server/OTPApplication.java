@@ -1,7 +1,6 @@
 package org.opentripplanner.standalone.server;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.CommonProperties;
@@ -95,8 +94,6 @@ public class OTPApplication extends Application {
             new OTPExceptionMapper(),
             // Enable Jackson JSON response serialization
             new JacksonJsonProvider(),
-            // Enable Jackson XML response serialization
-            new JacksonXMLProvider(),
             // Serialize POJOs (unannotated) JSON using Jackson
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes
