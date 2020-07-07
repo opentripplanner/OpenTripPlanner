@@ -7,6 +7,8 @@ import org.opentripplanner.model.CalendarService;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.File;
 import java.io.IOException;
@@ -14,6 +16,8 @@ import java.io.IOException;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarService;
 
 public class GtfsLibrary {
+
+    private static final Logger LOG = LoggerFactory.getLogger(GtfsLibrary.class);
 
     public static final char ID_SEPARATOR = ':'; // note this is different than what OBA GTFS uses to match our 1.0 API
 
@@ -88,7 +92,9 @@ public class GtfsLibrary {
         } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
             return TraverseMode.FUNICULAR;
         } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-            throw new IllegalArgumentException("Taxi service not supported" + routeType);
+            LOG.warn("Treating taxi route {} (extended route type {}) as a bus.",
+                route.getId(), routeType);
+            return TraverseMode.BUS;
         } else if (routeType >= 1600 && routeType < 1700) { //Self drive
             return TraverseMode.CAR;
         }
