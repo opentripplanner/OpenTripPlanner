@@ -10,17 +10,21 @@ import java.util.Map;
 
 class ParkingZonesGraphWriterRunnable implements GraphWriterRunnable {
 
+    private final ParkingZonesCalculator calculator;
     private final Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex;
     private final List<SingleParkingZone> parkingZonesEnabled;
 
-    public ParkingZonesGraphWriterRunnable(Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex,
+    public ParkingZonesGraphWriterRunnable(ParkingZonesCalculator calculator,
+                                           Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex,
                                            List<SingleParkingZone> parkingZonesEnabled) {
+        this.calculator = calculator;
         this.parkingZonesPerVertex = parkingZonesPerVertex;
         this.parkingZonesEnabled = parkingZonesEnabled;
     }
 
     @Override
     public void run(Graph graph) {
-        parkingZonesPerVertex.forEach((edge, parkingZones) -> edge.updateParkingZones(parkingZonesEnabled, parkingZones));
+        graph.parkingZonesCalculator = calculator;
+        parkingZonesPerVertex.forEach((e, parkingZones) -> e.updateParkingZones(parkingZonesEnabled, parkingZones));
     }
 }

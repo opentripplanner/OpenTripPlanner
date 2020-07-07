@@ -2,6 +2,7 @@ package org.opentripplanner.routing.location;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.TemporaryDropoffVehicleEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
@@ -31,7 +32,7 @@ final public class TemporaryStreetLocation extends StreetLocation implements Tem
     @Override
     public void addOutgoing(Edge edge) {
         if (edge instanceof TemporaryEdge) {
-            if (endVertex) {
+            if (endVertex && !(edge instanceof TemporaryDropoffVehicleEdge)) {
                 throw new UnsupportedOperationException("Can't add outgoing edge to end vertex");
             } else {
                 super.addOutgoing(edge);

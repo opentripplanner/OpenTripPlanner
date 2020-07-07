@@ -27,10 +27,6 @@ public class RentVehicleAnywhereEdge extends Edge {
         return availableVehicles;
     }
 
-    public ParkingZoneInfo getParkingZones() {
-        return parkingZones;
-    }
-
     @Override
     public String getName() {
         return "Rent vehicle in node " + getToVertex().getName();

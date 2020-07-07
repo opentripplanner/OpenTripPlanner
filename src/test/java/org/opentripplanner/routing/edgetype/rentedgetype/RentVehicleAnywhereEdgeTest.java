@@ -9,7 +9,8 @@ import org.opentripplanner.routing.vertextype.IntersectionVertex;
 
 import java.util.List;
 
-import static java.util.Collections.*;
+import static java.util.Collections.emptyList;
+import static java.util.Collections.singletonList;
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
@@ -133,7 +134,6 @@ public class RentVehicleAnywhereEdgeTest {
         request.rentingAllowed = true;
         List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
         edge.updateParkingZones(singleParkingZone, singleParkingZone);
-        edge.getParkingZones().updateParkingZones(singleParkingZone);
 
         // when
         State traversed = edge.traverse(rentingState);

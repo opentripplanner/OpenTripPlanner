@@ -54,6 +54,7 @@ import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
+import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesCalculator;
 import org.opentripplanner.util.WorldEnvelope;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -214,6 +215,8 @@ public class Graph implements Serializable {
 
     /** Areas for flex service */
     public Map<FeedScopedId, Geometry> flexAreasById = new HashMap<>();
+
+    public ParkingZonesCalculator parkingZonesCalculator;
 
     public Graph(Graph basedOn) {
         this();

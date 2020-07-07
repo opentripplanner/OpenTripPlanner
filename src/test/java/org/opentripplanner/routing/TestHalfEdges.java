@@ -21,6 +21,7 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.edgetype.rentedgetype.TemporaryDropoffVehicleEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -431,7 +432,12 @@ public class TestHalfEdges {
         assertNotNull(end);
 
         edges = end.getIncoming();
-        assertEquals(2, edges.size());
+        assertEquals(3, edges.size());
+        assertEquals(1, end.getOutgoing().size());
+
+        Edge temporary = end.getOutgoing().stream().findFirst().get();
+        assertTrue(temporary instanceof TemporaryDropoffVehicleEdge);
+        assertTrue(edges.contains(temporary));
 
 
         // test that it is possible to travel between two splits on the same street
