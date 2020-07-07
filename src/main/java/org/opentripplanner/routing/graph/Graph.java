@@ -59,6 +59,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.prefs.Preferences;
@@ -764,16 +765,16 @@ public class Graph implements Serializable {
 
     public void saveTransitLines(File file) throws IOException {
         LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
-        CsvWriter writer = new CsvWriter(file.getPath());
+        CsvWriter writer = new CsvWriter(file.getPath(), ',', Charset.forName("UTF-8"));
         for (Route route:getTransitRoutes()) {
             String routeTypeName = "UNSUPPORTED";
             try {
                 routeTypeName = GtfsLibrary.getTraverseMode(route).name();
             }catch(IllegalArgumentException e) {
-                LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), route.getShortName(), route.getAgency().getName());
+                LOG.error("Unsupported HVT type detected: {} for {} {}", route.getType(), Optional.ofNullable(route.getShortName()).orElseGet(route::getLongName), route.getAgency().getName());
             }
             try{
-                writer.writeRecord(new String[]{routeTypeName, route.getShortName(), route.getAgency().getName()});
+                writer.writeRecord(new String[]{routeTypeName, Optional.ofNullable(route.getShortName()).orElseGet(route::getLongName), route.getAgency().getName()});
             } catch (IOException e) {
                 file.delete();
                 throw e;
