@@ -52,9 +52,9 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
@@ -247,7 +247,7 @@ public class Graph implements Serializable {
 
     public transient TransitLayerUpdater transitLayerUpdater;
 
-    private transient AlertPatchService alertPatchService;
+    private transient TransitAlertService transitAlertService;
 
 
     /**
@@ -848,21 +848,21 @@ public class Graph implements Serializable {
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
 
-    public AlertPatchService getSiriAlertPatchService() {
-        if (alertPatchService == null) {
+    public TransitAlertService getSiriAlertPatchService() {
+        if (transitAlertService == null) {
             if (updaterManager == null) {
-                alertPatchService = new AlertPatchServiceImpl(this);
+                transitAlertService = new TransitAlertServiceImpl(this);
             }
             else {
-                Optional<AlertPatchService> patchServiceOptional = updaterManager.getUpdaterList().stream()
+                Optional<TransitAlertService> patchServiceOptional = updaterManager.getUpdaterList().stream()
                         .filter(SiriSXUpdater.class::isInstance)
                         .map(SiriSXUpdater.class::cast)
-                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
+                        .map(SiriSXUpdater::getTransitAlertService).findFirst();
 
-                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(this));
+                transitAlertService = patchServiceOptional.orElseGet(() -> new TransitAlertServiceImpl(this));
             }
         }
-        return alertPatchService;
+        return transitAlertService;
     }
 
     private Collection<Stop> getStopsForId(FeedScopedId id) {

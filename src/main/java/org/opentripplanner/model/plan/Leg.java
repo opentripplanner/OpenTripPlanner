@@ -3,11 +3,10 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -188,7 +187,7 @@ public class Leg {
 
    public Set<StreetNote> streetNotes = new HashSet<>();
 
-   public List<AlertPatch> alertPatches = new ArrayList<>();
+   public Set<TransitAlert> transitAlerts = new HashSet<>();
 
    public String routeShortName;
    public String routeLongName;
@@ -237,10 +236,8 @@ public class Leg {
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
 
-    public void addAlertPatch(AlertPatch alertPatch) {
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
+    public void addAlert(TransitAlert alert) {
+        transitAlerts.add(alert);
     }
 
     /**
@@ -296,7 +293,7 @@ public class Leg {
                 .addObj("legGeometry", legGeometry)
                 .addCol("walkSteps", walkSteps)
                 .addCol("streetNotes", streetNotes)
-                .addCol("alertPatches", alertPatches)
+                .addCol("transitAlerts", transitAlerts)
                 .addStr("routeShortName", routeShortName)
                 .addStr("routeLongName", routeLongName)
                 .addStr("boardRule", boardRule)

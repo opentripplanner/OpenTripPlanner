@@ -3,8 +3,8 @@ package org.opentripplanner.updater.alerts;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -41,8 +41,6 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    private AlertPatchService alertPatchService;
-
     private final long earlyStart;
 
     private AlertsUpdateHandler updateHandler = null;
@@ -71,18 +69,16 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) {
-        // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
         if (fuzzyTripMatching) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
-        this.alertPatchService = alertPatchService;
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setFeedId(feedId);
-        updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setTransitAlertService(transitAlertService);
         updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     }
 

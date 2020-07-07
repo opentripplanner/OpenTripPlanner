@@ -1,12 +1,15 @@
 package org.opentripplanner.ext.siri;
 
-import org.apache.commons.lang3.tuple.Pair;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.alertpatch.*;
+import org.opentripplanner.routing.alertpatch.AlertUrl;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
 import org.opentripplanner.util.TranslatedString;
@@ -17,8 +20,13 @@ import uk.org.siri.siri20.*;
 
 import java.io.Serializable;
 import java.time.ZonedDateTime;
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * This updater applies the equivalent of GTFS Alerts, but from SIRI Situation Exchange feeds.
@@ -29,7 +37,7 @@ public class SiriAlertsUpdateHandler {
 
     private static final Logger LOG = LoggerFactory.getLogger(SiriAlertsUpdateHandler.class);
 
-    private AlertPatchService alertPatchService;
+    private TransitAlertService transitAlertService;
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
@@ -37,6 +45,8 @@ public class SiriAlertsUpdateHandler {
     private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
     private String feedId;
+
+    private final Set<TransitAlert> alerts = new HashSet<>();
 
     public SiriAlertsUpdateHandler(String feedId) {
         this.feedId = feedId;
@@ -48,83 +58,71 @@ public class SiriAlertsUpdateHandler {
             if (situations != null) {
                 long t1 = System.currentTimeMillis();
                 Set<String> idsToExpire = new HashSet<>();
-                Set<AlertPatch> alertPatches = new HashSet<>();
 
                 for (PtSituationElement sxElement : situations.getPtSituationElements()) {
-                    Pair<Set<String>, Set<AlertPatch>> alertPatchChangePair = handleAlert(sxElement);
-                    if (alertPatchChangePair != null) {
-                        idsToExpire.addAll(alertPatchChangePair.getLeft());
-                        alertPatches.addAll(alertPatchChangePair.getRight());
+                    boolean expireSituation = (sxElement.getProgress() != null &&
+                        sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
+
+                    String situationNumber;
+                    if (sxElement.getSituationNumber() != null) {
+                        situationNumber = sxElement.getSituationNumber().getValue();
+                    } else {
+                        situationNumber = null;
+                    }
+
+                    if (expireSituation) {
+                        alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
+                    } else {
+                        TransitAlert alert = handleAlert(sxElement);
+                        if (alert != null) {
+                            alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
+                            alerts.add(alert);
+                            if (alert.getEntities().isEmpty()) {
+                                LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
+                            }
+                        }
                     }
                 }
 
-                alertPatchService.expire(idsToExpire);
-                alertPatchService.applyAll(alertPatches);
+                transitAlertService.setAlerts(alerts);
 
-                LOG.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms", alertPatches.size(), idsToExpire.size(), situations.getPtSituationElements().size(), alertPatchService.getAllAlertPatches().size(), (System.currentTimeMillis()-t1));
+                LOG.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms", alerts.size(), idsToExpire.size(), situations.getPtSituationElements().size(), transitAlertService
+                    .getAllAlerts().size(), (System.currentTimeMillis()-t1));
             }
         }
     }
 
-    private Pair<Set<String>, Set<AlertPatch>> handleAlert(PtSituationElement situation) {
+    private TransitAlert handleAlert(PtSituationElement situation) {
 
-        Alert alert = createAlertWithTexts(situation);
-
-        Set<String> idsToExpire = new HashSet<>();
-        boolean expireSituation = (situation.getProgress() != null &&
-                situation.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
+        TransitAlert alert = createAlertWithTexts(situation);
 
         //ROR-54
-        if (!expireSituation && //If situation is closed, it must be allowed - it will remove already existing alerts
-                ((alert.alertHeaderText == null || alert.alertHeaderText.toString().isEmpty()) &&
-                (alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()) &&
-                (alert.alertDetailText == null || alert.alertDetailText.toString().isEmpty()))) {
+        //If situation is closed, it must be allowed - it will remove already existing alerts
+        if ((alert.alertHeaderText == null || alert.alertHeaderText.toString().isEmpty()) && (
+            alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()
+        ) && (alert.alertDetailText == null || alert.alertDetailText.toString().isEmpty())) {
             LOG.debug("Empty Alert - ignoring situationNumber: {}", situation.getSituationNumber() != null ? situation.getSituationNumber().getValue():null);
             return null;
         }
 
         ArrayList<TimePeriod> periods = new ArrayList<>();
         if(situation.getValidityPeriods().size() > 0) {
-            long bestStartTime = Long.MAX_VALUE;
-            long bestEndTime = 0;
             for (HalfOpenTimestampOutputRangeStructure activePeriod : situation.getValidityPeriods()) {
 
                 final long realStart = activePeriod.getStartTime() != null ? activePeriod.getStartTime().toInstant().toEpochMilli() : 0;
                 final long start = activePeriod.getStartTime() != null? realStart - earlyStart : 0;
-                if (realStart > 0 && realStart < bestStartTime) {
-                    bestStartTime = realStart;
-                }
 
                 final long realEnd = activePeriod.getEndTime() != null ? activePeriod.getEndTime().toInstant().toEpochMilli() : 0;
                 final long end = activePeriod.getEndTime() != null? realEnd  : 0;
-                if (realEnd > 0 && realEnd > bestEndTime) {
-                    bestEndTime = realEnd;
-                }
-
                 periods.add(new TimePeriod(start/1000, end/1000));
-            }
-            if (bestStartTime != Long.MAX_VALUE) {
-                alert.effectiveStartDate = new Date(bestStartTime);
-            }
-            if (bestEndTime != 0) {
-                alert.effectiveEndDate = new Date(bestEndTime);
             }
         } else {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
             periods.add(new TimePeriod(0, Long.MAX_VALUE));
         }
 
-        String situationNumber;
+        alert.setTimePeriods(periods);
 
-        if (situation.getSituationNumber() != null) {
-            situationNumber = situation.getSituationNumber().getValue();
-        } else {
-            situationNumber = null;
-        }
-
-        String paddedSituationNumber = situationNumber + ":";
-
-        Set<AlertPatch> patches = new HashSet<>();
         AffectsScopeStructure affectsStructure = situation.getAffects();
 
         if (affectsStructure != null) {
@@ -143,17 +141,7 @@ public class SiriAlertsUpdateHandler {
                     // I leave this for now.
                     String agencyId = operatorRef.getValue();
 
-                    String id = paddedSituationNumber + agencyId;
-                    if (expireSituation) {
-                        idsToExpire.add(id);
-                    } else {
-                        AlertPatch alertPatch = new AlertPatch();
-                        alertPatch.setAgency(new FeedScopedId(feedId, agencyId));
-                        alertPatch.setTimePeriods(periods);
-                        alertPatch.setAlert(alert);
-                        alertPatch.setId(id);
-                        patches.add(alertPatch);
-                    }
+                    alert.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
                 }
             }
 
@@ -190,35 +178,19 @@ public class SiriAlertsUpdateHandler {
 
                     FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue());
 
-                    String id = paddedSituationNumber + stopPointRef.getValue();
-                    if (expireSituation) {
-                        idsToExpire.add(id);
-                    } else {
-                        if (stopId != null) {
-                            if (stopRoutes.isEmpty()) {
-                                AlertPatch stopOnlyAlertPatch = new AlertPatch();
-                                stopOnlyAlertPatch.setStop(stopId);
-                                stopOnlyAlertPatch.setTimePeriods(periods);
-                                stopOnlyAlertPatch.setId(id);
+                    if (stopId != null) {
+                        if (stopRoutes.isEmpty()) {
+                            alert.addEntity(new EntitySelector.Stop(stopId));
+                            // TODO: is this correct? Should the stop conditions be in the entity selector?
+                            updateStopConditions(alert, stopPoint.getStopConditions());
 
-                                updateStopConditions(stopOnlyAlertPatch, stopPoint.getStopConditions());
+                        } else {
+                            //Adding combination of stop & route
+                            for (Route route : stopRoutes) {
+                                alert.addEntity(new EntitySelector.StopAndRoute(stopId, route.getId()));
+                                // TODO: is this correct? Should the stop conditions be in the entity selector?
+                                updateStopConditions(alert, stopPoint.getStopConditions());
 
-                                patches.add(stopOnlyAlertPatch);
-                            } else {
-                                //Adding combination of stop & route
-                                for (Route route : stopRoutes) {
-                                    id = paddedSituationNumber + stopPointRef.getValue() + "-" + route.getId().getId();
-
-                                    AlertPatch alertPatch = new AlertPatch();
-                                    alertPatch.setStop(stopId);
-                                    alertPatch.setRoute(route.getId());
-                                    alertPatch.setTimePeriods(periods);
-                                    alertPatch.setId(id);
-
-                                    updateStopConditions(alertPatch, stopPoint.getStopConditions());
-
-                                    patches.add(alertPatch);
-                                }
                             }
                         }
                     }
@@ -233,30 +205,14 @@ public class SiriAlertsUpdateHandler {
 
                     FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue());
 
-                    String id = paddedSituationNumber + stopPlace.getValue();
-                    if (expireSituation) {
-                        idsToExpire.add(id);
-                    } else {
-                        if (stopId != null) {
+                    if (stopId != null) {
 
-                            if (stopRoutes.isEmpty()) {
-                                AlertPatch stopOnlyAlertPatch = new AlertPatch();
-                                stopOnlyAlertPatch.setStop(stopId);
-                                stopOnlyAlertPatch.setTimePeriods(periods);
-                                stopOnlyAlertPatch.setId(id);
-                                patches.add(stopOnlyAlertPatch);
-                            } else {
-                                //Adding combination of stop & route
-                                for (Route route : stopRoutes) {
-                                    id = paddedSituationNumber + stopPlace.getValue() + "-" + route.getId().getId();
-
-                                    AlertPatch alertPatch = new AlertPatch();
-                                    alertPatch.setStop(stopId);
-                                    alertPatch.setRoute(route.getId());
-                                    alertPatch.setTimePeriods(periods);
-                                    alertPatch.setId(id);
-                                    patches.add(alertPatch);
-                                }
+                        if (stopRoutes.isEmpty()) {
+                            alert.addEntity(new EntitySelector.Stop(stopId));
+                        } else {
+                            //Adding combination of stop & route
+                            for (Route route : stopRoutes) {
+                                alert.addEntity(new EntitySelector.StopAndRoute(stopId, route.getId()));
                             }
                         }
                     }
@@ -301,37 +257,12 @@ public class SiriAlertsUpdateHandler {
                                         if (stop == null) {
                                             continue;
                                         }
-                                        String id = paddedSituationNumber + route.getId() + "-" + stop.getId();
-                                        if (expireSituation) {
-                                            idsToExpire.add(id);
-                                        } else {
-                                            AlertPatch alertPatch = new AlertPatch();
-                                            alertPatch.setRoute(route.getId());
-                                            alertPatch.setStop(stop);
-                                            alertPatch.setId(id);
-                                            alertPatch.setTimePeriods(periods);
-
-                                            Alert vehicleJourneyAlert = cloneAlertTexts(alert);
-                                            vehicleJourneyAlert.effectiveStartDate = alert.effectiveStartDate;
-                                            vehicleJourneyAlert.effectiveEndDate = alert.effectiveEndDate;
-
-                                            alertPatch.setAlert(vehicleJourneyAlert);
-
-                                            updateStopConditions(alertPatch, affectedStop.getStopConditions());
-                                            patches.add(alertPatch);
-                                        }
+                                        alert.addEntity(new EntitySelector.StopAndRoute(stop, route.getId()));
+                                        // TODO: is this correct? Should the stop conditions be in the entity selector?
+                                        updateStopConditions(alert, affectedStop.getStopConditions());
                                     }
                                 } else {
-                                    String id = paddedSituationNumber + route.getId();
-                                    if (expireSituation) {
-                                        idsToExpire.add(id);
-                                    } else {
-                                        AlertPatch alertPatch = new AlertPatch();
-                                        alertPatch.setRoute(route.getId());
-                                        alertPatch.setTimePeriods(periods);
-                                        alertPatch.setId(id);
-                                        patches.add(alertPatch);
-                                    }
+                                    alert.addEntity(new EntitySelector.Route(route.getId()));
                                 }
                             }
                         }
@@ -342,15 +273,7 @@ public class SiriAlertsUpdateHandler {
                         }
                         String networkId = networkRef.getValue();
 
-                        String id = paddedSituationNumber + networkId;
-                        if (expireSituation) {
-                            idsToExpire.add(id);
-                        } else {
-                            AlertPatch alertPatch = new AlertPatch();
-                            alertPatch.setId(id);
-                            alertPatch.setTimePeriods(periods);
-                            patches.add(alertPatch);
-                        }
+                        // TODO: What to do here?
                     }
                 }
             }
@@ -406,8 +329,8 @@ public class SiriAlertsUpdateHandler {
                                 tripIds.add(tripIdFromVehicleJourney);
 
                                 // ServiceJourneyId matches - use provided validity
-                                effectiveStartDate = alert.effectiveStartDate;
-                                effectiveEndDate = alert.effectiveEndDate;
+                                effectiveStartDate = alert.getEffectiveStartDate();
+                                effectiveEndDate = alert.getEffectiveEndDate();
 
                                 effectiveValiditySetExplicitly = true;
 
@@ -437,11 +360,11 @@ public class SiriAlertsUpdateHandler {
                                     effectiveEndDate = new Date(effectiveStartDate.getTime() + (tripArrivalTime - tripDepartureTime + 6 * 3600) * 1000);
 
                                     // Verify that calculated validity does not exceed explicitly set validity
-                                    if (effectiveStartDate.before(alert.effectiveStartDate)) {
-                                        effectiveStartDate = alert.effectiveStartDate;
+                                    if (effectiveStartDate.before(alert.getEffectiveStartDate())) {
+                                        effectiveStartDate = alert.getEffectiveStartDate();
                                     }
-                                    if (effectiveEndDate.after(alert.effectiveEndDate)) {
-                                        effectiveEndDate = alert.effectiveEndDate;
+                                    if (effectiveEndDate.after(alert.getEffectiveEndDate())) {
+                                        effectiveEndDate = alert.getEffectiveEndDate();
                                     }
 
                                     if (effectiveStartDate.after(effectiveEndDate) | effectiveStartDate.equals(effectiveEndDate)) {
@@ -459,55 +382,25 @@ public class SiriAlertsUpdateHandler {
                                             continue;
                                         }
                                         // Creating unique, deterministic id for the alert
-                                        String id = paddedSituationNumber + tripId.getId() + "-" + new ServiceDate(effectiveStartDate).asCompactString() + "-" + stop.getId();
-                                        if (expireSituation) {
-                                            idsToExpire.add(id);
-                                        } else {
-                                            AlertPatch alertPatch = new AlertPatch();
-                                            alertPatch.setTrip(tripId);
-                                            alertPatch.setStop(stop);
-                                            alertPatch.setId(id);
+                                        alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
 
-                                            updateStopConditions(alertPatch, affectedStop.getStopConditions());
-
-                                            //  A tripId for a given date may be reused for other dates not affected by this alert.
-                                            List<TimePeriod> timePeriodList = new ArrayList<>();
-                                            timePeriodList.add(new TimePeriod(effectiveStartDate.getTime()/1000, effectiveEndDate.getTime()/1000));
-                                            alertPatch.setTimePeriods(timePeriodList);
-
-
-                                            Alert vehicleJourneyAlert = cloneAlertTexts(alert);
-                                            vehicleJourneyAlert.effectiveStartDate = effectiveStartDate;
-                                            vehicleJourneyAlert.effectiveEndDate = effectiveEndDate;
-
-                                            alertPatch.setAlert(vehicleJourneyAlert);
-
-                                            patches.add(alertPatch);
-                                        }
-                                    }
-                                } else {
-                                    String id = paddedSituationNumber + tripId.getId();
-                                    if (expireSituation) {
-                                        idsToExpire.add(id);
-                                    } else {
-                                        AlertPatch alertPatch = new AlertPatch();
-                                        alertPatch.setTrip(tripId);
-                                        alertPatch.setId(id);
+                                        // TODO: is this correct? Should the stop conditions be in the entity selector?
+                                        updateStopConditions(alert, affectedStop.getStopConditions());
 
                                         //  A tripId for a given date may be reused for other dates not affected by this alert.
                                         List<TimePeriod> timePeriodList = new ArrayList<>();
                                         timePeriodList.add(new TimePeriod(effectiveStartDate.getTime()/1000, effectiveEndDate.getTime()/1000));
-                                        alertPatch.setTimePeriods(timePeriodList);
-
-
-                                        Alert vehicleJourneyAlert = cloneAlertTexts(alert);
-                                        vehicleJourneyAlert.effectiveStartDate = effectiveStartDate;
-                                        vehicleJourneyAlert.effectiveEndDate = effectiveEndDate;
-
-                                        alertPatch.setAlert(vehicleJourneyAlert);
-
-                                        patches.add(alertPatch);
+                                        // TODO: Make it possible to add time periods for trip selectors
+                                        // alert.setTimePeriods(timePeriodList);
                                     }
+                                } else {
+                                    alert.addEntity(new EntitySelector.Trip(tripId));
+
+                                    //  A tripId for a given date may be reused for other dates not affected by this alert.
+                                    List<TimePeriod> timePeriodList = new ArrayList<>();
+                                    timePeriodList.add(new TimePeriod(effectiveStartDate.getTime()/1000, effectiveEndDate.getTime()/1000));
+                                    // TODO: Make it possible to add time periods for trip selectors
+                                    // alert.setTimePeriods(timePeriodList);
                                 }
                             }
                         }
@@ -516,69 +409,40 @@ public class SiriAlertsUpdateHandler {
 
                         Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef);
                         for (Route route : affectedRoutes) {
-                            String id = paddedSituationNumber + route.getId();
-                            if (expireSituation) {
-                                idsToExpire.add(id);
-                            } else {
-                                AlertPatch alertPatch = new AlertPatch();
-                                alertPatch.setRoute(route.getId());
-                                alertPatch.setTimePeriods(periods);
-                                alertPatch.setId(id);
-                                patches.add(alertPatch);
-                            }
+                            alert.addEntity(new EntitySelector.Route(route.getId()));
                         }
                     }
                 }
             }
         }
 
-        // Alerts are not partially updated - cancel ALL current related alerts before adding updated.
-        idsToExpire.addAll(alertPatchService.getAllAlertPatches()
-            .stream()
-            .filter(alertPatch -> alertPatch.getSituationNumber().equals(situationNumber))
-            .map(alertPatch -> alertPatch.getId())
-            .collect(Collectors.toList()));
-
-        if (!patches.isEmpty() | !idsToExpire.isEmpty()) {
-
-            for (AlertPatch patch : patches) {
-                if (patch.getAlert() == null) {
-                    patch.setAlert(alert);
-                }
-                if (patch.getStopConditions().isEmpty()) {
-                    updateStopConditions(patch, null);
-                }
-                patch.getAlert().alertType = situation.getReportType();
-
-                if (situation.getSeverity() != null) {
-                    patch.getAlert().severity = situation.getSeverity().value();
-                } else {
-                    // When severity is not set - use default
-                    patch.getAlert().severity = SeverityEnumeration.NORMAL.value();
-                }
-
-                if (situation.getParticipantRef() != null) {
-                    String codespace = situation.getParticipantRef().getValue();
-                    patch.setFeedId(codespace + ":Authority:" + codespace); //TODO - SIRI: Should probably not assume this codespace -> authority rule
-                }
-
-                patch.setSituationNumber(situationNumber);
-            }
-        } else if (expireSituation) {
-            LOG.debug("Expired non-existing alert - ignoring situation with situationNumber {}", situationNumber);
-        } else {
-            LOG.info("No match found for Alert - ignoring situation with situationNumber {}", situationNumber);
+        if (alert.getStopConditions().isEmpty()) {
+            updateStopConditions(alert, null);
         }
 
-        return Pair.of(idsToExpire, patches);
+        alert.alertType = situation.getReportType();
+
+        if (situation.getSeverity() != null) {
+            alert.severity = situation.getSeverity().value();
+        } else {
+            // When severity is not set - use default
+            alert.severity = SeverityEnumeration.NORMAL.value();
+        }
+
+        if (situation.getParticipantRef() != null) {
+            String codespace = situation.getParticipantRef().getValue();
+            alert.setFeedId(codespace + ":Authority:" + codespace); //TODO - SIRI: Should probably not assume this codespace -> authority rule
+        }
+
+        return alert;
     }
 
 
     /*
      * Creates alert from PtSituation with all textual content
      */
-    private Alert createAlertWithTexts(PtSituationElement situation) {
-        Alert alert = new Alert();
+    private TransitAlert createAlertWithTexts(PtSituationElement situation) {
+        TransitAlert alert = new TransitAlert();
 
         alert.alertDescriptionText = getTranslatedString(situation.getDescriptions());
         alert.alertDetailText = getTranslatedString(situation.getDetails());
@@ -588,21 +452,6 @@ public class SiriAlertsUpdateHandler {
         alert.setAlertUrlList(getInfoLinks(situation.getInfoLinks()));
 
         return alert;
-    }
-
-    /*
-     * Clones alert with all textual content
-     */
-    private Alert cloneAlertTexts(Alert alert) {
-        Alert vehicleJourneyAlert = new Alert();
-        vehicleJourneyAlert.alertHeaderText = alert.alertHeaderText;
-        vehicleJourneyAlert.alertDescriptionText = alert.alertDescriptionText;
-        vehicleJourneyAlert.alertDetailText = alert.alertDetailText;
-        vehicleJourneyAlert.alertAdviceText = alert.alertAdviceText;
-        vehicleJourneyAlert.alertUrl = alert.alertUrl;
-        vehicleJourneyAlert.setAlertUrlList(alert.getAlertUrlList());
-
-        return vehicleJourneyAlert;
     }
 
     /*
@@ -644,7 +493,7 @@ public class SiriAlertsUpdateHandler {
         return alertUrls;
     }
 
-    private void updateStopConditions(AlertPatch alertPatch, List<RoutePointTypeEnumeration> stopConditions) {
+    private void updateStopConditions(TransitAlert alertPatch, List<RoutePointTypeEnumeration> stopConditions) {
         Set<StopCondition> alertStopConditions = new HashSet<>();
         if (stopConditions != null) {
             for (RoutePointTypeEnumeration stopCondition : stopConditions) {
@@ -710,8 +559,8 @@ public class SiriAlertsUpdateHandler {
         return translations.isEmpty() ? null : TranslatedString.getI18NString(translations);
     }
 
-    public void setAlertPatchService(AlertPatchService alertPatchService) {
-        this.alertPatchService = alertPatchService;
+    public void setTransitAlertService(TransitAlertService transitAlertService) {
+        this.transitAlertService = transitAlertService;
     }
 
     public long getEarlyStart() {

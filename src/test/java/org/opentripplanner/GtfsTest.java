@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -38,7 +38,7 @@ public abstract class GtfsTest extends TestCase {
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
     TimetableSnapshotSource timetableSnapshotSource;
-    AlertPatchServiceImpl alertPatchServiceImpl;
+    TransitAlertServiceImpl alertPatchServiceImpl;
     public Router router;
     private GtfsFeedId feedId;
 
@@ -75,8 +75,8 @@ public abstract class GtfsTest extends TestCase {
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
         graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
-        alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
-        alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
+        alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
+        alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
         alertsUpdateHandler.setFeedId(feedId.getId());
 
         try {
