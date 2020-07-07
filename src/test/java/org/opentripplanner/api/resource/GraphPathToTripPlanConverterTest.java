@@ -1,5 +1,6 @@
 package org.opentripplanner.api.resource;
 
+import com.google.common.collect.ImmutableList;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
@@ -9,6 +10,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
 import org.junit.Test;
+import org.opentripplanner.api.model.*;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedScopedId;
@@ -19,12 +21,6 @@ import org.opentripplanner.model.StopPattern;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.api.model.AbsoluteDirection;
-import org.opentripplanner.api.model.Itinerary;
-import org.opentripplanner.api.model.Leg;
-import org.opentripplanner.api.model.Place;
-import org.opentripplanner.api.model.RelativeDirection;
-import org.opentripplanner.api.model.WalkStep;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.BikeAccess;
 import org.opentripplanner.routing.alertpatch.Alert;
@@ -62,6 +58,7 @@ import org.opentripplanner.routing.edgetype.TimetableSnapshot;
 import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TrivialPathException;
+import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.services.FareService;
@@ -69,18 +66,10 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
-import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.routing.vertextype.ExitVertex;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.OnboardDepartVertex;
-import org.opentripplanner.routing.vertextype.PatternArriveVertex;
-import org.opentripplanner.routing.vertextype.PatternDepartVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
-import org.opentripplanner.routing.vertextype.TransitStopArrive;
-import org.opentripplanner.routing.vertextype.TransitStopDepart;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.updater.stoptime.TimetableSnapshotSource;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.*;
@@ -177,6 +166,32 @@ public class GraphPathToTripPlanConverterTest {
     }
 
     /**
+     * Encoded polyline should contain non trival points from LEG_SWITCH states such as going to/from bus stop
+     */
+    @Test
+    public void testLegGeometryPolylineGeneration() {
+        // given
+        Leg leg = new Leg();
+        RoutingRequest options = new RoutingRequest("BICYCLE_RENT,TRANSIT");
+        GraphPath[] graphPaths = buildPaths();
+        List<Edge> edges = new ArrayList<>(graphPaths[0].edges);
+        LegStateSplit legStateSplit = new LegStateSplit(graphPaths[0].states, ImmutableList.of(
+                new State(
+                        graphPaths[0].states.get(3).getVertex(),
+                        new StreetTransitLink((StreetVertex) edges.get(edges.size() - 1).getToVertex(), ((TransitStop) graphPaths[0].edges.get(2).getToVertex()), false),
+                        30,
+                        options)
+        ));
+
+        // when
+        GraphPathToTripPlanConverter.addLegGeometryToLeg(leg, edges, legStateSplit);
+        EncodedPolylineBean normal = PolylineEncoder.createEncodings(graphPaths[0].getGeometry());
+
+        // then
+        assertNotEquals(normal, leg.legGeometry);
+    }
+
+    /**
      * Build three GraphPath objects that can be used for testing for forward, backward and onboard.
      * This method doesn't rely on any routing code.
      * Leg 0: Walking towards the train station
@@ -188,6 +203,7 @@ public class GraphPathToTripPlanConverterTest {
      * Leg 6: Cycling on a rented bike
      * Leg 7: Cycling on a rented bike, continued (to demonstrate a {@link LegSwitchingEdge})
      * Leg 8: Leaving the bike rental station on foot
+     *
      * @return An array containing the generated GraphPath objects: forward, then backward, onboard.
      */
     private GraphPath[] buildPaths() {
@@ -345,29 +361,35 @@ public class GraphPathToTripPlanConverterTest {
         trainStopDepartTime.setStopSequence(Integer.MIN_VALUE);
         trainStopDepartTime.setDepartureTime(10);
         trainStopDepartTime.setPickupType(3);
+
         trainStopDwellTime.setTrip(firstTrip);
         trainStopDwellTime.setStop(trainStopDwell);
         trainStopDwellTime.setStopSequence(0);
         trainStopDwellTime.setArrivalTime(12);
         trainStopDwellTime.setDepartureTime(13);
+
         trainStopInterlineFirstTime.setTrip(firstTrip);
         trainStopInterlineFirstTime.setStop(trainStopInterline);
         trainStopInterlineFirstTime.setStopSequence(Integer.MAX_VALUE);
         trainStopInterlineFirstTime.setArrivalTime(16);
+
         trainStopInterlineSecondTime.setTrip(secondTrip);
         trainStopInterlineSecondTime.setStop(trainStopInterline);
         trainStopInterlineSecondTime.setStopSequence(0);
         trainStopInterlineSecondTime.setDepartureTime(20);
+
         trainStopArriveTime.setTrip(secondTrip);
         trainStopArriveTime.setStop(trainStopArrive);
         trainStopArriveTime.setStopSequence(1);
         trainStopArriveTime.setArrivalTime(24);
         trainStopArriveTime.setDropOffType(2);
+
         ferryStopDepartTime.setTrip(thirdTrip);
         ferryStopDepartTime.setStop(ferryStopDepart);
         ferryStopDepartTime.setStopSequence(-1);
         ferryStopDepartTime.setDepartureTime(36);
         ferryStopDepartTime.setPickupType(2);
+
         ferryStopArriveTime.setTrip(thirdTrip);
         ferryStopArriveTime.setStop(ferryStopArrive);
         ferryStopArriveTime.setStopSequence(0);
@@ -387,17 +409,17 @@ public class GraphPathToTripPlanConverterTest {
         thirdStopTimes.add(ferryStopArriveTime);
 
         // Various patterns that are required to construct a full graph path, plus initialization
-        StopPattern firstStopPattern  = new StopPattern(firstStopTimes);
+        StopPattern firstStopPattern = new StopPattern(firstStopTimes);
         StopPattern secondStopPattern = new StopPattern(secondStopTimes);
-        StopPattern thirdStopPattern  = new StopPattern(thirdStopTimes);
+        StopPattern thirdStopPattern = new StopPattern(thirdStopTimes);
 
-        TripPattern firstTripPattern  = new TripPattern(firstRoute, firstStopPattern);
+        TripPattern firstTripPattern = new TripPattern(firstRoute, firstStopPattern);
         TripPattern secondTripPattern = new TripPattern(secondRoute, secondStopPattern);
-        TripPattern thirdTripPattern  = new TripPattern(thirdRoute, thirdStopPattern);
+        TripPattern thirdTripPattern = new TripPattern(thirdRoute, thirdStopPattern);
 
-        TripTimes firstTripTimes  = new TripTimes(firstTrip, firstStopTimes, new Deduplicator());
+        TripTimes firstTripTimes = new TripTimes(firstTrip, firstStopTimes, new Deduplicator());
         TripTimes secondTripTimes = new TripTimes(secondTrip, secondStopTimes, new Deduplicator());
-        TripTimes thirdTripTimes  = new TripTimes(thirdTrip, thirdStopTimes, new Deduplicator());
+        TripTimes thirdTripTimes = new TripTimes(thirdTrip, thirdStopTimes, new Deduplicator());
 
         firstTripPattern.add(firstTripTimes);
         secondTripPattern.add(secondTripTimes);
@@ -670,7 +692,7 @@ public class GraphPathToTripPlanConverterTest {
 
         // Create dummy TimetableSnapshot
         TimetableSnapshot snapshot = new TimetableSnapshot();
-        
+
         // Mock TimetableSnapshotSource to return dummy TimetableSnapshot
         TimetableSnapshotSource timetableSnapshotSource = mock(TimetableSnapshotSource.class);
 
@@ -829,7 +851,7 @@ public class GraphPathToTripPlanConverterTest {
         State s58Onboard = e57.traverse(s56Onboard);
         State s60Onboard = e59.traverse(s58Onboard);
 
-        return new GraphPath[] {new GraphPath(s60Forward, false),
+        return new GraphPath[]{new GraphPath(s60Forward, false),
                 new GraphPath(s0Backward, false), new GraphPath(s60Onboard, false)};
     }
 
@@ -923,7 +945,9 @@ public class GraphPathToTripPlanConverterTest {
         compareElevations(elevations, type);
     }
 
-    /** Compare all simple itinerary fields to their expected values. */
+    /**
+     * Compare all simple itinerary fields to their expected values.
+     */
     private void compareItinerary(Itinerary itinerary, Type type) {
         if (type == Type.FORWARD) {
             assertEquals(66.0, itinerary.duration.doubleValue(), 0.0);
@@ -973,7 +997,9 @@ public class GraphPathToTripPlanConverterTest {
         assertFalse(itinerary.tooSloped);
     }
 
-    /** Compare the computed fare to its expected value. */
+    /**
+     * Compare the computed fare to its expected value.
+     */
     private void compareFare(Fare fare) {
         assertEquals(0, fare.getFare(FareType.regular).getCents());
         assertEquals(1, fare.getFare(FareType.student).getCents());
@@ -982,7 +1008,9 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals(8, fare.getFare(FareType.special).getCents());
     }
 
-    /** Compare all simple leg fields to their expected values, leg by leg. */
+    /**
+     * Compare all simple leg fields to their expected values, leg by leg.
+     */
     private void compareLegs(Leg[] legs, Type type) {
         assertEquals(9, legs.length);
 
@@ -1348,7 +1376,9 @@ public class GraphPathToTripPlanConverterTest {
         }
     }
 
-    /** Compare all simple walk step fields to their expected values, step by step. */
+    /**
+     * Compare all simple walk step fields to their expected values, step by step.
+     */
     private void compareSteps(WalkStep[][] steps, Type type) {
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(1, steps[0].length);
@@ -1452,7 +1482,9 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(steps[7][0].exit);
     }
 
-    /** Compare the encoded geometries to their expected values, leg by leg. */
+    /**
+     * Compare the encoded geometries to their expected values, leg by leg.
+     */
     private void compareGeometries(EncodedPolylineBean[] geometries, Type type) {
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(2, geometries[0].getLength());
@@ -1490,7 +1522,9 @@ public class GraphPathToTripPlanConverterTest {
         assertEquals("", geometries[8].getPoints());
     }
 
-    /** Compare all simple place fields to their expected values, place by place. */
+    /**
+     * Compare all simple place fields to their expected values, place by place.
+     */
     private void comparePlaces(Place[][] places, Type type) {
         assertEquals(2, places[0].length);
         assertEquals(3, places[1].length);
@@ -1821,7 +1855,9 @@ public class GraphPathToTripPlanConverterTest {
         }
     }
 
-    /** Compare the stop ids to their expected values, place by place. */
+    /**
+     * Compare the stop ids to their expected values, place by place.
+     */
     private void compareStopIds(FeedScopedId[][] stopIds, Type type) {
         assertEquals(2, stopIds[0].length);
         assertEquals(3, stopIds[1].length);
@@ -1891,7 +1927,9 @@ public class GraphPathToTripPlanConverterTest {
         assertNull(stopIds[8][1]);
     }
 
-    /** Compare the elevations to their expected values, step by step. */
+    /**
+     * Compare the elevations to their expected values, step by step.
+     */
     private void compareElevations(Double[][][][] elevations, Type type) {
         if (type == Type.FORWARD || type == Type.BACKWARD) {
             assertEquals(0.0, elevations[0][0][0][0], 0.0);

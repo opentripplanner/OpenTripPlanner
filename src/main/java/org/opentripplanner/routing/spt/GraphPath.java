@@ -51,8 +51,6 @@ public class GraphPath {
      *            - the state for which a path is requested
      * @param optimize
      *            - whether excess waiting time should be removed
-     * @param options
-     *            - the traverse options used to reach this state
      */
     public GraphPath(State s, boolean optimize) {
         // Only optimize transit trips
@@ -209,7 +207,7 @@ public class GraphPath {
     }
 
     public LineString getGeometry() {
-        CoordinateArrayListSequence coordinates = makeCoordinates(edges.toArray(new Edge[0]));
+        CoordinateArrayListSequence coordinates = makeCoordinates(edges);
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
