@@ -1,21 +1,20 @@
 package org.opentripplanner.api.model;
 
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
-
-import org.opentripplanner.model.FeedScopedId;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.api.model.alertpatch.LocalizedAlert;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
+import java.util.TimeZone;
 
  /**
  * One leg of a trip -- that is, a temporally continuous piece of the journey that takes place on a
@@ -280,6 +279,7 @@ public class Leg {
      * Whether this leg is a transit leg or not.
      * @return Boolean true if the leg is a transit leg
      */
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public boolean isTransitLeg() {
         return mode.isTransit();
     }
@@ -287,7 +287,7 @@ public class Leg {
     /** 
      * The leg's duration in seconds
      */
-    @JsonSerialize
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public double getDuration() {
         return endTime.getTimeInMillis()/1000.0 - startTime.getTimeInMillis()/1000.0;
     }

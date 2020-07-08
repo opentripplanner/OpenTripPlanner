@@ -1,19 +1,19 @@
 package org.opentripplanner.api.resource;
 
+import org.opentripplanner.api.model.TripPlan;
+import org.opentripplanner.api.model.error.PlannerError;
+
+import javax.ws.rs.core.UriInfo;
+import java.io.Serializable;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map.Entry;
 
-import javax.ws.rs.core.UriInfo;
-
-import org.opentripplanner.api.model.TripPlan;
-import org.opentripplanner.api.model.error.PlannerError;
-
 /** Represents a trip planner response, will be serialized into XML or JSON by Jersey */
-public class Response {
+public class Response implements Serializable {
 
     /** A dictionary of the parameters provided in the request that triggered this response. */
-    public HashMap<String, String> requestParameters;
+    private HashMap<String, String> requestParameters;
     private TripPlan plan;
     private PlannerError error = null;
 
@@ -28,7 +28,7 @@ public class Response {
 
     /** Construct an new response initialized with all the incoming query parameters. */
     public Response(UriInfo info) {
-        this.requestParameters = new HashMap<String, String>();
+        this.requestParameters = new HashMap<>();
         if (info == null) { 
             // in tests where there is no HTTP request, just leave the map empty
             return;
@@ -60,5 +60,12 @@ public class Response {
     public void setError(PlannerError error) {
         this.error = error;
     }
-    
+
+    public HashMap<String, String> getRequestParameters() {
+        return requestParameters;
+    }
+
+    public void setRequestParameters(HashMap<String, String> requestParameters) {
+        this.requestParameters = requestParameters;
+    }
 }

@@ -1,8 +1,15 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
+import com.fasterxml.jackson.databind.annotation.JsonDeserialize;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import org.opentripplanner.api.model.FeedScopedIdDeserializer;
+import org.opentripplanner.api.model.FeedScopedIdSerializer;
+
 import java.io.Serializable;
 
+@JsonDeserialize(using = FeedScopedIdDeserializer.class)
+@JsonSerialize(using = FeedScopedIdSerializer.class)
 public class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
 
     public static final char ID_SEPARATOR = '_';

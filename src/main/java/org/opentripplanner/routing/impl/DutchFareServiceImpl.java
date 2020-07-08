@@ -9,6 +9,7 @@ import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.Fare;
 import org.opentripplanner.routing.core.Fare.FareType;
 import org.opentripplanner.routing.core.Money;
+import org.opentripplanner.routing.core.WrappedCurrency;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -197,7 +198,7 @@ public class DutchFareServiceImpl extends DefaultFareServiceImpl {
         Fare fare = super.getCost(path);
         if (fare != null) {
             for (Money money : fare.fare.values()) {
-                money.setCurrency(euros);
+                money.setCurrency(new WrappedCurrency(euros));
             }
         }
         return fare;
