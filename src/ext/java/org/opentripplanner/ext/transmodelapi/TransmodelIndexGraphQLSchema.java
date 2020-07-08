@@ -1643,7 +1643,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("situations")
                         .description("Get all situations active for the quay.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                    .dataFetcher(env -> getRoutingService(env).getSiriAlertPatchService()
+                    .dataFetcher(env -> getRoutingService(env).getTransitAlertService()
                         .getStopAlerts(((Stop)env.getSource()).getId()))
                         .build())
                 /*
@@ -2056,7 +2056,7 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Get all situations active for the service journey.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                         .dataFetcher(environment ->
-                            getRoutingService(environment).getSiriAlertPatchService().getTripAlerts(
+                            getRoutingService(environment).getTransitAlertService().getTripAlerts(
                             environment.getSource()))
                     .build())
                 /*
@@ -2146,7 +2146,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("situations")
                         .description("Get all situations active for the journey pattern.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                    .dataFetcher(environment -> getRoutingService(environment).getSiriAlertPatchService().getTripPatternAlerts(
+                    .dataFetcher(environment -> getRoutingService(environment).getTransitAlertService().getTripPatternAlerts(
                         ((TripPattern) environment.getSource()).getId()))
                     .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2273,7 +2273,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("situations")
                         .description("Get all situations active for the line.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                    .dataFetcher(environment -> getRoutingService(environment).getSiriAlertPatchService().getRouteAlerts(
+                    .dataFetcher(environment -> getRoutingService(environment).getTransitAlertService().getRouteAlerts(
                         environment.getSource()))
                     .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -2335,7 +2335,7 @@ public class TransmodelIndexGraphQLSchema {
                         .name("situations")
                         .description("Get all situations active for the authority.")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                        .dataFetcher(environment -> getRoutingService(environment).getSiriAlertPatchService() .getAgencyAlerts(
+                        .dataFetcher(environment -> getRoutingService(environment).getTransitAlertService() .getAgencyAlerts(
                             ((Agency)environment.getSource()).getId()))
                         .build())
                 .build();
@@ -3246,7 +3246,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .type(new GraphQLList(EnumTypes.SEVERITY))
                                 .build())
                         .dataFetcher(environment -> {
-                            Collection<TransitAlert> alerts = getRoutingService(environment).getSiriAlertPatchService().getAllAlerts();
+                            Collection<TransitAlert> alerts = getRoutingService(environment).getTransitAlertService().getAllAlerts();
                             if ((environment.getArgument("authorities") instanceof List)) {
                                 List<String> authorities = environment.getArgument("authorities");
                                 alerts = alerts.stream().filter(alertPatch -> authorities.contains(alertPatch.getFeedId())).collect(Collectors.toSet());
@@ -3310,7 +3310,7 @@ public class TransmodelIndexGraphQLSchema {
 
         Collection<TransitAlert> allAlerts = new HashSet<>();
 
-        TransitAlertService transitAlertService = routingService.getSiriAlertPatchService();
+        TransitAlertService transitAlertService = routingService.getTransitAlertService();
 
         // Quay
         allAlerts.addAll(transitAlertService.getStopAlerts(stopId));

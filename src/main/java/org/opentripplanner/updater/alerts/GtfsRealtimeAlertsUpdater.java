@@ -47,6 +47,8 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private final boolean fuzzyTripMatching;
 
+    private TransitAlertService transitAlertService;
+
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
@@ -73,6 +75,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         if (fuzzyTripMatching) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
+        this.transitAlertService = transitAlertService;
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }
@@ -112,6 +115,10 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     @Override
     public void teardown() {
+    }
+
+    public TransitAlertService getTransitAlertService() {
+        return transitAlertService;
     }
 
     public String toString() {

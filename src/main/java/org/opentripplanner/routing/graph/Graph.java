@@ -21,7 +21,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -52,7 +51,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
@@ -848,19 +847,9 @@ public class Graph implements Serializable {
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
 
-    public TransitAlertService getSiriAlertPatchService() {
+    public TransitAlertService getTransitAlertService() {
         if (transitAlertService == null) {
-            if (updaterManager == null) {
-                transitAlertService = new TransitAlertServiceImpl(this);
-            }
-            else {
-                Optional<TransitAlertService> patchServiceOptional = updaterManager.getUpdaterList().stream()
-                        .filter(SiriSXUpdater.class::isInstance)
-                        .map(SiriSXUpdater.class::cast)
-                        .map(SiriSXUpdater::getTransitAlertService).findFirst();
-
-                transitAlertService = patchServiceOptional.orElseGet(() -> new TransitAlertServiceImpl(this));
-            }
+            transitAlertService = new DelegatingTransitAlertServiceImpl(this);
         }
         return transitAlertService;
     }

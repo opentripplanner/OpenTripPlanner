@@ -2,6 +2,7 @@ package org.opentripplanner.index;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.mapping.AgencyMapper;
+import org.opentripplanner.api.mapping.AlertMapper;
 import org.opentripplanner.api.mapping.FeedInfoMapper;
 import org.opentripplanner.api.mapping.FeedScopedIdMapper;
 import org.opentripplanner.api.mapping.RouteMapper;
@@ -11,6 +12,7 @@ import org.opentripplanner.api.mapping.TransferMapper;
 import org.opentripplanner.api.mapping.TripMapper;
 import org.opentripplanner.api.mapping.TripPatternMapper;
 import org.opentripplanner.api.model.ApiAgency;
+import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiFeedInfo;
 import org.opentripplanner.api.model.ApiPatternShort;
 import org.opentripplanner.api.model.ApiRoute;
@@ -300,6 +302,18 @@ public class IndexAPI {
                 .collect(Collectors.toList());
     }
 
+    /**
+     * Return all alerts for a stop
+     */
+    @GET
+    @Path("/stops/{stopId}/alerts")
+    public Collection<ApiAlert> getAlertsForStop(@PathParam("stopId") String stopId) {
+        RoutingService routingService = createRoutingService();
+        AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
+        FeedScopedId id = createId("stopId", stopId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getStopAlerts(id));
+    }
+
     /** Return a list of all routes in the graph. */
     // with repeated hasStop parameters, replaces old routesBetweenStops
     @GET
@@ -370,6 +384,18 @@ public class IndexAPI {
             trips.addAll(pattern.getTrips());
         }
         return TripMapper.mapToApiShort(trips);
+    }
+
+    /**
+     * Return all alerts for a route
+     */
+    @GET
+    @Path("/routes/{routeId}/alerts")
+    public Collection<ApiAlert> getAlertsForRoute(@PathParam("routeId") String routeId) {
+        RoutingService routingService = createRoutingService();
+        AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
+        FeedScopedId id = createId("routeId", routeId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getRouteAlerts(id));
     }
 
     // Not implemented, results would be too voluminous.

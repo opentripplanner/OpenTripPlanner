@@ -104,7 +104,7 @@ public class AlertToLegMapper {
     }
 
     private static TransitAlertService alertPatchService(Graph g) {
-        return g.getSiriAlertPatchService();
+        return g.getTransitAlertService();
     }
 
     private static Collection<TransitAlert> getAlertsForStopAndRoute(Graph graph, FeedScopedId stopId, FeedScopedId routeId) {
@@ -118,14 +118,14 @@ public class AlertToLegMapper {
         if (stop == null) {
             return new ArrayList<>();
         }
-        Collection<TransitAlert> alertsForStopAndRoute = graph.getSiriAlertPatchService().getStopAndRouteAlerts(stopId, routeId);
+        Collection<TransitAlert> alertsForStopAndRoute = graph.getTransitAlertService().getStopAndRouteAlerts(stopId, routeId);
         if (checkParentStop) {
             if (alertsForStopAndRoute == null) {
                 alertsForStopAndRoute = new HashSet<>();
             }
             if (stop.isPartOfStation()) {
                 //Also check parent
-                Collection<TransitAlert> alerts = graph.getSiriAlertPatchService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
+                Collection<TransitAlert> alerts = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
                 if (alerts != null) {
                     alertsForStopAndRoute.addAll(alerts);
                 }
@@ -156,14 +156,14 @@ public class AlertToLegMapper {
             return new ArrayList<>();
         }
 
-        Collection<TransitAlert> alertsForStopAndTrip = graph.getSiriAlertPatchService().getStopAndTripAlerts(stopId, tripId);
+        Collection<TransitAlert> alertsForStopAndTrip = graph.getTransitAlertService().getStopAndTripAlerts(stopId, tripId);
         if (checkParentStop) {
             if (alertsForStopAndTrip == null) {
                 alertsForStopAndTrip = new HashSet<>();
             }
             if  (stop.isPartOfStation()) {
                 // Also check parent
-                Collection<TransitAlert> alerts = graph.getSiriAlertPatchService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId);
+                Collection<TransitAlert> alerts = graph.getTransitAlertService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId);
                 if (alerts != null) {
                     alertsForStopAndTrip.addAll(alerts);
                 }
@@ -191,7 +191,7 @@ public class AlertToLegMapper {
             return new ArrayList<>();
         }
 
-        Collection<TransitAlert> alertsForStop  = graph.getSiriAlertPatchService().getStopAlerts(stopId);
+        Collection<TransitAlert> alertsForStop  = graph.getTransitAlertService().getStopAlerts(stopId);
         if (checkParentStop) {
             if (alertsForStop == null) {
                 alertsForStop = new HashSet<>();
@@ -199,7 +199,7 @@ public class AlertToLegMapper {
 
             if  (stop.isPartOfStation()) {
                 // Also check parent
-                Collection<TransitAlert> parentStopAlerts = graph.getSiriAlertPatchService().getStopAlerts(stop.getParentStation().getId());
+                Collection<TransitAlert> parentStopAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
                 if (parentStopAlerts != null) {
                     alertsForStop.addAll(parentStopAlerts);
                 }
