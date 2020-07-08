@@ -3,6 +3,9 @@ package org.opentripplanner.model;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 
+import java.util.Set;
+import java.util.TreeSet;
+
 public final class Stop extends IdentityBean<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
@@ -49,6 +52,9 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     @JsonIgnore
     private String platformCode;
+
+    @JsonIgnore
+    private Set<String> lineNames = new TreeSet<>();
 
     public Stop() {
 
@@ -204,5 +210,13 @@ public final class Stop extends IdentityBean<FeedScopedId> {
 
     public void setPlatformCode(String platformCode) {
         this.platformCode = platformCode;
+    }
+
+    public Set<String> getLineNames(){
+        return this.lineNames;
+    }
+
+    public void addLine(String lineName){
+        this.lineNames.add(lineName);
     }
 }

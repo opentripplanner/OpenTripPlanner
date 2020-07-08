@@ -107,6 +107,8 @@ public class GtfsModule implements GraphBuilderModule {
 
                 OtpTransitService transitService = mapGtfsDaoToOTPTransitService(loadBundle(gtfsBundle));
                 graph.addTransitRoutes(transitService.getAllRoutes());
+                graph.addTransitStops(transitService.getAllStops());
+                transitService.getAllStopTimes().stream().forEach(stopTime -> graph.addTransitStopTime(stopTime));
 
                 GtfsContext context = GtfsLibrary
                         .createContext(gtfsBundle.getFeedId(), transitService, calendarService);
