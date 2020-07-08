@@ -43,7 +43,15 @@ public class OTPMain {
     /** ENTRY POINT: This is the main method that is called when running otp.jar from the command line. */
     public static void main(String[] args) {
 
-        /* Parse and validate command line parameters. */
+        CommandLineParameters params = parseCommandLineParams(args);
+
+        OTPMain main = new OTPMain(params);
+        main.run();
+    }
+
+    /** Parse and validate command line parameters.
+     * */
+    public static CommandLineParameters parseCommandLineParams(String[] args) {
         CommandLineParameters params = new CommandLineParameters();
         try {
             JCommander jc = new JCommander(params, args);
@@ -68,11 +76,7 @@ public class OTPMain {
             LOG.info("Nothing to do. Use --help to see available tasks.");
             System.exit(-1);
         }
-
-        OTPMain main = new OTPMain(params);
-        if (!main.run()) {
-            System.exit(-1);
-        }
+        return params;
     }
 
     /* Constructor. */
@@ -88,97 +92,97 @@ public class OTPMain {
      *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method will return when the web server shuts down;
      *         false - if an error occurs while loading the graph;
      */
-    public boolean run() {
-
-        // TODO do params.infer() here to ensure coherency?
-
+    public void run() {
         /* Create the top-level objects that represent the OTP server. */
-        makeGraphService();
+        graphService = new GraphService(params.autoReload, params.graphDirectory);
         otpServer = new OTPServer(params, graphService);
 
-        /* Start graph builder if requested */
         if (params.build != null) {
-            GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build); // TODO multiple directories
-            if (graphBuilder != null) {
-                graphBuilder.run();
-                /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
-                if (params.inMemory || params.preFlight) {
-                    Graph graph = graphBuilder.getGraph();
-                    graph.index(new DefaultStreetVertexIndexFactory());
-                    // FIXME set true router IDs
-                    graphService.registerGraph("", new MemoryGraphSource("", graph));
-                }
-            } else {
-                LOG.error("An error occurred while building the graph.");
-                return false;
-            }
+            buildGraph();
         }
 
-        /* Scan for graphs to load from disk if requested */
         // FIXME eventually router IDs will be present even when just building a graph.
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
-            /* Auto-register pre-existing graph on disk, with optional auto-scan. */
-            GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
-            graphScanner.basePath = params.graphDirectory;
-            if (params.routerIds != null && params.routerIds.size() > 0) {
-                graphScanner.defaultRouterId = params.routerIds.get(0);
-            }
-            graphScanner.autoRegister = params.routerIds;
-            graphScanner.startup();
+            registerRouters();
         }
 
-        /* Start visualizer if requested */
         if (params.visualize) {
-            Router defaultRouter = graphService.getRouter();
-            defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
-            defaultRouter.graphVisualizer.run();
-            defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
+            visualize();
         }
 
-        /* Start script if requested */
         if (params.scriptFile != null) {
-            try {
-                OTPScript otpScript = new BSFOTPScript(otpServer, params.scriptFile);
-                if (otpScript != null) {
-                    Object retval = otpScript.run();
-                    if (retval != null) {
-                        LOG.warn("Your script returned something, no idea what to do with it: {}", retval);
-                    }
-                }
-            } catch (Exception e) {
-                throw new RuntimeException(e);
-            }
+            startScript();
         }
 
-        /* Start web server if requested */
         if (params.server) {
-            GrizzlyServer grizzlyServer = new GrizzlyServer(params, otpServer);
-            while (true) { // Loop to restart server on uncaught fatal exceptions.
-                try {
-                    grizzlyServer.run();
-                    return true;
-                } catch (Throwable throwable) {
-                    LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
-                            throwable.getClass().getSimpleName(), throwable);
-                }
-            }
+            startServer();
         }
-
-        return true;
     }
 
-    /**
-     * Create a cached GraphService that will be used by all OTP components to resolve router IDs to Graphs.
-     * If a graph is supplied (graph parameter is not null) then that graph is also registered.
-     * TODO move into OTPServer and/or GraphService itself, eliminate FileFactory and put basePath in GraphService
-     */
-    public void makeGraphService () {
-        graphService = new GraphService(params.autoReload);
-        InputStreamGraphSource.FileFactory graphSourceFactory =
-                new InputStreamGraphSource.FileFactory(params.graphDirectory);
-        graphService.graphSourceFactory = graphSourceFactory;
-        if (params.graphDirectory != null) {
-            graphSourceFactory.basePath = params.graphDirectory;
+    /** Start graph builder */
+    public void buildGraph() {
+        GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build); // TODO multiple directories
+        if (graphBuilder != null) {
+            graphBuilder.run();
+            /* If requested, hand off the graph to the server as the default graph using an in-memory GraphSource. */
+            if (params.inMemory || params.preFlight) {
+                Graph graph = graphBuilder.getGraph();
+                graph.index(new DefaultStreetVertexIndexFactory());
+                // FIXME set true router IDs
+                graphService.registerGraph("", new MemoryGraphSource("", graph));
+            }
+        } else {
+            LOG.error("An error occurred while building the graph.");
+            System.exit(-1);
+        }
+    }
+
+    /** Scan for graphs to load from disk */
+    public void registerRouters() {
+        /* Auto-register pre-existing graph on disk, with optional auto-scan. */
+        GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
+        graphScanner.basePath = params.graphDirectory;
+        if (params.routerIds != null && params.routerIds.size() > 0) {
+            graphScanner.defaultRouterId = params.routerIds.get(0);
+        }
+        graphScanner.autoRegister = params.routerIds;
+        graphScanner.startup();
+    }
+
+    /** Start visualizer */
+    public void visualize() {
+        Router defaultRouter = graphService.getRouter();
+        defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
+        defaultRouter.graphVisualizer.run();
+        defaultRouter.timeouts = new double[] {60}; // avoid timeouts due to search animation
+    }
+
+    /** Start script */
+    public void startScript() {
+        try {
+            OTPScript otpScript = new BSFOTPScript(otpServer, params.scriptFile);
+            if (otpScript != null) {
+                Object retval = otpScript.run();
+                if (retval != null) {
+                    LOG.warn("Your script returned something, no idea what to do with it: {}", retval);
+                }
+            }
+        } catch (Exception e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    /** Start web server */
+    public void startServer() {
+        GrizzlyServer grizzlyServer = new GrizzlyServer(params, otpServer);
+        while (true) { // Loop to restart server on uncaught fatal exceptions.
+            try {
+                grizzlyServer.run();
+                return;
+            } catch (Throwable throwable) {
+                LOG.error("An uncaught {} occurred inside OTP. Restarting server.",
+                        throwable.getClass().getSimpleName(), throwable);
+            }
         }
     }
 

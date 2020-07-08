@@ -3,11 +3,14 @@ package org.opentripplanner.routing.services;
 import org.geotools.referencing.factory.DeferredAuthorityFactory;
 import org.geotools.util.WeakCollectionCleaner;
 import org.opentripplanner.routing.error.GraphNotFoundException;
+import org.opentripplanner.routing.impl.InputStreamGraphSource;
 import org.opentripplanner.standalone.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Nullable;
 import javax.annotation.PreDestroy;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -58,6 +61,10 @@ public class GraphService {
     }
 
     public GraphService(boolean autoReload) {
+        this(false, null);
+    }
+
+    public GraphService(boolean autoReload, @Nullable File graphDirectory) {
         if (autoReload) {
             scanExecutor = Executors.newSingleThreadScheduledExecutor();
             scanExecutor.scheduleWithFixedDelay(new Runnable() {
@@ -66,7 +73,12 @@ public class GraphService {
                     autoReloadScan();
                 }
             }, AUTORELOAD_PERIOD_SEC, AUTORELOAD_PERIOD_SEC, TimeUnit.SECONDS);
+
+            if(graphDirectory != null) {
+                graphSourceFactory = new InputStreamGraphSource.FileFactory(graphDirectory);
+            }
         }
+
     }
 
     /** @param defaultRouterId The ID of the default router to return when no one is specified */
