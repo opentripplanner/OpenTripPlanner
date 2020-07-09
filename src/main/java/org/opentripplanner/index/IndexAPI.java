@@ -147,6 +147,20 @@ public class IndexAPI {
         }
     }
 
+    /**
+     * Return all alerts for an agency
+     */
+    @GET
+    @Path("/agencies/{feedId}/{agencyId}/alerts")
+    public Collection<ApiAlert> getAlertsForTrip(
+        @PathParam("feedId") String feedId, @PathParam("agencyId") String agencyId
+    ) {
+        RoutingService routingService = createRoutingService();
+        AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
+        FeedScopedId id = new FeedScopedId(feedId, agencyId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getAgencyAlerts(id));
+    }
+
     /** Return specific transit stop in the graph, by ID. */
     @GET
     @Path("/stops/{stopId}")
@@ -443,6 +457,18 @@ public class IndexAPI {
         return PolylineEncoder.createEncodings(pattern.getGeometry());
     }
 
+    /**
+     * Return all alerts for a trip
+     */
+    @GET
+    @Path("/trips/{tripId}/alerts")
+    public Collection<ApiAlert> getAlertsForTrip(@PathParam("tripId") String tripId) {
+        RoutingService routingService = createRoutingService();
+        AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
+        FeedScopedId id = createId("tripId", tripId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripAlerts(id));
+    }
+
     @GET
     @Path("/patterns")
     public List<ApiPatternShort> getPatterns() {
@@ -484,6 +510,18 @@ public class IndexAPI {
     public EncodedPolylineBean getGeometryForPattern(@PathParam("patternId") String patternId) {
         LineString line = getTripPattern(createRoutingService(), patternId).getGeometry();
         return PolylineEncoder.createEncodings(line);
+    }
+
+    /**
+     * Return all alerts for a pattern
+     */
+    @GET
+    @Path("/patterns/{patternId}/alerts")
+    public Collection<ApiAlert> getAlertsForPattern(@PathParam("patternId") String patternId) {
+        RoutingService routingService = createRoutingService();
+        AlertMapper alertMapper = new AlertMapper(null); // TODO: Add locale
+        FeedScopedId id = createId("patternId", patternId);
+        return alertMapper.mapToApi(routingService.getTransitAlertService().getTripPatternAlerts(id));
     }
 
     // TODO include pattern ID for each trip in responses
