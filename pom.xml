@@ -809,5 +809,10 @@
             <artifactId>org.eclipse.paho.client.mqttv3</artifactId>
             <version>1.2.0</version>
         </dependency>
+        <dependency>
+            <groupId>com.wdtinc</groupId>
+            <artifactId>mapbox-vector-tile</artifactId>
+            <version>3.1.0</version>
+        </dependency>
     </dependencies>
 </project>
