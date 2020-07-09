@@ -1,7 +1,6 @@
 package org.opentripplanner.api.resource;
 
 import org.geotools.geometry.Envelope2D;
-import org.opentripplanner.analyst.request.TileRequest;
 import org.opentripplanner.common.geometry.WebMercatorTile;
 import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.api.parameter.MIMEImageFormat;
@@ -45,7 +44,7 @@ import java.io.ByteArrayOutputStream;
  * 
  */
 @Path("/routers/{ignoreRouterId}/inspector")
-public class GraphInspectorTileResource extends RoutingResource {
+public class GraphInspectorTileResource {
 
     @Context
     private OTPServer otpServer;
