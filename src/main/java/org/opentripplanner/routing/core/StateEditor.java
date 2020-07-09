@@ -411,6 +411,7 @@ public class StateEditor {
         cloneStateDataAsNeeded();
         child.stateData.currentTraverseMode = vehicleDescription.getTraverseMode();
         child.stateData.currentVehicle = vehicleDescription;
+        child.distanceTraversedInCurrentVehicle = 0;
         int droppingTime = child.getOptions().routingDelays.getDropoffTime(child.getCurrentVehicle());
         incrementTimeInSeconds(droppingTime);
     }
