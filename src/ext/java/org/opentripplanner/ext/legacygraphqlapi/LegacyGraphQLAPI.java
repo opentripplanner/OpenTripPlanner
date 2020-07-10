@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.legacygraphqlapi;
 
+import com.fasterxml.jackson.annotation.JsonInclude;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
@@ -17,6 +18,8 @@ import javax.ws.rs.core.Context;
 import javax.ws.rs.core.HttpHeaders;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import javax.ws.rs.ext.ContextResolver;
+import javax.ws.rs.ext.Providers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -40,8 +43,17 @@ public class LegacyGraphQLAPI {
   private final Router router;
   private final ObjectMapper deserializer = new ObjectMapper();
 
-  public LegacyGraphQLAPI(@Context OTPServer otpServer, @PathParam("routerId") String routerId) {
+  public LegacyGraphQLAPI(
+      @Context OTPServer otpServer,
+      @Context Providers providers,
+      @PathParam("routerId") String routerId
+  ) {
     this.router = otpServer.getRouter();
+
+    ContextResolver<ObjectMapper> resolver =
+        providers.getContextResolver(ObjectMapper.class, MediaType.APPLICATION_JSON_TYPE);
+    ObjectMapper mapper = resolver.getContext(ObjectMapper.class);
+    mapper.setDefaultPropertyInclusion(JsonInclude.Include.ALWAYS);
   }
 
   @POST
