@@ -269,6 +269,14 @@ public abstract class RoutingResource {
      */
     @QueryParam("transferPenalty")
     protected Integer transferPenalty;
+
+    /**
+     * An additional penalty added to trips involving shuttles.  The value is in OTP's
+     * internal weight units, which are roughly equivalent to seconds.  Set this to a high
+     * value to discourage shuttle trips
+     */
+    @QueryParam("shuttlePenalty")
+    protected Integer shuttlePenalty;
     
     /**
      * An additional penalty added to boardings after the first when the transfer is not
@@ -487,7 +495,11 @@ public abstract class RoutingResource {
         if (bikeSwitchCost != null)
             request.bikeSwitchCost = bikeSwitchCost;
 
-        request.mbtaShuttlePenalty = router.mbtaShuttlePenalty;
+        if (shuttlePenalty != null) {
+            request.mbtaShuttlePenalty = shuttlePenalty;
+        } else {
+            request.mbtaShuttlePenalty = router.mbtaShuttlePenalty;
+        }
 
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle

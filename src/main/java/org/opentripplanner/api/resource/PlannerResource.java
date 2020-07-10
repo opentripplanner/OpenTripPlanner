@@ -1,6 +1,7 @@
 package org.opentripplanner.api.resource;
 
 import org.glassfish.grizzly.http.server.Request;
+import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.common.RoutingResource;
 import org.opentripplanner.api.model.TripPlan;
 import org.opentripplanner.api.model.error.PlannerError;
@@ -122,6 +123,10 @@ public class PlannerResource extends RoutingResource {
             router.requestLogger.info(sb.toString());
         }
         return response;
+    }
+
+    public RoutingRequest buildRequest() throws ParameterException {
+        return super.buildRequest();
     }
 
 }

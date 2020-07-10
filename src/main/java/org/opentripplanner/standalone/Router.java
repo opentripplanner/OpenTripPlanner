@@ -35,7 +35,7 @@ public class Router {
     public String id;
     public Graph graph;
     public double[] timeouts = {5, 4, 2};
-    public int mbtaShuttlePenalty = 300;
+    public int mbtaShuttlePenalty = 0;
 
     /**
      *  Separate logger for incoming requests. This should be handled with a Logback logger rather than something
