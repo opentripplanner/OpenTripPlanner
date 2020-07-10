@@ -16,6 +16,8 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.RoutingRequestTransitDataProviderFilter;
+import org.opentripplanner.routing.algorithm.raptor.transit.request.TransitDataProviderFilter;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.InputField;
@@ -131,15 +133,7 @@ public class RoutingWorker {
             ? router.graph.getTransitLayer()
             : router.graph.getRealtimeTransitLayer();
 
-        RaptorRoutingRequestTransitData requestTransitDataProvider;
-        requestTransitDataProvider = new RaptorRoutingRequestTransitData(
-                transitLayer,
-                request.getDateTime().toInstant(),
-                request.additionalSearchDaysAfterToday,
-                request.modes.transitModes,
-                request.rctx.bannedRoutes,
-                request.walkSpeed
-        );
+        RaptorRoutingRequestTransitData requestTransitDataProvider = createRequestTransitDataProvider(transitLayer);
 
         this.debugAggregator.finishedPatternFiltering();
 
@@ -247,6 +241,21 @@ public class RoutingWorker {
         this.debugAggregator.finishedItineraryCreation();
 
         return itineraries;
+    }
+
+    private RaptorRoutingRequestTransitData createRequestTransitDataProvider(
+            TransitLayer transitLayer) {
+        return new RaptorRoutingRequestTransitData(
+                transitLayer,
+                request.getDateTime().toInstant(),
+                request.additionalSearchDaysAfterToday,
+                createRequestTransitDataProviderFilter(),
+                request.walkSpeed
+        );
+    }
+
+    private TransitDataProviderFilter createRequestTransitDataProviderFilter() {
+        return new RoutingRequestTransitDataProviderFilter(request);
     }
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
