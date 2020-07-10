@@ -35,6 +35,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.FareRuleSet;
 import org.opentripplanner.routing.core.OptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
@@ -64,6 +65,7 @@ public class LegacyGraphQLQueryTypeImpl
       String type = args.getLegacyGraphQLId().getType();
       String id = args.getLegacyGraphQLId().getId();
       RoutingService routingService = environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
+      BikeRentalStationService bikerentalStationService = routingService.getBikerentalStationService();
 
       switch (type) {
         case "Agency":
@@ -71,16 +73,14 @@ public class LegacyGraphQLQueryTypeImpl
         case "Alert":
           return null; //TODO
         case "BikePark":
-          return routingService
-              .getBikerentalStationService()
+          return bikerentalStationService == null ? null : bikerentalStationService
               .getBikeParks()
               .stream()
               .filter(bikePark -> bikePark.id.equals(id))
               .findAny()
               .orElse(null);
         case "BikeRentalStation":
-          return routingService
-              .getBikerentalStationService()
+          return bikerentalStationService == null ? null : bikerentalStationService
               .getBikeRentalStations()
               .stream()
               .filter(bikeRentalStation -> bikeRentalStation.id.equals(id))
@@ -483,9 +483,14 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<Iterable<BikeRentalStation>> bikeRentalStations() {
-    return environment -> getRoutingService(environment)
-              .getBikerentalStationService()
-              .getBikeRentalStations();
+    return environment -> {
+      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
+          .getBikerentalStationService();
+
+      if (bikerentalStationService == null) { return null; }
+
+      return bikerentalStationService.getBikeRentalStations();
+    };
   }
 
   @Override
@@ -493,8 +498,12 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeRentalStationArgs(environment.getArguments());
 
-      return getRoutingService(environment)
-              .getBikerentalStationService()
+      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
+          .getBikerentalStationService();
+
+      if (bikerentalStationService == null) { return null; }
+
+      return bikerentalStationService
               .getBikeRentalStations()
               .stream()
               .filter(bikeRentalStation -> bikeRentalStation.id.equals(args.getLegacyGraphQLId()))
@@ -505,9 +514,14 @@ public class LegacyGraphQLQueryTypeImpl
 
   @Override
   public DataFetcher<Iterable<BikePark>> bikeParks() {
-    return environment -> getRoutingService(environment)
-            .getBikerentalStationService()
-            .getBikeParks();
+    return environment -> {
+      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
+          .getBikerentalStationService();
+
+      if (bikerentalStationService == null) { return null; }
+
+      return bikerentalStationService.getBikeParks();
+    };
   }
 
   @Override
@@ -515,8 +529,12 @@ public class LegacyGraphQLQueryTypeImpl
     return environment -> {
       var args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeBikeParkArgs(environment.getArguments());
 
-      return getRoutingService(environment)
-              .getBikerentalStationService()
+      BikeRentalStationService bikerentalStationService = getRoutingService(environment)
+          .getBikerentalStationService();
+
+      if (bikerentalStationService == null) { return null; }
+
+      return bikerentalStationService
               .getBikeParks()
               .stream()
               .filter(bikepark -> bikepark.id.equals(args.getLegacyGraphQLId()))
