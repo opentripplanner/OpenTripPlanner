@@ -58,7 +58,7 @@ public class LegacyGraphQLPlaceImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment -> {
       Place place = getSource(environment).place;
 
-      if (!place.vertexType.equals(VertexType.BIKESHARE)) { retun null; }
+      if (!place.vertexType.equals(VertexType.BIKESHARE)) { return null; }
 
       BikeRentalStationService bikerentalStationService = getRoutingService(environment)
           .getBikerentalStationService();
