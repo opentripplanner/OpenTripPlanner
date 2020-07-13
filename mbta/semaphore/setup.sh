@@ -1,10 +1,12 @@
 #!/bin/bash
 set -e
 
-# ensure we use Java 8; other versions have an issue building the graph:
-# https://groups.google.com/forum/#!topic/opentripplanner-users/pvtm3BSyS9g
-source /opt/change-java-version.sh
-change-java-version 8
+# Add more swap space.
+sudo swapoff -a
+sudo dd if=/dev/zero of=/swapfile bs=1M count=8192
+sudo chmod 0600 /swapfile
+sudo mkswap /swapfile
+sudo swapon /swapfile
 
 export M2_CACHE="${SEMAPHORE_CACHE_DIR}/.m2/"
 mkdir -p "${M2_CACHE}"
