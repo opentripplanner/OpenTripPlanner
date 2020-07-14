@@ -3,6 +3,6 @@ package org.opentripplanner.api.parameter;
 public enum ApiRequestMode {
     WALK, BICYCLE, CAR,
     TRAM, SUBWAY, RAIL, BUS, FERRY,
-    CABLE_CAR, GONDOLA, FUNICULAR,
+    CABLECAR, GONDOLA, FUNICULAR,
     TRANSIT, AIRPLANE
 }

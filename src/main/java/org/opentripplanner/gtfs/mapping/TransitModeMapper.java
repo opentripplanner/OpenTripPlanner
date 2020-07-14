@@ -1,7 +1,6 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.core.TraverseMode;
 
 public class TransitModeMapper {
 
@@ -51,7 +50,7 @@ public class TransitModeMapper {
             case 4:
                 return TransitMode.FERRY;
             case 5:
-                return TransitMode.CABLE_CAR;
+                return TransitMode.CABLECAR;
             case 6:
                 return TransitMode.GONDOLA;
             case 7:

@@ -13,9 +13,9 @@ import java.util.Set;
 
 /**
  * A set of qualified modes. The original intent was to allow a sequence of mode sets, but the shift to "long distance
- * mode" routing means that it will make more sense to specify access, egress, and transit modes in separate parameters. 
+ * mode" routing means that it will make more sense to specify access, egress, and transit modes in separate parameters.
  * So now this only contains one mode set rather than a sequence of them.
- *  
+ *
  * This class and QualifiedMode are clearly somewhat inefficient and allow nonsensical combinations like
  * renting and parking a subway. They are not intended for use in routing. Rather, they simply parse the
  * language of mode specifications that may be given in the mode query parameter. They are then converted
@@ -23,7 +23,7 @@ import java.util.Set;
  */
 public class QualifiedModeSet implements Serializable {
     private static final long serialVersionUID = 1L;
-    
+
     public Set<QualifiedMode> qModes = Sets.newHashSet();
 
     public QualifiedModeSet(String s) {
@@ -61,8 +61,8 @@ public class QualifiedModeSet implements Serializable {
                  case AIRPLANE:
                      transitModes.add(TransitMode.AIRPLANE);
                      break;
-                 case CABLE_CAR:
-                     transitModes.add(TransitMode.CABLE_CAR);
+                 case CABLECAR:
+                     transitModes.add(TransitMode.CABLECAR);
                      break;
                  case GONDOLA:
                      transitModes.add(TransitMode.GONDOLA);
@@ -132,7 +132,7 @@ public class QualifiedModeSet implements Serializable {
 
         return requestModes;
     }
-    
+
     public String toString() {
         StringBuilder sb = new StringBuilder();
         for (QualifiedMode qm : qModes) {

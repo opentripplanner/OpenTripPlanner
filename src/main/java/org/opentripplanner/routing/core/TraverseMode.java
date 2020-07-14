@@ -18,7 +18,7 @@ public enum TraverseMode {
     public boolean isOnStreetNonTransit() {
         return this == WALK || this == BICYCLE || this == CAR;
     }
-    
+
     public boolean isDriving() {
         return this == CAR;
     }
@@ -42,7 +42,7 @@ public enum TraverseMode {
                 return TraverseMode.FERRY;
             case AIRPLANE:
                 return TraverseMode.AIRPLANE;
-            case CABLE_CAR:
+            case CABLECAR:
                 return TraverseMode.CABLE_CAR;
             case GONDOLA:
                 return TraverseMode.GONDOLA;

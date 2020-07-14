@@ -67,7 +67,7 @@ public class TraverseModeMapper {
         switch (domain) {
             case AIRPLANE: return "AIRPLANE";
             case BUS: return "BUS";
-            case CABLE_CAR: return "CABLE_CAR";
+            case CABLECAR: return "CABLE_CAR";
             case FERRY: return "FERRY";
             case FUNICULAR: return "FUNICULAR";
             case GONDOLA: return "GONDOLA";
