@@ -6,7 +6,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBElement;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Unmarshaller;
-import java.io.ByteArrayInputStream;
+import java.io.InputStream;
 
 /** Simple wrapper to perform typesafe xml parsing and simple error handling. */
 class NetexXmlParser {
@@ -18,11 +18,11 @@ class NetexXmlParser {
     }
 
     /**
-     * Parse a byte array and return the root document type for the given xml file(bytes).
+     * Parse an input stream and return the root document type for the given xml file (stream).
      */
-    PublicationDeliveryStructure parseXmlDoc(byte[] bytesArray) throws JAXBException {
+    PublicationDeliveryStructure parseXmlDoc(InputStream stream) throws JAXBException {
         JAXBElement<PublicationDeliveryStructure> root;
-        ByteArrayInputStream stream = new ByteArrayInputStream(bytesArray);
+
         //noinspection unchecked
         root = (JAXBElement<PublicationDeliveryStructure>) unmarshaller.unmarshal(stream);
 
