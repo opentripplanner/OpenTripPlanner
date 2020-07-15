@@ -8,7 +8,7 @@ public enum TransitMode {
   TRAM,
   FERRY,
   AIRPLANE,
-  CABLE_CAR,
+  CABLECAR,
   GONDOLA,
   FUNICULAR,
   /**
