@@ -29,5 +29,4 @@ _site/
 /otp
 /otp-batch-analyst
 *.DS_Store
-src/integrationTest/resources/graphs/bydgoszcz/Graph.obj
-src/integrationTest/resources/graphs/bydgoszcz/linie*
+src/integrationTest/resources/graphs/bydgoszcz/*

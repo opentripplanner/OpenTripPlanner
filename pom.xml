@@ -580,7 +580,7 @@
         <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
-            <version>4.11</version>
+            <version>4.13</version>
             <scope>test</scope>
         </dependency>
         <dependency>
@@ -594,6 +594,18 @@
             <artifactId>jersey-test-framework-provider-grizzly2</artifactId>
             <version>2.27</version>
             <scope> test</scope>
+        </dependency>
+        <dependency>
+            <groupId>com.github.tomakehurst</groupId>
+            <artifactId>wiremock-jre8</artifactId>
+            <version>2.27.0</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.hamcrest</groupId>
+            <artifactId>hamcrest</artifactId>
+            <version>2.2</version>
+            <scope>test</scope>
         </dependency>
         <!-- Provides some shared serializers for Kryo. Introduces transitive dependencies on Guava, Trove, and Kryo. -->
         <!-- Also provides classes for testing that a round trip through serialization reproduces the same network. -->
@@ -643,7 +655,6 @@
             <artifactId>jackson-jaxrs-xml-provider</artifactId>
             <version>${jackson.version}</version>
         </dependency>
-
         <!-- Asynchronous Websocket-capable client, for message-driven incremental GTFS-RT -->
         <!-- AsyncHttpClient Websockets need a newer version of Grizzly than Jersey does. -->
         <dependency>

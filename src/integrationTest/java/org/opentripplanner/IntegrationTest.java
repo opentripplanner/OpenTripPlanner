@@ -1,11 +1,16 @@
 package org.opentripplanner;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
+import com.github.tomakehurst.wiremock.core.WireMockConfiguration;
+import com.github.tomakehurst.wiremock.junit.WireMockClassRule;
 import org.glassfish.jersey.client.ClientConfig;
 import org.glassfish.jersey.test.JerseyTest;
 import org.glassfish.jersey.test.TestProperties;
+import org.junit.Before;
+import org.junit.BeforeClass;
+import org.junit.ClassRule;
+import org.junit.Rule;
 import org.opentripplanner.api.model.JSONObjectMapperProvider;
-import org.opentripplanner.routing.impl.GraphScanner;
 import org.opentripplanner.routing.services.GraphService;
 import org.opentripplanner.standalone.CommandLineParameters;
 import org.opentripplanner.standalone.OTPApplication;
@@ -28,27 +33,43 @@ public abstract class IntegrationTest extends JerseyTest {
             Integer.toString(port),
     };
 
+    private static CommandLineParameters params;
+    private static OTPServer otpServer;
+    private static GraphService graphService;
+
+    @ClassRule
+    public static WireMockClassRule wireMockClassRule = new WireMockClassRule(new WireMockConfiguration().port(8888).usingFilesUnderDirectory("src/integrationTest/resources/"));
+
+    @Rule
+    public WireMockClassRule wireMockInstance = wireMockClassRule;
+
 
     @Override
     public Application configure() {
-        set(TestProperties.CONTAINER_PORT, port);
-        System.setProperty("sharedVehiclesApi", "http://ns3114244.ip-54-38-192.eu:8888/get_standard_vehicle_positions"); // mocked database
-
-        CommandLineParameters params = OTPMain.parseCommandLineParams(args);
-        GraphService graphService = new GraphService(false, params.graphDirectory);
-        OTPServer otpServer = new OTPServer(params, graphService);
-
-        //init router
-        GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
-        graphScanner.basePath = params.graphDirectory;
-        if (params.routerIds != null && params.routerIds.size() > 0) {
-            graphScanner.defaultRouterId = params.routerIds.get(0);
-        }
-        graphScanner.autoRegister = params.routerIds;
-        graphScanner.startup();
-
         return new OTPApplication(otpServer, false);
     }
+
+
+    @BeforeClass
+    public static void beforeClass() throws Exception {
+        System.setProperty(TestProperties.CONTAINER_PORT, Integer.toString(port));
+        System.setProperty("sharedVehiclesApi", "http://localhost:8888/query_db"); // mocked database
+
+        params = OTPMain.parseCommandLineParams(args);
+        graphService = new GraphService(false, params.graphDirectory);
+        otpServer = new OTPServer(params, graphService);
+        System.out.printf("How many times it runs?\n");
+
+        OTPMain.registerRouters(params, graphService);
+
+        try {
+            Thread.sleep(3000); // wait for initialisation
+            System.out.printf("Hopefully it finished initialising vehicles\n");
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+    }
+
 
     @Override
     protected void configureClient(ClientConfig config) {

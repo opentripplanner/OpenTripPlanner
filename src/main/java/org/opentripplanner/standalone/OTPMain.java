@@ -36,17 +36,12 @@ public class OTPMain {
 
     private static final Logger LOG = LoggerFactory.getLogger(OTPMain.class);
 
-    private final CommandLineParameters params;
-    public OTPServer otpServer = null;
-    public GraphService graphService = null;
-
     /** ENTRY POINT: This is the main method that is called when running otp.jar from the command line. */
     public static void main(String[] args) {
 
         CommandLineParameters params = parseCommandLineParams(args);
 
-        OTPMain main = new OTPMain(params);
-        main.run();
+        run(params);
     }
 
     /** Parse and validate command line parameters.
@@ -79,11 +74,6 @@ public class OTPMain {
         return params;
     }
 
-    /* Constructor. */
-    public OTPMain(CommandLineParameters params) {
-        this.params = params;
-    }
-
     /**
      * Making OTPMain a concrete class and placing this logic an instance method instead of embedding it in the static
      * main method makes it possible to build graphs from web services or scripts, not just from the command line.
@@ -92,35 +82,36 @@ public class OTPMain {
      *         true - if the OTPServer starts successfully. If "Run an OTP API server" has been requested, this method will return when the web server shuts down;
      *         false - if an error occurs while loading the graph;
      */
-    public void run() {
+    public static OTPServer run(CommandLineParameters params) {
         /* Create the top-level objects that represent the OTP server. */
-        graphService = new GraphService(params.autoReload, params.graphDirectory);
-        otpServer = new OTPServer(params, graphService);
+        GraphService graphService = new GraphService(params.autoReload, params.graphDirectory);
+        OTPServer otpServer = new OTPServer(params, graphService);
 
         if (params.build != null) {
-            buildGraph();
+            buildGraph(params, graphService);
         }
 
         // FIXME eventually router IDs will be present even when just building a graph.
         if ((params.routerIds != null && params.routerIds.size() > 0) || params.autoScan) {
-            registerRouters();
+            registerRouters(params, graphService);
         }
 
         if (params.visualize) {
-            visualize();
+            visualize(graphService);
         }
 
         if (params.scriptFile != null) {
-            startScript();
+            startScript(params, otpServer);
         }
 
         if (params.server) {
-            startServer();
+            startServer(params, otpServer);
         }
+        return otpServer;
     }
 
     /** Start graph builder */
-    public void buildGraph() {
+    public static void buildGraph(CommandLineParameters params, GraphService graphService) {
         GraphBuilder graphBuilder = GraphBuilder.forDirectory(params, params.build); // TODO multiple directories
         if (graphBuilder != null) {
             graphBuilder.run();
@@ -138,7 +129,7 @@ public class OTPMain {
     }
 
     /** Scan for graphs to load from disk */
-    public void registerRouters() {
+    public static void registerRouters(CommandLineParameters params, GraphService graphService) {
         /* Auto-register pre-existing graph on disk, with optional auto-scan. */
         GraphScanner graphScanner = new GraphScanner(graphService, params.graphDirectory, params.autoScan);
         graphScanner.basePath = params.graphDirectory;
@@ -150,7 +141,7 @@ public class OTPMain {
     }
 
     /** Start visualizer */
-    public void visualize() {
+    public static void visualize(GraphService graphService) {
         Router defaultRouter = graphService.getRouter();
         defaultRouter.graphVisualizer = new GraphVisualizer(defaultRouter);
         defaultRouter.graphVisualizer.run();
@@ -158,7 +149,7 @@ public class OTPMain {
     }
 
     /** Start script */
-    public void startScript() {
+    public static void startScript(CommandLineParameters params, OTPServer otpServer) {
         try {
             OTPScript otpScript = new BSFOTPScript(otpServer, params.scriptFile);
             if (otpScript != null) {
@@ -173,7 +164,7 @@ public class OTPMain {
     }
 
     /** Start web server */
-    public void startServer() {
+    public static void startServer(CommandLineParameters params, OTPServer otpServer) {
         GrizzlyServer grizzlyServer = new GrizzlyServer(params, otpServer);
         while (true) { // Loop to restart server on uncaught fatal exceptions.
             try {

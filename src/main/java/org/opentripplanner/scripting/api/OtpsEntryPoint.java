@@ -63,7 +63,6 @@ public class OtpsEntryPoint {
         JCommander jc = new JCommander(params, args);
         params.analyst = true; // Force analyst
         params.infer();
-        OTPMain otpMain = new OTPMain(params);
         if (params.build != null) // TODO Enable this
             throw new IllegalArgumentException("Building from script is not yet supported.");
         if (params.scriptFile != null) // This would be weird
@@ -72,8 +71,7 @@ public class OtpsEntryPoint {
             throw new IllegalArgumentException("Vizualizer from script is not supported.");
         if (params.server) // Why not?
             throw new IllegalArgumentException("Server from script is not supported.");
-        otpMain.run();
-        return new OtpsEntryPoint(otpMain.otpServer);
+        return new OtpsEntryPoint(OTPMain.run(params));
     }
 
     public static OtpsEntryPoint fromArgs() throws Exception {

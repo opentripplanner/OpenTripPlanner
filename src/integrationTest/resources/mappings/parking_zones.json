@@ -1,0 +1,14 @@
+{
+  "priority": 1,
+  "request": {
+    "method": "POST",
+    "urlPath": "/query_db",
+    "bodyPatterns": [{
+      "contains": "query GetParkingZones"
+    }]
+  },
+  "response": {
+    "status": 200,
+    "bodyFileName": "../__files/parking_zones.json"
+  }
+}
