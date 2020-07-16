@@ -34,8 +34,7 @@ public abstract class VehicleDescription {
     @JsonIgnore
     private final Provider provider;
 
-    public VehicleDescription(String providerVehicleId,
-                              double longitude, double latitude, FuelType fuelType,
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider) {
         this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null);
     }

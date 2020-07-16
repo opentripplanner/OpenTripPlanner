@@ -280,11 +280,6 @@
                         <id>integration-test</id>
                         <goals>
                             <goal>integration-test</goal>
-                        </goals>
-                    </execution>
-                    <execution>
-                        <id>verify</id>
-                        <goals>
                             <goal>verify</goal>
                         </goals>
                     </execution>
@@ -308,7 +303,6 @@
                     <arguments>
                         <argument>--build</argument>
                         <argument>./src/integrationTest/resources/graphs/bydgoszcz/</argument>
-                        ...
                     </arguments>
                 </configuration>
             </plugin>

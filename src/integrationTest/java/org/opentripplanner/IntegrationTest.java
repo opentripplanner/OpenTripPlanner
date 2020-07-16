@@ -58,7 +58,6 @@ public abstract class IntegrationTest extends JerseyTest {
         params = OTPMain.parseCommandLineParams(args);
         graphService = new GraphService(false, params.graphDirectory);
         otpServer = new OTPServer(params, graphService);
-        System.out.printf("How many times it runs?\n");
 
         OTPMain.registerRouters(params, graphService);
 

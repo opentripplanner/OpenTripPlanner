@@ -1,19 +1,14 @@
 package org.opentripplanner.base;
 
-import com.github.tomakehurst.wiremock.stubbing.StubMapping;
 import org.junit.Test;
 import org.opentripplanner.IntegrationTest;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.resource.Response;
 
-import java.util.List;
-
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
-import static org.junit.Assert.assertEquals;
 
-public class ResponseStructureIT extends IntegrationTest {
-
+public class ResponseItineraryTypeBasicIT extends IntegrationTest {
 
     @Test
     public void testWalkAndBus() {
@@ -28,14 +23,11 @@ public class ResponseStructureIT extends IntegrationTest {
                 .request().get();
 
         Response body = response.readEntity(Response.class);
-        List<StubMapping> s = wireMockInstance.getStubMappings();
 
         assertThat(response.getStatus(), equalTo(200));
         assertThat(body.getPlan().itinerary.size(), equalTo(3));
 
-        assertEquals("should return status 200", 200, response.getStatus());
-        assertEquals("should return 3 itenaries", 3, body.getPlan().itinerary.size());
-        for(Itinerary it: body.getPlan().itinerary) {
+        for (Itinerary it : body.getPlan().itinerary) {
             assertThat(it.itineraryType, equalTo("WALK+TRANSIT"));
         }
     }
@@ -80,7 +72,6 @@ public class ResponseStructureIT extends IntegrationTest {
         assertThat(body.getPlan().itinerary.get(0).itineraryType, equalTo("WALK+KICKSCOOTER"));
     }
 
-
     @Test
     public void testBusAndBicycle() {
         javax.ws.rs.core.Response response = target("/routers/bydgoszcz/plan")
@@ -91,7 +82,7 @@ public class ResponseStructureIT extends IntegrationTest {
                 .queryParam("startingMode", "WALK")
                 .queryParam("softWalkLimit", "false")
                 .queryParam("rentingAllowed", "true")
-                .queryParam("vehicleTypesAllowed", "KICKSCOOTER","MOTORBIKE")
+                .queryParam("vehicleTypesAllowed", "KICKSCOOTER", "MOTORBIKE")
                 .queryParam("date", "07-16-2020")
                 .queryParam("time", "15:00:00")
                 .request().get();
