@@ -1,13 +1,23 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.annotation.JsonSubTypes;
+import com.fasterxml.jackson.annotation.JsonTypeInfo;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import static java.lang.Double.min;
 
+@JsonTypeInfo(use = JsonTypeInfo.Id.NAME, property = "vehicleType")
+@JsonSubTypes({
+        @JsonSubTypes.Type(value = KickScooterDescription.class, name = "KICKSCOOTER"),
+        @JsonSubTypes.Type(value = CarDescription.class, name = "CAR"),
+        @JsonSubTypes.Type(value = MotorbikeDescription.class, name = "MOTORBIKE"),
+})
 public abstract class VehicleDescription {
 
     private final String providerVehicleId;
@@ -86,12 +96,12 @@ public abstract class VehicleDescription {
         return rangeInMeters;
     }
 
-    @JsonSerialize
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public int getProviderId() {
         return provider.getId();
     }
 
-    @JsonSerialize
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public String getProviderName() {
         return provider.getName();
     }
@@ -105,7 +115,7 @@ public abstract class VehicleDescription {
     @JsonIgnore
     public abstract TraverseMode getTraverseMode();
 
-    @JsonSerialize
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     public abstract VehicleType getVehicleType();
 
     protected abstract double getDefaultRangeInMeters();
