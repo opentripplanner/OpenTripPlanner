@@ -38,7 +38,7 @@ public class TraverseModeMapper {
             case BICYCLE: return "BICYCLE";
             case BUS: return "BUS";
             case CAR: return "CAR";
-            case CABLE_CAR: return "CABLE_CAR";
+            case CABLE_CAR: return "CABLECAR";
             case FERRY: return "FERRY";
             case FUNICULAR: return "FUNICULAR";
             case GONDOLA: return "GONDOLA";
