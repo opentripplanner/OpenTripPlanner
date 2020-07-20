@@ -1,11 +1,14 @@
 package org.opentripplanner.util.model;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A list of coordinates encoded as a string.
- * 
+ * <p>
  * See <a href="http://code.google.com/apis/maps/documentation/polylinealgorithm.html">Encoded
  * polyline algorithm format</a>
  */
@@ -20,7 +23,9 @@ public class EncodedPolylineBean implements Serializable {
 
     private final int length;
 
-    public EncodedPolylineBean(String points, String levels, int length) {
+
+    @JsonCreator
+    public EncodedPolylineBean(@JsonProperty("points") String points, @JsonProperty("levels") String levels, @JsonProperty("length") int length) {
         this.points = points;
         this.levels = levels;
         this.length = length;
@@ -36,7 +41,7 @@ public class EncodedPolylineBean implements Serializable {
     /**
      * Levels describes which points should be shown at various zoom levels. Presently, we show all
      * points at all zoom levels.
-    */
+     */
     public String getLevels() {
         return levels;
     }

@@ -9,6 +9,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "../__files/parking_zones.json"
+    "bodyFileName": "../__files/parking_zones_bydgoszcz.json"
   }
 }

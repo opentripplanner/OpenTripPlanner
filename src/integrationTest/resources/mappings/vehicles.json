@@ -9,6 +9,6 @@
   },
   "response": {
     "status": 200,
-    "bodyFileName": "../__files/vehicle_positions.json"
+    "bodyFileName": "../__files/vehicle_bydgoszcz.json"
   }
 }
