@@ -109,6 +109,13 @@ public abstract class GraphPathToTripPlanConverter {
                 firstLeg.from.orig = plan.from.orig;
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
                 lastLeg.to.orig = plan.to.orig;
+
+                for (Leg leg:i.legs) {
+                    if(leg.mode!=TraverseMode.WALK && !leg.isTransitLeg() && Objects.isNull(leg.vehicleDescription)){
+                        LOG.warn("Returning leg without vehicle description for leg: from {} to {}, mode: {} (request: {})",
+                                leg.from.name, leg.to.name, leg.mode, request);
+                    }
+                }
             }
         }
         request.rctx.debugOutput.finishedRendering();
