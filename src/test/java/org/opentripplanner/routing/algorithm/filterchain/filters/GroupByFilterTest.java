@@ -2,127 +2,75 @@ package org.opentripplanner.routing.algorithm.filterchain.filters;
 
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
-import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupByLongestLegsId;
+import org.opentripplanner.routing.algorithm.filterchain.groupids.GroupId;
 
 import java.util.List;
 
 import static org.junit.Assert.assertEquals;
 import static org.opentripplanner.model.plan.Itinerary.toStr;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.A;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.B;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.C;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.D;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
-import static org.opentripplanner.model.plan.TestItineraryBuilder.F;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.routing.algorithm.filterchain.filters.GroupByFilter.groupMaxLimit;
 
 public class GroupByFilterTest {
 
-    private GroupByFilter<GroupByLongestLegsId> createFilter(int minLimit) {
-        return new GroupByFilter<>("test",
-                i -> new GroupByLongestLegsId(i, .5),
-                new OtpDefaultSortOrder(false),
-                minLimit
-        );
-    }
-
+    /**
+     * This test group by exact trip ids and test that the reduce function
+     * works properly. It do not merge any groups.
+     */
     @Test
-    public void groupByTheLongestItineraryAndTwoGroups() {
+    public void aSimpleTestGrpupByMatchingTripIdsNoMerge() {
         List<Itinerary> result;
 
         // Group 1
-        Itinerary i1 = newItinerary(A, 6)
-            .walk(240, C)
-            .build();
+        Itinerary i1 = newItinerary(A).bus(1, 0, 10, E).build();
 
-        // Group 2, with 2 itineraries
-        Itinerary i2 = newItinerary(A)
-            .bus(1, 0, 50, B)
-            .bus(11, 52, 100, C)
-            .build();
-        Itinerary i3 = newItinerary(A)
-            // Rail is 2x faster then bus, witch give us 12:2 in distance (84.6/15.4)
-            .rail(1, 0, 50, B)
-            .bus(12, 51, 100, C)
-            .build();
+        // Group 2, with 2 itineraries with the same id (no need to merge)
+        Itinerary i2a = newItinerary(A).bus(2, 1, 11, E).build();
+        Itinerary i2b = newItinerary(A).bus(2, 5, 16, E).build();
 
-        List<Itinerary> list = List.of(i1, i2, i3);
+        List<Itinerary> all = List.of(i1, i2a, i2b);
 
         // With min Limit = 1, expect the best trips from both groups
-        result = createFilter(1).filter(list);
-        assertEquals(toStr(List.of(i1, i2)), toStr(result));
+        result = createFilter(1).filter(all);
+        assertEquals(toStr(List.of(i1, i2a)), toStr(result));
 
         // With min Limit = 2, also one from each group
-        result = createFilter(2).filter(list);
-        assertEquals(toStr(List.of(i1, i2)), toStr(result));
+        result = createFilter(2).filter(all);
+        assertEquals(toStr(List.of(i1, i2a)), toStr(result));
 
         // With min Limit = 3, we get all 3 itineraries
-        result = createFilter(3).filter(list);
-        assertEquals(toStr(List.of(i1, i2, i3)), toStr(result));
+        result = createFilter(3).filter(all);
+        assertEquals(toStr(List.of(i1, i2a, i2b)), toStr(result));
     }
 
+    /**
+     * This test group by trips where the trip ids share the same prefix. The purpose is to test
+     * the merging of groups.
+     */
     @Test
-    public void groupByTheLongestItineraryWithHigherOrderGroups() {
+    public void testMerging() {
         List<Itinerary> result;
 
-        Leg legAB = newItinerary(A).bus(21, 6, 12, B).build().firstLeg();
-        Leg legBC = newItinerary(B).rail(31, 13, 18, C).build().firstLeg();
+        // Given these 3 itineraries witch all should be grouped in the same group
+        Itinerary i1 = newItinerary(A).bus(1, 1, 11, E).build();
+        Itinerary i11 = newItinerary(A).bus(11, 5, 16, E).build();
+        Itinerary i12 = newItinerary(A).bus(12, 5, 16, E).build();
 
-        //Leg legAB = leg(A, B, 6, 12, 6.0, TRANSIT);
-        // Leg legBC = leg(B, C, 13, 14, 10.0, TRANSIT);
+        // Then, independent of the order they are processed, we expect the itineraries to
+        // be grouped together into --ONE-- group. We do not have access to the groups,
+        // so each group is reduced to one element: 'i1', which prove that all 3 itineraries where
+        // grouped together. 'i11' and 'i12' do not match each other, while 'i1' match
+        // both 'i11' and 'i12, so we use the following combination to test:
+        List<Itinerary> inputA = List.of(i1, i11, i12);
+        List<Itinerary> inputB = List.of(i11, i1, i12);
+        List<Itinerary> inputC = List.of(i11, i12, i1);
 
-        // GroupId: [legBC, legAB]  Distance: 6 + 2*5 > 50% of total(6+10+5 = 21)
-        Itinerary it1 = newItinerary(A)
-            .bus(1, 6, 12, B)
-            .rail(110, 13, 18, C)
-            .bus(51, 19, 24, D)
-            .build();
-
-        // GroupId: [legBC, legEF, legFD]  Distance: 10 + 9 + 8 > 50% of 6+10+7+9+8 = 40
-        Itinerary it2 = newItinerary(A)
-            .bus(2, 6, 12, B)
-            .rail(110, 13, 18, C)
-            .bus(31,19, 26, D)
-            .bus(41, 27, 36, E)
-            .bus(51, 37, 45, F)
-            .build();
-
-        // GroupId: [legBC]  Distance: 10 > 50% of total(6+10+3 = 19)
-        Itinerary it3 = newItinerary(A)
-            .bus(3, 6, 12, B)
-            .rail(110, 13, 18, C)
-            .bus(21, 19, 22, D)
-            .build();
-
-        // GroupId: [legBC, legCD]  Distance: 10 + 9 > 50% of total(6+10+9 = 25)
-        Itinerary it4 = newItinerary(A)
-            .bus(4, 6, 12, B)
-            .rail(110, 13, 18, C)
-            .bus(31, 19, 28, D)
-            .build();
-
-        // Expected order:
-        String exp1 = toStr(List.of(it3));
-        String exp2 = toStr(List.of(it3, it1));
-        String exp4 = toStr(List.of(it1, it2, it3, it4));
-
-        // Assert all itineraries is put in the same group - expect just one result back
-        result = createFilter(1).filter(List.of(it1, it2, it3, it4));
-        assertEquals(exp1, toStr(result));
-
-        // Assert that we get all back if the limit is high enough
-        result = createFilter(4).filter(List.of(it1, it2, it3, it4));
-        assertEquals(exp4, toStr(result));
-
-        // Assert that the itinerary order do not affect the results - test 2 itineraries is ok
-        ItineraryFilter f = createFilter(2);
-        assertEquals(exp2, toStr(f.filter(List.of(it2, it1, it3, it4))));
-        assertEquals(exp2, toStr(f.filter(List.of(it3, it2, it1, it4))));
-        assertEquals(exp2, toStr(f.filter(List.of(it4, it3, it2, it1))));
-        assertEquals(exp2, toStr(f.filter(List.of(it3, it1, it4, it2))));
+        for (List<Itinerary> input : List.of(inputA, inputB, inputC)) {
+            result = createFilter(1).filter(input);
+            assertEquals(toStr(List.of(i1)), toStr(result));
+        }
     }
 
     @Test
@@ -153,5 +101,34 @@ public class GroupByFilterTest {
         assertEquals(2, groupMaxLimit(5, 3));
         assertEquals(1, groupMaxLimit(5, 4));
         assertEquals(1, groupMaxLimit(5, 100));
+    }
+
+    /**
+     * Create a filter that group by the first leg trip-id, and uses the default sort for each
+     * group.
+     */
+    private GroupByFilter<AGroupId> createFilter(int minLimit) {
+        return new GroupByFilter<>(
+            "test",
+            i -> new AGroupId(i.firstLeg().tripId.getId()),
+            new OtpDefaultSortOrder(false),
+            minLimit
+        );
+    }
+
+    /** A simple implementation of GroupId for this test */
+    private static class AGroupId implements GroupId<AGroupId> {
+        private final String id;
+        public AGroupId(String id) { this.id = id; }
+
+        @Override  public boolean match(AGroupId other) {
+            return this.id.startsWith(other.id) || other.id.startsWith(this.id);
+        }
+
+        @Override public AGroupId merge(AGroupId other) {
+            return this.id.length() <= other.id.length() ? this : other;
+        }
+
+        @Override public String toString() { return id; }
     }
 }

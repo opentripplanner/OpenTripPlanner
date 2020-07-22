@@ -41,7 +41,7 @@ public final class Stops<T extends RaptorTripSchedule> {
             int nStops,
             Collection<RaptorTransfer> egressLegs,
             DestinationArrivalPaths<T> paths,
-            CostCalculator costCalculator,
+            CostCalculator<T> costCalculator,
             DebugHandlerFactory<T> debugHandlerFactory,
             DebugLogger debugLogger
     ) {
@@ -113,7 +113,7 @@ public final class Stops<T extends RaptorTripSchedule> {
      */
     private void glueTogetherEgressStopWithDestinationArrivals(
             Map.Entry<Integer, List<RaptorTransfer>> egressLegs,
-            CostCalculator costCalculator,
+            CostCalculator<T> costCalculator,
             DestinationArrivalPaths<T> paths
     ) {
         int stop = egressLegs.getKey();

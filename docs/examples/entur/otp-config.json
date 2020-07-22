@@ -1,0 +1,7 @@
+{
+  "otpFeatures" : {
+    "GoogleCloudStorage" : true,
+    "ActuatorAPI": true,
+    "SandboxAPITransmodelApi": true
+  }
+}

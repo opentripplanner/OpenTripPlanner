@@ -229,7 +229,7 @@ public class Itinerary {
                 .addStr("from", firstLeg().from.toStringShort())
                 .addStr("to", lastLeg().to.toStringShort())
                 .addCalTime("start", firstLeg().startTime)
-                .addCalTime("end", lastLeg().startTime)
+                .addCalTime("end", lastLeg().endTime)
                 .addNum("nTransfers", nTransfers, -1)
                 .addDuration("duration", durationSeconds)
                 .addNum("generalizedCost", generalizedCost)

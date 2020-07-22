@@ -46,7 +46,7 @@ public class SortOnGeneralizedCostTest {
         result = new SortOnGeneralizedCost().filter(List.of(walk, bus, rail));
 
         // Then: expect rail(1/3 of walk time), bus(2/3 of walk time) and walk
-        assertEquals(Itinerary.toStr(List.of(walk, rail, bus)), Itinerary.toStr(result));
+        assertEquals(toStr(List.of(walk, rail, bus)), toStr(result));
     }
 
     @Test
