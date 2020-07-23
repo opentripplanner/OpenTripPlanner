@@ -7,7 +7,25 @@ The main Java server code is in `src/main/`. OTP also includes a Javascript clie
 Additional information and instructions are available in the [main documentation](http://opentripplanner.readthedocs.org/en/latest/), including a 
 [quick introduction](http://opentripplanner.readthedocs.org/en/latest/Basic-Usage/).
 
-[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
+[![Build Status](https://semaphoreci.com/api/v1/mbta/opentripplanner/branches/master/badge.svg)](https://semaphoreci.com/mbta/opentripplanner)
+
+## MBTA Fork Setup
+You'll need to clone this repo and [the `onebusaway-gtfs-modules` repo](https://github.com/mbta/onebusaway-gtfs-modules). From the `onebusaway-gtfs-modules` directory do:
+1. `asdf plugin add java`
+1. `asdf plugin add maven`
+1. `asdf install`
+1. `./build.sh`
+
+This last step will take care of building the modules and installing them locally, which is necessary for the next step: building and running OTP. From the OTP directory:
+1. `asdf install`
+1. `mbta/update_gtfs.sh` - fetches latest MBTA and Massport GTFS data
+1. `mbta/update_pbf.sh` - updates OpenStreetMap data
+1. `mbta/build.sh`
+
+If you want to test with your own local GTFS changes, simply put a copy of your GTFS file (the Google output) in `var/graphs/mbta/1_MBTA_GTFS.zip` and re-run the `build.sh` script.
+
+## Running
+With all of that setup done, you should be able to run `mbta/server.sh`. This will start your local OTP instance and, when ready, print a message saying that the web server is ready and listening. Open a browser pointing to `localhost` at the port specified and you'll have a barebones web interface to OTP where you can try out various trip plans.
 
 ## Development 
 
