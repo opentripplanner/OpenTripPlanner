@@ -1,0 +1,1306 @@
+{
+  "data": {
+    "vehicles": [
+      {
+        "providerVehicleId": "14376",
+        "latitude": 53.151564,
+        "longitude": 18.174105,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 266.25,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "15013",
+        "latitude": 53.123379,
+        "longitude": 17.955763,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 105,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "14575",
+        "latitude": 53.153536,
+        "longitude": 18.131225,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 352.5,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "16668",
+        "latitude": 53.124044,
+        "longitude": 17.975603,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 228.75,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "16703",
+        "latitude": 53.096755,
+        "longitude": 17.905433,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 296.25,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "16730",
+        "latitude": 53.107507,
+        "longitude": 18.047948,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 375,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "16839",
+        "latitude": 53.134489,
+        "longitude": 17.993088,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 243.75,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "17963",
+        "latitude": 53.091251,
+        "longitude": 17.907788,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 204.25,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "17904",
+        "latitude": 53.144038,
+        "longitude": 18.132096,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 231.12,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "18761",
+        "latitude": 53.127577,
+        "longitude": 18.002406,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 537.5,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "18780",
+        "latitude": 53.096806,
+        "longitude": 17.905433,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 400,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "18820",
+        "latitude": 53.144089,
+        "longitude": 18.132019,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 437.5,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19207",
+        "latitude": 53.161625,
+        "longitude": 18.154316,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 406.25,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19277",
+        "latitude": 53.12494,
+        "longitude": 17.982131,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 158.33,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19598",
+        "latitude": 53.097881,
+        "longitude": 18.039782,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 243.81,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19393",
+        "latitude": 53.113062,
+        "longitude": 18.061235,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 333.33,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19683",
+        "latitude": 53.131929,
+        "longitude": 17.984204,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 700,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "19730",
+        "latitude": 53.096652,
+        "longitude": 17.922022,
+        "fuelType": "hybrid",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 714.29,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20418",
+        "latitude": 53.693619,
+        "longitude": 17.559347,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 114.29,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20430",
+        "latitude": 53.109017,
+        "longitude": 18.033254,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 209.52,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20431",
+        "latitude": 53.094886,
+        "longitude": 17.914956,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 228.57,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20446",
+        "latitude": 53.132236,
+        "longitude": 17.947008,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 171.43,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20457",
+        "latitude": 53.140889,
+        "longitude": 17.976192,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 247.62,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20556",
+        "latitude": 53.151308,
+        "longitude": 18.156441,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 152.38,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20565",
+        "latitude": 53.09952,
+        "longitude": 17.920896,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 342.86,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20578",
+        "latitude": 53.11383,
+        "longitude": 18.012748,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 228.57,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20583",
+        "latitude": 53.114854,
+        "longitude": 17.99191,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 255.24,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "20615",
+        "latitude": 53.171251,
+        "longitude": 18.162099,
+        "fuelType": "fossil",
+        "gearbox": "automatic",
+        "type": "car",
+        "range": 198.1,
+        "provider": {
+          "id": 2,
+          "name": "Panek"
+        }
+      },
+      {
+        "providerVehicleId": "1622",
+        "latitude": 53.112579666667,
+        "longitude": 17.970403333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 24.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1628",
+        "latitude": 53.1215425,
+        "longitude": 17.971468333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 16.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1632",
+        "latitude": 53.108681666667,
+        "longitude": 17.977736,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 23.9,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1633",
+        "latitude": 53.1192355,
+        "longitude": 18.005087833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 27.9,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1653",
+        "latitude": 53.1123465,
+        "longitude": 18.003494333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 58.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1656",
+        "latitude": 53.113010333333,
+        "longitude": 18.001688166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 61.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1658",
+        "latitude": 53.114779166667,
+        "longitude": 18.0218075,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 28.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1667",
+        "latitude": 53.127974666667,
+        "longitude": 17.964479166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 58.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1675",
+        "latitude": 53.124638166667,
+        "longitude": 17.986365166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 59.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1678",
+        "latitude": 53.112547166667,
+        "longitude": 17.9703925,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 55.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1690",
+        "latitude": 53.131379833333,
+        "longitude": 18.020746,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 38.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1698",
+        "latitude": 53.123857666667,
+        "longitude": 18.068094333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 42.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1796",
+        "latitude": 53.1436935,
+        "longitude": 18.009572833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 9.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1797",
+        "latitude": 53.1229865,
+        "longitude": 17.992505333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 50.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1800",
+        "latitude": 53.101521166667,
+        "longitude": 18.033020833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 63.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1811",
+        "latitude": 53.113430166667,
+        "longitude": 18.022869333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 54.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1812",
+        "latitude": 53.124459333333,
+        "longitude": 17.969283833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 16,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1826",
+        "latitude": 53.130170166667,
+        "longitude": 17.976857666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 57,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1831",
+        "latitude": 53.145604833333,
+        "longitude": 18.024307,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1833",
+        "latitude": 53.121412166667,
+        "longitude": 17.975127666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 59.9,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1839",
+        "latitude": 53.1249705,
+        "longitude": 18.016238333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 16,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1842",
+        "latitude": 53.129174333333,
+        "longitude": 17.979905166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 54.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1882",
+        "latitude": 53.146053666667,
+        "longitude": 18.023679,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 30.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "1887",
+        "latitude": 53.123647166667,
+        "longitude": 18.027299666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 25.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2502",
+        "latitude": 53.1105995,
+        "longitude": 17.971673333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 35.9,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2526",
+        "latitude": 53.125159666667,
+        "longitude": 17.987336,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 60.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2530",
+        "latitude": 53.0991265,
+        "longitude": 18.037011,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 54.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2576",
+        "latitude": 53.132600166667,
+        "longitude": 17.9286765,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 45.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2908",
+        "latitude": 53.155244,
+        "longitude": 17.917020666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 59.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2909",
+        "latitude": 53.1327085,
+        "longitude": 17.925127666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 24.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2911",
+        "latitude": 53.110196,
+        "longitude": 18.004766,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 63.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2973",
+        "latitude": 53.132507833333,
+        "longitude": 17.9709085,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 58.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2984",
+        "latitude": 53.145111666667,
+        "longitude": 17.949403833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 61.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "2989",
+        "latitude": 53.155378833333,
+        "longitude": 17.917133,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 63.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "3001",
+        "latitude": 53.114109333333,
+        "longitude": 18.0016005,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 38.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "3004",
+        "latitude": 53.128067333333,
+        "longitude": 17.9643415,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 58.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "3036",
+        "latitude": 53.1454935,
+        "longitude": 18.024343,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 10.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "3070",
+        "latitude": 53.155304333333,
+        "longitude": 17.916994333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "scooter",
+        "range": 63.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4451",
+        "latitude": 53.1311375,
+        "longitude": 18.012131,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 17.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4621",
+        "latitude": 53.123165666667,
+        "longitude": 18.020706666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 21.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4628",
+        "latitude": 53.129741833333,
+        "longitude": 18.037211,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4725",
+        "latitude": 53.1331955,
+        "longitude": 17.969422,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4734",
+        "latitude": 53.129591333333,
+        "longitude": 17.9792,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4739",
+        "latitude": 53.145685166667,
+        "longitude": 18.024494,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4741",
+        "latitude": 53.1296755,
+        "longitude": 18.035539666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24.3,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4742",
+        "latitude": 53.1236035,
+        "longitude": 18.008773,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4743",
+        "latitude": 53.122517,
+        "longitude": 18.021371166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4747",
+        "latitude": 53.140645666667,
+        "longitude": 18.028326666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 7.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4750",
+        "latitude": 53.122731666667,
+        "longitude": 18.021887666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 10.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4752",
+        "latitude": 53.141028666667,
+        "longitude": 18.0285105,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4757",
+        "latitude": 53.140613833333,
+        "longitude": 18.029614,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4758",
+        "latitude": 53.133457666667,
+        "longitude": 17.969356166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4760",
+        "latitude": 53.139014833333,
+        "longitude": 18.0297325,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 12.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4761",
+        "latitude": 53.123912333333,
+        "longitude": 18.008492333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4765",
+        "latitude": 53.131479166667,
+        "longitude": 17.974668833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4767",
+        "latitude": 53.135902333333,
+        "longitude": 18.013728666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4772",
+        "latitude": 53.143661,
+        "longitude": 18.008542666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24.6,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4774",
+        "latitude": 53.126631666667,
+        "longitude": 18.045011166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4782",
+        "latitude": 53.131469166667,
+        "longitude": 17.974641833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 24,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4783",
+        "latitude": 53.108592666667,
+        "longitude": 17.994095166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 17.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4785",
+        "latitude": 53.126735833333,
+        "longitude": 18.034178666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4789",
+        "latitude": 53.126661666667,
+        "longitude": 18.0449705,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.5,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4791",
+        "latitude": 53.140104166667,
+        "longitude": 18.0311375,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 18.9,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4793",
+        "latitude": 53.131168666667,
+        "longitude": 18.012178833333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4805",
+        "latitude": 53.139701,
+        "longitude": 18.031156166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4825",
+        "latitude": 53.119235833333,
+        "longitude": 18.0052145,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 7.2,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4897",
+        "latitude": 53.129034333333,
+        "longitude": 18.006568666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4926",
+        "latitude": 53.130505666667,
+        "longitude": 17.992970666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 5.1,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "4927",
+        "latitude": 53.122114,
+        "longitude": 17.992532666667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.7,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "5179",
+        "latitude": 53.143206666667,
+        "longitude": 18.020493166667,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "5208",
+        "latitude": 53.145784166667,
+        "longitude": 18.024391333333,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 22.8,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      },
+      {
+        "providerVehicleId": "5223",
+        "latitude": 53.143655833333,
+        "longitude": 18.010694,
+        "fuelType": "electric",
+        "gearbox": null,
+        "type": "un-pedal-scooter",
+        "range": 23.4,
+        "provider": {
+          "id": 8,
+          "name": "Blinkee"
+        }
+      }
+    ]
+  }
+}
