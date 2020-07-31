@@ -287,6 +287,12 @@ public class TestOpenStreetMapGraphBuilder extends TestCase {
                                                                        // from track
         assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
 
+        // make sure the way property cache has been set with proper values along the way
+        dataForWay = wayPropertySet.getWayPropertyLookup().get("cycleway:right=track;cycleway=lane;highway=footway");
+        assertEquals(0.25, dataForWay.getSafetyFeatures().first); // right (with traffic) comes
+        // from track
+        assertEquals(0.75, dataForWay.getSafetyFeatures().second); // left comes from lane
+
         way = new OSMWay();
         way.addTag("highway", "footway");
         way.addTag("footway", "sidewalk");
