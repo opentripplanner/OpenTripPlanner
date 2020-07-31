@@ -135,6 +135,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
     public void setDefaultWayPropertySetSource(WayPropertySetSource source) {
         wayPropertySet = new WayPropertySet();
         source.populateProperties(wayPropertySet);
+        wayPropertySet.index();
     }
 
     /**
@@ -528,13 +529,14 @@ public class OpenStreetMapModule implements GraphBuilderModule {
 
             /* build the street segment graph from OSM ways */
             long wayIndex = 0;
-            long wayCount = osmdb.getWays().size();
+            Collection <OSMWay> ways = osmdb.getWays();
+            long wayCount = ways.size();
 
             WAY:
-            for (OSMWay way : osmdb.getWays()) {
+            for (OSMWay way : ways) {
 
-                if (wayIndex % 10000 == 0)
-                    LOG.debug("ways=" + wayIndex + "/" + wayCount);
+                if (wayIndex % 50000 == 0)
+                    LOG.info("ways=" + wayIndex + "/" + wayCount);
                 wayIndex++;
 
                 WayProperties wayData = wayPropertySet.getDataForWay(way);
