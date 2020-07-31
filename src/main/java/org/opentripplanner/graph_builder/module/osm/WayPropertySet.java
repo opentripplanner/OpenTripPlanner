@@ -181,8 +181,9 @@ public class WayPropertySet {
     public WayProperties getDataForWay(OSMWithTags way) {
         String wayPropertiesKey = getKeyFromApplicableTags(way, possibleWayPropertyTagValues);
         // check if lookup key found
-        if (wayPropertyLookup.containsKey(wayPropertiesKey)) {
-            return wayPropertyLookup.get(wayPropertiesKey);
+        WayProperties cachedWayProperties = wayPropertyLookup.get(wayPropertiesKey);
+        if (cachedWayProperties != null) {
+            return cachedWayProperties;
         }
 
         WayProperties leftResult = defaultProperties;
@@ -302,8 +303,9 @@ public class WayPropertySet {
         // also append back value
         wayPropertiesKey = String.format("%s;%s=%b", wayPropertiesKey, "back=", back);
         // check if lookup key found
-        if (carSpeedLookup.containsKey(wayPropertiesKey)) {
-            return carSpeedLookup.get(wayPropertiesKey);
+        Float cachedSpeed = carSpeedLookup.get(wayPropertiesKey);
+        if (cachedSpeed != null) {
+            return cachedSpeed;
         }
 
         Float speed = calculateCarSpeedForWay(way, back);
