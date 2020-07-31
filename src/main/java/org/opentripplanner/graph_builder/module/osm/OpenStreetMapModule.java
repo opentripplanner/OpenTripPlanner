@@ -778,7 +778,11 @@ public class OpenStreetMapModule implements GraphBuilderModule {
          * restricted area.
          */
         private void applyMicromobilityRestrictions(StreetEdge streetEdge) {
-            if (streetEdge != null) {
+            if (
+                streetEdge != null &&
+                    restrictedMicromobilityTravelGeometry != null &&
+                    restrictedMicromobilityDropoffGeometry != null
+            ) {
                 Geometry streetEdgeGeometry = streetEdge.getGeometry();
                 if (
                     restrictedMicromobilityTravelGeometry != null &&
