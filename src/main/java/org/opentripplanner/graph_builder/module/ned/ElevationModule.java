@@ -1,6 +1,7 @@
 package org.opentripplanner.graph_builder.module.ned;
 
 import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.KryoException;
 import com.esotericsoftware.kryo.io.Input;
 import com.esotericsoftware.kryo.io.Output;
 import org.locationtech.jts.geom.Coordinate;
@@ -178,7 +179,7 @@ public class ElevationModule implements GraphBuilderModule {
                 Input input = new Input(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) kryo.readClassAndObject(input);
                 log.info("Cached elevation data loaded into memory!");
-            } catch (FileNotFoundException e) {
+            } catch (KryoException | FileNotFoundException e) {
                 log.warn(graph.addBuilderAnnotation(new Graphwide(
                     String.format("Cached elevations file could not be read in due to error: %s!", e.getMessage()))));
             }
