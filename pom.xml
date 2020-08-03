@@ -300,6 +300,7 @@
                 </executions>
                 <configuration>
                     <mainClass>org.opentripplanner.standalone.OTPMain</mainClass>
+                    <cleanupDaemonThreads>false</cleanupDaemonThreads>
                     <arguments>
                         <argument>--build</argument>
                         <argument>./src/integrationTest/resources/graphs/bydgoszcz/</argument>

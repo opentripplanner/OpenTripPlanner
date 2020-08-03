@@ -12,12 +12,12 @@ public class ParkingZonesGetter {
     private static final Logger LOG = LoggerFactory.getLogger(ParkingZonesGetter.class);
 
     private static final String QUERY =
-            "{\"query\": \"query GetParkingZones {\n" +
-                    "  parking_zones {\n" +
-                    "    providerId\n" +
-                    "    vehicleType\n" +
-                    "    isAllowed\n" +
-                    "    area\n" +
+            "{\"query\": \"query GetParkingZones {" +
+                    "  parking_zones {\\n" +
+                    "    providerId\\n" +
+                    "    vehicleType\\n" +
+                    "    isAllowed\\n" +
+                    "    area\\n" +
                     "  }" +
                     "}\"" +
                     "}";

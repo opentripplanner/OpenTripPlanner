@@ -1,20 +1,20 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 public class Provider {
-    private final int id;
+    private final int providerId;
 
-    private final String name;
+    private final String providerName;
 
-    public Provider(int id, String name) {
-        this.id = id;
-        this.name = name;
+    public Provider(int providerId, String providerName) {
+        this.providerId = providerId;
+        this.providerName = providerName;
     }
 
-    public int getId() {
-        return id;
+    public int getProviderId() {
+        return providerId;
     }
 
-    public String getName() {
-        return name;
+    public String getProviderName() {
+        return providerName;
     }
 }

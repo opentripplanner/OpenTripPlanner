@@ -1,11 +1,11 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 
-import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.fasterxml.jackson.annotation.JsonSubTypes;
 import com.fasterxml.jackson.annotation.JsonTypeInfo;
+import com.fasterxml.jackson.annotation.JsonUnwrapped;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -31,7 +31,8 @@ public abstract class VehicleDescription {
     @JsonSerialize
     private final Gearbox gearbox;
 
-    @JsonIgnore
+    @JsonUnwrapped
+    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
     private final Provider provider;
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
@@ -63,8 +64,8 @@ public abstract class VehicleDescription {
                 ", latitude=" + latitude +
                 ", fuelType=" + fuelType +
                 ", gearbox=" + gearbox +
-                ", providerId=" + provider.getId() +
-                ", providerName=" + provider.getName() +
+                ", providerId=" + provider.getProviderId() +
+                ", providerName=" + provider.getProviderName() +
                 '}';
     }
 
@@ -88,22 +89,12 @@ public abstract class VehicleDescription {
         return gearbox;
     }
 
-    Provider getProvider() {
+    public Provider getProvider() {
         return provider;
     }
 
     public double getRangeInMeters() {
         return rangeInMeters;
-    }
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public int getProviderId() {
-        return provider.getId();
-    }
-
-    @JsonProperty(access = JsonProperty.Access.READ_ONLY)
-    public String getProviderName() {
-        return provider.getName();
     }
 
     /**

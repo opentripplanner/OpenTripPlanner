@@ -38,7 +38,7 @@ public class ParkingZoneInfo {
         }
 
         private boolean appliesToThisVehicle(VehicleDescription vehicle) {
-            return vehicle.getProviderId() == providerId && vehicle.getVehicleType().equals(vehicleType);
+            return vehicle.getProvider().getProviderId() == providerId && vehicle.getVehicleType().equals(vehicleType);
         }
 
         @Override

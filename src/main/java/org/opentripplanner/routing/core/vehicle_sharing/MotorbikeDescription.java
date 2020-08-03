@@ -14,12 +14,17 @@ public class MotorbikeDescription extends VehicleDescription {
 
     private static final VehicleType VEHICLE_TYPE = VehicleType.MOTORBIKE;
 
-    @JsonCreator
-    public MotorbikeDescription(@JsonProperty("providerVehicleId") String providerVehicleId,@JsonProperty("longitude") double longitude,
-                                @JsonProperty("latitude") double latitude, @JsonProperty("fuelType") FuelType fuelType,
-                                @JsonProperty("gearbox") Gearbox gearbox, @JsonProperty("provider") Provider provider,
-                                @JsonProperty("rangeInMeters") Double rangeInMeters) {
+    public MotorbikeDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                                Gearbox gearbox, Provider provider, Double rangeInMeters) {
         super(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters);
+    }
+
+    @JsonCreator(mode = JsonCreator.Mode.PROPERTIES)
+    public MotorbikeDescription(@JsonProperty("providerVehicleId") String providerVehicleId, @JsonProperty("longitude") double longitude,
+                                @JsonProperty("latitude") double latitude, @JsonProperty("fuelType") FuelType fuelType,
+                                @JsonProperty("gearbox") Gearbox gearbox, @JsonProperty("providerId") int providerId,
+                                @JsonProperty("providerName") String providerName, @JsonProperty("rangeInMeters") Double rangeInMeters) {
+        super(providerVehicleId, longitude, latitude, fuelType, gearbox, new Provider(providerId, providerName), rangeInMeters);
     }
 
     public MotorbikeDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,

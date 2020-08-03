@@ -27,9 +27,9 @@ public class ProviderFilter implements VehicleFilter {
     @Override
     public boolean isValid(VehicleDescription vehicle) {
         if (allowed) {
-            return providers.contains(vehicle.getProviderName().toLowerCase(Locale.US));
+            return providers.contains(vehicle.getProvider().getProviderName().toLowerCase(Locale.US));
         } else {
-            return !providers.contains(vehicle.getProviderName().toLowerCase(Locale.US));
+            return !providers.contains(vehicle.getProvider().getProviderName().toLowerCase(Locale.US));
         }
     }
 }

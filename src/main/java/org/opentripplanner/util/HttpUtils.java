@@ -17,6 +17,7 @@ import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.client.methods.HttpPost;
 import org.apache.http.config.SocketConfig;
+import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
@@ -52,7 +53,7 @@ public class HttpUtils {
     public static <T> T postData(String url, String data, Class<T> mapTo) {
         try {
             HttpPost request = new HttpPost(url);
-            request.setEntity(new StringEntity(data));
+            request.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
             HttpClient client = getClient();
             request.addHeader("content-type", "application/json");
             request.addHeader("accept", "application/json");

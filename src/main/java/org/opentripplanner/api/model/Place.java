@@ -1,6 +1,7 @@
 package org.opentripplanner.api.model;
 
 import java.util.Calendar;
+import java.util.Objects;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.util.Constants;
@@ -120,5 +121,33 @@ public class Place {
         this(lon, lat, name);
         this.arrival = arrival;
         this.departure = departure;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Place place = (Place) o;
+        return Objects.equals(name, place.name) &&
+                Objects.equals(stopId, place.stopId) &&
+                Objects.equals(stopCode, place.stopCode) &&
+                Objects.equals(platformCode, place.platformCode) &&
+                Objects.equals(lon, place.lon) &&
+                Objects.equals(lat, place.lat) &&
+                Objects.equals(arrival, place.arrival) &&
+                Objects.equals(departure, place.departure) &&
+                Objects.equals(orig, place.orig) &&
+                Objects.equals(zoneId, place.zoneId) &&
+                Objects.equals(stopIndex, place.stopIndex) &&
+                Objects.equals(stopSequence, place.stopSequence) &&
+                vertexType == place.vertexType &&
+                Objects.equals(bikeShareId, place.bikeShareId) &&
+                boardAlightType == place.boardAlightType &&
+                Objects.equals(flagStopArea, place.flagStopArea);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, stopId, stopCode, platformCode, lon, lat, arrival, departure, orig, zoneId, stopIndex, stopSequence, vertexType, bikeShareId, boardAlightType, flagStopArea);
     }
 }
