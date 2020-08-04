@@ -1,11 +1,13 @@
 package org.opentripplanner.transit.raptor.api.transit;
 
+import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+
 /**
  * The responsibility is to calculate multi-criteria value (like the generalized cost).
  * <P/>
  * The implementation should be immutable and thread safe.
  */
-public interface CostCalculator {
+public interface CostCalculator<T extends RaptorTripSchedule> {
 
     /**
      * Calculate cost when on-board of a trip. The cost is only used to compare to paths on the
@@ -13,24 +15,23 @@ public interface CostCalculator {
      * debugging easier if the cost can be compared with the "stop-arrival-cost". The cost must
      * incorporate the fact that 2 boarding may happen at 2 different stops.
      *
-     * @param prevStopArrivalCost The cost at the previous stop arrival
-     * @param boardWaitTime The time waiting before boarding at the board stop
-     * @param relativeTransitTime The relative transit time. This should increase for each stop
-     *                           visited in the pattern with the same amount of seconds that it
-     *                           takes to travel from the previous stop to the next. The
-     *                           'relativeTransitTime' for the fisrt stop can be any number, even
-     *                           negative.
-     * @param boardStop The stop where the pattern is boarded
-     *
+     * @param prevStopArrival The previous stop arrival
+     * @param waitTime        The time waiting before boarding at the board stop
+     * @param boardTime       The time of boarding
+     * @param trip            The trip borded
      */
-    int onTripRidingCost(
-        int prevStopArrivalCost, int boardWaitTime, int relativeTransitTime, int boardStop
-    );
+    int onTripRidingCost(ArrivalView<T> prevStopArrival, int waitTime, int boardTime, T trip);
 
     /**
      * Calculate the value when arriving by transit.
      */
-    int transitArrivalCost(int waitTime, int transitTime, int fromStop, int toStop);
+    int transitArrivalCost(
+        ArrivalView<T> previousArrival,
+        int waitTime,
+        int transitTime,
+        int toStop,
+        T trip
+    );
 
     /**
      * Calculate the value when arriving by transfer.

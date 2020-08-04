@@ -5,7 +5,6 @@ import com.google.common.base.Joiner;
 import org.opentripplanner.ext.transmodelapi.model.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.PlaceType;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Station;
@@ -26,8 +25,6 @@ public class TransmodelMappingUtil {
 
     private static final String LIST_VALUE_SEPARATOR = ",";
 
-    private static final String GTFS_LIBRARY_ID_SEPARATOR = ":";
-
     private String fixedAgencyId;
 
     private TimeZone timeZone;
@@ -42,14 +39,14 @@ public class TransmodelMappingUtil {
         if (fixedAgencyId != null) {
             return id.getId();
         }
-        return GtfsLibrary.convertIdToString(id);
+        return id.toString();
     }
 
     public FeedScopedId fromIdString(String id) {
         if (fixedAgencyId != null) {
             return new FeedScopedId(fixedAgencyId, id);
         }
-        return GtfsLibrary.convertIdFromString(id);
+        return FeedScopedId.parseId(id);
     }
 
 

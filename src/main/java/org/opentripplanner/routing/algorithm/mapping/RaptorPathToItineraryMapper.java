@@ -153,18 +153,8 @@ public class RaptorPathToItineraryMapper {
 
         // Find stop positions in pattern where this leg boards and alights.
         // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
-        int boardStopIndexInPattern = -1;
-        int alightStopIndexInPattern = -1;
-        for (int s = 0; s < numStopsInPattern; s++) {
-            if (pathLeg.fromTime() == tripSchedule.departure(s)) {
-                boardStopIndexInPattern = s;
-            }
-        }
-        for (int s = 0; s < numStopsInPattern; s++) {
-            if (pathLeg.toTime() == tripSchedule.arrival(s)) {
-                alightStopIndexInPattern = s;
-            }
-        }
+        int boardStopIndexInPattern = tripSchedule.findStopPosInPattern(pathLeg.fromStop(), pathLeg.fromTime(), true);
+        int alightStopIndexInPattern = tripSchedule.findStopPosInPattern(pathLeg.toStop(), pathLeg.toTime(), false);
 
         // Include real-time information in the Leg.
         if (!tripTimes.isScheduled()) {

@@ -67,7 +67,15 @@ public class DataStoreFactory {
         // The file data storage repository should be last, to allow
         // other repositories to "override" and grab files analyzing the
         // datasource uri passed in
-        repositories.add(new FileDataSourceRepository(config.baseDirectory()));
+        repositories.add(
+            new FileDataSourceRepository(
+                config.baseDirectory(),
+                config.gtfsLocalFilePattern(),
+                config.netexLocalFilePattern(),
+                config.osmLocalFilePattern(),
+                config.demLocalFilePattern()
+            )
+        );
 
         OtpDataStore store = new OtpDataStore(config, repositories);
 

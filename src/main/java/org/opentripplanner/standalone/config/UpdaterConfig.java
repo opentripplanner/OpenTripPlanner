@@ -14,6 +14,7 @@ import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdater
 import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
+import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -24,7 +25,7 @@ import java.util.function.Function;
  * each updater parameters. Some updaters use the same parameters, so a map is kept between the
  * JSON updater type strings and the appropriate updater parameter class.
  */
-public class UpdaterConfig {
+public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParameters {
 
   private static final String BIKE_RENTAL = "bike-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
@@ -38,7 +39,6 @@ public class UpdaterConfig {
   private static final String SIRI_ET_UPDATER = "siri-et-updater";
   private static final String SIRI_VM_UPDATER = "siri-vm-updater";
   private static final String SIRI_SX_UPDATER = "siri-sx-updater";
-
 
   private static final Map<String, Function<NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
@@ -59,8 +59,14 @@ public class UpdaterConfig {
 
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
-  public UpdaterConfig(NodeAdapter updaterConfigList) {
-    for (NodeAdapter conf : updaterConfigList.asList()) {
+  private final URI bikeRentalServiceDirectoryUrl;
+
+  public UpdaterConfig(NodeAdapter rootAdapter) {
+    this.bikeRentalServiceDirectoryUrl = rootAdapter.asUri("bikeRentalServiceDirectoryUrl", null);
+
+    List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
+
+    for (NodeAdapter conf : updaters) {
       String type = conf.asText("type");
       Function<NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
       if(factory == null) {
@@ -70,50 +76,71 @@ public class UpdaterConfig {
     }
   }
 
+  /**
+   * This is the endpoint url used for the BikeRentalServiceDirectory sandbox feature.
+   * @see org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher
+   */
+  @Override
+  public URI bikeRentalServiceDirectoryUrl() {
+   return this.bikeRentalServiceDirectoryUrl;
+  }
+
+  @Override
   public List<BikeRentalUpdaterParameters> getBikeRentalParameters() {
     return getParameters(BIKE_RENTAL, BikeRentalUpdaterParameters.class);
   }
 
+  @Override
   public List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters() {
     return getParameters(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterParameters.class);
   }
 
+  @Override
   public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
     return getParameters(WINKKI_POLLING_UPDATER, PollingStoptimeUpdaterParameters.class);
   }
 
+  @Override
   public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER, SiriETUpdaterParameters.class);
   }
 
+  @Override
   public List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters() {
     return getParameters(SIRI_SX_UPDATER, SiriSXUpdaterParameters.class);
   }
 
+  @Override
   public List<SiriVMUpdaterParameters> getSiriVMUpdaterParameters() {
     return getParameters(SIRI_VM_UPDATER, SiriVMUpdaterParameters.class);
   }
 
+  @Override
   public List<WebsocketGtfsRealtimeUpdaterParameters> getWebsocketGtfsRealtimeUpdaterParameters() {
     return getParameters(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterParameters.class);
   }
 
+  @Override
   public List<MqttGtfsRealtimeUpdaterParameters> getMqttGtfsRealtimeUpdaterParameters() {
     return getParameters(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterParameters.class);
   }
 
+  @Override
   public List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
     return getParameters(BIKE_PARK, PollingGraphUpdaterParameters.class);
   }
 
+  @Override
   public List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
     return getParameters(EXAMPLE_UPDATER, PollingGraphUpdaterParameters.class);
   }
 
+  @Override
   public List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
     return getParameters(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterParameters.class);
   }
 
+  @Override
   public List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters() {
     return getParameters(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterParameters.class);
   }

@@ -14,7 +14,6 @@ import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -334,7 +333,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     private static String stopNameAndId (Stop stop) {
-        return stop.getName() + " (" + GtfsLibrary.convertIdToString(stop.getId()) + ")";
+        return stop.getName() + " (" + stop.getId().toString() + ")";
     }
 
     /**
@@ -389,7 +388,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
         /* Ensure we have a unique name for every Route */
         for (Route route : patternsByRoute.keySet()) {
-            String routeName = GtfsLibrary.getRouteName(route);
+            String routeName = route.getName();
             if (usedRouteNames.contains(routeName)) {
                 int i = 2;
                 String generatedRouteName;

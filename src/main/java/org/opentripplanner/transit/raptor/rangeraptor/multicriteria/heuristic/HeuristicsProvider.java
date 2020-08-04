@@ -18,7 +18,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
     private final Heuristics heuristics;
     private final RoundProvider roundProvider;
     private final DestinationArrivalPaths<T> paths;
-    private final CostCalculator costCalculator;
+    private final CostCalculator<T> costCalculator;
     private final HeuristicAtStop[] stops;
     private final DebugHandlerFactory<T> debugHandlerFactory;
 
@@ -31,7 +31,7 @@ public final class HeuristicsProvider<T extends RaptorTripSchedule> {
             Heuristics heuristics,
             RoundProvider roundProvider,
             DestinationArrivalPaths<T> paths,
-            CostCalculator costCalculator,
+            CostCalculator<T> costCalculator,
             DebugHandlerFactory<T> debugHandlerFactory
     ) {
         this.heuristics = heuristics;
