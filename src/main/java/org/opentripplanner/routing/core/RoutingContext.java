@@ -61,9 +61,6 @@ public class RoutingContext implements Cloneable {
 
     public RemainingWeightHeuristic remainingWeightHeuristic;
 
-    /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public DebugOutput debugOutput = new DebugOutput();
-
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
 
@@ -157,7 +154,6 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
-        this.debugOutput.startedCalculating();
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;

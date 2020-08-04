@@ -20,6 +20,7 @@ import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
+import org.opentripplanner.routing.framework.DebugAggregator;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -49,12 +50,16 @@ public class RoutingWorker {
 
     private final RaptorService<TripSchedule> raptorService;
 
+    /** An object that accumulates profiling and debugging info for inclusion in the response. */
+    public final DebugAggregator debugAggregator = new DebugAggregator();
+
     private final RoutingRequest request;
     private Instant filterOnLatestDepartureTime = null;
     private int searchWindowUsedInSeconds = NOT_SET;
     private Itinerary firstRemovedItinerary = null;
 
     public RoutingWorker(RaptorConfig<TripSchedule> config, RoutingRequest request) {
+        this.debugAggregator.startedCalculating();
         this.raptorService = new RaptorService<>(config);
         this.request = request;
     }
@@ -63,12 +68,16 @@ public class RoutingWorker {
         List<Itinerary> itineraries = new ArrayList<>();
         List<RoutingError> routingErrors = new ArrayList<>();
 
+        this.debugAggregator.finishedPrecalculating();
+
         // Direct street routing
         try {
             itineraries.addAll(DirectStreetRouter.route(router, request));
         } catch (RoutingValidationException e) {
             routingErrors.addAll(e.getRoutingErrors());
         }
+
+        this.debugAggregator.finishedDirectStreetRouter();
 
         // Transit routing
         try {
@@ -77,26 +86,25 @@ public class RoutingWorker {
             routingErrors.addAll(e.getRoutingErrors());
         }
 
-        // Filter itineraries
-        long startTimeFiltering = System.currentTimeMillis();
+        this.debugAggregator.finishedTransitRouter();
 
         // Filter itineraries
         itineraries = filterItineraries(itineraries);
-        LOG.debug("Filtering took {} ms", System.currentTimeMillis() - startTimeFiltering);
         LOG.debug("Return TripPlan with {} itineraries", itineraries.size());
+
+        this.debugAggregator.finishedFiltering();
 
         return new RoutingResponse(
             TripPlanMapper.mapTripPlan(request, itineraries),
             createTripSearchMetadata(),
-            routingErrors
+            routingErrors,
+            debugAggregator
         );
     }
 
     private Collection<Itinerary> routeTransit(Router router) {
         request.setRoutingContext(router.graph);
         if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
-
-        long startTime = System.currentTimeMillis();
 
         TransitLayer transitLayer = request.ignoreRealtimeUpdates
             ? router.graph.getTransitLayer()
@@ -111,22 +119,18 @@ public class RoutingWorker {
                 request.rctx.bannedRoutes,
                 request.walkSpeed
         );
-        LOG.debug("Filtering tripPatterns took {} ms", System.currentTimeMillis() - startTime);
 
-        /* Prepare access/egress transfers */
+        this.debugAggregator.finishedPatternFiltering();
 
-        double startTimeAccessEgress = System.currentTimeMillis();
-
+        // Prepare access/egress transfers
         Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
         Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
 
-        LOG.debug("Access/egress routing took {} ms",
-                System.currentTimeMillis() - startTimeAccessEgress
-        );
         verifyEgressAccess(accessTransfers, egressTransfers);
 
+        this.debugAggregator.finishedAccessEgress();
+
         // Prepare transit search
-        double startTimeRouting = System.currentTimeMillis();
         RaptorRequest<TripSchedule> raptorRequest = RaptorRequestMapper.mapRequest(
                 request,
                 requestTransitDataProvider.getStartOfTime(),
@@ -142,11 +146,9 @@ public class RoutingWorker {
 
         LOG.debug("Found {} transit itineraries", transitResponse.paths().size());
         LOG.debug("Transit search params used: {}", transitResponse.requestUsed().searchParams());
-        LOG.debug("Main routing took {} ms", System.currentTimeMillis() - startTimeRouting);
+        this.debugAggregator.finishedRaptorSearch();
 
         // Create itineraries
-
-        double startItineraries = System.currentTimeMillis();
 
         RaptorPathToItineraryMapper itineraryMapper = new RaptorPathToItineraryMapper(
                 transitLayer,
@@ -179,10 +181,7 @@ public class RoutingWorker {
             filterOnLatestDepartureTime = Instant.ofEpochSecond(request.dateTime + searchWindowUsedInSeconds);
         }
 
-        LOG.debug("Creating {} itineraries took {} ms",
-                itineraries.size(),
-                System.currentTimeMillis() - startItineraries
-        );
+        this.debugAggregator.finishedItineraryCreation();
 
         return itineraries;
     }
