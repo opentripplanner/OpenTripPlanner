@@ -15,7 +15,6 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
@@ -694,8 +693,8 @@ public class LegacyGraphQLQueryTypeImpl
       boolean tripPlannedForNow = Math.abs(request.getDateTime().getTime() - new Date().getTime()) < NOW_THRESHOLD_MILLIS;
       request.useBikeRentalAvailabilityInformation = (tripPlannedForNow); // TODO the same thing for GTFS-RT
 
-      callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = GtfsLibrary.convertIdFromString(v));
-      callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = GtfsLibrary.convertIdFromString(v));
+      callWith.argument("startTransitStopId", (String v) -> request.startingTransitStopId = FeedScopedId.parseId(v));
+      callWith.argument("startTransitTripId", (String v) -> request.startingTransitTripId = FeedScopedId.parseId(v));
       //callWith.argument("reverseOptimizeOnTheFly", (Boolean v) -> request.reverseOptimizeOnTheFly = v);
       //callWith.argument("omitCanceled", (Boolean v) -> request.omitCanceled = v);
       callWith.argument("ignoreRealtimeUpdates", (Boolean v) -> request.ignoreRealtimeUpdates = v);

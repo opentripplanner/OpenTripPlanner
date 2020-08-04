@@ -15,7 +15,7 @@ public class LegacyGraphQLdebugOutputImpl
 
   @Override
   public DataFetcher<Long> pathCalculationTime() {
-    return environment -> getSource(environment).pathCalculationTime;
+    return environment -> getSource(environment).transitRouterTime;
   }
 
   @Override
@@ -30,7 +30,7 @@ public class LegacyGraphQLdebugOutputImpl
 
   @Override
   public DataFetcher<Boolean> timedOut() {
-    return environment -> getSource(environment).timedOut;
+    return environment -> false;
   }
 
   private DebugOutput getSource(DataFetchingEnvironment environment) {
