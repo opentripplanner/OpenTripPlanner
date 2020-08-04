@@ -5,6 +5,10 @@ import org.opentripplanner.api.resource.TransitTimingOutput;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+/**
+ * Keeps account of timing information within the different parts of the routing process, and is
+ * responsible of logging that information.
+ */
 public class DebugAggregator {
   private static final Logger LOG = LoggerFactory.getLogger(DebugAggregator.class);
 
@@ -54,24 +58,36 @@ public class DebugAggregator {
     LOG.debug("Direct street routing took {} ms", directStreetRouterTime);
   }
 
+  /**
+   * Record the time when we are finished with the creation of the raptor data models.
+   */
   public void finishedPatternFiltering() {
     finishedPatternFiltering = System.currentTimeMillis();
     tripPatternFilterTime = finishedPatternFiltering - finishedDirectStreetRouter;
     LOG.debug("Filtering tripPatterns took {} ms", tripPatternFilterTime);
   }
 
+  /**
+   * Record the time when we are finished with the access and egress routing.
+   */
   public void finishedAccessEgress() {
     finishedAccessEgress = System.currentTimeMillis();
     accessEgressTime = finishedAccessEgress - finishedPatternFiltering;
     LOG.debug("Access/egress routing took {} ms", accessEgressTime);
   }
 
+  /**
+   * Record the time when we are finished with the raptor search.
+   */
   public void finishedRaptorSearch() {
     finishedRaptorSearch = System.currentTimeMillis();
     raptorSearchTime = finishedRaptorSearch - finishedAccessEgress;
     LOG.debug("Main routing took {} ms", raptorSearchTime);
   }
 
+  /**
+   * Record the time when we have created internal itinerary objects from the raptor responses.
+   */
   public void finishedItineraryCreation() {
     itineraryCreationTime = System.currentTimeMillis() - finishedRaptorSearch;
     LOG.debug("Creating itineraries took {} ms", itineraryCreationTime);
