@@ -1,9 +1,6 @@
 package org.opentripplanner.graph_builder.linking;
 
 import com.google.common.collect.Iterables;
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import jersey.repackaged.com.google.common.collect.Lists;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -14,7 +11,6 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -25,6 +21,7 @@ import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -60,7 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -85,32 +81,33 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
-    private DataImportIssueStore issueStore;
+    private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
 
-    public static final int INITIAL_SEARCH_RADIUS_METERS = 100;
+    private static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
-    public static final int MAX_SEARCH_RADIUS_METERS = 1000;
-
-    private Boolean addExtraEdgesToAreas = false;
-
-    private StreetEdgeFactory edgeFactory;
-
-    public static final int WARNING_DISTANCE_METERS = 20;
+    private static final int WARNING_DISTANCE_METERS = 20;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
-    public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
+    private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
 
-    private Graph graph;
+    private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
-    private HashGridSpatialIndex<Edge> idx;
+    private final DataImportIssueStore issueStore;
 
-    private SpatialIndex transitStopIndex;
+    private final StreetEdgeFactory edgeFactory;
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private final Graph graph;
+
+    private final HashGridSpatialIndex<Edge> idx;
+
+    private final SpatialIndex transitStopIndex;
 
     //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
     //If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
     private final boolean destructiveSplitting;
+
+
+    private Boolean addExtraEdgesToAreas = false;
 
     /**
      * Construct a new SimpleStreetSplitter.
@@ -139,7 +136,6 @@ public class SimpleStreetSplitter {
         } else {
             idx = hashGridSpatialIndex;
         }
-
     }
 
     /**
@@ -153,8 +149,8 @@ public class SimpleStreetSplitter {
         this(graph, null, null, true, issueStore);
     }
 
-    public SimpleStreetSplitter(Graph graph) {
-        this(graph, new DataImportIssueStore(false));
+    public static SimpleStreetSplitter createForTest(Graph graph) {
+        return new SimpleStreetSplitter(graph, null, null, true, new DataImportIssueStore(false));
     }
 
     /** Link all relevant vertices to the street network */
@@ -342,7 +338,7 @@ public class SimpleStreetSplitter {
 
         for (Vertex vertex : vertices) {
             if (vertex instanceof  StreetVertex && !vertex.equals(splitterVertex)) {
-                LineString line = geometryFactory.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
+                LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
                 double length = SphericalDistanceLibrary.distance(splitterVertex.getCoordinate(),
                         vertex.getCoordinate());
                 I18NString name = new LocalizedString("", new OSMWithTags());
@@ -550,7 +546,7 @@ public class SimpleStreetSplitter {
         // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
         // for the actual distance calculations.
         LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
-        return transformed.distance(geometryFactory.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
+        return transformed.distance(GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
     }
 
     /** projected distance from stop to another stop, in latitude degrees */
@@ -570,7 +566,7 @@ public class SimpleStreetSplitter {
             coords[i] = c;
         }
 
-        return geometryFactory.createLineString(coords);
+        return GEOMETRY_FACTORY.createLineString(coords);
     }
 
     /**
@@ -636,10 +632,6 @@ public class SimpleStreetSplitter {
         }
         return closest;
 
-    }
-
-    public Boolean getAddExtraEdgesToAreas() {
-        return addExtraEdgesToAreas;
     }
 
     public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {
