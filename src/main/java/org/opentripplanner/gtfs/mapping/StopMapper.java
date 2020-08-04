@@ -4,6 +4,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -39,6 +40,7 @@ class StopMapper {
         base.getWheelchairBoarding(),
         base.getLevel(),
         gtfsStop.getZoneId(),
+        Collections.emptyList(),
         gtfsStop.getUrl()
     );
   }

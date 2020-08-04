@@ -22,6 +22,7 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
+import org.opentripplanner.model.TariffZone;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -90,6 +91,8 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FeedScopedId, BoardingArea> boardingAreasById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
+
+    private final EntityById<FeedScopedId, TariffZone> tariffZonesById = new EntityById<>();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
@@ -187,6 +190,8 @@ public class OtpTransitServiceBuilder {
     public TripStopTimes getStopTimesSortedByTrip() {
         return stopTimesByTrip;
     }
+
+    public EntityById<FeedScopedId, TariffZone> getTariffZonesById() { return tariffZonesById; }
 
     public List<Transfer> getTransfers() {
         return transfers;
