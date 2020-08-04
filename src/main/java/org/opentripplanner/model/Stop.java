@@ -15,6 +15,10 @@ public final class Stop extends StationElement {
 
   private static final long serialVersionUID = 2L;
 
+  /**
+   * Platform identifier for a platform/stop belonging to a station. This should be just the
+   * platform identifier (eg. "G" or "3").
+   */
   private final String platformCode;
 
   /**
@@ -29,6 +33,10 @@ public final class Stop extends StationElement {
 
   private final TimeZone timeZone;
 
+  /**
+   * Used for describing the type of transportation used at the stop. This can be used eg. for
+   * deciding how to render a stop when it is used by multiple routes with different vehicle types.
+   */
   private final TransitMode vehicleType;
 
   private HashSet<BoardingArea> boardingAreas;
