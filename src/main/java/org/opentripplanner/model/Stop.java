@@ -19,6 +19,8 @@ public final class Stop extends StationElement {
    */
   private final String zone;
 
+  private final Collection<TariffZone> tariffZones;
+
   /**
    * URL to a web page containing information about this particular stop.
    */
@@ -35,10 +37,12 @@ public final class Stop extends StationElement {
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
       String zone,
+      Collection<TariffZone> tariffZones,
       String url
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.zone = zone;
+    this.tariffZones = tariffZones;
     this.url = url;
   }
 
@@ -53,6 +57,7 @@ public final class Stop extends StationElement {
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
+        null,
         null,
         null,
         null,
@@ -92,5 +97,13 @@ public final class Stop extends StationElement {
   @NotNull
   public TransferPriority getCostPriority() {
     return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
+  }
+
+  public Collection<TariffZone> getTariffZones() {
+    return Collections.unmodifiableCollection(tariffZones);
+  }
+
+  public void addTariffZone(TariffZone tariffZone) {
+    this.tariffZones.add(tariffZone);
   }
 }
