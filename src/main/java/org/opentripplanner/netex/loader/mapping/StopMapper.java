@@ -42,9 +42,7 @@ class StopMapper {
         null,
         null,
         null,
-        quay.getTransportMode() == null
-            ? null
-            : TransitModeMapper.mapMode(TransportModeMapper.mapVehicleMode(quay.getTransportMode()))
+        TransitModeMapper.mapMode(TransportModeMapper.mapVehicleMode(quay.getTransportMode()))
     );
     stop.setParentStation(parentStation);
 

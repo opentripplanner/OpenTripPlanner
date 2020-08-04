@@ -43,7 +43,7 @@ class StopMapper {
         gtfsStop.getZoneId(),
         gtfsStop.getUrl(),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
-        gtfsStop.isVehicleTypeSet() ? TransitModeMapper.mapMode(gtfsStop.getVehicleType()) : null
+        TransitModeMapper.mapMode(gtfsStop.getVehicleType())
     );
   }
 }
