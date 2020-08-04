@@ -1,20 +1,20 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.List;
-
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 
 /**
@@ -85,7 +85,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
         	
             String proto = url2.getProtocol();
             if (proto.equals("http") || proto.equals("https")) {
-            	data = HttpUtils.getData(url, headerName, headerValue);
+            	data = HttpUtils.getData(URI.create(url), headerName, headerValue);
             } else {
                 // Local file probably, try standard java
                 data = url2.openStream();

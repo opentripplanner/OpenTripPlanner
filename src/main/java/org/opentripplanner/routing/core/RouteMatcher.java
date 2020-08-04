@@ -6,7 +6,6 @@ import java.util.HashSet;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.gtfs.GtfsLibrary;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
@@ -102,7 +101,7 @@ public class RouteMatcher implements Cloneable, Serializable {
             return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
-        String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
+        String routeName = route.getName().replace("_", " ");
         if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
                 routeName)))
             return true;

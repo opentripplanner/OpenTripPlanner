@@ -13,14 +13,29 @@ import static org.opentripplanner.routing.core.TraverseMode.BUS;
 import static org.opentripplanner.routing.core.TraverseMode.RAIL;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
+/**
+ * This is a helper class to allow unit-testing on Itineraries. The builder does not necessarily
+ * create complete/correct itineraries with legs - it is the unit-test witch is responsible to
+ * create an itinerary that have correct data witch is consistent with what is produced by OTP. To
+ * keep maintenance easy, create the minimum amount of data to focus your test - this also help
+ * demonstrate which data is needed by the "code-under-test".
+ */
 public class TestItineraryBuilder {
-  public static final Place A = place("A", 5.0, 8.0);
+  public static final Place A = place("A", 5.0, 8.0 );
   public static final Place B = place("B", 6.0, 8.5);
   public static final Place C = place("C", 7.0, 9.0);
   public static final Place D = place("D", 8.0, 9.5);
   public static final Place E = place("E", 9.0, 10.0);
   public static final Place F = place("F", 9.0, 10.5);
   public static final Place G = place("G", 9.5, 11.0);
+
+  /**
+   * For Transit Legs the stopIndex in from/to palce should be increasing. We do not use/lookup
+   * the pattern or trip in the unit tests using this, so the index is fiction. Some of the
+   * Itinerary filters rely on it to make sure to trips overlap.
+   */
+  private static final int TRIP_FROM_STOP_INDEX = 5;
+  private static final int TRIP_TO_STOP_INDEX = 7;
 
   private static final int NOT_SET = -999_999;
   public static final int BOARD_COST = 120;
@@ -129,9 +144,9 @@ public class TestItineraryBuilder {
 
     Leg leg = new Leg();
     leg.mode = mode;
-    leg.from = lastPlace;
+    leg.from = place(lastPlace, TRIP_FROM_STOP_INDEX);
     leg.startTime = newTime(startTime);
-    leg.to = to;
+    leg.to = place(to, TRIP_TO_STOP_INDEX);
     leg.endTime = newTime(endTime);
     leg.distanceMeters = speed(mode) * 60.0 * (endTime - startTime);
     legs.add(leg);
@@ -164,6 +179,13 @@ public class TestItineraryBuilder {
   private static Place place(String name, double lat, double lon) {
     Place p = new Place(lat, lon, name);
     p.stopId = new FeedScopedId("S", name);
+    return p;
+  }
+
+  private static Place place(Place source, int stopIndex) {
+    Place p = new Place(source.coordinate.latitude(), source.coordinate.longitude(), source.name);
+    p.stopId = source.stopId;
+    p.stopIndex = stopIndex;
     return p;
   }
 }

@@ -23,7 +23,7 @@ public class RemoveTransitIfStreetOnlyIsBetterFilterTest {
         List<Itinerary> result = new RemoveTransitIfStreetOnlyIsBetterFilter().filter(List.of(i1, i2));
 
         // Then:
-        assertEquals(toStr(result), List.of(i1, i2), result);
+        assertEquals(toStr(List.of(i1, i2)), toStr(result));
     }
 
     @Test

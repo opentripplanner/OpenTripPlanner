@@ -1,5 +1,28 @@
 # How to migrate OTP version 1.x to 2.x
 
+## Command line
+The command line parameters are changed. Use the `--help` option to get the current documentation,
+and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
+possibility to build the graph in 2 steps is new in OTP2. OTP2 does not support multiple routers.
+
+
+## File loading
+OTP1 access all files using the local file system, no other _data-source_ is supported. In OTP2 we 
+support accessing cloud storage. So far Google Cloud Storage is added and we plan to add support 
+for AWS S3 as well. Config files(_otp-config.json, build-config.json, router-config.json_) are read 
+from the local file system, while other files can be read/written from the local file-system or the
+cloud. OTP2 support mixing any data sources that is supported. 
+
+OTP1 loads input data files(_DEM, OSM, GTFS, NeTEx_) based on the suffix(file extension). But for 
+GTFS files OTP1 also open the zip-file and look for _stops.txt_. OTP2 identify GTFS files by the 
+name only. OTP2 will read any zip-file or directory that contains "gtfs" as part of the name. All 
+files-types in OTP2 is resolved by matching the name with a regexp pattern. You can configure the 
+patterns in the _build-config.json_ if the defaults does not suites you. 
+
+OTP2 do not support for multiple routers, but you can load as many GTFS and/or NeTEx feeds as 
+you want into a single instance of OTP2.
+
+
 ## Build config
 
 These properties changed names from:
@@ -8,15 +31,16 @@ These properties changed names from:
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
+These parameters is no longer supported:
+ - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
+
+ 
+ 
  ## Router config
  
  - All updaters that require data sources now require you to specify a `sourceType`, even if that
  particular updater only has one possible data source.
  
-## Command line
- The command line parameters are changed. Use the `--help` option to get the current documentation,
-  and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
-  possibility to build the graph in 2 steps is new in OTP2.  
    
 ## REST API
   

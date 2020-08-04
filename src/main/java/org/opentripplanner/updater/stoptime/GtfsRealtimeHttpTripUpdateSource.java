@@ -1,17 +1,17 @@
 package org.opentripplanner.updater.stoptime;
 
-import java.io.InputStream;
-import java.util.ArrayList;
-import java.util.List;
-
-import org.opentripplanner.util.HttpUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.transit.realtime.GtfsRealtime;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
+import org.opentripplanner.util.HttpUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.io.InputStream;
+import java.net.URI;
+import java.util.ArrayList;
+import java.util.List;
 
 public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
     private static final Logger LOG =
@@ -44,7 +44,7 @@ public class GtfsRealtimeHttpTripUpdateSource implements TripUpdateSource {
         fullDataset = true;
         try {
             InputStream is = HttpUtils.getData(
-                    url,
+                    URI.create(url),
                     "Accept",
                     "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*");
             if (is != null) {
