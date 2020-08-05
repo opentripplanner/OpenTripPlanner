@@ -8,7 +8,7 @@ import org.apache.lucene.util.SloppyMath;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.PermanentStreetSplitter;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Edge;
@@ -35,7 +35,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     private static final double MAX_DISTANCE_TO_VERTEX_IN_KM = 0.2;
 
     private final VehiclePositionsGetter vehiclePositionsGetter = new VehiclePositionsGetter();
-    private SimpleStreetSplitter simpleStreetSplitter;
+    private PermanentStreetSplitter permanentStreetSplitter;
     private GraphUpdaterManager graphUpdaterManager;
     private Graph graph;
     private String url;
@@ -66,7 +66,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
 
 
         if (vertexesToChooseFrom == null) {
-            stream = simpleStreetSplitter.getIdx().query(envelope).stream().map(Edge::getFromVertex);
+            stream = permanentStreetSplitter.getIdx().query(envelope).stream().map(Edge::getFromVertex);
         } else {
             stream = vertexesToChooseFrom.stream();
         }
@@ -152,7 +152,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) throws Exception {
         this.graph = graph;
-        this.simpleStreetSplitter = new SimpleStreetSplitter(graph);
+        this.permanentStreetSplitter = PermanentStreetSplitter.createNewDefaultInstance(graph, null, false);
     }
 
     @Override

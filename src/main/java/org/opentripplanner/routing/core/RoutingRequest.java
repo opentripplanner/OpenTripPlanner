@@ -5,6 +5,7 @@ import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.model.GenericLocation;
 import org.opentripplanner.common.model.NamedPlace;
+import org.opentripplanner.graph_builder.linking.PermanentStreetSplitter;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.core.routing_parametrizations.RoutingDelays;
@@ -1579,11 +1580,11 @@ public class RoutingRequest implements Cloneable, Serializable {
      * <p>
      * But throws TrivialPathException if same edge is split in origin/destination search.
      * <p>
-     * used in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
+     * used in {@link PermanentStreetSplitter} in {@link PermanentStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
      *
      * @param edge
      */
-    public void canSplitEdge(StreetEdge edge) {
+    public void canSplitEdge(StreetEdge edge) throws TrivialPathException {
         if (splitEdge == null) {
             splitEdge = edge;
         } else {

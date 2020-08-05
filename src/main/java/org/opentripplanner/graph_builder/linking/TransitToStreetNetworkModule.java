@@ -1,13 +1,13 @@
 package org.opentripplanner.graph_builder.linking;
 
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.List;
-
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.List;
 
 /**
  * {@link org.opentripplanner.graph_builder.services.GraphBuilderModule} plugin that links up the stops of a transit network to a street network.
@@ -31,10 +31,10 @@ public class TransitToStreetNetworkModule implements GraphBuilderModule {
         // split streets
         //NetworkLinker linker = new NetworkLinker(graph, extra);
         //linker.createLinkage();
-        
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
+
+        PermanentStreetSplitter splitter = PermanentStreetSplitter.createNewDefaultInstance(graph, null, false);
         splitter.link();
-        
+
         // don't split streets
         //SampleStopLinker linker = new SampleStopLinker(graph);
         //linker.link(true);

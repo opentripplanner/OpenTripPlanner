@@ -4,7 +4,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.PermanentStreetSplitter;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.graph.Graph;
 import org.slf4j.Logger;
@@ -44,8 +44,7 @@ public class StreetLinkerModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         if(graph.hasStreets) {
             LOG.info("Linking transit stops, bike rental stations, bike parking areas, and park-and-rides to graph . . .");
-            SimpleStreetSplitter linker = new SimpleStreetSplitter(graph);
-            linker.setAddExtraEdgesToAreas(this.addExtraEdgesToAreas);
+            PermanentStreetSplitter linker = PermanentStreetSplitter.createNewDefaultInstance(graph, null, this.addExtraEdgesToAreas);
             linker.link();
         }
         //Calculates convex hull of a graph which is shown in routerInfo API point

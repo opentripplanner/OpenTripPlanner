@@ -2,7 +2,7 @@ package org.opentripplanner.graph_builder.module;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.PermanentStreetSplitter;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.osm.DefaultWayPropertySetSource;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
@@ -132,7 +132,7 @@ public class FakeGraph {
 
     /** link the stops in the graph */
     public static void link (Graph g) {
-        SimpleStreetSplitter linker = new SimpleStreetSplitter(g);
+        PermanentStreetSplitter linker = PermanentStreetSplitter.createNewDefaultInstance(g, null, false);
         linker.link();
     }
 

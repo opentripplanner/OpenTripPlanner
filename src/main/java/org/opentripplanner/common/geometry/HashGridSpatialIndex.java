@@ -128,7 +128,7 @@ public class HashGridSpatialIndex<T> implements SpatialIndex, Serializable {
     }
 
     @Override
-    public final List<T> query(Envelope envelope) {
+    public List<T> query(Envelope envelope) {
         final Set<T> ret = new HashSet<>(1024);
         visit(envelope, false, new BinVisitor<T>() {
             @Override

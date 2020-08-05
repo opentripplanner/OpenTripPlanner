@@ -10,7 +10,7 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ExecutionException;
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
+import org.opentripplanner.graph_builder.linking.PermanentStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
@@ -23,8 +23,6 @@ import org.opentripplanner.updater.JsonConfigurable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import java.util.Map.Entry;
-import java.util.concurrent.ExecutionException;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -41,7 +39,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private BikeRentalDataSource source;
 
-    private SimpleStreetSplitter linker;
+    private PermanentStreetSplitter linker;
 
     private BikeRentalStationService service;
 
@@ -119,7 +117,7 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
     @Override
     public void setup(Graph graph) throws InterruptedException, ExecutionException {
         // Creation of network linker library will not modify the graph
-        linker = new SimpleStreetSplitter(graph);
+        linker = PermanentStreetSplitter.createNewDefaultInstance(graph, null, false);
         // Adding a bike rental station service needs a graph writer runnable
         service = graph.getService(BikeRentalStationService.class, true);
     }
