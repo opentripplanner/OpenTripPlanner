@@ -62,7 +62,7 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.graph_finder.StopAndDistance;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
@@ -70,7 +70,6 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
@@ -1224,18 +1223,18 @@ public class TransmodelIndexGraphQLSchema {
                         .name("id")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment -> relay.toGlobalId(quayAtDistance.getName(),
-                                Integer.toString(((StopFinder.StopAndDistance) environment.getSource()).distance) + ";" +
-                                        mappingUtil.toIdString(((StopFinder.StopAndDistance) environment.getSource()).stop.getId())))
+                                Integer.toString(((StopAndDistance) environment.getSource()).distance) + ";" +
+                                        mappingUtil.toIdString(((StopAndDistance) environment.getSource()).stop.getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quay")
                         .type(quayType)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).stop)
+                        .dataFetcher(environment -> ((StopAndDistance) environment.getSource()).stop)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("distance")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).distance)
+                        .dataFetcher(environment -> ((StopAndDistance) environment.getSource()).distance)
                         .build())
                 .build();
 
@@ -2754,9 +2753,9 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .argument(relay.getConnectionFieldArguments())
                         .dataFetcher(environment -> {
-                            List<StopFinder.StopAndDistance> stops;
+                            List<StopAndDistance> stops;
                             try {
-                                stops = getRoutingService(environment).findClosestStopsByWalking(
+                                stops = getRoutingService(environment).findClosestStops(
                                         environment.getArgument("latitude"),
                                         environment.getArgument("longitude"),
                                         environment.getArgument("radius"))

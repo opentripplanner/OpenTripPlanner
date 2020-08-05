@@ -10,7 +10,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.graph_finder.PlaceAndDistance;
 
 public class LegacyGraphQLplaceAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
@@ -18,7 +18,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
-      StopFinder.PlaceAndDistance placeAndDistance = getSource(environment);
+      PlaceAndDistance placeAndDistance = getSource(environment);
       Object place = placeAndDistance.place;
       TypeResolver typeResolver = new LegacyGraphQLPlaceInterfaceTypeResolver();
 
@@ -59,7 +59,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
     return environment -> getSource(environment).distance;
   }
 
-  private StopFinder.PlaceAndDistance getSource(DataFetchingEnvironment environment) {
+  private PlaceAndDistance getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

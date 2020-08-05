@@ -1,0 +1,157 @@
+package org.opentripplanner.routing.graph_finder;
+
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
+import org.opentripplanner.routing.algorithm.astar.strategies.SearchTerminationStrategy;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+import static java.util.stream.Collectors.toList;
+
+// TODO Add car and bike parks
+public class PlaceFinderTraverseVisitor implements TraverseVisitor {
+
+  public final List<PlaceAndDistance> placesFound = new ArrayList<>();
+  private final RoutingService routingService;
+  private final Set<TransitMode> filterByModes;
+  private final Set<FeedScopedId> filterByStops;
+  private final Set<FeedScopedId> filterByRoutes;
+  private final Set<String> filterByBikeRentalStation;
+  private final Set<String> seenPatternAtStops = new HashSet<>();
+  private final Set<FeedScopedId> seenStops = new HashSet<>();
+  private final Set<String> seenBicycleRentalStations = new HashSet<>();
+  private final boolean includeStops;
+  private final boolean includePatternAtStops;
+  private final boolean includeBikeShares;
+  private final int maxResults;
+
+  public PlaceFinderTraverseVisitor(
+      RoutingService routingService, List<TransitMode> filterByModes,
+      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
+      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations, int maxResults
+  ) {
+    this.routingService = routingService;
+    this.filterByModes = toSet(filterByModes);
+    this.filterByStops = toSet(filterByStops);
+    this.filterByRoutes = toSet(filterByRoutes);
+    this.filterByBikeRentalStation = toSet(filterByBikeRentalStations);
+
+    includeStops = filterByPlaceTypes == null || filterByPlaceTypes.contains(PlaceType.STOP);
+    includePatternAtStops = filterByPlaceTypes == null
+        || filterByPlaceTypes.contains(PlaceType.PATTERN_AT_STOP);
+    includeBikeShares = filterByPlaceTypes == null
+        || filterByPlaceTypes.contains(PlaceType.BICYCLE_RENT);
+    this.maxResults = maxResults;
+  }
+
+  private static <T> Set<T> toSet(List<T> list) {
+    if (list == null) { return null; }
+    return new HashSet<T>(list);
+  }
+
+  private boolean stopHasRoutesWithMode(Stop stop, Set<TransitMode> modes) {
+    return routingService
+        .getPatternsForStop(stop)
+        .stream()
+        .map(TripPattern::getMode)
+        .anyMatch(modes::contains);
+  }
+
+  @Override
+  public void visitEdge(Edge edge, State state) { }
+
+  @Override
+  public void visitEnqueue(State state) { }
+
+  @Override
+  public void visitVertex(State state) {
+    Vertex vertex = state.getVertex();
+    int distance = (int) state.getWalkDistance();
+    if (vertex instanceof TransitStopVertex) {
+      Stop stop = ((TransitStopVertex) vertex).getStop();
+      handleStop(stop, distance);
+      handlePatternsAtStop(stop, distance);
+    }
+    else if (vertex instanceof BikeRentalStationVertex) {
+      handleBikeRentalStation(((BikeRentalStationVertex) vertex).getStation(), distance);
+    }
+  }
+
+  private void handleStop(Stop stop, int distance) {
+    if (filterByStops != null && !filterByStops.contains(stop.getId())) { return; }
+    if (includeStops && !seenStops.contains(stop.getId()) && (
+        filterByModes == null || stopHasRoutesWithMode(stop, filterByModes)
+    )) {
+      placesFound.add(new PlaceAndDistance(stop, distance));
+      seenStops.add(stop.getId());
+    }
+  }
+
+  private void handlePatternsAtStop(Stop stop, int distance) {
+    if (includePatternAtStops) {
+      List<TripPattern> patterns = routingService
+          .getPatternsForStop(stop)
+          .stream()
+          .filter(pattern -> filterByModes == null || filterByModes.contains(pattern.getMode()))
+          .filter(pattern -> filterByRoutes == null
+              || filterByRoutes.contains(pattern.route.getId()))
+          .filter(pattern -> pattern.canBoard(pattern.getStopIndex(stop)))
+          .collect(toList());
+
+      for (TripPattern pattern : patterns) {
+        String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
+        if (!seenPatternAtStops.contains(seenKey)) {
+          PatternAtStop row = new PatternAtStop(stop, pattern);
+          PlaceAndDistance place = new PlaceAndDistance(row, distance);
+          placesFound.add(place);
+          seenPatternAtStops.add(seenKey);
+        }
+      }
+    }
+  }
+
+  private void handleBikeRentalStation(BikeRentalStation station, int distance) {
+    if (!includeBikeShares) { return; }
+    if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) {
+      return;
+    }
+    if (seenBicycleRentalStations.contains(station.id)) { return; }
+    seenBicycleRentalStations.add(station.id);
+    placesFound.add(new PlaceAndDistance(station, distance));
+  }
+
+  public SearchTerminationStrategy getSearchTerminationStrategy() {
+    return (origin, target, current, spt, traverseOptions) -> {
+      // the first n stops the search visit may not be the nearest n
+      // but when we have at least n stops found, we can update the
+      // max distance to be the furthest of the places so far
+      // and let the search terminate at that distance
+      // and then return the first n
+      if (PlaceFinderTraverseVisitor.this.placesFound.size()
+          >= PlaceFinderTraverseVisitor.this.maxResults) {
+        int furthestDistance = 0;
+        for (PlaceAndDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
+          if (pad.distance > furthestDistance) {
+            furthestDistance = pad.distance;
+          }
+        }
+        traverseOptions.worstTime = (traverseOptions.dateTime + furthestDistance);
+      }
+      return false;
+
+    };
+  }
+}

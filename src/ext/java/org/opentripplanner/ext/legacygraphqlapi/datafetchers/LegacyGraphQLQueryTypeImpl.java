@@ -28,7 +28,10 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.graph_finder.PatternAtStop;
+import org.opentripplanner.routing.graph_finder.PlaceAndDistance;
+import org.opentripplanner.routing.graph_finder.PlaceType;
+import org.opentripplanner.routing.graph_finder.StopAndDistance;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
@@ -90,7 +93,7 @@ public class LegacyGraphQLQueryTypeImpl
         case "Cluster":
           return null; //TODO
         case "DepartureRow":
-          return StopFinder.PatternAtStop.fromId(routingService, id);
+          return PatternAtStop.fromId(routingService, id);
         case "Pattern":
           return routingService.getTripPatternForId(FeedScopedId.parseId(id));
         case "placeAtDistance": {
@@ -104,7 +107,7 @@ public class LegacyGraphQLQueryTypeImpl
               .arguments(Map.of("id", internalId))
               .build());
 
-          return new StopFinder.PlaceAndDistance(place, Integer.parseInt(parts[0]));
+          return new PlaceAndDistance(place, Integer.parseInt(parts[0]));
         }
         case "Route":
           return routingService.getRouteForId(FeedScopedId.parseId(id));
@@ -116,7 +119,7 @@ public class LegacyGraphQLQueryTypeImpl
           String[] parts = id.split(";");
           Stop stop = routingService.getStopForId(FeedScopedId.parseId(parts[1]));
 
-          return new StopFinder.StopAndDistance(stop, Integer.parseInt(parts[0]));
+          return new StopAndDistance(stop, Integer.parseInt(parts[0]));
         }
         case "TicketType":
           return null; //TODO
@@ -208,13 +211,13 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius() {
+  public DataFetcher<Connection<StopAndDistance>> stopsByRadius() {
     return environment -> {
       LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs args = new LegacyGraphQLTypes.LegacyGraphQLQueryTypeStopsByRadiusArgs(environment.getArguments());
 
-      List<StopFinder.StopAndDistance> stops;
+      List<StopAndDistance> stops;
       try {
-        stops = getRoutingService(environment).findClosestStopsByWalking(
+        stops = getRoutingService(environment).findClosestStops(
             args.getLegacyGraphQLLat(),
             args.getLegacyGraphQLLon(),
             args.getLegacyGraphQLRadius()
@@ -229,7 +232,7 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Connection<StopFinder.PlaceAndDistance>> nearest() {
+  public DataFetcher<Connection<PlaceAndDistance>> nearest() {
     return environment -> {
       List<FeedScopedId> filterByStops = null;
       List<FeedScopedId> filterByRoutes = null;
@@ -265,16 +268,17 @@ public class LegacyGraphQLQueryTypeImpl
           .map(mode -> mode.label)
           .map(TransitMode::valueOf)
           .collect(Collectors.toList()) : null;
-      List<StopFinder.PlaceType> filterByPlaceTypes =
+      List<PlaceType> filterByPlaceTypes =
           args.getLegacyGraphQLFilterByPlaceTypes() != null ? StreamSupport
               .stream(args.getLegacyGraphQLFilterByPlaceTypes().spliterator(), false)
               .map(placeType -> placeType.label)
-              .map(StopFinder.PlaceType::valueOf)
+              .map(placeType -> placeType.equals("DEPARTURE_ROW") ? "PATTERN_AT_STOP" : placeType)
+              .map(PlaceType::valueOf)
               .collect(Collectors.toList()) : null;
 
-      List<StopFinder.PlaceAndDistance> places;
+      List<PlaceAndDistance> places;
       try {
-        places = new ArrayList<>(getRoutingService(environment).findClosestPlacesByWalking(
+        places = new ArrayList<>(getRoutingService(environment).findClosestPlaces(
             args.getLegacyGraphQLLat(),
             args.getLegacyGraphQLLon(),
             args.getLegacyGraphQLMaxDistance(),
@@ -285,7 +289,8 @@ public class LegacyGraphQLQueryTypeImpl
             filterByRoutes,
             filterByBikeRentalStations,
             filterByBikeParks,
-            filterByCarParks
+            filterByCarParks,
+            getRoutingService(environment)
         ));
       }
       catch (RoutingValidationException e) {
@@ -297,8 +302,8 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<StopFinder.PatternAtStop> departureRow() {
-    return environment -> StopFinder.PatternAtStop.fromId(
+  public DataFetcher<PatternAtStop> departureRow() {
+    return environment -> PatternAtStop.fromId(
         getRoutingService(environment),
         new LegacyGraphQLTypes.LegacyGraphQLQueryTypeDepartureRowArgs(environment.getArguments()).getLegacyGraphQLId()
     );

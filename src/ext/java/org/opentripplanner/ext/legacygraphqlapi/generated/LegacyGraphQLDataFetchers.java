@@ -20,13 +20,15 @@ import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.graph_finder.PatternAtStop;
+import org.opentripplanner.routing.graph_finder.PlaceAndDistance;
+import org.opentripplanner.routing.graph_finder.StopAndDistance;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Map;
@@ -268,13 +270,13 @@ public class LegacyGraphQLDataFetchers {
   
   /** A connection to a list of items. */
   public interface LegacyGraphQLPlaceAtDistanceConnection {
-    public DataFetcher<Iterable<Edge<StopFinder.PlaceAndDistance>>> edges();
+    public DataFetcher<Iterable<Edge<PlaceAndDistance>>> edges();
     public DataFetcher<Object> pageInfo();
   }
   
   /** An edge in a connection. */
   public interface LegacyGraphQLPlaceAtDistanceEdge {
-    public DataFetcher<StopFinder.PlaceAndDistance> node();
+    public DataFetcher<PlaceAndDistance> node();
     public DataFetcher<String> cursor();
   }
   
@@ -303,9 +305,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Agency> agency();
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Object>> stopsByBbox();
-    public DataFetcher<Connection<StopFinder.StopAndDistance>> stopsByRadius();
-    public DataFetcher<Connection<StopFinder.PlaceAndDistance>> nearest();
-    public DataFetcher<StopFinder.PatternAtStop> departureRow();
+    public DataFetcher<Connection<StopAndDistance>> stopsByRadius();
+    public DataFetcher<Connection<PlaceAndDistance>> nearest();
+    public DataFetcher<PatternAtStop> departureRow();
     public DataFetcher<Object> stop();
     public DataFetcher<Object> station();
     public DataFetcher<Iterable<Object>> stations();
@@ -398,7 +400,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Route>> routes();
     public DataFetcher<Iterable<TripPattern>> patterns();
-    public DataFetcher<Iterable<StopFinder.StopAndDistance>> transfers();
+    public DataFetcher<Iterable<StopAndDistance>> transfers();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
     public DataFetcher<Iterable<TripTimeShort>> stoptimesWithoutPatterns();
@@ -413,13 +415,13 @@ public class LegacyGraphQLDataFetchers {
   
   /** A connection to a list of items. */
   public interface LegacyGraphQLStopAtDistanceConnection {
-    public DataFetcher<Iterable<Edge<StopFinder.StopAndDistance>>> edges();
+    public DataFetcher<Iterable<Edge<StopAndDistance>>> edges();
     public DataFetcher<Object> pageInfo();
   }
   
   /** An edge in a connection. */
   public interface LegacyGraphQLStopAtDistanceEdge {
-    public DataFetcher<StopFinder.StopAndDistance> node();
+    public DataFetcher<StopAndDistance> node();
     public DataFetcher<String> cursor();
   }
   

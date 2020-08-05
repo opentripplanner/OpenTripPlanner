@@ -15,7 +15,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.graph_finder.StopAndDistance;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 import java.text.ParseException;
@@ -217,7 +217,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<StopFinder.StopAndDistance>> transfers() {
+  public DataFetcher<Iterable<StopAndDistance>> transfers() {
     return environment -> getValue(
         environment,
         stop -> {
@@ -229,7 +229,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .getTransfersByStop(stop)
               .stream()
               .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
-              .map(transfer -> new StopFinder.StopAndDistance(
+              .map(transfer -> new StopAndDistance(
                   transfer.to,
                   (int) transfer.getDistanceMeters()
               ))
