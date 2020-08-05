@@ -109,7 +109,6 @@ public class AStar {
         runState.heuristic.initialize(runState.options, abortTime);
         if (abortTime < Long.MAX_VALUE  && System.currentTimeMillis() > abortTime) {
             LOG.warn("Timeout during initialization of goal direction heuristic.");
-            options.rctx.debugOutput.timedOut = true;
             runState = null; // Search timed out
             return;
         }
@@ -237,7 +236,6 @@ public class AStar {
                 // we instead set a flag in the routing context and return the SPT anyway. This
                 // allows returning a partial list results even when a timeout occurs.
                 runState.options.rctx.aborted = true; // signal search cancellation up to higher stack frames
-                runState.options.rctx.debugOutput.timedOut = true; // signal timeout in debug output object
 
                 break;
             }
@@ -273,7 +271,6 @@ public class AStar {
                     && runState.u.isFinal()) {
                 runState.targetAcceptedStates.add(runState.u);
                 runState.foundPathWeight = runState.u.getWeight();
-                runState.options.rctx.debugOutput.foundPath();
                 // new GraphPath(runState.u, false).dump();
 
                 /* Break out of the search if we've found the requested number of paths. */

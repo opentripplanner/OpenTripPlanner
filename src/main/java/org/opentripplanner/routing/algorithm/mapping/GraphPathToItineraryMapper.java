@@ -84,9 +84,6 @@ public abstract class GraphPathToItineraryMapper {
             itineraries.add(itinerary);
         }
 
-        // TODO OTP2 - Move this to a more apropriate place ...
-        request.rctx.debugOutput.finishedRendering();
-
         return itineraries;
     }
 
