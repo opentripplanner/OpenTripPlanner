@@ -14,11 +14,6 @@ public final class Stop extends StationElement {
 
   private static final long serialVersionUID = 2L;
 
-  /**
-   * Used for GTFS fare information.
-   */
-  private final String zone;
-
   private final Collection<TariffZone> tariffZones;
 
   /**
@@ -36,12 +31,10 @@ public final class Stop extends StationElement {
       WgsCoordinate coordinate,
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
-      String zone,
       Collection<TariffZone> tariffZones,
       String url
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
-    this.zone = zone;
     this.tariffZones = tariffZones;
     this.url = url;
   }
@@ -57,7 +50,6 @@ public final class Stop extends StationElement {
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
-        null,
         null,
         null,
         null,
@@ -78,8 +70,12 @@ public final class Stop extends StationElement {
     return "<Stop " + this.id + ">";
   }
 
-  public String getZone() {
-    return zone;
+  /**
+   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
+   * which only permits one zone per stop.
+   */
+  public String getFirstZoneAsString() {
+    return tariffZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
   }
 
   public String getUrl() {

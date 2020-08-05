@@ -268,7 +268,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
-        return getStop(stopIndex).getZone();
+        return getStop(stopIndex).getFirstZoneAsString();
     }
 
     public int getAlightType(int stopIndex) {

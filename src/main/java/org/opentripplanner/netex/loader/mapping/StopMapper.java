@@ -44,7 +44,6 @@ class StopMapper {
         WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
         null,
         null,
-        null,
         tariffZones,
         null
     );
