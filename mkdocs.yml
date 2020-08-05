@@ -33,6 +33,7 @@ pages:
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
     - GTFS-Flex Routing: 'Flex.md'
+    - One-to-many Travel Times: 'Surface.md'
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
     - Architecture: 'Architecture.md'
