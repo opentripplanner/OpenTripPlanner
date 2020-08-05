@@ -48,6 +48,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.TariffZone;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -999,17 +1000,19 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        tariffZoneType = GraphQLObjectType.newObject()
+          tariffZoneType = GraphQLObjectType.newObject()
                 .name("TariffZone")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("id")
+                    .name("id")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(e -> "NOT IMPLEMENTED")
+                        .dataFetcher(
+                            environment -> (mappingUtil.toIdString(((TariffZone) environment.getSource()).getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(e -> "NOT IMPLEMENTED")
+                        .dataFetcher(
+                            environment -> ((TariffZone) environment.getSource()).getName())
                         .build())
                 .build();
 
@@ -1299,12 +1302,6 @@ public class TransmodelIndexGraphQLSchema {
                         .description("Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED")
                         .type(EnumTypes.INTERCHANGE_WEIGHTING)
                         .dataFetcher(environment -> 0)
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("tariffZones")
-                        .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-                        .description("NOT IMPLEMENTED")
-                        .dataFetcher(environment -> new ArrayList<>())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
@@ -1631,6 +1628,11 @@ public class TransmodelIndexGraphQLSchema {
                         .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
                         .dataFetcher(environment -> (null))
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("tariffZones")
+                    .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
+                    .dataFetcher(environment -> ((Stop) environment.getSource()).getTariffZones())
+                    .build())
                 .build();
 
         timetabledPassingTimeType = GraphQLObjectType.newObject()
