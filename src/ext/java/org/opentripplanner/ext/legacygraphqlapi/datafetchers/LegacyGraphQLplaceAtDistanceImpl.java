@@ -10,7 +10,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.graph_finder.PlaceAndDistance;
+import org.opentripplanner.routing.graph_finder.PlaceAtDistance;
 
 public class LegacyGraphQLplaceAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {
@@ -18,8 +18,8 @@ public class LegacyGraphQLplaceAtDistanceImpl
   @Override
   public DataFetcher<Relay.ResolvedGlobalId> id() {
     return environment -> {
-      PlaceAndDistance placeAndDistance = getSource(environment);
-      Object place = placeAndDistance.place;
+      PlaceAtDistance placeAtDistance = getSource(environment);
+      Object place = placeAtDistance.place;
       TypeResolver typeResolver = new LegacyGraphQLPlaceInterfaceTypeResolver();
 
       GraphQLInterfaceType placeInterface = (GraphQLInterfaceType) environment.getGraphQLSchema().getType("PlaceInterface");
@@ -44,7 +44,7 @@ public class LegacyGraphQLplaceAtDistanceImpl
 
       return new Relay.ResolvedGlobalId(
           "placeAtDistance",
-          placeAndDistance.distance + ";" + new Relay().toGlobalId(globalId.getType(), globalId.getId())
+          placeAtDistance.distance + ";" + new Relay().toGlobalId(globalId.getType(), globalId.getId())
       );
     };
   }
@@ -56,10 +56,10 @@ public class LegacyGraphQLplaceAtDistanceImpl
 
   @Override
   public DataFetcher<Integer> distance() {
-    return environment -> getSource(environment).distance;
+    return environment -> (int) getSource(environment).distance;
   }
 
-  private PlaceAndDistance getSource(DataFetchingEnvironment environment) {
+  private PlaceAtDistance getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

@@ -22,19 +22,19 @@ public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;
 
-  protected StreetGraphFinder(Graph graph) {
+  public StreetGraphFinder(Graph graph) {
     this.graph = graph;
   }
 
-  public List<StopAndDistance> findClosestStops(double lat, double lon, int radius) {
+  public List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters) {
       StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
-      findClosestUsingStreets(lat, lon, radius, visitor, null);
+      findClosestUsingStreets(lat, lon, radiusMeters, visitor, null);
       return visitor.stopsFound;
   }
 
   @Override
-  public List<PlaceAndDistance> findClosestPlaces(
-      double lat, double lon, int maxDistance, int maxResults, List<TransitMode> filterByModes,
+  public List<PlaceAtDistance> findClosestPlaces(
+      double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
       List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
       List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
       List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
@@ -49,14 +49,14 @@ public class StreetGraphFinder implements GraphFinder {
           maxResults
       );
       SearchTerminationStrategy terminationStrategy = visitor.getSearchTerminationStrategy();
-      findClosestUsingStreets(lat, lon, maxDistance, visitor, terminationStrategy);
-      List<PlaceAndDistance> results = visitor.placesFound;
-      results.sort(Comparator.comparingInt(pad -> pad.distance));
+      findClosestUsingStreets(lat, lon, radiusMeters, visitor, terminationStrategy);
+      List<PlaceAtDistance> results = visitor.placesFound;
+      results.sort(Comparator.comparingDouble(pad -> pad.distance));
       return results.subList(0, min(results.size(), maxResults));
   }
 
   private void findClosestUsingStreets(
-      double lat, double lon, int radius, TraverseVisitor visitor, SearchTerminationStrategy terminationStrategy
+      double lat, double lon, double radius, TraverseVisitor visitor, SearchTerminationStrategy terminationStrategy
   ) {
     // Make a normal OTP routing request so we can traverse edges and use GenericAStar
     // TODO make a function that builds normal routing requests from profile requests
@@ -69,7 +69,7 @@ public class StreetGraphFinder implements GraphFinder {
     rr.rctx.remainingWeightHeuristic = new TrivialRemainingWeightHeuristic();
     // RR dateTime defaults to currentTime.
     // If elapsed time is not capped, searches are very slow.
-    rr.worstTime = (rr.dateTime + radius);
+    rr.worstTime = (rr.dateTime + (int) radius);
     AStar astar = new AStar();
     rr.setNumItineraries(1);
     astar.setTraverseVisitor(visitor);

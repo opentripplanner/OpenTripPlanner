@@ -8,17 +8,16 @@ import org.opentripplanner.routing.graph.Graph;
 import java.util.List;
 
 public interface GraphFinder {
+  List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters);
 
-  List<StopAndDistance> findClosestStops(double lat, double lon, int radius);
-
-  List<PlaceAndDistance> findClosestPlaces(
-      double lat, double lon, int maxDistance, int maxResults, List<TransitMode> filterByModes,
+  List<PlaceAtDistance> findClosestPlaces(
+      double lat, double lon, double radiusMeters, int maxResults, List<TransitMode> filterByModes,
       List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
       List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
       List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
   );
 
   static GraphFinder getInstance(Graph graph) {
-    return graph.hasStreets ? new StreetGraphFinder(graph) : null; //TODO
+    return graph.hasStreets ? new StreetGraphFinder(graph) : new DirectGraphFinder(graph);
   }
 }

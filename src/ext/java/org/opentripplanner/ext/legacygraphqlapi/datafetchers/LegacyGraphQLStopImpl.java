@@ -3,6 +3,7 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
@@ -15,7 +16,8 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.graph_finder.StopAndDistance;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph_finder.StopAtDistance;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 import java.text.ParseException;
@@ -217,7 +219,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<StopAndDistance>> transfers() {
+  public DataFetcher<Iterable<StopAtDistance>> transfers() {
     return environment -> getValue(
         environment,
         stop -> {
@@ -229,9 +231,17 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .getTransfersByStop(stop)
               .stream()
               .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
-              .map(transfer -> new StopAndDistance(
+              .map(transfer -> new StopAtDistance(
                   transfer.to,
-                  (int) transfer.getDistanceMeters()
+                  transfer.getDistanceMeters(),
+                  transfer.getEdges(),
+                  GeometryUtils.concatenateLineStrings(transfer
+                        .getEdges()
+                        .stream()
+                      .map(Edge::getGeometry)
+                      .collect(Collectors.toList())
+                  ),
+                  null
               ))
               .collect(Collectors.toList());
         },

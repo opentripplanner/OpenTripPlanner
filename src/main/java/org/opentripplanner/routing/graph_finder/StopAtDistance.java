@@ -1,0 +1,101 @@
+package org.opentripplanner.routing.graph_finder;
+
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.api.resource.CoordinateArrayListSequence;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.PackedCoordinateSequence;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.PathwayEdge;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.ArrayList;
+import java.util.List;
+
+public class StopAtDistance implements Comparable<StopAtDistance> {
+
+  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+  public final Stop stop;
+  public final double distance;
+
+  public final List<Edge> edges;
+  public final LineString geometry;
+  public final State state;
+
+  public StopAtDistance(
+      Stop stop, double distance, List<Edge> edges, LineString geometry, State state
+  ) {
+    this.stop = stop;
+    this.distance = distance;
+    this.edges = edges;
+    this.geometry = geometry;
+    this.state = state;
+  }
+
+  public StopAtDistance(
+      TransitStopVertex stopVertex, double distance, List<Edge> edges, LineString geometry,
+      State state
+  ) {
+    this(stopVertex.getStop(), distance, edges, geometry, state);
+  }
+
+  @Override
+  public int compareTo(StopAtDistance that) {
+    return (int) (this.distance) - (int) (that.distance);
+  }
+
+  public String toString() {
+    return String.format("stop %s at %.1f meters", stop, distance);
+  }
+
+  /**
+   * Given a State at a StopVertex, bundle the StopVertex together with information about how far
+   * away it is and the geometry of the path leading up to the given State.
+   * <p>
+   * TODO this should probably be merged with similar classes in Profile routing.
+   */
+  public static StopAtDistance stopAtDistanceForState(State state) {
+    double effectiveWalkDistance = 0.0;
+    GraphPath graphPath = new GraphPath(state, false);
+    CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
+    List<Edge> edges = new ArrayList<>();
+    for (Edge edge : graphPath.edges) {
+      if (edge instanceof StreetEdge) {
+        LineString geometry = edge.getGeometry();
+        if (geometry != null) {
+          if (coordinates.size() == 0) {
+            coordinates.extend(geometry.getCoordinates());
+          }
+          else {
+            coordinates.extend(geometry.getCoordinates(), 1);
+          }
+        }
+        effectiveWalkDistance += edge.getEffectiveWalkDistance();
+      }
+      else if (edge instanceof PathwayEdge) {
+        effectiveWalkDistance += edge.getDistanceMeters();
+      }
+      edges.add(edge);
+    }
+    if (coordinates.size() < 2) {   // Otherwise the walk step generator breaks.
+      ArrayList<Coordinate> coordinateList = new ArrayList<Coordinate>(2);
+      coordinateList.add(graphPath.states.get(1).getVertex().getCoordinate());
+      State lastState = graphPath.states.getLast().getBackState();
+      coordinateList.add(lastState.getVertex().getCoordinate());
+      coordinates = new CoordinateArrayListSequence(coordinateList);
+    }
+    return new StopAtDistance(
+        (TransitStopVertex) state.getVertex(),
+        effectiveWalkDistance,
+        edges,
+        geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),
+        state
+    );
+  }
+}

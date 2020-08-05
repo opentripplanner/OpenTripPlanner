@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toList;
 // TODO Add car and bike parks
 public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
-  public final List<PlaceAndDistance> placesFound = new ArrayList<>();
+  public final List<PlaceAtDistance> placesFound = new ArrayList<>();
   private final RoutingService routingService;
   private final Set<TransitMode> filterByModes;
   private final Set<FeedScopedId> filterByStops;
@@ -79,7 +79,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   @Override
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
-    int distance = (int) state.getWalkDistance();
+    double distance = state.getWalkDistance();
     if (vertex instanceof TransitStopVertex) {
       Stop stop = ((TransitStopVertex) vertex).getStop();
       handleStop(stop, distance);
@@ -90,17 +90,17 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handleStop(Stop stop, int distance) {
+  private void handleStop(Stop stop, double distance) {
     if (filterByStops != null && !filterByStops.contains(stop.getId())) { return; }
     if (includeStops && !seenStops.contains(stop.getId()) && (
         filterByModes == null || stopHasRoutesWithMode(stop, filterByModes)
     )) {
-      placesFound.add(new PlaceAndDistance(stop, distance));
+      placesFound.add(new PlaceAtDistance(stop, distance));
       seenStops.add(stop.getId());
     }
   }
 
-  private void handlePatternsAtStop(Stop stop, int distance) {
+  private void handlePatternsAtStop(Stop stop, double distance) {
     if (includePatternAtStops) {
       List<TripPattern> patterns = routingService
           .getPatternsForStop(stop)
@@ -115,7 +115,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
         String seenKey = pattern.route.getId().toString() + ":" + pattern.getId().toString();
         if (!seenPatternAtStops.contains(seenKey)) {
           PatternAtStop row = new PatternAtStop(stop, pattern);
-          PlaceAndDistance place = new PlaceAndDistance(row, distance);
+          PlaceAtDistance place = new PlaceAtDistance(row, distance);
           placesFound.add(place);
           seenPatternAtStops.add(seenKey);
         }
@@ -123,14 +123,14 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     }
   }
 
-  private void handleBikeRentalStation(BikeRentalStation station, int distance) {
+  private void handleBikeRentalStation(BikeRentalStation station, double distance) {
     if (!includeBikeShares) { return; }
     if (filterByBikeRentalStation != null && !filterByBikeRentalStation.contains(station.id)) {
       return;
     }
     if (seenBicycleRentalStations.contains(station.id)) { return; }
     seenBicycleRentalStations.add(station.id);
-    placesFound.add(new PlaceAndDistance(station, distance));
+    placesFound.add(new PlaceAtDistance(station, distance));
   }
 
   public SearchTerminationStrategy getSearchTerminationStrategy() {
@@ -142,13 +142,13 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
       // and then return the first n
       if (PlaceFinderTraverseVisitor.this.placesFound.size()
           >= PlaceFinderTraverseVisitor.this.maxResults) {
-        int furthestDistance = 0;
-        for (PlaceAndDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
+        double furthestDistance = 0;
+        for (PlaceAtDistance pad : PlaceFinderTraverseVisitor.this.placesFound) {
           if (pad.distance > furthestDistance) {
             furthestDistance = pad.distance;
           }
         }
-        traverseOptions.worstTime = (traverseOptions.dateTime + furthestDistance);
+        traverseOptions.worstTime = (traverseOptions.dateTime + (int) furthestDistance);
       }
       return false;
 

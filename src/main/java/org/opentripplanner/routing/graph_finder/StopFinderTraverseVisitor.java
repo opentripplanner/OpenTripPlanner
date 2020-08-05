@@ -11,7 +11,7 @@ import java.util.List;
 
 public class StopFinderTraverseVisitor implements TraverseVisitor {
 
-  public final List<StopAndDistance> stopsFound = new ArrayList<>();
+  public final List<StopAtDistance> stopsFound = new ArrayList<>();
 
   @Override
   public void visitEdge(Edge edge, State state) { }
@@ -24,9 +24,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     if (vertex instanceof TransitStopVertex) {
-      stopsFound.add(new StopAndDistance(((TransitStopVertex) vertex).getStop(),
-          (int) state.getElapsedTimeSeconds()
-      ));
+      stopsFound.add(StopAtDistance.stopAtDistanceForState(state));
     }
   }
 }

@@ -1,0 +1,61 @@
+package org.opentripplanner.routing.graph_finder;
+
+import com.beust.jcommander.internal.Lists;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.GeometryFactory;
+import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.impl.StreetVertexIndex;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.List;
+
+public class DirectGraphFinder implements GraphFinder {
+
+  private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+
+  private StreetVertexIndex streetIndex;
+
+  public DirectGraphFinder(Graph graph) {
+    this.streetIndex = graph.streetIndex != null ? graph.streetIndex : new StreetVertexIndex(graph);
+  }
+
+  /**
+   * Return all stops within a certain radius of the given vertex, using straight-line distance independent of streets.
+   * If the origin vertex is a StopVertex, the result will include it.
+   */
+  @Override
+  public List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters) {
+    List<StopAtDistance> stopsFound = Lists.newArrayList();
+    Coordinate c0 = new Coordinate(lon, lat);
+    for (TransitStopVertex ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
+      double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
+      if (distance < radiusMeters) {
+        Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
+        StopAtDistance sd = new StopAtDistance(
+            ts1,
+            distance,
+            null,
+            geometryFactory.createLineString(coordinates),
+            null
+        );
+        stopsFound.add(sd);
+      }
+    }
+    return stopsFound;
+  }
+
+  @Override
+  public List<PlaceAtDistance> findClosestPlaces(
+      double lat, double lon, double maxDistance, int maxResults, List<TransitMode> filterByModes,
+      List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
+      List<FeedScopedId> filterByRoutes, List<String> filterByBikeRentalStations,
+      List<String> filterByBikeParks, List<String> filterByCarParks, RoutingService routingService
+  ) {
+    throw new UnsupportedOperationException("Not implemented");
+  }
+}
