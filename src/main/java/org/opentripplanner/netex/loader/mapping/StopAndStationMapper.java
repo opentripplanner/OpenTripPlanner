@@ -21,6 +21,7 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -113,6 +114,7 @@ class StopAndStationMapper {
             .getTariffZoneRef()
             .stream()
             .map(t -> tariffZonesById.get(idFactory.createId(t.getRef())))
+            .filter(Objects::nonNull)
             .collect(Collectors.toList())) : Collections.emptyList();
     }
 
