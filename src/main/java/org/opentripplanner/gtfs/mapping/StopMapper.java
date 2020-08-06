@@ -8,6 +8,7 @@ import org.opentripplanner.util.MapUtils;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
@@ -34,8 +35,7 @@ class StopMapper {
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
     // Map single GTFS ZoneId to OTP TariffZone collection
-    Collection<TariffZone> tariffZones = getTariffZones(
-        gtfsStop.getZoneId(),
+    Collection<TariffZone> tariffZones = getTariffZones(gtfsStop.getZoneId(),
         gtfsStop.getId().getAgencyId()
     );
 
@@ -52,9 +52,8 @@ class StopMapper {
   }
 
   private Collection<TariffZone> getTariffZones(String zoneId, String agencyId) {
-    return zoneId != null ? Collections.singleton(new TariffZone(
-        new FeedScopedId(agencyId, zoneId),
-        null
-    )) : Collections.emptyList();
+    return zoneId != null
+        ? List.of(new TariffZone(new FeedScopedId(agencyId, zoneId), null))
+        : Collections.emptyList();
   }
 }
