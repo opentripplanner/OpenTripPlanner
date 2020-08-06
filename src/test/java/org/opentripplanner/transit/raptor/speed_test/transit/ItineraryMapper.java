@@ -1,11 +1,11 @@
 package org.opentripplanner.transit.raptor.speed_test.transit;
 
-import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.transit.raptor.api.path.AccessPathLeg;
 import org.opentripplanner.transit.raptor.api.path.EgressPathLeg;
 import org.opentripplanner.transit.raptor.api.path.Path;
@@ -61,8 +61,8 @@ public class ItineraryMapper {
 
     private Itinerary createItinerary(
             Path<TripSchedule> path,
-            NearbyStopFinder.StopAtDistance accessPath,
-            NearbyStopFinder.StopAtDistance egressPath
+            StopAtDistance accessPath,
+            StopAtDistance egressPath
     ) {
         if (path == null) {  return null; }
 

@@ -8,6 +8,7 @@ import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
 import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
 import org.opentripplanner.index.IndexAPI;
@@ -24,6 +25,7 @@ import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.util.OTPFeature.SandboxAPILegacyGraphQLApi;
 import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
 
@@ -52,6 +54,7 @@ public class APIEndpoints {
         addIfEnabled(ActuatorAPI, ActuatorAPI.class);
         addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
         addIfEnabled(SandboxAPITransmodelApi, TransmodelIndexAPI.class);
+        addIfEnabled(SandboxAPILegacyGraphQLApi, LegacyGraphQLAPI.class);
     }
 
     /**

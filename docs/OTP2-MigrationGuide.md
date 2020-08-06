@@ -76,6 +76,8 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
   - `nextDateTime`
   - `prevDateTime`
 - `agencyId` in the `leg` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
+- `debugOutput` in `TripPlan` has changed due to the different algorithms used in OTP version 1.x and 2.x.
+  - The `totalTime` is left as is, `directStreetRouterTime`, `transitRouterTime`, `filteringTime` and `renderingTime` are new fields.
 
 ### Changes to the Index API
 - Error handling is improved, this is now consistently applied and uses build in framework support. 

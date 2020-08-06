@@ -1,14 +1,17 @@
 package org.opentripplanner.ext.transferanalyzer;
 
 import com.google.common.collect.Iterables;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferCouldNotBeRouted;
 import org.opentripplanner.ext.transferanalyzer.annotations.TransferRoutingDistanceTooLong;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
-import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,9 +62,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
         List<TransferInfo> directTransfersTooLong = new ArrayList<>();
         List<TransferInfo> directTransfersNotFound = new ArrayList<>();
 
-        NearbyStopFinder nearbyStopFinderEuclidian = new NearbyStopFinder(graph, radiusMeters, false);
-        NearbyStopFinder nearbyStopFinderStreets =
-                new NearbyStopFinder(graph, radiusMeters * RADIUS_MULTIPLIER, true);
+        DirectGraphFinder nearbyStopFinderEuclidian = new DirectGraphFinder(graph);
+        StreetGraphFinder nearbyStopFinderStreets = new StreetGraphFinder(graph);
 
         int stopsAnalyzed = 0;
 
@@ -71,14 +73,17 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
             }
 
             /* Find nearby stops by euclidean distance */
-            Map<Stop, NearbyStopFinder.StopAtDistance> stopsEuclidean =
-                    nearbyStopFinderEuclidian.findNearbyStopsEuclidean(originStopVertex).stream()
-                            .collect(Collectors.toMap(t -> t.tstop, t -> t));
+            Coordinate c0 = originStopVertex.getCoordinate();
+            Map<Stop, StopAtDistance> stopsEuclidean = nearbyStopFinderEuclidian
+                        .findClosestStops(c0.y, c0.x, radiusMeters)
+                        .stream()
+                        .collect(Collectors.toMap(t -> t.stop, t -> t));
 
             /* Find nearby stops by street distance */
-            Map<Stop, NearbyStopFinder.StopAtDistance> stopsStreets =
-                    nearbyStopFinderStreets.findNearbyStopsViaStreets(originStopVertex).stream()
-                            .collect(Collectors.toMap(t -> t.tstop, t -> t));
+            Map<Stop, StopAtDistance> stopsStreets = nearbyStopFinderStreets.
+                        findClosestStops(c0.y, c0.x, radiusMeters * RADIUS_MULTIPLIER)
+                        .stream()
+                        .collect(Collectors.toMap(t -> t.stop, t -> t));
 
             Stop originStop = originStopVertex.getStop();
 
@@ -95,8 +100,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                             .collect(Collectors.toList());
 
             for (Stop destStop : stopsConnected) {
-                NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
-                NearbyStopFinder.StopAtDistance streetStop = stopsStreets.get(destStop);
+                StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
+                StopAtDistance streetStop = stopsStreets.get(destStop);
 
                 TransferInfo transferInfo = new TransferInfo(
                         originStop,
@@ -112,7 +117,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
             }
 
             for (Stop destStop : stopsUnconnected) {
-                NearbyStopFinder.StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
+                StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
 
                 /* Log transfers that are found by euclidean search but not by street search */
                 directTransfersNotFound.add(

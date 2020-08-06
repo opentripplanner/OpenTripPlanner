@@ -2,6 +2,7 @@ package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
+import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.WgsCoordinate;
@@ -38,7 +39,10 @@ class StopMapper {
         null,
         null,
         null,
-        null
+        null,
+        null,
+        null,
+        TransitModeMapper.mapMode(TransportModeMapper.mapVehicleMode(quay.getTransportMode()))
     );
     stop.setParentStation(parentStation);
 
