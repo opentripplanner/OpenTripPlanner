@@ -73,7 +73,7 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   private static <T> Set<T> toSet(List<T> list) {
     if (list == null) { return null; }
-    return new HashSet<T>(list);
+    return Set.copyOf(list);
   }
 
   private boolean stopHasRoutesWithMode(Stop stop, Set<TransitMode> modes) {
