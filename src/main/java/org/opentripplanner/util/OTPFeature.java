@@ -25,6 +25,7 @@ public enum OTPFeature {
     ActuatorAPI(false),
     GoogleCloudStorage(false),
     SandboxAPITransmodelApi(false),
+    SandboxAPILegacyGraphQLApi(false),
     SandboxExampleAPIGraphStatistics(false),
     TransferAnalyzer(false);
 
