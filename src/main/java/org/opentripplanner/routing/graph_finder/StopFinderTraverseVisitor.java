@@ -9,8 +9,12 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A TraverseVisitor used in finding stops while walking the street graph.
+ */
 public class StopFinderTraverseVisitor implements TraverseVisitor {
 
+  /** A list of closest stops found while walking the graph */
   public final List<StopAtDistance> stopsFound = new ArrayList<>();
 
   @Override

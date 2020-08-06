@@ -17,6 +17,10 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
+ * state of how to reach the stop from the search origin
+ */
 public class StopAtDistance implements Comparable<StopAtDistance> {
 
   private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
@@ -57,8 +61,6 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
   /**
    * Given a State at a StopVertex, bundle the StopVertex together with information about how far
    * away it is and the geometry of the path leading up to the given State.
-   * <p>
-   * TODO this should probably be merged with similar classes in Profile routing.
    */
   public static StopAtDistance stopAtDistanceForState(State state) {
     double effectiveWalkDistance = 0.0;

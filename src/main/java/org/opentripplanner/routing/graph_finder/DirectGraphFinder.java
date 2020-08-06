@@ -14,6 +14,10 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.List;
 
+/**
+ * A Graph finder used in conjunction with a graph, which does not have a street network included.
+ * Also usable if performance is more important or if the "as the crow flies" distance id required.
+ */
 public class DirectGraphFinder implements GraphFinder {
 
   private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();

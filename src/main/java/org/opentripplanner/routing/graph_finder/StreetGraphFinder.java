@@ -18,6 +18,10 @@ import java.util.List;
 
 import static java.lang.Integer.min;
 
+/**
+ * A GraphFinder which uses the street network to traverse the graph in order to find the nearest
+ * stops and/or places from the origin.
+ */
 public class StreetGraphFinder implements GraphFinder {
 
   private final Graph graph;

@@ -21,7 +21,11 @@ import java.util.Set;
 
 import static java.util.stream.Collectors.toList;
 
-// TODO Add car and bike parks
+/**
+ * A TraverseVisitor used in finding various types of places while walking the street graph.
+ *
+ * TODO Add car and bike parks
+ */
 public class PlaceFinderTraverseVisitor implements TraverseVisitor {
 
   public final List<PlaceAtDistance> placesFound = new ArrayList<>();
@@ -38,6 +42,16 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
   private final boolean includeBikeShares;
   private final int maxResults;
 
+  /**
+   *
+   * @param routingService A RoutingService used in finding information about the various places.
+   * @param filterByModes A list of TransitModes for which to find Stops and PatternAtStops. Use null to disable the filtering.
+   * @param filterByPlaceTypes A list of PlaceTypes to search for. Use null to disable the filtering, and search for all types.
+   * @param filterByStops A list of Stop ids for which to find Stops and PatternAtStops. Use null to disable the filtering.
+   * @param filterByRoutes A list of Route ids used for filtering Stops. Only the stops which are served by the route are returned. Use null to disable the filtering.
+   * @param filterByBikeRentalStations A list of BikeRentalStation ids to use in filtering.  Use null to disable the filtering.
+   * @param maxResults Maximum number of results to return.
+   */
   public PlaceFinderTraverseVisitor(
       RoutingService routingService, List<TransitMode> filterByModes,
       List<PlaceType> filterByPlaceTypes, List<FeedScopedId> filterByStops,
@@ -133,6 +147,10 @@ public class PlaceFinderTraverseVisitor implements TraverseVisitor {
     placesFound.add(new PlaceAtDistance(station, distance));
   }
 
+  /**
+   * @return A SearchTerminationStrategy, which can be used to terminate the search after the max
+   * number of places has been found
+   */
   public SearchTerminationStrategy getSearchTerminationStrategy() {
     return (origin, target, current, spt, traverseOptions) -> {
       // the first n stops the search visit may not be the nearest n
