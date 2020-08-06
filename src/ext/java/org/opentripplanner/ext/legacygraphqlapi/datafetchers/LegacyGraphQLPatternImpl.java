@@ -20,6 +20,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 import java.text.ParseException;
 import java.util.Arrays;
 import java.util.BitSet;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLPattern {
@@ -122,7 +123,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
   // TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return environment -> null;
+    return environment -> List.of();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

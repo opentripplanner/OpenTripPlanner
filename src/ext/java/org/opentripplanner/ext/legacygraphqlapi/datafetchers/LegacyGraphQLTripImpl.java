@@ -23,6 +23,7 @@ import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.text.ParseException;
 import java.util.Arrays;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLTrip {
@@ -274,7 +275,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
   //TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return environment -> null;
+    return environment -> List.of();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

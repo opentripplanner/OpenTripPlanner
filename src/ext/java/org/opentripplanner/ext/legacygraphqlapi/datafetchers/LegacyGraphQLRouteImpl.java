@@ -14,6 +14,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 import java.util.Collection;
 import java.util.Collections;
+import java.util.List;
 import java.util.stream.Collectors;
 
 public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyGraphQLRoute {
@@ -119,7 +120,7 @@ public class LegacyGraphQLRouteImpl implements LegacyGraphQLDataFetchers.LegacyG
   //TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return environment -> Collections.EMPTY_LIST;
+    return environment -> List.of();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

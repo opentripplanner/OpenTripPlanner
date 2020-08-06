@@ -23,6 +23,7 @@ import org.opentripplanner.routing.alertpatch.AlertPatch;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
@@ -344,7 +345,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   // TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return environment -> null;
+    return environment -> List.of();
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

@@ -478,7 +478,7 @@ public class LegacyGraphQLQueryTypeImpl
   //TODO
   @Override
   public DataFetcher<Iterable<AlertPatch>> alerts() {
-    return environment -> null;
+    return environment -> List.of();
   }
 
   @Override
