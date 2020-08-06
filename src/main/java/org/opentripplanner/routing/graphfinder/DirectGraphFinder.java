@@ -35,13 +35,13 @@ public class DirectGraphFinder implements GraphFinder {
   @Override
   public List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters) {
     List<StopAtDistance> stopsFound = Lists.newArrayList();
-    Coordinate c0 = new Coordinate(lon, lat);
-    for (TransitStopVertex ts1 : streetIndex.getNearbyTransitStops(c0, radiusMeters)) {
-      double distance = SphericalDistanceLibrary.distance(c0, ts1.getCoordinate());
+    Coordinate coordinate = new Coordinate(lon, lat);
+    for (TransitStopVertex it : streetIndex.getNearbyTransitStops(coordinate, radiusMeters)) {
+      double distance = SphericalDistanceLibrary.distance(coordinate, it.getCoordinate());
       if (distance < radiusMeters) {
-        Coordinate coordinates[] = new Coordinate[] {c0, ts1.getCoordinate()};
+        Coordinate coordinates[] = new Coordinate[] {coordinate, it.getCoordinate()};
         StopAtDistance sd = new StopAtDistance(
-            ts1,
+            it,
             distance,
             null,
             geometryFactory.createLineString(coordinates),
