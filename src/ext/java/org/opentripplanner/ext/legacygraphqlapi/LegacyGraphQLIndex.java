@@ -21,7 +21,6 @@ import org.slf4j.LoggerFactory;
 
 import javax.ws.rs.core.Response;
 import java.net.URL;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
@@ -29,6 +28,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 class LegacyGraphQLIndex {
@@ -93,7 +93,7 @@ class LegacyGraphQLIndex {
 
   static HashMap<String, Object> getGraphQLExecutionResult(
       String query, Router router, Map<String, Object> variables, String operationName,
-      int maxResolves, Locale locale
+      int maxResolves, int timeoutMs, Locale locale
   ) {
     MaxQueryComplexityInstrumentation instrumentation = new MaxQueryComplexityInstrumentation(
         maxResolves);
@@ -120,7 +120,7 @@ class LegacyGraphQLIndex {
     HashMap<String, Object> content = new HashMap<>();
     ExecutionResult executionResult;
     try {
-      executionResult = graphQL.execute(executionInput);
+      executionResult = graphQL.executeAsync(executionInput).get(timeoutMs, TimeUnit.MILLISECONDS);
       if (!executionResult.getErrors().isEmpty()) {
         content.put("errors", mapErrors(executionResult.getErrors()));
       }
@@ -128,16 +128,18 @@ class LegacyGraphQLIndex {
         content.put("data", executionResult.getData());
       }
     }
-    catch (RuntimeException ge) {
-      LOG.warn("Exception during graphQL.execute: " + ge.getMessage(), ge);
-      content.put("errors", mapErrors(Arrays.asList(ge)));
+    catch (Exception e) {
+      Throwable reason = e;
+      if (e.getCause() != null) { reason = e.getCause(); }
+      LOG.warn("Exception during graphQL.execute: " + reason.getMessage(), reason);
+      content.put("errors", mapErrors(List.of(reason)));
     }
     return content;
   }
 
   static Response getGraphQLResponse(
       String query, Router router, Map<String, Object> variables, String operationName,
-      int maxResolves, Locale locale
+      int maxResolves, int timeoutMs, Locale locale
   ) {
     Response.ResponseBuilder res = Response.status(Response.Status.OK);
     HashMap<String, Object> content = getGraphQLExecutionResult(
@@ -146,6 +148,7 @@ class LegacyGraphQLIndex {
         variables,
         operationName,
         maxResolves,
+        timeoutMs,
         locale
     );
     return res.entity(content).build();

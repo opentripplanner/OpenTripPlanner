@@ -61,6 +61,7 @@ public class LegacyGraphQLAPI {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQL(
       HashMap<String, Object> queryParameters,
+      @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
       @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
       @Context HttpHeaders headers
   ) {
@@ -105,6 +106,7 @@ public class LegacyGraphQLAPI {
         variables,
         operationName,
         maxResolves,
+        timeout,
         locale
     );
   }
@@ -114,13 +116,21 @@ public class LegacyGraphQLAPI {
   @Consumes("application/graphql")
   public Response getGraphQL(
       String query,
+      @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
       @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
       @Context HttpHeaders headers
   ) {
     Locale locale = headers.getAcceptableLanguages().size() > 0
         ? headers.getAcceptableLanguages().get(0)
         : router.defaultRoutingRequest.locale;
-    return LegacyGraphQLIndex.getGraphQLResponse(query, router, null, null, maxResolves, locale);
+    return LegacyGraphQLIndex.getGraphQLResponse(
+        query,
+        router,
+        null,
+        null,
+        maxResolves,
+        timeout,
+        locale);
   }
 
   @POST
@@ -128,7 +138,7 @@ public class LegacyGraphQLAPI {
   @Consumes(MediaType.APPLICATION_JSON)
   public Response getGraphQLBatch(
       List<HashMap<String, Object>> queries,
-      @HeaderParam("OTPTimeout") @DefaultValue("10000") int timeout,
+      @HeaderParam("OTPTimeout") @DefaultValue("30000") int timeout,
       @HeaderParam("OTPMaxResolves") @DefaultValue("1000000") int maxResolves,
       @Context HttpHeaders headers
   ) {
@@ -167,6 +177,7 @@ public class LegacyGraphQLAPI {
           variables,
           operationName,
           maxResolves,
+          timeout,
           locale
       ));
     }
