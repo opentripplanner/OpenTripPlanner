@@ -5,7 +5,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph_finder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

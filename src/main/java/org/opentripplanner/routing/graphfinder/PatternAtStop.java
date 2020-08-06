@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph_finder;
+package org.opentripplanner.routing.graphfinder;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
@@ -6,7 +6,6 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
 
-import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.util.Base64;
 import java.util.List;

@@ -15,8 +15,8 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graph_finder.DirectGraphFinder;
-import org.opentripplanner.routing.graph_finder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
@@ -29,7 +29,7 @@ import java.util.Set;
 
 /**
  * These library functions are used by the streetless and streetful stop linkers, and in profile transfer generation.
- * TODO OTP2 Fold these into org.opentripplanner.routing.graph_finder.StreetGraphFinder
+ * TODO OTP2 Fold these into org.opentripplanner.routing.graphfinder.StreetGraphFinder
  *           These are not library functions, this is instantiated as an object. Define lifecycle of the object (reuse?).
  *           Because AStar instances should only be used once, NearbyStopFinder should only be used once.
  * Ideally they could also be used in long distance mode and profile routing for the street segments.

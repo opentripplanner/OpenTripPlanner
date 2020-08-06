@@ -9,7 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.graph_finder.PatternAtStop;
+import org.opentripplanner.routing.graphfinder.PatternAtStop;
 
 public class LegacyGraphQLDepartureRowImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLDepartureRow {

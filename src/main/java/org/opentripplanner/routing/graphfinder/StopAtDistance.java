@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph_finder;
+package org.opentripplanner.routing.graphfinder;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;

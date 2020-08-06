@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph_finder;
+package org.opentripplanner.routing.graphfinder;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.TransitMode;

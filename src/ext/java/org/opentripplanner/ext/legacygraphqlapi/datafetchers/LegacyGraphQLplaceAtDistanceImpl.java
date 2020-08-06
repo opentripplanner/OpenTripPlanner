@@ -10,7 +10,7 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.TypeResolver;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.graph_finder.PlaceAtDistance;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 
 public class LegacyGraphQLplaceAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLPlaceAtDistance {

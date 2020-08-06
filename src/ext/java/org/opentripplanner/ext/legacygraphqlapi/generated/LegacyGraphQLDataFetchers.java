@@ -26,9 +26,9 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.graph_finder.PatternAtStop;
-import org.opentripplanner.routing.graph_finder.PlaceAtDistance;
-import org.opentripplanner.routing.graph_finder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.PatternAtStop;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Map;

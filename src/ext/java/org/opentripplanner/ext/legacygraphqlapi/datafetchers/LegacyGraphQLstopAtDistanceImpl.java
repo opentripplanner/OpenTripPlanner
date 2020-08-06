@@ -4,7 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.graph_finder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 
 public class LegacyGraphQLstopAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLStopAtDistance {

@@ -1,4 +1,4 @@
-package org.opentripplanner.routing.graph_finder;
+package org.opentripplanner.routing.graphfinder;
 
 import com.beust.jcommander.internal.Lists;
 import org.locationtech.jts.geom.Coordinate;

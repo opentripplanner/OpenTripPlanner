@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph_finder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.transit.raptor.speed_test.SpeedTestRequest;
 import org.opentripplanner.transit.raptor.util.AvgTimer;
 
