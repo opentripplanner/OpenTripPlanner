@@ -161,7 +161,6 @@ public class GraphPathFinder {
                 request.rctx.slopeRestrictionRemoved = true;
                 paths = getGraphPathsConsideringIntermediates(relaxedRequest);
             }
-            request.rctx.debugOutput.finishedCalculating();
         } catch (RoutingValidationException e) {
             if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))
             LOG.info("Vertex not found: " + request.from + " : " + request.to);
@@ -191,7 +190,6 @@ public class GraphPathFinder {
 
         if (paths == null || paths.size() == 0) {
             LOG.debug("Path not found: " + request.from + " : " + request.to);
-            request.rctx.debugOutput.finishedRendering(); // make sure we still report full search time
             throw new PathNotFoundException();
         }
 
@@ -227,12 +225,6 @@ public class GraphPathFinder {
                 intermediateRequest.rctx = null;
                 intermediateRequest.setRoutingContext(router.graph);
 
-                if (debugOutput != null) {// Restore the previous debug info accumulator
-                    intermediateRequest.rctx.debugOutput = debugOutput;
-                } else {// Store the debug info accumulator
-                    debugOutput = intermediateRequest.rctx.debugOutput;
-                }
-
                 List<GraphPath> partialPaths = getPaths(intermediateRequest);
                 if (partialPaths.size() == 0) {
                     return partialPaths;
@@ -244,7 +236,6 @@ public class GraphPathFinder {
                 placeIndex += (request.arriveBy ? -1 : +1);
             }
             request.setRoutingContext(router.graph);
-            request.rctx.debugOutput = debugOutput;
             if (request.arriveBy) {
                 Collections.reverse(paths);
             }

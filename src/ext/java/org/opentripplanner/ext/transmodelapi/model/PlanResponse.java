@@ -14,7 +14,7 @@ public class PlanResponse {
     public TripPlan plan;
     public TripSearchMetadata metadata;
     public List<Message> messages = new ArrayList<>();
-    public DebugOutput debugOutput = new DebugOutput();
+    public DebugOutput debugOutput;
 
 
     @Override
