@@ -10,6 +10,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.TimeZone;
 
 /** Responsible for mapping GTFS Stop into the OTP model. */
 class StopMapper {
@@ -46,8 +47,11 @@ class StopMapper {
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
+        gtfsStop.getPlatformCode(),
         tariffZones,
-        gtfsStop.getUrl()
+        gtfsStop.getUrl(),
+        gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
+        TransitModeMapper.mapMode(gtfsStop.getVehicleType())
     );
   }
 

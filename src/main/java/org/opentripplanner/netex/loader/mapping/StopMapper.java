@@ -3,6 +3,7 @@ package org.opentripplanner.netex.loader.mapping;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TariffZone;
@@ -44,7 +45,10 @@ class StopMapper {
         WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
         null,
         null,
+        null,
         tariffZones,
+        null,
+        null,
         null
     );
     stop.setParentStation(parentStation);

@@ -5,6 +5,7 @@ import javax.validation.constraints.NotNull;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.TimeZone;
 
 /**
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
@@ -17,9 +18,23 @@ public final class Stop extends StationElement {
   private final Collection<TariffZone> tariffZones;
 
   /**
+   * Platform identifier for a platform/stop belonging to a station. This should be just the
+   * platform identifier (eg. "G" or "3").
+   */
+  private final String platformCode;
+
+  /**
    * URL to a web page containing information about this particular stop.
    */
   private final String url;
+
+  private final TimeZone timeZone;
+
+  /**
+   * Used for describing the type of transportation used at the stop. This can be used eg. for
+   * deciding how to render a stop when it is used by multiple routes with different vehicle types.
+   */
+  private final TransitMode vehicleType;
 
   private HashSet<BoardingArea> boardingAreas;
 
@@ -31,12 +46,18 @@ public final class Stop extends StationElement {
       WgsCoordinate coordinate,
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
+      String platformCode,
       Collection<TariffZone> tariffZones,
-      String url
+      String url,
+      TimeZone timeZone,
+      TransitMode vehicleType
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
+    this.platformCode = platformCode;
     this.tariffZones = tariffZones;
     this.url = url;
+    this.timeZone = timeZone;
+    this.vehicleType = vehicleType;
   }
 
   /**
@@ -50,6 +71,9 @@ public final class Stop extends StationElement {
         idAndName,
         null,
         new WgsCoordinate(lat, lon),
+        null,
+        null,
+        null,
         null,
         null,
         null,
@@ -70,6 +94,10 @@ public final class Stop extends StationElement {
     return "<Stop " + this.id + ">";
   }
 
+  public String getPlatformCode() {
+    return platformCode;
+  }
+
   /**
    * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
    * which only permits one zone per stop.
@@ -80,6 +108,14 @@ public final class Stop extends StationElement {
 
   public String getUrl() {
     return url;
+  }
+
+  public TimeZone getTimeZone() {
+    return timeZone;
+  }
+
+  public TransitMode getVehicleType() {
+    return vehicleType;
   }
 
   public Collection<BoardingArea> getBoardingAreas() {
@@ -97,9 +133,5 @@ public final class Stop extends StationElement {
 
   public Collection<TariffZone> getTariffZones() {
     return Collections.unmodifiableCollection(tariffZones);
-  }
-
-  public void addTariffZone(TariffZone tariffZone) {
-    this.tariffZones.add(tariffZone);
   }
 }

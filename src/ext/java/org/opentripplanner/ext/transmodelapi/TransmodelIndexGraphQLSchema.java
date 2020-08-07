@@ -13,6 +13,7 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNamedOutputType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -62,7 +63,7 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.StopFinder;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
@@ -70,7 +71,6 @@ import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
@@ -120,7 +120,7 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType operatorType = new GraphQLTypeReference("Operator");
 
-    private GraphQLOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
+    private GraphQLNamedOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
 
     private GraphQLOutputType bikeRentalStationType = new GraphQLTypeReference("BikeRentalStation");
 
@@ -144,11 +144,11 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType serviceJourneyType = new GraphQLTypeReference("ServiceJourney");
 
-    private GraphQLOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
+    private GraphQLNamedOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
 
     private GraphQLOutputType multilingualStringType = new GraphQLTypeReference("TranslatedString");
 
-    private GraphQLOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
+    private GraphQLNamedOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
 
     private GraphQLOutputType bookingArrangementType = new GraphQLTypeReference("BookingArrangement");
 
@@ -1226,18 +1226,18 @@ public class TransmodelIndexGraphQLSchema {
                         .name("id")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment -> relay.toGlobalId(quayAtDistance.getName(),
-                                Integer.toString(((StopFinder.StopAndDistance) environment.getSource()).distance) + ";" +
-                                        mappingUtil.toIdString(((StopFinder.StopAndDistance) environment.getSource()).stop.getId())))
+                                Integer.toString((int) ((StopAtDistance) environment.getSource()).distance) + ";" +
+                                        mappingUtil.toIdString(((StopAtDistance) environment.getSource()).stop.getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quay")
                         .type(quayType)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).stop)
+                        .dataFetcher(environment -> ((StopAtDistance) environment.getSource()).stop)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("distance")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).distance)
+                        .dataFetcher(environment -> ((StopAtDistance) environment.getSource()).distance)
                         .build())
                 .build();
 
@@ -2755,9 +2755,9 @@ public class TransmodelIndexGraphQLSchema {
                                 .build())
                         .argument(relay.getConnectionFieldArguments())
                         .dataFetcher(environment -> {
-                            List<StopFinder.StopAndDistance> stops;
+                            List<StopAtDistance> stops;
                             try {
-                                stops = getRoutingService(environment).findClosestStopsByWalking(
+                                stops = getRoutingService(environment).findClosestStops(
                                         environment.getArgument("latitude"),
                                         environment.getArgument("longitude"),
                                         environment.getArgument("radius"))

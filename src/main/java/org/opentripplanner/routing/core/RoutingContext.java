@@ -233,14 +233,14 @@ public class RoutingContext implements Cloneable {
         List<RoutingError> routingErrors = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
-        if (fromVertices == null) {
+        if (fromVertices == null && !(opt.oneToMany == true && opt.arriveBy == true)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
             );
         }
 
         // check destination present when not doing a depart-after batch search
-        if (toVertices == null) {
+        if (toVertices == null && !(opt.oneToMany == true && opt.arriveBy == false)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );

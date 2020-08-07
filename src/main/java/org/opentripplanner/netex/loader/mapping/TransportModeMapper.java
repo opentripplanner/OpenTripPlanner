@@ -81,6 +81,9 @@ class TransportModeMapper {
     }
 
     static int mapVehicleMode(VehicleModeEnumeration mode) {
+        // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
+        if (mode == null) { return -999; }
+
         switch (mode) {
         case AIR:
             return 1100;
