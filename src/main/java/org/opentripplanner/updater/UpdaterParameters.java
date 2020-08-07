@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+import org.opentripplanner.ext.siri.updater.SiriEstimatedTimetableGooglePubsubUpdater;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
@@ -25,6 +26,8 @@ public interface UpdaterParameters {
   List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
 
   List<SiriETUpdaterParameters> getSiriETUpdaterParameters();
+
+  List<SiriEstimatedTimetableGooglePubsubUpdater.Parameters> getSiriETGooglePubsubUpdaterParameters();
 
   List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters();
 

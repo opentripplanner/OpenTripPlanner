@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.siri;
 
+import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
@@ -334,31 +335,6 @@ public class SiriFuzzyTripMatcher {
         return null;
     }
 
-    List<FeedScopedId> getTripIdForTripShortNameServiceDateAndMode(String tripShortName, ServiceDate serviceDate, TraverseMode traverseMode/*, TransmodelTransportSubmode transportSubmode*/) {
-
-        Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(tripShortName);
-
-        if (cachedTripsBySiriId.isEmpty()) {
-            cachedTripsBySiriId = getCachedTripsByVehicleRef(tripShortName);
-        }
-
-        List<FeedScopedId> matches = new ArrayList<>();
-        for (Trip trip : cachedTripsBySiriId) {
-            if (trip.getRoute().getMode().equals(traverseMode)
-                /*|| trip.getTransportSubmode().equals(transportSubmode)*/) {
-                Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
-
-                if (serviceDates.contains(serviceDate) &&
-                        trip.getTripShortName() != null &&
-                        trip.getTripShortName().equals(tripShortName)) {
-                    matches.add(trip.getId());
-                }
-            }
-        }
-
-
-        return matches;
-    }
 
     public int getTripDepartureTime(FeedScopedId tripId) {
         Trip trip = routingService.getTripForId().get(tripId);

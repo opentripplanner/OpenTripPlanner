@@ -4,6 +4,7 @@ import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirec
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriEstimatedTimetableGooglePubsubUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
@@ -119,6 +120,9 @@ public abstract class GraphUpdaterConfigurator {
         }
         for (SiriETUpdaterParameters configItem : config.getSiriETUpdaterParameters()) {
             updaters.add(new SiriETUpdater(configItem));
+        }
+        for (SiriEstimatedTimetableGooglePubsubUpdater.Parameters configItem : config.getSiriETGooglePubsubUpdaterParameters()) {
+            updaters.add(new SiriEstimatedTimetableGooglePubsubUpdater(configItem));
         }
         for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
             updaters.add(new SiriSXUpdater(configItem));

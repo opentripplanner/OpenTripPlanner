@@ -2,6 +2,7 @@ package org.opentripplanner.model;
 
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
+import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
@@ -627,5 +628,30 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     private static Coordinate coordinate(Stop s) {
         return new Coordinate(s.getLon(), s.getLat());
+    }
+
+    // Need an equals() since "Trips in a pattern are no longer necessarily running on the same service ID."
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        if (!super.equals(o)) {
+            return false;
+        }
+        TripPattern that = (TripPattern) o;
+        return directionId == that.directionId &&
+                Objects.equal(id, that.id) &&
+                Objects.equal(name, that.name) &&
+                Objects.equal(route, that.route) &&
+                Objects.equal(stopPattern, that.stopPattern) &&
+                Objects.equal(scheduledTimetable, that.scheduledTimetable) &&
+                Objects.equal(trips, that.trips) &&
+                Objects.equal(hopGeometries, that.hopGeometries) &&
+                Objects.equal(perStopFlags, that.perStopFlags) &&
+                Objects.equal(services, that.services);
     }
 }

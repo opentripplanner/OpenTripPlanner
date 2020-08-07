@@ -368,6 +368,9 @@ public class TimetableHelper {
         //Get all scheduled stops
         Stop[] stops = timetable.pattern.stopPattern.stops;
 
+        // Keeping track of visited stop-objects to allow multiple visits to a stop.
+        List<Object> alreadyVisited = new ArrayList<>();
+
         List<Stop> modifiedStops = new ArrayList<>();
 
         for (int i = 0; i < stops.length; i++) {
@@ -377,6 +380,9 @@ public class TimetableHelper {
             if (i < recordedCalls.size()) {
                 for (RecordedCall recordedCall : recordedCalls) {
 
+                    if (alreadyVisited.contains(recordedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
@@ -392,12 +398,16 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(recordedCall);
                         break;
                     }
                 }
             } else {
                 for (EstimatedCall estimatedCall : estimatedCalls) {
 
+                    if (alreadyVisited.contains(estimatedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
@@ -413,6 +423,7 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(estimatedCall);
                         break;
                     }
                 }

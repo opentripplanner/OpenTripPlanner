@@ -279,7 +279,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                     //Handle deliveries
                     for (EstimatedVersionFrameStructure estimatedJourneyVersion : estimatedJourneyVersions) {
                         List<EstimatedVehicleJourney> journeys = estimatedJourneyVersion.getEstimatedVehicleJourneies();
-                        LOG.info("Handling {} EstimatedVehicleJourneys.", journeys.size());
+                        LOG.debug("Handling {} EstimatedVehicleJourneys.", journeys.size());
                         int handledCounter = 0;
                         int skippedCounter = 0;
                         int addedCounter = 0;
@@ -311,7 +311,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                                 }
                             }
                         }
-                        LOG.info("Processed EstimatedVehicleJourneys: updated {}, added {}, skipped {}, not monitored {}.", handledCounter, addedCounter, skippedCounter, notMonitoredCounter);
+                        LOG.debug("Processed EstimatedVehicleJourneys: updated {}, added {}, skipped {}, not monitored {}.", handledCounter, addedCounter, skippedCounter, notMonitoredCounter);
                     }
                 }
             }

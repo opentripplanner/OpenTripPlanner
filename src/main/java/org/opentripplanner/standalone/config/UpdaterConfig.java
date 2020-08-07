@@ -2,7 +2,9 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.siri.updater.SiriEstimatedTimetableGooglePubsubUpdater;
 import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.GooglePubsubSiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterParameters;
@@ -37,6 +39,7 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
   private static final String EXAMPLE_POLLING_UPDATER = "example-polling-updater";
   private static final String WINKKI_POLLING_UPDATER = "winkki-polling-updater";
   private static final String SIRI_ET_UPDATER = "siri-et-updater";
+  private static final String GOOGLE_PUBSUB_SIRI_ET_UPDATER = "google-pubsub-siri-et-updater";
   private static final String SIRI_VM_UPDATER = "siri-vm-updater";
   private static final String SIRI_SX_UPDATER = "siri-sx-updater";
 
@@ -53,6 +56,7 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
     CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterParameters::new);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterParameters::new);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterParameters::new);
+    CONFIG_CREATORS.put(GOOGLE_PUBSUB_SIRI_ET_UPDATER, GooglePubsubSiriETUpdaterParameters::new);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterParameters::new);
     CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterParameters::new);
   }
@@ -103,6 +107,11 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
   @Override
   public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER, SiriETUpdaterParameters.class);
+  }
+
+  @Override
+  public List<SiriEstimatedTimetableGooglePubsubUpdater.Parameters> getSiriETGooglePubsubUpdaterParameters() {
+    return getParameters(GOOGLE_PUBSUB_SIRI_ET_UPDATER, SiriEstimatedTimetableGooglePubsubUpdater.Parameters.class);
   }
 
   @Override

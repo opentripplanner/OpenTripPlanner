@@ -35,6 +35,8 @@ public class Alert implements Serializable {
     //null means unknown
     public String severity;
 
+    public int priority;
+
     public List<AlertUrl> getAlertUrlList() {
         return alertUrlList;
     }

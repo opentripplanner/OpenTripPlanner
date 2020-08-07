@@ -149,7 +149,6 @@ public class AlertPatchServiceImpl implements AlertPatchService {
             expire(alertPatches.get(alertPatch.getId()));
         }
 
-        alertPatch.apply(graph);
         alertPatches.put(alertPatch.getId(), alertPatch);
 
         FeedScopedId stop = alertPatch.getStop();
