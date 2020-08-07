@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import graphql.Scalars;
-import graphql.relay.DefaultConnection;
-import graphql.relay.DefaultPageInfo;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetchingEnvironment;
@@ -60,19 +58,19 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TranslatedString;
@@ -2751,7 +2749,7 @@ public class TransmodelIndexGraphQLSchema {
                                 .name("authority")
                                 .type(Scalars.GraphQLString)
                                 .build())
-                        .argument(relay.getConnectionFieldArguments())
+                        .arguments(relay.getConnectionFieldArguments())
                         .dataFetcher(environment -> {
                             List<StopAtDistance> stops;
                             try {
@@ -2769,16 +2767,12 @@ public class TransmodelIndexGraphQLSchema {
                                 LOG.warn(
                                     "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
                                     e);
-                                stops = Collections.emptyList();
+                                stops = List.of();
                             }
-
-                            if (CollectionUtils.isEmpty(stops)) {
-                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
-                            }
-                            return new SimpleListConnection(stops).get(environment);
+                            return new SimpleListConnection<>(stops).get(environment);
                         })
                         .build())
-                /*
+            /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("nearest")
                         .description(
@@ -3240,6 +3234,7 @@ public class TransmodelIndexGraphQLSchema {
 
         Set<GraphQLType> dictionary = new HashSet<>();
         dictionary.add(placeInterface);
+        dictionary.add(Relay.pageInfoType);
 
         indexSchema = GraphQLSchema.newSchema()
                 .query(queryType)
@@ -3262,9 +3257,6 @@ public class TransmodelIndexGraphQLSchema {
 
     /**
      * Resolves all AlertPatches that are relevant for the supplied TripTimeShort.
-     *
-     * @param tripTimeShort
-     * @return
      */
 
     private Collection<AlertPatch> getAllRelevantAlerts(
