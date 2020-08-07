@@ -57,7 +57,7 @@ class StopMapper {
 
   private Collection<TariffZone> getTariffZones(String zoneId, String agencyId) {
     return zoneId != null
-        ? List.of(new TariffZone(new FeedScopedId(agencyId, zoneId), null))
+        ? Collections.singletonList(new TariffZone(new FeedScopedId(agencyId, zoneId), null))
         : Collections.emptyList();
   }
 }

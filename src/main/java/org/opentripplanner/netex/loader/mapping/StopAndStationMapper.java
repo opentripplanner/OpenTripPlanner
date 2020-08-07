@@ -109,13 +109,13 @@ class StopAndStationMapper {
 
     private List<TariffZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
         StopPlace selectedStopPlace = first(stopPlaceAllVersions);
-        return selectedStopPlace.getTariffZones() != null ? List.copyOf(selectedStopPlace
+        return selectedStopPlace.getTariffZones() != null ? selectedStopPlace
             .getTariffZones()
             .getTariffZoneRef()
             .stream()
             .map(t -> tariffZonesById.get(idFactory.createId(t.getRef())))
             .filter(Objects::nonNull)
-            .collect(Collectors.toList())) : Collections.emptyList();
+            .collect(Collectors.toList()) : Collections.emptyList();
     }
 
     /**
