@@ -168,6 +168,7 @@ public class ElevationModule implements GraphBuilderModule {
         if (readCachedElevations) {
             // try to load in the cached elevation data
             try {
+                log.info("Loading cached elevation data into memory");
                 ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
                 log.info("Cached elevation data loaded into memory!");
