@@ -10,6 +10,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -48,8 +49,8 @@ public class JourneyWhiteListed {
 
     public static Stream<TripTimeShort> whiteListAuthoritiesAndOrLines(
         Stream<TripTimeShort> stream,
-        Set<FeedScopedId> authorityIds,
-        Set<FeedScopedId> lineIds,
+        Collection<FeedScopedId> authorityIds,
+        Collection<FeedScopedId> lineIds,
         RoutingService routingService
     ) {
         if (CollectionUtils.isEmpty(authorityIds) && CollectionUtils.isEmpty(lineIds)) {
@@ -65,8 +66,8 @@ public class JourneyWhiteListed {
 
     private static boolean isTripTimeShortAcceptable(
         TripTimeShort tts,
-        Set<FeedScopedId> authorityIds,
-        Set<FeedScopedId> lineIds,
+        Collection<FeedScopedId> authorityIds,
+        Collection<FeedScopedId> lineIds,
         RoutingService routingService
     ) {
         Trip trip = routingService.getTripForId().get(tts.tripId);

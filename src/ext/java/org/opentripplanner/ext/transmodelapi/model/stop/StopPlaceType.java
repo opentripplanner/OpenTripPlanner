@@ -17,13 +17,13 @@ import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.Collection;
 import java.util.List;
-import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -173,6 +173,11 @@ public class StopPlaceType {
                 .description("Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for")
                 .type(JourneyWhiteListed.INPUT_TYPE)
                 .build())
+            .argument(GraphQLArgument.newArgument()
+                .name("whiteListedModes")
+                .description("Only show estimated calls for selected modes.")
+                .type(GraphQLList.list(TRANSPORT_MODE))
+                .build())
             .dataFetcher(environment -> {
               boolean omitNonBoarding = environment.getArgument("omitNonBoarding");
               int numberOfDepartures = environment.getArgument("numberOfDepartures");
@@ -181,6 +186,7 @@ public class StopPlaceType {
 
               MonoOrMultiModalStation monoOrMultiModalStation = environment.getSource();
               JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
+              Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
               Long startTimeMs = environment.getArgument("startTime") == null ? 0L : environment.getArgument("startTime");
               Long startTimeSeconds = startTimeMs / 1000;
@@ -197,6 +203,7 @@ public class StopPlaceType {
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
                           whiteListed.lineIds,
+                          transitModes,
                           environment
                       )
                   )
@@ -216,8 +223,9 @@ public class StopPlaceType {
       boolean omitNonBoarding,
       int numberOfDepartures,
       Integer departuresPerLineAndDestinationDisplay,
-      Set<FeedScopedId> authorityIdsWhiteListed,
-      Set<FeedScopedId> lineIdsWhiteListed,
+      Collection<FeedScopedId> authorityIdsWhiteListed,
+      Collection<FeedScopedId> lineIdsWhiteListed,
+      Collection<TransitMode> transitModes,
       DataFetchingEnvironment environment
   ) {
     RoutingService routingService = GqlUtil.getRoutingService(environment);
@@ -237,11 +245,21 @@ public class StopPlaceType {
         omitNonBoarding
     );
 
-    Stream<TripTimeShort> tripTimesStream = stopTimesInPatterns
-        .stream()
+    // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used
+    //           - to limit the result, and using filters after that point may result in
+    //           - loosing valid results.
+
+    Stream<StopTimesInPattern> stopTimesStream = stopTimesInPatterns.stream();
+
+    if(!transitModes.isEmpty()) {
+      stopTimesStream = stopTimesStream.filter(it -> transitModes.contains(it.pattern.getMode()));
+    }
+
+    Stream<TripTimeShort> tripTimesStream = stopTimesStream
         .flatMap(p -> p.times.stream());
 
-    tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(tripTimesStream,
+    tripTimesStream = JourneyWhiteListed.whiteListAuthoritiesAndOrLines(
+        tripTimesStream,
         authorityIdsWhiteListed,
         lineIdsWhiteListed,
         routingService

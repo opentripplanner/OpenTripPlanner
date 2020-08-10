@@ -15,9 +15,13 @@ import org.opentripplanner.ext.transmodelapi.model.base.scalars.GeoJSONCoordinat
 import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.TripTimeShort;
 
+import java.util.Collection;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 
 public class QuayType {
 
@@ -152,6 +156,11 @@ public class QuayType {
                             .type(JourneyWhiteListed.INPUT_TYPE)
                             .build())
                     .argument(GraphQLArgument.newArgument()
+                          .name("whiteListedModes")
+                          .description("Only show estimated calls for selected modes.")
+                          .type(GraphQLList.list(TRANSPORT_MODE))
+                          .build())
+                    .argument(GraphQLArgument.newArgument()
                         .name("includeCancelledTrips")
                         .description("Indicates that realtime-cancelled trips should also be included. NOT IMPLEMENTED")
                         .type(Scalars.GraphQLBoolean)
@@ -165,6 +174,7 @@ public class QuayType {
                         Stop stop = environment.getSource();
 
                         JourneyWhiteListed whiteListed = new JourneyWhiteListed(environment);
+                        Collection<TransitMode> transitModes = environment.getArgument("whiteListedModes");
 
                         Long startTimeMs = environment.getArgument("startTime") == null ? 0L : environment.getArgument("startTime");
                         Long startTimeSeconds = startTimeMs / 1000;
@@ -178,6 +188,7 @@ public class QuayType {
                           departuresPerLineAndDestinationDisplay,
                           whiteListed.authorityIds,
                           whiteListed.lineIds,
+                          transitModes,
                           environment
                       )
                             .sorted(TripTimeShort.compareByDeparture())
