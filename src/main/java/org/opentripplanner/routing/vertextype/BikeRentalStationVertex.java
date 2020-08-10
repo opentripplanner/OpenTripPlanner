@@ -28,13 +28,20 @@ public class BikeRentalStationVertex extends Vertex {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private boolean isCarStation;
 
+    private BikeRentalStation station;
+
     public BikeRentalStationVertex(Graph g, BikeRentalStation station) {
         //FIXME: raw_name can be null if bike station is made from graph updater
         super(g, "bike rental station " + station.id, station.x, station.y, station.name);
         this.setId(station.id);
+        this.station = station;
         this.setBikesAvailable(station.bikesAvailable);
         this.setSpacesAvailable(station.spacesAvailable);
         this.isCarStation = station.isCarStation;
+    }
+
+    public BikeRentalStation getStation() {
+        return station;
     }
 
     public int getBikesAvailable() {

@@ -236,6 +236,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return stopPattern.stops[stopIndex];
     }
 
+
+    public int getStopIndex(Stop stop) {
+        return Arrays.asList(stopPattern.stops).indexOf(stop);
+    }
+
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
     }

@@ -1,6 +1,5 @@
 package org.opentripplanner.api.model;
 
-import org.opentripplanner.api.model.alertpatch.ApiAlert;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Calendar;

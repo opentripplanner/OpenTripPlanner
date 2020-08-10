@@ -5,8 +5,6 @@ import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
-import javax.xml.bind.annotation.XmlAttribute;
-import javax.xml.bind.annotation.XmlTransient;
 import java.io.Serializable;
 import java.util.Locale;
 import java.util.Set;
@@ -17,36 +15,27 @@ import java.util.Set;
 public class BikeRentalStation implements Serializable, Cloneable {
     private static final long serialVersionUID = 8311460609708089384L;
 
-    @XmlAttribute
     @JsonSerialize
     public String id;
     //Serialized in TranslatedBikeRentalStation
-    @XmlTransient
     @JsonIgnore
     public I18NString name;
-    @XmlAttribute
     @JsonSerialize
     public double x, y; //longitude, latitude
-    @XmlAttribute
     @JsonSerialize
     public int bikesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
-    @XmlAttribute
     @JsonSerialize
     public boolean allowDropoff = true;
-    @XmlAttribute
     @JsonSerialize
     public boolean isFloatingBike = false;
-    @XmlAttribute
     @JsonSerialize
     public boolean isCarStation = false;
 
     /**
      * List of compatible network names. Null (default) to be compatible with all.
      */
-    @XmlAttribute
     @JsonSerialize
     public Set<String> networks = null;
     
@@ -54,7 +43,6 @@ public class BikeRentalStation implements Serializable, Cloneable {
      * Whether this station is static (usually coming from OSM data) or a real-time source. If no real-time data, users should take
      * bikesAvailable/spacesAvailable with a pinch of salt, as they are always the total capacity divided by two. Only the total is meaningful.
      */
-    @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
 
@@ -71,7 +59,6 @@ public class BikeRentalStation implements Serializable, Cloneable {
      *
      */
     @JsonIgnore
-    @XmlTransient
     public Locale locale = ResourceBundleSingleton.INSTANCE.getLocale(null);
 
     /**
@@ -106,7 +93,6 @@ public class BikeRentalStation implements Serializable, Cloneable {
     /**
      * Gets translated name of bike rental station based on locale
      */
-    @XmlAttribute
     @JsonSerialize
     public String getName() {
         return name.toString(locale);

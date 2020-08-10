@@ -2,24 +2,24 @@ package org.opentripplanner.updater.street_notes;
 
 import com.google.common.collect.HashMultimap;
 import com.google.common.collect.SetMultimap;
-import org.locationtech.jts.geom.Geometry;
 import org.geotools.data.FeatureSource;
 import org.geotools.data.Query;
 import org.geotools.data.wfs.WFSDataStore;
 import org.geotools.data.wfs.WFSDataStoreFactory;
 import org.geotools.feature.FeatureIterator;
 import org.geotools.referencing.CRS;
+import org.locationtech.jts.geom.Geometry;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opengis.feature.simple.SimpleFeatureType;
 import org.opengis.referencing.FactoryException;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.notes.DynamicStreetNotesSource;
-import org.opentripplanner.routing.services.notes.MatcherAndAlert;
+import org.opentripplanner.routing.services.notes.MatcherAndStreetNote;
 import org.opentripplanner.routing.services.notes.NoteMatcher;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -52,13 +52,13 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    private SetMultimap<Edge, MatcherAndAlert> notesForEdge;
+    private SetMultimap<Edge, MatcherAndStreetNote> notesForEdge;
 
     /**
      * Set of unique matchers, kept during building phase, used for interning (lots of note/matchers
      * are identical).
      */
-    private Map<T2<NoteMatcher, Alert>, MatcherAndAlert> uniqueMatchers;
+    private Map<T2<NoteMatcher, StreetNote>, MatcherAndStreetNote> uniqueMatchers;
 
     private URL url;
     private String featureType;
@@ -140,15 +140,15 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
             SimpleFeature feature = features.next();
             if (feature.getDefaultGeometry() == null) continue;
 
-            Alert alert = getNote(feature);
-            if (alert == null) continue;
+            StreetNote streetNote = getNote(feature);
+            if (streetNote == null) continue;
 
             Geometry geom = (Geometry) feature.getDefaultGeometry();
             Geometry searchArea = geom.buffer(SEARCH_RADIUS_DEG);
             Collection<Edge> edges = graph.streetIndex.getEdgesForEnvelope(searchArea.getEnvelopeInternal());
             for(Edge edge: edges){
                 if (edge instanceof StreetEdge && !searchArea.disjoint(edge.getGeometry())) {
-                    addNote(edge, alert, NOTE_MATCHER);
+                    addNote(edge, streetNote, NOTE_MATCHER);
                 }
             }
         }
@@ -156,10 +156,10 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
     }
 
     /**
-     * Parses a SimpleFeature and returns an Alert if the feature should create one.
-     * The alert should be based on the fields specific for the specific WFS feed.
+     * Parses a SimpleFeature and returns an StreetNote if the feature should create one.
+     * The street note should be based on the fields specific for the specific WFS feed.
      */
-    protected abstract Alert getNote(SimpleFeature feature);
+    protected abstract StreetNote getNote(SimpleFeature feature);
 
     /**
      * Changes the note source to use the newly generated notes
@@ -174,24 +174,24 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Methods for writing into notesForEdge
      * TODO: Should these be extracted into somewhere?
      */
-    private void addNote(Edge edge, Alert note, NoteMatcher matcher) {
+    private void addNote(Edge edge, StreetNote note, NoteMatcher matcher) {
         if (LOG.isDebugEnabled())
             LOG.debug("Adding note {} to {} with matcher {}", note, edge, matcher);
-        notesForEdge.put(edge, buildMatcherAndAlert(matcher, note));
+        notesForEdge.put(edge, buildMatcherAndStreetNote(matcher, note));
     }
 
     /**
-     * Create a MatcherAndAlert, interning it if the note and matcher pair is already created. Note:
-     * we use the default Object.equals() for matchers, as they are mostly already singleton
+     * Create a MatcherAndStreetNote, interning it if the note and matcher pair is already created.
+     * Note: we use the default Object.equals() for matchers, as they are mostly already singleton
      * instances.
      */
-    private MatcherAndAlert buildMatcherAndAlert(NoteMatcher noteMatcher, Alert note) {
-        T2<NoteMatcher, Alert> key = new T2<>(noteMatcher, note);
-        MatcherAndAlert interned = uniqueMatchers.get(key);
+    private MatcherAndStreetNote buildMatcherAndStreetNote(NoteMatcher noteMatcher, StreetNote note) {
+        T2<NoteMatcher, StreetNote> key = new T2<>(noteMatcher, note);
+        MatcherAndStreetNote interned = uniqueMatchers.get(key);
         if (interned != null) {
             return interned;
         }
-        MatcherAndAlert ret = new MatcherAndAlert(noteMatcher, note);
+        MatcherAndStreetNote ret = new MatcherAndStreetNote(noteMatcher, note);
         uniqueMatchers.put(key, ret);
         return ret;
     }

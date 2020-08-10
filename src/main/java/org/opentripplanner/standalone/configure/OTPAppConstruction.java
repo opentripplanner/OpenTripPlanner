@@ -137,6 +137,6 @@ public class OTPAppConstruction {
     }
 
     private Application createApplication(Router router) {
-        return new OTPApplication(server(router), !config.getCli().insecure);
+        return new OTPApplication(server(router));
     }
 }

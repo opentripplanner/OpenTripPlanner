@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
@@ -33,7 +34,7 @@ class StreetSearch {
     private final SimpleStreetSplitter splitter;
     private final NearbyStopFinder nearbyStopFinder;
     final TIntIntMap resultTimesSecByStopIndex = new TIntIntHashMap();
-    final Map<Integer, NearbyStopFinder.StopAtDistance> pathsByStopIndex = new HashMap<>();
+    final Map<Integer, StopAtDistance> pathsByStopIndex = new HashMap<>();
 
     StreetSearch(
             TransitLayer transitLayer,
@@ -64,7 +65,7 @@ class StreetSearch {
             splitter.link(vertex);
         }
 
-        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(
+        List<StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(
                 Set.of(vertex), !fromOrigin, true
         );
 
@@ -72,8 +73,8 @@ class StreetSearch {
             throw new RuntimeException("No stops found nearby: " + place);
         }
 
-        for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
-            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.tstop);
+        for (StopAtDistance stopAtDistance : stopAtDistanceList) {
+            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.stop);
             int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             resultTimesSecByStopIndex.put(stopIndex, accessTimeSec);

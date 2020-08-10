@@ -1,11 +1,13 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.core.TraverseMode;
 
 public class TransitModeMapper {
 
     public static TransitMode mapMode(int routeType) {
+        // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
+        if (routeType == -999) { return null; }
+
         /* TPEG Extension  https://groups.google.com/d/msg/gtfs-changes/keT5rTPS7Y0/71uMz2l6ke0J */
         if (routeType >= 100 && routeType < 200) { // Railway Service
             return TransitMode.RAIL;

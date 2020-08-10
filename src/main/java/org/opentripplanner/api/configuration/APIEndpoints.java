@@ -1,6 +1,5 @@
 package org.opentripplanner.api.configuration;
 
-import org.opentripplanner.api.resource.AlertPatcher;
 import org.opentripplanner.api.resource.BikeRental;
 import org.opentripplanner.api.resource.ExternalGeocoderResource;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
@@ -9,6 +8,7 @@ import org.opentripplanner.api.resource.Routers;
 import org.opentripplanner.api.resource.ServerInfo;
 import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
+import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
 import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
 import org.opentripplanner.index.IndexAPI;
@@ -19,13 +19,13 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
-import static org.opentripplanner.util.OTPFeature.APIAlertPatcher;
 import static org.opentripplanner.util.OTPFeature.APIBikeRental;
 import static org.opentripplanner.util.OTPFeature.APIExternalGeocoder;
 import static org.opentripplanner.util.OTPFeature.APIGraphInspectorTile;
 import static org.opentripplanner.util.OTPFeature.APIServerInfo;
 import static org.opentripplanner.util.OTPFeature.APIUpdaterStatus;
 import static org.opentripplanner.util.OTPFeature.ActuatorAPI;
+import static org.opentripplanner.util.OTPFeature.SandboxAPILegacyGraphQLApi;
 import static org.opentripplanner.util.OTPFeature.SandboxAPITransmodelApi;
 import static org.opentripplanner.util.OTPFeature.SandboxExampleAPIGraphStatistics;
 
@@ -46,7 +46,6 @@ public class APIEndpoints {
         // See the OTPFeature enum for details.
         addIfEnabled(APIExternalGeocoder, ExternalGeocoderResource.class);
         addIfEnabled(APIBikeRental, BikeRental.class);
-        addIfEnabled(APIAlertPatcher, AlertPatcher.class);
         addIfEnabled(APIServerInfo, ServerInfo.class);
         addIfEnabled(APIGraphInspectorTile, GraphInspectorTileResource.class);
         addIfEnabled(APIUpdaterStatus, UpdaterStatusResource.class);
@@ -55,6 +54,7 @@ public class APIEndpoints {
         addIfEnabled(ActuatorAPI, ActuatorAPI.class);
         addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
         addIfEnabled(SandboxAPITransmodelApi, TransmodelIndexAPI.class);
+        addIfEnabled(SandboxAPILegacyGraphQLApi, LegacyGraphQLAPI.class);
     }
 
     /**

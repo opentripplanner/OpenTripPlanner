@@ -6,8 +6,8 @@ import org.opentripplanner.ext.siri.SiriFuzzyTripMatcher;
 import org.opentripplanner.ext.siri.SiriHttpUtils;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -32,7 +32,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private final String feedId;
 
-    private AlertPatchService alertPatchService;
+    private TransitAlertService transitAlertService;
 
     private final long earlyStart;
 
@@ -81,13 +81,13 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) {
-        this.alertPatchService = new AlertPatchServiceImpl(graph);
+        this.transitAlertService = new TransitAlertServiceImpl(graph);
         SiriFuzzyTripMatcher fuzzyTripMatcher = new SiriFuzzyTripMatcher(new RoutingService(graph));
         if (updateHandler == null) {
             updateHandler = new SiriAlertsUpdateHandler(feedId);
         }
         updateHandler.setEarlyStart(earlyStart);
-        updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setTransitAlertService(transitAlertService);
         updateHandler.setSiriFuzzyTripMatcher(fuzzyTripMatcher);
 
     }
@@ -160,8 +160,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     public void teardown() {
     }
 
-    public AlertPatchService getAlertPatchService() {
-        return alertPatchService;
+    public TransitAlertService getTransitAlertService() {
+        return transitAlertService;
     }
 
     public String toString() {

@@ -3,8 +3,8 @@ package org.opentripplanner.model.plan;
 import com.google.common.collect.Lists;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.BikeRentalStationInfo;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.WgsCoordinate;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.graph.Edge;
 
 import java.util.Collection;
@@ -93,7 +93,7 @@ public class WalkStep {
      */
     public List<P2<Double>> elevation;
 
-    public final Set<Alert> alerts = new HashSet<>();
+    public final Set<StreetNote> streetNotes = new HashSet<>();
 
     public double angle;
 
@@ -125,9 +125,9 @@ public class WalkStep {
         return elevation;
     }
 
-    public void addAlerts(Collection<Alert> alerts) {
-        if(alerts == null) { return; }
-        this.alerts.addAll(alerts);
+    public void addStreetNotes(Collection<StreetNote> streetNotes) {
+        if(streetNotes == null) { return; }
+        this.streetNotes.addAll(streetNotes);
     }
 
     public static RelativeDirection getRelativeDirection(double lastAngle, double thisAngle,
