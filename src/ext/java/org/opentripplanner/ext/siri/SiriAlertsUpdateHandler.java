@@ -76,9 +76,9 @@ public class SiriAlertsUpdateHandler {
                         expiredCounter++;
                     } else {
                         TransitAlert alert = handleAlert(sxElement);
-                        alert.setId(situationNumber);
                         addedCounter++;
                         if (alert != null) {
+                            alert.setId(situationNumber);
                             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
                             alerts.add(alert);
                             if (alert.getEntities().isEmpty()) {
@@ -100,11 +100,9 @@ public class SiriAlertsUpdateHandler {
 
         TransitAlert alert = createAlertWithTexts(situation);
 
-        //ROR-54
-        //If situation is closed, it must be allowed - it will remove already existing alerts
-        if ((alert.alertHeaderText == null || alert.alertHeaderText.toString().isEmpty()) && (
-            alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()
-        ) && (alert.alertDetailText == null || alert.alertDetailText.toString().isEmpty())) {
+        if ((alert.alertHeaderText == null      || alert.alertHeaderText.toString().isEmpty()) &&
+            (alert.alertDescriptionText == null || alert.alertDescriptionText.toString().isEmpty()) &&
+            (alert.alertDetailText == null      || alert.alertDetailText.toString().isEmpty())) {
             LOG.debug("Empty Alert - ignoring situationNumber: {}", situation.getSituationNumber() != null ? situation.getSituationNumber().getValue():null);
             return null;
         }
