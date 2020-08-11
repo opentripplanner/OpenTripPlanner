@@ -141,7 +141,7 @@ public class NetexMapper {
             StopAndStationMapper stopMapper = new StopAndStationMapper(
                 idFactory,
                 netexIndex.getQuayById(),
-                transitBuilder.getTariffZonesById(),
+                transitBuilder.getFareZonesById(),
                 issueStore
             );
             stopMapper.mapParentAndChildStops(stopPlaceAllVersions);
@@ -249,7 +249,7 @@ public class NetexMapper {
     private void mapTariffZones(NetexImportDataIndexReadOnlyView netexIndex) {
         TariffZoneMapper tariffZoneMapper = new TariffZoneMapper(idFactory);
         for (TariffZone tariffZone : netexIndex.getTariffZonesById().localValues()) {
-            transitBuilder.getTariffZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
+            transitBuilder.getFareZonesById().add(tariffZoneMapper.mapTariffZone(tariffZone));
         }
     }
 }

@@ -1,7 +1,7 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.TariffZone;
+import org.opentripplanner.model.FareZone;
 
 public class TariffZoneMapper {
 
@@ -14,9 +14,9 @@ public class TariffZoneMapper {
   /**
    * Map Netex TariffZone to OTP TariffZone
    */
-  public TariffZone mapTariffZone(org.rutebanken.netex.model.TariffZone tariffZone) {
+  public FareZone mapTariffZone(org.rutebanken.netex.model.TariffZone tariffZone) {
     FeedScopedId id = idFactory.createId(tariffZone.getId());
     String name = tariffZone.getName().getValue();
-    return new TariffZone(id, name);
+    return new FareZone(id, name);
   }
 }

@@ -6,7 +6,7 @@ import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TariffZone;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
@@ -45,7 +45,7 @@ class StopAndStationMapper {
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
-    private final EntityById<FeedScopedId, TariffZone> tariffZonesById;
+    private final EntityById<FeedScopedId, FareZone> tariffZonesById;
     private final FeedScopedIdFactory idFactory;
 
     /**
@@ -61,7 +61,7 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
-            EntityById<FeedScopedId, TariffZone> tariffZonesById,
+            EntityById<FeedScopedId, FareZone> tariffZonesById,
             DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(idFactory);
@@ -81,13 +81,13 @@ class StopAndStationMapper {
         //           - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
         Station station = mapStopPlaceAllVersionsToStation(stopPlaceAllVersions);
-        List<TariffZone> tariffZones = mapTariffZones(stopPlaceAllVersions);
+        List<FareZone> fareZones = mapTariffZones(stopPlaceAllVersions);
 
         // Loop through all versions of the StopPlace in order to collect all quays, even if they were deleted in
         // never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station, tariffZones);
+                addNewStopToParentIfNotPresent(quay, station, fareZones);
             }
         }
     }
@@ -107,7 +107,7 @@ class StopAndStationMapper {
         return station;
     }
 
-    private List<TariffZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
+    private List<FareZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
         StopPlace selectedStopPlace = first(stopPlaceAllVersions);
         return selectedStopPlace.getTariffZones() != null ? selectedStopPlace
             .getTariffZones()
@@ -130,7 +130,7 @@ class StopAndStationMapper {
     private void addNewStopToParentIfNotPresent(
         Quay quay,
         Station station,
-        List<TariffZone> tariffZones
+        List<FareZone> fareZones
     ) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
@@ -143,7 +143,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station, tariffZones);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones);
         if (stop == null) return;
 
         station.addChildStop(stop);

@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-public class TariffZone extends TransitEntity<FeedScopedId> {
+public class FareZone extends TransitEntity<FeedScopedId> {
 
   private final FeedScopedId id;
 
@@ -11,7 +11,7 @@ public class TariffZone extends TransitEntity<FeedScopedId> {
    */
   // TODO This should at some point be connected to Agency or Operator. Currently is is up to the
   //      user to make this connection (based on TariffZone id).
-  public TariffZone(FeedScopedId id, String name) {
+  public FareZone(FeedScopedId id, String name) {
     this.id = id;
     this.name = name;
   }

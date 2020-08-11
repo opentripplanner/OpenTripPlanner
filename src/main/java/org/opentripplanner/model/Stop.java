@@ -15,7 +15,7 @@ public final class Stop extends StationElement {
 
   private static final long serialVersionUID = 2L;
 
-  private final Collection<TariffZone> tariffZones;
+  private final Collection<FareZone> fareZones;
 
   /**
    * Platform identifier for a platform/stop belonging to a station. This should be just the
@@ -47,14 +47,14 @@ public final class Stop extends StationElement {
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
       String platformCode,
-      Collection<TariffZone> tariffZones,
+      Collection<FareZone> fareZones,
       String url,
       TimeZone timeZone,
       TransitMode vehicleType
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
-    this.tariffZones = tariffZones;
+    this.fareZones = fareZones;
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
@@ -103,7 +103,7 @@ public final class Stop extends StationElement {
    * which only permits one zone per stop.
    */
   public String getFirstZoneAsString() {
-    return tariffZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
+    return fareZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
   }
 
   public String getUrl() {
@@ -131,7 +131,7 @@ public final class Stop extends StationElement {
     return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
   }
 
-  public Collection<TariffZone> getTariffZones() {
-    return Collections.unmodifiableCollection(tariffZones);
+  public Collection<FareZone> getFareZones() {
+    return Collections.unmodifiableCollection(fareZones);
   }
 }

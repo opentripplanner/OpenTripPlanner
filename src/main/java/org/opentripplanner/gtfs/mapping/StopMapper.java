@@ -2,13 +2,12 @@ package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TariffZone;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.util.MapUtils;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
@@ -36,7 +35,7 @@ class StopMapper {
     StopMappingWrapper base = new StopMappingWrapper(gtfsStop);
 
     // Map single GTFS ZoneId to OTP TariffZone collection
-    Collection<TariffZone> tariffZones = getTariffZones(gtfsStop.getZoneId(),
+    Collection<FareZone> fareZones = getTariffZones(gtfsStop.getZoneId(),
         gtfsStop.getId().getAgencyId()
     );
 
@@ -47,17 +46,16 @@ class StopMapper {
         base.getCoordinate(),
         base.getWheelchairBoarding(),
         base.getLevel(),
-        gtfsStop.getPlatformCode(),
-        tariffZones,
+        gtfsStop.getPlatformCode(), fareZones,
         gtfsStop.getUrl(),
         gtfsStop.getTimezone() == null ? null : TimeZone.getTimeZone(gtfsStop.getTimezone()),
         TransitModeMapper.mapMode(gtfsStop.getVehicleType())
     );
   }
 
-  private Collection<TariffZone> getTariffZones(String zoneId, String agencyId) {
+  private Collection<FareZone> getTariffZones(String zoneId, String agencyId) {
     return zoneId != null
-        ? Collections.singletonList(new TariffZone(new FeedScopedId(agencyId, zoneId), null))
+        ? Collections.singletonList(new FareZone(new FeedScopedId(agencyId, zoneId), null))
         : Collections.emptyList();
   }
 }

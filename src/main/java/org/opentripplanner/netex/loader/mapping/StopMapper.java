@@ -2,11 +2,9 @@ package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.QuayWithoutCoordinates;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.gtfs.mapping.TransitModeMapper;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.TariffZone;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.WgsCoordinate;
 import org.rutebanken.netex.model.Quay;
 
@@ -29,7 +27,7 @@ class StopMapper {
   /**
    * Map Netex Quay to OTP Stop
    */
-  Stop mapQuayToStop(Quay quay, Station parentStation, List<TariffZone> tariffZones) {
+  Stop mapQuayToStop(Quay quay, Station parentStation, List<FareZone> fareZones) {
     WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(quay.getCentroid());
 
     if (coordinate == null) {
@@ -45,8 +43,7 @@ class StopMapper {
         WgsCoordinateMapper.mapToDomain(quay.getCentroid()),
         null,
         null,
-        null,
-        tariffZones,
+        null, fareZones,
         null,
         null,
         null

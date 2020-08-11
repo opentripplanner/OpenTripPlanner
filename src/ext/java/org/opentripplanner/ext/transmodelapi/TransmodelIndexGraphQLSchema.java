@@ -49,7 +49,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
-import org.opentripplanner.model.TariffZone;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -1006,13 +1006,13 @@ public class TransmodelIndexGraphQLSchema {
                     .name("id")
                         .type(Scalars.GraphQLString)
                         .dataFetcher(
-                            environment -> (mappingUtil.toIdString(((TariffZone) environment.getSource()).getId())))
+                            environment -> (mappingUtil.toIdString(((FareZone) environment.getSource()).getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
                         .type(Scalars.GraphQLString)
                         .dataFetcher(
-                            environment -> ((TariffZone) environment.getSource()).getName())
+                            environment -> ((FareZone) environment.getSource()).getName())
                         .build())
                 .build();
 
@@ -1631,7 +1631,7 @@ public class TransmodelIndexGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("tariffZones")
                     .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-                    .dataFetcher(environment -> ((Stop) environment.getSource()).getTariffZones())
+                    .dataFetcher(environment -> ((Stop) environment.getSource()).getFareZones())
                     .build())
                 .build();
 
