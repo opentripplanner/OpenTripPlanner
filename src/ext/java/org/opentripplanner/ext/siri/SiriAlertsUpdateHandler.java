@@ -19,6 +19,7 @@ import uk.org.ifopt.siri20.StopPlaceRef;
 import uk.org.siri.siri20.*;
 
 import java.io.Serializable;
+import java.text.ParseException;
 import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
@@ -57,8 +58,8 @@ public class SiriAlertsUpdateHandler {
             SituationExchangeDeliveryStructure.Situations situations = sxDelivery.getSituations();
             if (situations != null) {
                 long t1 = System.currentTimeMillis();
-                Set<String> idsToExpire = new HashSet<>();
-
+                int addedCounter = 0;
+                int expiredCounter = 0;
                 for (PtSituationElement sxElement : situations.getPtSituationElements()) {
                     boolean expireSituation = (sxElement.getProgress() != null &&
                         sxElement.getProgress().equals(WorkflowStatusEnumeration.CLOSED));
@@ -72,8 +73,11 @@ public class SiriAlertsUpdateHandler {
 
                     if (expireSituation) {
                         alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
+                        expiredCounter++;
                     } else {
                         TransitAlert alert = handleAlert(sxElement);
+                        alert.setId(situationNumber);
+                        addedCounter++;
                         if (alert != null) {
                             alerts.removeIf(transitAlert -> transitAlert.getId().equals(situationNumber));
                             alerts.add(alert);
@@ -86,8 +90,8 @@ public class SiriAlertsUpdateHandler {
 
                 transitAlertService.setAlerts(alerts);
 
-                LOG.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms", alerts.size(), idsToExpire.size(), situations.getPtSituationElements().size(), transitAlertService
-                    .getAllAlerts().size(), (System.currentTimeMillis()-t1));
+                LOG.info("Added {} alerts, expired {} alerts based on {} situations, current alert-count: {}, elapsed time {}ms",
+                        addedCounter, expiredCounter, situations.getPtSituationElements().size(), transitAlertService.getAllAlerts().size(), System.currentTimeMillis()-t1);
             }
         }
     }
@@ -123,6 +127,10 @@ public class SiriAlertsUpdateHandler {
 
         alert.setTimePeriods(periods);
 
+        if (situation.getPriority() != null) {
+            alert.priority = situation.getPriority().intValue();
+        }
+
         AffectsScopeStructure affectsStructure = situation.getAffects();
 
         if (affectsStructure != null) {
@@ -146,7 +154,7 @@ public class SiriAlertsUpdateHandler {
             }
 
             AffectsScopeStructure.Networks networks = affectsStructure.getNetworks();
-            Set<Route> stopRoutes = new HashSet<>();
+            Set<FeedScopedId> stopRoutes = new HashSet<>();
             if (networks != null) {
                 for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
                     List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
@@ -159,7 +167,7 @@ public class SiriAlertsUpdateHandler {
                                 continue;
                             }
 
-                            stopRoutes.addAll(siriFuzzyTripMatcher.getRoutes(lineRef.getValue()));
+                            stopRoutes.add(new FeedScopedId(feedId, lineRef.getValue()));
                         }
                     }
                 }
@@ -178,20 +186,21 @@ public class SiriAlertsUpdateHandler {
 
                     FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPointRef.getValue());
 
-                    if (stopId != null) {
-                        if (stopRoutes.isEmpty()) {
-                            alert.addEntity(new EntitySelector.Stop(stopId));
+                    if (stopId == null) {
+                        stopId = new FeedScopedId(feedId, stopPointRef.getValue());
+                    }
+
+                    if (stopRoutes.isEmpty()) {
+                        alert.addEntity(new EntitySelector.Stop(stopId));
+                        // TODO: is this correct? Should the stop conditions be in the entity selector?
+                        updateStopConditions(alert, stopPoint.getStopConditions());
+
+                    } else {
+                        //Adding combination of stop & route
+                        for (FeedScopedId routeId : stopRoutes) {
+                            alert.addEntity(new EntitySelector.StopAndRoute(stopId, routeId));
                             // TODO: is this correct? Should the stop conditions be in the entity selector?
                             updateStopConditions(alert, stopPoint.getStopConditions());
-
-                        } else {
-                            //Adding combination of stop & route
-                            for (Route route : stopRoutes) {
-                                alert.addEntity(new EntitySelector.StopAndRoute(stopId, route.getId()));
-                                // TODO: is this correct? Should the stop conditions be in the entity selector?
-                                updateStopConditions(alert, stopPoint.getStopConditions());
-
-                            }
                         }
                     }
                 }
@@ -205,17 +214,20 @@ public class SiriAlertsUpdateHandler {
 
                     FeedScopedId stopId = siriFuzzyTripMatcher.getStop(stopPlace.getValue());
 
-                    if (stopId != null) {
+                    if (stopId == null) {
+                        stopId = new FeedScopedId(feedId, stopPlace.getValue());
+                    }
 
-                        if (stopRoutes.isEmpty()) {
-                            alert.addEntity(new EntitySelector.Stop(stopId));
-                        } else {
-                            //Adding combination of stop & route
-                            for (Route route : stopRoutes) {
-                                alert.addEntity(new EntitySelector.StopAndRoute(stopId, route.getId()));
-                            }
+
+                    if (stopRoutes.isEmpty()) {
+                        alert.addEntity(new EntitySelector.Stop(stopId));
+                    } else {
+                        //Adding combination of stop & route
+                        for (FeedScopedId routeId : stopRoutes) {
+                            alert.addEntity(new EntitySelector.StopAndRoute(stopId, routeId));
                         }
                     }
+
                 }
             } else if (networks != null && !isListNullOrEmpty(networks.getAffectedNetworks())) {
 
@@ -248,22 +260,20 @@ public class SiriAlertsUpdateHandler {
                                     }
                                 }
                             }
-                            Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef.getValue());
+                            FeedScopedId affectedRoute = new FeedScopedId(feedId, lineRef.getValue());
 
-                            for (Route route : affectedRoutes) {
-                                if (! affectedStops.isEmpty()) {
-                                    for (AffectedStopPointStructure affectedStop : affectedStops) {
-                                        FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop.getStopPointRef().getValue());
-                                        if (stop == null) {
-                                            continue;
-                                        }
-                                        alert.addEntity(new EntitySelector.StopAndRoute(stop, route.getId()));
-                                        // TODO: is this correct? Should the stop conditions be in the entity selector?
-                                        updateStopConditions(alert, affectedStop.getStopConditions());
+                            if (! affectedStops.isEmpty()) {
+                                for (AffectedStopPointStructure affectedStop : affectedStops) {
+                                    FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop.getStopPointRef().getValue());
+                                    if (stop == null) {
+                                        stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                                     }
-                                } else {
-                                    alert.addEntity(new EntitySelector.Route(route.getId()));
+                                    alert.addEntity(new EntitySelector.StopAndRoute(stop, affectedRoute));
+                                    // TODO: is this correct? Should the stop conditions be in the entity selector?
+                                    updateStopConditions(alert, affectedStop.getStopConditions());
                                 }
+                            } else {
+                                alert.addEntity(new EntitySelector.Route(affectedRoute));
                             }
                         }
                     } else {
@@ -335,13 +345,20 @@ public class SiriAlertsUpdateHandler {
                                 effectiveValiditySetExplicitly = true;
 
                             } else {
-                                // TODO - SIRI: Support submode when fuzzy-searching for trips
-                                tripIds = siriFuzzyTripMatcher.getTripIdForTripShortNameServiceDateAndMode(vehicleJourneyRef.getValue(),
-                                        serviceDate, TraverseMode.RAIL/*, TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS*/);
 
-                                // ServiceJourneyId does NOT match - calculate validity based on originAimedDepartureTime
-                                effectiveStartDate = serviceDate.getAsDate();
-                                effectiveEndDate = serviceDate.next().getAsDate();
+//                                Commented out for now
+//
+//                                // TODO - SIRI: Support submode when fuzzy-searching for trips
+//                                tripIds = siriFuzzyTripMatcher.getTripIdForTripShortNameServiceDateAndMode(vehicleJourneyRef.getValue(),
+//                                        serviceDate, TraverseMode.RAIL/*, TransmodelTransportSubmode.RAIL_REPLACEMENT_BUS*/);
+//
+//                                // ServiceJourneyId does NOT match - calculate validity based on originAimedDepartureTime
+//                                effectiveStartDate = serviceDate.getAsDate();
+//                                effectiveEndDate = serviceDate.next().getAsDate();
+
+                                effectiveStartDate = null;
+                                effectiveEndDate = null;
+
 
                             }
                             for (FeedScopedId tripId : tripIds) {
@@ -379,7 +396,7 @@ public class SiriAlertsUpdateHandler {
                                     for (AffectedStopPointStructure affectedStop : affectedStops) {
                                         FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop.getStopPointRef().getValue());
                                         if (stop == null) {
-                                            continue;
+                                            stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
                                         }
                                         // Creating unique, deterministic id for the alert
                                         alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
@@ -391,7 +408,7 @@ public class SiriAlertsUpdateHandler {
                                         List<TimePeriod> timePeriodList = new ArrayList<>();
                                         timePeriodList.add(new TimePeriod(effectiveStartDate.getTime()/1000, effectiveEndDate.getTime()/1000));
                                         // TODO: Make it possible to add time periods for trip selectors
-                                        // alert.setTimePeriods(timePeriodList);
+                                         alert.setTimePeriods(timePeriodList);
                                     }
                                 } else {
                                     alert.addEntity(new EntitySelector.Trip(tripId));
@@ -400,11 +417,88 @@ public class SiriAlertsUpdateHandler {
                                     List<TimePeriod> timePeriodList = new ArrayList<>();
                                     timePeriodList.add(new TimePeriod(effectiveStartDate.getTime()/1000, effectiveEndDate.getTime()/1000));
                                     // TODO: Make it possible to add time periods for trip selectors
-                                    // alert.setTimePeriods(timePeriodList);
+                                     alert.setTimePeriods(timePeriodList);
                                 }
                             }
                         }
                     }
+
+                    final FramedVehicleJourneyRefStructure framedVehicleJourneyRef = affectedVehicleJourney.getFramedVehicleJourneyRef();
+                    if (framedVehicleJourneyRef != null) {
+                        final DataFrameRefStructure dataFrameRef = framedVehicleJourneyRef.getDataFrameRef();
+                        final String datedVehicleJourneyRef = framedVehicleJourneyRef.getDatedVehicleJourneyRef();
+
+                        FeedScopedId tripId = siriFuzzyTripMatcher.getTripId(datedVehicleJourneyRef);
+
+                        ServiceDate serviceDate = null;
+                        if (dataFrameRef != null && dataFrameRef.getValue() != null) {
+                            try {
+                                serviceDate = ServiceDate.parseString(dataFrameRef.getValue().replace("-", ""));
+                            } catch (ParseException e) {
+                                // Ignore field when not valid
+                            }
+                        }
+                        Date effectiveStartDate;
+                        Date effectiveEndDate;
+                        if (serviceDate != null) {
+                            // Calculate exact from-validity based on actual departure
+                            int tripDepartureTime = siriFuzzyTripMatcher.getTripDepartureTime(tripId);
+                            int tripArrivalTime = siriFuzzyTripMatcher.getTripArrivalTime(tripId);
+
+                            // ServiceJourneyId does NOT match - calculate validity based on serviceDate (calculated from originalAimedDepartureTime)
+                            effectiveStartDate = new Date(serviceDate.getAsDate().getTime() + tripDepartureTime * 1000);
+
+                            // Appending 6 hours to end-validity in case of delays.
+                            effectiveEndDate = new Date(effectiveStartDate.getTime() + (tripArrivalTime - tripDepartureTime + 6 * 3600) * 1000);
+
+                            // Verify that calculated validity does not exceed explicitly set validity
+                            if (effectiveStartDate.before(alert.getEffectiveStartDate())) {
+                                effectiveStartDate = alert.getEffectiveStartDate();
+                            }
+                            if (effectiveEndDate.after(alert.getEffectiveEndDate())) {
+                                effectiveEndDate = alert.getEffectiveEndDate();
+                            }
+
+                            if (effectiveStartDate.after(effectiveEndDate) || effectiveStartDate.equals(effectiveEndDate)) {
+                                //Ignore this as situation is no longer valid
+                                continue;
+                            }
+                        } else {
+                            effectiveStartDate = alert.getEffectiveStartDate();
+                            effectiveEndDate = alert.getEffectiveEndDate();
+                        }
+
+                        if (effectiveEndDate == null) {
+                            effectiveEndDate = new Date(Long.MAX_VALUE);
+                        }
+
+                        if (!affectedStops.isEmpty()) {
+                            for (AffectedStopPointStructure affectedStop : affectedStops) {
+                                FeedScopedId stop = siriFuzzyTripMatcher.getStop(affectedStop.getStopPointRef().getValue());
+                                if (stop == null) {
+                                    stop = new FeedScopedId(feedId, affectedStop.getStopPointRef().getValue());
+                                }
+                                //  A tripId for a given date may be reused for other dates not affected by this alert.
+                                List<TimePeriod> timePeriodList = new ArrayList<>();
+                                timePeriodList.add(new TimePeriod(effectiveStartDate.getTime() / 1000, effectiveEndDate.getTime() / 1000));
+
+                                alert.addEntity(new EntitySelector.StopAndTrip(stop, tripId));
+                                // TODO: Make it possible to add time periods for trip selectors
+                                 alert.setTimePeriods(timePeriodList);
+                            }
+                        } else {
+
+                            //  A tripId for a given date may be reused for other dates not affected by this alert.
+                            List<TimePeriod> timePeriodList = new ArrayList<>();
+                            timePeriodList.add(new TimePeriod(effectiveStartDate.getTime() / 1000, effectiveEndDate.getTime() / 1000));
+
+                            alert.addEntity(new EntitySelector.Trip(tripId));
+                            // TODO: Make it possible to add time periods for trip selectors
+                             alert.setTimePeriods(timePeriodList);
+                        }
+
+                    }
+
                     if (lineRef != null) {
 
                         Set<Route> affectedRoutes = siriFuzzyTripMatcher.getRoutes(lineRef);

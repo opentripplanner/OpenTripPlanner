@@ -1217,16 +1217,15 @@ public class TransmodelIndexGraphQLSchema {
                         .name("situationNumber")
                         .type(Scalars.GraphQLString)
                         .description("Operator's internal id for this situation")
-                        .dataFetcher(environment -> null)
+                        .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId())
                         .build())
-                /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("severity")
-                        .type(severityEnum)
+                        .type(EnumTypes.SEVERITY)
                         .description("Severity of this situation ")
-                        .dataFetcher(environment -> ((AlertPatch) environment.getSource()).getAlert().severity)
+                        .dataFetcher(environment -> ((TransitAlert) environment.getSource()).severity)
                         .build())
-                 */
+
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("reportAuthority")
                         .type(authorityType)
