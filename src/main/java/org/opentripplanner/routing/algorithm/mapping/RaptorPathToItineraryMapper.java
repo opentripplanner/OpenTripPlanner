@@ -163,7 +163,7 @@ public class RaptorPathToItineraryMapper {
             leg.arrivalDelay = tripTimes.getArrivalDelay(alightStopIndexInPattern);
         }
 
-        leg.serviceDate = new ServiceDate(request.getDateTime()).asCompactString(); // TODO: This has to be changed for multi-day searches
+        leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
         leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());

@@ -106,6 +106,12 @@ public class RoutingWorker {
         request.setRoutingContext(router.graph);
         if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
 
+        if (!router.graph.transitFeedCovers(request.dateTime)) {
+            throw new RoutingValidationException(List.of(
+                    new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
+            ));
+        }
+
         TransitLayer transitLayer = request.ignoreRealtimeUpdates
             ? router.graph.getTransitLayer()
             : router.graph.getRealtimeTransitLayer();
@@ -224,7 +230,7 @@ public class RoutingWorker {
     private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
         int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
         if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
-            throw new RoutingValidationException(Collections.singletonList(
+            throw new RoutingValidationException(List.of(
                 new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null)));
         }
     }

@@ -23,7 +23,7 @@ public class TripTimeShortHelper {
         if (trip == null) {
             return null;
         }
-        ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
 
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
@@ -51,7 +51,7 @@ public class TripTimeShortHelper {
         if (trip == null) {
             return null;
         }
-        ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
 
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
@@ -80,7 +80,7 @@ public class TripTimeShortHelper {
             return new ArrayList<>();
         }
         Trip trip = routingService.getTripForId().get(leg.tripId);
-        ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
         return routingService.getTripTimesShort(trip, serviceDate);
     }
 
@@ -93,7 +93,7 @@ public class TripTimeShortHelper {
         if (trip == null) {
             return new ArrayList<>();
         }
-        ServiceDate serviceDate = parseServiceDate(leg.serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
 
         List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
         List<TripTimeShort> filteredTripTimes = new ArrayList<>();
@@ -119,17 +119,6 @@ public class TripTimeShortHelper {
         }
 
         return filteredTripTimes;
-    }
-
-
-    private ServiceDate parseServiceDate(String serviceDateString) {
-        ServiceDate serviceDate;
-        try {
-            serviceDate = ServiceDate.parseString(serviceDateString);
-        } catch (ParseException pe) {
-            throw new RuntimeException("Unparsable service date: " + serviceDateString, pe);
-        }
-        return serviceDate;
     }
 
     private boolean matchesQuayOrSiblingQuay(FeedScopedId quayId, FeedScopedId candidate, RoutingService routingService) {
