@@ -11,7 +11,7 @@ import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.ext.transmodelapi.model.base.GqlUtil;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TripPattern;
 

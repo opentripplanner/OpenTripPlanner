@@ -6,13 +6,13 @@ import graphql.schema.GraphQLList;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
-import org.opentripplanner.ext.transmodelapi.model.base.GqlUtil;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.Agency;
 
 import java.util.Objects;
 import java.util.stream.Collectors;
 
-import static org.opentripplanner.ext.transmodelapi.model.base.GqlUtil.getRoutingService;
+import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.getRoutingService;
 
 public class AuthorityType {
 

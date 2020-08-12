@@ -28,7 +28,6 @@ import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
-import org.opentripplanner.ext.transmodelapi.model.base.GqlUtil;
 import org.opentripplanner.ext.transmodelapi.model.framework.AuthorityType;
 import org.opentripplanner.ext.transmodelapi.model.framework.InfoLinkType;
 import org.opentripplanner.ext.transmodelapi.model.framework.LocationInputType;
@@ -58,11 +57,9 @@ import org.opentripplanner.ext.transmodelapi.model.timetable.InterchangeType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.ServiceJourneyType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TimetabledPassingTimeType;
 import org.opentripplanner.ext.transmodelapi.model.timetable.TripMetadataType;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Station;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -90,6 +87,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
@@ -162,11 +160,20 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
     GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface);
 //  GraphQLOutputType carParkType = new GraphQLTypeReference("CarPark");
-    //GraphQLOutputType stopPlaceType = new GraphQLTypeReference("StopPlace");
-    GraphQLOutputType stopPlaceType = StopPlaceType.create(placeInterface, QuayType.REF, tariffZoneType, EstimatedCallType.REF,
+    GraphQLOutputType stopPlaceType = StopPlaceType.create(
+        placeInterface,
+        QuayType.REF,
+        tariffZoneType,
+        EstimatedCallType.REF,
         gqlUtil
     );
-    GraphQLOutputType quayType = QuayType.create(placeInterface, stopPlaceType, LineType.REF, JourneyPatternType.REF, EstimatedCallType.REF, PtSituationElementType.REF,
+    GraphQLOutputType quayType = QuayType.create(
+        placeInterface,
+        stopPlaceType,
+        LineType.REF,
+        JourneyPatternType.REF,
+        EstimatedCallType.REF,
+        PtSituationElementType.REF,
         gqlUtil
     );
     GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
@@ -884,10 +891,12 @@ public class TransmodelGraphQLSchema {
                 .name("id")
                 .type(new GraphQLNonNull(Scalars.GraphQLString))
                 .build())
-            .dataFetcher(env -> {
-              return GqlUtil.getRoutingService(env).getMonoOrMultiModalStation(TransitIdMapper.mapIDToDomain(
-                  env.getArgument("id")));
-            })
+            .dataFetcher(
+                env -> StopPlaceType.fetchStopPlaceById(
+                    TransitIdMapper.mapIDToDomain(env.getArgument("id")),
+                    env
+                )
+            )
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
@@ -903,10 +912,10 @@ public class TransmodelGraphQLSchema {
               if ((env.getArgument("ids") instanceof List)) {
                 return ((List<String>) env.getArgument("ids"))
                     .stream()
-                    .map(id -> {
-                      return GqlUtil.getRoutingService(env).getMonoOrMultiModalStation(TransitIdMapper.mapIDToDomain(
-                          id));
-                    })
+                    .map(TransitIdMapper::mapIDToDomain)
+                    .map(id ->
+                        StopPlaceType.fetchStopPlaceById(id, env)
+                    )
                     .collect(Collectors.toList());
               }
               return new ArrayList<>(GqlUtil.getRoutingService(env).getStations());
@@ -920,22 +929,22 @@ public class TransmodelGraphQLSchema {
             .argument(GraphQLArgument
                 .newArgument()
                 .name("minimumLatitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("minimumLongitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("maximumLatitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("maximumLongitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
@@ -960,40 +969,15 @@ public class TransmodelGraphQLSchema {
                 .defaultValue(Boolean.FALSE)
                 .build())
             .dataFetcher(env -> {
-              Stream<Station> stations = GqlUtil.getRoutingService(env)
-                  .getStopsByBoundingBox(env.getArgument("minimumLatitude"),
-                      env.getArgument("minimumLongitude"),
-                      env.getArgument("maximumLatitude"),
-                      env.getArgument("maximumLongitude")
-                  )
-                  .stream()
-                  .map(Stop::getParentStation)
-                  .filter(Objects::nonNull)
-                  .distinct()
-                  .filter(station -> {
-                    String authority = env.getArgument("authority");
-                    return authority == null || station
-                        .getId()
-                        .getFeedId()
-                        .equalsIgnoreCase(authority);
-                  });
+                double minLat = env.getArgument("minimumLatitude");
+                double minLon = env.getArgument("minimumLongitude");
+                double maxLat = env.getArgument("maximumLatitude");
+                double maxLon = env.getArgument("maximumLongitude");
+                String authority = env.getArgument("authority");
+                boolean filterByInUse = TRUE.equals(env.getArgument("filterByInUse"));
+                String multiModalMode = env.getArgument("multiModalMode");
 
-              if (Boolean.TRUE.equals(env.getArgument("filterByInUse"))) {
-                stations = stations.filter(s -> {
-                  return isStopPlaceInUse(s, GqlUtil.getRoutingService(env));
-                });
-              }
-              return stations.distinct().collect(Collectors.toList());
-
-              //                                String multiModalMode=environment.getArgument("multiModalMode");
-              //                                if ("parent".equals(multiModalMode)){
-              //                                    stops = stops.map(s -> getParentStopPlace(s).orElse(s));
-              //                                }
-              //                                List<Stop> stopList=stops.distinct().collect(Collectors.toList());
-              //                                if ("all".equals(multiModalMode)) {
-              //                                    stopList.addAll(stopList.stream().map(s -> getParentStopPlace(s).orElse(null)).filter(Objects::nonNull).distinct().collect(Collectors.toList()));
-              //                                }
-              //                                return stopList;
+                return StopPlaceType.fetchStopPlaces(minLat, minLon, maxLat, maxLon, authority, filterByInUse, multiModalMode, env);
             })
             .build())
         .field(GraphQLFieldDefinition
@@ -1062,22 +1046,22 @@ public class TransmodelGraphQLSchema {
             .argument(GraphQLArgument
                 .newArgument()
                 .name("minimumLatitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("minimumLongitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("maximumLatitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
                 .name("maximumLongitude")
-                .type(Scalars.GraphQLFloat)
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
@@ -1093,7 +1077,8 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> {
               return GqlUtil.getRoutingService(environment)
-                  .getStopsByBoundingBox(environment.getArgument("minimumLatitude"),
+                  .getStopsByBoundingBox(
+                      environment.getArgument("minimumLatitude"),
                       environment.getArgument("minimumLongitude"),
                       environment.getArgument("maximumLatitude"),
                       environment.getArgument("maximumLongitude")
@@ -1104,8 +1089,12 @@ public class TransmodelGraphQLSchema {
                       .getFeedId()
                       .equalsIgnoreCase(environment.getArgument("authority")))
                   .filter(stop -> {
-                    return !Boolean.TRUE.equals(environment.getArgument("filterByInUse"))
-                        || !GqlUtil.getRoutingService(environment).getPatternsForStop(stop, true).isEmpty();
+                    boolean filterByInUse = TRUE.equals(environment.getArgument("filterByInUse"));
+                    boolean inUse = !GqlUtil
+                        .getRoutingService(environment)
+                        .getPatternsForStop(stop, true)
+                        .isEmpty();
+                    return !filterByInUse || inUse;
                   })
                   .collect(Collectors.toList());
             })
@@ -2337,14 +2326,5 @@ public class TransmodelGraphQLSchema {
 
     private static String reverseMapEnumVal(GraphQLEnumType enumType, Object otpVal) {
         return enumType.getValues().stream().filter(e -> e.getValue().equals(otpVal)).findFirst().get().getName();
-    }
-
-  private static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
-        for (Stop quay : station.getChildStops()) {
-            if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
-                return true;
-            }
-        }
-        return false;
     }
 }

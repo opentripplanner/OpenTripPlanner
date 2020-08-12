@@ -12,10 +12,13 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
-import org.opentripplanner.ext.transmodelapi.model.base.GqlUtil;
 import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.MultiModalStation;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
@@ -23,10 +26,14 @@ import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.Collection;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static java.lang.Boolean.TRUE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 
@@ -117,7 +124,7 @@ public class StopPlaceType {
                 .build())
             .dataFetcher(environment -> {
               Collection<Stop> quays = ((MonoOrMultiModalStation) environment.getSource()).getChildStops();
-              if (Boolean.TRUE.equals(environment.getArgument("filterByInUse"))) {
+              if (TRUE.equals(environment.getArgument("filterByInUse"))) {
                 quays=quays.stream().filter(stop -> {
                   return !GqlUtil.getRoutingService(environment)
                       .getPatternsForStop(stop,true).isEmpty();
@@ -251,7 +258,7 @@ public class StopPlaceType {
 
     Stream<StopTimesInPattern> stopTimesStream = stopTimesInPatterns.stream();
 
-    if(!transitModes.isEmpty()) {
+    if(transitModes != null && !transitModes.isEmpty()) {
       stopTimesStream = stopTimesStream.filter(it -> transitModes.contains(it.pattern.getMode()));
     }
 
@@ -281,6 +288,94 @@ public class StopPlaceType {
             .sorted(TripTimeShort.compareByDeparture())
             .distinct()
             .limit(departuresPerLineAndDestinationDisplay));
+  }
+
+  public static MonoOrMultiModalStation fetchStopPlaceById(FeedScopedId id, DataFetchingEnvironment environment) {
+    RoutingService routingService = GqlUtil.getRoutingService(environment);
+
+    Station station = routingService.getStationById(id);
+
+    if (station != null) {
+      return new MonoOrMultiModalStation(station, routingService.getMultiModalStationForStations().get(station));
+    }
+
+    MultiModalStation multiModalStation = routingService.getMultiModalStation(id);
+
+    if (multiModalStation != null) {
+      return new MonoOrMultiModalStation(multiModalStation);
+    }
+    return null;
+  }
+
+  public static Collection<MonoOrMultiModalStation> fetchStopPlaces(
+      double minLat,
+      double minLon,
+      double maxLat,
+      double maxLon,
+      String authority,
+      Boolean filterByInUse,
+      String multiModalMode,
+      DataFetchingEnvironment environment
+  ) {
+    final RoutingService routingService = GqlUtil.getRoutingService(environment);
+
+    Stream<Station> stations = routingService
+        .getStopsByBoundingBox(minLat, minLon, maxLat, maxLon)
+        .stream()
+        .map(Stop::getParentStation)
+        .filter(Objects::nonNull)
+        .distinct();
+
+    if (authority != null) {
+      stations = stations.filter(s -> s.getId().equals(authority));
+    }
+
+    if (TRUE.equals(filterByInUse)) {
+      stations = stations.filter(s -> isStopPlaceInUse(s, routingService));
+    }
+
+    // "child" - Only mono modal children stop places, not their multi modal parent stop
+    if("child".equals(multiModalMode)) {
+      return stations
+          .map(s -> {
+            MultiModalStation parent = routingService.getMultiModalStationForStations().get(s);
+            return new MonoOrMultiModalStation(s, parent);
+          })
+          .collect(Collectors.toList());
+    }
+    // "all" - Both multiModal parents and their mono modal child stop places
+    else if("all".equals(multiModalMode)) {
+      Set<MonoOrMultiModalStation> result = new HashSet<>();
+      stations.forEach(it -> {
+        MultiModalStation p = routingService.getMultiModalStationForStations().get(it);
+        result.add(new MonoOrMultiModalStation(it, p));
+        if(p != null) {
+          result.add(new MonoOrMultiModalStation(p));
+        }
+      });
+      return result;
+    }
+    // Default "parent" - Multi modal parent stop places without their mono modal children
+    else if("parent".equals(multiModalMode)){
+      return stations
+          .map(it -> routingService.getMultiModalStationForStations().get(it))
+          .filter(Objects::nonNull)
+          .distinct()
+          .map(MonoOrMultiModalStation::new)
+          .collect(Collectors.toUnmodifiableList());
+    }
+    else {
+      throw new IllegalArgumentException("Unexpected multiModalMode: " + multiModalMode);
+    }
+  }
+
+  public static boolean isStopPlaceInUse(StopCollection station, RoutingService routingService) {
+    for (Stop quay : station.getChildStops()) {
+      if (!routingService.getPatternsForStop(quay, true).isEmpty()) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private static String destinationDisplayPerLine(TripTimeShort t, RoutingService routingService) {

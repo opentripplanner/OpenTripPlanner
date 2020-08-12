@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model.base;
+package org.opentripplanner.ext.transmodelapi.support;
 
 import graphql.Scalars;
 import graphql.schema.DataFetchingEnvironment;
@@ -11,10 +11,10 @@ import graphql.schema.GraphQLScalarType;
 import org.opentripplanner.ext.transmodelapi.TransmodelRequestContext;
 import org.opentripplanner.ext.transmodelapi.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.model.base.scalars.DateScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.base.scalars.DateTimeScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.base.scalars.LocalTimeScalarFactory;
-import org.opentripplanner.ext.transmodelapi.model.base.scalars.TimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
 
 import java.util.List;

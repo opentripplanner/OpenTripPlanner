@@ -22,7 +22,6 @@ import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -1033,21 +1032,12 @@ public class Graph implements Serializable {
         return stationById.get(id);
     }
 
-    public Collection<Station> getStations() {
-        return stationById.values();
+    public MultiModalStation getMultiModalStation(FeedScopedId id) {
+        return multiModalStationById.get(id);
     }
 
-    @SuppressWarnings({"unused", "UsedBy @Delegate"})
-    public MonoOrMultiModalStation getMonoOrMultiModalStation(FeedScopedId id) {
-        Station station = getStationById(id);
-        if (station != null) {
-            return new MonoOrMultiModalStation(station, index.getMultiModalStationForStations().get(station));
-        }
-        MultiModalStation multiModalStation = multiModalStationById.get(id);
-        if (multiModalStation != null) {
-            return new MonoOrMultiModalStation(multiModalStation);
-        }
-        return null;
+    public Collection<Station> getStations() {
+        return stationById.values();
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {

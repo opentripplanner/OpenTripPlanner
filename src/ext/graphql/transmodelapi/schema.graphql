@@ -364,7 +364,9 @@ type Quay implements PlaceInterface {
         startTime: DateTime,
         timeRange: Int = 86400,
         "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
-        whiteListed: InputWhiteListed
+        whiteListed: InputWhiteListed,
+        "Only show estimated calls for selected modes."
+        whiteListedModes: [TransportMode]
     ): [EstimatedCall]!
     "Geometry for flexible area."
     flexibleArea: Coordinates
@@ -433,10 +435,10 @@ type QueryType {
         authority: String,
         "If true only quays with at least one visiting line are included."
         filterByInUse: Boolean = false,
-        maximumLatitude: Float,
-        maximumLongitude: Float,
-        minimumLatitude: Float,
-        minimumLongitude: Float
+        maximumLatitude: Float!,
+        maximumLongitude: Float!,
+        minimumLatitude: Float!,
+        minimumLongitude: Float!
     ): [Quay]!
     "Get all quays within the specified radius from a location. The returned type has two fields quay and distance"
     quaysByRadius(
@@ -489,17 +491,17 @@ type QueryType {
         authority: String,
         "If true only stop places with at least one visiting line are included."
         filterByInUse: Boolean = false,
-        maximumLatitude: Float,
-        maximumLongitude: Float,
-        minimumLatitude: Float,
-        minimumLongitude: Float,
+        maximumLatitude: Float!,
+        maximumLongitude: Float!,
+        minimumLatitude: Float!,
+        minimumLongitude: Float!,
         "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response. Does not affect mono modal stop places that do not belong to a multi modal stop place."
         multiModalMode: MultiModalMode = parent
     ): [StopPlace]!
     "Input type for executing a travel search for a trip between two locations. Returns trip patterns describing suggested alternatives for the trip."
     trip(
         "The alightSlack is the minimum extra time after exiting a public transport vehicle. This is the default value used, if not overridden by the 'alightSlackList'."
-        alightSlackDefault: Int = 0,
+        alightSlackDefault: Int = 15,
         "List of alightSlack for a given set of modes. Defaults: []"
         alightSlackList: [TransportModeSlack],
         "Is bike rental allowed?"
@@ -511,8 +513,8 @@ type QueryType {
         "The maximum bike speed along streets, in meters per second"
         bikeSpeed: Float = 5.0,
         "The boardSlack is the minimum extra time to board a public transport vehicle. This is the same as the 'minimumTransferTime', except that this also apply to to the first transit leg in the trip. This is the default value used, if not overridden by the 'boardSlackList'."
-        boardSlackDefault: Int = 0,
-        "List of boardSlack for a given set of modes. Defaults: []"
+        boardSlackDefault: Int = 30,
+        "List of boardSlack for a given set of modes. Defaults: [rail : 120, water : 300, air : 1800]"
         boardSlackList: [TransportModeSlack],
         "DEPRECATED - NO EFFECT IN OTP2"
         compactLegsByReversedSearch: Boolean = false,
@@ -526,17 +528,17 @@ type QueryType {
         ignoreRealtimeUpdates: Boolean = false,
         locale: Locale = no,
         "Maximum time for the ride part of \"kiss and ride\" and \"ride and kiss\"."
-        maxPreTransitTime: Int = 600,
+        maxPreTransitTime: Int = 1800,
         "Max walk distance for access/egress legs. NOT IMPLEMENTED"
         maxPreTransitWalkDistance: Float,
         "The maximum walk distance allowed for transfers."
-        maxTransferWalkDistance: Float = 2000.0,
+        maxTransferWalkDistance: Float = 1.7976931348623157E+308,
         "Maximum number of transfers"
         maximumTransfers: Int,
         "DEPRECATED - Use maxPreTransitWalkDistance/maxTransferWalkDistance instead. The maximum distance (in meters) the user is willing to walk. Note that trip patterns with longer walking distances will be penalized, but not altogether disallowed. Maximum allowed value is 15000 m"
-        maximumWalkDistance: Float = 5000.0,
+        maximumWalkDistance: Float = 1.7976931348623157E+308,
         "DEPRECATED - Use 'transferSlack/boardSlack/alightSlack' instead.  "
-        minimumTransferTime: Int = 120,
+        minimumTransferTime: Int = 60,
         "The set of access/egress/direct/transit modes to be used for this search."
         modes: Modes,
         "The maximum number of trip patterns to return."
@@ -554,7 +556,7 @@ type QueryType {
         "An extra penalty added on transfers (i.e. all boardings except the first one). The transferPenalty is used when a user requests even less transfers. In the latter case, we don't actually optimise for fewest transfers, as this can lead to absurd results. Consider a trip in New York from Grand Army Plaza (the one in Brooklyn) to Kalustyan's at noon. The true lowest transfers trip pattern is to wait until midnight, when the 4 train runs local the whole way. The actual fastest trip pattern is the 2/3 to the 4/5 at Nevins to the 6 at Union Square, which takes half an hour. Even someone optimise for fewest transfers doesn't want to wait until midnight. Maybe they would be willing to walk to 7th Ave and take the Q to Union Square, then transfer to the 6. If this takes less than transferPenalty seconds, then that's what we'll return."
         transferPenalty: Int = 0,
         "An expected transfer time (in seconds) that specifies the amount of time that must pass between exiting one public transport vehicle and boarding another. This time is in addition to time it might take to walk between stops."
-        transferSlack: Int = 120,
+        transferSlack: Int = 60,
         "Optional set of allowed submodes per transport mode provided in 'modes'. If at least one submode is set for a transport mode all submodes not set will be disregarded. Note that transportMode must also be included in 'modes' for the submodes to be allowed"
         transportSubmodes: [TransportSubmodeFilter] = [],
         "Parameters for indicating authorities or lines that preferably should not be used in trip patters. A cost is applied to boarding nonpreferred authorities or lines (otherThanPreferredRoutesPenalty)."
@@ -564,9 +566,9 @@ type QueryType {
         "An ordered list of intermediate locations to be visited."
         vias: [Location],
         "Walk cost is multiplied by this value. This is the main parameter to use for limiting walking."
-        walkReluctance: Float = 4.0,
+        walkReluctance: Float = 2.0,
         "The maximum walk speed along streets, in meters per second"
-        walkSpeed: Float = 1.3,
+        walkSpeed: Float = 1.33,
         "Whether the trip must be wheelchair accessible."
         wheelchair: Boolean = false,
         "Parameters for indicating the only authorities, lines or quays to be used in the trip patterns"
@@ -733,7 +735,9 @@ type StopPlace implements PlaceInterface {
         startTime: DateTime,
         timeRange: Int = 86400,
         "Parameters for indicating the only authorities and/or lines or quays to list estimatedCalls for"
-        whiteListed: InputWhiteListed
+        whiteListed: InputWhiteListed,
+        "Only show estimated calls for selected modes."
+        whiteListedModes: [TransportMode]
     ): [EstimatedCall]!
     id: ID!
     latitude: Float
@@ -1273,6 +1277,12 @@ input TransportSubmodeFilter {
 }
 
 
+"List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]"
+scalar Coordinates
+
+"Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`."
+scalar Date
+
 """
 DateTime format accepting ISO 8601 dates with time zone offset.
 
@@ -1282,16 +1292,11 @@ Example: `2017-04-23T18:25:43+02:00` or `2017-04-23T16:25:43Z`
 """
 scalar DateTime
 
-scalar Coordinates
+"Time using the format: HH:mm:SS. Example: 18:25:SS"
+scalar LocalTime
 
 "Long type"
 scalar Long
-
-"Local date using the ISO 8601 format: `YYYY-MM-DD`. Example: `2020-05-17`."
-scalar Date
-
-"Time using the format: HH:mm:SS. Example: 18:25:SS"
-scalar LocalTime
 
 "Time using the format: `HH:MM:SS`. Example: `18:25:43`"
 scalar Time

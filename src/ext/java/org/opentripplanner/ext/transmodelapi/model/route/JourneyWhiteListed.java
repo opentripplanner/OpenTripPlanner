@@ -16,7 +16,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Stream;
 
-import static org.opentripplanner.ext.transmodelapi.model.base.GqlUtil.newIdListInputField;
+import static org.opentripplanner.ext.transmodelapi.support.GqlUtil.newIdListInputField;
 
 public class JourneyWhiteListed {
     public static final GraphQLInputObjectType INPUT_TYPE = GraphQLInputObjectType.newInputObject()

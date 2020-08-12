@@ -3,7 +3,7 @@ package org.opentripplanner.ext.transmodelapi.model.framework;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLObjectType;
 import org.apache.commons.lang3.tuple.Pair;
-import org.opentripplanner.ext.transmodelapi.model.base.GqlUtil;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 
 public class ValidityPeriodType {
 

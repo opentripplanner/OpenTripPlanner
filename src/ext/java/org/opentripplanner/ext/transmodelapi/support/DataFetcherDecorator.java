@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model.base;
+package org.opentripplanner.ext.transmodelapi.support;
 
 import graphql.schema.DataFetchingEnvironment;
 
