@@ -6,6 +6,7 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.util.ElevationUtils;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleSplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.I18NString;
 
@@ -139,16 +140,20 @@ final public class TemporaryPartialStreetEdge extends StreetWithElevationEdge im
 
     private void assertEdgeIsNotDirectedAwayFromTemporaryEndVertex(StreetVertex v1) {
         if(v1 instanceof TemporaryVertex) {
-            if (((TemporaryVertex)v1).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed away from an end vertex");
+            if (!(v1 instanceof TemporaryRentVehicleSplitterVertex)) { // When renting vehicles we want to connect it in both ways
+                if (((TemporaryVertex) v1).isEndVertex()) {
+                    throw new IllegalStateException("A temporary edge is directed away from an end vertex");
+                }
             }
         }
     }
 
     private void assertEdgeIsDirectedTowardsTemporaryEndVertex(StreetVertex v2) {
         if(v2 instanceof TemporaryVertex) {
-            if (!((TemporaryVertex)v2).isEndVertex()) {
-                throw new IllegalStateException("A temporary edge is directed towards a start vertex");
+            if (!(v2 instanceof TemporaryRentVehicleSplitterVertex)) { // When renting vehicles we want to connect it in both ways
+                if (!((TemporaryVertex) v2).isEndVertex()) {
+                    throw new IllegalStateException("A temporary edge is directed towards a start vertex");
+                }
             }
         }
     }

@@ -77,7 +77,7 @@ public class ParkingZonesCalculatorTest {
 
         // when
         List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForRentEdge(edge, parkingZonesEnabled);
+        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
 
         // then
         assertEquals(0, parkingZonesForEdge.size());
@@ -91,7 +91,7 @@ public class ParkingZonesCalculatorTest {
 
         // when
         List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForRentEdge(edge, parkingZonesEnabled);
+        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
 
         // then
         assertEquals(1, parkingZonesForEdge.size());
@@ -105,7 +105,7 @@ public class ParkingZonesCalculatorTest {
 
         // when
         List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForRentEdge(edge, parkingZonesEnabled);
+        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
 
         // then
         assertEquals(0, parkingZonesForEdge.size());

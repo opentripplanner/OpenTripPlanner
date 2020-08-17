@@ -6,23 +6,21 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 import java.util.Objects;
-import java.util.stream.Collectors;
 
-public class VehiclePositionsDiff {
+import static java.util.stream.Collectors.toList;
 
-    private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionsDiff.class);
+public class VehiclePositionsMapper {
 
-    private static final String CAR = "car";
-    private static final String MOTORBIKE = "scooter";
-    private static final String KICKSCOOTER = "un-pedal-scooter";
+    private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionsMapper.class);
 
-    private final List<VehicleDescription> appeared;
-
-    public VehiclePositionsDiff(List<SharedVehiclesApiResponse.Vehicle> vehicles) {
-        this.appeared = vehicles.stream().map(this::mapper).filter(Objects::nonNull).collect(Collectors.toList());
+    public List<VehicleDescription> map(List<SharedVehiclesApiResponse.Vehicle> vehicles) {
+        return vehicles.stream()
+                .map(this::mapToVehicleDescription)
+                .filter(Objects::nonNull)
+                .collect(toList());
     }
 
-    private VehicleDescription mapper(SharedVehiclesApiResponse.Vehicle vehicle) {
+    private VehicleDescription mapToVehicleDescription(SharedVehiclesApiResponse.Vehicle vehicle) {
         if (vehicle.getProvider() == null) {
             LOG.warn("Omitting vehicle {} because of lack of provider", vehicle.getProviderVehicleId());
             return null;
@@ -51,9 +49,5 @@ public class VehiclePositionsDiff {
                 LOG.warn("Omitting vehicle {} because of unsupported type {}", providerVehicleId, vehicleType);
                 return null;
         }
-    }
-
-    public List<VehicleDescription> getAppeared() {
-        return appeared;
     }
 }

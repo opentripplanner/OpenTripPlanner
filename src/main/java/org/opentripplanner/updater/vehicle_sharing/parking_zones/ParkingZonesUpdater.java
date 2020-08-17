@@ -39,7 +39,7 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
         return graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull)
-                .collect(toMap(identity(), e -> calculator.getParkingZonesForRentEdge(e, parkingZonesEnabled)));
+                .collect(toMap(identity(), e -> calculator.getParkingZonesForEdge(e, parkingZonesEnabled)));
     }
 
     @Override

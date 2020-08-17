@@ -100,6 +100,10 @@ public class SharedVehiclesApiResponse {
         public void setProvider(VehicleProvider provider) {
             this.provider = provider;
         }
+
+        public void setRange(Double range) {
+            this.range = range;
+        }
     }
 
     public static class VehicleProvider {

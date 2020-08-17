@@ -1,11 +1,7 @@
 package org.opentripplanner.routing.core.vehicle_sharing;
 
 
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.fasterxml.jackson.annotation.JsonProperty;
-import com.fasterxml.jackson.annotation.JsonSubTypes;
-import com.fasterxml.jackson.annotation.JsonTypeInfo;
-import com.fasterxml.jackson.annotation.JsonUnwrapped;
+import com.fasterxml.jackson.annotation.*;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -81,11 +77,11 @@ public abstract class VehicleDescription {
         return providerVehicleId;
     }
 
-    FuelType getFuelType() {
+    public FuelType getFuelType() {
         return fuelType;
     }
 
-    Gearbox getGearbox() {
+    public Gearbox getGearbox() {
         return gearbox;
     }
 

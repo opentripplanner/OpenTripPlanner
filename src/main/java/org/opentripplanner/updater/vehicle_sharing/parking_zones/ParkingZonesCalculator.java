@@ -5,8 +5,8 @@ import org.locationtech.jts.geom.CoordinateXY;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
+import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 
 import java.util.List;
 import java.util.Objects;
@@ -28,8 +28,8 @@ public class ParkingZonesCalculator {
                 .collect(toList());
     }
 
-    public List<SingleParkingZone> getParkingZonesForRentEdge(RentVehicleAnywhereEdge edge,
-                                                              List<SingleParkingZone> parkingZonesEnabled) {
+    public List<SingleParkingZone> getParkingZonesForEdge(EdgeWithParkingZones edge,
+                                                          List<SingleParkingZone> parkingZonesEnabled) {
         Point point = createPoint(edge);
         return geometryParkingZones.stream()
                 .map(gpz -> findMatchingParkingZone(point, gpz, parkingZonesEnabled))
@@ -37,8 +37,8 @@ public class ParkingZonesCalculator {
                 .collect(toList());
     }
 
-    private Point createPoint(RentVehicleAnywhereEdge e) {
-        CoordinateXY coord = new CoordinateXY(e.getFromVertex().getLon(), e.getFromVertex().getLat());
+    private Point createPoint(EdgeWithParkingZones edge) {
+        CoordinateXY coord = new CoordinateXY(edge.getFromVertex().getLon(), edge.getFromVertex().getLat());
         return new Point(new CoordinateArraySequence(new Coordinate[]{coord}), new GeometryFactory());
     }
 

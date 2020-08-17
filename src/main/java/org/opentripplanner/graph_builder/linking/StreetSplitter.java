@@ -8,6 +8,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleSplitterVertex;
 import org.opentripplanner.routing.vertextype.TemporarySplitterVertex;
 
 /**
@@ -25,7 +26,7 @@ public class StreetSplitter {
     }
 
     /**
-     * Split the street edge at the given fraction
+     * Split the street edge at the given fraction with default temporary {@link SplitterVertex}
      *
      * @param edge      to be split
      * @param ll        fraction at which to split the edge
@@ -37,6 +38,24 @@ public class StreetSplitter {
 
         // every edge can be split exactly once, so this is a valid label
         SplitterVertex v = new TemporarySplitterVertex("split from " + edge.getId(), splitPoint.x, splitPoint.y, edge, endVertex);
+
+        // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
+        // existing vertices
+        edge.split(v, false);
+        return v;
+    }
+
+    /**
+     * Split the street edge at the given fraction with {@link TemporaryRentVehicleSplitterVertex}
+     *
+     * @param edge to be split
+     * @param ll   fraction at which to split the edge
+     * @return Splitter vertex with added new edges
+     */
+    public TemporaryRentVehicleSplitterVertex splitTemporarilyWithRentVehicleSplitterVertex(StreetEdge edge, LinearLocation ll) {
+        Coordinate splitPoint = getSplitPoint(edge, ll);
+
+        TemporaryRentVehicleSplitterVertex v = new TemporaryRentVehicleSplitterVertex("temporary rent vehicle split from " + edge.getId(), splitPoint.x, splitPoint.y, edge);
 
         // Split the 'edge' at 'v' in 2 new edges and connect these 2 edges to the
         // existing vertices

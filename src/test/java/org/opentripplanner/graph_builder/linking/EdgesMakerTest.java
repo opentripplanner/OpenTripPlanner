@@ -9,6 +9,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 
 import static org.junit.Assert.assertEquals;
@@ -19,6 +20,7 @@ public class EdgesMakerTest {
 
     private TemporaryStreetLocation origin;
     private TemporaryStreetLocation destination;
+    private TemporaryRentVehicleVertex rentVehicleVertex;
     private StreetVertex to;
     private TransitStop transitStop;
 
@@ -28,6 +30,7 @@ public class EdgesMakerTest {
         origin = new TemporaryStreetLocation("id1", coordinate, null, false);
         destination = new TemporaryStreetLocation("id2", coordinate, null, true);
         to = new StreetLocation("id4", coordinate, "name");
+        rentVehicleVertex = new TemporaryRentVehicleVertex("id3", coordinate, "name");
 
         Graph graph = new Graph();
         Stop stop = new Stop();
@@ -104,5 +107,22 @@ public class EdgesMakerTest {
         assertEquals(1, transitStop.getIncoming().size());
         assertEquals(1, to.getOutgoing().size());
         assertEquals(transitStop.getIncoming(), to.getOutgoing());
+    }
+
+    @Test
+    public void shouldCreateTemporaryEdgesBothWays() {
+        // given
+
+        // when
+        edgesMaker.makeTemporaryEdgesBothWays(rentVehicleVertex, to);
+
+        // then
+        assertEquals(1, rentVehicleVertex.getOutgoing().size());
+        assertEquals(1, to.getIncoming().size());
+        assertEquals(rentVehicleVertex.getOutgoing(), to.getIncoming());
+
+        assertEquals(1, rentVehicleVertex.getIncoming().size());
+        assertEquals(1, to.getIncoming().size());
+        assertEquals(rentVehicleVertex.getIncoming(), to.getOutgoing());
     }
 }

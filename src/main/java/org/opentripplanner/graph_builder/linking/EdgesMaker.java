@@ -5,7 +5,9 @@ import org.opentripplanner.routing.edgetype.StreetBikeParkLink;
 import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
 import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleLinkEdge;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.*;
 import org.slf4j.Logger;
@@ -20,7 +22,7 @@ public class EdgesMaker {
 
     /**
      * Make temporary edges to origin/destination vertex in origin/destination search
-     **/
+     */
     public void makeTemporaryEdges(TemporaryStreetLocation temporary, Vertex graphVertex) {
         propagateWheelchairAccessibleIfNeeded(temporary, graphVertex);
         if (temporary.isEndVertex()) {
@@ -32,7 +34,16 @@ public class EdgesMaker {
         }
     }
 
-    private void propagateWheelchairAccessibleIfNeeded(TemporaryStreetLocation temporary, Vertex graphVertex) {
+    /**
+     * Make temporary edges to and from temporary renting vehicle vertex in linking rentable vehicles
+     */
+    public void makeTemporaryEdgesBothWays(TemporaryRentVehicleVertex temporary, Vertex graphVertex) {
+        propagateWheelchairAccessibleIfNeeded(temporary, graphVertex);
+        new RentVehicleLinkEdge(graphVertex, temporary);
+        new RentVehicleLinkEdge(temporary, graphVertex);
+    }
+
+    private void propagateWheelchairAccessibleIfNeeded(StreetLocation temporary, Vertex graphVertex) {
         if (graphVertex instanceof TemporarySplitterVertex) {
             temporary.setWheelchairAccessible(((TemporarySplitterVertex) graphVertex).isWheelchairAccessible());
         }

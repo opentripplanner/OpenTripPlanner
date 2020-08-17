@@ -8,6 +8,8 @@ import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.trippattern.TripTimes;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleSplitterVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -112,8 +114,7 @@ public class StateEditor {
         }
 
         // Check TemporaryVertex on a different request
-        if ((getVertex() instanceof TemporaryVertex)
-                && !child.getOptions().rctx.temporaryVertices.contains(getVertex())) {
+        if (isTemporaryVertexFromDifferentRequest()) {
             return null;
         }
 
@@ -133,6 +134,14 @@ public class StateEditor {
         }
         spawned = true;
         return child;
+    }
+
+    private boolean isTemporaryVertexFromDifferentRequest() {
+        Vertex vertex = getVertex();
+        return vertex instanceof TemporaryVertex
+                && !(vertex instanceof TemporaryRentVehicleSplitterVertex)
+                && !(vertex instanceof TemporaryRentVehicleVertex)
+                && !child.getOptions().rctx.temporaryVertices.contains(vertex);
     }
 
     public boolean weHaveWalkedTooFar(RoutingRequest options) {

@@ -10,10 +10,6 @@ import com.esotericsoftware.kryo.serializers.ExternalizableSerializer;
 import com.esotericsoftware.kryo.serializers.JavaSerializer;
 import com.google.common.annotations.VisibleForTesting;
 import com.google.common.collect.*;
-import org.locationtech.jts.geom.Coordinate;
-import org.locationtech.jts.geom.Envelope;
-import org.locationtech.jts.geom.Geometry;
-import org.locationtech.jts.geom.Polygon;
 import de.javakaffee.kryoserializers.UnmodifiableCollectionsSerializer;
 import gnu.trove.impl.hash.TPrimitiveHash;
 import gnu.trove.list.TDoubleList;
@@ -22,24 +18,29 @@ import gnu.trove.list.linked.TDoubleLinkedList;
 import gnu.trove.map.hash.TIntIntHashMap;
 import org.apache.commons.math3.stat.descriptive.rank.Median;
 import org.joda.time.DateTime;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
+import org.locationtech.jts.geom.Geometry;
+import org.locationtech.jts.geom.Polygon;
 import org.objenesis.strategy.SerializingInstantiatorStrategy;
-import org.opentripplanner.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.gtfs.GtfsLibrary;
-import org.opentripplanner.model.*;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.analyst.core.GeometryIndex;
 import org.opentripplanner.analyst.request.SampleFactory;
+import org.opentripplanner.calendar.impl.CalendarServiceImpl;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.kryo.HashBiMapSerializer;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
@@ -50,6 +51,7 @@ import org.opentripplanner.routing.services.StreetVertexIndexService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.vertextype.PatternArriveVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.routing.vertextype.TransitStop;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -218,13 +220,25 @@ public class Graph implements Serializable {
     /** Parent stops **/
     public Map<FeedScopedId, Stop> parentStopById = new HashMap<>();
 
-    /** Whether to use flex modes */
+    /**
+     * Whether to use flex modes
+     */
     public boolean useFlexService = false;
 
-    /** Areas for flex service */
+    /**
+     * Areas for flex service
+     */
     public Map<FeedScopedId, Geometry> flexAreasById = new HashMap<>();
 
+    /**
+     * Used for calculating parking zones for temporary vehicle dropoff edges added to graph
+     */
     public ParkingZonesCalculator parkingZonesCalculator;
+
+    /**
+     * Vehicles which we tried to link to graph. If vertex is present, then we succeeded in linking that vehicle
+     */
+    public final Map<VehicleDescription, Optional<TemporaryRentVehicleVertex>> vehiclesTriedToLink = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();

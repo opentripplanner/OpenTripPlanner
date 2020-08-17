@@ -12,6 +12,7 @@ import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 
 import static org.mockito.Mockito.*;
 
@@ -24,6 +25,7 @@ public class ToEdgeLinkerTest {
     private ToEdgeLinker toEdgeLinker;
 
     private TemporaryStreetLocation temporaryStreetLocation;
+    private TemporaryRentVehicleVertex temporaryRentVehicleVertex;
     private StreetVertex vertex;
     private StreetEdge edge;
     private LinearLocation ll;
@@ -37,6 +39,7 @@ public class ToEdgeLinkerTest {
 
         Coordinate coordinate = new Coordinate(1, 2);
         temporaryStreetLocation = new TemporaryStreetLocation("id1", coordinate, null, false);
+        temporaryRentVehicleVertex = new TemporaryRentVehicleVertex("id3", coordinate, "name");
         vertex = new StreetLocation("id1", coordinate, "name");
 
         StreetVertex from = new StreetLocation("id1", new Coordinate(0, 1), "name");
@@ -67,6 +70,18 @@ public class ToEdgeLinkerTest {
         // then
         verify(streetSplitter, times(1)).splitPermanently(edge, ll);
         verify(edgesMaker, times(1)).makePermanentEdges(eq(vertex), any());
+        verifyNoMoreInteractions(streetSplitter, edgesMaker);
+        verifyZeroInteractions(linkingGeoTools);
+    }
+
+    @Test
+    public void shouldLinkVertexOnEdgeBothWaysTemporarily() {
+        // when
+        toEdgeLinker.linkVertexToEdgeBothWaysTemporarily(temporaryRentVehicleVertex, edge, ll);
+
+        // then
+        verify(streetSplitter, times(1)).splitTemporarilyWithRentVehicleSplitterVertex(edge, ll);
+        verify(edgesMaker, times(1)).makeTemporaryEdgesBothWays(eq(temporaryRentVehicleVertex), any());
         verifyNoMoreInteractions(streetSplitter, edgesMaker);
         verifyZeroInteractions(linkingGeoTools);
     }

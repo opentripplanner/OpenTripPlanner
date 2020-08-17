@@ -11,10 +11,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.vertextype.IntersectionVertex;
-import org.opentripplanner.routing.vertextype.SplitterVertex;
-import org.opentripplanner.routing.vertextype.StreetVertex;
-import org.opentripplanner.routing.vertextype.TransitStop;
+import org.opentripplanner.routing.vertextype.*;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 
@@ -46,7 +43,7 @@ public class ToEdgeLinker {
     }
 
     /**
-     * Temporarily split edge at given location and link vertex to that split
+     * Temporarily split edge at given location and link vertex to that split (make connection from `origin` or to `destination`)
      */
     public void linkVertexToEdgeTemporarily(TemporaryStreetLocation temporaryVertex, StreetEdge edge, LinearLocation ll) {
         SplitterVertex splitterVertex = splitter.splitTemporarily(edge, ll, temporaryVertex.isEndVertex());
@@ -54,7 +51,16 @@ public class ToEdgeLinker {
     }
 
     /**
-     * Permanently split edge at given location and link vertex to that split
+     * Temporarily split edge at given location and link vertex to that split both ways (make connections both to and from `temporaryVertex`)
+     */
+    public void linkVertexToEdgeBothWaysTemporarily(TemporaryRentVehicleVertex temporaryVertex, StreetEdge edge, LinearLocation ll) {
+        SplitterVertex splitterVertex = splitter.splitTemporarilyWithRentVehicleSplitterVertex(edge, ll);
+        edgesMaker.makeTemporaryEdgesBothWays(temporaryVertex, splitterVertex);
+    }
+
+    /**
+     * Permanently split edge at given location and link vertex to that split (make connections both to and from
+     * `vertex` and remove original edge)
      */
     public void linkVertexToEdgePermanently(Vertex vertex, StreetEdge edge, LinearLocation ll) {
         SplitterVertex splitterVertex = splitter.splitPermanently(edge, ll);

@@ -13,6 +13,7 @@ import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.location.StreetLocation;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleSplitterVertex;
 
 import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
@@ -101,6 +102,30 @@ public class StreetSplitterTest {
         assertFalse(splitterVertex.getOutgoing().stream().findFirst().get() instanceof TemporaryEdge);
 
         assertEquals(0, from.getIncoming().size());
+        assertEquals(0, to.getOutgoing().size());
+
+        verify(ll, times(1)).getCoordinate(streetEdge.getGeometry());
+    }
+
+    @Test
+    public void shouldSplitEdgeTemporarilyWithRentVehicleVertex() {
+        // when
+        TemporaryRentVehicleSplitterVertex splitterVertex = streetSplitter.splitTemporarilyWithRentVehicleSplitterVertex(streetEdge, ll);
+
+        // then
+        assertEquals(1, splitterVertex.getIncoming().size());
+        Edge temporaryEdgeToSplitter = splitterVertex.getIncoming().stream().findFirst().get();
+        assertTrue(temporaryEdgeToSplitter instanceof TemporaryEdge);
+        assertTrue(from.getOutgoing().contains(temporaryEdgeToSplitter));
+
+        assertEquals(1, splitterVertex.getOutgoing().size());
+        Edge temporaryEdgeFromSplitter = splitterVertex.getOutgoing().stream().findFirst().get();
+        assertTrue(temporaryEdgeFromSplitter instanceof TemporaryEdge);
+        assertTrue(to.getIncoming().contains(temporaryEdgeFromSplitter));
+
+        assertEquals(0, from.getIncoming().size());
+        assertEquals(2, from.getOutgoing().size()); // we add one outgoing temporary edge
+        assertEquals(2, to.getIncoming().size()); // we add one incoming temporary edge
         assertEquals(0, to.getOutgoing().size());
 
         verify(ll, times(1)).getCoordinate(streetEdge.getGeometry());

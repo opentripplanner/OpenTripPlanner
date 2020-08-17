@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 
+import java.util.Objects;
+
 public class KickScooterDescription extends VehicleDescription {
     private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 15. * (10. / 36.);
     private static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 10. * (10. / 36.);
@@ -61,5 +63,19 @@ public class KickScooterDescription extends VehicleDescription {
     @Override
     protected Double getMaximumRangeInMeters() {
         return getDefaultRangeInMeters();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KickScooterDescription that = (KickScooterDescription) o;
+        return Objects.equals(getProviderVehicleId(), that.getProviderVehicleId()) &&
+                Objects.equals(getProvider(), that.getProvider());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(getProviderVehicleId(), getProvider());
     }
 }

@@ -816,11 +816,12 @@ public class StreetEdge extends Edge implements Cloneable {
                 e.setBack(isBack());
             }
         } else {
-            if (((TemporarySplitterVertex) v).isEndVertex()) {
+            if (((TemporarySplitterVertex) v).isEndVertex() || v instanceof TemporaryRentVehicleSplitterVertex) {
                 e1 = new TemporaryPartialStreetEdge(this, (StreetVertex) fromv, v, geoms.first, name);
                 e1.setNoThruTraffic(this.isNoThruTraffic());
                 e1.setStreetClass(this.getStreetClass());
-            } else {
+            }
+            if (!((TemporarySplitterVertex) v).isEndVertex() || v instanceof TemporaryRentVehicleSplitterVertex) {
                 e2 = new TemporaryPartialStreetEdge(this, v, (StreetVertex) tov, geoms.second, name);
                 e2.setNoThruTraffic(this.isNoThruTraffic());
                 e2.setStreetClass(this.getStreetClass());

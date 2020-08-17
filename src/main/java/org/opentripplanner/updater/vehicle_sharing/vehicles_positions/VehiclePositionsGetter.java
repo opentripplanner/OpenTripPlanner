@@ -1,9 +1,12 @@
 package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.List;
 
 public class VehiclePositionsGetter {
 
@@ -37,6 +40,8 @@ public class VehiclePositionsGetter {
                     "  }\\n" +
                     "}\",";
 
+    private final VehiclePositionsMapper mapper = new VehiclePositionsMapper();
+
     private String getArguments(Graph graph) {
         double latMin = graph.getEnvelope().getLowerLeftLatitude();
         double lonMin = graph.getEnvelope().getLowerLeftLongitude();
@@ -50,11 +55,11 @@ public class VehiclePositionsGetter {
                 "}}";
     }
 
-    VehiclePositionsDiff getVehiclePositionsDiff(Graph graph, String url) {
+    public List<VehicleDescription> getVehicleDescriptions(Graph graph, String url) {
         String arguments = getArguments(graph);
         String body = QUERY + arguments;
         SharedVehiclesApiResponse response = HttpUtils.postData(url, body, SharedVehiclesApiResponse.class);
         LOG.info("Got {} vehicles from API", response.getData().getVehicles().size());
-        return new VehiclePositionsDiff(response.getData().getVehicles());
+        return mapper.map(response.getData().getVehicles());
     }
 }
