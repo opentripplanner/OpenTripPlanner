@@ -61,9 +61,6 @@ public class RoutingContext implements Cloneable {
 
     public RemainingWeightHeuristic remainingWeightHeuristic;
 
-    /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public DebugOutput debugOutput = new DebugOutput();
-
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
 
@@ -157,7 +154,6 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
-        this.debugOutput.startedCalculating();
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
@@ -237,14 +233,14 @@ public class RoutingContext implements Cloneable {
         List<RoutingError> routingErrors = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
-        if (fromVertices == null) {
+        if (fromVertices == null && !(opt.oneToMany == true && opt.arriveBy == true)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
             );
         }
 
         // check destination present when not doing a depart-after batch search
-        if (toVertices == null) {
+        if (toVertices == null && !(opt.oneToMany == true && opt.arriveBy == false)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );
