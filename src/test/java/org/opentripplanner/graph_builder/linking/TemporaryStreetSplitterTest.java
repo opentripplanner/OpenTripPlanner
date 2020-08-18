@@ -160,7 +160,7 @@ public class TemporaryStreetSplitterTest {
 
         // then
         assertFalse(temporaryRentVehicleVertex.isPresent());
-        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(any(), eq(CAR.getTraverseMode()));
+        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(any(), eq(CAR));
     }
 
     @Test
@@ -183,7 +183,7 @@ public class TemporaryStreetSplitterTest {
         assertTrue(edge instanceof RentVehicleEdge);
         RentVehicleEdge rentVehicleEdge = (RentVehicleEdge) edge;
         assertEquals(CAR, rentVehicleEdge.getVehicle());
-        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(vertex, CAR.getTraverseMode());
+        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(vertex, CAR);
     }
 
     @Test
@@ -207,6 +207,6 @@ public class TemporaryStreetSplitterTest {
 
         verify(graph.parkingZonesCalculator, times(1)).getNewParkingZonesEnabled();
         verify(graph.parkingZonesCalculator, times(1)).getParkingZonesForEdge((EdgeWithParkingZones) edge, parkingZonesEnabled);
-        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(vertex, CAR.getTraverseMode());
+        verify(toStreetEdgeLinker, times(1)).linkTemporarilyBothWays(vertex, CAR);
     }
 }

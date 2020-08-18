@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.linking;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
@@ -35,6 +36,22 @@ public class EdgesToLinkFinder {
     public List<StreetEdge> findEdgesToLink(Vertex vertex, TraverseMode traverseMode) {
         List<StreetEdge> candidateEdges = getCandidateEdges(vertex, traverseMode);
         return bestCandidatesGetter.getBestCandidates(candidateEdges, edge -> linkingGeoTools.distance(vertex, edge));
+    }
+
+    /**
+     * Finds all near edges that we should link given vertex to. Return only edges that are traversable by given
+     * renting vehicle.
+     */
+    public List<StreetEdge> findEdgesToLinkVehicle(Vertex vertex, VehicleDescription vehicle) {
+        List<StreetEdge> candidateEdges =
+                filterEdgesForGivenVehicle(getCandidateEdges(vertex, vehicle.getTraverseMode()), vehicle);
+        return bestCandidatesGetter.getBestCandidates(candidateEdges, edge -> linkingGeoTools.distance(vertex, edge));
+    }
+
+    private List<StreetEdge> filterEdgesForGivenVehicle(List<StreetEdge> streetEdges, VehicleDescription vehicle) {
+        return streetEdges.stream()
+                .filter(edge -> edge.canTraverse(vehicle))
+                .collect(toList());
     }
 
     private List<StreetEdge> getCandidateEdges(Vertex vertex, TraverseMode traverseMode) {

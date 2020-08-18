@@ -5,6 +5,7 @@ import org.locationtech.jts.linearref.LinearLocation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Vertex;
@@ -53,8 +54,8 @@ public class ToStreetEdgeLinker {
     /**
      * Temporarily link this vertex to graph in both directions (make connections both to and from `vertex`)
      */
-    public boolean linkTemporarilyBothWays(TemporaryRentVehicleVertex vertex, TraverseMode traverseMode) {
-        List<StreetEdge> streetEdges = getStreetEdgesForceIncludeWalkEdge(vertex, traverseMode);
+    public boolean linkTemporarilyBothWays(TemporaryRentVehicleVertex vertex, VehicleDescription vehicle) {
+        List<StreetEdge> streetEdges = getStreetEdgesForceIncludeWalkEdge(vertex, vehicle);
         streetEdges.forEach(edge -> linkTemporarilyToEdgeBothWays(vertex, edge));
         return !streetEdges.isEmpty();
     }
@@ -82,8 +83,9 @@ public class ToStreetEdgeLinker {
         }
     }
 
-    private List<StreetEdge> getStreetEdgesForceIncludeWalkEdge(TemporaryRentVehicleVertex vertex, TraverseMode traverseMode) {
-        List<StreetEdge> streetEdgesForRiding = edgesToLinkFinder.findEdgesToLink(vertex, traverseMode);
+    private List<StreetEdge> getStreetEdgesForceIncludeWalkEdge(TemporaryRentVehicleVertex vertex,
+                                                                VehicleDescription vehicle) {
+        List<StreetEdge> streetEdgesForRiding = edgesToLinkFinder.findEdgesToLinkVehicle(vertex, vehicle);
         if (streetEdgesForRiding.stream().anyMatch(edge -> edge.canTraverse(new TraverseModeSet(TraverseMode.WALK)))) {
             return streetEdgesForRiding;
         }

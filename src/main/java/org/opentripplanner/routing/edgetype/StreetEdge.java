@@ -199,7 +199,7 @@ public class StreetEdge extends Edge implements Cloneable {
      * @param vehicle
      * @return
      */
-    private boolean canTraverse(VehicleDescription vehicle) {
+    public boolean canTraverse(VehicleDescription vehicle) {
         if (Objects.nonNull(vehicle)) {
             switch (vehicle.getVehicleType()) {
                 case MOTORBIKE:

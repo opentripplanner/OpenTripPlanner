@@ -110,7 +110,7 @@ public class TemporaryStreetSplitter {
      */
     public Optional<TemporaryRentVehicleVertex> linkRentableVehicleToGraph(VehicleDescription vehicle) {
         TemporaryRentVehicleVertex temporaryVertex = createTemporaryRentVehicleVertex(vehicle);
-        if (!toStreetEdgeLinker.linkTemporarilyBothWays(temporaryVertex, vehicle.getTraverseMode())) {
+        if (!toStreetEdgeLinker.linkTemporarilyBothWays(temporaryVertex, vehicle)) {
             LOG.debug("Couldn't link vehicle {} to graph", vehicle);
             return Optional.empty();
         } else {
