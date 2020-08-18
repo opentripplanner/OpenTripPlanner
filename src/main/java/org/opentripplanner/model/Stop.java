@@ -15,16 +15,13 @@ public final class Stop extends StationElement {
 
   private static final long serialVersionUID = 2L;
 
+  private final Collection<FareZone> fareZones;
+
   /**
    * Platform identifier for a platform/stop belonging to a station. This should be just the
    * platform identifier (eg. "G" or "3").
    */
   private final String platformCode;
-
-  /**
-   * Used for GTFS fare information.
-   */
-  private final String zone;
 
   /**
    * URL to a web page containing information about this particular stop.
@@ -50,14 +47,14 @@ public final class Stop extends StationElement {
       WheelChairBoarding wheelchairBoarding,
       StopLevel level,
       String platformCode,
-      String zone,
+      Collection<FareZone> fareZones,
       String url,
       TimeZone timeZone,
       TransitMode vehicleType
   ) {
     super(id, name, code, description, coordinate, wheelchairBoarding, level);
     this.platformCode = platformCode;
-    this.zone = zone;
+    this.fareZones = fareZones;
     this.url = url;
     this.timeZone = timeZone;
     this.vehicleType = vehicleType;
@@ -101,8 +98,12 @@ public final class Stop extends StationElement {
     return platformCode;
   }
 
-  public String getZone() {
-    return zone;
+  /**
+   * This is to ensure backwards compatibility with the REST API, which expects the GTFS zone_id
+   * which only permits one zone per stop.
+   */
+  public String getFirstZoneAsString() {
+    return fareZones.stream().map(t -> t.getId().getId()).findFirst().orElse(null);
   }
 
   public String getUrl() {
@@ -128,5 +129,9 @@ public final class Stop extends StationElement {
   @NotNull
   public TransferPriority getCostPriority() {
     return isPartOfStation() ? getParentStation().getCostPriority() : TransferPriority.ALLOWED;
+  }
+
+  public Collection<FareZone> getFareZones() {
+    return Collections.unmodifiableCollection(fareZones);
   }
 }

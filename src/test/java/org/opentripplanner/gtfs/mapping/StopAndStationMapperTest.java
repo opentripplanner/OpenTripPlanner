@@ -84,7 +84,7 @@ public class StopAndStationMapperTest {
         assertEquals(NAME, result.getName());
         assertEquals(URL, result.getUrl());
         assertEquals(WheelChairBoarding.POSSIBLE, result.getWheelchairBoarding());
-        assertEquals(ZONE_ID, result.getZone());
+        assertEquals(ZONE_ID, result.getFirstZoneAsString());
     }
 
     @Test
@@ -103,7 +103,7 @@ public class StopAndStationMapperTest {
         assertNull(result.getUrl());
         // Skip getting coordinate, it will throw an exception
         assertEquals(WheelChairBoarding.NO_INFORMATION, result.getWheelchairBoarding());
-        assertNull(result.getZone());
+        assertNull(result.getFirstZoneAsString());
     }
 
 

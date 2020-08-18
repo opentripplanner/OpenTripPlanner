@@ -340,7 +340,7 @@ public class RaptorPathToItineraryMapper {
         place.stopCode = stop.getCode();
         place.stopIndex = stopIndex;
         place.platformCode = stop.getCode();
-        place.zoneId = stop.getZone();
+        place.zoneId = stop.getFirstZoneAsString();
         place.vertexType = VertexType.TRANSIT;
         return place;
     }

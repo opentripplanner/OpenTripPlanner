@@ -27,6 +27,7 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 import java.util.Collection;
@@ -89,6 +90,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
     public final HierarchicalMapById<ServiceLink> serviceLinkById;
     public final HierarchicalVersionMapById<StopPlace> stopPlaceById;
+    public final HierarchicalMapById<TariffZone> tariffZonesById;
 
 
     // Relations between entities - The Netex XML sometimes rely on the the
@@ -129,6 +131,7 @@ public class NetexImportDataIndex {
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>();
         this.serviceLinkById = new HierarchicalMapById<>();
         this.stopPlaceById = new HierarchicalVersionMapById<>();
+        this.tariffZonesById = new HierarchicalMapById<>();
         this.timeZone = new HierarchicalElement<>();
     }
 
@@ -160,6 +163,7 @@ public class NetexImportDataIndex {
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>(parent.serviceJourneyByPatternId);
         this.serviceLinkById = new HierarchicalMapById<>(parent.serviceLinkById);
         this.stopPlaceById = new HierarchicalVersionMapById<>(parent.stopPlaceById);
+        this.tariffZonesById = new HierarchicalMapById<>(parent.tariffZonesById);
         this.timeZone = new HierarchicalElement<>(parent.timeZone);
     }
 
@@ -262,6 +266,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById() {
                 return stopPlaceById;
+            }
+
+            public ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById() {
+                return tariffZonesById;
             }
 
             public String getTimeZone() {

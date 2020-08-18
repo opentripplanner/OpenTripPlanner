@@ -494,7 +494,7 @@ public abstract class GraphPathToItineraryMapper {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
             place.platformCode = stop.getCode();
-            place.zoneId = stop.getZone();
+            place.zoneId = stop.getFirstZoneAsString();
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
