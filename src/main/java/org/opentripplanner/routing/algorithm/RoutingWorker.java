@@ -51,7 +51,7 @@ public class RoutingWorker {
      * can be boarded today. If there are trips that last multiple days, this will need to be
      * increased.
      */
-    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
+    private static final int ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY = 1;
 
     /**
      * The number of days after the search date to consider when filtering trips for this search.
@@ -59,7 +59,7 @@ public class RoutingWorker {
      * and would also need to board trips starting tomorrow. If a search window that lasts more than
      * a day is used, this will need to be increased.
      */
-    private static final int ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY = 1;
+    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
 
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
