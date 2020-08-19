@@ -3,8 +3,11 @@ package org.opentripplanner.netex.loader.mapping;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
+import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.FareZone;
+import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.opentripplanner.netex.support.StopPlaceVersionAndValidityComparator;
 import org.rutebanken.netex.model.Quay;
@@ -18,7 +21,9 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import static java.util.stream.Collectors.toList;
 
@@ -40,6 +45,8 @@ class StopAndStationMapper {
     private final ReadOnlyHierarchicalVersionMapById<Quay> quayIndex;
     private final StationMapper stationMapper;
     private final StopMapper stopMapper;
+    private final EntityById<FeedScopedId, FareZone> tariffZonesById;
+    private final FeedScopedIdFactory idFactory;
 
     /**
      * Quay ids for all processed stop places
@@ -54,11 +61,14 @@ class StopAndStationMapper {
     StopAndStationMapper(
             FeedScopedIdFactory idFactory,
             ReadOnlyHierarchicalVersionMapById<Quay> quayIndex,
+            EntityById<FeedScopedId, FareZone> tariffZonesById,
             DataImportIssueStore issueStore
     ) {
         this.stationMapper = new StationMapper(idFactory);
         this.stopMapper = new StopMapper(idFactory, issueStore);
         this.quayIndex = quayIndex;
+        this.tariffZonesById = tariffZonesById;
+        this.idFactory = idFactory;
     }
 
     /**
@@ -71,12 +81,13 @@ class StopAndStationMapper {
         //           - Issue: Netex import resolve version for all entities , not just stops #2781
         List<StopPlace> stopPlaceAllVersions = sortStopPlacesByValidityAndVersionDesc(stopPlaces);
         Station station = mapStopPlaceAllVersionsToStation(stopPlaceAllVersions);
+        List<FareZone> fareZones = mapTariffZones(stopPlaceAllVersions);
 
         // Loop through all versions of the StopPlace in order to collect all quays, even if they were deleted in
         // never versions of the StopPlace
         for (StopPlace stopPlace : stopPlaceAllVersions) {
             for (Quay quay : listOfQuays(stopPlace)) {
-                addNewStopToParentIfNotPresent(quay, station);
+                addNewStopToParentIfNotPresent(quay, station, fareZones);
             }
         }
     }
@@ -96,6 +107,17 @@ class StopAndStationMapper {
         return station;
     }
 
+    private List<FareZone> mapTariffZones(List<StopPlace> stopPlaceAllVersions) {
+        StopPlace selectedStopPlace = first(stopPlaceAllVersions);
+        return selectedStopPlace.getTariffZones() != null ? selectedStopPlace
+            .getTariffZones()
+            .getTariffZoneRef()
+            .stream()
+            .map(t -> tariffZonesById.get(idFactory.createId(t.getRef())))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList()) : Collections.emptyList();
+    }
+
     /**
      * Sort stop places on version with latest version first (descending order).
      */
@@ -105,7 +127,11 @@ class StopAndStationMapper {
                 .collect(toList());
     }
 
-    private void addNewStopToParentIfNotPresent(Quay quay, Station station) {
+    private void addNewStopToParentIfNotPresent(
+        Quay quay,
+        Station station,
+        List<FareZone> fareZones
+    ) {
         // TODO OTP2 - This assumtion is only valid because Norway have a
         //           - national stop register, we should add all stops/quays
         //           - for version resolution.
@@ -117,7 +143,7 @@ class StopAndStationMapper {
             return;
         }
 
-        Stop stop = stopMapper.mapQuayToStop(quay, station);
+        Stop stop = stopMapper.mapQuayToStop(quay, station, fareZones);
         if (stop == null) return;
 
         station.addChildStop(stop);

@@ -31,7 +31,7 @@ public class StopMapper {
         api.name = domain.getName();
         if (extended) {
             api.desc = domain.getDescription();
-            api.zoneId = domain.getZone();
+            api.zoneId = domain.getFirstZoneAsString();
             api.url = domain.getUrl();
             api.locationType = 0;
             api.stationId = FeedScopedIdMapper.mapIdToApi(domain.getParentStation());
