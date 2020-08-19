@@ -36,6 +36,7 @@ public class VehiclePositionsGetter {
                     "    provider {\\n" +
                     "      id\\n" +
                     "      name\\n" +
+                    "      available\\n" +
                     "    }\\n" +
                     "  }\\n" +
                     "}\",";
