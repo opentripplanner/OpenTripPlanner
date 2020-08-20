@@ -215,6 +215,7 @@ public class RoutingContext implements Cloneable {
         if (fromVertices != null && toVertices != null) {
             Set<StreetVertex> fromStreetVertices = new HashSet<>();
             for (Vertex from : fromVertices) {
+                if (from == null) { continue; }
                 for (Edge outgoing : from.getOutgoing()) {
                     Vertex toVertex = outgoing.getToVertex();
                     if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex
@@ -235,6 +236,7 @@ public class RoutingContext implements Cloneable {
 
             Set<StreetVertex> toStreetVertices = new HashSet<>();
             for (Vertex to : toVertices) {
+                if (to == null) { continue; }
                 for (Edge incoming : to.getIncoming()) {
                     Vertex fromVertex = incoming.getFromVertex();
                     if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex
