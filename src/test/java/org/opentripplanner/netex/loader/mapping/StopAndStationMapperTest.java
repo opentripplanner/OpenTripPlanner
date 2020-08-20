@@ -95,6 +95,7 @@ public class StopAndStationMapperTest {
         StopAndStationMapper stopMapper = new StopAndStationMapper(
                 MappingSupport.ID_FACTORY,
                 quaysById,
+                null,
                 new DataImportIssueStore(false)
         );
 

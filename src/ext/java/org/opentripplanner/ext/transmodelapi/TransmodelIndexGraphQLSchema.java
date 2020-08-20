@@ -1,8 +1,6 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import graphql.Scalars;
-import graphql.relay.DefaultConnection;
-import graphql.relay.DefaultPageInfo;
 import graphql.relay.Relay;
 import graphql.relay.SimpleListConnection;
 import graphql.schema.DataFetchingEnvironment;
@@ -13,6 +11,7 @@ import graphql.schema.GraphQLInputObjectField;
 import graphql.schema.GraphQLInputObjectType;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLList;
+import graphql.schema.GraphQLNamedOutputType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
@@ -48,6 +47,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopCollection;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.SystemNotice;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -59,20 +59,19 @@ import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
-import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.StopFinder;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.AlertUrl;
 import org.opentripplanner.routing.alertpatch.StopCondition;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.TranslatedString;
@@ -119,7 +118,7 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType operatorType = new GraphQLTypeReference("Operator");
 
-    private GraphQLOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
+    private GraphQLNamedOutputType ptSituationElementType = new GraphQLTypeReference("PtSituationElement");
 
     private GraphQLOutputType bikeRentalStationType = new GraphQLTypeReference("BikeRentalStation");
 
@@ -143,11 +142,11 @@ public class TransmodelIndexGraphQLSchema {
 
     private GraphQLOutputType serviceJourneyType = new GraphQLTypeReference("ServiceJourney");
 
-    private GraphQLOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
+    private GraphQLNamedOutputType quayAtDistance = new GraphQLTypeReference("QuayAtDistance");
 
     private GraphQLOutputType multilingualStringType = new GraphQLTypeReference("TranslatedString");
 
-    private GraphQLOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
+    private GraphQLNamedOutputType placeAtDistanceType = new GraphQLTypeReference("PlaceAtDistance");
 
     private GraphQLOutputType bookingArrangementType = new GraphQLTypeReference("BookingArrangement");
 
@@ -999,17 +998,19 @@ public class TransmodelIndexGraphQLSchema {
                         .build())
                 .build();
 
-        tariffZoneType = GraphQLObjectType.newObject()
+          tariffZoneType = GraphQLObjectType.newObject()
                 .name("TariffZone")
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("id")
+                    .name("id")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(e -> "NOT IMPLEMENTED")
+                        .dataFetcher(
+                            environment -> (mappingUtil.toIdString(((FareZone) environment.getSource()).getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("name")
                         .type(Scalars.GraphQLString)
-                        .dataFetcher(e -> "NOT IMPLEMENTED")
+                        .dataFetcher(
+                            environment -> ((FareZone) environment.getSource()).getName())
                         .build())
                 .build();
 
@@ -1223,18 +1224,18 @@ public class TransmodelIndexGraphQLSchema {
                         .name("id")
                         .type(new GraphQLNonNull(Scalars.GraphQLID))
                         .dataFetcher(environment -> relay.toGlobalId(quayAtDistance.getName(),
-                                Integer.toString(((StopFinder.StopAndDistance) environment.getSource()).distance) + ";" +
-                                        mappingUtil.toIdString(((StopFinder.StopAndDistance) environment.getSource()).stop.getId())))
+                                Integer.toString((int) ((StopAtDistance) environment.getSource()).distance) + ";" +
+                                        mappingUtil.toIdString(((StopAtDistance) environment.getSource()).stop.getId())))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("quay")
                         .type(quayType)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).stop)
+                        .dataFetcher(environment -> ((StopAtDistance) environment.getSource()).stop)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("distance")
                         .type(Scalars.GraphQLInt)
-                        .dataFetcher(environment -> ((StopFinder.StopAndDistance) environment.getSource()).distance)
+                        .dataFetcher(environment -> ((StopAtDistance) environment.getSource()).distance)
                         .build())
                 .build();
 
@@ -1301,12 +1302,6 @@ public class TransmodelIndexGraphQLSchema {
                         .dataFetcher(environment -> 0)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
-                        .name("tariffZones")
-                        .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
-                        .description("NOT IMPLEMENTED")
-                        .dataFetcher(environment -> new ArrayList<>())
-                        .build())
-                .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("transportMode")
                         .description("The transport mode serviced by this stop place.  NOT IMPLEMENTED")
                         .type(TRANSPORT_MODE)
@@ -1361,6 +1356,11 @@ public class TransmodelIndexGraphQLSchema {
                                     .getParentStation()
                             ))
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("tariffZones")
+                    .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
+                    .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getChildStops().stream().flatMap(s -> s.getFareZones().stream()).collect(Collectors.toSet()))
+                    .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("estimatedCalls")
                         .description("List of visits to this stop place as part of vehicle journeys.")
@@ -1631,6 +1631,11 @@ public class TransmodelIndexGraphQLSchema {
                         .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
                         .dataFetcher(environment -> (null))
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("tariffZones")
+                    .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
+                    .dataFetcher(environment -> ((Stop) environment.getSource()).getFareZones())
+                    .build())
                 .build();
 
         timetabledPassingTimeType = GraphQLObjectType.newObject()
@@ -2751,11 +2756,11 @@ public class TransmodelIndexGraphQLSchema {
                                 .name("authority")
                                 .type(Scalars.GraphQLString)
                                 .build())
-                        .argument(relay.getConnectionFieldArguments())
+                        .arguments(relay.getConnectionFieldArguments())
                         .dataFetcher(environment -> {
-                            List<StopFinder.StopAndDistance> stops;
+                            List<StopAtDistance> stops;
                             try {
-                                stops = getRoutingService(environment).findClosestStopsByWalking(
+                                stops = getRoutingService(environment).findClosestStops(
                                         environment.getArgument("latitude"),
                                         environment.getArgument("longitude"),
                                         environment.getArgument("radius"))
@@ -2769,16 +2774,12 @@ public class TransmodelIndexGraphQLSchema {
                                 LOG.warn(
                                     "findClosestPlacesByWalking failed with exception, returning empty list of places. ",
                                     e);
-                                stops = Collections.emptyList();
+                                stops = List.of();
                             }
-
-                            if (CollectionUtils.isEmpty(stops)) {
-                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
-                            }
-                            return new SimpleListConnection(stops).get(environment);
+                            return new SimpleListConnection<>(stops).get(environment);
                         })
                         .build())
-                /*
+            /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("nearest")
                         .description(
@@ -3240,6 +3241,7 @@ public class TransmodelIndexGraphQLSchema {
 
         Set<GraphQLType> dictionary = new HashSet<>();
         dictionary.add(placeInterface);
+        dictionary.add(Relay.pageInfoType);
 
         indexSchema = GraphQLSchema.newSchema()
                 .query(queryType)
@@ -3262,9 +3264,6 @@ public class TransmodelIndexGraphQLSchema {
 
     /**
      * Resolves all AlertPatches that are relevant for the supplied TripTimeShort.
-     *
-     * @param tripTimeShort
-     * @return
      */
 
     private Collection<AlertPatch> getAllRelevantAlerts(

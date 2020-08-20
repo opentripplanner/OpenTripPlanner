@@ -404,11 +404,6 @@ public class SimpleStreetSplitter {
                 endVertex = temporaryVertex.isEndVertex();
 
             }
-            //This throws runtime TrivialPathException if same edge is split in origin and destination link
-            //It is only used in origin/destination linking since otherwise options is null
-            if (options != null) {
-                options.canSplitEdge(edge);
-            }
             // split the edge, get the split vertex
             SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
