@@ -3,6 +3,7 @@ package org.opentripplanner.graph_builder.module.linking;
 import com.google.common.base.Predicate;
 import com.google.common.collect.Collections2;
 import com.google.common.collect.Iterables;
+import gnu.trove.set.TIntSet;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
@@ -15,15 +16,22 @@ import org.opentripplanner.routing.edgetype.StreetTransitLink;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.SplitterVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 
 import java.io.UnsupportedEncodingException;
+import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.junit.Assert.*;
+import static org.opentripplanner.common.geometry.SphericalDistanceLibrary.fastDistance;
 import static org.opentripplanner.graph_builder.module.FakeGraph.*;
 
 public class LinkingTest {
@@ -88,32 +96,31 @@ public class LinkingTest {
 
         // compare the linkages
         for (TransitStopVertex ts : Iterables.filter(g1.getVertices(), TransitStopVertex.class)) {
-            Collection<Edge> stls = stls(ts.getOutgoing());			
-            assertTrue(stls.size() >= 1);
-
-            StreetTransitLink exemplar = (StreetTransitLink) stls.iterator().next();
+            List<StreetTransitLink> stls1 = outgoingStls(ts);
+            assertTrue(stls1.size() >= 1);
 
             TransitStopVertex other = (TransitStopVertex) g2.getVertex(ts.getLabel());
+            List<StreetTransitLink> stls2 = outgoingStls(other);
 
-            Collection<Edge> ostls = stls(other.getOutgoing());
+            assertEquals("Unequal number of links from stop " + ts, stls1.size(), stls2.size());
 
-            assertEquals("Unequal number of links from stop " + ts, stls.size(), ostls.size());
+            for (int i = 0; i < stls1.size(); i++) {
+                Vertex v1 = stls1.get(i).getToVertex();
+                Vertex v2 = stls2.get(i).getToVertex();
+                assertEquals(v1.getLat(), v2.getLat(), 1e-10);
+                assertEquals(v1.getLon(), v2.getLon(), 1e-10);
+            }
 
-            StreetTransitLink oe = (StreetTransitLink) ostls.iterator().next();
-
-            assertEquals(exemplar.getToVertex().getLat(), oe.getToVertex().getLat(), 1e-10);
-            assertEquals(exemplar.getToVertex().getLon(), oe.getToVertex().getLon(), 1e-10);
         }
     }
 
-    private static Collection<Edge> stls (Collection<Edge> edges) {
-        return Collections2.filter(edges, new Predicate<Edge>() {
-
-            @Override
-            public boolean apply(Edge input) {
-                return input instanceof StreetTransitLink;
-            }
-        });
+    private static List<StreetTransitLink> outgoingStls (final TransitStopVertex tsv) {
+        List<StreetTransitLink> stls = tsv.getOutgoing().stream()
+                .filter(StreetTransitLink.class::isInstance)
+                .map(StreetTransitLink.class::cast)
+                .collect(Collectors.toList());
+        stls.sort(Comparator.comparing(e -> e.getGeometry().getLength()));
+        return stls;
     }
 
 }
