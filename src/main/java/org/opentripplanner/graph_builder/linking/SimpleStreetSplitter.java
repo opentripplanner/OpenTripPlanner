@@ -102,10 +102,9 @@ public class SimpleStreetSplitter {
 
     private final SpatialIndex transitStopIndex;
 
-    //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
-    //If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
+    // If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
+    // If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
     private final boolean destructiveSplitting;
-
 
     private Boolean addExtraEdgesToAreas = false;
 
@@ -188,15 +187,15 @@ public class SimpleStreetSplitter {
             boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
             if (alreadyLinked) { continue; }
 
-            //Do not link stops connected by pathways
+            // Do not link stops connected by pathways
             if (v instanceof TransitStopVertex && ((TransitStopVertex) v).hasPathways()) {
                 continue;
-            };
+            }
 
             if (!link(v)) {
                 issueStore.add(unlinkedIssueMapper.apply(v));
-            };
-            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            }
+            // Keep lambda! A method-ref would cause incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
         }
         LOG.info(progress.completeMessage());
@@ -209,10 +208,10 @@ public class SimpleStreetSplitter {
 
     /**
      * Link the given vertex into the graph (expand on that...)
-     * In OTP2 where the transit search can be quite fast, Hannes Junnila has reported >70% speedups in searches by
-     * making the search radius smaller. Therefore we use an expanding-envelope search, which is more efficient in
-     * dense areas.
-     * @return ...?
+     * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a significant
+     * fraction of response time. Hannes Junnila has reported >70% speedups in searches by making the search radius
+     * smaller. Therefore we use an expanding-envelope search, which is more efficient in dense areas.
+     * @return whether linking succeeded (an edge or edges were found within range)
      */
     public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
         if (linkToStreetEdges(vertex, traverseMode, options, INITIAL_SEARCH_RADIUS_METERS)) {
@@ -224,6 +223,7 @@ public class SimpleStreetSplitter {
     private static class DistanceTo<T> {
         T item;
         // Possible optimization: store squared lat to skip thousands of sqrt operations
+        // However we're using JTS distance functions that probably won't allow us to skip the final sqrt call.
         double distanceDegreesLat;
         public DistanceTo (T item, double distanceDegreesLat) {
             this.item = item;
@@ -257,7 +257,7 @@ public class SimpleStreetSplitter {
             List<DistanceTo<StreetEdge>> candidateEdges = idx.query(env).stream()
                     .filter(StreetEdge.class::isInstance)
                     .map(StreetEdge.class::cast)
-                    .filter(e -> e.canTraverse(traverseModeSet) && e.getToVertex().getIncoming().contains(e))
+                    .filter(e -> e.canTraverse(traverseModeSet) && edgeReachableFromGraph(e))
                     .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
                     .filter(ead -> ead.distanceDegreesLat < radiusDeg)
                     .collect(Collectors.toList());
@@ -325,6 +325,26 @@ public class SimpleStreetSplitter {
             return true;
         }
         return false;
+    }
+
+    /**
+     * While in destructive splitting mode (during graph construction rather than handling routing requests), we remove
+     * edges that have been split and may then re-split the resulting segments recursively, so parts of them are also
+     * removed. Newly created edge fragments are added to the spatial index; the edges that were split are removed
+     * (disconnected) from the graph but were previously not removed from the spatial index, so for all subsequent
+     * splitting operations we had to check whether any edge coming out of the spatial index had been "soft deleted".
+     *
+     * I believe this was compensating for the fact that STRTrees are optimized at construction and read-only. That
+     * restriction no longer applies since we've been using our own hash grid spatial index instead of the STRTree.
+     * So rather than filtering out soft deleted edges, this is now an assertion that the system behaves as intended,
+     * and will log an error if the spatial index is returning edges that have been disconnected from the graph.
+     */
+    private static boolean edgeReachableFromGraph (Edge edge) {
+        boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
+        if (!edgeReachableFromGraph) {
+            LOG.error("Edge returned from spatial index is no longer reachable from graph. That is not expected.");
+        }
+        return edgeReachableFromGraph;
     }
 
     // Link to all vertices in area/platform
@@ -436,11 +456,14 @@ public class SimpleStreetSplitter {
             idx.insert(edges.first.getGeometry(), edges.first);
             idx.insert(edges.second.getGeometry(), edges.second);
 
-            // (no need to remove original edge, we filter it when it comes out of the index)
-
             // remove original edge from the graph
             edge.getToVertex().removeIncoming(edge);
             edge.getFromVertex().removeOutgoing(edge);
+            // remove original edges from the spatial index
+            // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
+            // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
+            // insert logic is not trivial and would require additional testing of the spatial index.
+            idx.remove(edge.getGeometry().getEnvelopeInternal(), edge);
         }
 
         return v;
@@ -571,15 +594,10 @@ public class SimpleStreetSplitter {
 
     /**
      * Used to link origin and destination points to graph non destructively.
-     *
      * Split edges don't replace existing ones and only temporary edges and vertices are created.
+     * Will throw TrivialPathException if origin and destination Location are on the same edge
      *
-     * Will throw ThrivialPathException if origin and destination Location are on the same edge
-     *
-     * @param location
-     * @param options
      * @param endVertex true if this is destination vertex
-     * @return
      */
     public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
         boolean endVertex) {
