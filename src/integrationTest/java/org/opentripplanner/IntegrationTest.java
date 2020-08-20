@@ -62,7 +62,7 @@ public abstract class IntegrationTest extends JerseyTest {
         OTPMain.registerRouters(params, graphService);
 
         try {
-            Thread.sleep(3000); // wait for initialisation
+            Thread.sleep(5000); // wait for initialisation
             System.out.printf("Hopefully it finished initialising vehicles\n");
         } catch (InterruptedException e) {
             e.printStackTrace();
