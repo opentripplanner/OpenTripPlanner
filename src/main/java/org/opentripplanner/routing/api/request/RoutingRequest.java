@@ -16,8 +16,6 @@ import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -684,11 +682,6 @@ public class RoutingRequest implements Cloneable, Serializable {
      */
     public Double groupBySimilarityKeepNumOfItineraries = 0.68;
 
-    /** Saves split edge which can be split on origin/destination search
-     *
-     * This is used so that TrivialPathException is thrown if origin and destination search would split the same edge
-     */
-    public StreetEdge splitEdge = null;
 
     /* CONSTRUCTORS */
 
@@ -1094,7 +1087,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     private void resetRoutingContext() {
         Graph graph = rctx.graph;
         rctx = null;
-        splitEdge = null;
         setRoutingContext(graph);
     }
 
@@ -1386,24 +1378,6 @@ public class RoutingRequest implements Cloneable, Serializable {
     /** Create a new ShortestPathTree instance using the DominanceFunction specified in this RoutingRequest. */
     public ShortestPathTree getNewShortestPathTree() {
         return this.dominanceFunction.getNewShortestPathTree(this);
-    }
-
-    /**
-     * Does nothing if different edge is split in origin/destination search
-     *
-     * But throws TrivialPathException if same edge is split in origin/destination search.
-     *
-     * used in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter} in {@link org.opentripplanner.graph_builder.linking.SimpleStreetSplitter#link(Vertex, StreetEdge, double, RoutingRequest)}
-     */
-    public void canSplitEdge(StreetEdge edge) {
-        if (splitEdge == null) {
-            splitEdge = edge;
-        } else {
-            if (splitEdge.equals(edge)) {
-                throw new TrivialPathException();
-            }
-        }
-
     }
 
     public Comparator<GraphPath> getPathComparator(boolean compareStartTimes) {

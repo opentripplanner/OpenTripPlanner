@@ -9,7 +9,6 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -46,7 +45,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1;
 
     private static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
     private static final int MASK_PICKUP = 2|4;
@@ -273,7 +272,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
-        return getStop(stopIndex).getZone();
+        return getStop(stopIndex).getFirstZoneAsString();
     }
 
     public int getAlightType(int stopIndex) {

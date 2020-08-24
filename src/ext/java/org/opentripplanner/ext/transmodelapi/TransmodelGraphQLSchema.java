@@ -106,11 +106,8 @@ public class TransmodelGraphQLSchema {
 
   //private GraphQLObjectType brandingType;
 
-  private GraphQLOutputType tripType = new GraphQLTypeReference("Trip");
 
   private final TripTimeShortHelper tripTimeShortHelper;
-
-  private GraphQLOutputType lkj;
 
   private final GqlUtil gqlUtil;
 
@@ -174,6 +171,7 @@ public class TransmodelGraphQLSchema {
         JourneyPatternType.REF,
         EstimatedCallType.REF,
         PtSituationElementType.REF,
+        tariffZoneType,
         gqlUtil
     );
     GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
@@ -270,8 +268,7 @@ public class TransmodelGraphQLSchema {
             .build())
         .build();
 
-
-        tripType = createPlanType(
+        GraphQLOutputType tripType = createPlanType(
             bookingArrangementType,
             interchangeType,
             linkGeometryType,
@@ -1131,7 +1128,7 @@ public class TransmodelGraphQLSchema {
                 .name("authority")
                 .type(Scalars.GraphQLString)
                 .build())
-            .argument(relay.getConnectionFieldArguments())
+            .arguments(relay.getConnectionFieldArguments())
             .dataFetcher(environment -> {
               List<StopAtDistance> stops;
               try {

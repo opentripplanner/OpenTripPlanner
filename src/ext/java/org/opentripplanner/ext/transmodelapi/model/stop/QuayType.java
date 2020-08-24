@@ -35,6 +35,7 @@ public class QuayType {
       GraphQLOutputType journeyPatternType,
       GraphQLOutputType estimatedCallType,
       GraphQLOutputType ptSituationElementType,
+      GraphQLOutputType tariffZoneType,
       GqlUtil gqlUtil
       ) {
     return GraphQLObjectType.newObject()
@@ -217,6 +218,11 @@ public class QuayType {
                     .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
                     .dataFetcher(environment -> (null))
                     .build())
-            .build();
+           .field(GraphQLFieldDefinition.newFieldDefinition()
+                    .name("tariffZones")
+                    .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))
+                    .dataFetcher(environment -> ((Stop) environment.getSource()).getFareZones())
+                    .build())
+           .build();
   }
 }

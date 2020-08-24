@@ -49,11 +49,15 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   List<List<TripPatternForDates>> createTripPatternsPerStop(
-      int dayRange, Set<TransitMode> transitModes , Set<FeedScopedId> bannedRoutes
+      int additionalPastSearchDays,
+      int additionalFutureSearchDays,
+      Set<TransitMode> transitModes,
+      Set<FeedScopedId> bannedRoutes
   ) {
 
     List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = getTripPatternsForDateRange(
-        dayRange,
+        additionalPastSearchDays,
+        additionalFutureSearchDays,
         transitModes,
         bannedRoutes
     );
@@ -64,13 +68,15 @@ class RaptorRoutingRequestTransitDataCreator {
   }
 
   private List<Map<FeedScopedId, TripPatternForDate>> getTripPatternsForDateRange(
-      int dayRange, Set<TransitMode> transitModes, Set<FeedScopedId> bannedRoutes
+      int additionalPastSearchDays,
+      int additionalFutureSearchDays,
+      Set<TransitMode> transitModes,
+      Set<FeedScopedId> bannedRoutes
   ) {
     List<Map<FeedScopedId, TripPatternForDate>> tripPatternForDates = new ArrayList<>();
 
-    // Start at yesterdays date to account for trips that cross midnight. This is also
-    // accounted for in TripPatternForDates.
-    for (int d = -1; d < dayRange - 1; ++d) {
+    // This filters trips by the search date as well as additional dates before and after
+    for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       tripPatternForDates.add(
         filterActiveTripPatterns(
           transitLayer,

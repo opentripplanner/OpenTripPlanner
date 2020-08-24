@@ -20,7 +20,6 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -42,6 +41,7 @@ import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -428,10 +428,9 @@ public class TestHalfEdges {
         RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
         start = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.004, -74.0), walking, false);
-        exception.expect(TrivialPathException.class);
         end = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.008, -74.0), walking, true);
-         /*assertNotNull(end);
+        assertNotNull(end);
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
@@ -439,7 +438,7 @@ public class TestHalfEdges {
         for (State s : path.states) {
             assertFalse(s.getBackEdge() == top);
         }
-        walking.cleanup();*/
+        walking.cleanup();
 
     }
 
