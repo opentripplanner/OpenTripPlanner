@@ -294,6 +294,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Itinerary>> itineraries();
     public DataFetcher<Iterable<String>> messageEnums();
     public DataFetcher<Iterable<String>> messageStrings();
+    public DataFetcher<Long> prevDateTime();
+    public DataFetcher<Long> nextDateTime();
+    public DataFetcher<Long> searchWindowUsed();
     public DataFetcher<DebugOutput> debugOutput();
   }
   

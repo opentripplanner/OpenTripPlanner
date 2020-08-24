@@ -1062,6 +1062,28 @@ type Plan {
     """A list of possible error messages in cleartext"""
     messageStrings: [String]!
 
+    """
+    This is the suggested search time for the "previous page" or time window. Insert it together
+    with the searchWindowUsed in the request to get a new set of trips preceding in the
+    time-window BEFORE the current search. No duplicate trips should be returned, unless a trip
+    is delayed and new realtime-data is available.
+    """
+    prevDateTime: Long
+
+    """
+    This is the suggested search time for the "next page" or time window. Insert it together
+    with the searchWindowUsed in the request to get a new set of trips following in the
+    time-window AFTER the current search. No duplicate trips should be returned, unless a trip
+    is delayed and new realtime-data is available.
+    """
+    nextDateTime: Long
+
+    """
+    This is the time window used by the raptor search. The window is an optional parameter and
+    OTP might override it/dynamically assign a new value. The unit is seconds.
+    """
+    searchWindowUsed: Long
+
     """Information about the timings for the plan generation"""
     debugOutput: debugOutput!
 }
