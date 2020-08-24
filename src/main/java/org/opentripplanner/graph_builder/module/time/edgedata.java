@@ -1,4 +1,4 @@
-package org.opentripplanner.graph_builder.model;
+package org.opentripplanner.graph_builder.module.time;
 
 public class edgedata {
 

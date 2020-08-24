@@ -15,6 +15,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
+import org.opentripplanner.graph_builder.module.time.TraficPredictionBuildeModule;
 import org.opentripplanner.graph_builder.module.vehicle_sharing.VehicleSharingBuilderModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -181,6 +182,7 @@ public class GraphBuilder implements Runnable {
         JsonNode builderConfig = null;
         JsonNode routerConfig = null;
         File demFile = null;
+        File jsonFile = null;
         LOG.info("Searching for graph builder input files in {}", dir);
         if ( ! dir.isDirectory() && dir.canRead()) {
             LOG.error("'{}' is not a readable directory.", dir);
@@ -213,6 +215,10 @@ public class GraphBuilder implements Runnable {
                     } else {
                         LOG.info("Skipping DEM file {}", file);
                     }
+                    break;
+                case JSON:
+                    LOG.info("Found JSON file {}", file);
+                    jsonFile =file;
                     break;
                 case OTHER:
                     LOG.warn("Skipping unrecognized file '{}'", file);
@@ -318,6 +324,10 @@ public class GraphBuilder implements Runnable {
         graphBuilder.serializeGraph = ( ! params.inMemory ) || params.preFlight;
 
         graphBuilder.addModule(new VehicleSharingBuilderModule());
+        if (jsonFile != null)
+        {
+            graphBuilder.addModule(new TraficPredictionBuildeModule(jsonFile));
+        }
 
         return graphBuilder;
     }
@@ -328,7 +338,7 @@ public class GraphBuilder implements Runnable {
      * types are present. This helps point out when config files have been misnamed (builder-config vs. build-config).
      */
     private static enum InputFileType {
-        GTFS, OSM, DEM, CONFIG, GRAPH, OTHER;
+        GTFS, OSM, DEM, CONFIG, GRAPH,JSON, OTHER;
         public static InputFileType forFile(File file) {
             String name = file.getName();
             if (name.endsWith(".zip")) {
@@ -344,6 +354,7 @@ public class GraphBuilder implements Runnable {
             if (name.endsWith(".osm.xml")) return OSM;
             if (name.endsWith(".tif") || name.endsWith(".tiff")) return DEM; // Digital elevation model (elevation raster)
             if (name.equals("Graph.obj")) return GRAPH;
+            if (name.endsWith(".jsin")) return JSON;
             if (name.equals(GraphBuilder.BUILDER_CONFIG_FILENAME) || name.equals(Router.ROUTER_CONFIG_FILENAME)) {
                 return CONFIG;
             }

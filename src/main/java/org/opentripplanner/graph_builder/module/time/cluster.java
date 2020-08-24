@@ -1,9 +1,9 @@
-package org.opentripplanner.graph_builder.model;
+package org.opentripplanner.graph_builder.module.time;
 
 public class cluster {
 
     private int id;
-    private timetable[] timetable;
+    private org.opentripplanner.graph_builder.module.time.timetable[] timetable;
     private edgedata[] edges;
 
     public int getid() {

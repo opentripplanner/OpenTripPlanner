@@ -28,10 +28,20 @@ public abstract class Edge implements Serializable {
      */
     private static final UniqueIdGenerator<Edge> idGenerator = new IncrementingIdGenerator<Edge>();
 
+    public long getClusterId() {
+        return clusterId;
+    }
+
+    public void setClusterId(long clusterId) {
+        this.clusterId = clusterId;
+    }
+
     /**
      * Identifier of the edge. Negative means not set.
      */
     private int id;
+    private long  clusterId;
+
 
     protected Vertex fromv;
 
