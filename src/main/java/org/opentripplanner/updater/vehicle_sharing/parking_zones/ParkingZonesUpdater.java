@@ -2,7 +2,7 @@ package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -34,12 +34,11 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
                 .orElse(null);
     }
 
-    private Map<DropoffVehicleEdge, List<SingleParkingZone>> getNewParkingZones(
-            ParkingZonesCalculator calculator, List<SingleParkingZone> parkingZonesEnabled) {
+    private Map<DropoffVehicleEdge, ParkingZoneInfo> getNewParkingZones(ParkingZonesCalculator calculator) {
         return graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull)
-                .collect(toMap(identity(), e -> calculator.getParkingZonesForEdge(e, parkingZonesEnabled)));
+                .collect(toMap(identity(), calculator::getParkingZonesForEdge));
     }
 
     @Override
@@ -47,13 +46,10 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
         LOG.info("Polling parking zones from API");
         List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url, graph);
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(geometryParkingZones);
-        LOG.info("Grouping parking zones");
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
         LOG.info("Calculating parking zones for each vertex");
-        Map<DropoffVehicleEdge, List<SingleParkingZone>> parkingZonesPerVertex =
-                getNewParkingZones(calculator, parkingZonesEnabled);
+        Map<DropoffVehicleEdge, ParkingZoneInfo> parkingZonesPerVertex = getNewParkingZones(calculator);
         ParkingZonesGraphWriterRunnable graphWriterRunnable =
-                new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex, parkingZonesEnabled);
+                new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex);
         LOG.info("Executing parking zones update");
         graphUpdaterManager.execute(graphWriterRunnable);
         LOG.info("Finished updating parking zones");

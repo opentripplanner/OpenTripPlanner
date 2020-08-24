@@ -11,7 +11,6 @@ import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.TemporaryDropoffVehicleEdge;
 import org.opentripplanner.routing.error.TrivialPathException;
@@ -26,7 +25,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -154,9 +152,7 @@ public class TemporaryStreetSplitter {
 
     private void addParkingZonesToEdge(EdgeWithParkingZones edge) {
         if (graph.parkingZonesCalculator != null) {
-            List<SingleParkingZone> parkingZonesEnabled = graph.parkingZonesCalculator.getNewParkingZonesEnabled();
-            List<SingleParkingZone> parkingZones = graph.parkingZonesCalculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
-            edge.updateParkingZones(parkingZonesEnabled, parkingZones);
+            edge.setParkingZones(graph.parkingZonesCalculator.getParkingZonesForEdge(edge));
         }
     }
 
