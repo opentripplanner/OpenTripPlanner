@@ -5,6 +5,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.GeometryParkingZone;
 
+import java.io.Serializable;
 import java.util.List;
 import java.util.Objects;
 
@@ -15,7 +16,7 @@ import java.util.Objects;
  * type and some provider in a given location, then we will have this pair of <provider, vehicleType>
  * in `parkingZones` field;
  */
-public class ParkingZoneInfo {
+public class ParkingZoneInfo implements Serializable {
 
     /**
      * Are we inside a parking zone for given provider and vehicleType
@@ -50,7 +51,7 @@ public class ParkingZoneInfo {
         return parkingZones.stream().anyMatch(pz -> pz.appliesToThisVehicle(vehicle));
     }
 
-    public static class SingleParkingZone {
+    public static class SingleParkingZone implements Serializable {
 
         private final int providerId;
 
