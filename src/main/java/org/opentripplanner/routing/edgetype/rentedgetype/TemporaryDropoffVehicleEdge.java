@@ -8,7 +8,7 @@ import org.opentripplanner.routing.graph.Vertex;
  * rented vehicle, then cannot finnish spt query, because that state would not be final ( checked in `State#isFinal`).
  * However, we can drop off vehicle by traversing this edge, thus creating a final state.
  */
-public class TemporaryDropoffVehicleEdge extends RentVehicleAnywhereEdge implements TemporaryEdge {
+public class TemporaryDropoffVehicleEdge extends DropoffVehicleEdge implements TemporaryEdge {
 
     public TemporaryDropoffVehicleEdge(Vertex v) {
         super(v);

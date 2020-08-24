@@ -299,7 +299,7 @@ public class StreetEdge extends Edge implements Cloneable {
             return null;
         }
         /* We have to check whether we have enough fuel left in our vehicle*/
-        if(!s0.vehicleHasEnoughRange(getDistanceInMeters())){
+        if (!s0.vehicleHasEnoughRange(getDistanceInMeters())) {
             return null;
         }
 

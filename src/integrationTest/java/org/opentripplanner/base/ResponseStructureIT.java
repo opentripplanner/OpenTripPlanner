@@ -23,7 +23,7 @@ public class ResponseStructureIT extends IntegrationTest {
                 .queryParam("fromPlace", "53.119934, 17.997763")
                 .queryParam("toPlace", "53.142835, 18.018029")
                 .queryParam("locale", "pl")
-                .queryParam("mode", "WALK,TRANSIT, CAR, BICYCLE")
+                .queryParam("mode", "WALK,TRANSIT,CAR,BICYCLE")
                 .queryParam("startingMode", "WALK")
                 .queryParam("rentingAllowed", "true")
                 .queryParam("vehicleTypesAllowed", "KICKSCOOTER", "MOTORBIKE")
@@ -40,7 +40,7 @@ public class ResponseStructureIT extends IntegrationTest {
 
     private void assertRequestParameters(Response response) {
         assertThat(response.getRequestParameters().keySet(), Matchers.containsInAnyOrder("mode", "startingMode", "fromPlace", "toPlace", "locale", "rentingAllowed", "date", "time", "vehicleTypesAllowed"));
-        assertThat(response.getRequestParameters(), Matchers.hasEntry("mode", "WALK,TRANSIT, CAR, BICYCLE"));
+        assertThat(response.getRequestParameters(), Matchers.hasEntry("mode", "WALK,TRANSIT,CAR,BICYCLE"));
     }
 
     private void assertPlan(TripPlan tripPlan) {
@@ -69,9 +69,9 @@ public class ResponseStructureIT extends IntegrationTest {
         assertThat(itinerary.traverseDistance, equalTo(4296.029999999999));
 
         assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.TRANSIT, 60));
-        assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.WALK, 285));
+        assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.WALK, 199));
         assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.CAR, 998));
-        assertThat(itinerary.duration, equalTo((long) 60 + 998 + 285));
+        assertThat(itinerary.duration, equalTo((long) 60 + 998 + 199));
 
         assertThat(itinerary.legs.size(), equalTo(4));
 
@@ -108,9 +108,9 @@ public class ResponseStructureIT extends IntegrationTest {
         assertThat(itinerary.traverseDistance, equalTo(2697.368000000001 + 191.01500000000001));
 
         assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.BICYCLE, 842));
-        assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.WALK, 270));
+        assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.WALK, 184));
         assertThat(itinerary.timeTraversedInMode, Matchers.hasEntry(TraverseMode.TRANSIT, 240));
-        assertThat(itinerary.duration, equalTo((long) (842 + 270 + 240)));
+        assertThat(itinerary.duration, equalTo((long) (842 + 184 + 240)));
 
         assertThat(itinerary.legs.size(), equalTo(4));
 
