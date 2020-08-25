@@ -1,7 +1,7 @@
 package org.opentripplanner.hasura_client;
 
-import org.opentripplanner.hasura_client.hasura_mappers.HasuraToOTPMapper;
 import org.opentripplanner.hasura_client.hasura_objects.HasuraObject;
+import org.opentripplanner.hasura_client.mappers.HasuraToOTPMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -19,7 +19,7 @@ public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObj
 
     protected abstract HasuraToOTPMapper<HASURA_OBJECT, GRAPH_OBJECT> mapper();
 
-    private static String getArguments(Graph graph) {
+    protected String getGeolocationArguments(Graph graph) {
         double latMin = graph.getEnvelope().getLowerLeftLatitude();
         double lonMin = graph.getEnvelope().getLowerLeftLongitude();
         double latMax = graph.getEnvelope().getUpperRightLatitude();
@@ -34,10 +34,10 @@ public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObj
 
 
     public List<GRAPH_OBJECT> getFromHasura(Graph graph, String url, Type type) {
-        String arguments = getArguments(graph);
+        String arguments = getGeolocationArguments(graph);
         String body = QUERY() + arguments;
         ApiResponse<HASURA_OBJECT> response = HttpUtils.postData(url, body, type);
-        LOG.info("Got {} vehicles from API", response.getData().getItems().size());
+        LOG.info("Got {} objects from API", response.getData().getItems().size());
         return mapper().map(response.getData().getItems());
     }
 }

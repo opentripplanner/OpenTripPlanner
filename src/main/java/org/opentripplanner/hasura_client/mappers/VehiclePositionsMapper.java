@@ -1,4 +1,4 @@
-package org.opentripplanner.hasura_client.hasura_mappers;
+package org.opentripplanner.hasura_client.mappers;
 
 import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
 import org.opentripplanner.routing.core.vehicle_sharing.*;

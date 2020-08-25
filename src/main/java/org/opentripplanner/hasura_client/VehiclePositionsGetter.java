@@ -1,8 +1,8 @@
 package org.opentripplanner.hasura_client;
 
-import org.opentripplanner.hasura_client.hasura_mappers.HasuraToOTPMapper;
-import org.opentripplanner.hasura_client.hasura_mappers.VehiclePositionsMapper;
 import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
+import org.opentripplanner.hasura_client.mappers.HasuraToOTPMapper;
+import org.opentripplanner.hasura_client.mappers.VehiclePositionsMapper;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

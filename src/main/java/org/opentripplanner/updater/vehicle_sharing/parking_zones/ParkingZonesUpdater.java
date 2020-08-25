@@ -1,6 +1,10 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.reflect.TypeToken;
+import org.opentripplanner.hasura_client.ApiResponse;
+import org.opentripplanner.hasura_client.ParkingZonesGetter;
+import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Graph;
@@ -35,7 +39,7 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     }
 
     private Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> getNewParkingZones(ParkingZonesCalculator calculator,
-            List<GeometryParkingZone> geometryParkingZones, List<SingleParkingZone> parkingZonesEnabled) {
+                                                                                     List<GeometryParkingZone> geometryParkingZones, List<SingleParkingZone> parkingZonesEnabled) {
         return graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull)
@@ -45,7 +49,8 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling parking zones from API");
-        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url, graph);
+        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<ParkingZone>>() {
+        }.getType());
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(geometryParkingZones);
         LOG.info("Grouping parking zones");
         List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();

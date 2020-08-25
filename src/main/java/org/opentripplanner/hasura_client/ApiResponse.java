@@ -5,16 +5,6 @@ import java.util.List;
 public class ApiResponse<H> {
     private Data<H> data;
 
-    public List<H> items;
-
-    public List<H> getItems() {
-        return items;
-    }
-
-    public void setItems(List<H> items) {
-        this.items = items;
-    }
-
     public Data<H> getData() {
         return data;
     }
@@ -22,7 +12,6 @@ public class ApiResponse<H> {
     public void setData(Data<H> data) {
         this.data = data;
     }
-
 
     public static class Data<H2> {
 

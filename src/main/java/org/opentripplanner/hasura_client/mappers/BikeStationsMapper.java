@@ -1,4 +1,4 @@
-package org.opentripplanner.hasura_client.hasura_mappers;
+package org.opentripplanner.hasura_client.mappers;
 
 import org.opentripplanner.hasura_client.hasura_objects.BikeStationHasura;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;

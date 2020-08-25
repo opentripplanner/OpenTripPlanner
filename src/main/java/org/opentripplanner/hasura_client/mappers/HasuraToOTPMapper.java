@@ -1,4 +1,4 @@
-package org.opentripplanner.hasura_client.hasura_mappers;
+package org.opentripplanner.hasura_client.mappers;
 
 
 import org.slf4j.Logger;

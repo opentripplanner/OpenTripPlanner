@@ -2,8 +2,8 @@ package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import org.junit.Before;
 import org.junit.Test;
-import org.opentripplanner.hasura_client.hasura_mappers.VehiclePositionsMapper;
 import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
+import org.opentripplanner.hasura_client.mappers.VehiclePositionsMapper;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 
 import java.util.Collections;
