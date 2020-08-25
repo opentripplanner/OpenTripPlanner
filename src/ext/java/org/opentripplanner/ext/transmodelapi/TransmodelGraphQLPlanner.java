@@ -226,9 +226,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("minimumTransferTime", (Integer v) -> request.transferSlack = v);
         callWith.argument("transferSlack", (Integer v) -> request.transferSlack = v);
         callWith.argument("boardSlackDefault", (Integer v) -> request.boardSlack = v);
-        callWith.argument("boardSlackList", (Object v) -> request.boardSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
+        callWith.argument("boardSlackList", (Object v) -> request.boardSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
-        callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
+        callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
