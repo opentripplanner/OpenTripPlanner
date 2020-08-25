@@ -1,11 +1,5 @@
 package org.opentripplanner.util;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
-import java.util.concurrent.TimeUnit;
-
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 import org.apache.http.HttpEntity;
@@ -22,8 +16,15 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.util.EntityUtils;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
+import java.lang.reflect.Type;
+import java.util.concurrent.TimeUnit;
+
 public class HttpUtils {
-    
+
     private static final long TIMEOUT_CONNECTION = 5000;
     private static final int TIMEOUT_SOCKET = 5000;
 
@@ -60,6 +61,28 @@ public class HttpUtils {
             HttpResponse response = client.execute(request);
             String json = EntityUtils.toString(response.getEntity(), "UTF-8");
             return GSON.fromJson(json, mapTo);
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } catch (ClientProtocolException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        } catch (JsonSyntaxException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static <T> T postData(String url, String data, Type type) {
+        try {
+            HttpPost request = new HttpPost(url);
+            request.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
+            HttpClient client = getClient();
+            request.addHeader("content-type", "application/json");
+            request.addHeader("accept", "application/json");
+            HttpResponse response = client.execute(request);
+            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
+            return GSON.fromJson(json, type);
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         } catch (ClientProtocolException e) {

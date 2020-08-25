@@ -4,9 +4,8 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.reflect.TypeToken;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
 import org.opentripplanner.hasura_client.ApiResponse;
-import org.opentripplanner.hasura_client.VehiclePositionsGetter;
-import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
+import org.opentripplanner.hasura_client.BikeStationsGetter;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -15,11 +14,11 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-public class SharedVehiclesUpdater extends PollingGraphUpdater {
+public class BikesUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);
 
-    private final VehiclePositionsGetter vehiclePositionsGetter = new VehiclePositionsGetter();
+    private final BikeStationsGetter bikeStationsGetter = new BikeStationsGetter();
     private TemporaryStreetSplitter temporaryStreetSplitter;
     private GraphUpdaterManager graphUpdaterManager;
     private Graph graph;
@@ -28,11 +27,10 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling vehicles from API");
-//        List<VehicleDescription> vehicles = vehiclePositionsGetter.getVehicleDescriptions(graph, url);
-        List<VehicleDescription> vehicles = vehiclePositionsGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<Vehicle>>() {
+        List<BikeRentalStation> bikeRentalStations = bikeStationsGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<BikeRentalStation>>() {
         }.getType());
-        LOG.info("Got {} vehicles possible to place on a map", vehicles.size());
-        graphUpdaterManager.execute(new VehicleSharingGraphWriterRunnable(temporaryStreetSplitter, vehicles));
+        LOG.info("Got {} vehicles possible to place on a map", bikeRentalStations.size());
+//        graphUpdaterManager.execute(new VehicleSharingGraphWriterRunnable(temporaryStreetSplitter, bikeRentalStations));
     }
 
     @Override
