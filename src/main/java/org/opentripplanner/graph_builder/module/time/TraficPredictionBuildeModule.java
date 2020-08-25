@@ -1,14 +1,10 @@
 package org.opentripplanner.graph_builder.module.time;
 
-import gnu.trove.map.hash.THashMap;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.io.File;
-import java.lang.reflect.Array;
-import java.util.Arrays;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.TreeMap;
