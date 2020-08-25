@@ -1,13 +1,12 @@
 package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.graph_builder.module.time.queryData;
 import org.opentripplanner.graph_builder.module.time.timetable;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
@@ -18,9 +17,10 @@ import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.time.Duration;
 import java.time.Instant;
-import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Locale;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;
@@ -48,17 +48,16 @@ public abstract class Edge implements Serializable {
      */
     private int id;
     private long  clusterId;
-    public double getVooomSpeed()
-    {
+    public double getVooomSpeed() {
         ZonedDateTime nowZoned = ZonedDateTime.now();
         Instant midnight = nowZoned.toLocalDate().atStartOfDay(nowZoned.getZone()).toInstant();
         Duration duration = Duration.between(midnight, Instant.now());
         long seconds = duration.getSeconds();
-        this.getTimes().sort(Comparator.naturalOrder());
-        queryData q = new queryData(nowZoned.getDayOfWeek().getValue(),((int) seconds));
-        Collections.binarySearch(this.getTimes() ,q);
-        }
-
+        this.getTimes().sort(timetable::compareTo);
+        int i = Collections.binarySearch(times, new queryData(1, 2));
+        timetable timetable = times.get(i);
+        return timetable.getCurrentspeed();
+    }
 
     public ArrayList<timetable> getTimes() {
         return times;
