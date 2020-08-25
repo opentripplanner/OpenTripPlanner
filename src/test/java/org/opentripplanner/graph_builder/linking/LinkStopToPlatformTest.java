@@ -70,7 +70,7 @@ public class LinkStopToPlatformTest {
      */
     @Test
     public void testLinkStopWithoutExtraEdges() {
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
+        SimpleStreetSplitter splitter = SimpleStreetSplitter.createForTest(graph);
         splitter.link();
 
         assertEquals(16, graph.getEdges().size());
@@ -78,7 +78,7 @@ public class LinkStopToPlatformTest {
 
     @Test
     public void testLinkStopWithExtraEdges() {
-        SimpleStreetSplitter splitter = new SimpleStreetSplitter(graph);
+        SimpleStreetSplitter splitter = SimpleStreetSplitter.createForTest(graph);
         splitter.setAddExtraEdgesToAreas(true);
         splitter.link();
 
