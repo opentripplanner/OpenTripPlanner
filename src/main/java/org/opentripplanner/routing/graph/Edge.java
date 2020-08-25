@@ -1,6 +1,7 @@
 package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.graph_builder.module.time.queryData;
 import org.opentripplanner.graph_builder.module.time.timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
@@ -19,9 +20,7 @@ import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * This is the standard implementation of an edge with fixed from and to Vertex instances;
@@ -56,9 +55,10 @@ public abstract class Edge implements Serializable {
         Duration duration = Duration.between(midnight, Instant.now());
         long seconds = duration.getSeconds();
         this.getTimes().sort(Comparator.naturalOrder());
-        queryDa
+        queryData q = new queryData(nowZoned.getDayOfWeek().getValue(),((int) seconds));
+        Collections.binarySearch(this.getTimes() ,q);
         }
-    }
+
 
     public ArrayList<timetable> getTimes() {
         return times;
