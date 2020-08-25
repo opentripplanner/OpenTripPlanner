@@ -29,12 +29,13 @@ class AgencyMapper {
     }
 
     private Agency doMap(org.onebusaway.gtfs.model.Agency rhs) {
-        Agency lhs = new Agency();
+        Agency lhs = new Agency(
+            new FeedScopedId(feedId, rhs.getId()),
+            rhs.getName(),
+            rhs.getTimezone()
+        );
 
-        lhs.setId(new FeedScopedId(feedId, rhs.getId()));
-        lhs.setName(rhs.getName());
         lhs.setUrl(rhs.getUrl());
-        lhs.setTimezone(rhs.getTimezone());
         lhs.setLang(rhs.getLang());
         lhs.setPhone(rhs.getPhone());
         lhs.setFareUrl(rhs.getFareUrl());

@@ -24,9 +24,9 @@ public class StopTimesHelper {
   /**
    * Fetch upcoming vehicle departures from a stop.
    * It goes though all patterns passing the stop for the previous, current and next service date.
-   * It uses a priority queue to keep track of the next departures. The queue is shared between all dates, as services
-   * from the previous service date can visit the stop later than the current service date's services. This happens
-   * eg. with sleeper trains.
+   * It uses a priority queue to keep track of the next departures. The queue is shared between all
+   * dates, as services from the previous service date can visit the stop later than the current
+   * service date's services. This happens eg. with sleeper trains.
    *
    * TODO: Add frequency based trips
    * @param stop Stop object to perform the search for
@@ -34,9 +34,16 @@ public class StopTimesHelper {
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
-   * @return
    */
-  public static List<StopTimesInPattern> stopTimesForStop(RoutingService routingService, TimetableSnapshot timetableSnapshot, Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups) {
+  public static List<StopTimesInPattern> stopTimesForStop(
+      RoutingService routingService,
+      TimetableSnapshot timetableSnapshot,
+      Stop stop,
+      long startTime,
+      int timeRange,
+      int numberOfDepartures,
+      boolean omitNonPickups
+  ) {
 
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;
@@ -49,7 +56,7 @@ public class StopTimesHelper {
 
     for (TripPattern pattern : patternsForStop) {
 
-      Queue<TripTimeShort> pq = getTripTimeShortsForPatternAtStop(
+      Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
           routingService,
           timetableSnapshot,
           stop,
@@ -78,9 +85,13 @@ public class StopTimesHelper {
    *
    * @param stop Stop object to perform the search for
    * @param serviceDate Return all departures for the specified date
-   * @return
    */
-  public static List<StopTimesInPattern> getStopTimesForStop(RoutingService routingService, Stop stop, ServiceDate serviceDate, boolean omitNonPickups) {
+  public static List<StopTimesInPattern> stopTimesForStop(
+      RoutingService routingService,
+      Stop stop,
+      ServiceDate serviceDate,
+      boolean omitNonPickups
+  ) {
     List<StopTimesInPattern> ret = new ArrayList<>();
 
     Collection<TripPattern> patternsForStop = routingService.getPatternsForStop(stop, true);
@@ -123,7 +134,6 @@ public class StopTimesHelper {
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
-   * @return
    */
   public static List<TripTimeShort> stopTimesForPatternAtStop(
           RoutingService routingService,
@@ -140,7 +150,7 @@ public class StopTimesHelper {
     }
     Date date = new Date(startTime * 1000);
     ServiceDate[] serviceDates = {new ServiceDate(date).previous(), new ServiceDate(date), new ServiceDate(date).next()};
-    Queue<TripTimeShort> pq = getTripTimeShortsForPatternAtStop(
+    Queue<TripTimeShort> pq = listTripTimeShortsForPatternAtStop(
         routingService,
         timetableSnapshot,
         stop,
@@ -155,7 +165,7 @@ public class StopTimesHelper {
     return new ArrayList<>(pq);
   }
 
-  private static Queue<TripTimeShort> getTripTimeShortsForPatternAtStop(
+  private static Queue<TripTimeShort> listTripTimeShortsForPatternAtStop(
       RoutingService routingService,
       TimetableSnapshot timetableSnapshot,
       Stop stop,
@@ -198,7 +208,7 @@ public class StopTimesHelper {
       int sidx = 0;
       for (Stop currStop : pattern.stopPattern.stops) {
         if (currStop == stop) {
-          if (omitNonPickups && pattern.stopPattern.pickups[sidx] == pattern.stopPattern.PICKDROP_NONE) continue;
+          if (omitNonPickups && pattern.stopPattern.pickups[sidx] == StopPattern.PICKDROP_NONE) continue;
           for (TripTimes t : tt.tripTimes) {
             if (!sd.serviceRunning(t.serviceCode)) continue;
             if (t.getDepartureTime(sidx) != -1 &&
@@ -234,5 +244,4 @@ public class StopTimesHelper {
     }
     return pq;
   }
-
 }

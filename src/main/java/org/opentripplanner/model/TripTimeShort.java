@@ -8,7 +8,8 @@ import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 
-
+// TODO OTP2 - Convert all fields to get-methods and keep reference to TripTimes and let
+//           - getters call the appropriate TripTimes method instead of coping the fields.
 public class TripTimeShort {
 
     public static final int UNDEFINED = -1;

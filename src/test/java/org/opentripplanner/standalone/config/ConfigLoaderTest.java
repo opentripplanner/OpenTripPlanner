@@ -14,6 +14,7 @@ import java.util.Map;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -63,13 +64,13 @@ public class ConfigLoaderTest {
     public void loadRouterConfig() throws IOException {
         // Given:
         File file = new File(tempDir, ROUTER_CONFIG_FILENAME);
-        FileUtils.write(file, "{key-a : 12}", UTF_8);
+        FileUtils.write(file, "{requestLogFile : \"aFile.txt\"}", UTF_8);
 
         // when:
         RouterConfig params = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then:
-        assertEquals(12, params.rawJson.path("key-a").asInt());
+        assertEquals("aFile.txt", params.requestLogFile());
     }
 
     @Test
@@ -78,7 +79,7 @@ public class ConfigLoaderTest {
         RouterConfig res = new ConfigLoader(tempDir).loadRouterConfig();
 
         // then: expect missing node
-        assertTrue(res.toString(), res.rawJson.isMissingNode());
+        assertNull("Expect deafult value(null)", res.requestLogFile());
     }
 
     @Test

@@ -115,10 +115,10 @@ public class RouteMapperTest {
     }
 
     private Agency createAgency() {
-        Agency agency = new Agency();
-        agency.setId(MappingSupport.ID_FACTORY.createId(AUTHORITY_ID));
-        agency.setTimezone(TIME_ZONE);
-        agency.setName("Ruter");
-        return agency;
+        return new Agency(
+            MappingSupport.ID_FACTORY.createId(AUTHORITY_ID),
+            "Ruter AS",
+            TIME_ZONE
+        );
     }
 }
