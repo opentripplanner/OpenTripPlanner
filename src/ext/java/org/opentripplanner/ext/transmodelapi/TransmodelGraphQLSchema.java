@@ -2125,7 +2125,7 @@ public class TransmodelGraphQLSchema {
                         .name("intermediateEstimatedCalls")
                         .description("For ride legs, estimated calls for quays between the Place where the leg originates and the Place where the leg ends. For non-ride legs, empty list.")
                         .type(new GraphQLNonNull(new GraphQLList(estimatedCallType)))
-                        .dataFetcher(environment -> List.of())
+                        .dataFetcher(environment -> tripTimeShortHelper.getIntermediateTripTimeShortsForLeg((environment.getSource()), GqlUtil.getRoutingService(environment)))
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("serviceJourneyEstimatedCalls")
