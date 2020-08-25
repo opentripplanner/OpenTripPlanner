@@ -8,6 +8,7 @@ import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
@@ -78,12 +79,12 @@ public class DirectTransferGenerator implements GraphBuilderModule {
 
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
             int n = 0;
-            for (NearbyStopFinder.StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
+            for (StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0)) {
                 /* Skip the origin stop, loop transfers are not needed. */
-                if (sd.tstop == stop) continue;
+                if (sd.stop == stop) continue;
                 graph.transfersByStop.put(
                     stop,
-                    new SimpleTransfer(stop, sd.tstop, sd.distance, sd.edges)
+                    new SimpleTransfer(stop, sd.stop, sd.distance, sd.edges)
                 );
                 n += 1;
             }

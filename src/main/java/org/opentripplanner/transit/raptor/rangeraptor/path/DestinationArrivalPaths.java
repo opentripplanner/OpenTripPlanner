@@ -31,7 +31,7 @@ import java.util.Collection;
 public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     private final ParetoSet<Path<T>> paths;
     private final TransitCalculator transitCalculator;
-    private final CostCalculator costCalculator;
+    private final CostCalculator<T> costCalculator;
     private final PathMapper<T> pathMapper;
     private final DebugHandler<ArrivalView<T>> debugHandler;
     private boolean reachedCurrentRound = false;
@@ -40,7 +40,7 @@ public class DestinationArrivalPaths<T extends RaptorTripSchedule> {
     public DestinationArrivalPaths(
             ParetoComparator<Path<T>> paretoComparator,
             TransitCalculator transitCalculator,
-            CostCalculator costCalculator,
+            CostCalculator<T> costCalculator,
             PathMapper<T> pathMapper,
             DebugHandlerFactory<T> debugHandlerFactory,
             WorkerLifeCycle lifeCycle

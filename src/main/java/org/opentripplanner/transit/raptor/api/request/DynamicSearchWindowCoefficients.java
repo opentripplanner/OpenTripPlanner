@@ -36,7 +36,7 @@ public interface DynamicSearchWindowCoefficients {
      * {@code 0.0} to {@code 3.0}. Using {@code 0.0} will give you a raptor-search-window ≈
      * {@link #minWinTimeMinutes()}.
      */
-    default double minTripTimeCoefficient() { return 0.3f; }
+    default double minTripTimeCoefficient() { return 0.75f; }
 
     /**
      * {@code C} - The constant minimum number of minutes for a raptor search window. Use a value

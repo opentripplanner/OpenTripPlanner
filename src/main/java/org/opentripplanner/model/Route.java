@@ -1,8 +1,6 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-import org.opentripplanner.routing.core.TraverseMode;
-
 public final class Route extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
@@ -181,6 +179,13 @@ public final class Route extends TransitEntity<FeedScopedId> {
 
     public void setBrandingUrl(String brandingUrl) {
         this.brandingUrl = brandingUrl;
+    }
+
+    /** @return the route's short name, or the long name if the short name is null. */
+    public String getName() {
+        if (shortName != null)
+            return shortName;
+        return longName;
     }
 
     @Override

@@ -1,6 +1,7 @@
 # Configuring OpenTripPlanner
 
 ## Base directory
+**TODO OTP2** - This need to be revised.
 
 The OTP *base directory* defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration,
 input files and storage directories
@@ -12,6 +13,7 @@ In these cases one should use the basePath switch when starting up OTP to overri
 `--basePath C:\Users\username\otp` in Windows.
 
 ## Routers
+**TODO OTP2** - No support for multiple routers any more.
 
 A single OTP instance can handle several regions independently. Each of these separate (but potentially geographically overlapping)
 services is called a *router* and is referred to by a short unique ID such as 'newyork' or 'paris'. Each router has its
@@ -88,42 +90,93 @@ This table lists the possible settings that can be defined in a `build-config.js
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
-`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
-`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
-`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
-`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
-`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
-`stopClusterMode` | Stop clusters can be built in one of two ways, either by geographical proximity and name, or according to a parent/child station topology, if it exists | enum | `proximity` | options: `proximity`, `parentStation`
-`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
-`streets` | Include street input files (OSM/PBF) | boolean | true | 
-`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
+`` |  TODO | boolean | false |
 `areaVisibility` | Perform visibility calculations. If this is `true` OTP attempts to calculate a path straight through an OSM area using the shortest way rather than around the edge of it. (These calculations can be time consuming). | boolean | false |
-`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
-`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
-`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
-`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
-`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
-`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
-`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
-`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
-`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `norway`, `uk`
-`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
-`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
-`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
-`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
-`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
-`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
-`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
 `banDiscouragedWalking` | should walking should be allowed on OSM ways tagged with `foot=discouraged"` | boolean | false | 
 `banDiscouragedBiking` | should walking should be allowed on OSM ways tagged with `bicycle=discouraged"` | boolean | false | 
-`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`dataImportReport` |  Generate nice HTML report of Graph errors/warnings | boolean | false |
+`distanceBetweenElevationSamples` | TODO OTP2 | double | 10 |
+`elevationBucket` | If specified, download NED elevation tiles from the given AWS S3 bucket | object | null | provide an object with `accessKey`, `secretKey`, and `bucketName` for AWS S3
+`elevationUnitMultiplier` | Specify a multiplier to convert elevation units from source to meters | double | 1.0 | see [Elevation unit conversion](#elevation-unit-conversion)
+`embedRouterConfig` | Embed the Router config in the graph, which allows it to be sent to a server fully configured over the wire | boolean | true |
 `extraEdgesStopPlatformLink` | add extra edges when linking a stop to a platform, to prevent detours along the platform edge | boolean | false | 
+`fares` | A specific fares service to use | object | null | see [fares configuration](#fares-configuration)
+`fetchElevationUS` | Download US NED elevation data and apply it to the graph | boolean | false |
+`islandWithStopsMaxSize` | Pruning threshold for islands with stops. Any such island under this size will be pruned | int | 5 | 
+`islandWithoutStopsMaxSize` | Pruning threshold for islands without stops. Any such island under this size will be pruned | int | 40 | 
+`matchBusRoutesToStreets` | Based on GTFS shape data, guess which OSM streets each bus runs on to improve stop linking | boolean | false |
+`maxDataImportIssuesPerFile` | If number of data import issues is larger then specified maximum number of issues the report will be split in multiple files | int | 1,000 | 
+`maxInterlineDistance` | Maximal distance between stops in meters that will connect consecutive trips that are made with same vehicle | int | 200 | units: meters
+`maxTransferDistance` | Transfers up to this length in meters will be pre-calculated and included in the Graph | double | 2,000 | units: meters
+`multiThreadElevationCalculations` | If true, the elevation module will use multi-threading during elevation calculations. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`osmNaming` | A custom OSM namer to use | object | null | see [custom naming](#custom-naming)
+`osmWayPropertySet` | Custom OSM way properties | string | `default` | options: `default`, `finland`, `norway`, `uk`
+`parentStopLinking` | Link GTFS stops to their parent stops | boolean | false |
+`platformEntriesLinking` | Link unconnected entries to public transport platforms | boolean | false |
+`readCachedElevations` | If true, reads in pre-calculated elevation data. | boolean | true | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
+`staticBikeParkAndRide` | Whether we should create bike P+R stations from OSM data | boolean | false | 
+`staticBikeRental` | Whether bike rental stations should be loaded from OSM, rather than periodically dynamically pulled from APIs | boolean | false | 
+`staticParkAndRide` | Whether we should create car P+R stations from OSM data | boolean | true | 
+`stationTransfers` | Create direct transfers between the constituent stops of each parent station | boolean | false |
+`streets` | Include street input files (OSM/PBF) | boolean | true | 
+`storage` | Configure access to data sources like GRAPH/OSM/DEM/GTFS/NETEX/ISSUE-REPORT. | object | null | 
+`subwayAccessTime` | Minutes necessary to reach stops served by trips on routes of `route_type=1` (subway) from the street | double | 2.0 | units: minutes
+`transit` | Include all transit input files (GTFS) from scanned directory | boolean | true |
 `transitServiceStart` | Limit the import of transit services to the given *start* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. To specify a week before the build date use a negative period like `-P1W`. | Date or Period (ISO 8601) | `-P1Y` | `2020-01-01`, `-P1M3D`, `-P3W`
 `transitServiceEnd` | Limit the import of transit services to the given *end* date. *Inclusive*. Use an absolute date or a period relative to the day the graph is build. | Date or Period (ISO 8601) | `P3Y` | `2022-12-31`, `P1Y6M10D`, `P12W`
+`useTransfersTxt` | Create direct transfer edges from transfers.txt in GTFS, instead of based on distance | boolean | false |
+`writeCachedElevations` | If true, writes the calculated elevation data. | boolean | false | see [Elevation Data Calculation Optimizations](#elevation-data-calculation-optimizations)
 
-This list of parameters in defined in the [code](https://github.com/opentripplanner/OpenTripPlanner/blob/master/src/main/java/org/opentripplanner/standalone/config/GraphBuildParameters.java#L186-L215) for `GraphBuildParameters`.
+This list of parameters in defined in the [BuildConfig.java](https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/BuildConfig.java).
+
+
+## Storage
+Nested inside `storage {...}` in `build-config.json`.
+
+Using other data-sources than the local file system is new in OTP2. This allow for access to cloud 
+based storage as well as using local disk. If you run OTP in the cloud you might get faster start-up 
+and build times if you use the cloud storage instead of copying the files, it also simplefy the 
+deplyment. Nested `storage` build-config. 
+
+See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
+for up-to-date detailed description of each config parameter. Here is an overview:
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`gsCredentials` | Use an environment variable to point to the Google Cloud credentials: `"${MY_GOC_SERVICE}"`. | string | `null`
+`graph` | Absolute path to the graph file. | URI | `null`
+`streetGraph` | Absolute path to the street-graph file. | URI | `null`
+`osm` | List of absolute paths of Open Street Map files to build. | URI array | `null`
+`dem` | List of absolute paths of Elevation DEM files to build. | URI array | `null`
+`gtfs` | List of GTFS transit data files to build. | URI array | `null`
+`netex` | List of NeTEx transit data files to build. | URI array | `null`
+`buildReportDir` | Path to directory for the build issue report generated by OTP. | URI | `null`
+`localFileNamePatterns` | Patterns to use for auto resolving local filenames to input data types. | object | `null`
+
+### Local Filename Patterns
+Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.json`.
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf|\.osm|\.osm\.xml)$` 
+`dem` | Pattern used to match Elevation DEM files on local disk | Regexp Pattern | `(?i)\.tiff?$` 
+`gtfs` | Pattern used to match GTFS files on local disk | Regexp Pattern | `(?i)gtfs` 
+`netex` | Pattern used to match NeTEx files on local disk | Regexp Pattern | `(?i)netex` 
+
+### Storage example:
+```
+storage : {
+  // Use the GCS_SERVICE_CREDENTIALS environment variable to locate GCS credentials
+  gsCredentials: "${GCS_SERVICE_CREDENTIALS}",
+  streetGraph: "file:///Users/kelvin/otp/streetGraph.obj",
+  osm: ["gs://bucket-name/shared-osm-file.pbf"]
+  localFileNamePatterns: {
+    // All filenames that start with "g-" and end with ".zip" is imported as a GTFS file.
+    gtfs : "^g-.*\.zip$", 
+  }
+}
+```
+
 
 ## Limit the transit service period
 
@@ -428,7 +481,7 @@ such as:
 There is currently only one custom naming module called `portland` (which has no parameters).
 
 
-# Runtime router configuration
+# Router configuration
 
 This section covers all options that can be set for each router using the `router-config.json` file.
 These options can be applied by the OTP server without rebuilding the graph.
@@ -440,6 +493,8 @@ config key | description | value type | value default | notes
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
 `transit` | Transit tuning parameters | `TransitRoutingConfig` |  | see [Tuning transit routing](#Tuning-transit-routing)
 `updaters` | configure real-time updaters, such as GTFS-realtime feeds | object | null | see [configuring real-time updaters](#configuring-real-time-updaters)
+`transmodelApi` | configure Entur Transmodel API (**Sandbox**) | object | null | See the code for parameters, no doc provided.
+
 
 ## Routing defaults
 
@@ -462,7 +517,43 @@ Any public field or setter method in this class can be given a default value usi
 }
 ```
 
+## Tuning itinerary filtering
+Nested inside `routingDefaults {...}` in `router-config.json`.
+
+OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the returned itineraries.
+
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`debugItineraryFilter` | Enable this to attach a system notice to itineraries instead of removing them. Some filters are not configurable, byt will show up in the system-notice if debugging is enabled. | boolean | `false`
+`groupBySimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
+`groupBySimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+
+
+### Group-by-filters
+
+The group-by-filter is a bit complex, but should be simple to use. Set `debugItineraryFilter=true` 
+and experiment with `searchWindow` and the two group-by parameters(`debugItineraryFilter` and 
+`groupBySimilarityKeepNumOfItineraries`). 
+
+The group-by-filter work by grouping itineraries together and then reducing the number of 
+itineraries in each group, keeping the itinerary/itineraries with the best _generalized-cost_. The 
+group-by function first pick all transit legs that account for more than N% of the itinerary based 
+on distance traveled. This become the group-key. To keys are the same if all legs in one of the keys
+also exist in the other. Note, one key may have a lager set of legs than the other, but they can 
+still be the same. When comparing to legs we compare the `tripId` and make sure the legs overlap in
+place and time. Two legs are the same if both legs ride at least a common subsection of the same 
+trip. The `groupBySimilarityKeepOne` filter will keep ONE itinerary in each group. The 
+`groupBySimilarityKeepNumOfItineraries` is a bit more complex, because it uses the 
+`numOfItineraries` request parameter to estimate a maxLimit for each group. For example, if the 
+`numOfItineraries` is 5 elements and there is 3 groups, we set the _max-limit_ for each group
+to 2, returning between 4 and 6 elements depending on the distribution. The _max-limit_ can never 
+be less than 1.
+
+
 ## Routing modes
+
+TODO OTP2 - This need to be updated. Why is this even here, does it make sence to configure this and is it possible?
+          - Is this API documentation? Move to proper place.
 
 The routing request parameter `mode` determines which transport modalities should be considered when calculating the list
 of routes.
@@ -611,71 +702,47 @@ Finally, for each itinerary returned to the user, there is a travel duration in 
 
 
 ## Tuning transit routing
+Nested inside `transit {...}` in `router-config.json`.
 
 Some of these parameters for tuning transit routing is only available through configuration and cannot be set in the routing request. These parameters work together with the default routing request and the actual routing request.
 
-### transit.maxNumberOfTransfers
-This parameter is used to allocate enough memory space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network.
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`maxNumberOfTransfers` | Use this parameter to allocate enough space for Raptor. Set it to the maximum number of transfers for any given itinerary expected to be found within the entire transit network. The memory overhead of setting this higher than the maximum number of transfers is very little so it is better to set it too high then to low. | int | `12`
+`scheduledTripBinarySearchThreshold` | The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent. | int | `50`
+`iterationDepartureStepInSeconds` | Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds. | int | `60`
+`searchThreadPoolSize` | Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread. | int | `0`
+`dynamicSearchWindow` | The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics. | object | `null`
+`stopTransferCost` | Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. | object | `null`
 
-**Type:** `int`  **Default value:** 12
+### Tuning transit routing - Dynamic search window
+Nested inside `transit : { dynamicSearchWindow : { ... } }` in `router-config.json`.
 
-### transit.scheduledTripBinarySearchThreshold
-The threshold is used to determine when to perform a binary trip schedule search to reduce the number of trips departure time lookups and comparisons. When testing with data from Entur and all of Norway as a Graph, the optimal value was around 50. Changing this may improve the performance with just a few percent.
-
-**Type:** `int`  **Default value:** 50
-
-### transit.iterationDepartureStepInSeconds
-Step for departure times between each RangeRaptor iterations. A transit network usually uses minute resolution for its depature and arrival times. To match that, set this variable to 60 seconds.
-
-**Type:** `int`  **Default value:** 60
-
-### transit.searchThreadPoolSize
-Split a travel search in smaller jobs and run them in parallel to improve performance. Use this parameter to set the total number of executable threads available across all searches. Multiple searches can run in parallel - this parameter have no effect with regard to that. If 0, no extra threads are started and the search is done in one thread.
-
-**Type:** `int`  **Default value:** 0
-
-### transit.dynamicSearchWindow
-The dynamic search window coefficients used to calculate the EDT(earliest-departure-time), LAT(latest-arrival-time) and SW(raptor-search-window) using heuristics.
-
-#### transit.dynamicSearchWindow.minTripTimeCoefficient
-The coefficient to multiply with minimum travel time found using a heuristic search. This 
- value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give 
- ok results.
-
-**Type:** `double`  **Default value:** 0.3
+config key | description | value type | value default
+---------- | ----------- | ---------- | -------------
+`minTripTimeCoefficient` | The coefficient to multiply with minimum travel time found using a heuristic search. This value is added to the `minWinTimeMinutes`. A value between `0.0` to `3.0` is expected to give ok results. | double | `0.75`
+`minWinTimeMinutes` | The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment. | int | `40`
+`maxWinTimeMinutes` | Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time. | int | `180` (3 hours)
+`stepMinutes` | The search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes. | int | `10`
 
 
-#### transit.dynamicSearchWindow.minWinTimeMinutes
-The constant minimum number of minutes for a raptor search window. Use a value between 20-180 minutes in a normal deployment.
-**Type:** `int`  **Default value:** 40
-
-#### transit.dynamicSearchWindow.maxWinTimeMinutes
-Set an upper limit to the calculation of the dynamic search window to prevent exceptionable cases to cause very long search windows. Long search windows consumes a lot of resources and may take a long time. Use this parameter to tune the desired maximum search time.
-
-**Type:** `int`  **Default value:** 180 (3 timer) 
-
-#### transit.dynamicSearchWindow.stepMinutes
-he search window is rounded of to the closest multiplication of N minutes. If N=10 minutes, the search-window can be 10, 20, 30 ... minutes. It the computed search-window is 5 minutes and 17 seconds it will be rounded up to 10 minutes.
-
-**Type:** `int`  **Default value:** 10 
-
-
-### transit.stopTransferCost.<TransferPriority>
-Use this to set a stop transfer cost for the given `TransferPriority`. The cost is applied to boarding and alighting at all stops. All stops have a transfer cost priority set, the default is `ALLOWED`. The `stopTransferCost` parameter is optional, but if listed all values must be set. 
+### Tuning transit routing - Stop transfer cost
+Nested inside `transit : { stopTransferCost : { ... } }` in `router-config.json`.
 
 This _cost_ is in addition to other costs like `boardCost` and indirect cost from waiting (board-/alight-/transfer slack). You should account for this when you tune the routing search parameters.
 
-If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops.
+If not set the `stopTransferCost` is ignored. This is only available for NeTEx imported Stops. 
 
-**Key type:** DISCOURAGED, ALLOWED, RECOMMENDED or PREFERRED 
+The cost is a scalar, but is equivalent to the felt cost of riding a transit trip for 1 second.
 
-**Value Type:**  `int` 
+config key | description | value type 
+---------- | ----------- | ---------- 
+`DISCOURAGED` | Use a very high cost like `72 000` to eliminate transfers ath the stop if not the only option. | int
+`ALLOWED` | Allowed, but not recommended. Use something like `150`. | int 
+`RECOMMENDED` | Use a small cost penalty like `60`. | int
+`PREFERRED` | The best place to do transfers. Should be set to `0`(zero). | int 
 
-**Value Unit:** Scalar, equivalent to one second of transit. 
-
-**Value Range:** `[0 .. 100,000]`
-
-**All key/value pairs are required if specified.** 
+Use values in a range from `0` to `100 000`. **All key/value pairs are required if the `stopTransferCost` is listed.** 
 
 
 ### Transit example section from router-config.json
@@ -865,6 +932,17 @@ sourceType: "gbfs"
 url: the URL of the GBFS feed (do not include the gbfs.json at the end) *
 ```
 \* For a list of known GBFS feeds see the [list of known GBFS feeds](https://github.com/NABSA/gbfs/blob/master/systems.csv)
+
+#### Bike Rental Service Directory configuration (sandbox feature)
+
+To configure and url for the [BikeRentalServiceDirectory](sandbox/BikeRentalServiceDirectory.md).
+
+```JSON
+// router-config.json
+{
+  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes"
+}
+```
 
 # Configure using command-line arguments
 

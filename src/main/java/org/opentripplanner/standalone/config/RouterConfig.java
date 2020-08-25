@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.node.MissingNode;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitTuningParameters;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.transit.raptor.api.request.RaptorTuningParameters;
+import org.opentripplanner.updater.UpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,24 +28,25 @@ public class RouterConfig implements Serializable {
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
      */
-    public final JsonNode rawJson;
-
+    private final JsonNode rawJson;
     private final String requestLogFile;
+    private final boolean transmodelApiHideFeedId;
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
-    private final UpdaterConfig updaterConfig;
+    private final UpdaterParameters updaterParameters;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
         this.requestLogFile = adapter.asText("requestLogFile", null);
+        this.transmodelApiHideFeedId = adapter.path("transmodelApi").asBoolean("hideFeedId", false);
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterConfig = new UpdaterConfig(adapter.path("updaters"));
+        this.updaterParameters = new UpdaterConfig(adapter);
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
@@ -65,6 +67,8 @@ public class RouterConfig implements Serializable {
         return streetRoutingTimeoutSeconds;
     }
 
+    public boolean transmodelApiHideFeedId() { return transmodelApiHideFeedId; }
+
     public RoutingRequest routingRequestDefaults() {
         return routingRequestDefaults;
     }
@@ -77,7 +81,7 @@ public class RouterConfig implements Serializable {
         return transitConfig;
     }
 
-    public UpdaterConfig updaterConfig() { return updaterConfig; }
+    public UpdaterParameters updaterConfig() { return updaterParameters; }
 
     /**
      * If {@code true} the config is loaded from file, in not the DEFAULT config is used.

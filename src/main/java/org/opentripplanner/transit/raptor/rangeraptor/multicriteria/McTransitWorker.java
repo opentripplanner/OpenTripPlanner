@@ -22,7 +22,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
 
     private final McRangeRaptorWorkerState<T> state;
     private final TransitCalculator calculator;
-    private final CostCalculator costCalculator;
+    private final CostCalculator<T> costCalculator;
     private final SlackProvider slackProvider;
     private final ParetoSet<PatternRide<T>> patternRides = new ParetoSet<>(PatternRide.paretoComparatorRelativeCost());
 
@@ -33,7 +33,7 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
         McRangeRaptorWorkerState<T> state,
         SlackProvider slackProvider,
         TransitCalculator calculator,
-        CostCalculator costCalculator
+        CostCalculator<T> costCalculator
     ) {
         this.state = state;
         this.slackProvider = slackProvider;
@@ -89,18 +89,19 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
                     prevArrival = prevArrival.timeShiftNewArrivalTime(boardTime - slackProvider.boardSlack());
                 }
 
+                // TODO OTP2 - Some access legs can be time-shifted towards the board time and
+                //           - we need to account for this here, not in the calculator as done
+                //           - now. If we don´t do that the alight slack of the first transit
+                //           - is not added to the cost, giving the first transit leg a lower cost
+                //           - than other transit legs.
+                //           - See
                 final int boardWaitTime = boardTime - prevArrival.arrivalTime();
 
-                // We want to find the "relative-transit-time" spent onboard so we can add it to the
-                // cost when comparing two trips A and B. Let A board at stop S at 10:00 and B
-                // board at stop T at 10:05. Than, clearly it does not matter when we alight, Trip A
-                // is going to spend 5 minutes more in transit than trip when alighting at the same
-                // stop. Hence we can use the negative board-time as the "relative-transit-time".
-                final int relativeTransitTime =  - boardTime;
                 final int relativeBoardCost = calculateOnTripRelativeCost(
                     prevArrival,
-                    relativeTransitTime,
-                    boardWaitTime
+                    boardTime,
+                    boardWaitTime,
+                    trip
                 );
 
                 patternRides.add(
@@ -128,22 +129,21 @@ public final class McTransitWorker<T extends RaptorTripSchedule> implements Rout
      * trip.
      *
      * @param prevArrival The stop-arrival where the trip was boarded.
+     * @param boardTime the wait-time at the board stop before boarding.
      * @param boardWaitTime the wait-time at the board stop before boarding.
-     * @param relativeTransitTime The time spent on transit. We do not know the alight-stop,
-     *                            so it is impossible to know the correct result. But the only thing
-     *                            that maters is that the relative difference between to boardings
-     *                            are correct.
+     * @param trip boarded trip
      */
     private int calculateOnTripRelativeCost(
         AbstractStopArrival<T> prevArrival,
-        int relativeTransitTime,
-        int boardWaitTime
+        int boardTime,
+        int boardWaitTime,
+        T trip
     ) {
         return costCalculator.onTripRidingCost(
-            prevArrival.cost(),
+            prevArrival,
             boardWaitTime,
-            relativeTransitTime,
-            prevArrival.stop()
+            boardTime,
+            trip
         );
     }
 

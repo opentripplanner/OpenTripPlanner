@@ -51,6 +51,8 @@ public class RoutingRequestMapper {
         request.carDropoffTime = c.asInt("carDropoffTime", dft.carDropoffTime);
         request.carSpeed = c.asDouble("carSpeed", dft.carSpeed);
         request.debugItineraryFilter = c.asBoolean("debugItineraryFilter", dft.debugItineraryFilter);
+        request.groupBySimilarityKeepOne = c.asDouble("groupBySimilarityKeepOne", dft.groupBySimilarityKeepOne);
+        request.groupBySimilarityKeepNumOfItineraries = c.asDouble("groupBySimilarityKeepNumOfItineraries", dft.groupBySimilarityKeepNumOfItineraries);
         request.disableAlertFiltering = c.asBoolean("disableAlertFiltering", dft.disableAlertFiltering);
         request.disableRemainingWeightHeuristic = c.asBoolean("disableRemainingWeightHeuristic", dft.disableRemainingWeightHeuristic);
         request.driveOnRight = c.asBoolean("driveOnRight", dft.driveOnRight);

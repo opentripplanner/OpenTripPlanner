@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
 
 import static graphql.schema.GraphQLInputObjectField.newInputObjectField;
 import static graphql.schema.GraphQLNonNull.nonNull;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
 
 public class TransportModeSlack {
     private static final String BOARD_SLACK_DESCRIPTION;
@@ -42,7 +42,7 @@ public class TransportModeSlack {
             "The alightSlack is the minimum extra time after exiting a public transport vehicle.";
 
         INT_TYPE = nonNull(Scalars.GraphQLInt);
-        MODE_LIST_TYPE = nonNull(GraphQLList.list(nonNull(TRANSPORT_MODE)));
+        MODE_LIST_TYPE = nonNull(GraphQLList.list(nonNull(MODE)));
         SLACK_INPUT_TYPE = GraphQLInputObjectType.newInputObject()
                 .name("TransportModeSlack")
                 .description("Used to specify board and alight slack for a given modes.")
@@ -123,7 +123,6 @@ public class TransportModeSlack {
     }
 
     public static List<TransportModeSlack> mapToApiList(Map<TraverseMode, Integer> domain) {
-        System.out.println("TransportSlack.mapToApiList");
         // Group modes by slack value
         Multimap<Integer, TraverseMode> modesBySlack = ArrayListMultimap.create();
         domain.forEach((k,v) -> modesBySlack.put(v, k));
@@ -139,7 +138,6 @@ public class TransportModeSlack {
 
     @SuppressWarnings("unchecked")
     public static Map<TraverseMode, Integer> mapToDomain(Object value) {
-        System.out.println("TransportSlack.mapSlack");
         Map<TraverseMode, Integer> result = new HashMap<>();
         if(value instanceof List) {
             List<Map<String, Object>> list = (List<Map<String, Object>>) value;
@@ -148,7 +146,6 @@ public class TransportModeSlack {
                 ((List<TraverseMode>) map.get("modes")).forEach(m -> result.put(m, slack));
             }
         }
-        System.out.println("\n SET DEFAULT SLACK\n  " + value.getClass() + ", value: " + value);
         return result;
     }
 
@@ -159,6 +156,6 @@ public class TransportModeSlack {
     }
 
     private static Object serializeTransportMode(TraverseMode m) {
-        return TRANSPORT_MODE.getCoercing().serialize(m);
+        return MODE.getCoercing().serialize(m);
     }
 }

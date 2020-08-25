@@ -1,6 +1,5 @@
 package org.opentripplanner.routing.vertextype;
 
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.StationElement;
 import org.opentripplanner.model.WheelChairBoarding;
@@ -20,7 +19,7 @@ public class TransitBoardingAreaVertex extends Vertex {
   public TransitBoardingAreaVertex(Graph graph, BoardingArea boardingArea) {
     super(
         graph,
-        GtfsLibrary.convertIdToString(boardingArea.getId()),
+        boardingArea.getId().toString(),
         boardingArea.getLon(),
         boardingArea.getLat()
     );

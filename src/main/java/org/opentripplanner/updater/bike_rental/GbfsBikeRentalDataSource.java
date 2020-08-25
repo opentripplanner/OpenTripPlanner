@@ -35,6 +35,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
+    // TODO This should be updated to fetch the endpoints defined in gbfs.json
     private void setBaseUrl (String url) {
         String baseUrl = url;
         if (!baseUrl.endsWith("/")) baseUrl += "/";
