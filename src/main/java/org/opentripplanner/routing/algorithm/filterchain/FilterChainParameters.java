@@ -8,6 +8,10 @@ import java.util.List;
 /**
  * Configure the filter-chain by passing in this set of parameters. Set these parameters
  * in the request or in config.
+ * <p>
+ *  Parameters that are aggregated or calculated based on data partially dependent on the
+ *  transit data, not only the request it self, is NOT part of this interface. Instead
+ *  they are set directly using the {@link ItineraryFilterChainBuilder}.
  */
 public interface FilterChainParameters {
 
