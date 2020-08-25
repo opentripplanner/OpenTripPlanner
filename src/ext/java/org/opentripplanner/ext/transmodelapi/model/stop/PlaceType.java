@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.transmodelapi.model;
+package org.opentripplanner.ext.transmodelapi.model.stop;
 
 public enum PlaceType {
     STOP,

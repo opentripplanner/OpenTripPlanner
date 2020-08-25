@@ -38,6 +38,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
@@ -54,7 +55,6 @@ import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
@@ -1032,12 +1032,12 @@ public class Graph implements Serializable {
         return stationById.get(id);
     }
 
-    public Collection<Station> getStations() {
-        return stationById.values();
+    public MultiModalStation getMultiModalStation(FeedScopedId id) {
+        return multiModalStationById.get(id);
     }
 
-    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
-        return multiModalStationById.get(feedScopedId);
+    public Collection<Station> getStations() {
+        return stationById.values();
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {

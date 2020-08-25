@@ -72,7 +72,8 @@ public class RoutingService {
     public List<StopTimesInPattern> stopTimesForStop(
             Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
     ) {
-        return StopTimesHelper.stopTimesForStop(this,
+        return StopTimesHelper.stopTimesForStop(
+                this,
                 lazyGetTimeTableSnapShot(),
                 stop,
                 startTime,
@@ -92,7 +93,7 @@ public class RoutingService {
     public List<StopTimesInPattern> getStopTimesForStop(
             Stop stop, ServiceDate serviceDate, boolean omitNonPickups
     ) {
-        return StopTimesHelper.getStopTimesForStop(this, stop, serviceDate, omitNonPickups);
+        return StopTimesHelper.stopTimesForStop(this, stop, serviceDate, omitNonPickups);
     }
 
 
@@ -114,7 +115,8 @@ public class RoutingService {
     public List<TripTimeShort> stopTimesForPatternAtStop(
             Stop stop, TripPattern pattern, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
     ) {
-        return StopTimesHelper.stopTimesForPatternAtStop(this,
+        return StopTimesHelper.stopTimesForPatternAtStop(
+                this,
                 lazyGetTimeTableSnapShot(),
                 stop,
                 pattern,

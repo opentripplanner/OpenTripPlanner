@@ -11,8 +11,8 @@ import org.opentripplanner.api.resource.UpdaterStatusResource;
 import org.opentripplanner.ext.examples.statistics.api.resource.GraphStatisticsResource;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLAPI;
 import org.opentripplanner.ext.readiness_endpoint.ActuatorAPI;
-import org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI;
 import org.opentripplanner.index.IndexAPI;
+import org.opentripplanner.ext.transmodelapi.TransmodelAPI;
 import org.opentripplanner.util.OTPFeature;
 
 import java.util.ArrayList;
@@ -56,7 +56,7 @@ public class APIEndpoints {
         // Sandbox extension APIs
         addIfEnabled(ActuatorAPI, ActuatorAPI.class);
         addIfEnabled(SandboxExampleAPIGraphStatistics, GraphStatisticsResource.class);
-        addIfEnabled(SandboxAPITransmodelApi, TransmodelIndexAPI.class);
+        addIfEnabled(SandboxAPITransmodelApi, TransmodelAPI.class);
         addIfEnabled(SandboxAPILegacyGraphQLApi, LegacyGraphQLAPI.class);
     }
 

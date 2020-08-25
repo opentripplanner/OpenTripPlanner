@@ -28,9 +28,9 @@ public class RouterConfig implements Serializable {
     /**
      * The raw JsonNode three kept for reference and (de)serialization.
      */
-    public final JsonNode rawJson;
-
+    private final JsonNode rawJson;
     private final String requestLogFile;
+    private final boolean transmodelApiHideFeedId;
     private final double streetRoutingTimeoutSeconds;
     private final RoutingRequest routingRequestDefaults;
     private final TransitRoutingConfig transitConfig;
@@ -40,6 +40,7 @@ public class RouterConfig implements Serializable {
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
         this.requestLogFile = adapter.asText("requestLogFile", null);
+        this.transmodelApiHideFeedId = adapter.path("transmodelApi").asBoolean("hideFeedId", false);
         this.streetRoutingTimeoutSeconds = adapter.asDouble(
                 "streetRoutingTimeout", DEFAULT_STREET_ROUTING_TIMEOUT
         );
@@ -65,6 +66,8 @@ public class RouterConfig implements Serializable {
     public double streetRoutingTimeoutSeconds() {
         return streetRoutingTimeoutSeconds;
     }
+
+    public boolean transmodelApiHideFeedId() { return transmodelApiHideFeedId; }
 
     public RoutingRequest routingRequestDefaults() {
         return routingRequestDefaults;
