@@ -1,7 +1,7 @@
 package org.opentripplanner.graph_builder.module.time;
 
 
-    public class timetable {
+    public class timetable implements Comparable<timetable> {
 
         private int id;
         private long clusterid;
@@ -56,6 +56,15 @@ package org.opentripplanner.graph_builder.module.time;
 
         public void setDaynumber(int daynuiber) {
             this.daynumber = daynuiber;
+        }
+
+        @Override
+        public int compareTo(timetable o) {
+            if(this.getDaynuiber()!=o.getDaynuiber())
+                return  this.getDaynuiber()-o.getDaynuiber();
+            if (this.starttime!=o.starttime)
+                return this.starttime-o.starttime;
+            return this.endtime- o.endtime;
         }
     }
 

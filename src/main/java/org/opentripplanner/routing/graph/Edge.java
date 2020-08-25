@@ -1,10 +1,12 @@
 package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
+import org.opentripplanner.graph_builder.module.time.timetable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.util.IncrementingIdGenerator;
 import org.opentripplanner.routing.util.UniqueIdGenerator;
 
@@ -13,6 +15,12 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
+import java.time.Duration;
+import java.time.Instant;
+import java.time.ZoneId;
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
+import java.util.Comparator;
 import java.util.Locale;
 
 /**
@@ -41,7 +49,26 @@ public abstract class Edge implements Serializable {
      */
     private int id;
     private long  clusterId;
+    public double getVooomSpeed()
+    {
+        ZonedDateTime nowZoned = ZonedDateTime.now();
+        Instant midnight = nowZoned.toLocalDate().atStartOfDay(nowZoned.getZone()).toInstant();
+        Duration duration = Duration.between(midnight, Instant.now());
+        long seconds = duration.getSeconds();
+        this.getTimes().sort(Comparator.naturalOrder());
+        queryDa
+        }
+    }
 
+    public ArrayList<timetable> getTimes() {
+        return times;
+    }
+
+    public void setTimes(ArrayList<timetable> times) {
+        this.times = times;
+    }
+
+    ArrayList<timetable> times;
 
     protected Vertex fromv;
 
