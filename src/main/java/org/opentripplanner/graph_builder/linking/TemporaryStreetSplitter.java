@@ -9,7 +9,6 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
@@ -134,24 +133,18 @@ public class TemporaryStreetSplitter {
         return new TemporaryStreetLocation(UUID.randomUUID().toString(), coord, new NonLocalizedString(name), endVertex);
     }
 
-    // TODO AdamWiktor VMP-59
     private TraverseMode createTraverseMode(RoutingRequest options, boolean endVertex) {
-        //It can be null in tests
-        if (options != null) {
-            TraverseModeSet modes = options.modes;
-            if (modes.getCar())
-                // for park and ride we will start in car mode and walk to the end vertex
-                if (endVertex && options.parkAndRide) {
-                    return TraverseMode.WALK;
-                } else {
-                    return TraverseMode.CAR;
-                }
-            else if (modes.getWalk())
-                return TraverseMode.WALK;
-            else if (modes.getBicycle())
-                return TraverseMode.BICYCLE;
+        if (options.startingMode != null) {
+            return options.startingMode;
+        } else if (endVertex && options.parkAndRide) {
+            return TraverseMode.WALK;
+        } else if (options.modes.getCar()) {
+            return TraverseMode.CAR;
+        } else if (options.modes.getBicycle()) {
+            return TraverseMode.BICYCLE;
+        } else {
+            return TraverseMode.WALK;
         }
-        return TraverseMode.WALK;
     }
 
     private void addTemporaryDropoffVehicleEdge(Vertex destination) {

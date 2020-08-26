@@ -24,12 +24,12 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
 
     @Override
     public String getName() {
-        return "Rent vehicle " + vehicle;
+        return "Rent vehicle " + vehicle + " in node " + tov.getName();
     }
 
     @Override
     public String getName(Locale locale) {
-        return "Rent vehicle " + vehicle;
+        return "Rent vehicle " + vehicle + " in node " + tov.getName();
     }
 
     @Override
@@ -39,17 +39,28 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         }
         if (state.getOptions().vehicleValidator.isValid(vehicle)) {
             if (state.isCurrentlyRentingVehicle()) {
-                return trySwitchVehicles(state, vehicle);
+                return trySwitchVehicles(state);
             } else {
-                return beginVehicleRenting(state, vehicle);
+                return beginVehicleRenting(state);
             }
         }
         return null;
     }
 
-    // TODO AdamWiktor VMP-4 reverse-optimize
+    public State reversedTraverseSwitchVehicles(State state, VehicleDescription vehicle) {
+        StateEditor next = state.edit(this);
+        next.reversedBeginVehicleRenting();
+        next.reversedDoneVehicleRenting(vehicle);
+        return next.makeState();
+    }
 
-    private State trySwitchVehicles(State state, VehicleDescription vehicle) {
+    public State reversedTraverseBeginRenting(State state) {
+        StateEditor next = state.edit(this);
+        next.reversedBeginVehicleRenting();
+        return next.makeState();
+    }
+
+    private State trySwitchVehicles(State state) {
         if (!canDropoffVehicleHere(state.getCurrentVehicle())) {
             return null;
         }
@@ -59,7 +70,7 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         return stateEditor.makeState();
     }
 
-    private State beginVehicleRenting(State state, VehicleDescription vehicle) {
+    private State beginVehicleRenting(State state) {
         StateEditor next = state.edit(this);
         next.beginVehicleRenting(vehicle);
         return next.makeState();

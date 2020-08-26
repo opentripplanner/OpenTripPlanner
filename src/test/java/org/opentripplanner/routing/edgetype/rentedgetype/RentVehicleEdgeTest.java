@@ -120,4 +120,24 @@ public class RentVehicleEdgeTest {
         // then
         assertNotNull(traversed);
     }
+
+    @Test
+    public void shouldAllowToReversedTraverseBeginRenting() {
+        // when
+        State traversed = edge.reversedTraverseBeginRenting(rentingState);
+
+        // then
+        assertNotNull(traversed);
+        assertFalse(traversed.isCurrentlyRentingVehicle());
+    }
+
+    @Test
+    public void shouldAllowToReversedTraverseSwitchVehicles() {
+        // when
+        State traversed = edge.reversedTraverseSwitchVehicles(rentingState, CAR_2);
+
+        // then
+        assertNotNull(traversed);
+        assertEquals(CAR_2, traversed.getCurrentVehicle());
+    }
 }

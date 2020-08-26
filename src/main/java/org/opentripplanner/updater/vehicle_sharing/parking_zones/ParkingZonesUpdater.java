@@ -5,6 +5,7 @@ import com.google.common.reflect.TypeToken;
 import org.opentripplanner.hasura_client.ApiResponse;
 import org.opentripplanner.hasura_client.ParkingZonesGetter;
 import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Graph;
@@ -30,16 +31,16 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     private Graph graph;
     private String url;
 
-    private RentVehicleAnywhereEdge getRentVehicleAnywhereEdge(Vertex v) {
+    private DropoffVehicleEdge getRentVehicleAnywhereEdge(Vertex v) {
         return v.getOutgoing().stream()
-                .filter(RentVehicleAnywhereEdge.class::isInstance)
-                .map(RentVehicleAnywhereEdge.class::cast)
+                .filter(DropoffVehicleEdge.class::isInstance)
+                .map(DropoffVehicleEdge.class::cast)
                 .findAny()
                 .orElse(null);
     }
 
-    private Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> getNewParkingZones(ParkingZonesCalculator calculator,
-                                                                                     List<GeometryParkingZone> geometryParkingZones, List<SingleParkingZone> parkingZonesEnabled) {
+    private Map<DropoffVehicleEdge, List<SingleParkingZone>> getNewParkingZones(
+            ParkingZonesCalculator calculator, List<SingleParkingZone> parkingZonesEnabled) {
         return graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull)
@@ -55,8 +56,8 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
         LOG.info("Grouping parking zones");
         List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
         LOG.info("Calculating parking zones for each vertex");
-        Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex =
-                getNewParkingZones(calculator, geometryParkingZones, parkingZonesEnabled);
+        Map<DropoffVehicleEdge, List<SingleParkingZone>> parkingZonesPerVertex =
+                getNewParkingZones(calculator, parkingZonesEnabled);
         ParkingZonesGraphWriterRunnable graphWriterRunnable =
                 new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex, parkingZonesEnabled);
         LOG.info("Executing parking zones update");

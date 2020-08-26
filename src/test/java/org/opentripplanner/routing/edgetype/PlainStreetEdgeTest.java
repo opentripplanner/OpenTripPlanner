@@ -4,26 +4,31 @@ import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateXY;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
+import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 
 import static org.junit.Assert.*;
 
 public class PlainStreetEdgeTest {
 
+    private static final CarDescription CAR = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK"));
+    private static final MotorbikeDescription MOTORBIKE = new MotorbikeDescription("2", 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, new Provider(1, "HopCity"));
+
     private Graph graph;
     private IntersectionVertex v0, v1, v2;
+    private TemporaryRentVehicleVertex vertex;
     private RoutingRequest proto;
+
+    private State rentingCar, rentingMotorbike;
 
     @Before
     public void before() {
@@ -32,7 +37,7 @@ public class PlainStreetEdgeTest {
         v0 = vertex("maple_0th", 0.0, 0.0); // label, X, Y
         v1 = vertex("maple_1st", 2.0, 2.0);
         v2 = vertex("maple_2nd", 1.0, 2.0);
-        
+
         proto = new RoutingRequest();
         proto.setDummyRoutingContext(graph);
         proto.carSpeed = 15.0f;
@@ -42,21 +47,34 @@ public class PlainStreetEdgeTest {
         proto.stairsReluctance = (1.0);
         proto.turnReluctance = (1.0);
         proto.setModes(TraverseModeSet.allModes());
+
+        vertex = new TemporaryRentVehicleVertex("v_name", new CoordinateXY(1, 2), "name");
+        RentVehicleEdge rentEdge = new RentVehicleEdge(vertex, null);
+
+        RoutingRequest options = new RoutingRequest();
+        options.setRoutingContext(graph, vertex, v1);
+        State state = new State(options);
+        StateEditor se = state.edit(rentEdge);
+        se.beginVehicleRenting(CAR);
+        rentingCar = se.makeState();
+        StateEditor se1 = state.edit(rentEdge);
+        se1.beginVehicleRenting(MOTORBIKE);
+        rentingMotorbike = se1.makeState();
     }
-    
+
     @Test
     public void testInAndOutAngles() {
         // An edge heading straight West
         StreetEdge e1 = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
-        
+
         // Edge has same first and last angle.
         assertEquals(90, e1.getInAngle());
         assertEquals(90, e1.getOutAngle());
-        
+
         // 2 new ones
         StreetVertex u = vertex("test1", 2.0, 1.0);
         StreetVertex v = vertex("test2", 2.0, 2.0);
-        
+
         // Second edge, heading straight North
         StreetEdge e2 = edge(u, v, 1.0, StreetTraversalPermission.ALL);
 
@@ -73,17 +91,17 @@ public class PlainStreetEdgeTest {
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.WALK);
         options.setRoutingContext(graph, v1, v2);
-        
+
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
-        
+
         // Should use the speed on the edge.
         double expectedWeight = e1.getDistanceInMeters() / options.walkSpeed;
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
-    
+
     @Test
     public void testTraverseAsCar() {
         StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
@@ -92,110 +110,95 @@ public class PlainStreetEdgeTest {
         RoutingRequest options = proto.clone();
         options.setMode(TraverseMode.CAR);
         options.setRoutingContext(graph, v1, v2);
-        
+
         State s0 = new State(options);
         State s1 = e1.traverse(s0);
-        
+
         // Should use the speed on the edge.
         double expectedWeight = e1.getDistanceInMeters() / e1.getMaxStreetTraverseSpeed();
         long expectedDuration = (long) Math.ceil(expectedWeight);
         assertEquals(expectedDuration, s1.getElapsedTimeSeconds(), 0.0);
         assertEquals(expectedWeight, s1.getWeight(), 0.0);
     }
-    
+
     @Test
     public void testModeSetCanTraverse() {
         StreetEdge e = edge(v1, v2, 1.0, StreetTraversalPermission.ALL);
-        
+
         TraverseModeSet modes = TraverseModeSet.allModes();
         assertTrue(e.canTraverse(modes));
-        
+
         modes = new TraverseModeSet(TraverseMode.BICYCLE, TraverseMode.WALK);
         assertTrue(e.canTraverse(modes));
-        
+
         e = edge(v1, v2, 1.0, StreetTraversalPermission.CAR);
         assertFalse(e.canTraverse(modes));
-        
+
         modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
         assertTrue(e.canTraverse(modes));
     }
 
     @Test
-    public void testMotorbikeNotAllowedForMaxTraverseSpeed() {
-        // generate a very simple graph
-        Graph graph = new Graph();
-        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
-        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+    public void shouldMotorbikeNotBeAllowedForHighway() {
+        // given
+        StreetEdge highway = edge(vertex, v1, 100.0, StreetTraversalPermission.ALL);
+        highway.setMaxStreetTraverseSpeed(120 / 3.6f);
 
-        //Rent a vehicle (motorbike)
-        VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
-                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
-        rent1.getAvailableVehicles().add(vehicle);
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
-        options.setStartingMode(TraverseMode.WALK);
-        options.setRentingAllowed(true);
-        options.setRoutingContext(graph, v1, v2);
-        State s0 = new State(v1, options);
-        State s1 = rent1.traverse(s0);
+        // when
+        State traverse = highway.traverse(rentingMotorbike);
 
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        //Set traverse speed limit to above 80 km/h
-        e1.setMaxStreetTraverseSpeed(81 / 3.6f);
-        //Motorbike should not be allowed to traverse this street
-        assertNull(e1.traverse(s1));
+        // then
+        assertNull(traverse);
     }
 
     @Test
-    public void testCarAllowedForMaxTraverseSpeed() {
-        // generate a very simple graph
-        Graph graph = new Graph();
-        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
-        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+    public void shouldCarBeAllowedForHighway() {
+        // given
+        StreetEdge highway = edge(vertex, v1, 100.0, StreetTraversalPermission.ALL);
+        highway.setMaxStreetTraverseSpeed(120 / 3.6f);
 
-        //Rent a vehicle (car)
-        VehicleDescription vehicle = new CarDescription("1234", v1.getLat(), v1.getLon(),
-                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
-        rent1.getAvailableVehicles().add(vehicle);
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
-        options.setStartingMode(TraverseMode.WALK);
-        options.setRentingAllowed(true);
-        options.setRoutingContext(graph, v1, v2);
-        State s0 = new State(v1, options);
-        State s1 = rent1.traverse(s0);
+        // when
+        State traverse = highway.traverse(rentingCar);
 
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        //Set traverse speed limit to above 80 km/h
-        e1.setMaxStreetTraverseSpeed(81 / 3.6f);
-        //Car should be allowed to traverse this street
-        assertNotNull(e1.traverse(s1));
+        // then
+        assertNotNull(traverse);
     }
 
     @Test
-    public void testMotorbikeAllowedForMaxTraverseSpeed() {
-        // generate a very simple graph
-        Graph graph = new Graph();
-        StreetVertex v1 = new IntersectionVertex(graph, "v1", -77.0492, 38.85, "v1");
-        StreetVertex v2 = new IntersectionVertex(graph, "v2", -77.0492, 38.86, "v2");
+    public void shouldMotorbikeBeAllowedForNormalStreet() {
+        // given
+        StreetEdge street = edge(vertex, v1, 100.0, StreetTraversalPermission.ALL);
+        street.setMaxStreetTraverseSpeed(50 / 3.6f);
 
-        //Rent a vehicle (motorbike)
-        VehicleDescription vehicle = new MotorbikeDescription("1234", v1.getLat(), v1.getLon(),
-                FuelType.ELECTRIC, Gearbox.MANUAL, new Provider(0, "test"));
-        RentVehicleAnywhereEdge rent1 = new RentVehicleAnywhereEdge(v1);
-        rent1.getAvailableVehicles().add(vehicle);
-        RoutingRequest options = new RoutingRequest(new TraverseModeSet("CAR"));
-        options.setStartingMode(TraverseMode.WALK);
-        options.setRentingAllowed(true);
-        options.setRoutingContext(graph, v1, v2);
-        State s0 = new State(v1, options);
-        State s1 = rent1.traverse(s0);
+        // when
+        State traverse = street.traverse(rentingMotorbike);
 
-        StreetEdge e1 = edge(v1, v2, 100.0, StreetTraversalPermission.ALL);
-        //Set traverse speed limit to 50 km/h
-        e1.setMaxStreetTraverseSpeed(50 / 3.6f);
-        //Motorbike should be allowed to traverse this street
-        assertNotNull(e1.traverse(s1));
+        // then
+        assertNotNull(traverse);
+    }
+
+    @Test
+    public void shouldTraverseVehicleIfEnoughRange() {
+        // given
+        StreetEdge street = edge(vertex, v1, MOTORBIKE.getRangeInMeters() - 1, StreetTraversalPermission.ALL);
+
+        // when
+        State traverse = street.traverse(rentingMotorbike);
+
+        // then
+        assertNotNull(traverse);
+    }
+
+    @Test
+    public void shouldNotTraverseVehicleIfNotEnoughRange() {
+        // given
+        StreetEdge street = edge(vertex, v1, MOTORBIKE.getRangeInMeters() + 1, StreetTraversalPermission.ALL);
+
+        // when
+        State traverse = street.traverse(rentingMotorbike);
+
+        // then
+        assertNull(traverse);
     }
 
     /**
@@ -345,13 +348,13 @@ public class PlainStreetEdgeTest {
 
     /**
      * Create an edge. If twoWay, create two edges (back and forth).
-     * 
+     *
      * @param vA
      * @param vB
      * @param length
      */
     private StreetEdge edge(StreetVertex vA, StreetVertex vB, double length,
-            StreetTraversalPermission perm) {
+                            StreetTraversalPermission perm) {
         String labelA = vA.getLabel();
         String labelB = vB.getLabel();
         String name = String.format("%s_%s", labelA, labelB);
