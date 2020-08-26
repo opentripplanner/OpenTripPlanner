@@ -47,6 +47,5 @@ public class VehiclePositionsGetter extends HasuraGetter<VehicleDescription, Veh
     @Override
     protected HasuraToOTPMapper<Vehicle, VehicleDescription> mapper() {
         return new VehiclePositionsMapper();
-
     }
 }

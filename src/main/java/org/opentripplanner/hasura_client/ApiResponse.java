@@ -14,7 +14,6 @@ public class ApiResponse<H> {
     }
 
     public static class Data<H2> {
-
         private List<H2> items;
 
         public List<H2> getItems() {
