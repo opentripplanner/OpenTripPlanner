@@ -7,6 +7,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -36,6 +37,10 @@ public class clusterlist {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        for (cluster c : this.getclusters()){
+            if (Array.getLength(c.gettimetable())==0)
+                c.settimetable(null);
         }
     }
 

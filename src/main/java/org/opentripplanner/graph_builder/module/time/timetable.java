@@ -50,7 +50,7 @@ package org.opentripplanner.graph_builder.module.time;
             this.endtime = endtime;
         }
 
-        public int getDaynuiber() {
+        public int getDaynumber() {
             return daynumber;
         }
 
@@ -59,8 +59,8 @@ package org.opentripplanner.graph_builder.module.time;
         }
 
         public int compareTo(timetable o) {
-            if (this.getDaynuiber() != o.getDaynuiber())
-                return this.getDaynuiber() - o.getDaynuiber();
+            if (this.getDaynumber() != o.getDaynumber())
+                return this.getDaynumber() - o.getDaynumber();
             if (this.starttime != o.starttime)
                 return this.starttime - o.starttime;
             return this.endtime - o.endtime;
@@ -68,8 +68,8 @@ package org.opentripplanner.graph_builder.module.time;
 
         @Override
         public int compareTo(queryData o) {
-            if (o.getDay() != this.getDaynuiber())
-                return o.getDay() - this.getDaynuiber();
+            if (o.getDay() != this.getDaynumber())
+                return o.getDay() - this.getDaynumber();
             if (o.getTime() < this.getStarttime())
                 return -1;
             if (o.getTime() < this.getEndtime())
