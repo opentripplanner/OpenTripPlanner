@@ -11,15 +11,17 @@ import java.lang.reflect.Type;
 import java.util.List;
 
 public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObject> {
-
-
     private static final Logger LOG = LoggerFactory.getLogger(HasuraGetter.class);
 
     protected abstract String QUERY();
 
     protected abstract HasuraToOTPMapper<HASURA_OBJECT, GRAPH_OBJECT> mapper();
 
-    protected String getGeolocationArguments(Graph graph) {
+    protected boolean addGeolocationArguments() {
+        return true;
+    }
+
+    private String getGeolocationArguments(Graph graph) {
         double latMin = graph.getEnvelope().getLowerLeftLatitude();
         double lonMin = graph.getEnvelope().getLowerLeftLongitude();
         double latMax = graph.getEnvelope().getUpperRightLatitude();
@@ -35,7 +37,7 @@ public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObj
 
     public List<GRAPH_OBJECT> getFromHasura(Graph graph, String url, Type type) {
         String arguments = getGeolocationArguments(graph);
-        String body = QUERY() + arguments;
+        String body = addGeolocationArguments() ? QUERY() + arguments : QUERY();
         ApiResponse<HASURA_OBJECT> response = HttpUtils.postData(url, body, type);
         LOG.info("Got {} objects from API", response.getData().getItems().size());
         return mapper().map(response.getData().getItems());

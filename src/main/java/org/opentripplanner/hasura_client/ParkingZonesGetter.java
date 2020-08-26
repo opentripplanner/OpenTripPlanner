@@ -3,7 +3,6 @@ package org.opentripplanner.hasura_client;
 import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
 import org.opentripplanner.hasura_client.mappers.HasuraToOTPMapper;
 import org.opentripplanner.hasura_client.mappers.ParkingZonesMapper;
-import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.GeometryParkingZone;
 
 public class ParkingZonesGetter extends HasuraGetter<GeometryParkingZone, ParkingZone> {
@@ -21,8 +20,8 @@ public class ParkingZonesGetter extends HasuraGetter<GeometryParkingZone, Parkin
     }
 
     @Override
-    protected String getGeolocationArguments(Graph graph) {
-        return "";
+    protected boolean addGeolocationArguments() {
+        return false;
     }
 
     @Override
