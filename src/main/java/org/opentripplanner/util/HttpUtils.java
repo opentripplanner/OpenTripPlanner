@@ -41,7 +41,7 @@ public class HttpUtils {
         }
         HttpClient httpclient = getClient();
         HttpResponse response = httpclient.execute(httpget);
-        if(response.getStatusLine().getStatusCode() != 200)
+        if (response.getStatusLine().getStatusCode() != 200)
             return null;
 
         HttpEntity entity = response.getEntity();
@@ -49,28 +49,6 @@ public class HttpUtils {
             return null;
         }
         return entity.getContent();
-    }
-
-    public static <T> T postData(String url, String data, Class<T> mapTo) {
-        try {
-            HttpPost request = new HttpPost(url);
-            request.setEntity(new StringEntity(data, ContentType.APPLICATION_JSON));
-            HttpClient client = getClient();
-            request.addHeader("content-type", "application/json");
-            request.addHeader("accept", "application/json");
-            HttpResponse response = client.execute(request);
-            String json = EntityUtils.toString(response.getEntity(), "UTF-8");
-            return GSON.fromJson(json, mapTo);
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        } catch (ClientProtocolException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        } catch (JsonSyntaxException e) {
-            e.printStackTrace();
-        }
-        return null;
     }
 
     public static <T> T postData(String url, String data, Type type) {
@@ -110,7 +88,7 @@ public class HttpUtils {
                     + status.getReasonPhrase());
         }
     }
-    
+
     private static HttpClient getClient() {
         HttpClient httpClient = HttpClientBuilder.create()
                 .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(TIMEOUT_SOCKET).build())
