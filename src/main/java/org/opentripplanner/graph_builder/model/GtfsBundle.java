@@ -21,6 +21,7 @@ public class GtfsBundle {
 
     private static final Logger LOG = LoggerFactory.getLogger(GtfsBundle.class);
 
+
     private File path;
 
     private URL url;
@@ -63,6 +64,8 @@ public class GtfsBundle {
     public GtfsBundle(File gtfsFile) {
         this.setPath(gtfsFile);
     }
+
+    public File getPath() { return path; }
 
     public void setPath(File path) {
         this.path = path;

@@ -39,7 +39,11 @@ public class RentACarOffEdge extends RentACarAbstractEdge {
     public State traverse(State s0) {
         RoutingRequest options = s0.getOptions();
 
-        if (!s0.isCarRentalDropoffAllowed(!station.isBorderDropoff))
+        // check if the current state would allow a car rental dropoff. In certain cases, RentACarOffEdges can be
+        // created when creating border drop-off stations. In these cases we still want to specify that the car is
+        // being dropped off at a designated area in order for reverse optimization searches to recognize the station
+        // when approaching from the out-of-boundary side.
+        if (!s0.isCarRentalDropoffAllowed(true))
             return null;
 
         // make sure there is at least one spot to park at the station

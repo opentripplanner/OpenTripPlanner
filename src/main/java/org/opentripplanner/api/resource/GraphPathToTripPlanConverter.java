@@ -42,6 +42,7 @@ import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.SimpleTransfer;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TransitBoardAlight;
 import org.opentripplanner.routing.edgetype.TripPattern;
 import org.opentripplanner.routing.error.TransportationNetworkCompanyAvailabilityException;
 import org.opentripplanner.routing.edgetype.flex.PartialPatternHop;
@@ -329,6 +330,18 @@ public abstract class GraphPathToTripPlanConverter {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
                 } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
+                    // if the start edge of the first state in the current leg index pair is a TransitBoardAlight edge
+                    // and the edge of the state just after the current leg index pair is a TransitBoardAlight edge,
+                    // then make that index be the final state of the current leg. This is to ensure that alerts
+                    // associated with TransitBoardAlight vertices are able to be found for legs.
+                    if (
+                        states[legIndexPairs[0]].getBackMode() != null &&
+                        states[legIndexPairs[0]].backEdge instanceof TransitBoardAlight &&
+                            states[legIndexPairs[1] + 1].backEdge instanceof TransitBoardAlight &&
+                            legIndexPairs[1] + 1 < states.length - 1
+                    ) {
+                        legIndexPairs[1] = legIndexPairs[1] + 1;
+                    }
                     if (legIndexPairs[1] != states.length - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
@@ -375,7 +388,7 @@ public abstract class GraphPathToTripPlanConverter {
         Edge[] edges = new Edge[states.length - 1];
 
         leg.startTime = makeCalendar(states[0]);
-        leg.endTime = makeCalendar(states[states.length - 1]);
+        leg.endTime = makeCalendar(getLastOnboardTransitState(states));
 
         // Calculate leg distance and fill array of edges
         leg.distance = 0.0;
@@ -751,7 +764,8 @@ public abstract class GraphPathToTripPlanConverter {
             Set<Alert> alerts = graph.streetNotesService.getNotes(state);
             Edge edge = state.getBackEdge();
 
-            if (mode != null) {
+            // Update the mode for each state, unless it is null or a LEG_SWITCH mode
+            if (mode != null && mode != TraverseMode.LEG_SWITCH) {
                 leg.mode = mode.toString();
             }
 
@@ -790,14 +804,15 @@ public abstract class GraphPathToTripPlanConverter {
         if (trip != null) {
             Route route = trip.getRoute();
             Agency agency = route.getAgency();
-            ServiceDay serviceDay = states[states.length - 1].getServiceDay();
+            State lastOnboardTransitState = getLastOnboardTransitState(states);
+            ServiceDay serviceDay = lastOnboardTransitState.getServiceDay();
 
             leg.agencyId = agency.getId();
             leg.agencyName = agency.getName();
             leg.agencyUrl = agency.getUrl();
             leg.agencyBrandingUrl = agency.getBrandingUrl();
             leg.headsign = states[1].getBackDirection();
-            leg.route = states[states.length - 1].getBackEdge().getName(requestedLocale);
+            leg.route = lastOnboardTransitState.getBackEdge().getName(requestedLocale);
             leg.routeColor = route.getColor();
             leg.routeId = route.getId();
             leg.routeLongName = route.getLongName();
@@ -822,14 +837,14 @@ public abstract class GraphPathToTripPlanConverter {
                 leg.headsign = trip.getTripHeadsign();
             }
 
-            Edge edge = states[states.length - 1].backEdge;
+            Edge edge = lastOnboardTransitState.backEdge;
             if (edge instanceof TemporaryDirectPatternHop) {
                 leg.callAndRide = true;
             }
             if (edge instanceof PartialPatternHop) {
                 PartialPatternHop hop = (PartialPatternHop) edge;
                 int directTime = hop.getDirectVehicleTime();
-                TripTimes tt = states[states.length - 1].getTripTimes();
+                TripTimes tt = lastOnboardTransitState.getTripTimes();
                 int maxTime = tt.getDemandResponseMaxTime(directTime);
                 int avgTime = tt.getDemandResponseAvgTime(directTime);
                 int delta = maxTime - avgTime;
@@ -871,7 +886,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         leg.from = makePlace(states[0], firstVertex, edges[0], firstStop, tripTimes, requestedLocale);
         leg.from.arrival = null;
-        leg.to = makePlace(states[states.length - 1], lastVertex, null, lastStop, tripTimes, requestedLocale);
+        leg.to = makePlace(getLastOnboardTransitState(states), lastVertex, null, lastStop, tripTimes, requestedLocale);
         leg.to.departure = null;
 
         if (showIntermediateStops) {
@@ -899,6 +914,20 @@ public abstract class GraphPathToTripPlanConverter {
                 leg.stop.add(makePlace(states[i], vertex, edges[i], currentStop, tripTimes, requestedLocale));
             }
         }
+    }
+
+    /**
+     * In some leg states, the final state might be a TransitBoardAlight edge type, where instead we may want an edge
+     * containing information about the transit route/pattern/etc. This method will find and return the correct state to
+     * use for calculating transit-related items for a leg.
+     *
+     * @param states An array of states representing a leg
+     */
+    private static State getLastOnboardTransitState(State[] states) {
+        int lastTransitStateIndex = states[states.length - 1].backEdge instanceof TransitBoardAlight
+            ? states.length - 2
+            : states.length - 1;
+        return states[lastTransitStateIndex];
     }
 
     /**
@@ -935,7 +964,8 @@ public abstract class GraphPathToTripPlanConverter {
             place.platformCode = stop.getPlatformCode();
             place.zoneId = stop.getZoneId();
             place.stopIndex = ((OnboardEdge) edge).getStopIndex();
-            if (endOfLeg) place.stopIndex++;
+            // TransitBoardAlight edges don't advance the stopIndex, so don't increment if one is encountered at the end
+            if (endOfLeg && !(edge instanceof TransitBoardAlight)) place.stopIndex++;
             if (tripTimes != null) {
                 place.stopSequence = tripTimes.getStopSequence(place.stopIndex);
             }

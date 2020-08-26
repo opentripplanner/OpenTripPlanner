@@ -419,6 +419,7 @@ public class StreetEdge extends Edge implements Cloneable {
                     editorCar.incrementWeight(options.carRentalPickupCost);
                     editorCar.incrementTimeInSeconds(options.carRentalPickupTime);
                     editorCar.beginCarRenting(getDistance(), carNetworks, true);
+                    editorCar.setBackMode(TraverseMode.CAR);
                     if (state != null) {
                         // make the forkState be of the non-car mode so it's possible to build walk steps
                         state.addToExistingResultChain(editorCar.makeState());
@@ -509,12 +510,24 @@ public class StreetEdge extends Edge implements Cloneable {
                 }
             }
             // possible backward transition of completing a dropping off of a floating vehicle when in "arrive by" mode
+            // NOTE: the previous StreetEdge is considered because it can be reasoned that the very first point of the
+            // previous StreetEdge constitutes a part of this current StreetEdge. Since a vehicle rental could end on
+            // the previous StreetEdge, the floating rental vehicle is assumed to be left at the very end of the
+            // StreetEdge.
             else if (
                 !s0.isVehicleRenting() &&
-                    getPermission().allows(TraverseMode.MICROMOBILITY) &&
+                    (getPermission().allows(TraverseMode.MICROMOBILITY) || getPermission().allows(TraverseMode.WALK)) &&
                     currMode != TraverseMode.MICROMOBILITY &&
                     options.arriveBy &&
-                    s0.isVehicleRentalDropoffAllowed(this, false)
+                    (s0.isVehicleRentalDropoffAllowed(this, false) ||
+                        (
+                            s0.backEdge instanceof StreetEdge &&
+                                s0.isVehicleRentalDropoffAllowed(
+                                    (StreetEdge) s0.backEdge,
+                                    false
+                                )
+                        )
+                    )
             ) {
                 StateEditor editorWithVehicleRental = doTraverse(s0, options, TraverseMode.MICROMOBILITY);
                 if (editorWithVehicleRental != null) {
@@ -522,6 +535,17 @@ public class StreetEdge extends Edge implements Cloneable {
                     editorWithVehicleRental.incrementWeight(options.vehicleRentalPickupCost);
                     editorWithVehicleRental.incrementTimeInSeconds(options.vehicleRentalPickupTime);
                     editorWithVehicleRental.beginVehicleRenting(getDistance(), vehicleNetworks, true);
+                    // in arriveBy mode transitions on a street edge, we must immediately set the backmode to
+                    // Micromobility to make sure proper state is maintained for correct state slicing and reverse
+                    // optimization. In rentAVehicleOn/OffEdges, the mode should not change until the following state to
+                    // ensure that the state is sliced at the rentAVehicleOn/OffEdge. However, here, the slice must
+                    // occur here. NOTE: if the edge is only traversable by walking, then the backMode should be set to
+                    // walk
+                    editorWithVehicleRental.setBackMode(
+                        canTraverse(options, TraverseMode.MICROMOBILITY)
+                            ? TraverseMode.MICROMOBILITY
+                            : TraverseMode.WALK
+                    );
                     State editorWithVehicleRentalState = editorWithVehicleRental.makeState();
                     if (state != null) {
                         // make the forkState be of the non-vehicle-rental mode so it's possible to build walk steps

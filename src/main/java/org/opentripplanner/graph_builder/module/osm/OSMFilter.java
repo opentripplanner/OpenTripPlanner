@@ -36,6 +36,7 @@ public class OSMFilter {
             if(
                     highway.equals("conveyer") ||
                     highway.equals("proposed") ||
+                    highway.equals("planned") ||
                     highway.equals("construction") ||
                     highway.equals("razed") ||
                     highway.equals("raceway") ||

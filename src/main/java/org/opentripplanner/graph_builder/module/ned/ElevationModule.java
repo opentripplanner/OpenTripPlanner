@@ -1,5 +1,8 @@
 package org.opentripplanner.graph_builder.module.ned;
 
+import com.esotericsoftware.kryo.Kryo;
+import com.esotericsoftware.kryo.io.Input;
+import com.esotericsoftware.kryo.io.Output;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
 import org.geotools.geometry.DirectPosition2D;
@@ -28,6 +31,7 @@ import org.slf4j.LoggerFactory;
 import java.io.BufferedOutputStream;
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -147,12 +151,14 @@ public class ElevationModule implements GraphBuilderModule {
         this.elevationUnitMultiplier = elevationUnitMultiplier;
     }
 
-    public List<String> provides() {
-        return Arrays.asList("elevation");
-    }
-
-    public List<String> getPrerequisites() {
-        return Arrays.asList("streets");
+    /**
+     * Use Kryo to serialize/deserialize cached elevations
+     */
+    private Kryo makeKryo() {
+        Kryo kryo = new Kryo();
+        kryo.register(HashMap.class);
+        kryo.register(PackedCoordinateSequence.Double.class);
+        return kryo;
     }
 
     @Override
@@ -169,12 +175,21 @@ public class ElevationModule implements GraphBuilderModule {
             // try to load in the cached elevation data
             try {
                 log.info("Loading cached elevation data into memory");
-                ObjectInputStream in = new ObjectInputStream(new FileInputStream(cachedElevationsFile));
-                cachedElevations = (HashMap<String, PackedCoordinateSequence>) in.readObject();
+                Kryo kryo = makeKryo();
+                Input input = new Input(new FileInputStream(cachedElevationsFile));
+                cachedElevations = (HashMap<String, PackedCoordinateSequence>) kryo.readClassAndObject(input);
                 log.info("Cached elevation data loaded into memory!");
-            } catch (IOException | ClassNotFoundException e) {
-                log.warn(graph.addBuilderAnnotation(new Graphwide(
-                    String.format("Cached elevations file could not be read in due to error: %s!", e.getMessage()))));
+            } catch (Exception e) {
+                log.warn(
+                    graph.addBuilderAnnotation(
+                        new Graphwide(
+                            String.format(
+                                "Cached elevations file could not be read in due to error: %s!",
+                                e.getMessage()
+                            )
+                        )
+                    )
+                );
             }
         }
         log.info(demPrepareTask.finish());
@@ -244,9 +259,9 @@ public class ElevationModule implements GraphBuilderModule {
                     streetEdge.getElevationProfile());
             }
             try {
-                ObjectOutputStream out = new ObjectOutputStream(
-                    new BufferedOutputStream(new FileOutputStream(cachedElevationsFile)));
-                out.writeObject(newCachedElevations);
+                Kryo kryo = makeKryo();
+                Output out = new Output(new BufferedOutputStream(new FileOutputStream(cachedElevationsFile)));
+                kryo.writeClassAndObject(out, newCachedElevations);
                 out.close();
             } catch (IOException e) {
                 log.error(e.getMessage());
