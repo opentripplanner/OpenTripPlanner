@@ -1,12 +1,7 @@
 package org.opentripplanner.updater.stoptime;
 
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.BitSet;
-import java.util.Calendar;
-import java.util.List;
-import java.util.Set;
-import java.util.TimeZone;
+import java.util.*;
 import java.util.concurrent.locks.ReentrantLock;
 
 import org.opentripplanner.model.Agency;
@@ -61,6 +56,18 @@ public class TimetableSnapshotSource {
      * duplicating a TripPattern -> Timetable map and indexing the new Timetables.
      */
     public int maxSnapshotFrequency = 1000; // msec
+
+    /**
+     * Window for updating other trips on the block of the trip update.
+     *
+     * 0 indicates only the matching trip's times should be updated.
+     *
+     * Any positive integer indicates that any trip on the same block on the updated trip
+     * should be updated if the start time of the trip occurs between the update timestamp and
+     * the number of seconds forward the timestamp of the update.
+     *
+     */
+    public int blockUpdateWindow = 0; //sec
 
     /**
      * The last committed snapshot that was handed off to a routing thread. This snapshot may be
@@ -155,14 +162,10 @@ public class TimetableSnapshotSource {
     /**
      * Method to apply a trip update list to the most recent version of the timetable snapshot. A
      * GTFS-RT feed is always applied against a single static feed (indicated by feedId).
-<<<<<<< HEAD
-     * 
-=======
      *
      * However, multi-feed support is not completed and we currently assume there is only one static
      * feed when matching IDs.
      *
->>>>>>> 7296be8ffd532a13afb0bec263a9f436ab787022
      * @param graph graph to update (needed for adding/changing stop patterns)
      * @param fullDataset true iff the list with updates represent all updates that are active right
      *        now, i.e. all previous updates should be disregarded
@@ -173,6 +176,14 @@ public class TimetableSnapshotSource {
         if (updates == null) {
             LOG.warn("updates is null");
             return;
+        }
+
+        //create a simple list of all the trip ids that are included in the update
+        List<String> allUpdatedTripIds = new ArrayList<>();
+        for (TripUpdate u : updates) {
+            if (u.hasTrip() && u.getTrip().hasTripId()) {
+                allUpdatedTripIds.add(u.getTrip().getTripId());
+            }
         }
 
         // Acquire lock on buffer
@@ -224,6 +235,18 @@ public class TimetableSnapshotSource {
                 switch (tripScheduleRelationship) {
                     case SCHEDULED:
                         applied = handleScheduledTrip(tripUpdate, feedId, serviceDate);
+
+                        //if configuration allows it and the trip update has a timestamp,
+                        //try propagating delay to other trips on the block
+                        if (blockUpdateWindow > 0 && tripUpdate.hasTimestamp() &&
+                                tripUpdate.hasTrip() && tripUpdate.getTrip().hasTripId()) {
+                            Trip t = getTripForTripId(feedId, tripUpdate.getTrip().getTripId());
+
+                            //if the trip has a block, update other trips on the same block
+                            if (t.getBlockId() != null) {
+                                updateBlockTrips(graph, tripUpdate, feedId, serviceDate, allUpdatedTripIds);
+                            }
+                        }
                         break;
                     case ADDED:
                         applied = validateAndHandleAddedTrip(graph, tripUpdate, feedId, serviceDate);
@@ -338,6 +361,128 @@ public class TimetableSnapshotSource {
         final boolean success = buffer.update(feedId, pattern, updatedTripTimes, serviceDate);
         return success;
     }
+
+    private void updateBlockTrips(final Graph graph, final TripUpdate tripUpdate, final String feedId, final ServiceDate serviceDate, final List<String> allUpdatedTripIds) {
+        Trip t = getTripForTripId(feedId, tripUpdate.getTrip().getTripId());
+        Collection<Trip> tripsForBlock = graph.index.tripsForBlockId.get(t.getBlockId());
+
+        TripPattern updatePattern = getPatternForTripId(feedId, t.getId().getId());
+
+        //pull scheduled start time of updated trip (arrival time at the first stop)
+        if (!updatePattern.scheduledTimetable.hasTripTimes()) {
+            LOG.warn("No trip times stored in scheduled table for {}", updatePattern.toString());
+            return;
+        }
+        int updateTripStartTime = updatePattern.scheduledTimetable.getTripTimes(t).getScheduledArrivalTime(0);
+
+        Calendar calTimestamp = Calendar.getInstance(timeZone);
+        calTimestamp.setTimeInMillis(tripUpdate.getTimestamp() * 1000);
+        long timeStampSecSinceMid = calTimestamp.get(Calendar.HOUR_OF_DAY) * 60 * 60 + calTimestamp.get(Calendar.MINUTE) * 60 + calTimestamp.get(Calendar.SECOND);
+
+        //set the calTimestamp to the beginning of the day so it can be compared to service date
+        calTimestamp.set(Calendar.HOUR_OF_DAY, 0);
+        calTimestamp.set(Calendar.MINUTE, 0);
+        calTimestamp.set(Calendar.SECOND, 0);
+        calTimestamp.set(Calendar.MILLISECOND, 0);
+
+        int result = calTimestamp.compareTo(serviceDate.getAsCalendar(timeZone));
+        if (result > 0) { // service date was in the past
+            timeStampSecSinceMid += (24 * 60 * 60);//add 24 hours to the timestamp sec since midnight because we are past the actual service day
+        } else if (result < 0) {// service date is in the future
+            timeStampSecSinceMid -= (24 * 60 * 60);//subtract 24 hours from the timestamp sec since midnight because we are before the actual service day
+        }
+
+
+        for (Trip blockTrip : tripsForBlock) {
+            if (allUpdatedTripIds.contains(blockTrip.getId().getId())) continue;//skip any trip that will have it's own update
+
+            TripPattern blockTripPattern = getPatternForTripId(feedId, blockTrip.getId().getId());
+
+            if (!blockTripPattern.scheduledTimetable.hasTripTimes()) {
+                LOG.warn("No trip times stored in scheduled table for {}", blockTripPattern.toString());
+                continue;
+            }
+
+            TripTimes newTimes = new TripTimes(blockTripPattern.scheduledTimetable.getTripTimes(blockTrip));
+
+            newTimes.getScheduledArrivalTime(0);
+
+            // check scheduled times of block trip and updated trip
+            // and then check the adj start time of the block trip compared to the window
+            if (newTimes.getScheduledArrivalTime(0) > updateTripStartTime &&
+                    newTimes.getScheduledArrivalTime(0)  >= timeStampSecSinceMid &&
+                    newTimes.getScheduledArrivalTime(0)  <= (timeStampSecSinceMid + blockUpdateWindow)) {
+
+                TripTimes updatedTripTimesForBlockTrip = createUpdatedTripTimes(newTimes, tripUpdate, updatePattern.scheduledTimetable.getTripTimes(t), timeZone, serviceDate);
+
+                if (updatedTripTimesForBlockTrip == null) continue;
+
+                // Make sure that updated trip times have the correct real time state
+                updatedTripTimesForBlockTrip.setRealTimeState(RealTimeState.UPDATED);
+
+                buffer.update(feedId, blockTripPattern, updatedTripTimesForBlockTrip, serviceDate);
+            }
+        }
+    }
+
+    private TripTimes createUpdatedTripTimes(TripTimes newTimes, TripUpdate tripUpdate, TripTimes updateTripSchedule, TimeZone timeZone, ServiceDate updateServiceDate) {
+
+            // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
+            Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
+            if (!updates.hasNext()) {
+                return null;
+            }
+
+            //get the last stop time update for the trip
+            //we don't need more than one since we are just going to apply the delay (if any)
+            // from the stop closest to the following block trips
+            StopTimeUpdate update = updates.next();
+            while (updates.hasNext()) update = updates.next();
+
+            //get the zero point of the update's service date
+            long updateServiceDateBeginning = updateServiceDate.getAsDate(timeZone).getTime();
+
+            int numStops = newTimes.getNumStops();
+
+            for (int i = 0; i < numStops; i++) {//update all the stops for the block trips since they are after the update trip
+
+                if (update.hasArrival()) {
+                    TripUpdate.StopTimeEvent arrival = update.getArrival();
+                    if (arrival.hasDelay()) {
+                        newTimes.updateArrivalDelay(i, arrival.getDelay());
+                    }
+                    else if (updateTripSchedule != null && arrival.hasTime()) {
+                        int scheduledArrivalTime = updateTripSchedule.getScheduledArrivalTime(i);
+
+                        int expectedArrivalTime = (int)((update.getArrival().getTime() - updateServiceDateBeginning) / 1000);
+                        newTimes.updateArrivalDelay(i, (expectedArrivalTime - scheduledArrivalTime));
+                    }
+                }
+
+                if (update.hasDeparture()) {
+                    TripUpdate.StopTimeEvent departure = update.getDeparture();
+                    if (departure.hasDelay()) {
+                        newTimes.updateDepartureDelay(i, departure.getDelay());
+                    }
+                    else if (updateTripSchedule != null && departure.hasTime()) {
+                        int scheduledDepartureTime = updateTripSchedule.getScheduledDepartureTime(i);
+
+                        int expectedDepartureTime = (int)((update.getDeparture().getTime() - updateServiceDateBeginning) / 1000);
+                        newTimes.updateDepartureDelay(i, (expectedDepartureTime - scheduledDepartureTime));
+                    }
+                }
+            }
+
+        if (!newTimes.timesIncreasing()) {
+            LOG.error("TripTimes are non-increasing after applying GTFS-RT delay propagation to a block trip for update {}.", tripUpdate.getTrip().getTripId());
+            return null;
+        }
+
+        LOG.debug("A valid TripUpdate object was applied to block trip for update trip {}.", tripUpdate.getTrip().getTripId());
+        return newTimes;
+    }
+
+
 
     /**
      * Validate and handle GTFS-RT TripUpdate message containing an ADDED trip.

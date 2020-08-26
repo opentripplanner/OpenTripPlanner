@@ -433,6 +433,10 @@ public class Timetable implements Serializable {
         return -1;
     }
 
+    public boolean hasTripTimes() {
+        return tripTimes != null && tripTimes.size() > 0;
+    }
+
     public TripTimes getTripTimes(int tripIndex) {
         return tripTimes.get(tripIndex);
     }

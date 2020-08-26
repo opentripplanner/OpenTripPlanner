@@ -51,6 +51,11 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
     /**
      * Property to set on the RealtimeDataSnapshotSource
      */
+    private Integer blockUpdateWindow;
+
+    /**
+     * Property to set on the RealtimeDataSnapshotSource
+     */
     private Boolean purgeExpiredData;
 
     /**
@@ -98,6 +103,10 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         if (maxSnapshotFrequency >= 0) {
             this.maxSnapshotFrequency = maxSnapshotFrequency;
         }
+        int blockUpdateWindow = config.path("blockUpdateWindowSec").asInt(-1);
+        if (blockUpdateWindow >= 0) {
+            this.blockUpdateWindow = blockUpdateWindow;
+        }
         this.purgeExpiredData = config.path("purgeExpiredData").asBoolean(true);
         if (config.path("fuzzyTripMatching").asBoolean(false)) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(graph.index);
@@ -120,6 +129,9 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         }
         if (maxSnapshotFrequency != null) {
             snapshotSource.maxSnapshotFrequency = (maxSnapshotFrequency);
+        }
+        if (blockUpdateWindow != null) {
+            snapshotSource.blockUpdateWindow = (blockUpdateWindow);
         }
         if (purgeExpiredData != null) {
             snapshotSource.purgeExpiredData = (purgeExpiredData);
