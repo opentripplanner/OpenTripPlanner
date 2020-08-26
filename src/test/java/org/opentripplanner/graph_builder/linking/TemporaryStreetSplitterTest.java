@@ -103,9 +103,61 @@ public class TemporaryStreetSplitterTest {
     }
 
     @Test
+    public void shouldSetTraverseModeToStartingModeWhenRoutingWithRentingVehicles() {
+        // given
+        routingRequest.startingMode = TraverseMode.WALK;
+        when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
+
+        // when
+        TemporaryStreetLocation closestVertex = temporaryStreetSplitter.linkLocationToGraph(genericLocation, routingRequest, false);
+
+        // then
+        verify(toStreetEdgeLinker, times(1)).linkTemporarily(closestVertex, TraverseMode.WALK, routingRequest);
+    }
+
+    @Test
+    public void shouldSetTraverseModeToCarWhenRoutingTaxi() {
+        // given
+        routingRequest.startingMode = TraverseMode.CAR;
+        when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
+
+        // when
+        TemporaryStreetLocation closestVertex = temporaryStreetSplitter.linkLocationToGraph(genericLocation, routingRequest, false);
+
+        // then
+        verify(toStreetEdgeLinker, times(1)).linkTemporarily(closestVertex, TraverseMode.CAR, routingRequest);
+    }
+
+    @Test
+    public void shouldSetTraverseModeToWalkWhenEndOfParkAndRide() {
+        // given
+        routingRequest.parkAndRide = true;
+        when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
+
+        // when
+        TemporaryStreetLocation closestVertex = temporaryStreetSplitter.linkLocationToGraph(genericLocation, routingRequest, true);
+
+        // then
+        verify(toStreetEdgeLinker, times(1)).linkTemporarily(closestVertex, TraverseMode.WALK, routingRequest);
+    }
+
+    @Test
+    public void shouldSetTraverseModeToBicycleWhenRoutingBicycle() {
+        // given
+        routingRequest.modes = new TraverseModeSet(TraverseMode.BICYCLE);
+        when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
+
+        // when
+        TemporaryStreetLocation closestVertex = temporaryStreetSplitter.linkLocationToGraph(genericLocation, routingRequest, false);
+
+        // then
+        verify(toStreetEdgeLinker, times(1)).linkTemporarily(closestVertex, TraverseMode.BICYCLE, routingRequest);
+    }
+
+    @Test
     public void shouldSetTraverseModeToCarWhenRoutingCar() {
         // given
-        routingRequest.modes = new TraverseModeSet(TraverseMode.CAR);
+        routingRequest.modes = new TraverseModeSet(TraverseMode.CAR, TraverseMode.WALK);
         when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
 
         // when

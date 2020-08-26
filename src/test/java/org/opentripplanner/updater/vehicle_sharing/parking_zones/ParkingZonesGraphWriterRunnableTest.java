@@ -3,8 +3,8 @@ package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 import org.junit.Test;
 import org.locationtech.jts.geom.CoordinateXY;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
@@ -28,8 +28,8 @@ public class ParkingZonesGraphWriterRunnableTest {
         // given
         Graph graph = new Graph();
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(null);
-        RentVehicleAnywhereEdge edge = mock(RentVehicleAnywhereEdge.class);
-        Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex = singletonMap(edge, parkingZonesForEdge);
+        DropoffVehicleEdge edge = mock(DropoffVehicleEdge.class);
+        Map<DropoffVehicleEdge, List<SingleParkingZone>> parkingZonesPerVertex = singletonMap(edge, parkingZonesForEdge);
 
         ParkingZonesGraphWriterRunnable runnable = new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex, parkingZonesEnabled);
 

@@ -4,8 +4,8 @@ import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.List;
@@ -20,7 +20,7 @@ import static org.mockito.Mockito.when;
 
 public class ParkingZonesCalculatorTest {
 
-    private RentVehicleAnywhereEdge edge;
+    private DropoffVehicleEdge edge;
     private Geometry geometryAllowed;
     private Geometry geometryDisallowed;
     private ParkingZonesCalculator calculator;
@@ -34,7 +34,7 @@ public class ParkingZonesCalculatorTest {
         Vertex vertex = mock(Vertex.class);
         when(vertex.getLat()).thenReturn(1.1);
         when(vertex.getLon()).thenReturn(2.2);
-        edge = new RentVehicleAnywhereEdge(vertex);
+        edge = new DropoffVehicleEdge(vertex);
         geometryAllowed = mock(Geometry.class);
         geometryDisallowed = mock(Geometry.class);
         GeometryParkingZone geometryParkingZone = new GeometryParkingZone(1, VehicleType.CAR, singletonList(geometryAllowed), singletonList(geometryDisallowed));

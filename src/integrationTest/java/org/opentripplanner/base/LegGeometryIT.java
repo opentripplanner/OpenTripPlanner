@@ -81,7 +81,7 @@ public class LegGeometryIT extends IntegrationTest {
                 coordinates = PolylineEncoder.decode(itinerary.legs.get(i).legGeometry);
                 assertThat(coordinates.isEmpty(), is(false));
                 next = coordinates.get(0);
-                assertThat(prev.distance(next), closeTo(0, 0.01));
+                assertThat(prev.distance(next), closeTo(0, 0.001));
                 prev = coordinates.get(coordinates.size()-1);
             }
         }

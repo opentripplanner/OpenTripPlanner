@@ -1,9 +1,13 @@
 package org.opentripplanner.base;
 
+import org.hamcrest.CoreMatchers;
+import org.hamcrest.Matchers;
 import org.junit.Test;
 import org.opentripplanner.IntegrationTest;
 import org.opentripplanner.api.model.Itinerary;
 import org.opentripplanner.api.resource.Response;
+
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.equalTo;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -90,8 +94,7 @@ public class ResponseItineraryTypeBasicIT extends IntegrationTest {
 
         assertThat(response.getStatus(), equalTo(200));
         assertThat(body.getPlan().itinerary.size(), equalTo(3));
-        assertThat(body.getPlan().itinerary.get(0).itineraryType, equalTo("WALK+KICKSCOOTER"));
-        assertThat(body.getPlan().itinerary.get(1).itineraryType, equalTo("WALK+MOTORBIKE+TRANSIT"));
-        assertThat(body.getPlan().itinerary.get(2).itineraryType, equalTo("WALK+KICKSCOOTER+TRANSIT"));
+        assertThat(body.getPlan().itinerary.stream().map(it -> it.itineraryType).collect(Collectors.toList()),
+                Matchers.contains("WALK+KICKSCOOTER", "WALK+KICKSCOOTER+TRANSIT", "WALK+KICKSCOOTER+TRANSIT"));
     }
 }
