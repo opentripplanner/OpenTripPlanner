@@ -82,7 +82,7 @@ public class WayPropertySet {
     }
 
     /**
-     * Initializes lookups and Indexes for quick lookup of applicable values for way properties and car speeds. This
+     * Initializes lookups and indexes for quick lookup of applicable values for way properties and car speeds. This
      * function must be called before looking up way properties and car speeds for ways in order for those caches to be
      * properly initialized.
      */
@@ -117,7 +117,7 @@ public class WayPropertySet {
      * @param way The way from which to calculate a key
      * @param possibleTagValues The possible tag values that would apply for this way
      */
-    private String getKeyFromApplicableTags (OSMWithTags way, HashSet possibleTagValues) {
+    private String getKeyFromApplicableTags(OSMWithTags way, HashSet possibleTagValues) {
         List<String> applicableTagValues = new ArrayList<>();
         Map<String, String> wayTags = way.getTags();
         if (wayTags == null) {
