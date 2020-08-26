@@ -21,7 +21,7 @@ public class RentVehicleEdgeTest {
     private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(1, "PANEK"));
     private static final CarDescription CAR_2 = new CarDescription("2", 0, 0, FuelType.FOSSIL, Gearbox.MANUAL, new Provider(2, "PANEK"));
 
-    private List<ParkingZoneInfo.SingleParkingZone> parkingZoneApplicableForCar2;
+    private List<SingleParkingZone> parkingZoneApplicableForCar2;
     private RoutingRequest request;
     private State state, rentingState;
 
@@ -37,7 +37,7 @@ public class RentVehicleEdgeTest {
         request.setStartingMode(TraverseMode.WALK);
         request.vehicleValidator = mock(VehicleValidator.class);
         state = new State(vertex, request);
-        parkingZoneApplicableForCar2 = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
+        parkingZoneApplicableForCar2 = singletonList(new SingleParkingZone(2, VehicleType.CAR));
         edge = new RentVehicleEdge(vertex, CAR_1);
         StateEditor se = state.edit(edge);
         se.beginVehicleRenting(CAR_2);

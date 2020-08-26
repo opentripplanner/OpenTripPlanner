@@ -1,19 +1,19 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.HashSet;
-import java.util.Map;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.HashSet;
+import java.util.Map;
 
 /**
  * Bike-rental station data source for the "Communauté d'Agglomération de Bordeaux" (CUB) VCub (aka
  * V^3) bike-rental network.
- * 
+ *
  * URL: http://data.lacub.fr/wfs?key=<your-API-key>&request=getfeature&service=wfs&version=1.1.0&
  * typename=CI_VCUB_P&srsname=epsg:4326
- * 
- * 
+ *
+ *
  * @author laurent
  */
 public class VCubDataSource extends GenericXmlBikeRentalDataSource {
@@ -27,10 +27,10 @@ public class VCubDataSource extends GenericXmlBikeRentalDataSource {
         brstation.id = attributes.get("bm:GID").trim();
         String[] coordinates = attributes.get("bm:geometry").trim().split(" ");
         if (coordinates.length >= 2) {
-            brstation.x = Double.parseDouble(coordinates[1]);
-            brstation.y = Double.parseDouble(coordinates[0]);
+            brstation.longitude = Double.parseDouble(coordinates[1]);
+            brstation.latitude = Double.parseDouble(coordinates[0]);
         }
-        if (brstation.x == 0 || brstation.y == 0)
+        if (brstation.longitude == 0 || brstation.latitude == 0)
             return null;
         brstation.name = new NonLocalizedString(attributes.get("bm:NOM"));
         boolean connected = "CONNECTEE".equalsIgnoreCase(attributes.get("bm:ETAT"));

@@ -40,7 +40,7 @@ public class DropoffVehicleEdgeTest {
     @Test
     public void shouldNotAllowToDropoffVehicleOutsideParkingZone() {
         // given
-        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
+        List<SingleParkingZone> singleParkingZone = singletonList(new SingleParkingZone(2, VehicleType.CAR));
         edge.updateParkingZones(singleParkingZone, emptyList());
 
         // when
@@ -54,7 +54,7 @@ public class DropoffVehicleEdgeTest {
     public void shouldAllowToDropoffVehicleInsideParkingZone() {
         // given
         request.rentingAllowed = true;
-        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.CAR));
+        List<SingleParkingZone> singleParkingZone = singletonList(new SingleParkingZone(2, VehicleType.CAR));
         edge.updateParkingZones(singleParkingZone, singleParkingZone);
 
         // when
@@ -68,7 +68,7 @@ public class DropoffVehicleEdgeTest {
     public void shouldAllowToDropoffVehicleWhenParkingZonesDontApplyToIt() {
         // given
         request.rentingAllowed = true;
-        List<ParkingZoneInfo.SingleParkingZone> singleParkingZone = singletonList(new ParkingZoneInfo.SingleParkingZone(2, VehicleType.MOTORBIKE));
+        List<SingleParkingZone> singleParkingZone = singletonList(new SingleParkingZone(2, VehicleType.MOTORBIKE));
         edge.updateParkingZones(singleParkingZone, emptyList());
 
         // when

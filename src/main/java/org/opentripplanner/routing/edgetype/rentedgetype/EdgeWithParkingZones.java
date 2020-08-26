@@ -7,9 +7,9 @@ import org.opentripplanner.routing.graph.Vertex;
 import java.util.List;
 
 public abstract class EdgeWithParkingZones extends Edge {
-
+//    TODO comments needed!!!!
     private final ParkingZoneInfo parkingZones = new ParkingZoneInfo();
-
+    //    TODO comments needed!!!!
     private final ParkingZoneInfo parkingZonesEnabled = new ParkingZoneInfo();
 
     protected EdgeWithParkingZones(Vertex v1, Vertex v2) {
@@ -20,8 +20,8 @@ public abstract class EdgeWithParkingZones extends Edge {
         return !parkingZonesEnabled.appliesToVehicle(vehicle) || parkingZones.appliesToVehicle(vehicle);
     }
 
-    public void updateParkingZones(List<ParkingZoneInfo.SingleParkingZone> parkingZonesEnabled,
-                                   List<ParkingZoneInfo.SingleParkingZone> parkingZones) {
+    public void updateParkingZones(List<SingleParkingZone> parkingZonesEnabled,
+                                   List<SingleParkingZone> parkingZones) {
         this.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
         this.parkingZones.updateParkingZones(parkingZones);
     }

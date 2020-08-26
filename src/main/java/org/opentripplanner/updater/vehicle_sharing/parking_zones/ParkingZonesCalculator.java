@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
+import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
 
 import java.util.List;
 import java.util.Objects;

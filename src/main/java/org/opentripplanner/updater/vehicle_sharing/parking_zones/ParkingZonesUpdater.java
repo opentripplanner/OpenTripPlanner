@@ -6,7 +6,7 @@ import org.opentripplanner.hasura_client.ApiResponse;
 import org.opentripplanner.hasura_client.ParkingZonesGetter;
 import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
+import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.updater.GraphUpdaterManager;

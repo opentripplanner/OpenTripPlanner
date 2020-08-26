@@ -8,8 +8,8 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.TemporaryDropoffVehicleEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -30,8 +30,8 @@ public class TemporaryStreetSplitterTest {
 
     private static final CarDescription CAR = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(2, "PANEK"));
 
-    private final List<ParkingZoneInfo.SingleParkingZone> parkingZonesEnabled = singletonList(new ParkingZoneInfo.SingleParkingZone(1, VehicleType.CAR));
-    private final List<ParkingZoneInfo.SingleParkingZone> parkingZonesForEdge = singletonList(new ParkingZoneInfo.SingleParkingZone(1, VehicleType.CAR));
+    private final List<SingleParkingZone> parkingZonesEnabled = singletonList(new SingleParkingZone(1, VehicleType.CAR));
+    private final List<SingleParkingZone> parkingZonesForEdge = singletonList(new SingleParkingZone(1, VehicleType.CAR));
 
     private Graph graph;
     private ToStreetEdgeLinker toStreetEdgeLinker;
@@ -172,8 +172,8 @@ public class TemporaryStreetSplitterTest {
         // given
         when(toStreetEdgeLinker.linkTemporarily(any(), any(), eq(routingRequest))).thenReturn(true);
 
-        List<ParkingZoneInfo.SingleParkingZone> parkingZonesEnabled = emptyList();
-        List<ParkingZoneInfo.SingleParkingZone> parkingZonesForEdge = emptyList();
+        List<SingleParkingZone> parkingZonesEnabled = emptyList();
+        List<SingleParkingZone> parkingZonesForEdge = emptyList();
         graph.parkingZonesCalculator = mock(ParkingZonesCalculator.class);
         when(graph.parkingZonesCalculator.getNewParkingZonesEnabled()).thenReturn(parkingZonesEnabled);
         when(graph.parkingZonesCalculator.getParkingZonesForEdge(any(), eq(parkingZonesEnabled))).thenReturn(parkingZonesForEdge);

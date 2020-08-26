@@ -21,6 +21,8 @@ public abstract class VehicleDescription {
     private final double latitude;
     private final double rangeInMeters;
 
+    protected boolean hubbable;
+
     @JsonSerialize
     private final FuelType fuelType;
 
@@ -32,12 +34,23 @@ public abstract class VehicleDescription {
     private final Provider provider;
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                              Gearbox gearbox, Provider provider, boolean hubbable) {
+        this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null, hubbable);
+    }
+
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider) {
         this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null);
     }
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider, Double rangeInMeters) {
+        this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters, false);
+
+    }
+
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                              Gearbox gearbox, Provider provider, Double rangeInMeters, boolean hubbable) {
         if (rangeInMeters == null)
             rangeInMeters = this.getDefaultRangeInMeters();
 
@@ -50,6 +63,7 @@ public abstract class VehicleDescription {
         this.gearbox = gearbox;
         this.provider = provider;
         this.rangeInMeters = rangeInMeters;
+        this.hubbable = hubbable;
     }
 
     @Override
@@ -109,5 +123,14 @@ public abstract class VehicleDescription {
 
     protected Double getMaximumRangeInMeters() {
         return Double.MAX_VALUE;
+    }
+
+    public boolean isHubbable() {
+        return hubbable;
+    }
+
+    // TODO remove if proven unnecesarry
+    public void setHubbable(boolean hubbable) {
+        this.hubbable = hubbable;
     }
 }

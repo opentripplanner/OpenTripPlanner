@@ -37,6 +37,7 @@ import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.profile.StopClusterMode;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -44,6 +45,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.flex.FlexIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
 import org.opentripplanner.routing.services.StreetVertexIndexFactory;
@@ -241,6 +243,11 @@ public class Graph implements Serializable {
      * Vehicles which we tried to link to graph. If vertex is present, then we succeeded in linking that vehicle
      */
     public final Map<VehicleDescription, Optional<TemporaryRentVehicleVertex>> vehiclesTriedToLink = new HashMap<>();
+
+    /**
+     * All bike stations currently linked to graph
+     */
+    public final Map<BikeRentalStation, RentVehicleEdge> bikeRentalStationsInGraph = new HashMap<>();
 
     public Graph(Graph basedOn) {
         this();

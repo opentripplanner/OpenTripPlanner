@@ -1,9 +1,11 @@
 package org.opentripplanner.routing.edgetype.rentedgetype;
 
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.TemporaryEdge;
+import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 
 import java.util.Locale;
@@ -17,9 +19,15 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
 
     private final VehicleDescription vehicle;
 
+    private BikeRentalStation bikeRentalStation = null;
+
     public RentVehicleEdge(TemporaryRentVehicleVertex v, VehicleDescription vehicle) {
         super(v, v);
         this.vehicle = vehicle;
+    }
+
+    public static RentVehicleEdge getRentEdge(Vertex vertex) {
+        return (RentVehicleEdge) vertex.getOutgoing().stream().filter(e -> e instanceof RentVehicleEdge).findFirst().get();
     }
 
     @Override
@@ -32,11 +40,16 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         return "Rent vehicle " + vehicle + " in node " + tov.getName();
     }
 
+    private boolean canRentStation() {
+        return bikeRentalStation == null || bikeRentalStation.bikesAvailable > 0;
+    }
+
     @Override
     public State traverse(State state) {
         if (!state.getOptions().rentingAllowed) {
             return null;
         }
+
         if (state.getOptions().vehicleValidator.isValid(vehicle)) {
             if (state.isCurrentlyRentingVehicle()) {
                 return trySwitchVehicles(state);
@@ -78,5 +91,13 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
 
     public VehicleDescription getVehicle() {
         return vehicle;
+    }
+
+    public BikeRentalStation getBikeRentalStation() {
+        return bikeRentalStation;
+    }
+
+    public void setBikeRentalStation(BikeRentalStation bikeRentalStation) {
+        this.bikeRentalStation = bikeRentalStation;
     }
 }

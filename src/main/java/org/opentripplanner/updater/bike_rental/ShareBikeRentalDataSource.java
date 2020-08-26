@@ -80,24 +80,24 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 		if (!rentalStationNode.path("Online").asBoolean()) {
 			log.debug("Station is offline: " + rentalStationNode.path("StationName").asText());
 
-			return null;
-		}
+            return null;
+        }
 
-		BikeRentalStation brstation = new BikeRentalStation();
+        BikeRentalStation brstation = new BikeRentalStation();
 
-		
+
         brstation.networks = new HashSet<String>();
         brstation.networks.add(this.networkID);
-		
-		brstation.id = networkID+"_"+rentalStationNode.path("StationID").toString();
-		brstation.x = rentalStationNode.path("Longitude").asDouble();
-		brstation.y = rentalStationNode.path("Latitude").asDouble();
-		brstation.name = new NonLocalizedString(rentalStationNode.path("StationName").asText("").trim());
-		brstation.bikesAvailable = rentalStationNode.path("AvailableBikeCount").asInt();
-		brstation.spacesAvailable = rentalStationNode.path("AvailableSlotCount").asInt();
 
-		return brstation;
-	}
+        brstation.id = networkID + "_" + rentalStationNode.path("StationID").toString();
+        brstation.longitude = rentalStationNode.path("Longitude").asDouble();
+        brstation.latitude = rentalStationNode.path("Latitude").asDouble();
+        brstation.name = new NonLocalizedString(rentalStationNode.path("StationName").asText("").trim());
+        brstation.bikesAvailable = rentalStationNode.path("AvailableBikeCount").asInt();
+        brstation.spacesAvailable = rentalStationNode.path("AvailableSlotCount").asInt();
+
+        return brstation;
+    }
 
 	public static Map<String, List<String>> splitQuery(URL url) throws UnsupportedEncodingException {
 		final Map<String, List<String>> query_pairs = new LinkedHashMap<String, List<String>>();

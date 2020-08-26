@@ -5,7 +5,7 @@ import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
+import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.List;
