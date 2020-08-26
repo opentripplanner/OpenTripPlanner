@@ -13,6 +13,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
@@ -20,6 +21,8 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static java.util.Collections.sort;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -54,6 +57,14 @@ public class WayPropertySet {
 
     public WayPropertySetSource base;
 
+    private HashMap<String, WayProperties> wayPropertyLookup;
+
+    private HashSet<String> possibleWayPropertyTagValues;
+
+    private HashMap<String, Float> carSpeedLookup;
+
+    private HashSet<String> possibleCarSpeedTagValues;
+
     public WayPropertySet() {
         /* sensible defaults */
         defaultProperties = new WayProperties();
@@ -71,10 +82,111 @@ public class WayPropertySet {
     }
 
     /**
+     * Initializes lookups and indexes for quick lookup of applicable values for way properties and car speeds. This
+     * function must be called before looking up way properties and car speeds for ways in order for those caches to be
+     * properly initialized.
+     */
+    public void index() {
+        // index for way properties
+        wayPropertyLookup = new HashMap<>();
+        possibleWayPropertyTagValues = new HashSet<>();
+        for (WayPropertyPicker wayProperty : wayProperties) {
+            for (P2<String> kvpair : wayProperty.getSpecifier().kvpairs) {
+                possibleWayPropertyTagValues.add(String.format("%s=%s", kvpair.first, kvpair.second));
+            }
+        }
+
+        // index for car speed lookup
+        carSpeedLookup = new HashMap<>();
+        possibleCarSpeedTagValues = new HashSet<>();
+        for (SpeedPicker speedPicker : speedPickers) {
+            for (P2<String> kvpair : speedPicker.specifier.kvpairs) {
+                possibleCarSpeedTagValues.add(String.format("%s=%s", kvpair.first, kvpair.second));
+            }
+        }
+        // also add manual search terms from getCarSpeedForWay method
+        possibleCarSpeedTagValues.add("maxspeed:motorcar=*");
+        possibleCarSpeedTagValues.add("maxspeed:forward=*");
+        possibleCarSpeedTagValues.add("maxspeed:reverse=*");
+        possibleCarSpeedTagValues.add("maxspeed:lanes=*");
+        possibleCarSpeedTagValues.add("maxspeed=*");
+    }
+
+    /**
+     * compute lookup key for way based on applicable tags/values
+     * @param way The way from which to calculate a key
+     * @param possibleTagValues The possible tag values that would apply for this way
+     */
+    private String getKeyFromApplicableTags(OSMWithTags way, HashSet possibleTagValues) {
+        List<String> applicableTagValues = new ArrayList<>();
+        Map<String, String> wayTags = way.getTags();
+        if (wayTags == null) {
+            // no tags added to way. Probably occurs only during testing.
+            return "";
+        }
+        for (Entry<String, String> wayTagValue : wayTags.entrySet()) {
+            String tag = wayTagValue.getKey();
+            String value = wayTagValue.getValue();
+            String tagValue = String.format("%s=%s", tag, value);
+
+            // create list of tags to see if any of them are in applicable list
+            List<String> possibleMatches = new ArrayList<>();
+
+            // add exact match use case
+            possibleMatches.add(tagValue);
+
+            // add wildcard value for tag
+            possibleMatches.add(String.format("%s=*", tag));
+
+            // if value contains a colon and thus possibly a suffix (such as surface=cobblestone:flattened), use the
+            // root tag value
+            String rootValue = null;
+            if (value.contains(":")) {
+                rootValue = value.split(":", 2)[0];
+                // add exact tag wth root value
+                possibleMatches.add(String.format("%s=%s", tag, rootValue));
+            }
+
+            // if tag contains a colon and thus a suffix (such as cycleway:right), use the root tag key to check if
+            // there is a match
+            if (tag.contains(":")) {
+                String rootTag = tag.split(":", 2)[0];
+                // add both exact and wilcard tag/values
+                possibleMatches.add(String.format("%s=%s", rootTag, value));
+                possibleMatches.add(String.format("%s=*", rootTag));
+
+                // also add rootValue if applicable
+                if (rootValue != null) {
+                    possibleMatches.add(String.format("%s=%s", rootTag, rootValue));
+                }
+            }
+
+            for (String possibleMatch : possibleMatches) {
+                if (possibleTagValues.contains(possibleMatch)) {
+                    // add the exact tag value to make sure cache key is for this exact set of tag/values
+                    applicableTagValues.add(tagValue);
+                    // break as there is no need to search for other possibilities
+                    break;
+                }
+            }
+        }
+        // sort values to make deterministic key
+        sort(applicableTagValues);
+        return String.join(";", applicableTagValues);
+    }
+
+    /**
      * Applies the WayProperties whose OSMPicker best matches this way. In addition, WayProperties that are mixins
      * will have their safety values applied if they match at all.
      */
     public WayProperties getDataForWay(OSMWithTags way) {
+        String wayPropertiesKey = getKeyFromApplicableTags(way, possibleWayPropertyTagValues);
+        // check if lookup key found
+        WayProperties cachedWayProperties = wayPropertyLookup.get(wayPropertiesKey);
+        if (cachedWayProperties != null) {
+            return cachedWayProperties;
+        }
+
         WayProperties leftResult = defaultProperties;
         WayProperties rightResult = defaultProperties;
         int bestLeftScore = 0;
@@ -123,7 +235,15 @@ public class WayPropertySet {
             String all_tags = dumpTags(way);
             LOG.debug("Used default permissions: " + all_tags);
         }
+        wayPropertyLookup.put(wayPropertiesKey, result);
         return result;
+    }
+
+    /**
+     * Returns the current way property lookup hashmap. Used for testing only.
+     */
+    public HashMap<String, WayProperties> getWayPropertyLookup () {
+        return wayPropertyLookup;
     }
 
     private String dumpTags(OSMWithTags way) {
@@ -176,9 +296,28 @@ public class WayPropertySet {
     }
     
     /**
-     * Calculate the automobile speed, in meters per second, for this way.
+     * Get the automobile speed, in meters per second, for this way. Try to get value from the cache, otherwise
+     * calculate and store in cache.
      */
     public float getCarSpeedForWay(OSMWithTags way, boolean back) {
+        String wayPropertiesKey = getKeyFromApplicableTags(way, possibleCarSpeedTagValues);
+        // also append back value
+        wayPropertiesKey = String.format("%s;%s=%b", wayPropertiesKey, "back=", back);
+        // check if lookup key found
+        Float cachedSpeed = carSpeedLookup.get(wayPropertiesKey);
+        if (cachedSpeed != null) {
+            return cachedSpeed;
+        }
+
+        Float speed = calculateCarSpeedForWay(way, back);
+        carSpeedLookup.put(wayPropertiesKey, speed);
+        return speed;
+    }
+
+    /**
+     * Calculate the automobile speed, in meters per second, for this way.
+     */
+    private float calculateCarSpeedForWay(OSMWithTags way, boolean back) {
         // first, check for maxspeed tags
         Float speed = null;
         Float currentSpeed;
@@ -236,6 +375,13 @@ public class WayPropertySet {
             return bestSpeed;
         else
             return this.defaultSpeed;
+    }
+
+    /**
+     * Returns the current car speed lookup hashmap. Used for testing only.
+     */
+    public HashMap<String, Float> getCarSpeedLookup() {
+        return carSpeedLookup;
     }
 
     public Set<T2<Alert, NoteMatcher>> getNoteForWay(OSMWithTags way) {
