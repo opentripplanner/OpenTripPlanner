@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -154,9 +153,7 @@ public class TemporaryStreetSplitter {
 
     private void addParkingZonesToEdge(EdgeWithParkingZones edge) {
         if (graph.parkingZonesCalculator != null) {
-            List<SingleParkingZone> parkingZonesEnabled = graph.parkingZonesCalculator.getNewParkingZonesEnabled();
-            List<SingleParkingZone> parkingZones = graph.parkingZonesCalculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
-            edge.updateParkingZones(parkingZonesEnabled, parkingZones);
+            edge.setParkingZones(graph.parkingZonesCalculator.getParkingZonesForEdge(edge));
         }
     }
 

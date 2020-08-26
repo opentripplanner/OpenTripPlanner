@@ -13,7 +13,7 @@ import java.util.Locale;
 public class DropoffVehicleEdge extends EdgeWithParkingZones {
 
     public DropoffVehicleEdge(Vertex v) {
-        super(v, v);
+        super(v);
     }
 
     public static DropoffVehicleEdge getDropEdge(Vertex vertex) {

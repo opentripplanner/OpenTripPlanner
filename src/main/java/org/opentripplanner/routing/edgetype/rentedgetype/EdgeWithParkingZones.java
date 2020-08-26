@@ -4,25 +4,21 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 
-import java.util.List;
+import static java.util.Collections.emptyList;
 
 public abstract class EdgeWithParkingZones extends Edge {
-//    TODO comments needed!!!!
-    private final ParkingZoneInfo parkingZones = new ParkingZoneInfo();
-    //    TODO comments needed!!!!
-    private final ParkingZoneInfo parkingZonesEnabled = new ParkingZoneInfo();
 
-    protected EdgeWithParkingZones(Vertex v1, Vertex v2) {
-        super(v1, v2);
+    private ParkingZoneInfo parkingZones = new ParkingZoneInfo(emptyList(), emptyList());
+
+    protected EdgeWithParkingZones(Vertex v) {
+        super(v, v);
     }
 
     protected boolean canDropoffVehicleHere(VehicleDescription vehicle) {
-        return !parkingZonesEnabled.appliesToVehicle(vehicle) || parkingZones.appliesToVehicle(vehicle);
+        return parkingZones.canDropoffVehicleHere(vehicle);
     }
 
-    public void updateParkingZones(List<SingleParkingZone> parkingZonesEnabled,
-                                   List<SingleParkingZone> parkingZones) {
-        this.parkingZonesEnabled.updateParkingZones(parkingZonesEnabled);
-        this.parkingZones.updateParkingZones(parkingZones);
+    public void setParkingZones(ParkingZoneInfo parkingZones) {
+        this.parkingZones = parkingZones;
     }
 }
