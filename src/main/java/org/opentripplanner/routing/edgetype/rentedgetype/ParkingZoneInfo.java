@@ -40,6 +40,8 @@ public class ParkingZoneInfo implements Serializable {
     }
 
     private boolean hasProviderAndVehicleTypeDisabledParkingZonesFeature(VehicleDescription vehicle) {
+        if (vehicle.isHubbable())
+            return false;
         return parkingZonesEnabled.stream().noneMatch(pz -> pz.appliesToThisVehicle(vehicle));
     }
 
