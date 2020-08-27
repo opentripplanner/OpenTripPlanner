@@ -28,6 +28,7 @@ public class TraficPredictionBuilderModule implements GraphBuilderModule {
         }
         for (StreetEdge e : graph.getStreetEdges()) {
             e.setTimes(this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
+            e.getTimes().sort(timetable::compareTo);
         }
     }
 
