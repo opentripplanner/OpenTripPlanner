@@ -1,6 +1,5 @@
 package org.opentripplanner.api.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
 import java.io.Serializable;
 import java.util.Objects;
 

@@ -9,7 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 
 import java.util.Collections;
 import java.util.List;
@@ -70,7 +70,7 @@ public class LegacyGraphQLAgencyImpl implements LegacyGraphQLDataFetchers.Legacy
 
   @Override
   //TODO
-  public DataFetcher<Iterable<AlertPatch>> alerts() {
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
   }
 

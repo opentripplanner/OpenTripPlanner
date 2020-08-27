@@ -15,7 +15,7 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.ServiceDay;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.opentripplanner.util.PolylineEncoder;
@@ -274,7 +274,7 @@ public class LegacyGraphQLTripImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   //TODO
   @Override
-  public DataFetcher<Iterable<AlertPatch>> alerts() {
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
   }
 

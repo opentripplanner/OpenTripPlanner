@@ -5,13 +5,13 @@ import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.util.TranslatedString;
 
 import java.util.Collections;
@@ -40,27 +40,50 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<Agency> agency() {
-    return environment -> getRoutingService(environment)
-        .getAgencyForId(getSource(environment).getAgency());
+    return environment -> getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Agency)
+        .findAny()
+        .map(EntitySelector.Agency.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getAgencyForId(entitySelector.agencyId))
+        .orElse(null);
   }
 
   @Override
   public DataFetcher<Route> route() {
-    return environment -> getRoutingService(environment)
-        .getRouteForId(getSource(environment).getRoute());
+    return environment -> getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Route)
+        .findAny()
+        .map(EntitySelector.Route.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getRouteForId(entitySelector.routeId))
+        .orElse(null);
   }
 
   @Override
   public DataFetcher<Trip> trip() {
-    return environment -> getRoutingService(environment)
-        .getTripForId()
-        .get(getSource(environment).getTrip());
+    return environment -> getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Trip)
+        .findAny()
+        .map(EntitySelector.Trip.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getTripForId().get(entitySelector.tripId))
+        .orElse(null);
   }
 
   @Override
   public DataFetcher<Object> stop() {
-    return environment -> getRoutingService(environment)
-        .getStopForId(getSource(environment).getStop());
+    return environment -> getSource(environment)
+        .getEntities()
+        .stream()
+        .filter(entitySelector -> entitySelector instanceof EntitySelector.Stop)
+        .findAny()
+        .map(EntitySelector.Stop.class::cast)
+        .map(entitySelector -> getRoutingService(environment).getStopForId(entitySelector.stopId))
+        .orElse(null);
   }
 
   // TODO
@@ -71,14 +94,14 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertHeaderText() {
-    return environment -> getSource(environment).getAlert().alertHeaderText.toString(
+    return environment -> getSource(environment).alertHeaderText.toString(
         environment.getLocale());
   }
 
   @Override
   public DataFetcher<Iterable<Map.Entry<String, String>>> alertHeaderTextTranslations() {
     return environment -> {
-      var text = getSource(environment).getAlert().alertHeaderText;
+      var text = getSource(environment).alertHeaderText;
       return text instanceof TranslatedString
           ? ((TranslatedString) text).getTranslations()
           : Collections.emptyList();
@@ -87,7 +110,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertDescriptionText() {
-    return environment -> getSource(environment).getAlert().alertDescriptionText.toString(
+    return environment -> getSource(environment).alertDescriptionText.toString(
         environment.getLocale());
   }
 
@@ -99,7 +122,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertUrl() {
-    return environment -> getSource(environment).getAlert().alertUrl.toString(
+    return environment -> getSource(environment).alertUrl.toString(
         environment.getLocale());
   }
 
@@ -123,13 +146,13 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
 
   @Override
   public DataFetcher<String> alertSeverityLevel() {
-    return environment -> getSource(environment).getAlert().severity;
+    return environment -> getSource(environment).severity;
   }
 
   @Override
   public DataFetcher<Long> effectiveStartDate() {
     return environment -> {
-      Date effectiveStartDate = getSource(environment).getAlert().effectiveStartDate;
+      Date effectiveStartDate = getSource(environment).getEffectiveStartDate();
       if (effectiveStartDate == null) return null;
       return effectiveStartDate.getTime() / 1000;
     };
@@ -138,7 +161,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
   @Override
   public DataFetcher<Long> effectiveEndDate() {
     return environment -> {
-      Date effectiveEndDate = getSource(environment).getAlert().effectiveEndDate;
+      Date effectiveEndDate = getSource(environment).getEffectiveEndDate();
       if (effectiveEndDate == null) return null;
       return effectiveEndDate.getTime() / 1000;
     };
@@ -148,7 +171,7 @@ public class LegacyGraphQLAlertImpl implements LegacyGraphQLDataFetchers.LegacyG
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
 
-  private AlertPatch getSource(DataFetchingEnvironment environment) {
+  private TransitAlert getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

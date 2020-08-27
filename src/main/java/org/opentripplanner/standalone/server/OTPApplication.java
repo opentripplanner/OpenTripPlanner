@@ -1,13 +1,10 @@
 package org.opentripplanner.standalone.server;
 
 import com.fasterxml.jackson.jaxrs.json.JacksonJsonProvider;
-import com.fasterxml.jackson.jaxrs.xml.JacksonXMLProvider;
 import com.google.common.collect.Maps;
 import com.google.common.collect.Sets;
 import org.glassfish.jersey.CommonProperties;
-import org.glassfish.jersey.media.multipart.MultiPartFeature;
 import org.glassfish.jersey.server.ServerProperties;
-import org.glassfish.jersey.server.filter.RolesAllowedDynamicFeature;
 import org.opentripplanner.api.common.OTPExceptionMapper;
 import org.opentripplanner.api.configuration.APIEndpoints;
 import org.opentripplanner.api.json.JSONObjectMapperProvider;
@@ -37,20 +34,15 @@ public class OTPApplication extends Application {
     /* This object groups together all the modules for a single running OTP server. */
     public final OTPServer server;
 
-    /* If secure is true, OTP will require Basic authentication over HTTPS when accessing dangerous web services. */
-    private final boolean secure;
-
     /**
      * The OTPServer provides entry points to OTP routing functionality for a collection of OTPRouters.
      * It provides a Java API, not an HTTP API.
      * The OTPApplication wraps an OTPServer in a Jersey (JAX-RS) Application, configuring an HTTP API.
      *
      * @param server The OTP server to wrap
-     * @param secure Should this server require authentication over HTTPS to access secure resources, e.g. /routers?
      */
-    public OTPApplication (OTPServer server, boolean secure) {
+    public OTPApplication (OTPServer server) {
         this.server = server;
-        this.secure = secure;
     }
 
     /**
@@ -69,14 +61,7 @@ public class OTPApplication extends Application {
 
         /* Features and Filters: extend Jersey, manipulate requests and responses. */
         classes.add(CorsFilter.class);
-        classes.add(MultiPartFeature.class);
 
-        if (this.secure) {
-            // A filter that converts HTTP Basic authentication headers into a Jersey SecurityContext
-            classes.add(AuthFilter.class);
-            // Enforce roles annotations defined by JSR-250 (allow access to API methods based on the SecurityContext)
-            classes.add(RolesAllowedDynamicFeature.class);
-        }
         return classes;
     }
 
@@ -95,8 +80,6 @@ public class OTPApplication extends Application {
             new OTPExceptionMapper(),
             // Enable Jackson JSON response serialization
             new JacksonJsonProvider(),
-            // Enable Jackson XML response serialization
-            new JacksonXMLProvider(),
             // Serialize POJOs (unannotated) JSON using Jackson
             new JSONObjectMapperProvider(),
             // Allow injecting the OTP server object into Jersey resource classes

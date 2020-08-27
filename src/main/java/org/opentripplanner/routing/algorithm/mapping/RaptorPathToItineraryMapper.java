@@ -127,7 +127,7 @@ public class RaptorPathToItineraryMapper {
         GraphPath graphPath = new GraphPath(accessPath.getLastState(), false);
 
         Itinerary subItinerary = GraphPathToItineraryMapper
-            .generateItinerary(graphPath, false, true, request.locale);
+            .generateItinerary(graphPath, request.locale);
 
         if (subItinerary.legs.isEmpty()) { return; }
 
@@ -235,7 +235,7 @@ public class RaptorPathToItineraryMapper {
         GraphPath graphPath = new GraphPath(egressPath.getLastState(), false);
 
         Itinerary subItinerary = GraphPathToItineraryMapper
-            .generateItinerary(graphPath, false, true, request.locale);
+            .generateItinerary(graphPath, request.locale);
 
         if (subItinerary.legs.isEmpty()) { return; }
 
@@ -278,7 +278,7 @@ public class RaptorPathToItineraryMapper {
             GraphPath graphPath = new GraphPath(states[states.length - 1], false);
 
             Itinerary subItinerary = GraphPathToItineraryMapper
-                    .generateItinerary(graphPath, false, true, request.locale);
+                    .generateItinerary(graphPath, request.locale);
 
             // TODO OTP2 We use the duration initially calculated for use during routing
             //      because they do not always match up and we risk getting negative wait times

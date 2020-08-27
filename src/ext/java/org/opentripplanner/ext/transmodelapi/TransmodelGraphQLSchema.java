@@ -67,7 +67,7 @@ import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -1683,21 +1683,21 @@ public class TransmodelGraphQLSchema {
                 .type(new GraphQLList(EnumTypes.SEVERITY))
                 .build())
             .dataFetcher(environment -> {
-              Collection<AlertPatch> alerts = GqlUtil.getRoutingService(environment)
-                  .getSiriAlertPatchService()
-                  .getAllAlertPatches();
+              Collection<TransitAlert> alerts = GqlUtil.getRoutingService(environment)
+                  .getTransitAlertService()
+                  .getAllAlerts();
               if ((environment.getArgument("authorities") instanceof List)) {
                 List<String> authorities = environment.getArgument("authorities");
                 alerts = alerts
                     .stream()
-                    .filter(alertPatch -> authorities.contains(alertPatch.getFeedId()))
+                    .filter(alert -> authorities.contains(alert.getFeedId()))
                     .collect(Collectors.toSet());
               }
               if ((environment.getArgument("severities") instanceof List)) {
                 List<String> severities = environment.getArgument("severities");
                 alerts = alerts
                     .stream()
-                    .filter(alertPatch -> severities.contains(alertPatch.getAlert().severity))
+                    .filter(alert -> severities.contains(alert.severity))
                     .collect(Collectors.toSet());
               }
               return alerts;
@@ -2147,7 +2147,7 @@ public class TransmodelGraphQLSchema {
                         .name("situations")
                         .description("All relevant situations for this leg")
                         .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).alertPatches)
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).transitAlerts)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("steps")
