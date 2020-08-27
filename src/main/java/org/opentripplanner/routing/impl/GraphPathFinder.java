@@ -1,27 +1,19 @@
 package org.opentripplanner.routing.impl;
 
-import com.google.common.collect.Lists;
-import org.opentripplanner.api.resource.DebugOutput;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
 import org.opentripplanner.routing.error.PathNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
@@ -152,14 +144,14 @@ public class GraphPathFinder {
 
         List<GraphPath> paths = null;
         try {
-            paths = getGraphPathsConsideringIntermediates(request);
+            paths = getPaths(request);
             if (paths == null && request.wheelchairAccessible) {
                 // There are no paths that meet the user's slope restrictions.
                 // Try again without slope restrictions, and warn the user in the response.
                 RoutingRequest relaxedRequest = request.clone();
                 relaxedRequest.maxWheelchairSlope = Double.MAX_VALUE;
                 request.rctx.slopeRestrictionRemoved = true;
-                paths = getGraphPathsConsideringIntermediates(relaxedRequest);
+                paths = getPaths(relaxedRequest);
             }
         } catch (RoutingValidationException e) {
             if (e.getRoutingErrors().get(0).code.equals(RoutingErrorCode.LOCATION_NOT_FOUND))
@@ -194,77 +186,5 @@ public class GraphPathFinder {
         }
 
         return paths;
-    }
-
-    /**
-     * Break up a RoutingRequest with intermediate places into separate requests, in the given order.
-     *
-     * If there are no intermediate places, issue a single request. Otherwise process the places
-     * list [from, i1, i2, ..., to] either from left to right (if {@code request.arriveBy==false})
-     * or from right to left (if {@code request.arriveBy==true}). In the latter case the order of
-     * the requested subpaths is (i2, to), (i1, i2), and (from, i1) which has to be reversed at
-     * the end.
-     */
-    private List<GraphPath> getGraphPathsConsideringIntermediates (RoutingRequest request) {
-        if (request.hasIntermediatePlaces()) {
-            List<GenericLocation> places = Lists.newArrayList(request.from);
-            places.addAll(request.intermediatePlaces);
-            places.add(request.to);
-            long time = request.dateTime;
-
-            List<GraphPath> paths = new ArrayList<>();
-            DebugOutput debugOutput = null;
-            int placeIndex = (request.arriveBy ? places.size() - 1 : 1);
-
-            while (0 < placeIndex && placeIndex < places.size()) {
-                RoutingRequest intermediateRequest = request.clone();
-                intermediateRequest.setNumItineraries(1);
-                intermediateRequest.dateTime = time;
-                intermediateRequest.from = places.get(placeIndex - 1);
-                intermediateRequest.to = places.get(placeIndex);
-                intermediateRequest.rctx = null;
-                intermediateRequest.setRoutingContext(router.graph);
-
-                List<GraphPath> partialPaths = getPaths(intermediateRequest);
-                if (partialPaths.size() == 0) {
-                    return partialPaths;
-                }
-
-                GraphPath path = partialPaths.get(0);
-                paths.add(path);
-                time = (request.arriveBy ? path.getStartTime() : path.getEndTime());
-                placeIndex += (request.arriveBy ? -1 : +1);
-            }
-            request.setRoutingContext(router.graph);
-            if (request.arriveBy) {
-                Collections.reverse(paths);
-            }
-            return Collections.singletonList(joinPaths(paths));
-        } else {
-            return getPaths(request);
-        }
-    }
-
-    private static GraphPath joinPaths(List<GraphPath> paths) {
-        State lastState = paths.get(0).states.getLast();
-        GraphPath newPath = new GraphPath(lastState, false);
-        Vertex lastVertex = lastState.getVertex();
-
-        for (GraphPath path : paths.subList(1, paths.size())) {
-            lastState = newPath.states.getLast();
-            // add a leg-switching state
-            LegSwitchingEdge legSwitchingEdge = new LegSwitchingEdge(lastVertex, lastVertex);
-            lastState = legSwitchingEdge.traverse(lastState);
-            newPath.edges.add(legSwitchingEdge);
-            newPath.states.add(lastState);
-            // add the next subpath
-            for (Edge e : path.edges) {
-                lastState = e.traverse(lastState);
-                newPath.edges.add(e);
-                newPath.states.add(lastState);
-            }
-            lastVertex = path.getEndVertex();
-        }
-        return newPath;
     }
 }

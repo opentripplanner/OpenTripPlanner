@@ -54,10 +54,6 @@ public class StreetTransitLink extends Edge {
         return GeometryUtils.getGeometryFactory().createLineString(coordinates);
     }
 
-    public TraverseMode getMode() {
-        return TraverseMode.LEG_SWITCH;
-    }
-
     public String getName() {
         return "street transit link";
     }
@@ -114,14 +110,12 @@ public class StreetTransitLink extends Edge {
         int streetToStopTime = stopVertex.hasPathways() ? 0 : stopVertex.getStreetToStopTime();
         s1.incrementTimeInSeconds(streetToStopTime + STL_TRAVERSE_COST);
         s1.incrementWeight(STL_TRAVERSE_COST + streetToStopTime);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
 
     public State optimisticTraverse(State s0) {
         StateEditor s1 = s0.edit(this);
         s1.incrementWeight(STL_TRAVERSE_COST);
-        s1.setBackMode(TraverseMode.LEG_SWITCH);
         return s1.makeState();
     }
     

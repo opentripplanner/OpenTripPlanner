@@ -176,9 +176,8 @@ public abstract class GraphPathToItineraryMapper {
 
     /**
      * Slice a {@link State} array at the leg boundaries. Leg switches occur when:
-     * 1. A LEG_SWITCH mode (which itself isn't part of any leg) is seen
-     * 2. The mode changes otherwise, for instance from BICYCLE to WALK
-     * 3. A PatternInterlineDwell edge (i.e. interlining) is seen
+     * 1. The mode changes otherwise, for instance from BICYCLE to WALK
+     * 2. A PatternInterlineDwell edge (i.e. interlining) is seen
      *
      * @param states The one-dimensional array of input states
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
@@ -189,7 +188,7 @@ public abstract class GraphPathToItineraryMapper {
         for (State state : states) {
             TraverseMode traverseMode = state.getBackMode();
 
-            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
+            if (traverseMode != null) {
                 trivial = false;
                 break;
             }
@@ -208,18 +207,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (backMode == null || forwardMode == null) continue;
 
-            Edge edge = states[i + 1].getBackEdge();
-
-            if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
-                if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
-                    legIndexPairs[1] = i;
-                } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
-                    if (legIndexPairs[1] != states.length - 1) {
-                        legsIndexes.add(legIndexPairs);
-                    }
-                    legIndexPairs = new int[] {i, states.length - 1};
-                }
-            } else if (backMode != forwardMode) {                       // Mode change => leg switch
+            if (backMode != forwardMode) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
