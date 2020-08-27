@@ -15,9 +15,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.io.Serializable;
-import java.time.Duration;
-import java.time.Instant;
-import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Locale;
@@ -96,21 +93,21 @@ public abstract class Edge implements Serializable {
     public Vertex getToVertex() {
         return tov;
     }
-    
+
     /**
      * Returns true if this edge is partial - overriden by subclasses.
      */
     public boolean isPartial() {
         return false;
     }
-    
+
     /**
      * Checks equivalency to another edge. Default implementation is trivial equality, but subclasses may want to do something more tricky.
      */
     public boolean isEquivalentTo(Edge e) {
         return this == e;
     }
-    
+
     /**
      * Returns true if this edge is the reverse of another.
      */
@@ -118,10 +115,10 @@ public abstract class Edge implements Serializable {
         return (this.getFromVertex() == e.getToVertex() &&
                 this.getToVertex() == e.getFromVertex());
     }
-    
+
     /**
      * Get a direction on paths where it matters, or null
-     * 
+     *
      * @return
      */
     public String getDirection() {
@@ -131,7 +128,7 @@ public abstract class Edge implements Serializable {
     /**
      * This should only be called inside State; other methods should call
      * org.opentripplanner.routing.core.State.getBackTrip()
-     * 
+     *
      * @author mattwigway
      */
     public Trip getTrip() {
@@ -154,7 +151,7 @@ public abstract class Edge implements Serializable {
 
     /**
      * Traverse this edge.
-     * 
+     *
      * @param s0 The State coming into the edge.
      * @return The State upon exiting the edge.
      */
@@ -166,7 +163,7 @@ public abstract class Edge implements Serializable {
 
     /**
      * Returns a lower bound on edge weight given the routing options.
-     * 
+     *
      * @param options
      * @return edge weight as a double.
      */
@@ -178,7 +175,7 @@ public abstract class Edge implements Serializable {
 
     /**
      * Returns a lower bound on traversal time given the routing options.
-     * 
+     *
      * @param options
      * @return edge weight as a double.
      */
@@ -229,7 +226,7 @@ public abstract class Edge implements Serializable {
 
     /**
      * Returns the azimuth of this edge from head to tail.
-     * 
+     *
      * @return
      */
     public double getAzimuth() {
@@ -300,7 +297,7 @@ public abstract class Edge implements Serializable {
             return false;
         }
     }
-    
+
     public int getId(){
     	return this.id;
     }
