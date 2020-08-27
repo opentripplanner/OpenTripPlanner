@@ -1089,7 +1089,7 @@ public class TransmodelGraphQLSchema {
             .newFieldDefinition()
             .name("quaysByRadius")
             .description(
-                "Get all quays within the specified radius from a location. The returned type has two fields quay and distance")
+                "Get all quays within the specified walking radius from a location. The returned type has two fields quay and distance")
             .type(relay.connectionType("quayAtDistance",
                 relay.edgeType("quayAtDistance", quayAtDistance, null, new ArrayList<>()),
                 new ArrayList<>()
@@ -1108,9 +1108,9 @@ public class TransmodelGraphQLSchema {
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
-                .name("radius")
+                .name("walkRadius")
                 .description("Radius (in meters) to search for from the specified location")
-                .type(new GraphQLNonNull(Scalars.GraphQLInt))
+                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
@@ -1124,7 +1124,7 @@ public class TransmodelGraphQLSchema {
                 stops = GqlUtil.getRoutingService(environment)
                     .findClosestStops(environment.getArgument("latitude"),
                         environment.getArgument("longitude"),
-                        environment.getArgument("radius")
+                        environment.getArgument("walkRadius")
                     )
                     .stream()
                     .filter(stopAtDistance -> environment.getArgument("authority") == null
