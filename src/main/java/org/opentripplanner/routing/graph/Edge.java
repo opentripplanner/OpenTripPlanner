@@ -49,12 +49,8 @@ public abstract class Edge implements Serializable {
     private int id;
     private long  clusterId;
     public double getVooomSpeed() {
-        ZonedDateTime nowZoned = ZonedDateTime.now();
-        Instant midnight = nowZoned.toLocalDate().atStartOfDay(nowZoned.getZone()).toInstant();
-        Duration duration = Duration.between(midnight, Instant.now());
-        long seconds = duration.getSeconds();
         this.getTimes().sort(timetable::compareTo);
-        int i = Collections.binarySearch(times, new queryData(1, 2));
+        int i = Collections.binarySearch(times, queryData.QueryNaw());
         timetable timetable = times.get(i);
         return timetable.getCurrentspeed();
     }
