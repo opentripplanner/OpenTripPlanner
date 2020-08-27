@@ -2,13 +2,10 @@ package org.opentripplanner.graph_builder.module;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.BogusEdgeGeometry;
 import org.opentripplanner.graph_builder.issues.BogusVertexGeometry;
-import org.opentripplanner.graph_builder.issues.VertexShapeError;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
-import org.opentripplanner.routing.edgetype.HopEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -20,6 +17,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 
+// TODO OTP2 This test might be obsolete now that there is no HopEdge anymore
 /**
  * Check the geometry of every edge in the graph for any bogus geometry --
  * that is, geometry with coordinates of NaN.
@@ -64,6 +62,7 @@ public class CheckGeometryModule implements GraphBuilderModule {
                         issueStore.add(new BogusEdgeGeometry(e));
                     }
                 }
+                /*
                 if (e instanceof HopEdge) {
                     Coordinate edgeStartCoord = e.getFromVertex().getCoordinate();
                     Coordinate edgeEndCoord = e.getToVertex().getCoordinate();
@@ -80,6 +79,7 @@ public class CheckGeometryModule implements GraphBuilderModule {
                         issueStore.add(new VertexShapeError(e));
                     }
                 }
+                 */
             }
         }
 

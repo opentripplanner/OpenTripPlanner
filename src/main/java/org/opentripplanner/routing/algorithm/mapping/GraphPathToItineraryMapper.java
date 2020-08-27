@@ -266,35 +266,11 @@ public abstract class GraphPathToItineraryMapper {
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
 
-        addFrequencyFields(states, leg);
-
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
         addModeAndAlerts(graph, leg, states);
 
         return leg;
-    }
-
-    private static void addFrequencyFields(State[] states, Leg leg) {
-        /* TODO adapt to new frequency handling.
-        if (states[0].getBackEdge() instanceof FrequencyBoard) {
-            State preBoardState = states[0].getBackState();
-
-            FrequencyBoard fb = (FrequencyBoard) states[0].getBackEdge();
-            FrequencyBasedTripPattern pt = fb.getPattern();
-            int boardTime;
-            if (preBoardState.getServiceDay() == null) {
-                boardTime = 0; //TODO why is this happening?
-            } else {
-                boardTime = preBoardState.getServiceDay().secondsSinceMidnight(
-                        preBoardState.getTimeSeconds());
-            }
-            int period = pt.getPeriod(fb.getStopIndex(), boardTime); //TODO fix
-
-            leg.isNonExactFrequency = !pt.isExact();
-            leg.headway = period;
-        }
-        */
     }
 
     /**
@@ -308,8 +284,6 @@ public abstract class GraphPathToItineraryMapper {
         WalkStep previousStep = null;
 
         TraverseMode lastMode = null;
-
-        BikeRentalStationVertex onVertex = null, offVertex = null;
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
@@ -396,7 +370,6 @@ public abstract class GraphPathToItineraryMapper {
         for (State state : states) {
             TraverseMode mode = state.getBackMode();
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
-            Edge edge = state.getBackEdge();
 
             if (mode != null) {
                 leg.mode = mode;
@@ -425,20 +398,19 @@ public abstract class GraphPathToItineraryMapper {
         Stop lastStop = lastVertex instanceof TransitStopVertex ?
                 ((TransitStopVertex) lastVertex).getStop(): null;
 
-        leg.from = makePlace(states[0], firstVertex, firstStop, requestedLocale);
-        leg.to = makePlace(states[states.length - 1], lastVertex, lastStop, requestedLocale);
+        leg.from = makePlace(firstVertex, firstStop, requestedLocale);
+        leg.to = makePlace(lastVertex, lastStop, requestedLocale);
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
-     * @param state The {@link State} that the {@link Place} pertains to.
      * @param vertex The {@link Vertex} at the {@link State}.
      * @param stop The {@link Stop} associated with the {@link Vertex}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(State state, Vertex vertex, Stop stop, Locale requestedLocale) {
+    private static Place makePlace(Vertex vertex, Stop stop, Locale requestedLocale) {
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport
