@@ -77,11 +77,13 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
 
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
@@ -352,11 +354,12 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
-
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {

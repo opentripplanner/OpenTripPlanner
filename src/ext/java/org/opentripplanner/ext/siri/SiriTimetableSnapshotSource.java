@@ -1065,68 +1065,83 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
 
         List<RecordedCall> recordedCalls = (journey.getRecordedCalls() != null ? journey.getRecordedCalls().getRecordedCalls():new ArrayList<>());
-        List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+        List<EstimatedCall> estimatedCalls;
+        if (journey.getEstimatedCalls() != null) {
+            estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+        } else {
+            return null;
+        }
 
-            String journeyFirstStopId;
-            ServiceDate journeyDate;
-            if (recordedCalls != null && !recordedCalls.isEmpty()) {
-                RecordedCall recordedCall = recordedCalls.get(0);
-                journeyFirstStopId = recordedCall.getStopPointRef().getValue();
-                journeyDate = new ServiceDate(Date.from(recordedCall.getAimedDepartureTime().toInstant()));
-            } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
-                EstimatedCall estimatedCall = estimatedCalls.get(0);
-                journeyFirstStopId = estimatedCall.getStopPointRef().getValue();
-                journeyDate = new ServiceDate(Date.from(estimatedCall.getAimedDepartureTime().toInstant()));
-            } else {
-                return null;
+        String journeyFirstStopId;
+        String journeyLastStopId;
+        ServiceDate journeyDate;
+        //Resolve first stop - check recordedCalls, then estimatedCalls
+        if (recordedCalls != null && !recordedCalls.isEmpty()) {
+            RecordedCall recordedCall = recordedCalls.get(0);
+            journeyFirstStopId = recordedCall.getStopPointRef().getValue();
+            journeyDate = new ServiceDate(Date.from(recordedCall.getAimedDepartureTime().toInstant()));
+        } else if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
+            EstimatedCall estimatedCall = estimatedCalls.get(0);
+            journeyFirstStopId = estimatedCall.getStopPointRef().getValue();
+            journeyDate = new ServiceDate(Date.from(estimatedCall.getAimedDepartureTime().toInstant()));
+        } else {
+            return null;
+        }
+
+        //Resolve last stop - check estimatedCalls, then recordedCalls
+        if (estimatedCalls != null && !estimatedCalls.isEmpty()) {
+            EstimatedCall estimatedCall = estimatedCalls.get(estimatedCalls.size() - 1);
+            journeyLastStopId = estimatedCall.getStopPointRef().getValue();
+        } else if (recordedCalls != null && !recordedCalls.isEmpty()) {
+            RecordedCall recordedCall = recordedCalls.get(recordedCalls.size() - 1);
+            journeyLastStopId = recordedCall.getStopPointRef().getValue();
+        } else {
+            return null;
+        }
+
+        TripPattern lastAddedTripPattern = null;
+        if (getTimetableSnapshot() != null) {
+            lastAddedTripPattern  = getTimetableSnapshot().getLastAddedTripPattern(trip.getId(), journeyDate);
+        }
+
+        TripPattern tripPattern;
+        if (lastAddedTripPattern != null) {
+            tripPattern = lastAddedTripPattern;
+        } else {
+            tripPattern = routingService.getPatternForTrip().get(trip);
+        }
+
+
+        Stop firstStop = tripPattern.getStop(0);
+        Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
+
+        if (serviceDates.contains(journeyDate)) {
+            boolean firstStopIsMatch = firstStop.getId().getId().equals(journeyFirstStopId);
+            boolean lastStopIsMatch = lastStop.getId().getId().equals(journeyLastStopId);
+
+            if (!firstStopIsMatch && firstStop.isPartOfStation()) {
+                Stop otherFirstStop = routingService
+                    .getStopForId(
+                            new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId)
+                    );
+                firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
             }
 
-            String journeyLastStopId = estimatedCalls.get(estimatedCalls.size() - 1).getStopPointRef().getValue();
-
-
-            TripPattern lastAddedTripPattern = null;
-            if (getTimetableSnapshot() != null) {
-                lastAddedTripPattern  = getTimetableSnapshot().getLastAddedTripPattern(trip.getId(), journeyDate);
+            if (!lastStopIsMatch && lastStop.isPartOfStation()) {
+                Stop otherLastStop = routingService
+                    .getStopForId(
+                            new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId)
+                    );
+                lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
             }
 
-            TripPattern tripPattern;
-            if (lastAddedTripPattern != null) {
-                tripPattern = lastAddedTripPattern;
-            } else {
-                tripPattern = routingService.getPatternForTrip().get(trip);
+            if (firstStopIsMatch & lastStopIsMatch) {
+                // Found matches
+                return tripPattern;
             }
 
-
-            Stop firstStop = tripPattern.getStop(0);
-            Stop lastStop = tripPattern.getStop(tripPattern.getStops().size() - 1);
-
-            if (serviceDates.contains(journeyDate)) {
-                boolean firstStopIsMatch = firstStop.getId().getId().equals(journeyFirstStopId);
-                boolean lastStopIsMatch = lastStop.getId().getId().equals(journeyLastStopId);
-
-                if (!firstStopIsMatch && firstStop.isPartOfStation()) {
-                    Stop otherFirstStop = routingService
-                        .getStopForId(
-                                new FeedScopedId(firstStop.getId().getFeedId(), journeyFirstStopId)
-                        );
-                    firstStopIsMatch = firstStop.isPartOfSameStationAs(otherFirstStop);
-                }
-
-                if (!lastStopIsMatch && lastStop.isPartOfStation()) {
-                    Stop otherLastStop = routingService
-                        .getStopForId(
-                                new FeedScopedId(lastStop.getId().getFeedId(), journeyLastStopId)
-                        );
-                    lastStopIsMatch = lastStop.isPartOfSameStationAs(otherLastStop);
-                }
-
-                if (firstStopIsMatch & lastStopIsMatch) {
-                    // Found matches
-                    return tripPattern;
-                }
-
-                return null;
-            }
+            return null;
+        }
 
         return null;
     }
@@ -1190,7 +1205,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
 
         List<RecordedCall> recordedCalls = (journey.getRecordedCalls() != null ? journey.getRecordedCalls().getRecordedCalls():new ArrayList<>());
-        List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+        List<EstimatedCall> estimatedCalls =  (journey.getEstimatedCalls() != null ? journey.getEstimatedCalls().getEstimatedCalls():null);
 
         ZonedDateTime date;
         int stopNumber = 1;
@@ -1238,7 +1253,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
                         if (stop.isPartOfStation()) {
                             Stop alternativeStop = routingService
                                 .getStopForId(new FeedScopedId(agencyId, firstStopId));
-                            if (stop.isPartOfSameStationAs(alternativeStop)) {
+                            if (alternativeStop != null && stop.isPartOfSameStationAs(alternativeStop)) {
                                 firstReportedStopIsFound = true;
                             }
                         }

@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
@@ -130,12 +131,27 @@ public class SiriFuzzyTripMatcher {
             }
         }
         if (trips == null || trips.isEmpty()) {
-            List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
-            EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size() - 1);
 
-            String lastStopPoint = lastStop.getStopPointRef().getValue();
+            String lastStopPoint = null;
+            ZonedDateTime arrivalTime = null;
 
-            ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+            if (journey.getEstimatedCalls() != null && journey.getEstimatedCalls().getEstimatedCalls() != null
+                    && !journey.getEstimatedCalls().getEstimatedCalls().isEmpty()) { // Pick last stop from EstimatedCalls
+                List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+                EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size() - 1);
+
+                lastStopPoint = lastStop.getStopPointRef().getValue();
+                arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+
+            } else if (journey.getRecordedCalls() != null && journey.getRecordedCalls().getRecordedCalls() != null
+                    && !journey.getRecordedCalls().getRecordedCalls().isEmpty()) { // No EstimatedCalls exist - pick last RecordedCall
+
+                List<RecordedCall> recordedCalls = journey.getRecordedCalls().getRecordedCalls();
+                final RecordedCall lastStop = recordedCalls.get(recordedCalls.size() - 1);
+
+                lastStopPoint = lastStop.getStopPointRef().getValue();
+                arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+            }
 
             if (arrivalTime != null) {
                 trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime);
