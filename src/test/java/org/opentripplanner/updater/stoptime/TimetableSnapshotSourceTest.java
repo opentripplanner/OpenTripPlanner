@@ -1,11 +1,6 @@
 package org.opentripplanner.updater.stoptime;
 
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNotSame;
-import static org.junit.Assert.assertSame;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.createCalendarServiceData;
 
 import java.io.File;
@@ -117,6 +112,7 @@ public class TimetableSnapshotSourceTest {
                 createCalendarServiceData(context.getOtpTransitService())
         );
         updater = new TimetableSnapshotSource(graph);
+        updater.blockUpdateWindow = 3600;//set the block update window to 1 hour
     }
 
     @Test
@@ -160,6 +156,170 @@ public class TimetableSnapshotSourceTest {
             assertEquals(TripTimes.UNAVAILABLE, tripTimes.getArrivalTime(i));
         }
         assertEquals(RealTimeState.CANCELED, tripTimes.getRealTimeState());
+    }
+
+    @Test
+    public void testUpdateBlockTrips() {
+        final FeedScopedId tripId = new FeedScopedId(feedId, "6.2");
+        final FeedScopedId tripId1 = new FeedScopedId(feedId, "7.2");//another trip on block
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "8.1");//later trip on block
+        final Trip trip = graph.index.tripForId.get(tripId);
+        final Trip trip1 = graph.index.tripForId.get(tripId1);
+        final Trip trip2 = graph.index.tripForId.get(tripId2);
+        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final TripPattern pattern1 = graph.index.patternForTrip.get(trip1);
+        final TripPattern pattern2 = graph.index.patternForTrip.get(trip2);
+        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        final int tripIndex1 = pattern1.scheduledTimetable.getTripIndex(tripId1);
+        final int tripIndex2 = pattern2.scheduledTimetable.getTripIndex(tripId2);
+
+        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId("6.2");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+
+        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        Calendar calToday = Calendar.getInstance(graph.getTimeZone());
+        calToday.set(Calendar.HOUR_OF_DAY, 13);
+        calToday.set(Calendar.MINUTE, 5);
+        calToday.set(Calendar.SECOND, 0);
+        calToday.set(Calendar.MILLISECOND, 0);
+        tripUpdateBuilder.setTimestamp(calToday.getTimeInMillis() / 1000);//today at 13:05 (in sec)
+
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeUpdateBuilder.setStopSequence(2);
+
+        final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+        final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+
+        arrivalBuilder.setDelay(1);
+        departureBuilder.setDelay(1);
+
+        final TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
+
+        final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        final Timetable schedule = snapshot.resolve(pattern, null);
+        final Timetable forToday1 = snapshot.resolve(pattern1, serviceDate);
+        final Timetable schedule1 = snapshot.resolve(pattern1, null);
+        final Timetable forToday2 = snapshot.resolve(pattern2, serviceDate);
+        final Timetable schedule2 = snapshot.resolve(pattern2, null);
+
+        //assert that 6.2 was updated since it was from trip update
+        //assert that 7.2 was updated since it is within the window (1hr set above)
+        //assert that 8.3 was not updated since it was out of the window (1hr set above)
+
+        assertNotSame(forToday, schedule);
+        assertNotSame(forToday1, schedule1);
+        assertSame(forToday2, schedule2);
+
+        assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+        assertNotSame(forToday1.getTripTimes(tripIndex1), schedule1.getTripTimes(tripIndex1));
+        assertSame(forToday2.getTripTimes(tripIndex2), schedule2.getTripTimes(tripIndex2));
+
+        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
+        assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getArrivalDelay(1));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getDepartureDelay(1));
+
+        assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule1.getTripTimes(tripIndex1).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday1.getTripTimes(tripIndex1).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule2.getTripTimes(tripIndex2).getRealTimeState());
+        assertEquals(RealTimeState.SCHEDULED, forToday2.getTripTimes(tripIndex2).getRealTimeState());
+    }
+
+    @Test
+    public void testUpdateBlockTrips2() {
+        final FeedScopedId tripId = new FeedScopedId(feedId, "6.2");
+        final FeedScopedId tripId1 = new FeedScopedId(feedId, "7.2");//another trip on block
+        final FeedScopedId tripId2 = new FeedScopedId(feedId, "8.1");//later trip on block
+        final Trip trip = graph.index.tripForId.get(tripId);
+        final Trip trip1 = graph.index.tripForId.get(tripId1);
+        final Trip trip2 = graph.index.tripForId.get(tripId2);
+        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final TripPattern pattern1 = graph.index.patternForTrip.get(trip1);
+        final TripPattern pattern2 = graph.index.patternForTrip.get(trip2);
+        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        final int tripIndex1 = pattern1.scheduledTimetable.getTripIndex(tripId1);
+        final int tripIndex2 = pattern2.scheduledTimetable.getTripIndex(tripId2);
+
+        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId("7.2");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+
+        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        Calendar calToday = Calendar.getInstance(graph.getTimeZone());
+        calToday.set(Calendar.HOUR_OF_DAY, 13);
+        calToday.set(Calendar.MINUTE, 5);
+        calToday.set(Calendar.SECOND, 0);
+        calToday.set(Calendar.MILLISECOND, 0);
+        tripUpdateBuilder.setTimestamp(calToday.getTimeInMillis() / 1000);//today at 13:05 (in sec)
+
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeUpdateBuilder.setStopSequence(2);
+
+        final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+        final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+
+        arrivalBuilder.setDelay(1);
+        departureBuilder.setDelay(1);
+
+        final TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
+
+        final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        final Timetable schedule = snapshot.resolve(pattern, null);
+        final Timetable forToday1 = snapshot.resolve(pattern1, serviceDate);
+        final Timetable schedule1 = snapshot.resolve(pattern1, null);
+        final Timetable forToday2 = snapshot.resolve(pattern2, serviceDate);
+        final Timetable schedule2 = snapshot.resolve(pattern2, null);
+
+        //assert that 6.2 was not updated since it was before trip update
+        //assert that 7.2 was updated since it was the trip update
+        //assert that 8.3 was not updated since it was out of the window (1hr set above)
+
+        assertSame(forToday, schedule);
+        assertNotSame(forToday1, schedule1);
+        assertSame(forToday2, schedule2);
+
+        assertSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+        assertNotSame(forToday1.getTripTimes(tripIndex1), schedule1.getTripTimes(tripIndex1));
+        assertSame(forToday2.getTripTimes(tripIndex2), schedule2.getTripTimes(tripIndex2));
+
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getArrivalDelay(1));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getDepartureDelay(1));
+
+        assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
+        assertEquals(RealTimeState.SCHEDULED, forToday.getTripTimes(tripIndex).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule1.getTripTimes(tripIndex1).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday1.getTripTimes(tripIndex1).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule2.getTripTimes(tripIndex2).getRealTimeState());
+        assertEquals(RealTimeState.SCHEDULED, forToday2.getTripTimes(tripIndex2).getRealTimeState());
     }
 
     @Test
