@@ -2,12 +2,15 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import java.util.Collection;
-import java.util.Set;
 import org.opentripplanner.annotation.ComponentAnnotationConfigurator;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.util.ConstructorDescriptor;
 import org.opentripplanner.util.OtpAppException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Collection;
+import java.util.Set;
 
 /**
  * This class maps between the JSON array of updaters and the concrete class implementations of each
@@ -16,13 +19,18 @@ import org.opentripplanner.util.OtpAppException;
  */
 public class UpdaterConfig {
 
+  private static final Logger LOG = LoggerFactory.getLogger(UpdaterConfig.class);
+
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
 
   public UpdaterConfig(NodeAdapter updaterConfigList) {
+    LOG.info("There are {} updaters", updaterConfigList.asList().size());
     for (NodeAdapter conf : updaterConfigList.asList()) {
       String type = conf.asText("type");
+      LOG.info("Creating updater in type '{}'", type);
+
       ConstructorDescriptor descriptor = ComponentAnnotationConfigurator.getInstance()
-          .getConstructorDescriptor(type, ServiceType.GraphUpdater);
+        .getConstructorDescriptor(type, ServiceType.GraphUpdater);
       Class<?> paramClazz = descriptor.getInitialClass();
       if (paramClazz != null) {
         try {
