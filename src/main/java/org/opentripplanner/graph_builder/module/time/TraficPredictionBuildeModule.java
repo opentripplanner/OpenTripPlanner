@@ -11,7 +11,7 @@ import java.util.TreeMap;
 
 
 public class TraficPredictionBuildeModule implements GraphBuilderModule {
-private final clusterlist clusterlist;
+    private final clusterlist clusterlist;
 
     public TraficPredictionBuildeModule(File traficprediction) {
         this.clusterlist = new clusterlist(traficprediction);
@@ -20,16 +20,15 @@ private final clusterlist clusterlist;
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-    graph.setClusters(this.clusterlist);
-        TreeMap<Integer,Integer> map = new TreeMap<>();
-    for (cluster c : graph.getClusters().getclusters()) {
-        for( edgedata e: c.getedges())
-            map.put( ((int) e.getid()),e.getclusterid());
-    }
-    for(StreetEdge e : graph.getStreetEdges())
-    {
-        e.setTimes( this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
-    }
+        graph.setClusters(this.clusterlist);
+        TreeMap<Integer, Integer> map = new TreeMap<>();
+        for (cluster c : graph.getClusters().getclusters()) {
+            for (edgedata e : c.getedges())
+                map.put(((int) e.getid()), e.getclusterid());
+        }
+        for (StreetEdge e : graph.getStreetEdges()) {
+            e.setTimes(this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
+        }
     }
 
     @Override

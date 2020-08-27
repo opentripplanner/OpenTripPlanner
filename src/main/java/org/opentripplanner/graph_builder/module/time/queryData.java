@@ -12,13 +12,13 @@ public class queryData {
         this.day = day;
         this.time = time;
     }
-    public static   queryData QueryNaw ()
-    {
+
+    public static queryData QueryNaw() {
         ZonedDateTime nowZoned = ZonedDateTime.now();
         Instant midnight = nowZoned.toLocalDate().atStartOfDay(nowZoned.getZone()).toInstant();
         Duration duration = Duration.between(midnight, Instant.now());
         long seconds = duration.getSeconds();
-        return new queryData(nowZoned.getDayOfWeek().getValue(),seconds);
+        return new queryData(nowZoned.getDayOfWeek().getValue(), seconds);
 
     }
 
