@@ -10,10 +10,10 @@ import java.util.HashMap;
 import java.util.TreeMap;
 
 
-public class TraficPredictionBuildeModule implements GraphBuilderModule {
+public class TraficPredictionBuilderModule implements GraphBuilderModule {
     private final clusterlist clusterlist;
 
-    public TraficPredictionBuildeModule(File traficprediction) {
+    public TraficPredictionBuilderModule(File traficprediction) {
         this.clusterlist = new clusterlist(traficprediction);
         this.clusterlist.getclusters().sort(Comparator.naturalOrder());
     }
