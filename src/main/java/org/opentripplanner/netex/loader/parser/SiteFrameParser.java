@@ -6,6 +6,7 @@ import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -21,6 +22,8 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
 
     private final Collection<StopPlace> stopPlaces = new ArrayList<>();
 
+    private final Collection<TariffZone> tariffZones = new ArrayList<>();
+
     private final Collection<Quay> quays = new ArrayList<>();
 
     @Override
@@ -30,6 +33,9 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         }
         if (frame.getGroupsOfStopPlaces() != null) {
             parseGroupsOfStopPlaces(frame.getGroupsOfStopPlaces().getGroupOfStopPlaces());
+        }
+        if (frame.getTariffZones() != null) {
+            parseTariffZones(frame.getTariffZones().getTariffZone());
         }
         // Keep list sorted alphabetically
         warnOnMissingMapping(LOG, frame.getAccesses());
@@ -47,7 +53,6 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         warnOnMissingMapping(LOG, frame.getPointOfInterestClassifications());
         warnOnMissingMapping(LOG, frame.getPointOfInterestClassificationHierarchies());
         warnOnMissingMapping(LOG, frame.getSiteFacilitySets());
-        warnOnMissingMapping(LOG, frame.getTariffZones());
         warnOnMissingMapping(LOG, frame.getTopographicPlaces());
 
         verifyCommonUnusedPropertiesIsNotSet(LOG, frame);
@@ -58,6 +63,7 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         netexIndex.groupOfStopPlacesById.addAll(groupsOfStopPlaces);
         netexIndex.multiModalStopPlaceById.addAll(multiModalStopPlaces);
         netexIndex.stopPlaceById.addAll(stopPlaces);
+        netexIndex.tariffZonesById.addAll(tariffZones);
         netexIndex.quayById.addAll(quays);
     }
 
@@ -74,6 +80,10 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
                 parseQuays(stopPlace.getQuays());
             }
         }
+    }
+
+    private void parseTariffZones(Collection<TariffZone> tariffZoneList) {
+        tariffZones.addAll(tariffZoneList);
     }
 
     private void parseQuays(Quays_RelStructure quayRefOrQuay) {

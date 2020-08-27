@@ -45,7 +45,22 @@ import java.util.List;
 public class RoutingWorker {
     private static final int NOT_SET = -1;
 
-    private static final int TRANSIT_SEARCH_RANGE_IN_DAYS = 2;
+    /**
+     * The numbers of days before the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for trips starting yesterday and crossing midnight so that they
+     * can be boarded today. If there are trips that last multiple days, this will need to be
+     * increased.
+     */
+    private static final int ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY = 1;
+
+    /**
+     * The number of days after the search date to consider when filtering trips for this search.
+     * This is set to 1 to account for searches today having a search window that crosses midnight
+     * and would also need to board trips starting tomorrow. If a search window that lasts more than
+     * a day is used, this will need to be increased.
+     */
+    private static final int ADDITIONAL_SEARCH_DAYS_AFTER_TODAY = 1;
+
     private static final Logger LOG = LoggerFactory.getLogger(RoutingWorker.class);
 
     private final RaptorService<TripSchedule> raptorService;
@@ -106,6 +121,12 @@ public class RoutingWorker {
         request.setRoutingContext(router.graph);
         if (request.modes.transitModes.isEmpty()) { return Collections.emptyList(); }
 
+        if (!router.graph.transitFeedCovers(request.dateTime)) {
+            throw new RoutingValidationException(List.of(
+                    new RoutingError(RoutingErrorCode.OUTSIDE_SERVICE_PERIOD, InputField.DATE_TIME)
+            ));
+        }
+
         TransitLayer transitLayer = request.ignoreRealtimeUpdates
             ? router.graph.getTransitLayer()
             : router.graph.getRealtimeTransitLayer();
@@ -114,7 +135,8 @@ public class RoutingWorker {
         requestTransitDataProvider = new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDateTime().toInstant(),
-                TRANSIT_SEARCH_RANGE_IN_DAYS,
+                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
+                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
                 request.modes.transitModes,
                 request.rctx.bannedRoutes,
                 request.walkSpeed
@@ -224,7 +246,7 @@ public class RoutingWorker {
     private void checkIfTransitConnectionExists(RaptorResponse<TripSchedule> response) {
         int searchWindowUsed = response.requestUsed().searchParams().searchWindowInSeconds();
         if (searchWindowUsed <= 0 && response.paths().isEmpty()) {
-            throw new RoutingValidationException(Collections.singletonList(
+            throw new RoutingValidationException(List.of(
                 new RoutingError(RoutingErrorCode.NO_TRANSIT_CONNECTION, null)));
         }
     }

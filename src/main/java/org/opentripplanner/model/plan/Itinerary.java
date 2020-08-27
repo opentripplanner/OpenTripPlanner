@@ -108,8 +108,6 @@ public class Itinerary {
 
 
     public Itinerary(List<Leg> legs) {
-        if(legs.isEmpty()) { throw new IllegalArgumentException("At least one leg is required."); }
-
         this.legs = List.copyOf(legs);
 
         // Set aggregated data

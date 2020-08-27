@@ -71,7 +71,7 @@ public class LegMapper {
         api.headsign = domain.headsign;
         api.agencyId = FeedScopedIdMapper.mapToApi(domain.agencyId);
         api.tripId = FeedScopedIdMapper.mapToApi(domain.tripId);
-        api.serviceDate = domain.serviceDate;
+        api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;

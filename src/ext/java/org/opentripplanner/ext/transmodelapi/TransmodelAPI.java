@@ -1,6 +1,11 @@
 package org.opentripplanner.ext.transmodelapi;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import graphql.schema.GraphQLSchema;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.standalone.server.OTPServer;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
@@ -31,12 +36,16 @@ import java.util.concurrent.Future;
 
 @Path("/routers/{ignoreRouterId}/transmodel/index")    // It would be nice to get rid of the final /index.
 @Produces(MediaType.APPLICATION_JSON) // One @Produces annotation for all endpoints.
-public class TransmodelIndexAPI {
+public class TransmodelAPI {
     @SuppressWarnings("unused")
-    private static final Logger LOG = LoggerFactory.getLogger(TransmodelIndexAPI.class);
+    private static final Logger LOG = LoggerFactory.getLogger(TransmodelAPI.class);
+
+    private static GqlUtil gqlUtil;
+    private static GraphQLSchema schema;
 
     private final Router router;
-    private final TransmodelGraphIndex index;
+
+    private final TransmodelGraph index;
     private final ObjectMapper deserializer = new ObjectMapper();
 
     /**
@@ -46,9 +55,26 @@ public class TransmodelIndexAPI {
     @Deprecated @PathParam("ignoreRouterId")
     private String ignoreRouterId;
 
-    public TransmodelIndexAPI(@Context OTPServer otpServer) {
+    public TransmodelAPI(@Context OTPServer otpServer) {
         this.router = otpServer.getRouter();
-        index = new TransmodelGraphIndex(router.graph, router.defaultRoutingRequest);
+        this.index = new TransmodelGraph(schema);
+    }
+
+    /**
+     * This method should be called BEFORE the Web-Container is started and load new
+     * instances of this class. This is a hack, and it would be better if the configuration
+     * was done more explicit and enforced, not relaying on a "static" setup method to be called.
+     */
+    public static void setUp(
+        boolean hideFeedId,
+        Graph graph,
+        RoutingRequest defaultRoutingRequest
+    ) {
+        if(hideFeedId) {
+          TransitIdMapper.setupFixedFeedId(graph.getAgencies());
+        }
+        gqlUtil = new GqlUtil(graph.getTimeZone());
+        schema = TransmodelGraphQLSchema.create(defaultRoutingRequest, gqlUtil);
     }
 
     /**

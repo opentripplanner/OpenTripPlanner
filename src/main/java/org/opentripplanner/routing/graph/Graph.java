@@ -955,12 +955,12 @@ public class Graph implements Serializable {
         return stationById.get(id);
     }
 
-    public Collection<Station> getStations() {
-        return stationById.values();
+    public MultiModalStation getMultiModalStation(FeedScopedId id) {
+        return multiModalStationById.get(id);
     }
 
-    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
-        return multiModalStationById.get(feedScopedId);
+    public Collection<Station> getStations() {
+        return stationById.values();
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {

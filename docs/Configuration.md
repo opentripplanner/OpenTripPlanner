@@ -493,6 +493,8 @@ config key | description | value type | value default | notes
 `requestLogFile` | Path to a plain-text file where requests will be logged | string | null | see [logging incoming requests](#logging-incoming-requests)
 `transit` | Transit tuning parameters | `TransitRoutingConfig` |  | see [Tuning transit routing](#Tuning-transit-routing)
 `updaters` | configure real-time updaters, such as GTFS-realtime feeds | object | null | see [configuring real-time updaters](#configuring-real-time-updaters)
+`transmodelApi` | configure Entur Transmodel API (**Sandbox**) | object | null | See the code for parameters, no doc provided.
+
 
 ## Routing defaults
 

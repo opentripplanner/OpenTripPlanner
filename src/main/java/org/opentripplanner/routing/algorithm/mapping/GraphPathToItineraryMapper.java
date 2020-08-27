@@ -29,7 +29,6 @@ import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
@@ -74,6 +73,7 @@ public abstract class GraphPathToItineraryMapper {
         List<Itinerary> itineraries = new LinkedList<>();
         for (GraphPath path : paths) {
             Itinerary itinerary = generateItinerary(path, request.locale);
+            if (itinerary.legs.isEmpty()) { continue; }
             itinerary = adjustItinerary(request, itinerary);
             itineraries.add(itinerary);
         }
@@ -196,7 +196,7 @@ public abstract class GraphPathToItineraryMapper {
         }
 
         if (trivial) {
-            throw new TrivialPathException();
+            return new State[][]{};
         }
 
         int[] legIndexPairs = {0, states.length - 1};
@@ -469,7 +469,7 @@ public abstract class GraphPathToItineraryMapper {
             place.stopId = stop.getId();
             place.stopCode = stop.getCode();
             place.platformCode = stop.getCode();
-            place.zoneId = stop.getZone();
+            place.zoneId = stop.getFirstZoneAsString();
             place.vertexType = VertexType.TRANSIT;
         } else if(vertex instanceof BikeRentalStationVertex) {
             place.bikeShareId = ((BikeRentalStationVertex) vertex).getId();
