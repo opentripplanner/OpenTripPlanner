@@ -190,7 +190,7 @@ public class PtSituationElementType {
                     .name("situationNumber")
                     .type(Scalars.GraphQLString)
                     .description("Operator's internal id for this situation")
-                    .dataFetcher(environment -> null)
+                    .dataFetcher(environment -> ((TransitAlert) environment.getSource()).getId())
                     .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("severity")
