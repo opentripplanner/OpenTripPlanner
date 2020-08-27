@@ -157,7 +157,14 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public void setHopGeometriesFromPattern(TripPattern other) {
         this.hopGeometries = new byte[this.getStops().size() - 1][];
-        for (int i = 0; i < other.getStops().size() - 1; i++) {
+
+        // This accounts for the new TripPattern provided by a real-time update and the one that is
+        // being replaced having a different number of stops. In that case the geometry will be
+        // preserved up until the first mismatching stop, and a straight line will be used for
+        // all segments after that.
+        int sizeOfShortestPattern = Math.min(this.getStops().size(), other.getStops().size());
+
+        for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
             if (other.getHopGeometry(i) != null
                 && other.getStop(i).equals(this.getStop(i))
                 && other.getStop(i + 1).equals(this.getStop(i + 1))) {
