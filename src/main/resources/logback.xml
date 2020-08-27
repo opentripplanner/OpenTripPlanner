@@ -27,6 +27,8 @@
   <logger name="org.apache.http" level="info" />
   <logger name="com.conveyal" level="info"/>
 
+  <logger name="nz.govert.nzta.maas" level="debug" />
+
   <logger name="org.opentripplanner.graph_builder.module.DirectTransferGenerator" level="info" />
   <logger name="org.opentripplanner" level="info" />
   <logger name="org.opentripplanner.analyst" level="info" />
