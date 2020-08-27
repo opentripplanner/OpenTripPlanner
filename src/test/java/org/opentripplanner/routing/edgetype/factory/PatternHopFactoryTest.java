@@ -26,7 +26,7 @@ public class PatternHopFactoryTest {
         gtfs.putLines("frequencies.txt", "trip_id,start_time,end_time,headway_secs",
                 "t0,09:00:00,17:00:00,300");
 
-        GtfsFeedId feedId = new GtfsFeedId.Builder().id("FEED").build();
+        GtfsFeedId feedId = new GtfsFeedId.Builder().id("").build();
         PatternHopFactory factory = new PatternHopFactory(
                 GtfsLibrary.createContext(feedId, gtfs.read())
         );
