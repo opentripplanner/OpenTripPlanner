@@ -40,8 +40,8 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         return "Rent vehicle " + vehicle + " in node " + tov.getName();
     }
 
-    private boolean canRentStation() {
-        return bikeRentalStation == null || bikeRentalStation.bikesAvailable > 0;
+    private boolean bikeStationProhibitsRenting() {
+        return (bikeRentalStation != null && bikeRentalStation.bikesAvailable <= 0);
     }
 
     @Override
@@ -54,7 +54,8 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
             if (state.isCurrentlyRentingVehicle()) {
                 return trySwitchVehicles(state);
             } else {
-                return beginVehicleRenting(state);
+                if (!bikeStationProhibitsRenting())
+                    return beginVehicleRenting(state);
             }
         }
         return null;
@@ -74,7 +75,7 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
     }
 
     private State trySwitchVehicles(State state) {
-        if (!canDropoffVehicleHere(state.getCurrentVehicle())) {
+        if (!canDropoffVehicleHere(state.getCurrentVehicle()) || bikeStationProhibitsRenting()) {
             return null;
         }
         StateEditor stateEditor = state.edit(this);

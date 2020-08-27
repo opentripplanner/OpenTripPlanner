@@ -32,6 +32,19 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonSerialize
     public boolean isCarStation = false;
 
+    public BikeRentalStation() {
+
+    }
+
+    public BikeRentalStation(String id, double longitude, double latitude, int bikesAvailable, int spacesAvailable, Provider provider) {
+        this.id = id;
+        this.longitude = longitude;
+        this.latitude = latitude;
+        this.bikesAvailable = bikesAvailable;
+        this.spacesAvailable = spacesAvailable;
+        this.provider = provider;
+    }
+
     public BikeDescription getBikeFromStation() {
         return new BikeDescription(this);
     }

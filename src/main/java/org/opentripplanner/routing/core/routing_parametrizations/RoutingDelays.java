@@ -17,6 +17,10 @@ public class RoutingDelays {
 
     private int carRentingTime = 90;
 
+    private int bikeDropoffTime = 30;
+
+    private int bikeRentingTime = 120;
+
     public int getCarDropoffTime() {
         return carDropoffTime;
     }
@@ -31,6 +35,8 @@ public class RoutingDelays {
                 return motorbikeRentingTime;
             case KICKSCOOTER:
                 return kickScooterRentingTime;
+            case BIKE:
+                return bikeRentingTime;
             default:
                 return 0;
         }
@@ -44,6 +50,8 @@ public class RoutingDelays {
                 return motorbikeDropoffTime;
             case KICKSCOOTER:
                 return kickScooterDropoffTime;
+            case BIKE:
+                return bikeDropoffTime;
             default:
                 throw new IllegalArgumentException("Dropoff time is not specified for this vehicle type");
         }
@@ -71,5 +79,13 @@ public class RoutingDelays {
 
     public void setCarDropoffTime(int carDropoffTime) {
         this.carDropoffTime = carDropoffTime;
+    }
+
+    public void setBikeDropoffTime(int bikeDropoffTime) {
+        this.bikeDropoffTime = bikeDropoffTime;
+    }
+
+    public void setBikeRentingTime(int bikeRentingTime) {
+        this.bikeRentingTime = bikeRentingTime;
     }
 }

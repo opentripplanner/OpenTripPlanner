@@ -9,6 +9,7 @@ public class BikeStationParkingZone extends SingleParkingZone {
 
     public BikeStationParkingZone(BikeRentalStation station) {
         super(station.provider.getProviderId(), VehicleType.BIKE);
+        this.bikeRentalStation = station;
     }
 
     @Override
