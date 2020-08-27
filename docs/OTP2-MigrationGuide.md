@@ -78,6 +78,7 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
 - `agencyId` in the `leg` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
 - `debugOutput` in `TripPlan` has changed due to the different algorithms used in OTP version 1.x and 2.x.
   - The `totalTime` is left as is, `directStreetRouterTime`, `transitRouterTime`, `filteringTime` and `renderingTime` are new fields.
+- `effectiveEndDate` is added to the `Alert`s
 
 ### Changes to the Index API
 - Error handling is improved, this is now consistently applied and uses build in framework support. 
@@ -106,6 +107,8 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
     deprecated ~~cluster~~.
 - `Agency`
   - The `id` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
+- 'Alert'
+  - `effectiveEndDate` is added to show the end time of the alert validity.
 
 ### AlertPatcher
 
