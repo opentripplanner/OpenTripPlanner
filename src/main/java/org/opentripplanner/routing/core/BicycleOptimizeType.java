@@ -5,7 +5,7 @@ package org.opentripplanner.routing.core;
  * If so this should be very clearly stated in documentation and even in the Enum name, which could be
  * BicycleOptimizeType, since TRANSFERS is vestigial and should probably be removed.
  */
-public enum OptimizeType {
+public enum BicycleOptimizeType {
     QUICK, /* the fastest trip */
     SAFE,
     FLAT, /* needs a rewrite */

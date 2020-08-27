@@ -10,7 +10,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
 import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
@@ -208,7 +208,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *                       documented and carried over into the Enum name.
      */
     @Deprecated
-    public OptimizeType optimize = OptimizeType.QUICK;
+    public BicycleOptimizeType optimize = BicycleOptimizeType.QUICK;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -713,11 +713,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
-    public RoutingRequest(TraverseMode mode, OptimizeType optimize) {
+    public RoutingRequest(TraverseMode mode, BicycleOptimizeType optimize) {
         this(new TraverseModeSet(mode), optimize);
     }
 
-    public RoutingRequest(TraverseModeSet modeSet, OptimizeType optimize) {
+    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType optimize) {
         this();
         this.optimize = optimize;
         this.setStreetSubRequestModes(modeSet);
@@ -774,7 +774,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setOptimize(OptimizeType optimize) {
+    public void setOptimize(BicycleOptimizeType optimize) {
         this.optimize = optimize;
         bikeWalkingOptions.optimize = optimize;
     }

@@ -5,7 +5,7 @@ import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.AbsoluteDirection;
 import org.opentripplanner.model.plan.RelativeDirection;
 import org.opentripplanner.model.plan.VertexType;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.trippattern.RealTimeState;
@@ -219,14 +219,14 @@ public class EnumTypes {
             .build();
 */
 
-    public static GraphQLEnumType OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
+    public static GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
             .name("OptimisationMethod")
-            .value("quick", OptimizeType.QUICK)
-            .value("safe", OptimizeType.SAFE)
-            .value("flat", OptimizeType.FLAT)
-            .value("greenways", OptimizeType.GREENWAYS)
-            .value("triangle", OptimizeType.TRIANGLE)
-            .value("transfers", OptimizeType.TRANSFERS)
+            .value("quick", BicycleOptimizeType.QUICK)
+            .value("safe", BicycleOptimizeType.SAFE)
+            .value("flat", BicycleOptimizeType.FLAT)
+            .value("greenways", BicycleOptimizeType.GREENWAYS)
+            .value("triangle", BicycleOptimizeType.TRIANGLE)
+            .value("transfers", BicycleOptimizeType.TRANSFERS)
             .build();
 
     public static GraphQLEnumType DIRECTION_TYPE = GraphQLEnumType.newEnum()
