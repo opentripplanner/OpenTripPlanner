@@ -9,13 +9,13 @@ public final class Agency extends TransitEntity<FeedScopedId> {
 
     private static final long serialVersionUID = 1L;
 
-    private FeedScopedId id;
+    private final FeedScopedId id;
 
-    private String name;
+    private final String name;
+
+    private final String timezone;
 
     private String url;
-
-    private String timezone;
 
     private String lang;
 
@@ -25,17 +25,10 @@ public final class Agency extends TransitEntity<FeedScopedId> {
 
     private String brandingUrl;
 
-    public Agency() {
-    }
-
-    public Agency(Agency a) {
-        this.id = a.id;
-        this.name = a.name;
-        this.url = a.url;
-        this.timezone = a.timezone;
-        this.lang = a.lang;
-        this.phone = a.phone;
-        this.brandingUrl = a.brandingUrl;
+    public Agency(FeedScopedId id, String name, String timezone) {
+        this.id = id;
+        this.name = name;
+        this.timezone = timezone;
     }
 
     @Override
@@ -43,16 +36,8 @@ public final class Agency extends TransitEntity<FeedScopedId> {
         return id;
     }
 
-    public void setId(FeedScopedId id) {
-        this.id = id;
-    }
-
     public String getName() {
         return name;
-    }
-
-    public void setName(String name) {
-        this.name = name;
     }
 
     public String getUrl() {
@@ -65,10 +50,6 @@ public final class Agency extends TransitEntity<FeedScopedId> {
 
     public String getTimezone() {
         return timezone;
-    }
-
-    public void setTimezone(String timezone) {
-        this.timezone = timezone;
     }
 
     public String getLang() {

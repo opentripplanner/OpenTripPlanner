@@ -21,7 +21,6 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.StateEditor;
 import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -130,6 +129,8 @@ public class RaptorPathToItineraryMapper {
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
 
+        if (subItinerary.legs.isEmpty()) { return; }
+
         subItinerary.timeShiftToStartAt(createCalendar(accessPathLeg.fromTime()));
 
         legs.addAll(subItinerary.legs);
@@ -163,7 +164,7 @@ public class RaptorPathToItineraryMapper {
             leg.arrivalDelay = tripTimes.getArrivalDelay(alightStopIndexInPattern);
         }
 
-        leg.serviceDate = new ServiceDate(request.getDateTime()).asCompactString(); // TODO: This has to be changed for multi-day searches
+        leg.serviceDate = new ServiceDate(tripSchedule.getServiceDate());
         leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
@@ -236,6 +237,8 @@ public class RaptorPathToItineraryMapper {
         Itinerary subItinerary = GraphPathToItineraryMapper
             .generateItinerary(graphPath, request.locale);
 
+        if (subItinerary.legs.isEmpty()) { return; }
+
         subItinerary.timeShiftToStartAt(createCalendar(egressPathLeg.fromTime()));
 
         legs.addAll(subItinerary.legs);
@@ -271,27 +274,23 @@ public class RaptorPathToItineraryMapper {
                 transferStates.add(s);
             }
 
-            try {
-                State[] states = transferStates.toArray(new State[0]);
-                GraphPath graphPath = new GraphPath(states[states.length - 1], false);
+            State[] states = transferStates.toArray(new State[0]);
+            GraphPath graphPath = new GraphPath(states[states.length - 1], false);
 
-                Itinerary subItinerary = GraphPathToItineraryMapper
-                        .generateItinerary(graphPath, request.locale);
+            Itinerary subItinerary = GraphPathToItineraryMapper
+                    .generateItinerary(graphPath, request.locale);
 
-                // TODO OTP2 We use the duration initially calculated for use during routing
-                //      because they do not always match up and we risk getting negative wait times
-                //      (#2955)
-                if (subItinerary.legs.size() != 1) {
-                    throw new IllegalArgumentException("Sub itineraries should only contain one leg.");
-                }
-                subItinerary.legs.get(0).startTime = createCalendar(pathLeg.fromTime());
-                subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
+            // TODO OTP2 We use the duration initially calculated for use during routing
+            //      because they do not always match up and we risk getting negative wait times
+            //      (#2955)
+            if (subItinerary.legs.size() != 1) {
+                throw new IllegalArgumentException("Sub itineraries should only contain one leg.");
+            }
+            subItinerary.legs.get(0).startTime = createCalendar(pathLeg.fromTime());
+            subItinerary.legs.get(0).endTime = createCalendar(pathLeg.toTime());
 
-                if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
-                    legs.addAll(subItinerary.legs);
-                }
-            } catch (TrivialPathException e) {
-                // Ignore, no legs need be copied
+            if (!onlyIfNonZeroDistance || subItinerary.nonTransitDistanceMeters > 0) {
+                legs.addAll(subItinerary.legs);
             }
         }
     }
@@ -340,7 +339,7 @@ public class RaptorPathToItineraryMapper {
         place.stopCode = stop.getCode();
         place.stopIndex = stopIndex;
         place.platformCode = stop.getCode();
-        place.zoneId = stop.getZone();
+        place.zoneId = stop.getFirstZoneAsString();
         place.vertexType = VertexType.TRANSIT;
         return place;
     }

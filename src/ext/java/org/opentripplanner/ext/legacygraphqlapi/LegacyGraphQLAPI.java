@@ -38,7 +38,7 @@ import java.util.concurrent.Future;
 public class LegacyGraphQLAPI {
 
   @SuppressWarnings("unused")
-  private static final Logger LOG = LoggerFactory.getLogger(org.opentripplanner.ext.transmodelapi.TransmodelIndexAPI.class);
+  private static final Logger LOG = LoggerFactory.getLogger(LegacyGraphQLAPI.class);
 
   private final Router router;
   private final ObjectMapper deserializer = new ObjectMapper();

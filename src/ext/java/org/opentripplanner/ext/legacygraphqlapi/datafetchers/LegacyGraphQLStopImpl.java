@@ -103,7 +103,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   @Override
   public DataFetcher<String> zoneId() {
-    return environment -> getValue(environment, Stop::getZone, station -> null);
+    return environment -> getValue(environment, Stop::getFirstZoneAsString, station -> null);
   }
 
   @Override

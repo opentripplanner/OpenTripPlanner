@@ -40,8 +40,8 @@ public class RideMapper {
         TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
         ride.firstStop = transitLayer.getStopByIndex(transitPathLeg.fromStop());
         ride.lastStop = transitLayer.getStopByIndex(transitPathLeg.toStop());
-        ride.startZone = ride.firstStop.getZone();
-        ride.endZone = ride.lastStop.getZone();
+        ride.startZone = ride.firstStop.getFirstZoneAsString();
+        ride.endZone = ride.lastStop.getFirstZoneAsString();
         // In almost all cases (except some loop routes) this should get the right set of zones passed through.
         // We don't have the position of the stops within the pattern so can't readily get more accurate than this.
         boolean onBoard = false;
@@ -50,7 +50,7 @@ public class RideMapper {
                 onBoard = true;
             }
             if (onBoard) {
-                ride.zones.add(stop.getZone());
+                ride.zones.add(stop.getFirstZoneAsString());
                 if (stop == ride.lastStop) break;
             }
         }

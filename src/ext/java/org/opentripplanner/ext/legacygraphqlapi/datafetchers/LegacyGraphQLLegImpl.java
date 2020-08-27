@@ -2,13 +2,13 @@ package org.opentripplanner.ext.legacygraphqlapi.datafetchers;
 
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
+import org.opentripplanner.api.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.legacygraphqlapi.LegacyGraphQLRequestContext;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.plan.Leg;
-import org.opentripplanner.model.plan.Place;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
@@ -115,7 +115,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<String> serviceDate() {
-    return environment -> getSource(environment).serviceDate;
+    return environment -> ServiceDateMapper.mapToApi(getSource(environment).serviceDate);
   }
 
   @Override

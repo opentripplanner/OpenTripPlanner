@@ -1,9 +1,6 @@
 package org.opentripplanner.graph_builder.linking;
 
 import com.google.common.collect.Iterables;
-import gnu.trove.map.TObjectDoubleMap;
-import gnu.trove.map.hash.TObjectDoubleHashMap;
-import jersey.repackaged.com.google.common.collect.Lists;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
@@ -14,7 +11,6 @@ import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
-import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
@@ -25,6 +21,7 @@ import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
+import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -60,7 +57,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -85,30 +81,32 @@ public class SimpleStreetSplitter {
 
     private static final Logger LOG = LoggerFactory.getLogger(SimpleStreetSplitter.class);
 
-    private DataImportIssueStore issueStore;
+    private static final int INITIAL_SEARCH_RADIUS_METERS = 100;
 
-    public static final int MAX_SEARCH_RADIUS_METERS = 1000;
+    private static final int MAX_SEARCH_RADIUS_METERS = 1000;
 
-    private Boolean addExtraEdgesToAreas = false;
-
-    private StreetEdgeFactory edgeFactory;
-
-    public static final int WARNING_DISTANCE_METERS = 20;
+    private static final int WARNING_DISTANCE_METERS = 20;
 
     /** if there are two ways and the distances to them differ by less than this value, we link to both of them */
-    public static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
+    private static final double DUPLICATE_WAY_EPSILON_METERS = 0.001;
 
-    private Graph graph;
+    private static final GeometryFactory GEOMETRY_FACTORY = GeometryUtils.getGeometryFactory();
 
-    private HashGridSpatialIndex<Edge> idx;
+    private final DataImportIssueStore issueStore;
 
-    private SpatialIndex transitStopIndex;
+    private final StreetEdgeFactory edgeFactory;
 
-    private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
+    private final Graph graph;
 
-    //If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
-    //If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
+    private final HashGridSpatialIndex<Edge> idx;
+
+    private final SpatialIndex transitStopIndex;
+
+    // If true edges are split and new edges are created (used when linking transit stops etc. during graph building)
+    // If false new temporary edges are created and no edges are deleted (Used when searching for origin/destination)
     private final boolean destructiveSplitting;
+
+    private Boolean addExtraEdgesToAreas = false;
 
     /**
      * Construct a new SimpleStreetSplitter.
@@ -137,7 +135,6 @@ public class SimpleStreetSplitter {
         } else {
             idx = hashGridSpatialIndex;
         }
-
     }
 
     /**
@@ -151,8 +148,8 @@ public class SimpleStreetSplitter {
         this(graph, null, null, true, issueStore);
     }
 
-    public SimpleStreetSplitter(Graph graph) {
-        this(graph, new DataImportIssueStore(false));
+    public static SimpleStreetSplitter createForTest(Graph graph) {
+        return new SimpleStreetSplitter(graph, null, null, true, new DataImportIssueStore(false));
     }
 
     /** Link all relevant vertices to the street network */
@@ -190,15 +187,15 @@ public class SimpleStreetSplitter {
             boolean alreadyLinked = v.getOutgoing().stream().anyMatch(e -> e instanceof StreetTransitLink);
             if (alreadyLinked) { continue; }
 
-            //Do not link stops connected by pathways
+            // Do not link stops connected by pathways
             if (v instanceof TransitStopVertex && ((TransitStopVertex) v).hasPathways()) {
                 continue;
-            };
+            }
 
             if (!link(v)) {
                 issueStore.add(unlinkedIssueMapper.apply(v));
-            };
-            //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+            }
+            // Keep lambda! A method-ref would cause incorrect class and line number to be logged
             progress.step(m -> LOG.info(m));
         }
         LOG.info(progress.completeMessage());
@@ -209,13 +206,34 @@ public class SimpleStreetSplitter {
         return link(vertex, TraverseMode.WALK, null);
     }
 
-    /** Link this vertex into the graph */
+    /**
+     * Link the given vertex into the graph (expand on that...)
+     * In OTP2 where the transit search can be quite fast, searching for a good linking point can be a significant
+     * fraction of response time. Hannes Junnila has reported >70% speedups in searches by making the search radius
+     * smaller. Therefore we use an expanding-envelope search, which is more efficient in dense areas.
+     * @return whether linking succeeded (an edge or edges were found within range)
+     */
     public boolean link(Vertex vertex, TraverseMode traverseMode, RoutingRequest options) {
-        // find nearby street edges
-        // TODO: we used to use an expanding-envelope search, which is more efficient in
-        // dense areas. but first let's see how inefficient this is. I suspect it's not too
-        // bad and the gains in simplicity are considerable.
-        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(MAX_SEARCH_RADIUS_METERS);
+        if (linkToStreetEdges(vertex, traverseMode, options, INITIAL_SEARCH_RADIUS_METERS)) {
+            return true;
+        }
+        return linkToStreetEdges(vertex, traverseMode, options, MAX_SEARCH_RADIUS_METERS);
+    }
+
+    private static class DistanceTo<T> {
+        T item;
+        // Possible optimization: store squared lat to skip thousands of sqrt operations
+        // However we're using JTS distance functions that probably won't allow us to skip the final sqrt call.
+        double distanceDegreesLat;
+        public DistanceTo (T item, double distanceDegreesLat) {
+            this.item = item;
+            this.distanceDegreesLat = distanceDegreesLat;
+        }
+    }
+
+    public boolean linkToStreetEdges (Vertex vertex, TraverseMode traverseMode, RoutingRequest options, int radiusMeters) {
+
+        final double radiusDeg = SphericalDistanceLibrary.metersToDegrees(radiusMeters);
 
         Envelope env = new Envelope(vertex.getCoordinate());
 
@@ -227,124 +245,106 @@ public class SimpleStreetSplitter {
 
         final double DUPLICATE_WAY_EPSILON_DEGREES = SphericalDistanceLibrary.metersToDegrees(DUPLICATE_WAY_EPSILON_METERS);
 
-        final TraverseModeSet traverseModeSet;
+        final TraverseModeSet traverseModeSet = new TraverseModeSet(traverseMode);
         if (traverseMode == TraverseMode.BICYCLE) {
-            traverseModeSet = new TraverseModeSet(traverseMode, TraverseMode.WALK);
-        } else {
-            traverseModeSet = new TraverseModeSet(traverseMode);
+            traverseModeSet.setWalk(true);
         }
-        // We sort the list of candidate edges by distance to the stop
-        // This should remove any issues with things coming out of the spatial index in different orders
-        // Then we link to everything that is within DUPLICATE_WAY_EPSILON_METERS of of the best distance
-        // so that we capture back edges and duplicate ways.
-        List<StreetEdge> candidateEdges = idx.query(env).stream()
-            .filter(streetEdge -> streetEdge instanceof  StreetEdge)
-            .map(edge -> (StreetEdge) edge)
-            // note: not filtering by radius here as distance calculation is expensive
-            // we do that below.
-            .filter(edge -> edge.canTraverse(traverseModeSet) &&
-                // only link to edges still in the graph.
-                edge.getToVertex().getIncoming().contains(edge))
-            .collect(Collectors.toList());
+        // Scope block to avoid confusing edge-related local variables with stop-related variables below.
+        {
+            // Perform several transformations at once on the edges returned by the index.
+            // Only consider street edges traversable by the given mode and still present in the graph.
+            // Calculate a distance to each of those edges, and keep only the ones within the search radius.
+            List<DistanceTo<StreetEdge>> candidateEdges = idx.query(env).stream()
+                    .filter(StreetEdge.class::isInstance)
+                    .map(StreetEdge.class::cast)
+                    .filter(e -> e.canTraverse(traverseModeSet) && edgeReachableFromGraph(e))
+                    .map(e -> new DistanceTo<>(e, distance(vertex, e, xscale)))
+                    .filter(ead -> ead.distanceDegreesLat < radiusDeg)
+                    .collect(Collectors.toList());
 
-        // Make a map of distances to all edges.
-        final TObjectDoubleMap<Edge> distances = new TObjectDoubleHashMap<>();
-        for (StreetEdge e : candidateEdges) {
-            distances.put(e, distance(vertex, e, xscale));
+            // The following logic has gone through several different versions using different approaches.
+            // The core idea is to find all edges that are roughly the same distance from the given vertex, which will
+            // catch things like superimposed edges going in opposite directions.
+            // First, all edges within DUPLICATE_WAY_EPSILON_METERS of of the best distance were selected.
+            // More recently, the edges were sorted in order of increasing distance, and all edges in the list were selected
+            // up to the point where a distance increase of DUPLICATE_WAY_EPSILON_DEGREES from one edge to the next.
+            // This was in response to concerns about arbitrary cutoff distances: at any distance, it's always possible
+            // one half of a dual carriageway (or any other pair of edges in opposite directions) will be caught and the
+            // other half lost. It seems like this was based on some incorrect premises about floating point calculations
+            // being non-deterministic.
+            if (!candidateEdges.isEmpty()) {
+                // There is at least one appropriate edge within range.
+                double closestDistance = candidateEdges.stream()
+                        .mapToDouble(ce -> ce.distanceDegreesLat)
+                        .min().getAsDouble();
+
+                candidateEdges.stream()
+                        .filter(ce -> ce.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
+                        .forEach(ce -> link(vertex, ce.item, xscale, options));
+
+                // Warn if a linkage was made for a transit stop, but the linkage was suspiciously long.
+                if (vertex instanceof TransitStopVertex) {
+                    int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(closestDistance);
+                    if (distanceMeters > WARNING_DISTANCE_METERS) {
+                        issueStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
+                    }
+                }
+                return true;
+            }
         }
-
-        // Sort the list.
-        Collections.sort(candidateEdges, (o1, o2) -> {
-            double diff = distances.get(o1) - distances.get(o2);
-            // A Comparator must return an integer but our distances are doubles.
-            if (diff < 0)
-                return -1;
-            if (diff > 0)
-                return 1;
-            return 0;
-        });
-
-        // find the closest candidate edges
-        if (candidateEdges.isEmpty() || distances.get(candidateEdges.get(0)) > radiusDeg) {
+        if (radiusMeters >= MAX_SEARCH_RADIUS_METERS) {
+            // There were no candidate edges within the max linking distance, fall back on finding transit stops.
             // We only link to stops if we are searching for origin/destination and for that we need transitStopIndex.
             if (destructiveSplitting || transitStopIndex == null) {
                 return false;
             }
-            LOG.debug("No street edge was found for {}", vertex);
-            // We search for closest stops (since this is only used in origin/destination linking if no edges were found)
-            // in the same way the closest edges are found.
-            List<TransitStopVertex> candidateStops = new ArrayList<>();
-            transitStopIndex.query(env).forEach(candidateStop -> candidateStops.add((TransitStopVertex) candidateStop));
+            LOG.debug("No street edge was found for {}, checking transit stop vertices.", vertex);
+            List<TransitStopVertex> transitStopVertices = transitStopIndex.query(env);
+            List<DistanceTo<TransitStopVertex>> candidateStops = transitStopVertices.stream()
+                    .map(tsv -> new DistanceTo<>(tsv, distance(vertex, tsv, xscale)))
+                    .filter(dts -> dts.distanceDegreesLat <= radiusDeg)
+                    .collect(Collectors.toList());
 
-            final TObjectDoubleMap<Vertex> stopDistances = new TObjectDoubleHashMap<>();
-
-            for (TransitStopVertex t : candidateStops) {
-                stopDistances.put(t, distance(vertex, t, xscale));
-            }
-
-            Collections.sort(candidateStops, (o1, o2) -> {
-                    double diff = stopDistances.get(o1) - stopDistances.get(o2);
-                    if (diff < 0) {
-                        return -1;
-                    }
-                    if (diff > 0) {
-                        return 1;
-                    }
-                    return 0;
-            });
-            if (candidateStops.isEmpty() || stopDistances.get(candidateStops.get(0)) > radiusDeg) {
-                LOG.debug("Stops aren't close either!");
+            if (candidateStops.isEmpty()) {
+                LOG.debug("No stops nearby.");
                 return false;
-            } else {
-                List<TransitStopVertex> bestStops = Lists.newArrayList();
-                // Add stops until there is a break of epsilon meters.
-                // we do this to enforce determinism. if there are a lot of stops that are all extremely close to each other,
-                // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
-                // fall just inside or beyond the cutoff depending on floating-point operations.
-                int i = 0;
-                do {
-                    bestStops.add(candidateStops.get(i++));
-                } while (i < candidateStops.size() &&
-                    stopDistances.get(candidateStops.get(i)) - stopDistances
-                        .get(candidateStops.get(i - 1)) < DUPLICATE_WAY_EPSILON_DEGREES);
-
-                for (TransitStopVertex stop: bestStops) {
-                    LOG.debug("Linking vertex to stop: {}", stop.getName());
-                    makeTemporaryEdges((TemporaryStreetLocation)vertex, stop);
-                }
-                return true;
             }
-        } else {
+            // There is at least one stop within range.
+            double closestDistance = candidateStops.stream()
+                    .mapToDouble(c -> c.distanceDegreesLat)
+                    .min().getAsDouble();
 
-            // find the best edges
-            List<StreetEdge> bestEdges = Lists.newArrayList();
-
-            // add edges until there is a break of epsilon meters.
-            // we do this to enforce determinism. if there are a lot of edges that are all extremely close to each other,
-            // we want to be sure that we deterministically link to the same ones every time. Any hard cutoff means things can
-            // fall just inside or beyond the cutoff depending on floating-point operations.
-            int i = 0;
-            do {
-                bestEdges.add(candidateEdges.get(i++));
-            } while (i < candidateEdges.size() &&
-                distances.get(candidateEdges.get(i)) - distances
-                    .get(candidateEdges.get(i - 1)) < DUPLICATE_WAY_EPSILON_DEGREES);
-
-            for (StreetEdge edge : bestEdges) {
-                link(vertex, edge, xscale, options);
-            }
-
-            // Warn if a linkage was made, but the linkage was suspiciously long.
-            if (vertex instanceof TransitStopVertex) {
-                double distanceDegreesLatitude = distances.get(candidateEdges.get(0));
-                int distanceMeters = (int)SphericalDistanceLibrary.degreesLatitudeToMeters(distanceDegreesLatitude);
-                if (distanceMeters > WARNING_DISTANCE_METERS) {
-                    issueStore.add(new StopLinkedTooFar((TransitStopVertex)vertex, distanceMeters));
-                }
-            }
+            candidateStops.stream()
+                    .filter(dts -> dts.distanceDegreesLat <= closestDistance + DUPLICATE_WAY_EPSILON_DEGREES)
+                    .map(dts -> dts.item)
+                    .forEach(sv -> {
+                        LOG.debug("Linking vertex to stop: {}", sv.getName());
+                        makeTemporaryEdges((TemporaryStreetLocation)vertex, sv);
+                    });
 
             return true;
         }
+        return false;
+    }
+
+    /**
+     * While in destructive splitting mode (during graph construction rather than handling routing requests), we remove
+     * edges that have been split and may then re-split the resulting segments recursively, so parts of them are also
+     * removed. Newly created edge fragments are added to the spatial index; the edges that were split are removed
+     * (disconnected) from the graph but were previously not removed from the spatial index, so for all subsequent
+     * splitting operations we had to check whether any edge coming out of the spatial index had been "soft deleted".
+     *
+     * I believe this was compensating for the fact that STRTrees are optimized at construction and read-only. That
+     * restriction no longer applies since we've been using our own hash grid spatial index instead of the STRTree.
+     * So rather than filtering out soft deleted edges, this is now an assertion that the system behaves as intended,
+     * and will log an error if the spatial index is returning edges that have been disconnected from the graph.
+     */
+    private static boolean edgeReachableFromGraph (Edge edge) {
+        boolean edgeReachableFromGraph = edge.getToVertex().getIncoming().contains(edge);
+        if (!edgeReachableFromGraph) {
+            LOG.error("Edge returned from spatial index is no longer reachable from graph. That is not expected.");
+        }
+        return edgeReachableFromGraph;
     }
 
     // Link to all vertices in area/platform
@@ -358,7 +358,7 @@ public class SimpleStreetSplitter {
 
         for (Vertex vertex : vertices) {
             if (vertex instanceof  StreetVertex && !vertex.equals(splitterVertex)) {
-                LineString line = geometryFactory.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
+                LineString line = GEOMETRY_FACTORY.createLineString(new Coordinate[] { splitterVertex.getCoordinate(), vertex.getCoordinate()});
                 double length = SphericalDistanceLibrary.distance(splitterVertex.getCoordinate(),
                         vertex.getCoordinate());
                 I18NString name = new LocalizedString("", new OSMWithTags());
@@ -403,11 +403,6 @@ public class SimpleStreetSplitter {
                 temporaryVertex = (TemporaryVertex) tstop;
                 endVertex = temporaryVertex.isEndVertex();
 
-            }
-            //This throws runtime TrivialPathException if same edge is split in origin and destination link
-            //It is only used in origin/destination linking since otherwise options is null
-            if (options != null) {
-                options.canSplitEdge(edge);
             }
             // split the edge, get the split vertex
             SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
@@ -456,11 +451,14 @@ public class SimpleStreetSplitter {
             idx.insert(edges.first.getGeometry(), edges.first);
             idx.insert(edges.second.getGeometry(), edges.second);
 
-            // (no need to remove original edge, we filter it when it comes out of the index)
-
             // remove original edge from the graph
             edge.getToVertex().removeIncoming(edge);
             edge.getFromVertex().removeOutgoing(edge);
+            // remove original edges from the spatial index
+            // This iterates over the entire rectangular envelope of the edge rather than the segments making it up.
+            // It will be inefficient for very long edges, but creating a new remove method mirroring the more efficient
+            // insert logic is not trivial and would require additional testing of the spatial index.
+            idx.remove(edge.getGeometry().getEnvelopeInternal(), edge);
         }
 
         return v;
@@ -566,7 +564,7 @@ public class SimpleStreetSplitter {
         // Despite the fact that we want to use a fast somewhat inaccurate projection, still use JTS library tools
         // for the actual distance calculations.
         LineString transformed = equirectangularProject(edge.getGeometry(), xscale);
-        return transformed.distance(geometryFactory.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
+        return transformed.distance(GEOMETRY_FACTORY.createPoint(new Coordinate(tstop.getLon() * xscale, tstop.getLat())));
     }
 
     /** projected distance from stop to another stop, in latitude degrees */
@@ -586,20 +584,15 @@ public class SimpleStreetSplitter {
             coords[i] = c;
         }
 
-        return geometryFactory.createLineString(coords);
+        return GEOMETRY_FACTORY.createLineString(coords);
     }
 
     /**
      * Used to link origin and destination points to graph non destructively.
-     *
      * Split edges don't replace existing ones and only temporary edges and vertices are created.
+     * Will throw TrivialPathException if origin and destination Location are on the same edge
      *
-     * Will throw ThrivialPathException if origin and destination Location are on the same edge
-     *
-     * @param location
-     * @param options
      * @param endVertex true if this is destination vertex
-     * @return
      */
     public Vertex getClosestVertex(GenericLocation location, RoutingRequest options,
         boolean endVertex) {
@@ -652,10 +645,6 @@ public class SimpleStreetSplitter {
         }
         return closest;
 
-    }
-
-    public Boolean getAddExtraEdgesToAreas() {
-        return addExtraEdgesToAreas;
     }
 
     public void setAddExtraEdgesToAreas(Boolean addExtraEdgesToAreas) {

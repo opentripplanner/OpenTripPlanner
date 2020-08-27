@@ -3,6 +3,7 @@ package org.opentripplanner.model.plan;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.base.ToStringBuilder;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
@@ -147,10 +148,13 @@ public class Leg {
    /**
     * For transit legs, the service date of the trip.
     * For non-transit legs, null.
+    * <p>
+    * The trip service date should be used to identify the correct trip schedule and
+    * can not be trusted to display the date for any departures or arrivals. For example,
+    * the first departure for a given trip may happen at service date March 25th and
+    * service time 25:00, which in local time would be Mach 26th 01:00.
     */
-   // TODO OTP2 - This should not be a String? What is this used for? Is it the actual date or the
-   //           - Service date?
-   public String serviceDate = null;
+   public ServiceDate serviceDate = null;
 
     /**
      * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
@@ -287,7 +291,7 @@ public class Leg {
                 .addStr("headsign", headsign)
                 .addObj("agencyId", agencyId)
                 .addObj("tripId", tripId)
-                .addStr("serviceDate", serviceDate)
+                .addObj("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)
                 .addCol("intermediateStops", intermediateStops)
                 .addObj("legGeometry", legGeometry)

@@ -22,8 +22,8 @@ public class TestBanning {
 
         RoutingRequest routingRequest = new RoutingRequest();
 
-        routingRequest.setBannedRoutes("RB__RUT:Route:1");
-        routingRequest.setBannedAgencies("RB:RUT:Agency:2");
+        routingRequest.setBannedRoutesFromSting("RB__RUT:Route:1");
+        routingRequest.setBannedAgenciesFromSting("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
             routingRequest.getBannedRoutes(routes);
@@ -39,8 +39,8 @@ public class TestBanning {
 
         RoutingRequest routingRequest = new RoutingRequest();
 
-        routingRequest.setWhiteListedRoutes("RB__RUT:Route:1");
-        routingRequest.setWhiteListedAgencies("RB:RUT:Agency:2");
+        routingRequest.setWhiteListedRoutesFromSting("RB__RUT:Route:1");
+        routingRequest.setWhiteListedAgenciesFromSting("RB:RUT:Agency:2");
 
         Collection<FeedScopedId> bannedRoutes =
             routingRequest.getBannedRoutes(routes);
@@ -60,10 +60,12 @@ public class TestBanning {
         route3.setId(new FeedScopedId("RB", "RUT:Route:3"));
         route3.setLongName("");
 
-        Agency agency1 = new Agency();
-        agency1.setId(new FeedScopedId("RB", "RUT:Agency:1"));
-        Agency agency2 = new Agency();
-        agency2.setId(new FeedScopedId("RB", "RUT:Agency:2"));
+        Agency agency1 = new Agency(
+            new FeedScopedId("RB", "RUT:Agency:1"), "A", "Europe/Paris"
+        );
+        Agency agency2 = new Agency(
+            new FeedScopedId("RB", "RUT:Agency:2"), "B", "Europe/Paris"
+        );
 
         route1.setAgency(agency1);
         route2.setAgency(agency1);

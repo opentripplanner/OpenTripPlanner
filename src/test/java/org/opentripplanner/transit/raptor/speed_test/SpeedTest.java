@@ -362,7 +362,8 @@ public class SpeedTest {
         return new RaptorRoutingRequestTransitData(
                 transitLayer,
                 request.getDepartureDateWithZone().toInstant(),
-                2,
+                1,
+                1,
                 request.getTransitModes(),
                 Collections.emptySet(),
                 request.getWalkSpeedMeterPrSecond()

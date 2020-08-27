@@ -143,6 +143,11 @@ public class ApiLeg {
     /**
      * For transit legs, the service date of the trip.
      * For non-transit legs, null.
+     * <p>
+     * The trip service date should be used to identify the correct trip schedule and
+     * can not be trusted to display the date for any departures or arrivals. For example,
+     * the first departure for a given trip may happen at service date March 25th and
+     * service time 25:00, which in local time would be Mach 26th 01:00.
      */
     public String serviceDate = null;
 
