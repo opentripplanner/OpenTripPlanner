@@ -610,12 +610,10 @@ public class LegacyGraphQLTypes {
         this._maxDistance = (Integer) args.get("maxDistance");
         this._maxResults = (Integer) args.get("maxResults");
         if (args.get("filterByPlaceTypes") != null) {
-          this._filterByPlaceTypes = ((List<String>) args.get("filterByPlaceTypes")).stream().map(
-              LegacyGraphQLFilterPlaceType::valueOfLabel).collect(Collectors.toList());
+          this._filterByPlaceTypes = ((List<String>) args.get("filterByPlaceTypes")).stream().map(LegacyGraphQLFilterPlaceType::valueOfLabel).collect(Collectors.toList());
         }
         if (args.get("filterByModes") != null) {
-          this._filterByModes = ((List<String>) args.get("filterByModes")).stream().map(
-              LegacyGraphQLMode::valueOfLabel).collect(Collectors.toList());
+          this._filterByModes = ((List<String>) args.get("filterByModes")).stream().map(LegacyGraphQLMode::valueOfLabel).collect(Collectors.toList());
         }
         this._filterByIds = new LegacyGraphQLInputFiltersInput((Map<String, Object>) args.get("filterByIds"));
         this._before = (String) args.get("before");

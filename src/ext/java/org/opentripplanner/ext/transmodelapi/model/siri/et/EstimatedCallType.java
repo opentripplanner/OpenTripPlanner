@@ -14,9 +14,9 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.StopCondition;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
 
 import java.util.Arrays;
 import java.util.Collection;
@@ -230,7 +230,7 @@ public class EstimatedCallType {
   /**
    * Resolves all AlertPatches that are relevant for the supplied TripTimeShort.
    */
-  private static Collection<AlertPatch> getAllRelevantAlerts(
+  private static Collection<TransitAlert> getAllRelevantAlerts(
       TripTimeShort tripTimeShort,
       RoutingService routingService
   ) {
@@ -243,27 +243,27 @@ public class EstimatedCallType {
     Stop stop = routingService.getStopForId(stopId);
     FeedScopedId parentStopId = stop.getParentStation().getId();
 
-    Collection<AlertPatch> allAlerts = new HashSet<>();
+    Collection<TransitAlert> allAlerts = new HashSet<>();
 
-    AlertPatchService alertPatchService = routingService.getSiriAlertPatchService();
+    TransitAlertService alertPatchService = routingService.getTransitAlertService();
 
     // Quay
-    allAlerts.addAll(alertPatchService.getStopPatches(stopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripPatches(stopId, tripId));
-    allAlerts.addAll(alertPatchService.getStopAndRoutePatches(stopId, routeId));
+    allAlerts.addAll(alertPatchService.getStopAlerts(stopId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(stopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(stopId, routeId));
     // StopPlace
-    allAlerts.addAll(alertPatchService.getStopPatches(parentStopId));
-    allAlerts.addAll(alertPatchService.getStopAndTripPatches(parentStopId, tripId));
-    allAlerts.addAll(alertPatchService.getStopAndRoutePatches(parentStopId, routeId));
+    allAlerts.addAll(alertPatchService.getStopAlerts(parentStopId));
+    allAlerts.addAll(alertPatchService.getStopAndTripAlerts(parentStopId, tripId));
+    allAlerts.addAll(alertPatchService.getStopAndRouteAlerts(parentStopId, routeId));
     // Trip
-    allAlerts.addAll(alertPatchService.getTripPatches(tripId));
+    allAlerts.addAll(alertPatchService.getTripAlerts(tripId));
     // Route
-    allAlerts.addAll(alertPatchService.getRoutePatches(routeId));
+    allAlerts.addAll(alertPatchService.getRouteAlerts(routeId));
     // Agency
     // TODO OTP2 This should probably have a FeedScopeId argument instead of string
-    allAlerts.addAll(alertPatchService.getAgencyPatches(trip.getRoute().getAgency().getId()));
+    allAlerts.addAll(alertPatchService.getAgencyAlerts(trip.getRoute().getAgency().getId()));
     // TripPattern
-    allAlerts.addAll(alertPatchService.getTripPatternPatches(routingService.getPatternForTrip().get(trip)));
+    allAlerts.addAll(alertPatchService.getTripPatternAlerts(routingService.getPatternForTrip().get(trip).getId()));
 
     long serviceDayMillis = 1000 * tripTimeShort.serviceDay;
     long arrivalMillis = 1000 * tripTimeShort.realtimeArrival;
@@ -277,12 +277,12 @@ public class EstimatedCallType {
     return allAlerts;
   }
 
-  private static void filterSituationsByDateAndStopConditions(Collection<AlertPatch> alertPatches, Date fromTime, Date toTime, List<StopCondition> stopConditions) {
+  private static void filterSituationsByDateAndStopConditions(Collection<TransitAlert> alertPatches, Date fromTime, Date toTime, List<StopCondition> stopConditions) {
     if (alertPatches != null) {
 
       // First and last period
-      alertPatches.removeIf(alert -> alert.getAlert().effectiveStartDate.after(toTime) ||
-          (alert.getAlert().effectiveEndDate != null && alert.getAlert().effectiveEndDate.before(fromTime)));
+      alertPatches.removeIf(alert -> alert.getEffectiveStartDate().after(toTime) ||
+          (alert.getEffectiveEndDate() != null && alert.getEffectiveEndDate().before(fromTime)));
 
       // Handle repeating validityPeriods
       alertPatches.removeIf(alertPatch -> !alertPatch.displayDuring(fromTime.getTime()/1000, toTime.getTime()/1000));

@@ -28,11 +28,11 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.opentripplanner.routing.graphfinder.StopAtDistance;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -477,7 +477,7 @@ public class LegacyGraphQLQueryTypeImpl
 
   //TODO
   @Override
-  public DataFetcher<Iterable<AlertPatch>> alerts() {
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
   }
 

@@ -181,7 +181,7 @@ public class ServiceJourneyType {
                     .description("Get all situations active for the service journey.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                     .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getSiriAlertPatchService().getTripPatches(
+                      return GqlUtil.getRoutingService(environment).getTransitAlertService().getTripAlerts(
                       environment.getSource());
                     })
                 .build())

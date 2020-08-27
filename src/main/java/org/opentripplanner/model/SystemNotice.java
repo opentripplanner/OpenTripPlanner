@@ -1,6 +1,8 @@
 package org.opentripplanner.model;
 
 
+import org.opentripplanner.routing.alertpatch.TransitAlert;
+
 /**
  * A system notice is used to tag elements with system information.
  * <p>
@@ -9,7 +11,7 @@ package org.opentripplanner.model;
  * are meant for system testers and developers and should not be used for end user notification
  * or alerts.
  *
- * @see org.opentripplanner.routing.alertpatch.Alert for end user alerts
+ * @see TransitAlert for end user alerts
  * @see Notice for end user notices
  */
 public class SystemNotice {

@@ -60,7 +60,7 @@ public class OTPFeatureTest {
         String json =
         "{\n"
                 + "  otpFeatures : {\n"
-                + "    APIAlertPatcher : true,\n"
+                + "    APIServerInfo : true,\n"
                 + "    APIBikeRental : false\n"
                 + "  }\n"
                 + "}\n";
@@ -68,7 +68,7 @@ public class OTPFeatureTest {
         OTPConfiguration config = OTPConfiguration.createForTest(json);
 
         // And features set with opposite value
-        OTPFeature.APIAlertPatcher.set(false);
+        OTPFeature.APIServerInfo.set(false);
         OTPFeature.APIBikeRental.set(true);
 
         // And features missing in the config file
@@ -79,7 +79,7 @@ public class OTPFeatureTest {
         OTPFeature.enableFeatures(config.otpConfig().otpFeatures);
 
         // Then
-        assertTrue(OTPFeature.APIAlertPatcher.isOn());
+        assertTrue(OTPFeature.APIServerInfo.isOn());
         assertTrue(OTPFeature.APIBikeRental.isOff());
         assertTrue(OTPFeature.APIExternalGeocoder.isOn());
     }

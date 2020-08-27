@@ -1,5 +1,15 @@
 package org.opentripplanner.graph_builder.module.osm;
 
+import org.opentripplanner.common.model.P2;
+import org.opentripplanner.common.model.T2;
+import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.openstreetmap.model.OSMWithTags;
+import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
+import org.opentripplanner.routing.services.notes.NoteMatcher;
+import org.opentripplanner.util.I18NString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -8,16 +18,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
-import org.opentripplanner.common.model.P2;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.services.notes.NoteMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.opentripplanner.util.I18NString;
 
 /**
  * Information given to the GraphBuilder about how to assign permissions, safety values, names, etc. to edges based on OSM tags.
@@ -236,8 +236,8 @@ public class WayPropertySet {
             return this.defaultSpeed;
     }
 
-    public Set<T2<Alert, NoteMatcher>> getNoteForWay(OSMWithTags way) {
-        HashSet<T2<Alert, NoteMatcher>> out = new HashSet<>();
+    public Set<T2<StreetNote, NoteMatcher>> getNoteForWay(OSMWithTags way) {
+        HashSet<T2<StreetNote, NoteMatcher>> out = new HashSet<>();
         for (NotePicker picker : notes) {
             OSMSpecifier specifier = picker.specifier;
             NoteProperties noteProperties = picker.noteProperties;

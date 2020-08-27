@@ -22,16 +22,16 @@ import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.osm.CustomNamer;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.openstreetmap.BinaryOpenStreetMapProvider;
 import org.opentripplanner.openstreetmap.model.OSMLevel;
 import org.opentripplanner.openstreetmap.model.OSMNode;
 import org.opentripplanner.openstreetmap.model.OSMWay;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
-import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraversalRequirements;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.AreaEdge;
@@ -724,7 +724,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
         protected void applyWayProperties(StreetEdge street, StreetEdge backStreet,
                                         WayProperties wayData, OSMWithTags way) {
 
-            Set<T2<Alert, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
+            Set<T2<StreetNote, NoteMatcher>> notes = wayPropertySet.getNoteForWay(way);
             boolean noThruTraffic = way.isThroughTrafficExplicitlyDisallowed();
             // if (noThruTraffic) LOG.info("Way {} does not allow through traffic.", way.getId());
             if (street != null) {
@@ -734,7 +734,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                     bestBikeSafety = (float)safety;
                 }
                 if (notes != null) {
-                    for (T2<Alert, NoteMatcher> note : notes)
+                    for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(street, note.first, note.second);
                 }
                 street.setNoThruTraffic(noThruTraffic);
@@ -747,7 +747,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
                 }
                 backStreet.setBicycleSafetyFactor((float)safety);
                 if (notes != null) {
-                    for (T2<Alert, NoteMatcher> note : notes)
+                    for (T2<StreetNote, NoteMatcher> note : notes)
                         graph.streetNotesService.addStaticNote(backStreet, note.first, note.second);
                 }
                 backStreet.setNoThruTraffic(noThruTraffic);

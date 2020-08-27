@@ -30,8 +30,6 @@ pages:
     - 'Getting OTP': 'Getting-OTP.md'
     - Configuration: 'Configuration.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
-    - Analyst: 'Analyst.md'
-    - Scripting: 'Scripting.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
 - Development:

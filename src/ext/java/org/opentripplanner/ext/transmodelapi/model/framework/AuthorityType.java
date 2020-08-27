@@ -61,8 +61,8 @@ public class AuthorityType {
                 .description("Get all situations active for the authority.")
                 .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                 .dataFetcher(environment -> getRoutingService(environment)
-                    .getSiriAlertPatchService()
-                    .getAgencyPatches(((Agency)environment.getSource()).getId()))
+                    .getTransitAlertService()
+                    .getAgencyAlerts(((Agency)environment.getSource()).getId()))
                 .build())
         .build();
   }

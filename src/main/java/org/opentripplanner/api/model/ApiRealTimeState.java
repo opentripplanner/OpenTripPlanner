@@ -1,7 +1,5 @@
 package org.opentripplanner.api.model;
 
-import javax.xml.bind.annotation.XmlRootElement;
-
 /**
  * The real-time state of a trip
  */

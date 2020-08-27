@@ -203,8 +203,8 @@ public class QuayType {
                     .description("Get all situations active for the quay.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
                 .dataFetcher(env -> {
-                  return GqlUtil.getRoutingService(env).getSiriAlertPatchService()
-                      .getStopPatches(((Stop)env.getSource()).getId());
+                  return GqlUtil.getRoutingService(env).getTransitAlertService()
+                      .getStopAlerts(((Stop)env.getSource()).getId());
                 })
                     .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
