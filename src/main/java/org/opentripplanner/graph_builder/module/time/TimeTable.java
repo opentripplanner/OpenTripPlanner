@@ -26,9 +26,9 @@ public class TimeTable implements Comparable<QueryData> {
         this.clusterid = clusterid;
     }
 
-    public int getCurrentspeed() {
-        return currentspeed;
-    }
+    public int getCurrentspeed() { return currentspeed; }
+
+    public  double  getMetrpersecundSpeed(){ return this.getCurrentspeed() *3.6; }
 
     public void setCurrentspeed(int currentspeed) {
         this.currentspeed = currentspeed;

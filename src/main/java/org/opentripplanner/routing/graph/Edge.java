@@ -45,12 +45,6 @@ public abstract class Edge implements Serializable {
      */
     private int id;
     private long  clusterId;
-    public double getVooomSpeed(long timeMillis) {
-        int i = Collections.binarySearch(times, QueryData.QueryNaw());
-        TimeTable timetable = times.get(i);
-            return timetable.getCurrentspeed();
-
-    }
 
     public ArrayList<TimeTable> getTimes() {
         return times;

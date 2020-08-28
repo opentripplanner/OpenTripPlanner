@@ -7,6 +7,8 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.*;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.time.QueryData;
+import org.opentripplanner.graph_builder.module.time.TimeTable;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Edge;
@@ -525,6 +527,17 @@ public class StreetEdge extends Edge implements Cloneable {
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
      */
+    public double getVooomSpeed(long timeMillis) {
+
+        if (this.getTimes()!=null) {
+            int i = Collections.binarySearch(this.getTimes(), QueryData.QueryNaw());
+            TimeTable timetable = this.getTimes().get(i);
+            if(timetable!=null)
+                return timetable.getMetrpersecundSpeed();
+        }
+        return this.getMaxStreetTraverseSpeed();
+    }
+
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, VehicleDescription currentVehicle, long timeMillis) {
         double maxVehicleSpeed = options.getSpeed(traverseMode);
         if(currentVehicle != null) {
