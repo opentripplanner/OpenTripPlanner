@@ -1,8 +1,12 @@
 package org.opentripplanner.gtfs.mapping;
 
 import org.opentripplanner.model.TransitMode;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class TransitModeMapper {
+
+    private static final Logger LOG = LoggerFactory.getLogger(TransitModeMapper.class);
 
     public static TransitMode mapMode(int routeType) {
         // Should really be reference to org.onebusaway.gtfs.model.Stop.MISSING_VALUE, but it is private.
@@ -36,7 +40,8 @@ public class TransitModeMapper {
         } else if (routeType >= 1400 && routeType < 1500) { //Funicalar Service
             return TransitMode.FUNICULAR;
         } else if (routeType >= 1500 && routeType < 1600) { //Taxi Service
-            throw new IllegalArgumentException("Taxi service not supported" + routeType);
+            LOG.warn("Treating taxi extended route type {} as a bus.", routeType);
+            return TransitMode.BUS;
         } else if (routeType >= 1600 && routeType < 1700) { //Self drive
             return TransitMode.BUS;
         }
