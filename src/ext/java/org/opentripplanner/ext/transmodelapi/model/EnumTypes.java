@@ -220,7 +220,7 @@ public class EnumTypes {
 */
 
     public static GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
-            .name("OptimisationMethod")
+            .name("BicycleOptimisationMethod")
             .value("quick", BicycleOptimizeType.QUICK)
             .value("safe", BicycleOptimizeType.SAFE)
             .value("flat", BicycleOptimizeType.FLAT)
