@@ -15,7 +15,7 @@ import org.opentripplanner.graph_builder.module.ned.ElevationModule;
 import org.opentripplanner.graph_builder.module.ned.GeotiffGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.ned.NEDGridCoverageFactoryImpl;
 import org.opentripplanner.graph_builder.module.osm.OpenStreetMapModule;
-import org.opentripplanner.graph_builder.module.time.TraficPredictionBuilderModule;
+import org.opentripplanner.graph_builder.module.time.TrafifcPredictionBuilderModule;
 import org.opentripplanner.graph_builder.module.vehicle_sharing.VehicleSharingBuilderModule;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
@@ -345,7 +345,7 @@ public class GraphBuilder implements Runnable {
 
         graphBuilder.addModule(new VehicleSharingBuilderModule());
         if (jsonFile != null) {
-            graphBuilder.addModule(new TraficPredictionBuilderModule(jsonFile));
+            graphBuilder.addModule(new TrafifcPredictionBuilderModule(jsonFile));
         }
 
         return graphBuilder;
