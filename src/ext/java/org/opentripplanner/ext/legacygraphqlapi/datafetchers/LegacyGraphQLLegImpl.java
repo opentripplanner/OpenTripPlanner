@@ -149,6 +149,32 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     return environment -> getSource(environment).walkSteps;
   }
 
+  @Override
+  public DataFetcher<String> pickupType() {
+    return environment -> {
+      if (getSource(environment).boardRule == null) return "SCHEDULED";
+      switch (getSource(environment).boardRule) {
+        case "impossible": return "NONE";
+        case "mustPhone": return "CALL_AGENCY";
+        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
+        default: return "SCHEDULED";
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<String> dropoffType() {
+    return environment -> {
+      if (getSource(environment).alightRule == null) return "SCHEDULED";
+      switch (getSource(environment).alightRule) {
+        case "impossible": return "NONE";
+        case "mustPhone": return "CALL_AGENCY";
+        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
+        default: return "SCHEDULED";
+      }
+    };
+  }
+
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }

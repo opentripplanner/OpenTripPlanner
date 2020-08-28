@@ -790,6 +790,16 @@ type Leg {
     """
     intermediatePlace: Boolean
     steps: [step]
+
+    """
+    This is used to indicate if boarding this leg is possible only with special arrangements.
+    """
+    pickupType: PickupDropoffType
+
+    """
+    This is used to indicate if alighting from this leg is possible only with special arrangements.
+    """
+    dropoffType: PickupDropoffType
 }
 
 """Identifies whether this stop represents a stop or station."""

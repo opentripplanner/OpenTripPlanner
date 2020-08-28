@@ -213,6 +213,8 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<StopArrival>> intermediatePlaces();
     public DataFetcher<Boolean> intermediatePlace();
     public DataFetcher<Iterable<WalkStep>> steps();
+    public DataFetcher<String> pickupType();
+    public DataFetcher<String> dropoffType();
   }
   
   /** An object with an ID */
