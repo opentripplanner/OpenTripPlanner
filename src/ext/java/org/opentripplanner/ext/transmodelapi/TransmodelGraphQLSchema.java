@@ -1112,8 +1112,8 @@ public class TransmodelGraphQLSchema {
                 .build())
             .argument(GraphQLArgument
                 .newArgument()
-                .name("walkRadius")
-                .description("Radius (in meters) to search for from the specified location")
+                .name("radius")
+                .description("Radius via streets (in meters) to search for from the specified location")
                 .type(new GraphQLNonNull(Scalars.GraphQLFloat))
                 .build())
             .argument(GraphQLArgument
@@ -1128,7 +1128,7 @@ public class TransmodelGraphQLSchema {
                 stops = GqlUtil.getRoutingService(environment)
                     .findClosestStops(environment.getArgument("latitude"),
                         environment.getArgument("longitude"),
-                        environment.getArgument("walkRadius")
+                        environment.getArgument("radius")
                     )
                     .stream()
                     .filter(stopAtDistance -> environment.getArgument("authority") == null
