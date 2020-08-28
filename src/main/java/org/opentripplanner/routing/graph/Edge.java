@@ -2,8 +2,8 @@ package org.opentripplanner.routing.graph;
 
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.MavenVersion;
-import org.opentripplanner.graph_builder.module.time.queryData;
-import org.opentripplanner.graph_builder.module.time.timetable;
+import org.opentripplanner.graph_builder.module.time.QueryData;
+import org.opentripplanner.graph_builder.module.time.TimeTable;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -45,21 +45,23 @@ public abstract class Edge implements Serializable {
      */
     private int id;
     private long  clusterId;
-    public double getVooomSpeed() {
-        int i = Collections.binarySearch(times, queryData.QueryNaw());
-        timetable timetable = times.get(i);
-        return timetable.getCurrentspeed();
+    public double getVooomSpeed(long timeMillis) {
+        int i = Collections.binarySearch(times, QueryData.QueryNaw());
+        TimeTable timetable = times.get(i);
+        if (timetable!=null) {
+            return timetable.getCurrentspeed();
+        }
     }
 
-    public ArrayList<timetable> getTimes() {
+    public ArrayList<TimeTable> getTimes() {
         return times;
     }
 
-    public void setTimes(ArrayList<timetable> times) {
+    public void setTimes(ArrayList<TimeTable> times) {
         this.times = times;
     }
 
-    ArrayList<timetable> times;
+    ArrayList<TimeTable> times;
 
     protected Vertex fromv;
 

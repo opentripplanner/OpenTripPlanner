@@ -30,7 +30,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.graph_builder.module.time.clusterlist;
+import org.opentripplanner.graph_builder.module.time.ClusterList;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.*;
@@ -198,13 +198,13 @@ public class Graph implements Serializable {
 
     /** True if GTFS data was loaded into this Graph. */
     public boolean hasTransit = false;
-    private clusterlist clusters;
+    private ClusterList clusters;
 
-    public clusterlist getClusters() {
+    public ClusterList getClusters() {
         return clusters;
     }
 
-    public void setClusters(clusterlist clusters) {
+    public void setClusters(ClusterList clusters) {
         this.clusters = clusters;
     }
 

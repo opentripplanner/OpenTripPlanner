@@ -11,14 +11,14 @@ import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 
-public class clusterlist {
+public class ClusterList {
 
-    private List<cluster> clusters;
+    private List<Cluster> clusters;
 
-    public clusterlist(String jsonPath) {
+    public ClusterList(String jsonPath) {
         ObjectMapper mapper = new ObjectMapper();
         try (InputStream fileStream = new FileInputStream(jsonPath)) {
-            this.clusters = mapper.readValue(fileStream, mapper.getTypeFactory().constructCollectionType(ArrayList.class, cluster.class));
+            this.clusters = mapper.readValue(fileStream, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Cluster.class));
         } catch (JsonParseException e) {
             e.printStackTrace();
         } catch (JsonMappingException e) {
@@ -27,10 +27,10 @@ public class clusterlist {
             e.printStackTrace();
         }
     }
-    public clusterlist(File file) {
+    public ClusterList(File file) {
         ObjectMapper mapper = new ObjectMapper();
         try (InputStream fileStream = new FileInputStream(file)) {
-            this.clusters = mapper.readValue(fileStream, mapper.getTypeFactory().constructCollectionType(ArrayList.class, cluster.class));
+            this.clusters = mapper.readValue(fileStream, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Cluster.class));
         } catch (JsonParseException e) {
             e.printStackTrace();
         } catch (JsonMappingException e) {
@@ -38,17 +38,17 @@ public class clusterlist {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (cluster c : this.getclusters()){
+        for (Cluster c : this.getclusters()){
             if (Array.getLength(c.gettimetable())==0)
                 c.settimetable(null);
         }
     }
 
-    public List<cluster> getclusters() {
+    public List<Cluster> getclusters() {
         return clusters;
     }
 
-    public void setclusters(List<cluster> clusters) {
+    public void setclusters(List<Cluster> clusters) {
         this.clusters = clusters;
     }
 }

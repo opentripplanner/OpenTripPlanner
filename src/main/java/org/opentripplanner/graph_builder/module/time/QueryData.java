@@ -2,23 +2,33 @@ package org.opentripplanner.graph_builder.module.time;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.time.ZoneId;
 import java.time.ZonedDateTime;
 
-public class queryData {
+
+public class QueryData {
     private int day;
     private long time;
 
-    public queryData(int day, long time) {
+    public QueryData(long timeMilis) {
+        Instant i = Instant.ofEpochMilli(timeMilis);
+        ZonedDateTime z = ZonedDateTime.ofInstant(i, ZoneId.of("Poland/Warsaw"));
+        this.setDay(z.getDayOfWeek().getValue());
+        this.setTime(z.getHour() * 3600 + z.getMinute() * 60 + z.getSecond());
+
+    }
+
+    public QueryData(int day, long time) {
         this.day = day;
         this.time = time;
     }
 
-    public static queryData QueryNaw() {
+    public static QueryData QueryNaw() {
         ZonedDateTime nowZoned = ZonedDateTime.now();
         Instant midnight = nowZoned.toLocalDate().atStartOfDay(nowZoned.getZone()).toInstant();
         Duration duration = Duration.between(midnight, Instant.now());
         long seconds = duration.getSeconds();
-        return new queryData(nowZoned.getDayOfWeek().getValue(), seconds);
+        return new QueryData(nowZoned.getDayOfWeek().getValue(), seconds);
 
     }
 

@@ -11,10 +11,10 @@ import java.util.TreeMap;
 
 
 public class TraficPredictionBuilderModule implements GraphBuilderModule {
-    private final clusterlist clusterlist;
+    private final ClusterList clusterlist;
 
     public TraficPredictionBuilderModule(File traficprediction) {
-        this.clusterlist = new clusterlist(traficprediction);
+        this.clusterlist = new ClusterList(traficprediction);
         this.clusterlist.getclusters().sort(Comparator.naturalOrder());
     }
 
@@ -22,13 +22,13 @@ public class TraficPredictionBuilderModule implements GraphBuilderModule {
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
         graph.setClusters(this.clusterlist);
         TreeMap<Integer, Integer> map = new TreeMap<>();
-        for (cluster c : graph.getClusters().getclusters()) {
-            for (edgedata e : c.getedges())
+        for (Cluster c : graph.getClusters().getclusters()) {
+            for (EdgeData e : c.getedges())
                 map.put(((int) e.getid()), e.getclusterid());
         }
         for (StreetEdge e : graph.getStreetEdges()) {
             e.setTimes(this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
-            e.getTimes().sort(timetable::compareTo);
+            e.getTimes().sort(TimeTable::compareTo);
         }
     }
 

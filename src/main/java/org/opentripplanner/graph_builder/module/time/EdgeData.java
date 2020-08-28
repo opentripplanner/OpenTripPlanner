@@ -1,6 +1,6 @@
 package org.opentripplanner.graph_builder.module.time;
 
-public class edgedata {
+public class EdgeData {
 
     private long id;
     private int clusterid;
