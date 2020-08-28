@@ -36,6 +36,7 @@ public class RouterConfig implements Serializable {
     private final UpdaterConfig updaterConfig;
 
     public RouterConfig(JsonNode node, String source, boolean logUnusedParams) {
+        LOG.info("Initialising RouterConfig");
         NodeAdapter adapter = new NodeAdapter(node, source);
         this.rawJson = node;
         this.requestLogFile = adapter.asText("requestLogFile", null);
