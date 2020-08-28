@@ -5,6 +5,7 @@ import static org.opentripplanner.calendar.impl.CalendarServiceDataFactoryImpl.c
 
 import java.io.File;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
@@ -199,8 +200,13 @@ public class TimetableSnapshotSourceTest {
         final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
         final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
 
-        arrivalBuilder.setDelay(1);
-        departureBuilder.setDelay(1);
+        Calendar _1311 = Calendar.getInstance(graph.getTimeZone());
+        _1311.set(Calendar.HOUR_OF_DAY, 13);
+        _1311.set(Calendar.MINUTE, 11);
+        _1311.set(Calendar.SECOND, 0);
+        _1311.set(Calendar.MILLISECOND, 0);
+        arrivalBuilder.setTime(_1311.getTimeInMillis() / 1000);//13:11 (60 sec delay)
+        departureBuilder.setTime(_1311.getTimeInMillis() / 1000);//13:11
 
         final TripUpdate tripUpdate = tripUpdateBuilder.build();
 
@@ -226,10 +232,10 @@ public class TimetableSnapshotSourceTest {
         assertNotSame(forToday1.getTripTimes(tripIndex1), schedule1.getTripTimes(tripIndex1));
         assertSame(forToday2.getTripTimes(tripIndex2), schedule2.getTripTimes(tripIndex2));
 
-        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
-        assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
-        assertEquals(1, forToday1.getTripTimes(tripIndex1).getArrivalDelay(1));
-        assertEquals(1, forToday1.getTripTimes(tripIndex1).getDepartureDelay(1));
+        assertEquals(60, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
+        assertEquals(60, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+        assertEquals(60, forToday1.getTripTimes(tripIndex1).getArrivalDelay(1));
+        assertEquals(60, forToday1.getTripTimes(tripIndex1).getDepartureDelay(1));
 
         assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
         assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
@@ -320,6 +326,78 @@ public class TimetableSnapshotSourceTest {
 
         assertEquals(RealTimeState.SCHEDULED, schedule2.getTripTimes(tripIndex2).getRealTimeState());
         assertEquals(RealTimeState.SCHEDULED, forToday2.getTripTimes(tripIndex2).getRealTimeState());
+    }
+
+    @Test
+    public void testUpdateBlockTrips3() {
+        final FeedScopedId tripId = new FeedScopedId(feedId, "18.13");
+        final FeedScopedId tripId1 = new FeedScopedId(feedId, "18.14");//another trip on block
+        final Trip trip = graph.index.tripForId.get(tripId);
+        final Trip trip1 = graph.index.tripForId.get(tripId1);
+        final TripPattern pattern = graph.index.patternForTrip.get(trip);
+        final TripPattern pattern1 = graph.index.patternForTrip.get(trip1);
+        final int tripIndex = pattern.scheduledTimetable.getTripIndex(tripId);
+        final int tripIndex1 = pattern1.scheduledTimetable.getTripIndex(tripId1);
+
+        final TripDescriptor.Builder tripDescriptorBuilder = TripDescriptor.newBuilder();
+
+        tripDescriptorBuilder.setTripId("18.13");
+        tripDescriptorBuilder.setScheduleRelationship(
+                TripDescriptor.ScheduleRelationship.SCHEDULED);
+
+        final TripUpdate.Builder tripUpdateBuilder = TripUpdate.newBuilder();
+
+        Calendar calToday = Calendar.getInstance(graph.getTimeZone());
+        calToday.set(Calendar.HOUR_OF_DAY, 0);
+        calToday.set(Calendar.MINUTE, 7);
+        calToday.set(Calendar.SECOND, 0);
+        calToday.set(Calendar.MILLISECOND, 0);
+        calToday.add(Calendar.DATE, 1);
+        tripUpdateBuilder.setTimestamp(calToday.getTimeInMillis() / 1000);//tomorrow at 00:07 (in sec)
+
+        tripUpdateBuilder.setTrip(tripDescriptorBuilder);
+
+        final StopTimeUpdate.Builder stopTimeUpdateBuilder = tripUpdateBuilder.addStopTimeUpdateBuilder();
+
+        stopTimeUpdateBuilder.setScheduleRelationship(
+                StopTimeUpdate.ScheduleRelationship.SCHEDULED);
+        stopTimeUpdateBuilder.setStopSequence(2);
+
+        final StopTimeEvent.Builder arrivalBuilder = stopTimeUpdateBuilder.getArrivalBuilder();
+        final StopTimeEvent.Builder departureBuilder = stopTimeUpdateBuilder.getDepartureBuilder();
+
+        arrivalBuilder.setDelay(1);
+        departureBuilder.setDelay(1);
+
+        final TripUpdate tripUpdate = tripUpdateBuilder.build();
+
+        updater.applyTripUpdates(graph, fullDataset, Arrays.asList(tripUpdate), feedId);
+
+        final TimetableSnapshot snapshot = updater.getTimetableSnapshot();
+        final Timetable forToday = snapshot.resolve(pattern, serviceDate);
+        final Timetable schedule = snapshot.resolve(pattern, null);
+        final Timetable forToday1 = snapshot.resolve(pattern1, serviceDate);
+        final Timetable schedule1 = snapshot.resolve(pattern1, null);
+
+        assertNotSame(forToday, schedule);
+        assertNotSame(forToday1, schedule1);
+
+        assertNotSame(forToday.getTripTimes(tripIndex), schedule.getTripTimes(tripIndex));
+        assertNotSame(forToday1.getTripTimes(tripIndex1), schedule1.getTripTimes(tripIndex1));
+
+
+        assertEquals(1, forToday.getTripTimes(tripIndex).getArrivalDelay(1));
+        assertEquals(1, forToday.getTripTimes(tripIndex).getDepartureDelay(1));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getArrivalDelay(0));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getDepartureDelay(0));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getArrivalDelay(1));
+        assertEquals(1, forToday1.getTripTimes(tripIndex1).getDepartureDelay(1));
+
+        assertEquals(RealTimeState.SCHEDULED, schedule.getTripTimes(tripIndex).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday.getTripTimes(tripIndex).getRealTimeState());
+
+        assertEquals(RealTimeState.SCHEDULED, schedule1.getTripTimes(tripIndex1).getRealTimeState());
+        assertEquals(RealTimeState.UPDATED, forToday1.getTripTimes(tripIndex1).getRealTimeState());
     }
 
     @Test

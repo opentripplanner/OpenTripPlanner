@@ -181,7 +181,7 @@ public class OtpTransitServiceImplTest {
     public void testGetAllStopTimes() {
         Collection<StopTime> stopTimes = subject.getAllStopTimes();
 
-        assertEquals(80, stopTimes.size());
+        assertEquals(88, stopTimes.size());
         assertEquals("StopTime(seq=1 stop=Z_A trip=agency_1.1 times=00:00:00-00:00:00)",
                 first(stopTimes).toString());
     }
@@ -190,7 +190,7 @@ public class OtpTransitServiceImplTest {
     public void testGetAllTrips() {
         Collection<Trip> trips = subject.getAllTrips();
 
-        assertEquals(33, trips.size());
+        assertEquals(37, trips.size());
         assertEquals("<Trip agency_1.1>", first(trips).toString());
     }
 

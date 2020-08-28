@@ -390,7 +390,7 @@ public class TimetableSnapshotSource {
             timeStampSecSinceMid += (24 * 60 * 60);//add 24 hours to the timestamp sec since midnight because we are past the actual service day
         } else if (result < 0) {// service date is in the future
             timeStampSecSinceMid -= (24 * 60 * 60);//subtract 24 hours from the timestamp sec since midnight because we are before the actual service day
-        }
+        }//future service dates are not currently supported but leaving this here for completeness
 
 
         for (Trip blockTrip : tripsForBlock) {
@@ -405,15 +405,13 @@ public class TimetableSnapshotSource {
 
             TripTimes newTimes = new TripTimes(blockTripPattern.scheduledTimetable.getTripTimes(blockTrip));
 
-            newTimes.getScheduledArrivalTime(0);
-
             // check scheduled times of block trip and updated trip
             // and then check the adj start time of the block trip compared to the window
             if (newTimes.getScheduledArrivalTime(0) > updateTripStartTime &&
                     newTimes.getScheduledArrivalTime(0)  >= timeStampSecSinceMid &&
                     newTimes.getScheduledArrivalTime(0)  <= (timeStampSecSinceMid + blockUpdateWindow)) {
 
-                TripTimes updatedTripTimesForBlockTrip = createUpdatedTripTimes(newTimes, tripUpdate, updatePattern.scheduledTimetable.getTripTimes(t), timeZone, serviceDate);
+                TripTimes updatedTripTimesForBlockTrip = createUpdatedTripTimes(newTimes, tripUpdate, updatePattern, t, timeZone, serviceDate);
 
                 if (updatedTripTimesForBlockTrip == null) continue;
 
@@ -425,7 +423,7 @@ public class TimetableSnapshotSource {
         }
     }
 
-    private TripTimes createUpdatedTripTimes(TripTimes newTimes, TripUpdate tripUpdate, TripTimes updateTripSchedule, TimeZone timeZone, ServiceDate updateServiceDate) {
+    private TripTimes createUpdatedTripTimes(TripTimes newTimes, TripUpdate tripUpdate, TripPattern updatePattern, Trip t, TimeZone timeZone, ServiceDate updateServiceDate) {
 
             // The GTFS-RT reference specifies that StopTimeUpdates are sorted by stop_sequence.
             Iterator<StopTimeUpdate> updates = tripUpdate.getStopTimeUpdateList().iterator();
@@ -440,36 +438,62 @@ public class TimetableSnapshotSource {
             while (updates.hasNext()) update = updates.next();
 
             //get the zero point of the update's service date
-            long updateServiceDateBeginning = updateServiceDate.getAsDate(timeZone).getTime();
+            long updateServiceDateBeginning = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+            TripTimes updateTripSchedule = updatePattern.scheduledTimetable.getTripTimes(t);
+
+            int stopIndex = 0;
+            if (update.hasStopSequence()) {
+                for (int i = 0; i < updateTripSchedule.getNumStops(); i++) {
+                    if (update.getStopSequence() == updateTripSchedule.getStopSequence(i)) {
+                        stopIndex = i;
+                        break;
+                    }
+                }
+            } else if (update.hasStopId()) {
+                for (Stop stop : updatePattern.getStops()) {
+                    if (stop.getId().getId().equals(update.getStopId())) {
+                        break;
+                    }
+                    stopIndex++;
+                }
+            }
+
+            Integer arrivalDelay = null;
+            Integer departureDelay = null;
+            if (update.hasArrival()) {
+                if (update.getArrival().hasDelay()) {
+                    arrivalDelay = update.getArrival().getDelay();
+                }
+                else if (update.getArrival().hasTime()) {
+                    int scheduledArrivalTime = updateTripSchedule.getScheduledArrivalTime(stopIndex);
+
+                    int expectedArrivalTime = (int)(update.getArrival().getTime() - updateServiceDateBeginning);
+                    arrivalDelay = expectedArrivalTime - scheduledArrivalTime;
+                }
+            }
+
+            if (update.hasDeparture()) {
+                if (update.getDeparture().hasDelay()) {
+                    departureDelay = update.getDeparture().getDelay();
+                }
+                else if (update.getDeparture().hasTime()) {
+                    int scheduledDepartureTime = updateTripSchedule.getScheduledDepartureTime(stopIndex);
+
+                    int expectedDepartureTime = (int)(update.getDeparture().getTime() - updateServiceDateBeginning);
+                    departureDelay = expectedDepartureTime - scheduledDepartureTime;
+                }
+            }
 
             int numStops = newTimes.getNumStops();
 
             for (int i = 0; i < numStops; i++) {//update all the stops for the block trips since they are after the update trip
 
-                if (update.hasArrival()) {
-                    TripUpdate.StopTimeEvent arrival = update.getArrival();
-                    if (arrival.hasDelay()) {
-                        newTimes.updateArrivalDelay(i, arrival.getDelay());
-                    }
-                    else if (updateTripSchedule != null && arrival.hasTime()) {
-                        int scheduledArrivalTime = updateTripSchedule.getScheduledArrivalTime(i);
-
-                        int expectedArrivalTime = (int)((update.getArrival().getTime() - updateServiceDateBeginning) / 1000);
-                        newTimes.updateArrivalDelay(i, (expectedArrivalTime - scheduledArrivalTime));
-                    }
+                if (arrivalDelay != null) {
+                    newTimes.updateArrivalDelay(i, arrivalDelay);
                 }
 
-                if (update.hasDeparture()) {
-                    TripUpdate.StopTimeEvent departure = update.getDeparture();
-                    if (departure.hasDelay()) {
-                        newTimes.updateDepartureDelay(i, departure.getDelay());
-                    }
-                    else if (updateTripSchedule != null && departure.hasTime()) {
-                        int scheduledDepartureTime = updateTripSchedule.getScheduledDepartureTime(i);
-
-                        int expectedDepartureTime = (int)((update.getDeparture().getTime() - updateServiceDateBeginning) / 1000);
-                        newTimes.updateDepartureDelay(i, (expectedDepartureTime - scheduledDepartureTime));
-                    }
+                if (departureDelay != null) {
+                    newTimes.updateDepartureDelay(i, departureDelay);
                 }
             }
 
