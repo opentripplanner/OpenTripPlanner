@@ -48,9 +48,8 @@ public abstract class Edge implements Serializable {
     public double getVooomSpeed(long timeMillis) {
         int i = Collections.binarySearch(times, QueryData.QueryNaw());
         TimeTable timetable = times.get(i);
-        if (timetable!=null) {
             return timetable.getCurrentspeed();
-        }
+
     }
 
     public ArrayList<TimeTable> getTimes() {
