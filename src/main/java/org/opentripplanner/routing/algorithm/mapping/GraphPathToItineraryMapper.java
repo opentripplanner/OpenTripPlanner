@@ -175,9 +175,8 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Slice a {@link State} array at the leg boundaries. Leg switches occur when:
-     * 1. The mode changes otherwise, for instance from BICYCLE to WALK
-     * 2. A PatternInterlineDwell edge (i.e. interlining) is seen
+     * Slice a {@link State} array at the leg boundaries. Leg switches occur when the mode changes,
+     * for instance from BICYCLE to WALK.
      *
      * @param states The one-dimensional array of input states
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
