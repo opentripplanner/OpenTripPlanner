@@ -800,6 +800,13 @@ type Leg {
     This is used to indicate if alighting from this leg is possible only with special arrangements.
     """
     dropoffType: PickupDropoffType
+
+    """
+    Interlines with previous leg.
+    This is true when the same vehicle is used for the previous leg as for this leg
+    and passenger can stay inside the vehicle.
+    """
+    interlineWithPreviousLeg: Boolean
 }
 
 """Identifies whether this stop represents a stop or station."""

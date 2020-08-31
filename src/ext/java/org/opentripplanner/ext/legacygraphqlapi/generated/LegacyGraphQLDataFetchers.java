@@ -215,6 +215,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<WalkStep>> steps();
     public DataFetcher<String> pickupType();
     public DataFetcher<String> dropoffType();
+    public DataFetcher<Boolean> interlineWithPreviousLeg();
   }
   
   /** An object with an ID */

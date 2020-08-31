@@ -175,6 +175,11 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
     };
   }
 
+  @Override
+  public DataFetcher<Boolean> interlineWithPreviousLeg() {
+    return environment -> getSource(environment).interlineWithPreviousLeg;
+  }
+
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {
     return environment.<LegacyGraphQLRequestContext>getContext().getRoutingService();
   }
