@@ -18,7 +18,7 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
     private final VehicleDescription vehicle;
 
     public RentVehicleEdge(TemporaryRentVehicleVertex v, VehicleDescription vehicle) {
-        super(v, v);
+        super(v);
         this.vehicle = vehicle;
     }
 
