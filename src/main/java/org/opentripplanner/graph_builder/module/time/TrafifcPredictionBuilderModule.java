@@ -27,9 +27,13 @@ public class TrafifcPredictionBuilderModule implements GraphBuilderModule {
                 map.put(((int) e.getid()), e.getclusterid());
         }
         for (StreetEdge e : graph.getStreetEdges()) {
+            if (this.clusterlist.getclusters()!=null
+                    && this.clusterlist.getclusters().get(map.get(e.getId()) )!=null
+                    && this.clusterlist.getclusters().get(map.get(e.getId()) ).gettimetable()!=null
+                ){
             e.setTimes(this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
             e.getTimes().sort(TimeTable::compareTo);
-        }
+        }}
     }
 
     @Override
