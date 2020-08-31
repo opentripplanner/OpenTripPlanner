@@ -622,7 +622,7 @@ public class OpenStreetMapModule implements GraphBuilderModule {
             for (OSMWay way : ways) {
 
                 if (wayIndex % 50000 == 0)
-                    LOG.info("ways=" + wayIndex + "/" + wayCount);
+                    LOG.info("Building graph from {} / {} ways.", wayIndex, wayCount);
                 wayIndex++;
 
                 WayProperties wayData = wayPropertySet.getDataForWay(way);

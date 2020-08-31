@@ -174,6 +174,7 @@ public class ElevationModule implements GraphBuilderModule {
         if (readCachedElevations) {
             // try to load in the cached elevation data
             try {
+                log.info("Loading cached elevation data into memory");
                 Kryo kryo = makeKryo();
                 Input input = new Input(new FileInputStream(cachedElevationsFile));
                 cachedElevations = (HashMap<String, PackedCoordinateSequence>) kryo.readClassAndObject(input);

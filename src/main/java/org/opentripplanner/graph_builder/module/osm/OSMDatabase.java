@@ -186,8 +186,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         nodesById.put(node.getId(), node);
 
-        if (nodesById.size() % 100000 == 0)
-            LOG.debug("nodes=" + nodesById.size());
+        if (nodesById.size() % 1000000 == 0)
+            LOG.info("Read {} nodes from OSM file.", nodesById.size());
     }
 
     @Override
@@ -226,8 +226,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         waysById.put(wayId, way);
 
-        if (waysById.size() % 10000 == 0)
-            LOG.debug("ways=" + waysById.size());
+        if (waysById.size() % 100000 == 0)
+            LOG.info("Read {} routeable ways from OSM file.", waysById.size());
     }
 
     @Override
@@ -260,8 +260,8 @@ public class OSMDatabase implements OpenStreetMapContentHandler {
 
         relationsById.put(relation.getId(), relation);
 
-        if (relationsById.size() % 100 == 0)
-            LOG.debug("relations=" + relationsById.size());
+        if (relationsById.size() % 1000 == 0)
+            LOG.info("Read {} relations from OSM file.", relationsById.size());
     }
 
     @Override
