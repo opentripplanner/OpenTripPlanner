@@ -76,6 +76,7 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         configurePolling(graph, config);
+        type = "Parking Zones";
     }
 
     @Override

@@ -46,6 +46,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         configurePolling(graph, config);
+        type = "Shared Vehicles";
     }
 
     @Override
