@@ -1,6 +1,10 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import com.google.common.reflect.TypeToken;
+import org.opentripplanner.hasura_client.ApiResponse;
+import org.opentripplanner.hasura_client.ParkingZonesGetter;
+import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
 import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.graph.Graph;
@@ -44,7 +48,8 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling parking zones from API");
-        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url, graph);
+        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<ParkingZone>>() {
+        }.getType());
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(geometryParkingZones);
         LOG.info("Calculating parking zones for each vertex");
         Map<DropoffVehicleEdge, ParkingZoneInfo> parkingZonesPerVertex = getNewParkingZones(calculator);
