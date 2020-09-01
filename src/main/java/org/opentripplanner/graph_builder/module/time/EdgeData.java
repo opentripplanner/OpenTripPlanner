@@ -7,11 +7,11 @@ public class EdgeData {
 
     private long startnodeid;
     private double startlatitude;
-    private long startlongitude;
+    private double startlongitude;
 
     private long endnodeid;
     private double endlatitude;
-    private long endlongitude;
+    private double endlongitude;
 
     private long wayid;
 
@@ -31,7 +31,7 @@ public class EdgeData {
         this.clusterid = clusterid;
     }
 
-    public long getstartnodeid() {
+    public double getstartnodeid() {
         return startnodeid;
     }
 
@@ -47,7 +47,7 @@ public class EdgeData {
         this.startlatitude = startlatitude;
     }
 
-    public long getstartlongitude() {
+    public double getstartlongitude() {
         return startlongitude;
     }
 
@@ -71,7 +71,7 @@ public class EdgeData {
         this.endlatitude = endlatitude;
     }
 
-    public long getendlongitude() {
+    public double getendlongitude() {
         return endlongitude;
     }
 
