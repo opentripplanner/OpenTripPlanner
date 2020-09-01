@@ -245,8 +245,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public boolean wheelchairAccessible = false;
 
-    /** The maximum number of itineraries to return. */
-    public int numItineraries = 12;
+    /**
+     * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
+     * but in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is
+     * a post search filter function. A side effect from reducing the result is that OTP2 cannot
+     * guarantee to find all pareto-optimal itineraries when paging. Also, a large search-window
+     * and a small {@code numItineraries} waste computer CPU calculation time.
+     * <p>
+     * The default value is 50. This is a reasonably high threshold to prevent large amount of data
+     * to be returned. Consider tuning the search-window instead of setting this to a small value.
+     */
+    public int numItineraries = 50;
 
     /** The maximum slope of streets for wheelchair trips. */
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
