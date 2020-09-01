@@ -15,10 +15,6 @@ public class EdgeData {
 
     private long wayid;
 
-    public long getid() {
-        return id;
-    }
-
     public void setid(long id) {
         this.id = id;
     }
@@ -41,6 +37,10 @@ public class EdgeData {
 
     public double getstartlatitude() {
         return startlatitude;
+    }
+
+    public long getid() {
+        return id;
     }
 
     public void setstartlatitude(double startlatitude) {
