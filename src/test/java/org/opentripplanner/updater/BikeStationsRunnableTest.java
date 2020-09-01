@@ -1,6 +1,5 @@
 package org.opentripplanner.updater;
 
-import com.sun.tools.javac.util.List;
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.CoordinateXY;
@@ -12,6 +11,8 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesCalculator;
 import org.opentripplanner.updater.vehicle_sharing.vehicles_positions.BikeStationsGraphWriterRunnable;
+
+import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
@@ -51,7 +52,7 @@ public class BikeStationsRunnableTest {
         rentVehicleEdge.setBikeRentalStation(station11);
 
         //given
-        BikeStationsGraphWriterRunnable runnable = new BikeStationsGraphWriterRunnable(temporaryStreetSplitter, List.of(newStation));
+        BikeStationsGraphWriterRunnable runnable = new BikeStationsGraphWriterRunnable(temporaryStreetSplitter, Collections.singletonList(newStation));
         runnable.run(graph);
 
         //then
