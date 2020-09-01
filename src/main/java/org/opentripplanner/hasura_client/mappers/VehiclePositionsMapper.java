@@ -1,9 +1,14 @@
 package org.opentripplanner.hasura_client.mappers;
 
+import org.opentripplanner.hasura_client.HasuraGetter;
 import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class VehiclePositionsMapper extends HasuraToOTPMapper<Vehicle, VehicleDescription> {
+    private static final Logger LOG = LoggerFactory.getLogger(HasuraGetter.class);
+
     @Override
     protected VehicleDescription mapSingleHasuraObject(Vehicle vehicle) {
         if (vehicle.getProvider() == null) {

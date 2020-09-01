@@ -1,6 +1,6 @@
 package org.opentripplanner.hasura_client.mappers;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
@@ -24,7 +24,7 @@ public class ParkingZonesMapper extends HasuraToOTPMapper<ParkingZone, GeometryP
 
     private final GeometryJSON geometryJSON = new GeometryJSON();
 
-    private Geometry deserializeGeometry(JsonObject jsonObject) {
+    private Geometry deserializeGeometry(JsonNode jsonObject) {
         try {
             return geometryJSON.read(jsonObject.toString());
         } catch (Exception e) {

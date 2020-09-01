@@ -2,7 +2,6 @@ package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
-import org.opentripplanner.hasura_client.BikeStationsGetter;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;

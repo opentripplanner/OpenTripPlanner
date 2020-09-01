@@ -1,11 +1,8 @@
 package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.reflect.TypeToken;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
-import org.opentripplanner.hasura_client.ApiResponse;
 import org.opentripplanner.hasura_client.VehiclePositionsGetter;
-import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -28,8 +25,7 @@ public class SharedVehiclesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling vehicles from API");
-        List<VehicleDescription> vehicles = vehiclePositionsGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<Vehicle>>() {
-        }.getType());
+        List<VehicleDescription> vehicles = vehiclePositionsGetter.getFromHasura(graph, url);
         LOG.info("Got {} vehicles possible to place on a map", vehicles.size());
         graphUpdaterManager.execute(new VehicleSharingGraphWriterRunnable(temporaryStreetSplitter, vehicles));
     }

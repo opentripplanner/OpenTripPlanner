@@ -2,25 +2,25 @@ package org.opentripplanner.hasura_client;
 
 import java.util.List;
 
-public class ApiResponse<H> {
-    private Data<H> data;
+public class ApiResponse<HASURA_OBJECT> {
+    private Data<HASURA_OBJECT> data;
 
-    public Data<H> getData() {
+    public Data<HASURA_OBJECT> getData() {
         return data;
     }
 
-    public void setData(Data<H> data) {
+    public void setData(Data<HASURA_OBJECT> data) {
         this.data = data;
     }
 
-    public static class Data<H2> {
-        private List<H2> items;
+    public static class Data<HASURA_OBJECT2> {
+        private List<HASURA_OBJECT2> items;
 
-        public List<H2> getItems() {
+        public List<HASURA_OBJECT2> getItems() {
             return items;
         }
 
-        public void setItems(List<H2> items) {
+        public void setItems(List<HASURA_OBJECT2> items) {
             this.items = items;
         }
     }
