@@ -22,8 +22,8 @@ public class Cluster implements Comparable<Cluster> {
     }
 
     public ArrayList<TimeTable> gettimetableas() {
-        ArrayList<TimeTable> s = new ArrayList<>(Arrays.asList(timetable));
-        return s;
+        return   new ArrayList<>(Arrays.asList(timetable));
+
     }
 
     public void settimetable(TimeTable[] timetable) {
