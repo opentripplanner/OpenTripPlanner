@@ -56,9 +56,9 @@ public class TimetableSnapshotTest {
         Timetable orig = new Timetable(null);
         Timetable a = new Timetable(orig, new ServiceDate().previous());
         Timetable b = new Timetable(orig, new ServiceDate());
-        assertEquals(-1, (new TimetableSnapshot.SortedTimetableComparator()).compare(a, b));
+        assertTrue((new TimetableSnapshot.SortedTimetableComparator()).compare(a, b) < 0);
     }
-    
+
     private boolean updateResolver(TimetableSnapshot resolver, TripPattern pattern, TripUpdate tripUpdate, String feedId, ServiceDate serviceDate) {
         TripTimes updatedTripTimes = pattern.scheduledTimetable.createUpdatedTripTimes(tripUpdate,
                 timeZone, serviceDate);

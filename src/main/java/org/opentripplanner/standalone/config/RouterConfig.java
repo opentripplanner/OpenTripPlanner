@@ -47,7 +47,7 @@ public class RouterConfig implements Serializable {
         );
         this.transitConfig = new TransitRoutingConfig(adapter.path("transit"));
         this.routingRequestDefaults = mapRoutingRequest(adapter.path("routingDefaults"));
-        this.updaterParameters = new UpdaterConfig(adapter);
+        this.updaterParameters = new UpdaterConfig(adapter.path("updaters"));
 
         if(logUnusedParams) {
             adapter.logAllUnusedParameters(LOG);
