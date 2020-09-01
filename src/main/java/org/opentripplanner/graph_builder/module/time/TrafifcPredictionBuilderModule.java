@@ -24,19 +24,19 @@ public class TrafifcPredictionBuilderModule implements GraphBuilderModule {
         TreeMap<Integer, Integer> map = new TreeMap<>();
         for (Cluster c : graph.getClusters().getclusters()) {
             for (EdgeData e : c.getedges())
-                map.put(((int) e.getid()), e.getclusterid()-1);
+                if (c.gettimetable() != null)
+                    map.put(((int) e.getid()), e.getclusterid() - 1);
         }
-        for (StreetEdge e : graph.getStreetEdges()) {
-            if (this.clusterlist.getclusters()!=null && map.get(e.getId())!=null)
-            {
-                    if( this.clusterlist.getclusters().get(map.get(e.getId() ) )!=null){
-                    if( this.clusterlist.getclusters().get(map.get(e.getId()) ).gettimetable()!=null) {
-                        e.setTimes(this.clusterlist.getclusters().get(map.get(e.getId())).gettimetableas());
-                        e.getTimes().sort(TimeTable::compareTo);
-                    }}
-        }}
-    }
 
+        for (StreetEdge e : graph.getStreetEdges()) {
+            if (map.get(e.getId()) != null) {
+                int clid = map.get(e.getId());
+                e.setTimes((this.clusterlist.getclusters().get(clid)).gettimetableas());
+                e.getTimes().sort(TimeTable::compareTo);
+
+            }
+        }
+    }
     @Override
     public void checkInputs() {
 
