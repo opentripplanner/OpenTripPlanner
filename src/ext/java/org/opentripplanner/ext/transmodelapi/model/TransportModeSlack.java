@@ -12,6 +12,7 @@ import graphql.schema.GraphQLOutputType;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
@@ -152,6 +153,7 @@ public class TransportModeSlack {
     private static String defaultsToString(Map<TraverseMode, Integer> byMode) {
         List<String> groups = new ArrayList<>();
         byMode.forEach((m,v) -> groups.add(serializeTransportMode(m) + " : " + v));
+        Collections.sort(groups);
         return "Defaults: " + groups;
     }
 

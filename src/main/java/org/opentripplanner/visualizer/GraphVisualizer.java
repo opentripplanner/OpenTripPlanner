@@ -4,7 +4,7 @@ import javassist.Modifier;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.DataImportIssue;
 import org.opentripplanner.routing.algorithm.astar.TraverseVisitor;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseModeSet;
@@ -715,20 +715,20 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         return pane;
     }
 	
-	OptimizeType getSelectedOptimizeType(){
+	BicycleOptimizeType getSelectedOptimizeType(){
 		if(opQuick.isSelected()){
-			return OptimizeType.QUICK;
+			return BicycleOptimizeType.QUICK;
 		}
 		if(opSafe.isSelected()){
-			return OptimizeType.SAFE;
+			return BicycleOptimizeType.SAFE;
 		}
 		if(opFlat.isSelected()){
-			return OptimizeType.FLAT;
+			return BicycleOptimizeType.FLAT;
 		}
 		if(opGreenways.isSelected()){
-			return OptimizeType.GREENWAYS;
+			return BicycleOptimizeType.GREENWAYS;
 		}
-		return OptimizeType.QUICK;
+		return BicycleOptimizeType.QUICK;
 	}
 	
     

@@ -19,7 +19,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -124,9 +124,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("bikeSwitchCost", (Integer v) -> request.bikeSwitchCost = v);
 //        callWith.argument("transitDistanceReluctance", (Double v) -> request.transitDistanceReluctance = v);
 
-        OptimizeType optimize = environment.getArgument("optimize");
+        BicycleOptimizeType optimize = environment.getArgument("optimize");
 
-        if (optimize == OptimizeType.TRIANGLE) {
+        if (optimize == BicycleOptimizeType.TRIANGLE) {
             try {
                 RoutingRequest.assertTriangleParameters(
                     request.bikeTriangleSafetyFactor,
@@ -173,8 +173,8 @@ public class TransmodelGraphQLPlanner {
         //callWith.argument("useFlex", (Boolean v) -> request.useFlexService = v);
         //callWith.argument("ignoreMinimumBookingPeriod", (Boolean v) -> request.ignoreDrtAdvanceBookMin = v);
 
-        if (optimize == OptimizeType.TRANSFERS) {
-            optimize = OptimizeType.QUICK;
+        if (optimize == BicycleOptimizeType.TRANSFERS) {
+            optimize = BicycleOptimizeType.QUICK;
             request.transferCost += 1800;
         }
 

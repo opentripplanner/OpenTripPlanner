@@ -2,7 +2,7 @@ package org.opentripplanner.api.common;
 
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.request.BannedStopSet;
 import org.opentripplanner.standalone.server.OTPServer;
@@ -202,7 +202,7 @@ public abstract class RoutingResource {
      */
     @Deprecated
     @QueryParam("optimize")
-    protected OptimizeType optimize;
+    protected BicycleOptimizeType optimize;
     
     /**
      * The set of modes that a user is willing to use, with qualifiers stating whether vehicles
@@ -676,7 +676,7 @@ public abstract class RoutingResource {
         if (optimize != null) {
             // Optimize types are basically combined presets of routing parameters, except for triangle
             request.setOptimize(optimize);
-            if (optimize == OptimizeType.TRIANGLE) {
+            if (optimize == BicycleOptimizeType.TRIANGLE) {
                 RoutingRequest.assertTriangleParameters(
                         triangleSafetyFactor, triangleTimeFactor, triangleSlopeFactor
                 );
@@ -736,8 +736,8 @@ public abstract class RoutingResource {
         // The "Least transfers" optimization is accomplished via an increased transfer penalty.
         // See comment on RoutingRequest.transferPentalty.
         if (transferPenalty != null) { request.transferCost = transferPenalty; }
-        if (optimize == OptimizeType.TRANSFERS) {
-            optimize = OptimizeType.QUICK;
+        if (optimize == BicycleOptimizeType.TRANSFERS) {
+            optimize = BicycleOptimizeType.QUICK;
             request.transferCost += 1800;
         }
 

@@ -55,6 +55,8 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  class for documentation on what is currently supported - we are adding features one by one. The 
  plan is to go over the API documentation before the release - we do not prioritize keeping 
  the documentation up to date, except for this migration guide document.
+ 
+ 
   
 #### Paging
  In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
@@ -62,7 +64,8 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  the already fetched results. In OTP2 the recommended way to do this is to use the new `TripPlan` 
  `metadata` returned by the router call.
 
-#### New query parameters in the plan request
+#### New/changed query parameters in the plan request
+- `numItineraries` The parameter is no longer used to terminate the request when the numItineraries is found, instead the new `searchWindow` parameter should be used to limit the search. In OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is a post search filter function. The best option is to configure this on the server side and not use it as a client side input parameter. A side effect from reducing the result is that OTP2 cannot guarantee to find all pareto-optimal itineraries when paging. Also, a large search-window and a small {@code numItineraries} waste computer CPU calculation time. Consider tuning the `searchWindow` instead of setting this to a small value.
  - `searchWindow` Limit the departure window or arrival window for the routing search.
  - `boardSlackByMode` How much time ride a vehicle takes for each given mode.
  - `alightSlackByMode` How much time alighting a vehicle takes for each given mode.
