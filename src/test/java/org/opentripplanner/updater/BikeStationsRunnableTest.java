@@ -23,8 +23,6 @@ public class BikeStationsRunnableTest {
 
     private TemporaryRentVehicleVertex vertex;
 
-//    private StreetLocation v1 = new StreetLocation
-
     private static final BikeRentalStation station11 = new BikeRentalStation("11", 0, 0, 1, 1, new Provider(1, "provider1"));
 
 
