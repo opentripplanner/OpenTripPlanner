@@ -1,5 +1,6 @@
 package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
+import com.google.common.annotations.VisibleForTesting;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.vehicle_sharing.BikeDescription;
@@ -13,11 +14,10 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
+public class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
     private static final Logger LOG = LoggerFactory.getLogger(BikeStationsGraphWriterRunnable.class);
 
-
-    private final TemporaryStreetSplitter temporaryStreetSplitter;
+    public final TemporaryStreetSplitter temporaryStreetSplitter;
     private final List<BikeRentalStation> bikeRentalStationsFetchedFromApi;
 
     public BikeStationsGraphWriterRunnable(TemporaryStreetSplitter temporaryStreetSplitter, List<BikeRentalStation> bikeRentalStations) {
@@ -25,6 +25,7 @@ class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
         this.bikeRentalStationsFetchedFromApi = bikeRentalStations;
     }
 
+    @VisibleForTesting
     private boolean addBikeStationToGraph(BikeRentalStation station, Graph graph) {
         BikeDescription bike = station.getBikeFromStation();
 
@@ -34,7 +35,7 @@ class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
 
         if (edge.isPresent()) {
             BikeStationParkingZone parkingZone = new BikeStationParkingZone(station);
-            graph.parkingZonesCalculator.enableNewParkingZone(parkingZone);
+            graph.parkingZonesCalculator.enableNewParkingZone(parkingZone, graph);
             List<SingleParkingZone> parkingZonesEnabled = graph.parkingZonesCalculator.getParkingZonesEnabled();
 
 
@@ -65,6 +66,11 @@ class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
 
     @Override
     public void run(Graph graph) {
-        int count = (int) bikeRentalStationsFetchedFromApi.stream().filter(station -> updateBikeStationInfo(station, graph)).count();
+        if (graph.parkingZonesCalculator != null) {
+            int count = (int) bikeRentalStationsFetchedFromApi.stream().filter(station -> updateBikeStationInfo(station, graph)).count();
+            LOG.info("Placed {} bike stations on a map", count);
+        } else {
+            LOG.warn("Parking zones calculator is not initialised yet, omitting bike stations update");
+        }
     }
 }

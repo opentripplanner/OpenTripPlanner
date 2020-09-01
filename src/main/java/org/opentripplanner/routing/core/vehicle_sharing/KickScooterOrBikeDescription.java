@@ -41,7 +41,6 @@ public abstract class KickScooterOrBikeDescription extends VehicleDescription {
         return DEFAULT_RANGE_IN_METERS;
     }
 
-    //  We don't want to return routes with long kickscooter legs.
     @Override
     protected Double getMaximumRangeInMeters() {
         return getDefaultRangeInMeters();

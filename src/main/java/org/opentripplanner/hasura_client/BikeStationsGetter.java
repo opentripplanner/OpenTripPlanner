@@ -30,8 +30,8 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
                 "\\n" +
                 "    provider {\\n" +
                 "      available\\n" +
-                "      id\\n" +
-                "      name\\n" +
+                "      providerId: id\\n" +
+                "      providerName: name\\n" +
                 "    }\\n" +
                 "    latitude\\n" +
                 "    longitude\\n" +
@@ -39,7 +39,6 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
                 "    bikesAvaiable: adultBike\\n" +
                 "    spacesAvaiable: bikeRacks\\n" +
                 "  }\\n" +
-//                " }\\n" +
                 "}\",";
     }
 

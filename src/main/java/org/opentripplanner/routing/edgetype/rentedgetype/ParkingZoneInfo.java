@@ -49,4 +49,7 @@ public class ParkingZoneInfo implements Serializable {
         return parkingZones.stream().anyMatch(pz -> pz.appliesToThisVehicle(vehicle));
     }
 
+    public List<SingleParkingZone> getParkingZones() {
+        return parkingZones;
+    }
 }

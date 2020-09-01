@@ -9,6 +9,7 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
+import org.opentripplanner.routing.graph.Graph;
 
 import java.util.LinkedList;
 import java.util.List;
@@ -21,7 +22,7 @@ public class ParkingZonesCalculator {
     private final List<GeometryParkingZone> geometryParkingZones;
 
     @VisibleForTesting
-    final List<SingleParkingZone> parkingZonesEnabled;
+    List<SingleParkingZone> parkingZonesEnabled;
     private final List<SingleParkingZone> additionalParkingZonesEnabled = new LinkedList<>();
 
     public ParkingZonesCalculator(List<GeometryParkingZone> geometryParkingZones) {
@@ -71,10 +72,16 @@ public class ParkingZonesCalculator {
                 .orElse(null);
     }
 
-    public void enableNewParkingZone(SingleParkingZone parkingZone) {
-        if (parkingZonesEnabled.contains(parkingZone)) {
-            parkingZonesEnabled.add(parkingZone);
-            additionalParkingZonesEnabled.add(parkingZone);
+    public void enableNewParkingZone(SingleParkingZone parkingZone, Graph graph) {
+        if (!parkingZonesEnabled.contains(parkingZone)) {
+
+            List<SingleParkingZone> newParkingZonesEnabled = new LinkedList<>(parkingZonesEnabled);
+//          This should be thread secure because at any given time, only one updater may modify graph.
+            newParkingZonesEnabled.add(parkingZone);
+
+            parkingZonesEnabled = newParkingZonesEnabled;
+
+            graph.getDropEdges().forEach(e -> e.setParkingZones(new ParkingZoneInfo(e.getParkingZones().getParkingZones(), parkingZonesEnabled)));
         }
     }
 

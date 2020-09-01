@@ -6,7 +6,11 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 public class BikeStationsMapper extends HasuraToOTPMapper<BikeStationHasura, BikeRentalStation> {
     @Override
     protected BikeRentalStation mapSingleHasuraObject(BikeStationHasura hasuraObject) {
-//        TODO miron
-        return null;
+        return new BikeRentalStation(Long.toString(hasuraObject.getId()),
+                hasuraObject.getLongitude(),
+                hasuraObject.getLatitude(),
+                hasuraObject.getBikesAvaiable(),
+                hasuraObject.getSpacesAvaiable(),
+                hasuraObject.getProvider());
     }
 }

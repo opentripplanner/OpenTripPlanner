@@ -13,6 +13,7 @@ import static java.lang.Double.min;
         @JsonSubTypes.Type(value = KickScooterDescription.class, name = "KICKSCOOTER"),
         @JsonSubTypes.Type(value = CarDescription.class, name = "CAR"),
         @JsonSubTypes.Type(value = MotorbikeDescription.class, name = "MOTORBIKE"),
+        @JsonSubTypes.Type(value = BikeDescription.class, name = "BIKE"),
 })
 public abstract class VehicleDescription {
 
@@ -127,10 +128,5 @@ public abstract class VehicleDescription {
 
     public boolean isHubbable() {
         return hubbable;
-    }
-
-    // TODO remove if proven unnecesarry
-    public void setHubbable(boolean hubbable) {
-        this.hubbable = hubbable;
     }
 }

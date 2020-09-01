@@ -5,25 +5,25 @@ import org.junit.Test;
 import org.locationtech.jts.geom.CoordinateXY;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.*;
-import org.opentripplanner.routing.core.vehicle_sharing.BikeDescription;
-import org.opentripplanner.routing.core.vehicle_sharing.Provider;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleValidator;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesCalculator;
 
 import java.util.Collections;
 
-import static org.junit.Assert.assertNotNull;
-import static org.junit.Assert.assertNull;
+import static org.junit.Assert.*;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
-public class RentBikeEdgeTest {
+public class RentAndDropBikeEdgeTest {
+    private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(1, "PANEK"));
+
     private static final BikeRentalStation station11 = new BikeRentalStation("11", 0, 0, 1, 1, new Provider(1, "provider1"));
     private static final BikeRentalStation station12 = new BikeRentalStation("12", 1, 1, 1, 1, new Provider(1, "provider1"));
 
     private static final BikeRentalStation station21 = new BikeRentalStation("21", 0, 0, 1, 1, new Provider(1, "provider2"));
+    TemporaryRentVehicleVertex v1 = new TemporaryRentVehicleVertex("v1", new CoordinateXY(0, 0), "name");
 
     private RoutingRequest request;
     private State state, rentingState;
@@ -39,11 +39,10 @@ public class RentBikeEdgeTest {
 
         bike1 = station11.getBikeFromStation();
 
-        TemporaryRentVehicleVertex v1 = new TemporaryRentVehicleVertex("v1", new CoordinateXY(0, 0), "name");
 
         request = new RoutingRequest();
         request.setDummyRoutingContext(graph);
-        request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE));
+        request.setModes(new TraverseModeSet(TraverseMode.WALK, TraverseMode.BICYCLE, TraverseMode.CAR));
         request.setStartingMode(TraverseMode.WALK);
 
         request.vehicleValidator = mock(VehicleValidator.class);
@@ -64,8 +63,8 @@ public class RentBikeEdgeTest {
         rentingState = se.makeState();
 
         graph.parkingZonesCalculator = new ParkingZonesCalculator(Collections.emptyList());
-        graph.parkingZonesCalculator.enableNewParkingZone(new BikeStationParkingZone(station11));
-        graph.parkingZonesCalculator.enableNewParkingZone(new BikeStationParkingZone(station21));
+        graph.parkingZonesCalculator.enableNewParkingZone(new BikeStationParkingZone(station11), graph);
+        graph.parkingZonesCalculator.enableNewParkingZone(new BikeStationParkingZone(station21), graph);
     }
 
     @Test
@@ -125,11 +124,31 @@ public class RentBikeEdgeTest {
         station12.spacesAvailable = 0;
 
         //given
-
         State traversed = dropEdge11.traverse(rentingState);
 
         //then
         assertNull(traversed);
     }
+
+    @Test
+    public void changeCarForBike() {
+        //when
+        RentVehicleEdge rentCarEdge = new RentVehicleEdge(v1, CAR_1);
+        when(request.vehicleValidator.isValid(CAR_1)).thenReturn(true);
+        when(request.vehicleValidator.isValid(bike1)).thenReturn(true);
+        when(rentEdge11.canDropoffVehicleHere(CAR_1)).thenReturn(true);
+
+
+        State carState = rentCarEdge.traverse(state);
+
+//        given
+        State bikeState = rentEdge11.traverse(carState);
+
+        //then
+        assertNotNull(carState);
+        assertNotNull(bikeState);
+        assertEquals(bikeState.getCurrentVehicleType(), VehicleType.BIKE);
+    }
+
 
 }

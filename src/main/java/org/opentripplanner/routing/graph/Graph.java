@@ -45,6 +45,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.flex.FlexIndex;
 import org.opentripplanner.routing.impl.DefaultStreetVertexIndexFactory;
@@ -247,7 +248,7 @@ public class Graph implements Serializable {
     /**
      * All bike stations currently linked to graph
      */
-    public final Map<BikeRentalStation, RentVehicleEdge> bikeRentalStationsInGraph = new HashMap<>();
+    public Map<BikeRentalStation, RentVehicleEdge> bikeRentalStationsInGraph;
 
     public Graph(Graph basedOn) {
         this();
@@ -258,6 +259,7 @@ public class Graph implements Serializable {
         this.vertices = new ConcurrentHashMap<String, Vertex>();
         this.edgeById = new ConcurrentHashMap<Integer, Edge>();
         this.vertexById = new ConcurrentHashMap<Integer, Vertex>();
+        this.bikeRentalStationsInGraph = new ConcurrentHashMap<>();
     }
 
     /**
@@ -1166,11 +1168,19 @@ public class Graph implements Serializable {
         newStops.stream().forEach(newStop -> this.transitStops.put(newStop.getId(), newStop));
     }
 
-    public void addTransitStopTime(StopTime newStopTime){
+    public void addTransitStopTime(StopTime newStopTime) {
         this.transitStopTimes.add(newStopTime);
-        if(!this.transitStops.containsKey(newStopTime.getStop().getId())){
+        if (!this.transitStops.containsKey(newStopTime.getStop().getId())) {
             this.transitStops.put(newStopTime.getStop().getId(), newStopTime.getStop());
         }
         this.transitStops.get(newStopTime.getStop().getId()).addLine(Optional.ofNullable(newStopTime.getTrip().getRoute().getShortName()).orElseGet(newStopTime.getTrip().getRoute()::getLongName));
+    }
+
+    public Stream<DropoffVehicleEdge> getDropEdges() {
+        return getEdges().stream().filter(e -> e instanceof DropoffVehicleEdge).map(e -> (DropoffVehicleEdge) e);
+    }
+
+    public Stream<RentVehicleEdge> getRentEdges() {
+        return getEdges().stream().filter(e -> e instanceof RentVehicleEdge).map(e -> (RentVehicleEdge) e);
     }
 }
