@@ -46,15 +46,6 @@ public abstract class Edge implements Serializable {
     private int id;
     private long  clusterId;
 
-    public ArrayList<TimeTable> getTimes() {
-        return times;
-    }
-
-    public void setTimes(ArrayList<TimeTable> times) {
-        this.times = times;
-    }
-
-    ArrayList<TimeTable> times;
 
     protected Vertex fromv;
 

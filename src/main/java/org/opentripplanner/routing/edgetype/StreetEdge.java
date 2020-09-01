@@ -527,10 +527,20 @@ public class StreetEdge extends Edge implements Cloneable {
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
      */
+    public ArrayList<TimeTable> getTimes() {
+        return times;
+    }
+
+    public void setTimes(ArrayList<TimeTable> times) {
+        this.times = times;
+    }
+
+    ArrayList<TimeTable> times;
+
     public double getVooomSpeed(long timeMillis) {
 
         if (this.getTimes()!=null) {
-            int i = Collections.binarySearch(this.getTimes(), QueryData.QueryNaw());
+            int i = Collections.binarySearch(this.getTimes(), new QueryData(timeMillis));
             TimeTable timetable = this.getTimes().get(i);
             if(timetable!=null)
                 return timetable.getMetrpersecundSpeed();

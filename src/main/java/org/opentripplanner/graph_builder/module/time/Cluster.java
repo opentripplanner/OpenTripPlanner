@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.time;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.List;
 
 public class Cluster implements Comparable<Cluster> {
 
@@ -21,9 +20,10 @@ public class Cluster implements Comparable<Cluster> {
     public TimeTable[] gettimetable() {
         return timetable;
     }
-    public ArrayList<TimeTable>gettimetableas(){
-    ArrayList<TimeTable> s =new ArrayList<> ( Arrays.asList(timetable));
-     return s;
+
+    public ArrayList<TimeTable> gettimetableas() {
+        ArrayList<TimeTable> s = new ArrayList<>(Arrays.asList(timetable));
+        return s;
     }
 
     public void settimetable(TimeTable[] timetable) {
@@ -40,6 +40,6 @@ public class Cluster implements Comparable<Cluster> {
 
     @Override
     public int compareTo(Cluster o) {
-        return this.getid()- o.getid();
+        return this.getid() - o.getid();
     }
 }

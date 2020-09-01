@@ -3,12 +3,7 @@ package org.opentripplanner.graph_builder;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Lists;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
-import org.opentripplanner.graph_builder.module.DirectTransferGenerator;
-import org.opentripplanner.graph_builder.module.EmbedConfig;
-import org.opentripplanner.graph_builder.module.GtfsModule;
-import org.opentripplanner.graph_builder.module.PruneFloatingIslands;
-import org.opentripplanner.graph_builder.module.StreetLinkerModule;
-import org.opentripplanner.graph_builder.module.TransitToTaggedStopsModule;
+import org.opentripplanner.graph_builder.module.*;
 import org.opentripplanner.graph_builder.module.map.BusRouteStreetMatcher;
 import org.opentripplanner.graph_builder.module.ned.DegreeGridNEDTileSource;
 import org.opentripplanner.graph_builder.module.ned.ElevationModule;
@@ -25,11 +20,7 @@ import org.opentripplanner.openstreetmap.services.OpenStreetMapProvider;
 import org.opentripplanner.reflect.ReflectionLibrary;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.CommandLineParameters;
-import org.opentripplanner.standalone.GraphBuilderParameters;
-import org.opentripplanner.standalone.OTPMain;
-import org.opentripplanner.standalone.Router;
-import org.opentripplanner.standalone.S3BucketConfig;
+import org.opentripplanner.standalone.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -47,36 +38,23 @@ import java.util.zip.ZipFile;
  */
 public class GraphBuilder implements Runnable {
 
-    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
-
     public static final String BUILDER_CONFIG_FILENAME = "build-config.json";
-
-    private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
-
+    private static Logger LOG = LoggerFactory.getLogger(GraphBuilder.class);
     private final File graphFile;
-
     private final File transitLineFile;
-
     private final File transitLineStopsFile;
-
     private final File transitLineStopTimesFile;
-
-    private boolean disableGtfsDataExport;
-
-    private long transitLineStopTimesExportTimeout;
-
-    private boolean _alwaysRebuild = true;
-
-    private List<RoutingRequest> modeList;
-
-    private String baseGraph = null;
-
-    private Graph graph = new Graph();
-
     /**
      * Should the graph be serialized to disk after being created or not?
      */
     public boolean serializeGraph = true;
+    private List<GraphBuilderModule> _graphBuilderModules = new ArrayList<GraphBuilderModule>();
+    private boolean disableGtfsDataExport;
+    private long transitLineStopTimesExportTimeout;
+    private boolean _alwaysRebuild = true;
+    private List<RoutingRequest> modeList;
+    private String baseGraph = null;
+    private Graph graph = new Graph();
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
         graphFile = new File(path, "Graph.obj");
@@ -85,106 +63,6 @@ public class GraphBuilder implements Runnable {
         transitLineStopTimesFile = new File(path, "godziny.csv");
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
-
-    public void addModule(GraphBuilderModule loader) {
-        _graphBuilderModules.add(loader);
-    }
-
-    public void setGraphBuilders(List<GraphBuilderModule> graphLoaders) {
-        _graphBuilderModules = graphLoaders;
-    }
-
-    public void setAlwaysRebuild(boolean alwaysRebuild) {
-        _alwaysRebuild = alwaysRebuild;
-    }
-
-    public void setBaseGraph(String baseGraph) {
-        this.baseGraph = baseGraph;
-        try {
-            graph = Graph.load(new File(baseGraph));
-        } catch (Exception e) {
-            throw new RuntimeException("error loading base graph");
-        }
-    }
-
-    public void addMode(RoutingRequest mo) {
-        modeList.add(mo);
-    }
-
-    public void setModes(List<RoutingRequest> modeList) {
-        this.modeList = modeList;
-    }
-
-    public void setDisableGtfsDataExport(boolean disableGtfsDataExport) {
-        this.disableGtfsDataExport = disableGtfsDataExport;
-    }
-
-    public void setTransitLineStopTimesExportTimeout(long transitLineStopTimesExportTimeout) {
-        this.transitLineStopTimesExportTimeout = transitLineStopTimesExportTimeout;
-    }
-
-    public Graph getGraph() {
-        return this.graph;
-    }
-
-    public void run() {
-        /* Record how long it takes to build the graph, purely for informational purposes. */
-        long startTime = System.currentTimeMillis();
-
-        if (serializeGraph) {
-
-            if (graphFile == null) {
-                throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
-            }
-
-            if (graphFile.exists() && !_alwaysRebuild) {
-                LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
-                return;
-            }
-
-            try {
-                if (!graphFile.getParentFile().exists()) {
-                    if (!graphFile.getParentFile().mkdirs()) {
-                        LOG.error("Failed to create directories for graph bundle at " + graphFile);
-                    }
-                }
-                graphFile.createNewFile();
-            } catch (IOException e) {
-                throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
-            }
-        }
-
-        // Check all graph builder inputs, and fail fast to avoid waiting until the build process advances.
-        for (GraphBuilderModule builder : _graphBuilderModules) {
-            builder.checkInputs();
-        }
-
-        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
-        for (GraphBuilderModule load : _graphBuilderModules)
-            load.buildGraph(graph, extra);
-
-        graph.summarizeBuilderAnnotations();
-        if (serializeGraph) {
-            try {
-                graph.save(graphFile);
-                if (!this.disableGtfsDataExport) {
-                    graph.saveTransitLines(transitLineFile);
-                    graph.saveTransitLineStops(transitLineStopsFile);
-                    graph.saveTransitLineStopTimes(transitLineStopTimesFile, this.transitLineStopTimesExportTimeout);
-                } else {
-                    LOG.info("Skipping transit line data export, as requested");
-                }
-            } catch (Exception ex) {
-                throw new IllegalStateException(ex);
-            }
-        } else {
-            LOG.info("Not saving graph to disk, as requested.");
-        }
-
-        long endTime = System.currentTimeMillis();
-        LOG.info(String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0));
-    }
-
 
     /**
      * Factory method to create and configure a GraphBuilder with all the appropriate modules to build a graph from
@@ -349,6 +227,105 @@ public class GraphBuilder implements Runnable {
         }
 
         return graphBuilder;
+    }
+
+    public void addModule(GraphBuilderModule loader) {
+        _graphBuilderModules.add(loader);
+    }
+
+    public void setGraphBuilders(List<GraphBuilderModule> graphLoaders) {
+        _graphBuilderModules = graphLoaders;
+    }
+
+    public void setAlwaysRebuild(boolean alwaysRebuild) {
+        _alwaysRebuild = alwaysRebuild;
+    }
+
+    public void setBaseGraph(String baseGraph) {
+        this.baseGraph = baseGraph;
+        try {
+            graph = Graph.load(new File(baseGraph));
+        } catch (Exception e) {
+            throw new RuntimeException("error loading base graph");
+        }
+    }
+
+    public void addMode(RoutingRequest mo) {
+        modeList.add(mo);
+    }
+
+    public void setModes(List<RoutingRequest> modeList) {
+        this.modeList = modeList;
+    }
+
+    public void setDisableGtfsDataExport(boolean disableGtfsDataExport) {
+        this.disableGtfsDataExport = disableGtfsDataExport;
+    }
+
+    public void setTransitLineStopTimesExportTimeout(long transitLineStopTimesExportTimeout) {
+        this.transitLineStopTimesExportTimeout = transitLineStopTimesExportTimeout;
+    }
+
+    public Graph getGraph() {
+        return this.graph;
+    }
+
+    public void run() {
+        /* Record how long it takes to build the graph, purely for informational purposes. */
+        long startTime = System.currentTimeMillis();
+
+        if (serializeGraph) {
+
+            if (graphFile == null) {
+                throw new RuntimeException("graphBuilderTask has no attribute graphFile.");
+            }
+
+            if (graphFile.exists() && !_alwaysRebuild) {
+                LOG.info("graph already exists and alwaysRebuild=false => skipping graph build");
+                return;
+            }
+
+            try {
+                if (!graphFile.getParentFile().exists()) {
+                    if (!graphFile.getParentFile().mkdirs()) {
+                        LOG.error("Failed to create directories for graph bundle at " + graphFile);
+                    }
+                }
+                graphFile.createNewFile();
+            } catch (IOException e) {
+                throw new RuntimeException("Cannot create or overwrite graph at path " + graphFile);
+            }
+        }
+
+        // Check all graph builder inputs, and fail fast to avoid waiting until the build process advances.
+        for (GraphBuilderModule builder : _graphBuilderModules) {
+            builder.checkInputs();
+        }
+
+        HashMap<Class<?>, Object> extra = new HashMap<Class<?>, Object>();
+        for (GraphBuilderModule load : _graphBuilderModules)
+            load.buildGraph(graph, extra);
+
+        graph.summarizeBuilderAnnotations();
+        if (serializeGraph) {
+            try {
+                graph.save(graphFile);
+                if (!this.disableGtfsDataExport) {
+                    graph.saveTransitLines(transitLineFile);
+                    graph.saveTransitLineStops(transitLineStopsFile);
+                    graph.saveTransitLineStopTimes(transitLineStopTimesFile, this.transitLineStopTimesExportTimeout);
+                } else {
+                    LOG.info("Skipping transit line data export, as requested");
+                }
+            } catch (Exception ex) {
+                throw new IllegalStateException(ex);
+            }
+        } else {
+            LOG.info("Not saving graph to disk, as requested.");
+        }
+
+        long endTime = System.currentTimeMillis();
+        LOG.info(String.format("Graph building took %.1f minutes.", (endTime - startTime) / 1000 / 60.0));
     }
 
     /**

@@ -1,4 +1,5 @@
 package org.opentripplanner.graph_builder.module.time;
+
 import com.fasterxml.jackson.core.JsonParseException;
 import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -15,18 +16,7 @@ public class ClusterList {
 
     private List<Cluster> clusters;
 
-    public ClusterList(String jsonPath) {
-        ObjectMapper mapper = new ObjectMapper();
-        try (InputStream fileStream = new FileInputStream(jsonPath)) {
-            this.clusters = mapper.readValue(fileStream, mapper.getTypeFactory().constructCollectionType(ArrayList.class, Cluster.class));
-        } catch (JsonParseException e) {
-            e.printStackTrace();
-        } catch (JsonMappingException e) {
-            e.printStackTrace();
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
+
     public ClusterList(File file) {
         ObjectMapper mapper = new ObjectMapper();
         try (InputStream fileStream = new FileInputStream(file)) {
@@ -38,8 +28,8 @@ public class ClusterList {
         } catch (IOException e) {
             e.printStackTrace();
         }
-        for (Cluster c : this.getclusters()){
-            if (Array.getLength(c.gettimetable())==0)
+        for (Cluster c : this.getclusters()) {
+            if (Array.getLength(c.gettimetable()) == 0)
                 c.settimetable(null);
         }
     }
