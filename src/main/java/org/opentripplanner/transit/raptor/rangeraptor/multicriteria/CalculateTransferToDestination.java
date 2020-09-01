@@ -21,12 +21,12 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
 
     private final List<RaptorTransfer> egressLegs;
     private final DestinationArrivalPaths<T> destinationArrivals;
-    private final CostCalculator costCalculator;
+    private final CostCalculator<T> costCalculator;
 
     CalculateTransferToDestination(
             List<RaptorTransfer> egressLegs,
             DestinationArrivalPaths<T> destinationArrivals,
-            CostCalculator costCalculator
+            CostCalculator<T> costCalculator
     ) {
         this.egressLegs = egressLegs;
         this.destinationArrivals = destinationArrivals;

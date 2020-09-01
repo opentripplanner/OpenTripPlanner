@@ -20,6 +20,7 @@ class ItinerariesCalculateLegTotals {
     boolean streetOnly = true;
 
     public ItinerariesCalculateLegTotals(List<Leg> legs) {
+        if (legs.isEmpty()) { return; }
         calculate(legs);
     }
 

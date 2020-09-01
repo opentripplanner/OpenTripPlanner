@@ -41,7 +41,7 @@ public class Place {
     public String zoneId;
 
     /**
-     * For transit trips, the stop index (numbered from zero from the start of the trip
+     * For transit trips, the stop index (numbered from zero from the start of the trip).
      */
     public Integer stopIndex;
 

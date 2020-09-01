@@ -12,7 +12,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.module.StreetLinkerModule;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -20,13 +21,11 @@ import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.routing.spt.ShortestPathTree;
@@ -42,6 +41,7 @@ import java.util.Set;
 
 import static com.google.common.collect.Iterables.filter;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNotSame;
 import static org.junit.Assert.assertTrue;
@@ -332,8 +332,8 @@ public class TestHalfEdges {
         turns.add(left);
         turns.add(leftBack);
 
-        Alert alert = Alert.createSimpleAlerts("This is the alert");
-        Set<Alert> alerts = new HashSet<>();
+        StreetNote alert = new StreetNote("This is the alert");
+        Set<StreetNote> alerts = new HashSet<>();
         alerts.add(alert);
 
         graph.streetNotesService.addStaticNote(left, alert, StreetNotesService.ALWAYS_MATCHER);
@@ -362,8 +362,8 @@ public class TestHalfEdges {
         assertNotSame(leftBack, traversedOne.getBackEdge().getFromVertex());
 
         // now, make sure wheelchair alerts are preserved
-        Alert wheelchairAlert = Alert.createSimpleAlerts("This is the wheelchair alert");
-        Set<Alert> wheelchairAlerts = new HashSet<>();
+        StreetNote wheelchairAlert = new StreetNote("This is the wheelchair alert");
+        Set<StreetNote> wheelchairAlerts = new HashSet<>();
         wheelchairAlerts.add(wheelchairAlert);
 
         graph.streetNotesService.removeStaticNotes(left);
@@ -428,10 +428,9 @@ public class TestHalfEdges {
         RoutingRequest walking = new RoutingRequest(TraverseMode.WALK);
         start = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.004, -74.0), walking, false);
-        exception.expect(TrivialPathException.class);
         end = (TemporaryStreetLocation) finder.getVertexForLocation(
                 new GenericLocation(40.008, -74.0), walking, true);
-         /*assertNotNull(end);
+        assertNotNull(end);
         // The visibility for temp edges for start and end is set in the setRoutingContext call
         walking.setRoutingContext(graph, start, end);
         ShortestPathTree spt = aStar.getShortestPathTree(walking);
@@ -439,7 +438,7 @@ public class TestHalfEdges {
         for (State s : path.states) {
             assertFalse(s.getBackEdge() == top);
         }
-        walking.cleanup();*/
+        walking.cleanup();
 
     }
 

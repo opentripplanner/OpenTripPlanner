@@ -1,25 +1,25 @@
 package org.opentripplanner.updater.alerts;
 
-import java.util.*;
-
-import java.util.function.Function;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
-import org.opentripplanner.routing.alertpatch.TimePeriod;
-import org.opentripplanner.routing.services.AlertPatchService;
-import org.opentripplanner.util.I18NString;
-import org.opentripplanner.util.TranslatedString;
-import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.google.transit.realtime.GtfsRealtime;
-import com.google.transit.realtime.GtfsRealtime.EntitySelector;
 import com.google.transit.realtime.GtfsRealtime.FeedEntity;
 import com.google.transit.realtime.GtfsRealtime.FeedMessage;
 import com.google.transit.realtime.GtfsRealtime.TimeRange;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.alertpatch.EntitySelector;
+import org.opentripplanner.routing.alertpatch.TimePeriod;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.services.TransitAlertService;
+import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
+import org.opentripplanner.util.I18NString;
+import org.opentripplanner.util.TranslatedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * This updater only includes GTFS-Realtime Service Alert feeds.
@@ -31,9 +31,7 @@ public class AlertsUpdateHandler {
 
     private String feedId;
 
-    private Set<String> patchIds = new HashSet<String>();
-
-    private AlertPatchService alertPatchService;
+    private TransitAlertService transitAlertService;
 
     /** How long before the posted start of an event it should be displayed to users */
     private long earlyStart;
@@ -42,60 +40,47 @@ public class AlertsUpdateHandler {
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
     public void update(FeedMessage message) {
-        alertPatchService.expire(patchIds);
-        patchIds.clear();
-
+        Collection<TransitAlert> alerts = new ArrayList<>();
         for (FeedEntity entity : message.getEntityList()) {
             if (!entity.hasAlert()) {
                 continue;
             }
             GtfsRealtime.Alert alert = entity.getAlert();
             String id = entity.getId();
-            handleAlert(id, alert);
+            alerts.add(mapAlert(id, alert));
         }
+        transitAlertService.setAlerts(alerts);
     }
 
-    protected void handleAlert(String id, GtfsRealtime.Alert alert) {
-        Alert alertText = new Alert();
+    private TransitAlert mapAlert(String id, GtfsRealtime.Alert alert) {
+        TransitAlert alertText = new TransitAlert();
+        alertText.setId(id);
         alertText.alertDescriptionText = deBuffer(alert.getDescriptionText());
         alertText.alertHeaderText = deBuffer(alert.getHeaderText());
         alertText.alertUrl = deBuffer(alert.getUrl());
         ArrayList<TimePeriod> periods = new ArrayList<TimePeriod>();
         if(alert.getActivePeriodCount() > 0) {
-            long bestStartTime = Long.MAX_VALUE;
-            long lastEndTime = Long.MIN_VALUE;
             for (TimeRange activePeriod : alert.getActivePeriodList()) {
                 final long realStart = activePeriod.hasStart() ? activePeriod.getStart() : 0;
                 final long start = activePeriod.hasStart() ? realStart - earlyStart : 0;
-                if (realStart > 0 && realStart < bestStartTime) {
-                    bestStartTime = realStart;
-                }
                 final long end = activePeriod.hasEnd() ? activePeriod.getEnd() : Long.MAX_VALUE;
-                if (end > lastEndTime) {
-                    lastEndTime = end;
-                }
                 periods.add(new TimePeriod(start, end));
-            }
-            if (bestStartTime != Long.MAX_VALUE) {
-                alertText.effectiveStartDate = new Date(bestStartTime * 1000);
-            }
-            if (lastEndTime != Long.MIN_VALUE) {
-                alertText.effectiveEndDate = new Date(lastEndTime * 1000);
             }
         } else {
             // Per the GTFS-rt spec, if an alert has no TimeRanges, than it should always be shown.
             periods.add(new TimePeriod(0, Long.MAX_VALUE));
         }
-        for (EntitySelector informed : alert.getInformedEntityList()) {
+        alertText.setTimePeriods(periods);
+        alertText.setFeedId(feedId);
+        for (GtfsRealtime.EntitySelector informed : alert.getInformedEntityList()) {
             if (fuzzyTripMatcher != null && informed.hasTrip()) {
                 TripDescriptor trip = fuzzyTripMatcher.match(feedId, informed.getTrip());
                 informed = informed.toBuilder().setTrip(trip).build();
             }
-            String patchId = createId(id, informed);
 
             String routeId = null;
             if (informed.hasRouteId()) {
-                routeId = getId(informed,EntitySelector::getRouteId);
+                routeId = informed.getRouteId();
             }
 
             int direction;
@@ -108,56 +93,45 @@ public class AlertsUpdateHandler {
             // TODO: The other elements of a TripDescriptor are ignored...
             String tripId = null;
             if (informed.hasTrip() && informed.getTrip().hasTripId()) {
-                tripId = getId(informed,entitySelector -> entitySelector.getTrip().getTripId());
+                tripId = informed.getTrip().getTripId();
             }
             String stopId = null;
             if (informed.hasStopId()) {
-                stopId =getId(informed,EntitySelector::getStopId);
+                stopId = informed.getStopId();
             }
 
             String agencyId = informed.getAgencyId();
             if (informed.hasAgencyId()) {
-                agencyId = getId(informed,entitySelector -> entitySelector.getAgencyId().intern());
+                agencyId = informed.getAgencyId().intern();
             }
 
-            AlertPatch patch = new AlertPatch();
-            patch.setFeedId(feedId);
-            if (routeId != null) {
-                patch.setRoute(new FeedScopedId(feedId, routeId));
-                // Makes no sense to set direction if we don't have a route
-                if (direction != -1) {
-                    patch.setDirectionId(direction);
-                }
-            }
             if (tripId != null) {
-                patch.setTrip(new FeedScopedId(feedId, tripId));
+                if (stopId != null) {
+                    alertText.addEntity(new EntitySelector.StopAndTrip(
+                        new FeedScopedId(feedId, stopId),
+                        new FeedScopedId(feedId, tripId)
+                    ));
+                } else {
+                    alertText.addEntity(new EntitySelector.Trip(new FeedScopedId(feedId, tripId)));
+                }
+            } else if (routeId != null) {
+                // TODO: Handle direction
+                if (stopId != null) {
+                    alertText.addEntity(new EntitySelector.StopAndRoute(
+                        new FeedScopedId(feedId, stopId),
+                        new FeedScopedId(feedId, routeId)
+                    ));
+                } else {
+                    alertText.addEntity(new EntitySelector.Route(new FeedScopedId(feedId, routeId)));
+                }
+            } else if (stopId != null) {
+                alertText.addEntity(new EntitySelector.Stop(new FeedScopedId(feedId, stopId)));
+            } else if (agencyId != null) {
+                alertText.addEntity(new EntitySelector.Agency(new FeedScopedId(feedId, agencyId)));
             }
-            if (stopId != null) {
-                patch.setStop(new FeedScopedId(feedId, stopId));
-            }
-            if (agencyId != null && routeId == null && tripId == null && stopId == null) {
-                patch.setAgency(new FeedScopedId(feedId, agencyId));
-            }
-            patch.setTimePeriods(periods);
-            patch.setAlert(alertText);
-
-            patch.setId(patchId);
-            patchIds.add(patchId);
-
-            alertPatchService.apply(patch);
         }
-    }
 
-    private String createId(String id, EntitySelector informed) {
-        return id + " "
-            + (informed.hasAgencyId  () ? informed.getAgencyId  () : " null ") + " "
-            + (informed.hasRouteId   () ? informed.getRouteId   () : " null ") + " "
-            + (informed.hasTrip() && informed.getTrip().hasDirectionId() ?
-                informed.getTrip().hasDirectionId() : " null ") + " "
-            + (informed.hasRouteType () ? informed.getRouteType () : " null ") + " "
-            + (informed.hasStopId    () ? informed.getStopId    () : " null ") + " "
-            + (informed.hasTrip() && informed.getTrip().hasTripId() ?
-                informed.getTrip().getTripId() : " null ");
+        return alertText;
     }
 
     /**
@@ -180,12 +154,8 @@ public class AlertsUpdateHandler {
             this.feedId = feedId.intern();
     }
 
-    public void setAlertPatchService(AlertPatchService alertPatchService) {
-        this.alertPatchService = alertPatchService;
-    }
-
-    public long getEarlyStart() {
-        return earlyStart;
+    public void setTransitAlertService(TransitAlertService transitAlertService) {
+        this.transitAlertService = transitAlertService;
     }
 
     public void setEarlyStart(long earlyStart) {
@@ -194,9 +164,5 @@ public class AlertsUpdateHandler {
 
     public void setFuzzyTripMatcher(GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher) {
         this.fuzzyTripMatcher = fuzzyTripMatcher;
-    }
-
-    protected String getId(EntitySelector entity,Function<EntitySelector,String> func){
-        return func.apply(entity);
     }
 }

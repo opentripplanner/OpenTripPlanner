@@ -9,6 +9,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -48,7 +49,7 @@ public class AccessEgressRouter {
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
         // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
         // target vertex will be cleaned up at the end of the super-request, and we don't want that to happen twice.
-        List<NearbyStopFinder.StopAtDistance> stopAtDistanceList =
+        List<StopAtDistance> stopAtDistanceList =
                 nearbyStopFinder.findNearbyStopsViaStreets(
                     vertices,
                     fromTarget,
@@ -57,10 +58,10 @@ public class AccessEgressRouter {
                 );
 
         Collection<AccessEgress> result = new ArrayList<>();
-        for (NearbyStopFinder.StopAtDistance stopAtDistance : stopAtDistanceList) {
+        for (StopAtDistance stopAtDistance : stopAtDistanceList) {
             result.add(
                 new AccessEgress(
-                    stopIndex.indexByStop.get(stopAtDistance.tstop),
+                    stopIndex.indexByStop.get(stopAtDistance.stop),
                     (int)stopAtDistance.state.getElapsedTimeSeconds(),
                     fromTarget ? stopAtDistance.state.reverse() : stopAtDistance.state
                 )

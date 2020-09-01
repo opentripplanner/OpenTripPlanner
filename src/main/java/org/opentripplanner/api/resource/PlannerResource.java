@@ -8,10 +8,9 @@ import org.opentripplanner.api.mapping.TripPlanMapper;
 import org.opentripplanner.api.mapping.TripSearchMetadataMapper;
 import org.opentripplanner.api.model.error.PlannerError;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.api.response.RoutingError;
-import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -83,16 +82,14 @@ public class PlannerResource extends RoutingResource {
             response.elevationMetadata = new ElevationMetadata();
             response.elevationMetadata.ellipsoidToGeoidDifference = router.graph.ellipsoidToGeoidDifference;
             response.elevationMetadata.geoidElevation = request.geoidElevation;
+
+            response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
         catch (Exception e) {
-            LOG.warn("System error", e);
+            LOG.error("System error", e);
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.setError(error);
-        } finally {
-            if (request != null && request.rctx != null) {
-                response.debugOutput = request.rctx.debugOutput;
-            }
         }
 
         /* Log this request if such logging is enabled. */

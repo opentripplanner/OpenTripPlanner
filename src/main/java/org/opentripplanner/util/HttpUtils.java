@@ -1,31 +1,35 @@
 package org.opentripplanner.util;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.util.concurrent.TimeUnit;
-
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.StatusLine;
-import org.apache.http.client.ClientProtocolException;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpHead;
 import org.apache.http.config.SocketConfig;
 import org.apache.http.impl.client.HttpClientBuilder;
 
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.net.URI;
+import java.util.concurrent.TimeUnit;
+
 public class HttpUtils {
     
     private static final long TIMEOUT_CONNECTION = 5000;
     private static final int TIMEOUT_SOCKET = 5000;
 
-    public static InputStream getData(String url) throws IOException {
-        return getData(url, null, null);
+    public static InputStream getData(URI uri) throws IOException {
+        return getData(uri, null, null);
     }
 
-    public static InputStream getData(String url, String requestHeaderName, String requestHeaderValue) throws ClientProtocolException, IOException {
-        HttpGet httpget = new HttpGet(url);
+    public static InputStream getData(String uri) throws IOException {
+        return getData(URI.create(uri));
+    }
+
+    public static InputStream getData(URI uri, String requestHeaderName, String requestHeaderValue) throws IOException {
+        HttpGet httpget = new HttpGet(uri);
         if (requestHeaderValue != null) {
             httpget.addHeader(requestHeaderName, requestHeaderValue);
         }
@@ -58,11 +62,9 @@ public class HttpUtils {
     }
     
     private static HttpClient getClient() {
-        HttpClient httpClient = HttpClientBuilder.create()
+        return HttpClientBuilder.create()
                 .setDefaultSocketConfig(SocketConfig.custom().setSoTimeout(TIMEOUT_SOCKET).build())
                 .setConnectionTimeToLive(TIMEOUT_CONNECTION, TimeUnit.MILLISECONDS)
                 .build();
-
-        return httpClient;
     }
 }

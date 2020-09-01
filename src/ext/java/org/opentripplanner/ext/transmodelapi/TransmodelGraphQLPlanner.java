@@ -5,19 +5,21 @@ import org.opentripplanner.api.common.Message;
 import org.opentripplanner.api.common.ParameterException;
 import org.opentripplanner.api.mapping.PlannerErrorMapper;
 import org.opentripplanner.api.model.error.PlannerError;
-import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
+import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
+import org.opentripplanner.ext.transmodelapi.support.DataFetcherDecorator;
+import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.routing.api.request.BannedStopSet;
+import org.opentripplanner.routing.api.request.RequestModes;
+import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.api.request.StreetMode;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.api.request.RequestModes;
-import org.opentripplanner.routing.api.request.RoutingRequest;
-import org.opentripplanner.routing.api.request.BannedStopSet;
-import org.opentripplanner.routing.api.request.StreetMode;
-import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.standalone.server.Router;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,19 +34,14 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
-import java.util.function.Consumer;
 import java.util.function.Function;
 import java.util.stream.Collectors;
+
+import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 
 public class TransmodelGraphQLPlanner {
 
     private static final Logger LOG = LoggerFactory.getLogger(TransmodelGraphQLPlanner.class);
-
-    private TransmodelMappingUtil mappingUtil;
-
-    public TransmodelGraphQLPlanner(TransmodelMappingUtil mappingUtil) {
-        this.mappingUtil = mappingUtil;
-    }
 
     public PlanResponse plan(DataFetchingEnvironment environment) {
         PlanResponse response = new PlanResponse();
@@ -63,6 +60,8 @@ public class TransmodelGraphQLPlanner {
             for (RoutingError routingError : res.getRoutingErrors()) {
                 response.messages.add(PlannerErrorMapper.mapMessage(routingError).message);
             }
+
+            response.debugOutput = res.getDebugAggregator().finishedRendering();
         }
         catch (Exception e) {
             LOG.warn("System error");
@@ -70,53 +69,8 @@ public class TransmodelGraphQLPlanner {
             PlannerError error = new PlannerError();
             error.setMsg(Message.SYSTEM_ERROR);
             response.messages.add(error.message);
-        } finally {
-            if (request != null && request.rctx != null) {
-                response.debugOutput = request.rctx.debugOutput;
-            }
         }
         return response;
-    }
-
-    private static <T> void call(Map<String, T> m, String name, Consumer<T> consumer) {
-        if (!name.contains(".")) {
-            if (hasArgument(m, name)) {
-                T v = m.get(name);
-                consumer.accept(v);
-            }
-        } else {
-            String[] parts = name.split("\\.");
-            if (hasArgument(m, parts[0])) {
-                Map<String, T> nm = (Map<String, T>) m.get(parts[0]);
-                call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
-            }
-        }
-    }
-
-    private static <T> void call(DataFetchingEnvironment environment, String name, Consumer<T> consumer) {
-        if (!name.contains(".")) {
-            if (hasArgument(environment, name)) {
-                consumer.accept(environment.getArgument(name));
-            }
-        } else {
-            String[] parts = name.split("\\.");
-            if (hasArgument(environment, parts[0])) {
-                Map<String, T> nm = (Map<String, T>) environment.getArgument(parts[0]);
-                call(nm, String.join(".", Arrays.copyOfRange(parts, 1, parts.length)), consumer);
-            }
-        }
-    }
-
-    private static class CallerWithEnvironment {
-        private final DataFetchingEnvironment environment;
-
-        public CallerWithEnvironment(DataFetchingEnvironment e) {
-            this.environment = e;
-        }
-
-        private <T> void argument(String name, Consumer<T> consumer) {
-            call(environment, name, consumer);
-        }
     }
 
     private GenericLocation toGenericLocation(Map<String, Object> m) {
@@ -129,7 +83,7 @@ public class TransmodelGraphQLPlanner {
         }
 
         String placeRef = (String) m.get("place");
-        FeedScopedId stopId = placeRef == null ? null : mappingUtil.fromIdString(placeRef);
+        FeedScopedId stopId = placeRef == null ? null : TransitIdMapper.mapIDToDomain(placeRef);
         String name = (String) m.get("name");
         name = name == null ? "" : name;
 
@@ -141,18 +95,14 @@ public class TransmodelGraphQLPlanner {
         Router router = context.getRouter();
         RoutingRequest request = router.defaultRoutingRequest.clone();
 
-        TransmodelGraphQLPlanner.CallerWithEnvironment callWith = new TransmodelGraphQLPlanner.CallerWithEnvironment(environment);
+        DataFetcherDecorator callWith = new DataFetcherDecorator(environment);
 
         callWith.argument("locale", (String v) -> request.locale = Locale.forLanguageTag(v));
 
         callWith.argument("from", (Map<String, Object> v) -> request.from = toGenericLocation(v));
         callWith.argument("to", (Map<String, Object> v) -> request.to = toGenericLocation(v));
 
-        if (hasArgument(environment, "dateTime")) {
-            callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)));
-        } else {
-            request.setDateTime(new Date());
-        }
+        callWith.argument("dateTime", millisSinceEpoch -> request.setDateTime(new Date((long) millisSinceEpoch)), Date::new);
         callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofMinutes(m));
         callWith.argument("wheelchair", request::setWheelchairAccessible);
         callWith.argument("numTripPatterns", request::setNumItineraries);
@@ -178,7 +128,11 @@ public class TransmodelGraphQLPlanner {
 
         if (optimize == OptimizeType.TRIANGLE) {
             try {
-                request.assertTriangleParameters(request.bikeTriangleSafetyFactor, request.bikeTriangleTimeFactor, request.bikeTriangleSlopeFactor);
+                RoutingRequest.assertTriangleParameters(
+                    request.bikeTriangleSafetyFactor,
+                    request.bikeTriangleTimeFactor,
+                    request.bikeTriangleSlopeFactor
+                );
                 callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
                 callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
                 callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
@@ -190,26 +144,23 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("arriveBy", request::setArriveBy);
         request.showIntermediateStops = true;
         callWith.argument("vias", (List<Map<String, Object>> v) -> request.intermediatePlaces = v.stream().map(this::toGenericLocation).collect(Collectors.toList()));
-//        callWith.argument("preferred.lines", lines -> request.setPreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("preferred.otherThanPreferredLinesPenalty", request::setOtherThanPreferredRoutesPenalty);
-        // Deprecated organisations -> authorities
-        callWith.argument("preferred.organisations", (Collection<String> organisations) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
-        callWith.argument("preferred.authorities", (Collection<String> authorities) -> request.setPreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
-//        callWith.argument("unpreferred.lines", lines -> request.setUnpreferredRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("unpreferred.organisations", (Collection<String> organisations) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
-        callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
-        callWith.argument("banned.lines", lines -> request.setBannedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("banned.organisations", (Collection<String> organisations) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
-        callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
+        callWith.argument("preferred.authorities", (Collection<String> authorities) -> request.setPreferredAgencies(mapIDsToDomain(authorities)));
+        callWith.argument("unpreferred.authorities", (Collection<String> authorities) -> request.setUnpreferredAgencies(mapIDsToDomain(authorities)));
+        callWith.argument("whiteListed.authorities", (Collection<String> authorities) -> request.setWhiteListedAgencies(mapIDsToDomain(authorities)));
+        callWith.argument("banned.authorities", (Collection<String> authorities) -> request.setBannedAgencies(mapIDsToDomain(authorities)));
+
+        callWith.argument("preferred.otherThanPreferredLinesPenalty", request::setOtherThanPreferredRoutesPenalty);
+        callWith.argument("preferred.lines", (List<String> lines) -> request.setPreferredRoutes(mapIDsToDomain(lines)));
+        callWith.argument("unpreferred.lines", (List<String> lines) -> request.setUnpreferredRoutes(mapIDsToDomain(lines)));
+        callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mapIDsToDomain(lines)));
+        callWith.argument("banned.lines", (List<String> lines) -> request.setBannedRoutes(mapIDsToDomain(lines)));
+
         callWith.argument("banned.serviceJourneys", (Collection<String> serviceJourneys) -> request.bannedTrips = toBannedTrips(serviceJourneys));
 
 //        callWith.argument("banned.quays", quays -> request.setBannedStops(mappingUtil.prepareListOfFeedScopedId((List<String>) quays)));
 //        callWith.argument("banned.quaysHard", quaysHard -> request.setBannedStopsHard(mappingUtil.prepareListOfFeedScopedId((List<String>) quaysHard)));
 
-        callWith.argument("whiteListed.lines", (List<String> lines) -> request.setWhiteListedRoutes(mappingUtil.prepareListOfFeedScopedId((List<String>) lines, "__")));
-        callWith.argument("whiteListed.organisations", (Collection<String> organisations) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(organisations, in -> in)));
-        callWith.argument("whiteListed.authorities", (Collection<String> authorities) -> request.setWhiteListedAgencies(mappingUtil.mapCollectionOfValues(authorities, in -> in)));
 
         //callWith.argument("heuristicStepsPerMainStep", (Integer v) -> request.heuristicStepsPerMainStep = v);
         // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> { /* not used any more */ });
@@ -231,7 +182,7 @@ public class TransmodelGraphQLPlanner {
             request.optimize = optimize;
         }
 
-        if (hasArgument(environment, "modes")) {
+        if (GqlUtil.hasArgument(environment, "modes")) {
             ElementWrapper<StreetMode> accessMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> egressMode = new ElementWrapper<>();
             ElementWrapper<StreetMode> directMode = new ElementWrapper<>();
@@ -267,7 +218,7 @@ public class TransmodelGraphQLPlanner {
             }
         }*/
 
-        if (request.bikeRental && !hasArgument(environment, "bikeSpeed")) {
+        if (request.bikeRental && !GqlUtil.hasArgument(environment, "bikeSpeed")) {
             //slower bike speed for bike sharing, based on empirical evidence from DC.
             request.bikeSpeed = 4.3;
         }
@@ -275,9 +226,9 @@ public class TransmodelGraphQLPlanner {
         callWith.argument("minimumTransferTime", (Integer v) -> request.transferSlack = v);
         callWith.argument("transferSlack", (Integer v) -> request.transferSlack = v);
         callWith.argument("boardSlackDefault", (Integer v) -> request.boardSlack = v);
-        callWith.argument("boardSlackList", (Object v) -> request.boardSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
+        callWith.argument("boardSlackList", (Object v) -> request.boardSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("alightSlackDefault", (Integer v) -> request.alightSlack = v);
-        callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode.putAll(TransportModeSlack.mapToDomain(v)));
+        callWith.argument("alightSlackList", (Object v) -> request.alightSlackForMode = TransportModeSlack.mapToDomain(v));
         callWith.argument("maximumTransfers", (Integer v) -> request.maxTransfers = v);
 
         final long NOW_THRESHOLD_MILLIS = 15 * 60 * 60 * 1000;
@@ -309,7 +260,10 @@ public class TransmodelGraphQLPlanner {
     }
 
     private HashMap<FeedScopedId, BannedStopSet> toBannedTrips(Collection<String> serviceJourneyIds) {
-        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds.stream().map(mappingUtil::fromIdString).collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
+        Map<FeedScopedId, BannedStopSet> bannedTrips = serviceJourneyIds
+            .stream()
+            .map(TransitIdMapper::mapIDToDomain)
+            .collect(Collectors.toMap(Function.identity(), id -> BannedStopSet.ALL));
         return new HashMap<>(bannedTrips);
     }
 
@@ -328,14 +282,6 @@ public class TransmodelGraphQLPlanner {
         }
     }
     */
-
-    public static boolean hasArgument(DataFetchingEnvironment environment, String name) {
-        return environment.containsArgument(name) && environment.getArgument(name) != null;
-    }
-
-    public static <T> boolean hasArgument(Map<String, T> m, String name) {
-        return m.containsKey(name) && m.get(name) != null;
-    }
 
     /**
      * Simple wrapper in order to pass a consumer into the CallerWithEnvironment.argument method.

@@ -3,8 +3,8 @@ package org.opentripplanner.updater.street_notes;
 import org.opengis.feature.simple.SimpleFeature;
 import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
-import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterParameters;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.Date;
@@ -29,12 +29,14 @@ public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
         super(config);
     }
 
-    protected Alert getNote(SimpleFeature feature) {
-        Alert alert = Alert.createSimpleAlerts("winkki:" + feature.getAttribute("licence_type"));
-        alert.alertDescriptionText = feature.getAttribute("event_description") == null ?
+    protected StreetNote getNote(SimpleFeature feature) {
+        StreetNote streetNote = new StreetNote(feature.getAttribute("licence_type").toString());
+        streetNote.descriptionText = feature.getAttribute("event_description") == null ?
                 new NonLocalizedString("") : new NonLocalizedString(feature.getAttribute("event_description").toString());
-        alert.effectiveStartDate = feature.getAttribute("licence_startdate") == null ?
+        streetNote.effectiveStartDate = feature.getAttribute("licence_startdate") == null ?
                 (Date) feature.getAttribute("event_startdate") : (Date) feature.getAttribute("licence_startdate");
-        return alert;
+        streetNote.effectiveEndDate = feature.getAttribute("licence_enddate") == null ?
+            (Date) feature.getAttribute("event_enddate") : (Date) feature.getAttribute("licence_enddate");
+        return streetNote;
     }
 }

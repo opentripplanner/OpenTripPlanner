@@ -2,23 +2,23 @@ package org.opentripplanner.routing.core;
 
 import com.google.common.collect.Sets;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.routing.algorithm.astar.strategies.EuclideanRemainingWeightHeuristic;
 import org.opentripplanner.routing.algorithm.astar.strategies.RemainingWeightHeuristic;
+import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.api.response.InputField;
 import org.opentripplanner.routing.api.response.RoutingError;
 import org.opentripplanner.routing.api.response.RoutingErrorCode;
 import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.edgetype.TemporaryFreeEdge;
 import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
 import org.opentripplanner.routing.error.GraphNotFoundException;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.location.TemporaryStreetLocation;
-import org.opentripplanner.routing.api.request.RoutingRequest;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TemporaryVertex;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
@@ -26,6 +26,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -61,9 +62,6 @@ public class RoutingContext implements Cloneable {
 
     public RemainingWeightHeuristic remainingWeightHeuristic;
 
-    /** An object that accumulates profiling and debugging info for inclusion in the response. */
-    public DebugOutput debugOutput = new DebugOutput();
-
     /** Indicates that the search timed out or was otherwise aborted. */
     public boolean aborted;
 
@@ -95,7 +93,7 @@ public class RoutingContext implements Cloneable {
      * It does not look at the TemporaryPartialStreetEdges, but the real parents
      * of these edges.
      */
-    private Set<StreetEdge> overlappingParentStreetEdges(TemporaryStreetLocation u, TemporaryStreetLocation v) {
+    private Set<StreetEdge> overlappingParentStreetEdges(Vertex u, Vertex v) {
         // Fetch the parent edges so we aren't stuck with temporary edges.
         Set<StreetEdge> vEdges = getConnectedParentEdges(v);
         Set<StreetEdge> uEdges = getConnectedParentEdges(u);
@@ -104,10 +102,10 @@ public class RoutingContext implements Cloneable {
 
     /**
      * Find all parent edges ({@link TemporaryPartialStreetEdge#getParentEdge()}) for
-     * {@link TemporaryStreetLocation#getIncoming()} and
-     * {@link TemporaryStreetLocation#getIncoming()} edges. Edges of other types are ignored.
+     * {@link Vertex#getIncoming()} and {@link Vertex#getIncoming()} edges.
+     * Edges of other types are ignored.
      */
-    private static Set<StreetEdge> getConnectedParentEdges(TemporaryStreetLocation loc) {
+    private static Set<StreetEdge> getConnectedParentEdges(Vertex loc) {
         return Stream.concat(loc.getIncoming().stream(), loc.getOutgoing().stream())
                 .filter(it -> it instanceof TemporaryPartialStreetEdge)
                 .map(it -> ((TemporaryPartialStreetEdge)it).getParentEdge())
@@ -117,8 +115,7 @@ public class RoutingContext implements Cloneable {
     /**
      * Creates a PartialStreetEdge along the input StreetEdge iff its direction makes this possible.
      */
-    private void makePartialEdgeAlong(StreetEdge streetEdge, TemporaryStreetLocation from,
-                                      TemporaryStreetLocation to) {
+    private void makePartialEdgeAlong(StreetEdge streetEdge, StreetVertex from, StreetVertex to) {
         LineString parent = streetEdge.getGeometry();
         LineString head = GeometryUtils.getInteriorSegment(parent,
                 streetEdge.getFromVertex().getCoordinate(), from.getCoordinate());
@@ -157,7 +154,6 @@ public class RoutingContext implements Cloneable {
         }
         this.opt = routingRequest;
         this.graph = graph;
-        this.debugOutput.startedCalculating();
 
         Set<Vertex> fromVertices;
         Set<Vertex> toVertices;
@@ -212,20 +208,61 @@ public class RoutingContext implements Cloneable {
     }
 
     /**
-     * If the from and to vertices are generated and lie on some of the same edges, we need to wire
+     * If the from and to vertices are generated and lie along some of the same edges, we need to wire
      * them up along those edges so that we don't get odd circuitous routes for really short trips.
      */
     private void adjustForSameFromToEdge() {
         if (fromVertices != null && toVertices != null) {
-            Vertex fromVertex = fromVertices.iterator().next();
-            Vertex toVertex = toVertices.iterator().next();
-            if (fromVertex instanceof TemporaryStreetLocation && toVertex instanceof TemporaryStreetLocation) {
-                TemporaryStreetLocation fromStreetVertex = (TemporaryStreetLocation) fromVertex;
-                TemporaryStreetLocation toStreetVertex = (TemporaryStreetLocation) toVertex;
-                Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex,
-                        toStreetVertex);
-                for (StreetEdge pse : overlap) {
-                    makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+            Set<StreetVertex> fromStreetVertices = new HashSet<>();
+            for (Vertex from : fromVertices) {
+                if (from == null) { continue; }
+                for (Edge outgoing : from.getOutgoing()) {
+                    Vertex toVertex = outgoing.getToVertex();
+                    if (outgoing instanceof TemporaryFreeEdge && toVertex instanceof StreetVertex
+                        && toVertex
+                        .getOutgoing()
+                        .stream()
+                        .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+                        // The vertex is connected with an TemporaryFreeEdge connector to the
+                        // TemporaryPartialStreetEdge
+                        fromStreetVertices.add((StreetVertex) toVertex);
+                    }
+                    else if (outgoing instanceof TemporaryPartialStreetEdge
+                        && from instanceof StreetVertex) {
+                        fromStreetVertices.add((StreetVertex) from);
+                    }
+                }
+            }
+
+            Set<StreetVertex> toStreetVertices = new HashSet<>();
+            for (Vertex to : toVertices) {
+                if (to == null) { continue; }
+                for (Edge incoming : to.getIncoming()) {
+                    Vertex fromVertex = incoming.getFromVertex();
+                    if (incoming instanceof TemporaryFreeEdge && fromVertex instanceof StreetVertex
+                        && fromVertex
+                        .getIncoming()
+                        .stream()
+                        .anyMatch(edge -> edge instanceof TemporaryPartialStreetEdge)) {
+                        // The vertex is connected with an TemporaryFreeEdge connector to the
+                        // TemporaryPartialStreetEdge
+                        toStreetVertices.add((StreetVertex) fromVertex);
+                    }
+                    else if (incoming instanceof TemporaryPartialStreetEdge
+                        && to instanceof StreetVertex) {
+                        toStreetVertices.add((StreetVertex) to);
+                    }
+                }
+            }
+
+            for (StreetVertex fromStreetVertex : fromStreetVertices) {
+                for (StreetVertex toStreetVertex : toStreetVertices) {
+                    Set<StreetEdge> overlap = overlappingParentStreetEdges(fromStreetVertex,
+                        toStreetVertex
+                    );
+                    for (StreetEdge pse : overlap) {
+                        makePartialEdgeAlong(pse, fromStreetVertex, toStreetVertex);
+                    }
                 }
             }
         }
@@ -237,14 +274,14 @@ public class RoutingContext implements Cloneable {
         List<RoutingError> routingErrors = new ArrayList<>();
 
         // check origin present when not doing an arrive-by batch search
-        if (fromVertices == null) {
+        if (fromVertices == null && !(opt.oneToMany == true && opt.arriveBy == true)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.FROM_PLACE)
             );
         }
 
         // check destination present when not doing a depart-after batch search
-        if (toVertices == null) {
+        if (toVertices == null && !(opt.oneToMany == true && opt.arriveBy == false)) {
             routingErrors.add(
                 new RoutingError(RoutingErrorCode.LOCATION_NOT_FOUND, InputField.TO_PLACE)
             );

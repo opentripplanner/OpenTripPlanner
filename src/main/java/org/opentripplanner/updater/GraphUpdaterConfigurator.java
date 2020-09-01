@@ -1,5 +1,6 @@
 package org.opentripplanner.updater;
 
+
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -53,8 +54,8 @@ public abstract class GraphUpdaterConfigurator {
       ConstructorDescriptor descriptor = ComponentAnnotationConfigurator.getInstance()
           .getConstructorDescriptor(type, ServiceType.GraphUpdater);
       config.getParameters(type).stream().map(para ->
-          (GraphUpdater) descriptor.newInstance(para)
-      ).filter(Objects::nonNull).forEach(updaters::add);
+          descriptor.newInstance(para)
+      ).filter(Objects::nonNull).forEach(u -> updaters.add((GraphUpdater) u));
     }
     return updaters;
   }

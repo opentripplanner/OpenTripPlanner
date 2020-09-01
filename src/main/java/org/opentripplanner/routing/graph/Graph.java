@@ -21,7 +21,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -38,6 +37,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.TimetableSnapshotProvider;
 import org.opentripplanner.model.TransitEntity;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.WgsCoordinate;
@@ -45,17 +45,15 @@ import org.opentripplanner.model.calendar.CalendarService;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.impl.DelegatingTransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
-import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.services.AlertPatchService;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.util.ConcurrentPublished;
@@ -101,8 +99,6 @@ public class Graph implements Serializable {
 
     // TODO Remove this field, use Router.routerId ?
     public String routerId;
-
-    private final Map<Edge, Set<AlertPatch>> alertPatches = new HashMap<Edge, Set<AlertPatch>>(0);
 
     private final Map<Edge, List<TurnRestriction>> turnRestrictions = Maps.newHashMap();
 
@@ -250,7 +246,7 @@ public class Graph implements Serializable {
 
     public transient TransitLayerUpdater transitLayerUpdater;
 
-    private transient AlertPatchService alertPatchService;
+    private transient TransitAlertService transitAlertService;
 
 
     /**
@@ -320,10 +316,6 @@ public class Graph implements Serializable {
      */
     public void removeEdge(Edge e) {
         if (e != null) {
-            synchronized (alertPatches) {   // This synchronization is somewhat silly because this
-                alertPatches.remove(e);     // method isn't thread-safe anyway, but it is consistent
-            }
-
             turnRestrictions.remove(e);
             streetNotesService.removeStaticNotes(e);
 
@@ -373,65 +365,6 @@ public class Graph implements Serializable {
             edges.addAll(v.getOutgoing());
         }
         return edges;
-    }
-
-    /**
-     * Add an {@link AlertPatch} to the {@link AlertPatch} {@link Set} belonging to an {@link Edge}.
-     * @param edge
-     * @param alertPatch
-     */
-    public void addAlertPatch(Edge edge, AlertPatch alertPatch) {
-        if (edge == null || alertPatch == null) return;
-        synchronized (alertPatches) {
-            Set<AlertPatch> alertPatches = this.alertPatches.get(edge);
-            if (alertPatches == null) {
-                this.alertPatches.put(edge, Collections.singleton(alertPatch));
-            } else if (alertPatches instanceof HashSet) {
-                alertPatches.add(alertPatch);
-            } else {
-                alertPatches = new HashSet<AlertPatch>(alertPatches);
-                if (alertPatches.add(alertPatch)) {
-                    this.alertPatches.put(edge, alertPatches);
-                }
-            }
-        }
-    }
-
-    /**
-     * Remove an {@link AlertPatch} from the {@link AlertPatch} {@link Set} belonging to an
-     * {@link Edge}.
-     * @param edge
-     * @param alertPatch
-     */
-    public void removeAlertPatch(Edge edge, AlertPatch alertPatch) {
-        if (edge == null || alertPatch == null) return;
-        synchronized (alertPatches) {
-            Set<AlertPatch> alertPatches = this.alertPatches.get(edge);
-            if (alertPatches != null && alertPatches.contains(alertPatch)) {
-                if (alertPatches.size() < 2) {
-                    this.alertPatches.remove(edge);
-                } else {
-                    alertPatches.remove(alertPatch);
-                }
-            }
-        }
-    }
-
-    /**
-     * Get the {@link AlertPatch} {@link Set} that belongs to an {@link Edge} and build a new array.
-     * @param edge
-     * @return The {@link AlertPatch} array that belongs to the {@link Edge}
-     */
-    public AlertPatch[] getAlertPatches(Edge edge) {
-        if (edge != null) {
-            synchronized (alertPatches) {
-                Set<AlertPatch> alertPatches = this.alertPatches.get(edge);
-                if (alertPatches != null) {
-                    return alertPatches.toArray(new AlertPatch[alertPatches.size()]);
-                }
-            }
-        }
-        return new AlertPatch[0];
     }
 
     /**
@@ -914,21 +847,11 @@ public class Graph implements Serializable {
         CompactElevationProfile.setDistanceBetweenSamplesM(distanceBetweenElevationSamples);
     }
 
-    public AlertPatchService getSiriAlertPatchService() {
-        if (alertPatchService == null) {
-            if (updaterManager == null) {
-                alertPatchService = new AlertPatchServiceImpl(this);
-            }
-            else {
-                Optional<AlertPatchService> patchServiceOptional = updaterManager.getUpdaterList().stream()
-                        .filter(SiriSXUpdater.class::isInstance)
-                        .map(SiriSXUpdater.class::cast)
-                        .map(SiriSXUpdater::getAlertPatchService).findFirst();
-
-                alertPatchService = patchServiceOptional.orElseGet(() -> new AlertPatchServiceImpl(this));
-            }
+    public TransitAlertService getTransitAlertService() {
+        if (transitAlertService == null) {
+            transitAlertService = new DelegatingTransitAlertServiceImpl(this);
         }
-        return alertPatchService;
+        return transitAlertService;
     }
 
     private Collection<Stop> getStopsForId(FeedScopedId id) {
@@ -1032,12 +955,12 @@ public class Graph implements Serializable {
         return stationById.get(id);
     }
 
-    public Collection<Station> getStations() {
-        return stationById.values();
+    public MultiModalStation getMultiModalStation(FeedScopedId id) {
+        return multiModalStationById.get(id);
     }
 
-    public MultiModalStation getMultiModalStationById(FeedScopedId feedScopedId) {
-        return multiModalStationById.get(feedScopedId);
+    public Collection<Station> getStations() {
+        return stationById.values();
     }
 
     public Map<FeedScopedId, Integer> getServiceCodes() {

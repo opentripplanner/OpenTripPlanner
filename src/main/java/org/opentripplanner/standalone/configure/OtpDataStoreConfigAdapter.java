@@ -6,6 +6,7 @@ import org.opentripplanner.standalone.config.StorageConfig;
 import java.io.File;
 import java.net.URI;
 import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * This class is a thin wrapper around the OTP configuration to provide a
@@ -70,5 +71,25 @@ class OtpDataStoreConfigAdapter implements OtpDataStoreConfig {
     @Override
     public URI streetGraph() {
         return config.streetGraph;
+    }
+
+    @Override
+    public Pattern gtfsLocalFilePattern() {
+        return config.localFileNamePatterns.gtfs;
+    }
+
+    @Override
+    public Pattern netexLocalFilePattern() {
+        return config.localFileNamePatterns.netex;
+    }
+
+    @Override
+    public Pattern osmLocalFilePattern() {
+        return config.localFileNamePatterns.osm;
+    }
+
+    @Override
+    public Pattern demLocalFilePattern() {
+        return config.localFileNamePatterns.dem;
     }
 }

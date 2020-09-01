@@ -1,0 +1,104 @@
+{
+  "streetRoutingTimeout": 5,
+  "routingDefaults": {
+    "walkSpeed": 1.3,
+    "bikeSpeed": 5,
+    "carSpeed": 40,
+    "maxWalkDistance": 5000,
+    "maxTransferWalkDistance": 2000,
+    "maxPreTransitTime": 600,
+    "wheelchairAccessible": false,
+    "numItineraries": 3,
+    // "maxSlope": 0.0833333333333,
+    "showIntermediateStops": false,
+    "transferPenalty": 0,
+    "walkReluctance": 4.0,
+    "stairsReluctance": 1.65,
+    "turnReluctance": 1.0,
+    //"walkOnStreetReluctance": 1.0,
+    "elevatorBoardTime": 90,
+    "elevatorBoardCost": 90,
+    "elevatorHopTime": 20,
+    "elevatorHopCost": 20,
+    "bikeRentalPickupCost": 120,
+    "bikeRentalDropoffTime": 30,
+    "bikeRentalDropoffCost": 30,
+    "bikeParkTime": 60,
+    "bikeParkCost": 120,
+    "carDropoffTime": 120,
+    "waitReluctance": 0.8,
+    "waitAtBeginningFactor": 0.4,
+    "walkBoardCost": 600,
+    "bikeBoardCost": 600,
+    "otherThanPreferredRoutesPenalty": 300,
+    "transferSlack": 120,
+    // Default slack for any mode is 0 (zero)
+    "boardSlackForMode": {
+      "FERRY": 60,
+      "AIRPLANE" : 2100
+    },
+    "alightSlackForMode": {
+      "FERRY": 30,
+      "AIRPLANE" : 900
+    },
+    "carDecelerationSpeed": 2.9,
+    "carAccelerationSpeed": 2.9,
+    "ignoreRealtimeUpdates": false,
+    "disableRemainingWeightHeuristic": false,
+    //"preTransitPenalty": 300.0,
+    // "preTransitOverageRate": 10.0,
+    "allowBikeRental": false,
+    "bikeParkAndRide": false,
+    "parkAndRide": false,
+    "kissAndRide": false,
+    //"useTraffic": true,
+    "onlyTransitTrips": false,
+    "disableAlertFiltering": false,
+    "geoidElevation": false
+    // "callAndRideReluctance": 1.0
+  },
+  "transit": {
+    "maxNumberOfTransfers" : 12,
+    "dynamicSearchWindow" : {
+      "minTripTimeCoefficient" : 0.75,
+      "minWinTimeMinutes" : 30,
+      "maxWinTimeMinutes" : 300
+    },
+    "stopTransferCost" : {
+      "DISCOURAGED" : 3000,
+      "ALLOWED" : 150,
+      "RECOMMENDED" : 60,
+      "PREFERRED" : 0
+    }
+  },
+  "updaters": [
+    // SIRI SX service alerts
+    {
+      "type": "siri-sx-updater",
+      "frequencySec": 60,
+      "url": "https://<host>/realtime/v1/services?maxSize=50",
+      "feedId": "siri-sx",
+      "blockReadinessUntilInitialized": true,
+      "sourceType": "siri-sx"
+    },
+    // SIRI ET updater
+    {
+      "type": "siri-et-updater",
+      "frequencySec": 20,
+      "previewIntervalMinutes": 180,
+      "url": "https://<host>/realtime/v1/services",
+      "feedId": "RB",
+      "blockReadinessUntilInitialized": true,
+      "sourceType": "siri-et"
+    },
+    // SIRI VM updater
+    {
+      "type": "siri-vm-updater",
+      "frequencySec": 60,
+      "url": "https://<host>/realtime/v1/services?excludedDatasetIds=<OperatorNameSpace>",
+      "feedId": "siri-vm",
+      "blockReadinessUntilInitialized": true,
+      "sourceType": "siri-vm"
+    }
+  ]
+}

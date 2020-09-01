@@ -34,6 +34,13 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
 - Make agency id feed scoped (#3035)
 - Refactor kiss and ride to a more general car pickup mode (#3063)
+- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
+- Add MQTT transport for the GTFS-RT trip update updater (#3094)
+- Add FinlandWayPropertySetSource (#3096)
+- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
+- Reading and writing files(CONFIG, GRAPH, DEM, OSM, GTFS, NETEX, DATA_IMPORT_ISSUES) is changed. All files, except configuration files, are read from a data source. We support Google Cloud Storage and the local file system data sources for now, but plan to add at least support for AWS S3 (#2891)
+- Remove AlertPatcher (#3134)
+- Update DebugOutput to match new routing phases of OTP2 (#3109)
 
 ## Ported over from the 1.x
 - Add application/x-protobuf to accepted protobuf content-types (#2839)

@@ -1,5 +1,28 @@
 # How to migrate OTP version 1.x to 2.x
 
+## Command line
+The command line parameters are changed. Use the `--help` option to get the current documentation,
+and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
+possibility to build the graph in 2 steps is new in OTP2. OTP2 does not support multiple routers.
+
+
+## File loading
+OTP1 access all files using the local file system, no other _data-source_ is supported. In OTP2 we 
+support accessing cloud storage. So far Google Cloud Storage is added and we plan to add support 
+for AWS S3 as well. Config files(_otp-config.json, build-config.json, router-config.json_) are read 
+from the local file system, while other files can be read/written from the local file-system or the
+cloud. OTP2 support mixing any data sources that is supported. 
+
+OTP1 loads input data files(_DEM, OSM, GTFS, NeTEx_) based on the suffix(file extension). But for 
+GTFS files OTP1 also open the zip-file and look for _stops.txt_. OTP2 identify GTFS files by the 
+name only. OTP2 will read any zip-file or directory that contains "gtfs" as part of the name. All 
+files-types in OTP2 is resolved by matching the name with a regexp pattern. You can configure the 
+patterns in the _build-config.json_ if the defaults does not suites you. 
+
+OTP2 do not support for multiple routers, but you can load as many GTFS and/or NeTEx feeds as 
+you want into a single instance of OTP2.
+
+
 ## Build config
 
 These properties changed names from:
@@ -8,15 +31,16 @@ These properties changed names from:
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
+These parameters is no longer supported:
+ - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
+
+ 
+ 
  ## Router config
  
  - All updaters that require data sources now require you to specify a `sourceType`, even if that
  particular updater only has one possible data source.
  
-## Command line
- The command line parameters are changed. Use the `--help` option to get the current documentation,
-  and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
-  possibility to build the graph in 2 steps is new in OTP2.  
    
 ## REST API
   
@@ -52,6 +76,9 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
   - `nextDateTime`
   - `prevDateTime`
 - `agencyId` in the `leg` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
+- `debugOutput` in `TripPlan` has changed due to the different algorithms used in OTP version 1.x and 2.x.
+  - The `totalTime` is left as is, `directStreetRouterTime`, `transitRouterTime`, `filteringTime` and `renderingTime` are new fields.
+- `effectiveEndDate` is added to the `Alert`s
 
 ### Changes to the Index API
 - Error handling is improved, this is now consistently applied and uses build in framework support. 
@@ -80,3 +107,22 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
     deprecated ~~cluster~~.
 - `Agency`
   - The `id` is now feed-scoped and similarly to other ids, is prefixed with `<FEED_ID>:`
+- 'Alert'
+  - `effectiveEndDate` is added to show the end time of the alert validity.
+
+### AlertPatcher
+
+The AlertPatcher, which was under the `/patch` path, is removed. In order to update alerts, please 
+use a GTFS-RT Service Alert updater instead. An example of a simple service for producing static 
+GTFS-RT Service Alert feed from JSON is [manual-gtfsrt](https://github.com/pailakka/manual-gtfsrt).
+
+Querying for alerts has been moved under the index API, where `/alerts` can be appended to stop, 
+route, trip and pattern.
+
+### Analyst
+
+The analyst API endpoints have been removed.
+
+### Scripting
+
+The scripting API endpoint has been removed.

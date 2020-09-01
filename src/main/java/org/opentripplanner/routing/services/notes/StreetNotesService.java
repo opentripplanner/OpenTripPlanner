@@ -1,17 +1,17 @@
 package org.opentripplanner.routing.services.notes;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
-
-import org.opentripplanner.routing.alertpatch.Alert;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.graph.Edge;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * This service manage street edge notes. An edge note is an free-format alert (text) attached to an
@@ -100,12 +100,12 @@ public class StreetNotesService implements Serializable {
      * @param state
      * @return The set of notes or null if empty.
      */
-    public Set<Alert> getNotes(State state) {
+    public Set<StreetNote> getNotes(State state) {
         Edge edge = state.getBackEdge();
-        Set<MatcherAndAlert> maas = new HashSet<MatcherAndAlert>();
+        Set<MatcherAndStreetNote> maas = new HashSet<MatcherAndStreetNote>();
 
         for (StreetNotesSource source : sources) {
-            Set<MatcherAndAlert> maas2 = source.getNotes(edge);
+            Set<MatcherAndStreetNote> maas2 = source.getNotes(edge);
             if (maas2 != null)
                 maas.addAll(maas2);
         }
@@ -113,8 +113,8 @@ public class StreetNotesService implements Serializable {
             return null;
         }
 
-        Set<Alert> notes = new HashSet<Alert>(maas.size());
-        for (MatcherAndAlert maa : maas) {
+        Set<StreetNote> notes = new HashSet<StreetNote>(maas.size());
+        for (MatcherAndStreetNote maa : maas) {
             if (maa.getMatcher().matches(state))
                 notes.add(maa.getNote());
         }
@@ -123,7 +123,7 @@ public class StreetNotesService implements Serializable {
         return notes;
     }
 
-    public void addStaticNote(Edge edge, Alert note, NoteMatcher matcher) {
+    public void addStaticNote(Edge edge, StreetNote note, NoteMatcher matcher) {
         staticNotesSource.addNote(edge, note, matcher);
     }
 

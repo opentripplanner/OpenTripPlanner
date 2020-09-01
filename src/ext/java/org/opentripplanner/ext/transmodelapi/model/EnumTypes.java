@@ -90,14 +90,20 @@ public class EnumTypes {
 
     public static GraphQLEnumType STREET_MODE = GraphQLEnumType.newEnum()
         .name("StreetMode")
-        .value("foot", StreetMode.WALK)
-        .value("bicycle", StreetMode.BIKE)
-        .value("bike_park", StreetMode.BIKE_TO_PARK)
-        .value("bike_rental", StreetMode.BIKE_RENTAL)
-        .value("car", StreetMode.CAR)
-        .value("car_park", StreetMode.CAR_TO_PARK)
-        .value("car_pickup", StreetMode.CAR_PICKUP)
-        .value("car_rental", StreetMode.CAR_RENTAL)
+        .value("foot", StreetMode.WALK, "Walk only")
+        .value("bicycle", StreetMode.BIKE, "Bike only. This can be used as "
+            + "access/egress, but transfers will still be walk only.")
+        .value("bike_park", StreetMode.BIKE_TO_PARK, "Bike to a bike parking area, "
+            + "then walk the rest of the way. Direct mode and access mode only.")
+        .value("bike_rental", StreetMode.BIKE_RENTAL, "Walk to a bike rental point, "
+            + "bike to a bike rental drop-off point, and walk the rest of the way. This can include "
+            + "bike rental at fixed locations or free-floating services.")
+        .value("car", StreetMode.CAR, "Car only. Direct mode only.")
+        .value("car_park", StreetMode.CAR_TO_PARK, "Start in the car, drive to a "
+            + "parking area, and walk the rest of the way. Direct mode and access mode only.")
+        .value("car_pickup", StreetMode.CAR_PICKUP, "Walk to a pickup point along "
+            + "the road, drive to a drop-off point along the road, and walk the rest of the way. "
+            + "This can include various taxi-services or kiss & ride.")
         .build();
 
     public static GraphQLEnumType MODE = GraphQLEnumType.newEnum()

@@ -1,13 +1,13 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.base.ToStringBuilder;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -148,10 +148,13 @@ public class Leg {
    /**
     * For transit legs, the service date of the trip.
     * For non-transit legs, null.
+    * <p>
+    * The trip service date should be used to identify the correct trip schedule and
+    * can not be trusted to display the date for any departures or arrivals. For example,
+    * the first departure for a given trip may happen at service date March 25th and
+    * service time 25:00, which in local time would be Mach 26th 01:00.
     */
-   // TODO OTP2 - This should not be a String? What is this used for? Is it the actual date or the
-   //           - Service date?
-   public String serviceDate = null;
+   public ServiceDate serviceDate = null;
 
     /**
      * For transit leg, the route's branding URL (if one exists). For non-transit legs, null.
@@ -186,9 +189,9 @@ public class Leg {
     */
    public List<WalkStep> walkSteps;
 
-   public Set<Alert> alerts = new HashSet<>();
+   public Set<StreetNote> streetNotes = new HashSet<>();
 
-   public List<AlertPatch> alertPatches = new ArrayList<>();
+   public Set<TransitAlert> transitAlerts = new HashSet<>();
 
    public String routeShortName;
    public String routeLongName;
@@ -223,8 +226,8 @@ public class Leg {
         return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
     }
 
-    public void addAlert(Alert alert) {
-        alerts.add(alert);
+    public void addStretNote(StreetNote streetNote) {
+        streetNotes.add(streetNote);
     }
 
     public void setTimeZone(TimeZone timeZone) {
@@ -237,26 +240,27 @@ public class Leg {
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
 
-    public void addAlertPatch(AlertPatch alertPatch) {
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
+    public void addAlert(TransitAlert alert) {
+        transitAlerts.add(alert);
     }
 
     /**
-     * Compare to legs to determine if they start and end at the same place and time.
-     *
-     * Note! Properties like mode and trip is NOT considered.
+     * Return {@code true} if to legs ride the same trip(same tripId) and at least part of the
+     * rides overlap. Two legs overlap is they have at least one segment(from one stop to the next)
+     * in common.
      */
-    public boolean sameStartAndEnd(Leg other) {
-        if (this == other) { return true; }
-        return startTime.equals(other.startTime)
-                && endTime.equals(other.endTime)
-                && from.sameLocation(other.from)
-                && to.sameLocation(other.to);
+    public boolean isPartiallySameTransitLeg(Leg other) {
+      // Assert both legs are transit legs
+      if(!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
+
+      // If NOT the same trip, return false
+      if(!tripId.equals(other.tripId)) { return false; }
+
+      // Return true if legs overlap
+      return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
     }
 
-    /** Should be used for debug logging only */
+  /** Should be used for debug logging only */
     @Override
     public String toString() {
         return ToStringBuilder.of(Leg.class)
@@ -287,13 +291,13 @@ public class Leg {
                 .addStr("headsign", headsign)
                 .addObj("agencyId", agencyId)
                 .addObj("tripId", tripId)
-                .addStr("serviceDate", serviceDate)
+                .addObj("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)
                 .addCol("intermediateStops", intermediateStops)
                 .addObj("legGeometry", legGeometry)
                 .addCol("walkSteps", walkSteps)
-                .addCol("alerts", alerts)
-                .addCol("alertPatches", alertPatches)
+                .addCol("streetNotes", streetNotes)
+                .addCol("transitAlerts", transitAlerts)
                 .addStr("routeShortName", routeShortName)
                 .addStr("routeLongName", routeLongName)
                 .addStr("boardRule", boardRule)

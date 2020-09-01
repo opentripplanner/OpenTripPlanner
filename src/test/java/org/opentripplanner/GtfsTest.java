@@ -17,7 +17,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
 import org.opentripplanner.routing.impl.GraphPathFinder;
 import org.opentripplanner.routing.spt.GraphPath;
 import org.opentripplanner.standalone.config.RouterConfig;
@@ -38,7 +38,7 @@ public abstract class GtfsTest extends TestCase {
     public Graph graph;
     AlertsUpdateHandler alertsUpdateHandler;
     TimetableSnapshotSource timetableSnapshotSource;
-    AlertPatchServiceImpl alertPatchServiceImpl;
+    TransitAlertServiceImpl alertPatchServiceImpl;
     public Router router;
     private GtfsFeedId feedId;
 
@@ -75,8 +75,8 @@ public abstract class GtfsTest extends TestCase {
         timetableSnapshotSource = new TimetableSnapshotSource(graph);
         timetableSnapshotSource.purgeExpiredData = false;
         graph.getOrSetupTimetableSnapshotProvider(g -> timetableSnapshotSource);
-        alertPatchServiceImpl = new AlertPatchServiceImpl(graph);
-        alertsUpdateHandler.setAlertPatchService(alertPatchServiceImpl);
+        alertPatchServiceImpl = new TransitAlertServiceImpl(graph);
+        alertsUpdateHandler.setTransitAlertService(alertPatchServiceImpl);
         alertsUpdateHandler.setFeedId(feedId.getId());
 
         try {
@@ -124,7 +124,7 @@ public abstract class GtfsTest extends TestCase {
         routingRequest.setStreetSubRequestModes(new TraverseModeSet(TraverseMode.WALK, mode));
         // TODO route matcher still using underscores because it's quite nonstandard and should be eliminated from the 1.0 release rather than reworked
         if (excludedRoute != null && !excludedRoute.isEmpty()) {
-            routingRequest.setBannedRoutes(feedId.getId() + "__" + excludedRoute);
+            routingRequest.setBannedRoutesFromSting(feedId.getId() + "__" + excludedRoute);
         }
         if (excludedStop != null && !excludedStop.isEmpty()) {
             throw new UnsupportedOperationException("Stop banning is not yet implemented in OTP2");
@@ -168,11 +168,11 @@ public abstract class GtfsTest extends TestCase {
             assertNull(leg.from.stopId);
         }
         if (alert != null) {
-            assertNotNull(leg.alerts);
-            assertEquals(1, leg.alerts.size());
-            assertEquals(alert, leg.alerts.iterator().next().alertHeaderText.toString());
+            assertNotNull(leg.streetNotes);
+            assertEquals(1, leg.streetNotes.size());
+            assertEquals(alert, leg.streetNotes.iterator().next().note.toString());
         } else {
-            assertNull(leg.alerts);
+            assertNull(leg.streetNotes);
         }
     }
 }

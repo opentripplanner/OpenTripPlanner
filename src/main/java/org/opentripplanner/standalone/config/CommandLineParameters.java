@@ -104,10 +104,6 @@ public class CommandLineParameters implements Cloneable {
             + "(for development).")
     public boolean disableFileCache = false;
 
-    @Parameter(names = {"--insecure"},
-            description = "Allow unauthenticated access to sensitive API resources, e.g. /routers")
-    public boolean insecure = false;
-
     @Parameter(names = {"--maxThreads"}, description = "The maximum number of HTTP handler threads.")
     public Integer maxThreads;
 

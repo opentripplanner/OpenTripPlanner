@@ -14,11 +14,9 @@ public class LocalTimeScalarFactory {
     private static final String EXAMPLE_TIME = "18:25:SS";
     private static final String TIME_PATTERN = "HH:mm:SS";
     private static final String DATE_SCALAR_DESCRIPTION = "Time using the format: " + TIME_PATTERN + ". Example: " + EXAMPLE_TIME;
+    private static final DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
 
-    private static DateTimeFormatter FORMATTER = DateTimeFormatter.ofPattern(TIME_PATTERN);
-
-    private LocalTimeScalarFactory() {
-    }
+    private LocalTimeScalarFactory() { }
 
     public static GraphQLScalarType createLocalTimeScalar() {
         return new GraphQLScalarType("LocalTime", DATE_SCALAR_DESCRIPTION, new Coercing() {

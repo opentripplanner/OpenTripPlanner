@@ -21,6 +21,7 @@ import org.rutebanken.netex.model.Route;
 import org.rutebanken.netex.model.ServiceJourney;
 import org.rutebanken.netex.model.ServiceLink;
 import org.rutebanken.netex.model.StopPlace;
+import org.rutebanken.netex.model.TariffZone;
 import org.rutebanken.netex.model.TimetabledPassingTime;
 
 import java.util.Collection;
@@ -47,5 +48,6 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId();
     ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
     ReadOnlyHierarchicalVersionMapById<StopPlace> getStopPlaceById();
+    ReadOnlyHierarchicalMapById<TariffZone> getTariffZonesById();
     String getTimeZone();
 }

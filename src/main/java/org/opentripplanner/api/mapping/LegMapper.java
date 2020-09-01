@@ -1,5 +1,6 @@
 package org.opentripplanner.api.mapping;
 
+import org.opentripplanner.api.model.ApiAlert;
 import org.opentripplanner.api.model.ApiLeg;
 import org.opentripplanner.model.plan.Leg;
 
@@ -10,10 +11,12 @@ import java.util.Locale;
 
 public class LegMapper {
     private final WalkStepMapper walkStepMapper;
+    private final StreetNoteMaperMapper streetNoteMaperMapper;
     private final AlertMapper alertMapper;
 
     public LegMapper(Locale locale) {
         this.walkStepMapper = new WalkStepMapper(locale);
+        this.streetNoteMaperMapper = new StreetNoteMaperMapper(locale);
         this.alertMapper = new AlertMapper(locale);
     }
 
@@ -68,12 +71,15 @@ public class LegMapper {
         api.headsign = domain.headsign;
         api.agencyId = FeedScopedIdMapper.mapToApi(domain.agencyId);
         api.tripId = FeedScopedIdMapper.mapToApi(domain.tripId);
-        api.serviceDate = domain.serviceDate;
+        api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
         api.legGeometry = domain.legGeometry;
         api.steps = walkStepMapper.mapWalkSteps(domain.walkSteps);
-        api.alerts = alertMapper.mapToApi(domain.alerts);
+        api.alerts = concatenateAlerts(
+            streetNoteMaperMapper.mapToApi(domain.streetNotes),
+            alertMapper.mapToApi(domain.transitAlerts)
+        );
         api.routeShortName = domain.routeShortName;
         api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;
@@ -81,6 +87,18 @@ public class LegMapper {
         api.rentedBike = domain.rentedBike;
 
         return api;
+    }
+
+    private static List<ApiAlert> concatenateAlerts(List<ApiAlert> a, List<ApiAlert> b) {
+        if (a == null) {
+            return b;
+        } else if (b == null) {
+            return a;
+        } else {
+            List<ApiAlert> ret = new ArrayList<>(a);
+            ret.addAll(b);
+            return ret;
+        }
     }
 
 }

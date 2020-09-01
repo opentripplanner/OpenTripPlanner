@@ -4,7 +4,7 @@ package org.opentripplanner.model;
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Arrays;
-import java.util.HashSet;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 public final class FeedScopedId implements Serializable, Comparable<FeedScopedId> {
@@ -45,6 +45,14 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         return c;
     }
 
+    /**
+     * DO NOT CHANGE THIS - It is used in Serialization of the id.
+     */
+    @Override
+    public String toString() {
+        return concatenateId(feedId, id);
+    }
+
     @Override
     public int hashCode() {
         return feedId.hashCode() ^ id.hashCode();
@@ -60,11 +68,6 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
         return feedId.equals(other.feedId) && id.equals(other.id);
     }
 
-    @Override
-    public String toString() {
-        return concatenateId(feedId, id);
-    }
-
     /**
      * Given an id of the form "feedId:entityId", parses into a
      * {@link FeedScopedId} id object.
@@ -74,8 +77,9 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
      * @throws IllegalArgumentException if the id cannot be parsed
      */
     public static FeedScopedId parseId(String value) throws IllegalArgumentException {
-        if (value == null || value.isEmpty())
+        if (value == null || value.isEmpty()) {
             return null;
+        }
         int index = value.indexOf(ID_SEPARATOR);
         if (index == -1) {
             throw new IllegalArgumentException("invalid feed-scoped-id: " + value);
@@ -98,10 +102,10 @@ public final class FeedScopedId implements Serializable, Comparable<FeedScopedId
     /**
      * Parses a string consisting of concatenated FeedScopedIds to a Set
      */
-    public static HashSet<FeedScopedId> parseListOfIds(String s) {
+    public static Set<FeedScopedId> parseListOfIds(String s) {
         return Arrays
             .stream(s.split(","))
             .map(FeedScopedId::parseId)
-            .collect(Collectors.toCollection(HashSet::new));
+            .collect(Collectors.toSet());
     }
 }

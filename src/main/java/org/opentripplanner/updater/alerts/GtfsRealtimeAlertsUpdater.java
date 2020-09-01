@@ -6,9 +6,11 @@ import org.opentripplanner.annotation.Component;
 import org.opentripplanner.annotation.ServiceType;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.impl.AlertPatchServiceImpl;
-import org.opentripplanner.routing.services.AlertPatchService;
 import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterParameters;
+
+import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import org.opentripplanner.routing.impl.TransitAlertServiceImpl;
+import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -16,7 +18,7 @@ import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.google.transit.realtime.GtfsRealtime.FeedMessage;
+import java.net.URI;
 
 /**
  * GTFS-RT alerts updater
@@ -45,13 +47,13 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     private GtfsRealtimeFuzzyTripMatcher fuzzyTripMatcher;
 
-    private AlertPatchService alertPatchService;
-
     private final long earlyStart;
 
     private AlertsUpdateHandler updateHandler = null;
 
     private final boolean fuzzyTripMatching;
+
+    private TransitAlertService transitAlertService;
 
     @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
@@ -75,18 +77,17 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     @Override
     public void setup(Graph graph) {
-        // TODO: add options to choose different patch services
-        AlertPatchService alertPatchService = new AlertPatchServiceImpl(graph);
+        TransitAlertService transitAlertService = new TransitAlertServiceImpl(graph);
         if (fuzzyTripMatching) {
             this.fuzzyTripMatcher = new GtfsRealtimeFuzzyTripMatcher(new RoutingService(graph));
         }
-        this.alertPatchService = alertPatchService;
+        this.transitAlertService = transitAlertService;
         if (updateHandler == null) {
             updateHandler = new AlertsUpdateHandler();
         }
         updateHandler.setEarlyStart(earlyStart);
         updateHandler.setFeedId(feedId);
-        updateHandler.setAlertPatchService(alertPatchService);
+        updateHandler.setTransitAlertService(transitAlertService);
         updateHandler.setFuzzyTripMatcher(fuzzyTripMatcher);
     }
 
@@ -94,7 +95,7 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
     protected void runPolling() {
         try {
             InputStream data = HttpUtils.getData(
-                    url,
+                    URI.create(url),
                     "Accept",
                     "application/x-google-protobuf, application/x-protobuf, application/protobuf, application/octet-stream, */*");
             if (data == null) {
@@ -120,6 +121,10 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
 
     @Override
     public void teardown() {
+    }
+
+    public TransitAlertService getTransitAlertService() {
+        return transitAlertService;
     }
 
     public String toString() {

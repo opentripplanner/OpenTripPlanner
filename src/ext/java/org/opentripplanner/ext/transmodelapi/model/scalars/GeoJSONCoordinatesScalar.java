@@ -25,12 +25,13 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class GeoJSONCoordinatesScalar {
+    private static final String DOCUMENTATION = "List of coordinates like: [[60.89, 11.12], [62.56, 12.10]]";
 
     public static GraphQLScalarType getGraphQGeoJSONCoordinatesScalar() {
-        return GraphQLGeoJSONCoordinates;
+        return INSTANCE;
     }
 
-    private static GraphQLScalarType GraphQLGeoJSONCoordinates = new GraphQLScalarType("Coordinates", null, new Coercing() {
+    private final static GraphQLScalarType INSTANCE = new GraphQLScalarType("Coordinates", DOCUMENTATION, new Coercing() {
         @Override
         public List<List<Double>> serialize(Object input) {
             if (input instanceof Coordinate[]) {

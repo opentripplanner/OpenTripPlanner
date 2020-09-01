@@ -22,7 +22,6 @@ public class ItinerariesHelper {
 
             // fix up from/to on first/last legs
             if (it.legs.size() == 0) {
-                LOG.warn("itinerary has no legs");
                 continue;
             }
             Leg firstLeg = it.legs.get(0);

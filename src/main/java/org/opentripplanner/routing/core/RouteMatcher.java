@@ -1,12 +1,12 @@
 package org.opentripplanner.routing.core;
 
-import java.io.Serializable;
-import java.util.HashSet;
-
+import org.opentripplanner.common.model.T2;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.common.model.T2;
-import org.opentripplanner.gtfs.GtfsLibrary;
+
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashSet;
 
 /**
  * A RouteMatcher is a collection of routes based on IDs, short name and/or agency IDs.
@@ -18,17 +18,21 @@ public class RouteMatcher implements Cloneable, Serializable {
     private static final long serialVersionUID = 8066547338465440312L;
 
     /* Set of full matching route ids (agency ID + route ID) */
-    private HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
+    private final HashSet<FeedScopedId> agencyAndRouteIds = new HashSet<FeedScopedId>();
 
     /* Set of full matching route code/names (agency ID + route code/name) */
-    private HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
+    private final HashSet<T2<String, String>> agencyIdAndRouteNames = new HashSet<T2<String, String>>();
 
     /* Set of matching route names (without specifying an agency ID) */
-    private HashSet<String> routeNames = new HashSet<String>();
+    private final HashSet<String> routeNames = new HashSet<String>();
 
-    private static RouteMatcher EMPTY_MATCHER = new RouteMatcher();
+    private static final RouteMatcher EMPTY_MATCHER = new RouteMatcher();
 
     private RouteMatcher() {
+    }
+
+    private RouteMatcher(Collection<FeedScopedId> routeIds) {
+        agencyAndRouteIds.addAll(routeIds);
     }
 
     /**
@@ -36,6 +40,13 @@ public class RouteMatcher implements Cloneable, Serializable {
      */
     public static RouteMatcher emptyMatcher() {
         return EMPTY_MATCHER;
+    }
+
+    /**
+     * Return an empty matcher (which match no routes).
+     */
+    public static RouteMatcher idMatcher(Collection<FeedScopedId> routeIds) {
+        return routeIds == null || routeIds.isEmpty() ? emptyMatcher() : new RouteMatcher(routeIds);
     }
 
     /**
@@ -102,7 +113,7 @@ public class RouteMatcher implements Cloneable, Serializable {
             return false;
         if (agencyAndRouteIds.contains(route.getId()))
             return true;
-        String routeName = GtfsLibrary.getRouteName(route).replace("_", " ");
+        String routeName = route.getName().replace("_", " ");
         if (agencyIdAndRouteNames.contains(new T2<String, String>(route.getId().getFeedId(),
                 routeName)))
             return true;

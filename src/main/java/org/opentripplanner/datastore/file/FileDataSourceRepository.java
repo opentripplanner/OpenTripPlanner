@@ -16,6 +16,7 @@ import java.io.File;
 import java.net.URI;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.regex.Pattern;
 
 import static org.opentripplanner.datastore.FileType.CONFIG;
 import static org.opentripplanner.datastore.FileType.DEM;
@@ -38,9 +39,24 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
     private static final Logger LOG = LoggerFactory.getLogger(FileDataSourceRepository.class);
 
     private final File baseDir;
+    private final Pattern gtfsLocalFilePattern;
+    private final Pattern netexLocalFilePattern;
+    private final Pattern osmLocalFilePattern;
+    private final Pattern demLocalFilePattern;
 
-    public FileDataSourceRepository(File baseDir) {
+
+    public FileDataSourceRepository(
+        File baseDir,
+        Pattern gtfsLocalFilePattern,
+        Pattern netexLocalFilePattern,
+        Pattern osmLocalFilePattern,
+        Pattern demLocalFilePattern
+    ) {
         this.baseDir = baseDir;
+        this.gtfsLocalFilePattern = gtfsLocalFilePattern;
+        this.netexLocalFilePattern = netexLocalFilePattern;
+        this.osmLocalFilePattern = osmLocalFilePattern;
+        this.demLocalFilePattern = demLocalFilePattern;
     }
 
     /**
@@ -135,15 +151,13 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
 
 
 
-    private static FileType resolveFileType(File file) {
+    private FileType resolveFileType(File file) {
         String name = file.getName();
-        if (isGTFSFile(file)) { return GTFS; }
-        if (isTransitFile(file, "netex")) { return NETEX; }
-        if (name.endsWith(".pbf")) { return OSM; }
-        if (name.endsWith(".osm")) { return OSM; }
-        if (name.endsWith(".osm.xml")) { return OSM; }
+        if (isTransitFile(file, gtfsLocalFilePattern) || isGTFSFile(file)) { return GTFS; }
+        if (isTransitFile(file, netexLocalFilePattern)) { return NETEX; }
+        if (osmLocalFilePattern.matcher(name).find()) { return OSM; }
         // Digital elevation model (elevation raster)
-        if (name.endsWith(".tif") || name.endsWith(".tiff")) { return DEM; }
+        if (demLocalFilePattern.matcher(name).find()) { return DEM; }
         if (name.matches("(streetG|g)raph.obj")) { return GRAPH; }
         if (name.matches("otp-status.(inProgress|ok|failed)")) { return OTP_STATUS; }
         if (name.equals(BUILD_REPORT_DIR)) { return REPORT; }
@@ -151,13 +165,13 @@ public class FileDataSourceRepository implements LocalDataSourceRepository {
         return UNKNOWN;
     }
 
-    private static boolean isTransitFile(File file, String subName) {
-        return file.getName().toLowerCase().contains(subName)
+    private static boolean isTransitFile(File file, Pattern pattern) {
+        return pattern.matcher(file.getName()).find()
                 && (file.isDirectory() || file.getName().endsWith(".zip"));
     }
 
-  private static boolean isGTFSFile(File file) {
-    if (file.getName().endsWith("zip") && !isTransitFile(file, "netex")) {
+  private boolean isGTFSFile(File file) {
+    if (file.getName().endsWith("zip") && !isTransitFile(file, netexLocalFilePattern)) {
       try (ZipInputStream zis = new ZipInputStream(new FileInputStream(file))) {
         for (ZipEntry entry = zis.getNextEntry(); entry != null; entry = zis.getNextEntry()){
           if(entry.getName().endsWith("stop_times.txt")){

@@ -9,12 +9,10 @@ import com.google.common.hash.Hashing;
 import com.google.common.io.BaseEncoding;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
-import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.CompactLineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NonUniqueRouteName;
-import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.routing.trippattern.FrequencyEntry;
 import org.opentripplanner.routing.trippattern.TripTimes;
 import org.slf4j.Logger;
@@ -47,7 +45,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 
-    private static final long serialVersionUID = MavenVersion.VERSION.getUID();
+    private static final long serialVersionUID = 1;
 
     private static final int FLAG_WHEELCHAIR_ACCESSIBLE = 1;
     private static final int MASK_PICKUP = 2|4;
@@ -159,7 +157,14 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
      */
     public void setHopGeometriesFromPattern(TripPattern other) {
         this.hopGeometries = new byte[this.getStops().size() - 1][];
-        for (int i = 0; i < other.getStops().size() - 1; i++) {
+
+        // This accounts for the new TripPattern provided by a real-time update and the one that is
+        // being replaced having a different number of stops. In that case the geometry will be
+        // preserved up until the first mismatching stop, and a straight line will be used for
+        // all segments after that.
+        int sizeOfShortestPattern = Math.min(this.getStops().size(), other.getStops().size());
+
+        for (int i = 0; i < sizeOfShortestPattern - 1; i++) {
             if (other.getHopGeometry(i) != null
                 && other.getStop(i).equals(this.getStop(i))
                 && other.getStop(i + 1).equals(this.getStop(i + 1))) {
@@ -236,6 +241,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return stopPattern.stops[stopIndex];
     }
 
+
+    public int getStopIndex(Stop stop) {
+        return Arrays.asList(stopPattern.stops).indexOf(stop);
+    }
+
     public List<Stop> getStops() {
         return Arrays.asList(stopPattern.stops);
     }
@@ -269,7 +279,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     /** Returns the zone of a given stop */
     public String getZone(int stopIndex) {
-        return getStop(stopIndex).getZone();
+        return getStop(stopIndex).getFirstZoneAsString();
     }
 
     public int getAlightType(int stopIndex) {
@@ -329,7 +339,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     private static String stopNameAndId (Stop stop) {
-        return stop.getName() + " (" + GtfsLibrary.convertIdToString(stop.getId()) + ")";
+        return stop.getName() + " (" + stop.getId().toString() + ")";
     }
 
     /**
@@ -384,7 +394,7 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
         /* Ensure we have a unique name for every Route */
         for (Route route : patternsByRoute.keySet()) {
-            String routeName = GtfsLibrary.getRouteName(route);
+            String routeName = route.getName();
             if (usedRouteNames.contains(routeName)) {
                 int i = 2;
                 String generatedRouteName;
