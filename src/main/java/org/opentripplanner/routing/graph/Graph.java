@@ -198,15 +198,6 @@ public class Graph implements Serializable {
 
     /** True if GTFS data was loaded into this Graph. */
     public boolean hasTransit = false;
-    private ClusterList clusters;
-
-    public ClusterList getClusters() {
-        return clusters;
-    }
-
-    public void setClusters(ClusterList clusters) {
-        this.clusters = clusters;
-    }
 
     /** True if direct single-edge transfers were generated between transit stops in this Graph. */
     public boolean hasDirectTransfers = false;

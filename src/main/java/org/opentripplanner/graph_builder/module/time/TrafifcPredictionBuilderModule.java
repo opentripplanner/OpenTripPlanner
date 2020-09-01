@@ -20,9 +20,8 @@ public class TrafifcPredictionBuilderModule implements GraphBuilderModule {
 
     @Override
     public void buildGraph(Graph graph, HashMap<Class<?>, Object> extra) {
-        graph.setClusters(this.clusterlist);
         TreeMap<Integer, Integer> map = new TreeMap<>();
-        for (Cluster c : graph.getClusters().getclusters()) {
+        for (Cluster c : this.clusterlist.getclusters()) {
             for (EdgeData e : c.getedges())
                 if (c.gettimetable() != null)
                     map.put(((int) e.getid()), e.getclusterid() - 1);
