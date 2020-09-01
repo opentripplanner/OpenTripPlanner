@@ -10,6 +10,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.Provider;
 import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
+import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesCalculator;
 import org.opentripplanner.updater.vehicle_sharing.vehicles_positions.BikeStationsGraphWriterRunnable;
 
 import static org.junit.Assert.assertEquals;
@@ -40,12 +41,14 @@ public class BikeStationsRunnableTest {
         //when
         temporaryStreetSplitter = mock(TemporaryStreetSplitter.class);
         RentVehicleEdge rentVehicleEdge = new RentVehicleEdge(vertex, station11.getBikeFromStation());
+        graph.bikeRentalStationsInGraph.put(station11, rentVehicleEdge);
+        graph.parkingZonesCalculator = mock(ParkingZonesCalculator.class);
+
         BikeRentalStation newStation = station11.clone();
         newStation.spacesAvailable = 13;
         newStation.bikesAvailable = 12;
 
         rentVehicleEdge.setBikeRentalStation(station11);
-        graph.bikeRentalStationsInGraph.put(station11, rentVehicleEdge);
 
         //given
         BikeStationsGraphWriterRunnable runnable = new BikeStationsGraphWriterRunnable(temporaryStreetSplitter, List.of(newStation));
