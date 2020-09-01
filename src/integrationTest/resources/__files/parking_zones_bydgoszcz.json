@@ -1,6 +1,6 @@
 {
   "data": {
-    "parking_zones": [
+    "items": [
       {
         "providerId": 2,
         "vehicleType": "car",
