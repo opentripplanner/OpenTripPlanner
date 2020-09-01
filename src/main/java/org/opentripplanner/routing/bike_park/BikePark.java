@@ -2,7 +2,6 @@ package org.opentripplanner.routing.bike_park;
 
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 
-import javax.xml.bind.annotation.XmlAttribute;
 import java.io.Serializable;
 import java.util.Locale;
 
@@ -13,20 +12,16 @@ public class BikePark implements Serializable {
      * Unique ID of the bike park. Creator should ensure the ID is unique server-wide (prefix by a
      * source ID if there are several sources)
      */
-    @XmlAttribute
     @JsonSerialize
     public String id;
 
-    @XmlAttribute
     @JsonSerialize
     public String name;
 
     /** Note: x = Longitude, y = Latitude */
-    @XmlAttribute
     @JsonSerialize
     public double x, y;
 
-    @XmlAttribute
     @JsonSerialize
     public int spacesAvailable = Integer.MAX_VALUE;
 
@@ -34,7 +29,6 @@ public class BikePark implements Serializable {
      * Whether this station has space available information updated in real-time. If no real-time
      * data, users should take spacesAvailable with a pinch of salt, as they are a crude estimate.
      */
-    @XmlAttribute
     @JsonSerialize
     public boolean realTimeData = true;
 

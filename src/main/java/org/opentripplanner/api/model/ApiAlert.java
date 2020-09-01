@@ -1,4 +1,4 @@
-package org.opentripplanner.api.model.alertpatch;
+package org.opentripplanner.api.model;
 
 import java.util.Date;
 
@@ -8,4 +8,5 @@ public class ApiAlert {
     public String alertUrl;
     /** null means unknown */
     public Date effectiveStartDate;
+    public Date effectiveEndDate;
 }

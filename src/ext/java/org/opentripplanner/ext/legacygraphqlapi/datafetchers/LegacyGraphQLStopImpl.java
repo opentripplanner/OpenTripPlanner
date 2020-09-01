@@ -16,9 +16,9 @@ import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graphfinder.StopAtDistance;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -343,7 +343,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
 
   // TODO
   @Override
-  public DataFetcher<Iterable<AlertPatch>> alerts() {
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
   }
 

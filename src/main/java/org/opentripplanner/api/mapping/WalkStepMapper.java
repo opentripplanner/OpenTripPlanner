@@ -13,10 +13,10 @@ import static org.opentripplanner.api.mapping.ElevationMapper.mapElevation;
 import static org.opentripplanner.api.mapping.RelativeDirectionMapper.mapRelativeDirection;
 
 public class WalkStepMapper {
-    private final AlertMapper alertsMapper;
+    private final StreetNoteMaperMapper alertsMapper;
 
     public WalkStepMapper(Locale locale) {
-        this.alertsMapper = new AlertMapper(locale);
+        this.alertsMapper = new StreetNoteMaperMapper(locale);
     }
 
     public List<ApiWalkStep> mapWalkSteps(Collection<WalkStep> domain) {
@@ -41,7 +41,7 @@ public class WalkStepMapper {
             api.lat = domain.startLocation.latitude();
         }
         api.elevation = mapElevation(domain.elevation);
-        api.alerts = alertsMapper.mapToApi(domain.alerts);
+        api.alerts = alertsMapper.mapToApi(domain.streetNotes);
 
         return api;
     }

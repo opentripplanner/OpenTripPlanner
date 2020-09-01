@@ -1,31 +1,31 @@
 package org.opentripplanner.routing.services.notes;
 
-import java.io.Serializable;
+import org.opentripplanner.model.StreetNote;
 
-import org.opentripplanner.routing.alertpatch.Alert;
+import java.io.Serializable;
 
 /**
  * A container for a pair (note matcher, note).
  * 
  * @author laurent
  */
-public class MatcherAndAlert implements Serializable {
+public class MatcherAndStreetNote implements Serializable {
     private static final long serialVersionUID = 1L;
 
-    public MatcherAndAlert(NoteMatcher matcher, Alert note) {
+    public MatcherAndStreetNote(NoteMatcher matcher, StreetNote note) {
         this.matcher = matcher;
         this.note = note;
     }
 
     private NoteMatcher matcher;
 
-    private Alert note;
+    private StreetNote note;
 
     public NoteMatcher getMatcher() {
         return matcher;
     }
 
-    public Alert getNote() {
+    public StreetNote getNote() {
         return note;
     }
 }

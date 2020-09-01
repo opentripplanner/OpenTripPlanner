@@ -16,7 +16,6 @@ import java.util.stream.Collectors;
 public enum OTPFeature {
     APIExternalGeocoder(true),
     APIBikeRental(true),
-    APIAlertPatcher(true),
     APIServerInfo(true),
     APIGraphInspectorTile(true),
     APIUpdaterStatus(true),

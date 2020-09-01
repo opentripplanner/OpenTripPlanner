@@ -13,7 +13,7 @@ import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.util.PolylineEncoder;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
@@ -122,7 +122,7 @@ public class LegacyGraphQLPatternImpl implements LegacyGraphQLDataFetchers.Legac
 
   // TODO
   @Override
-  public DataFetcher<Iterable<AlertPatch>> alerts() {
+  public DataFetcher<Iterable<TransitAlert>> alerts() {
     return environment -> List.of();
   }
 

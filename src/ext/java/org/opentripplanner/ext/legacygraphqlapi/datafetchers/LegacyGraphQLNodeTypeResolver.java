@@ -11,10 +11,10 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.TripTimeShort;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 import org.opentripplanner.routing.graphfinder.StopAtDistance;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareRuleSet;
@@ -27,7 +27,7 @@ public class LegacyGraphQLNodeTypeResolver implements TypeResolver {
     GraphQLSchema schema = environment.getSchema();
 
     if (o instanceof Agency) return schema.getObjectType("Agency");
-    if (o instanceof AlertPatch) return schema.getObjectType("Alert");
+    if (o instanceof TransitAlert) return schema.getObjectType("Alert");
     if (o instanceof BikePark) return schema.getObjectType("BikePark");
     if (o instanceof BikeRentalStation) return schema.getObjectType("BikeRentalStation");
     // if (o instanceof CarPark) return schema.getObjectType("CarPark");

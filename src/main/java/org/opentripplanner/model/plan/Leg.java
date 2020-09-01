@@ -1,14 +1,13 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.alertpatch.Alert;
-import org.opentripplanner.routing.alertpatch.AlertPatch;
+import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
-import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.HashSet;
 import java.util.List;
@@ -190,9 +189,9 @@ public class Leg {
     */
    public List<WalkStep> walkSteps;
 
-   public Set<Alert> alerts = new HashSet<>();
+   public Set<StreetNote> streetNotes = new HashSet<>();
 
-   public List<AlertPatch> alertPatches = new ArrayList<>();
+   public Set<TransitAlert> transitAlerts = new HashSet<>();
 
    public String routeShortName;
    public String routeLongName;
@@ -227,8 +226,8 @@ public class Leg {
         return (500 + endTime.getTimeInMillis() - startTime.getTimeInMillis()) / 1000;
     }
 
-    public void addAlert(Alert alert) {
-        alerts.add(alert);
+    public void addStretNote(StreetNote streetNote) {
+        streetNotes.add(streetNote);
     }
 
     public void setTimeZone(TimeZone timeZone) {
@@ -241,10 +240,8 @@ public class Leg {
         agencyTimeZoneOffset = timeZone.getOffset(startTime.getTimeInMillis());
     }
 
-    public void addAlertPatch(AlertPatch alertPatch) {
-        if (!alertPatches.contains(alertPatch)) {
-            alertPatches.add(alertPatch);
-        }
+    public void addAlert(TransitAlert alert) {
+        transitAlerts.add(alert);
     }
 
     /**
@@ -299,8 +296,8 @@ public class Leg {
                 .addCol("intermediateStops", intermediateStops)
                 .addObj("legGeometry", legGeometry)
                 .addCol("walkSteps", walkSteps)
-                .addCol("alerts", alerts)
-                .addCol("alertPatches", alertPatches)
+                .addCol("streetNotes", streetNotes)
+                .addCol("transitAlerts", transitAlerts)
                 .addStr("routeShortName", routeShortName)
                 .addStr("routeLongName", routeLongName)
                 .addStr("boardRule", boardRule)

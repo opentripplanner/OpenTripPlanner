@@ -172,7 +172,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
     private void parseGroupOfLines(Collection<GroupOfLines> groupOfLines, Network network) {
         for (GroupOfLines group : groupOfLines) {
-            networkIdByGroupOfLineId.put(network.getId(), group.getId());
+            networkIdByGroupOfLineId.put(group.getId(), network.getId());
+            this.groupOfLines.add(group);
         }
     }
 

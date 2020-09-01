@@ -11,5 +11,5 @@ import org.opentripplanner.routing.graph.Edge;
  */
 public interface StreetNotesSource {
 
-    public Set<MatcherAndAlert> getNotes(Edge edge);
+    public Set<MatcherAndStreetNote> getNotes(Edge edge);
 }
