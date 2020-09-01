@@ -213,6 +213,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<StopArrival>> intermediatePlaces();
     public DataFetcher<Boolean> intermediatePlace();
     public DataFetcher<Iterable<WalkStep>> steps();
+    public DataFetcher<String> pickupType();
+    public DataFetcher<String> dropoffType();
+    public DataFetcher<Boolean> interlineWithPreviousLeg();
   }
   
   /** An object with an ID */
@@ -294,6 +297,9 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Itinerary>> itineraries();
     public DataFetcher<Iterable<String>> messageEnums();
     public DataFetcher<Iterable<String>> messageStrings();
+    public DataFetcher<Long> prevDateTime();
+    public DataFetcher<Long> nextDateTime();
+    public DataFetcher<Long> searchWindowUsed();
     public DataFetcher<DebugOutput> debugOutput();
   }
   

@@ -107,7 +107,7 @@ public class LegacyGraphQLQueryTypeImpl
               .arguments(Map.of("id", internalId))
               .build());
 
-          return new PlaceAtDistance(place, Integer.parseInt(parts[0]));
+          return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
         }
         case "Route":
           return routingService.getRouteForId(FeedScopedId.parseId(id));
