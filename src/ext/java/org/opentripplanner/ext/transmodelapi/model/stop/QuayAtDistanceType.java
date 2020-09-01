@@ -31,7 +31,8 @@ public class QuayAtDistanceType {
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("distance")
-                    .type(Scalars.GraphQLInt)
+                    .type(Scalars.GraphQLFloat)
+                    .description("The distance in meters to the given quay.")
                     .dataFetcher(environment -> ((StopAtDistance) environment.getSource()).distance)
                     .build())
             .build();

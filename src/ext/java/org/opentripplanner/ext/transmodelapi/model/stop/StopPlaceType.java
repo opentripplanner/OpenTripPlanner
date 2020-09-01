@@ -72,11 +72,6 @@ public class StopPlaceType {
             .dataFetcher(environment -> (((MonoOrMultiModalStation) environment.getSource()).getDescription()))
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("wheelchairBoarding")
-            .description("Whether this stop place is suitable for wheelchair boarding.")
-            .type(EnumTypes.WHEELCHAIR_BOARDING)
-            .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("weighting")
             .description("Relative weighting of this stop with regards to interchanges. NOT IMPLEMENTED")
             .type(EnumTypes.INTERCHANGE_WEIGHTING)
@@ -90,13 +85,17 @@ public class StopPlaceType {
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("transportMode")
-            .description("The transport mode serviced by this stop place.  NOT IMPLEMENTED")
-            .type(TRANSPORT_MODE)
-            .dataFetcher(environment -> "unknown")
+            .description("The transport modes of quays under this stop place.")
+            .type(new GraphQLList(TRANSPORT_MODE))
+            .dataFetcher(environment ->
+                ((MonoOrMultiModalStation) environment.getSource()).getChildStops()
+                    .stream().map(Stop::getVehicleType).collect(Collectors.toSet())
+                )
             .build())
         .field(GraphQLFieldDefinition.newFieldDefinition()
             .name("transportSubmode")
             .description("The transport submode serviced by this stop place. NOT IMPLEMENTED")
+            .deprecate("Submodes not implemented")
             .type(TRANSPORT_SUBMODE)
             .dataFetcher(environment -> TransmodelTransportSubmode.UNDEFINED)
             .build())
@@ -106,10 +105,6 @@ public class StopPlaceType {
         //                        .type(new GraphQLList(Scalars.GraphQLString))
         //                        .dataFetcher(environment -> ((MonoOrMultiModalStation) environment.getSource()).getAdjacentSites())
         //                        .build())
-        .field(GraphQLFieldDefinition.newFieldDefinition()
-            .name("timezone")
-            .type(new GraphQLNonNull(Scalars.GraphQLString))
-            .build())
         // TODO stopPlaceType?
 
         .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -338,7 +333,7 @@ public class StopPlaceType {
         .distinct();
 
     if (authority != null) {
-      stations = stations.filter(s -> s.getId().equals(authority));
+      stations = stations.filter(s -> s.getId().getFeedId().equalsIgnoreCase(authority));
     }
 
     if (TRUE.equals(filterByInUse)) {

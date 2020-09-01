@@ -14,7 +14,7 @@ import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcess
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.calendar.CalendarServiceData;
 import org.opentripplanner.routing.algorithm.astar.AStar;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.core.State;
@@ -429,7 +429,7 @@ public class TestGeometryAndBlockProcessor extends TestCase {
         Vertex stop_c = graph.getVertex(feedId + ":C");
         Vertex stop_d = graph.getVertex(feedId + ":D");
         RoutingRequest options = new RoutingRequest();
-        options.optimize = OptimizeType.QUICK;
+        options.optimize = BicycleOptimizeType.QUICK;
         options.dateTime = TestUtils.dateInSeconds("America/New_York", 2009, 8, 1, 16, 0, 0);
         options.setRoutingContext(graph, stop_c, stop_d);  
                 
