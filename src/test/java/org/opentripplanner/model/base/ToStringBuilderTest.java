@@ -1,6 +1,8 @@
 package org.opentripplanner.model.base;
 
 import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Trip;
 
 import java.time.Duration;
 import java.time.LocalDateTime;
@@ -70,6 +72,16 @@ public class ToStringBuilderTest {
   public void addEnum() {
     assertEquals("ToStringBuilderTest{a: A}", subject().addEnum("a", AEnum.A).toString());
     assertEquals("ToStringBuilderTest{}", subject().addEnum("b", null).toString());
+  }
+
+  @Test
+  public void addTransitEntity() {
+    Trip trip = new Trip();
+    trip.setId(new FeedScopedId("F", "1"));
+    assertEquals(
+        "ToStringBuilderTest{tripId: F:1}",
+        subject().addEntityId("tripId", trip).toString()
+    );
   }
 
   @Test

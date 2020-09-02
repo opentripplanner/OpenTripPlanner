@@ -55,22 +55,35 @@ public class LegMapper {
         api.distance = domain.distanceMeters;
         api.pathway = domain.pathway;
         api.mode = TraverseModeMapper.mapToApi(domain.mode);
-        api.transitLeg = domain.mode == null ? null : domain.mode.isTransit();
-        api.route = domain.route;
-        api.agencyName = domain.agencyName;
-        api.agencyUrl = domain.agencyUrl;
-        api.agencyBrandingUrl = domain.agencyBrandingUrl;
         api.agencyTimeZoneOffset = domain.agencyTimeZoneOffset;
-        api.routeColor = domain.routeColor;
-        api.routeType = domain.routeType;
-        api.routeId = FeedScopedIdMapper.mapToApi(domain.routeId);
-        api.routeTextColor = domain.routeTextColor;
+        api.transitLeg = domain.isTransitLeg();
+
+        if(domain.isTransitLeg()) {
+            var agency = domain.getAgency();
+            api.agencyId = FeedScopedIdMapper.mapToApi(agency.getId());
+            api.agencyName = agency.getName();
+
+            var route = domain.getRoute();
+            api.route = route.getLongName();
+            api.routeColor = route.getColor();
+            api.routeType = domain.routeType;
+            api.routeId = FeedScopedIdMapper.mapToApi(route.getId());
+            api.routeShortName = route.getShortName();
+            api.routeLongName = route.getLongName();
+            api.routeTextColor = route.getTextColor();
+
+            var trip = domain.getTrip();
+            api.tripId = FeedScopedIdMapper.mapToApi(trip.getId());
+            api.tripShortName = trip.getTripShortName();
+            api.tripBlockId = trip.getBlockId();
+        }
+        else {
+            // TODO OTP2 - This should be set to the street name according to the JavaDoc
+            api.route = "";
+        }
+
         api.interlineWithPreviousLeg = domain.interlineWithPreviousLeg;
-        api.tripShortName = domain.tripShortName;
-        api.tripBlockId = domain.tripBlockId;
         api.headsign = domain.headsign;
-        api.agencyId = FeedScopedIdMapper.mapToApi(domain.agencyId);
-        api.tripId = FeedScopedIdMapper.mapToApi(domain.tripId);
         api.serviceDate = ServiceDateMapper.mapToApi(domain.serviceDate);
         api.routeBrandingUrl = domain.routeBrandingUrl;
         api.intermediateStops = PlaceMapper.mapStopArrivals(domain.intermediateStops);
@@ -80,8 +93,6 @@ public class LegMapper {
             streetNoteMaperMapper.mapToApi(domain.streetNotes),
             alertMapper.mapToApi(domain.transitAlerts)
         );
-        api.routeShortName = domain.routeShortName;
-        api.routeLongName = domain.routeLongName;
         api.boardRule = domain.boardRule;
         api.alightRule = domain.alightRule;
         api.rentedBike = domain.rentedBike;

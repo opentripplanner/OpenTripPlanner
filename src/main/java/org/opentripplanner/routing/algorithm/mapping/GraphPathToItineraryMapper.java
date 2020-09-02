@@ -250,7 +250,7 @@ public abstract class GraphPathToItineraryMapper {
      * @return The generated leg
      */
     private static Leg generateLeg(Graph graph, State[] states, Locale requestedLocale) {
-        Leg leg = new Leg();
+        Leg leg = new Leg(resolveMode(states));
 
         Edge[] edges = new Edge[states.length - 1];
 
@@ -282,7 +282,7 @@ public abstract class GraphPathToItineraryMapper {
 
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states);
+        addAlerts(graph, leg, states);
 
         return leg;
     }
@@ -399,20 +399,31 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
+     * Resolve mode from states.
+     * @param states The states that go with the leg
+     */
+    private static TraverseMode resolveMode(State[] states) {
+        TraverseMode returnMode = TraverseMode.WALK;
+
+        for (State state : states) {
+            TraverseMode mode = state.getBackMode();
+
+            if (mode != null) {
+                returnMode = mode;
+            }
+        }
+        return returnMode;
+    }
+
+    /**
      * Add mode and alerts fields to a {@link Leg}.
      *
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
-            TraverseMode mode = state.getBackMode();
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
-            Edge edge = state.getBackEdge();
-
-            if (mode != null) {
-                leg.mode = mode;
-            }
 
             if (streetNotes != null) {
                 for (StreetNote streetNote : streetNotes) {

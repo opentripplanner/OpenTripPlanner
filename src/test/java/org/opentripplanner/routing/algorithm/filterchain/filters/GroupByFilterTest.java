@@ -109,8 +109,7 @@ public class GroupByFilterTest {
      */
     private GroupByFilter<AGroupId> createFilter(int minLimit) {
         return new GroupByFilter<>(
-            "test",
-            i -> new AGroupId(i.firstLeg().tripId.getId()),
+            "test", i -> new AGroupId(i.firstLeg().getTrip().getId().getId()),
             new OtpDefaultSortOrder(false),
             minLimit
         );

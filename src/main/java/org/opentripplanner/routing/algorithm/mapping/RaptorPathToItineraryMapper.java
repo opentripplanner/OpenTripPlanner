@@ -3,9 +3,7 @@ package org.opentripplanner.routing.algorithm.mapping;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.model.GenericLocation;
-import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
@@ -141,16 +139,13 @@ public class RaptorPathToItineraryMapper {
             TransitPathLeg<TripSchedule> pathLeg,
             boolean firstLeg
     ) {
-        Leg leg = new Leg();
 
         Stop boardStop = transitLayer.getStopByIndex(pathLeg.fromStop());
         Stop alightStop = transitLayer.getStopByIndex(pathLeg.toStop());
         TripSchedule tripSchedule = pathLeg.trip();
         TripTimes tripTimes = tripSchedule.getOriginalTripTimes();
-        TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
-        Trip trip = tripTimes.trip;
-        Route route = tripPattern.route;
-        int numStopsInPattern = tripTimes.getNumStops();
+
+        Leg leg = new Leg(tripTimes.trip);
 
         // Find stop positions in pattern where this leg boards and alights.
         // We cannot assume every stop appears only once in a pattern, so we match times instead of stops.
@@ -168,8 +163,6 @@ public class RaptorPathToItineraryMapper {
         leg.intermediateStops = new ArrayList<>();
         leg.startTime = createCalendar(pathLeg.fromTime());
         leg.endTime = createCalendar(pathLeg.toTime());
-        leg.mode = TraverseMode.fromTransitMode(tripPattern.getMode());
-        leg.tripId = trip.getId();
         leg.from = mapStopToPlace(boardStop, boardStopIndexInPattern);
         leg.to = mapStopToPlace(alightStop, alightStopIndexInPattern);
         List<Coordinate> transitLegCoordinates = extractTransitLegCoordinates(pathLeg);
@@ -180,14 +173,6 @@ public class RaptorPathToItineraryMapper {
             leg.intermediateStops = extractIntermediateStops(pathLeg);
         }
 
-        leg.route = route.getLongName();
-        leg.routeId = route.getId();
-        leg.agencyName = route.getAgency().getName();
-        leg.routeColor = route.getColor();
-        leg.tripShortName = trip.getTripShortName();
-        leg.agencyId = route.getAgency().getId();
-        leg.routeShortName = route.getShortName();
-        leg.routeLongName = route.getLongName();
         leg.headsign = tripTimes.getHeadsign(boardStopIndexInPattern);
         leg.walkSteps = new ArrayList<>();
 
@@ -247,12 +232,11 @@ public class RaptorPathToItineraryMapper {
     private void mapNonTransitLeg(List<Leg> legs, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
         List<Edge> edges = transfer.getEdges();
         if (edges.isEmpty()) {
-            Leg leg = new Leg();
+            Leg leg = new Leg(TraverseMode.WALK);
             leg.from = from;
             leg.to = to;
             leg.startTime = createCalendar(pathLeg.fromTime());
             leg.endTime = createCalendar(pathLeg.toTime());
-            leg.mode = TraverseMode.WALK;
             leg.legGeometry = PolylineEncoder.createEncodings(transfer.getCoordinates());
             leg.distanceMeters = (double) transfer.getDistanceMeters();
             leg.walkSteps = Collections.emptyList();

@@ -1,6 +1,9 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Route;
+import org.opentripplanner.model.TransitMode;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.ArrayList;
@@ -9,8 +12,6 @@ import java.util.List;
 
 import static java.util.Calendar.FEBRUARY;
 import static org.opentripplanner.routing.core.TraverseMode.BICYCLE;
-import static org.opentripplanner.routing.core.TraverseMode.BUS;
-import static org.opentripplanner.routing.core.TraverseMode.RAIL;
 import static org.opentripplanner.routing.core.TraverseMode.WALK;
 
 /**
@@ -21,6 +22,10 @@ import static org.opentripplanner.routing.core.TraverseMode.WALK;
  * demonstrate which data is needed by the "code-under-test".
  */
 public class TestItineraryBuilder {
+  public static final String FEED = "F";
+  public static final Route BUS_ROUTE = route(TransitMode.BUS);
+  public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
+
   public static final Place A = place("A", 5.0, 8.0 );
   public static final Place B = place("B", 6.0, 8.5);
   public static final Place C = place("C", 7.0, 9.0);
@@ -79,7 +84,7 @@ public class TestItineraryBuilder {
   public TestItineraryBuilder walk(int duration, Place to) {
     if(lastEndTime == NOT_SET) { throw new IllegalStateException("Start time unknown!"); }
     cost += cost(WALK_RELUCTANCE_FACTOR, duration);
-    leg(WALK, lastEndTime, lastEndTime + duration, to);
+    streetLeg(WALK, lastEndTime, lastEndTime + duration, to);
     return this;
   }
 
@@ -89,7 +94,7 @@ public class TestItineraryBuilder {
    */
   public TestItineraryBuilder bicycle(int start, int end, Place to) {
     cost += cost(BICYCLE_RELUCTANCE_FACTOR, end - start);
-    leg(BICYCLE, start, end, to);
+    streetLeg(BICYCLE, start, end, to);
     return this;
   }
 
@@ -98,7 +103,7 @@ public class TestItineraryBuilder {
    * @param start/end  The number on minutes past noon. E.g. 123 is 14:03
    */
   public TestItineraryBuilder bus(int tripId, int start, int end, Place to) {
-    return transit(BUS, "B", tripId, start, end, to);
+    return transit(BUS_ROUTE, tripId, start, end, to);
   }
 
   /**
@@ -106,7 +111,7 @@ public class TestItineraryBuilder {
    * @param start/end  The number on minutes past noon. E.g. 123 is 14:03
    */
   public TestItineraryBuilder rail(int tripId, int start, int end, Place to) {
-    return transit(RAIL, "R", tripId, start, end, to);
+    return transit(RAIL_ROUTE, tripId, start, end, to);
   }
 
 
@@ -130,25 +135,25 @@ public class TestItineraryBuilder {
 
   /* private methods */
 
-  private TestItineraryBuilder transit(TraverseMode mode, String feed, int tripId, int start, int end, Place to) {
+  private TestItineraryBuilder transit(Route route, int tripId, int start, int end, Place to) {
     if(lastPlace == null) { throw new IllegalStateException("Trip from place is unknown!"); }
     int waitTime = start - lastEndTime(start);
     cost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     cost += cost(1.0f, end - start) + BOARD_COST;
-    Leg leg = leg(mode, start, end, to);
-    leg.tripId = new FeedScopedId(feed, Integer.toString(tripId));
+    leg(new Leg(trip(tripId, route)), start, end, to);
     return this;
   }
 
-  private Leg leg(TraverseMode mode, int startTime, int endTime, Place to) {
+  private Leg streetLeg(TraverseMode mode, int startTime, int endTime, Place to) {
+    return leg(new Leg(mode), startTime, endTime, to);
+  }
 
-    Leg leg = new Leg();
-    leg.mode = mode;
+  private Leg leg(Leg leg, int startTime, int endTime, Place to) {
     leg.from = place(lastPlace, TRIP_FROM_STOP_INDEX);
     leg.startTime = newTime(startTime);
     leg.to = place(to, TRIP_TO_STOP_INDEX);
     leg.endTime = newTime(endTime);
-    leg.distanceMeters = speed(mode) * 60.0 * (endTime - startTime);
+    leg.distanceMeters = speed(leg.mode) * 60.0 * (endTime - startTime);
     legs.add(leg);
 
     // Setup for adding another leg
@@ -178,7 +183,7 @@ public class TestItineraryBuilder {
 
   private static Place place(String name, double lat, double lon) {
     Place p = new Place(lat, lon, name);
-    p.stopId = new FeedScopedId("S", name);
+    p.stopId = new FeedScopedId(FEED, name);
     return p;
   }
 
@@ -187,5 +192,22 @@ public class TestItineraryBuilder {
     p.stopId = source.stopId;
     p.stopIndex = stopIndex;
     return p;
+  }
+
+  /** Create a dummy trip */
+  private  static Trip trip(int id, Route route) {
+    Trip trip = new Trip();
+    trip.setId(new FeedScopedId(FEED, Integer.toString(id)));
+    trip.setRoute(route);
+    return trip;
+  }
+
+  /** Create a dummy route */
+  private  static Route route(TransitMode mode) {
+    Route route = new Route();
+    route.setId(new FeedScopedId(FEED, mode.name()));
+    route.setMode(mode);
+    route.setLongName(mode.name());
+    return route;
   }
 }

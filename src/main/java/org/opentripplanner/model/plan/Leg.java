@@ -1,7 +1,9 @@
 package org.opentripplanner.model.plan;
 
-import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
+import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.base.ToStringBuilder;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
@@ -21,7 +23,15 @@ import java.util.TimeZone;
 
 public class Leg {
 
-   /**
+  /**
+   * The mode (e.g., <code>Walk</code>) used when traversing this leg.
+   */
+  public final TraverseMode mode;
+
+
+  private final Trip trip;
+
+  /**
     * The date and time this leg begins.
     */
    public Calendar startTime = null;
@@ -69,29 +79,7 @@ public class Leg {
     */
    public Boolean pathway = false;
 
-   /**
-    * The mode (e.g., <code>Walk</code>) used when traversing this leg.
-    */
-   public TraverseMode mode = TraverseMode.WALK;
-
-   /**
-    * For transit legs, the route of the bus or train being used. For non-transit legs, the name of
-    * the street being traversed.
-    */
-   public String route = "";
-
-   public String agencyName;
-
-   public String agencyUrl;
-
-   public String agencyBrandingUrl;
-
    public int agencyTimeZoneOffset;
-
-   /**
-    * For transit leg, the route's (background) color (if one exists). For non-transit legs, null.
-    */
-   public String routeColor = null;
 
    /**
     * For transit legs, the type of the route. Non transit -1
@@ -102,48 +90,14 @@ public class Leg {
    public Integer routeType = null;
 
    /**
-    * For transit legs, the ID of the route.
-    * For non-transit legs, null.
-    */
-   public FeedScopedId routeId = null;
-
-   /**
-    * For transit leg, the route's text color (if one exists). For non-transit legs, null.
-    */
-   public String routeTextColor = null;
-
-   /**
     * For transit legs, if the rider should stay on the vehicle as it changes route names.
     */
    public Boolean interlineWithPreviousLeg;
-
-
-   /**
-    * For transit leg, the trip's short name (if one exists). For non-transit legs, null.
-    */
-   public String tripShortName = null;
-
-   /**
-    * For transit leg, the trip's block ID (if one exists). For non-transit legs, null.
-    */
-   public String tripBlockId = null;
 
    /**
     * For transit legs, the headsign of the bus or train being used. For non-transit legs, null.
     */
    public String headsign = null;
-
-   /**
-    * For transit legs, the ID of the transit agency that operates the service used for this leg.
-    * For non-transit legs, null.
-    */
-   public FeedScopedId agencyId = null;
-
-   /**
-    * For transit legs, the ID of the trip.
-    * For non-transit legs, null.
-    */
-   public FeedScopedId tripId = null;
 
    /**
     * For transit legs, the service date of the trip.
@@ -193,16 +147,26 @@ public class Leg {
 
    public Set<TransitAlert> transitAlerts = new HashSet<>();
 
-   public String routeShortName;
-   public String routeLongName;
-
    public String boardRule;
 
    public String alightRule;
 
    public Boolean rentedBike;
 
-   /**
+  public Leg(TraverseMode mode) {
+    if(mode.isTransit()) {
+      throw new IllegalArgumentException("To create a transit leg use the other constructor.");
+    }
+    this.mode = mode;
+    this.trip = null;
+  }
+
+  public Leg(Trip trip) {
+    this.mode = TraverseMode.fromTransitMode(trip.getRoute().getMode());
+    this.trip = trip;
+  }
+
+  /**
     * Whether this leg is a transit leg or not.
     * @return Boolean true if the leg is a transit leg
     */
@@ -254,16 +218,29 @@ public class Leg {
       if(!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
 
       // If NOT the same trip, return false
-      if(!tripId.equals(other.tripId)) { return false; }
+      if(!trip.getId().equals(other.trip.getId())) { return false; }
 
       // Return true if legs overlap
       return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
     }
 
+  /**
+   * For transit legs, the route agency. For non-transit legs {@code null}.
+   */
+  public Agency getAgency() {
+    return isTransitLeg() ? getRoute().getAgency() : null;
+  }
+
+  /** For transit legs, the the trip. For non-transit legs, null. */
+  public Trip getTrip() {  return trip; }
+
+  /** For transit legs, the the route. For non-transit legs, null. */
+  public Route getRoute() { return isTransitLeg() ? trip.getRoute() : null; }
+
   /** Should be used for debug logging only */
     @Override
     public String toString() {
-        return ToStringBuilder.of(Leg.class)
+      return ToStringBuilder.of(Leg.class)
                 .addObj("from", from)
                 .addObj("to", to)
                 .addCalTime("startTime", startTime)
@@ -276,21 +253,13 @@ public class Leg {
                 .addNum("distance", distanceMeters, "m")
                 .addBool("pathway", pathway)
                 .addEnum("mode", mode)
-                .addStr("route", route)
-                .addStr("agencyName", agencyName)
-                .addStr("agencyUrl", agencyUrl)
-                .addStr("agencyBrandingUrl", agencyBrandingUrl)
                 .addNum("agencyTimeZoneOffset", agencyTimeZoneOffset, 0)
-                .addStr("routeColor", routeColor)
                 .addNum("routeType", routeType)
-                .addObj("routeId", routeId)
-                .addStr("routeTextColor", routeTextColor)
-                .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
-                .addStr("tripShortName", tripShortName)
-                .addStr("tripBlockId", tripBlockId)
+                .addEntityId("agencyId", getAgency())
+                .addEntityId("routeId", getRoute())
+                .addEntityId("tripId", trip)
                 .addStr("headsign", headsign)
-                .addObj("agencyId", agencyId)
-                .addObj("tripId", tripId)
+                .addBool("interlineWithPreviousLeg", interlineWithPreviousLeg)
                 .addObj("serviceDate", serviceDate)
                 .addStr("routeBrandingUrl", routeBrandingUrl)
                 .addCol("intermediateStops", intermediateStops)
@@ -298,8 +267,6 @@ public class Leg {
                 .addCol("walkSteps", walkSteps)
                 .addCol("streetNotes", streetNotes)
                 .addCol("transitAlerts", transitAlerts)
-                .addStr("routeShortName", routeShortName)
-                .addStr("routeLongName", routeLongName)
                 .addStr("boardRule", boardRule)
                 .addStr("alightRule", alightRule)
                 .addBool("rentedBike", rentedBike)

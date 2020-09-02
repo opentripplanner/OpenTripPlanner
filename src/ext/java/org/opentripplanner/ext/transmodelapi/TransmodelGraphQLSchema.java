@@ -2018,23 +2018,13 @@ public class TransmodelGraphQLSchema {
                         .name("authority")
                         .description("For ride legs, the service authority used for this legs. For non-ride legs, null.")
                         .type(authorityType)
-                        .dataFetcher(environment -> {
-                          return GqlUtil.getRoutingService(environment)
-                              .getAgencyForId(((Leg) environment.getSource()).agencyId);
-                        })
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).getAgency())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("operator")
                         .description("For ride legs, the operator used for this legs. For non-ride legs, null.")
                         .type(operatorType)
-                        .dataFetcher(
-                                environment -> {
-                                    FeedScopedId tripId = ((Leg) environment.getSource()).tripId;
-                                  return tripId == null ? null : GqlUtil
-                                      .getRoutingService(environment)
-                                        .getTripForId().get(tripId).getOperator();
-                                }
-                        )
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).getTrip().getOperator())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtime")
@@ -2088,18 +2078,13 @@ public class TransmodelGraphQLSchema {
                         .name("line")
                         .description("For ride legs, the line. For non-ride legs, null.")
                         .type(lineType)
-                        .dataFetcher(environment -> {
-                              return GqlUtil.getRoutingService(environment).getRouteForId(
-                                      ((Leg) environment.getSource()).routeId);
-                            }
-                        ).build())
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).getRoute())
+                    .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("serviceJourney")
                         .description("For ride legs, the service journey. For non-ride legs, null.")
                         .type(serviceJourneyType)
-                        .dataFetcher(environment -> {
-                          return GqlUtil.getRoutingService(environment).getTripForId().get(((Leg) environment.getSource()).tripId);
-                        })
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).getTrip())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("intermediateQuays")
