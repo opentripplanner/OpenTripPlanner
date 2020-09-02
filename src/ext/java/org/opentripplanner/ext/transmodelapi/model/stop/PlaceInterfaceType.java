@@ -6,6 +6,8 @@ import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
+import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -14,6 +16,7 @@ public class PlaceInterfaceType {
 
   public static GraphQLInterfaceType create(
       GraphQLOutputType quayType,
+      GraphQLOutputType stationType,
       GraphQLOutputType bikeRentalStationType,
       GraphQLOutputType bikeParkType
   ) {
@@ -38,17 +41,21 @@ public class PlaceInterfaceType {
             .build())
         .typeResolver(typeResolutionEnvironment -> {
           Object o = typeResolutionEnvironment.getObject();
+          GraphQLSchema schema = typeResolutionEnvironment.getSchema();
 
           // TODO OTP2 - Add support for Station, osv
 
           if (o instanceof Stop) {
-            return (GraphQLObjectType) quayType;
+            return schema.getObjectType("Quay");
+          }
+          if (o instanceof MonoOrMultiModalStation) {
+            return schema.getObjectType("StopPlace");
           }
           if (o instanceof BikeRentalStation) {
-            return (GraphQLObjectType) bikeRentalStationType;
+            return schema.getObjectType("BikeRentalStation");
           }
           if (o instanceof BikePark) {
-            return (GraphQLObjectType) bikeParkType;
+            return schema.getObjectType("BikePark");
           }
           //if (o instanceof CarPark) {
           //    return (GraphQLObjectType) carParkType;

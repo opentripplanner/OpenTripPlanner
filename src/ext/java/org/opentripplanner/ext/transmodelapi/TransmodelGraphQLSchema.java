@@ -22,9 +22,11 @@ import graphql.schema.GraphQLTypeReference;
 import org.apache.commons.collections.CollectionUtils;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
+import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
+import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelTransportSubmode;
 import org.opentripplanner.ext.transmodelapi.model.TransportModeSlack;
 import org.opentripplanner.ext.transmodelapi.model.TripTimeShortHelper;
@@ -47,6 +49,8 @@ import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
+import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
+import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceInterfaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayType;
@@ -60,6 +64,8 @@ import org.opentripplanner.ext.transmodelapi.model.timetable.TripMetadataType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.Place;
@@ -74,15 +80,19 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -91,8 +101,11 @@ import java.util.stream.Stream;
 import static java.lang.Boolean.TRUE;
 import static java.util.Collections.emptyList;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.MULTI_MODAL_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
+import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.filterPlaceTypeEnum;
 
 /**
  * Schema definition for the Transmodel GraphQL API.
@@ -151,6 +164,7 @@ public class TransmodelGraphQLSchema {
     GraphQLOutputType tariffZoneType = TariffZoneType.createTZ();
     GraphQLInterfaceType placeInterface = PlaceInterfaceType.create(
         QuayType.REF,
+        StopPlaceType.REF,
         new GraphQLTypeReference(BikeRentalStationType.NAME),
         new GraphQLTypeReference(BikeParkType.NAME)
     );
@@ -175,7 +189,7 @@ public class TransmodelGraphQLSchema {
         gqlUtil
     );
     GraphQLNamedOutputType quayAtDistance = QuayAtDistanceType.createQD(quayType, relay);
-//    GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay);
+    GraphQLNamedOutputType placeAtDistanceType = PlaceAtDistanceType.create(relay, placeInterface);
 
     // Network
     GraphQLObjectType presentationType = PresentationType.create();
@@ -680,34 +694,34 @@ public class TransmodelGraphQLSchema {
 //                        .build())
 //                .build();
 
-//        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
-//                .name("InputFilters")
-//                .field(GraphQLInputObjectField.newInputObjectField()
-//                        .name("quays")
-//                        .description("Quays to include by id.")
-//                        .type(new GraphQLList(Scalars.GraphQLString))
-//                        .build())
-//                .field(GraphQLInputObjectField.newInputObjectField()
-//                        .name("lines")
-//                        .description("Lines to include by id.")
-//                        .type(new GraphQLList(Scalars.GraphQLString))
-//                        .build())
-//                .field(GraphQLInputObjectField.newInputObjectField()
-//                        .name("bikeRentalStations")
-//                        .description("Bike rentals to include by id.")
-//                        .type(new GraphQLList(Scalars.GraphQLString))
-//                        .build())
-//                .field(GraphQLInputObjectField.newInputObjectField()
-//                        .name("bikeParks")
-//                        .description("Bike parks to include by id.")
-//                        .type(new GraphQLList(Scalars.GraphQLString))
-//                        .build())
-//                .field(GraphQLInputObjectField.newInputObjectField()
-//                        .name("carParks")
-//                        .description("Car parks to include by id.")
-//                        .type(new GraphQLList(Scalars.GraphQLString))
-//                        .build())
-//                .build();
+        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
+                .name("InputFilters")
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("quays")
+                        .description("Quays to include by id.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("lines")
+                        .description("Lines to include by id.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("bikeRentalStations")
+                        .description("Bike rentals to include by id.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("bikeParks")
+                        .description("Bike parks to include by id.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
+                .field(GraphQLInputObjectField.newInputObjectField()
+                        .name("carParks")
+                        .description("Car parks to include by id.")
+                        .type(new GraphQLList(Scalars.GraphQLString))
+                        .build())
+                .build();
 
     //                                String multiModalMode=environment.getArgument("multiModalMode");
     //                                if ("parent".equals(multiModalMode)){
@@ -723,123 +737,6 @@ public class TransmodelGraphQLSchema {
     //                                        .stream()
     //                                        .map(result -> index.stopForId.get(mapper.fromIdString(result.id)));
     //                            }
-    //                .field(GraphQLFieldDefinition.newFieldDefinition()
-    //                        .name("nearest")
-    //                        .description(
-    //                                "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
-    //                        .type(relay.connectionType("placeAtDistance",
-    //                                relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
-    //                                new ArrayList<>()))
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("latitude")
-    //                                .description("Latitude of the location")
-    //                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("longitude")
-    //                                .description("Longitude of the location")
-    //                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("maximumDistance")
-    //                                .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
-    //                                .defaultValue(2000)
-    //                                .type(Scalars.GraphQLInt)
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("maximumResults")
-    //                                .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
-    //                                .defaultValue(20)
-    //                                .type(Scalars.GraphQLInt)
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("filterByPlaceTypes")
-    //                                .description("Only include places of given types if set. Default accepts all types")
-    //                                .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
-    //                                .type(new GraphQLList(filterPlaceTypeEnum))
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("filterByModes")
-    //                                .description("Only include places that include this mode. Only checked for places with mode i.e. quays, departures.")
-    //                                .type(new GraphQLList(modeEnum))
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("filterByInUse")
-    //                                .description("Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included.")
-    //                                .type(Scalars.GraphQLBoolean)
-    //                                .defaultValue(Boolean.FALSE)
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("filterByIds")
-    //                                .description("Only include places that match one of the given ids.")
-    //                                .type(filterInputType)
-    //                                .build())
-    //                        .argument(GraphQLArgument.newArgument()
-    //                                .name("multiModalMode")
-    //                                .type(multiModalModeEnum)
-    //                                .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-    //                                                     " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace")
-    //                                .defaultValue("parent")
-    //                                .build())
-    //                        .argument(relay.getConnectionFieldArguments())
-    //                        .dataFetcher(environment -> {
-    //                            List<FeedScopedId> filterByStops = null;
-    //                            List<FeedScopedId> filterByRoutes = null;
-    //                            List<String> filterByBikeRentalStations = null;
-    //                            List<String> filterByBikeParks = null;
-    //                            List<String> filterByCarParks = null;
-    //                            @SuppressWarnings("rawtypes")
-    //                            Map filterByIds = environment.getArgument("filterByIds");
-    //                            if (filterByIds != null) {
-    //                                filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
-    //                                filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
-    //                                filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
-    //                                filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
-    //                                filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
-    //                            }
-    //
-    //                            List<TraverseMode> filterByTransportModes = environment.getArgument("filterByModes");
-    //                            List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
-    //                            if (CollectionUtils.isEmpty(placeTypes)) {
-    //                                placeTypes = Arrays.asList(TransmodelPlaceType.values());
-    //                            }
-    //                            List<GraphIndex.PlaceType> filterByPlaceTypes = mapper.mapPlaceTypes(placeTypes);
-    //
-    //                            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
-    //                            int orgMaxResults = environment.getArgument("maximumResults");
-    //                            int maxResults = orgMaxResults;
-    //                            if (placeTypes != null && placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-    //                                maxResults *= 5;
-    //                            }
-    //
-    //                            List<GraphIndex.PlaceAndDistance> places;
-    //                            try {
-    //                                places = index.findClosestPlacesByWalking(
-    //                                        environment.getArgument("latitude"),
-    //                                        environment.getArgument("longitude"),
-    //                                        environment.getArgument("maximumDistance"),
-    //                                        maxResults,
-    //                                        filterByTransportModes,
-    //                                        filterByPlaceTypes,
-    //                                        filterByStops,
-    //                                        filterByRoutes,
-    //                                        filterByBikeRentalStations,
-    //                                        filterByBikeParks,
-    //                                        filterByCarParks,
-    //                                        environment.getArgument("filterByInUse")
-    //                                );
-    //                            } catch (VertexNotFoundException e) {
-    //                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
-    //                                places = Collections.emptyList();
-    //                            }
-    //
-    //                            places = convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode")).stream().limit(orgMaxResults).collect(Collectors.toList());
-    //                            if (CollectionUtils.isEmpty(places)) {
-    //                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
-    //                            }
-    //                            return new SimpleListConnection(places).get(environment);
-    //                        })
-    //                        .build())
     // TODO OTP2 - FIX THIS, THIS IS A BUG
     //List<String> privateCodes=environment.getArgument("privateCodes");
     // TODO OTP2 - Use FeedScoped ID
@@ -961,7 +858,7 @@ public class TransmodelGraphQLSchema {
             .argument(GraphQLArgument
                 .newArgument()
                 .name("multiModalMode")
-                .type(EnumTypes.MULTI_MODAL_MODE)
+                .type(MULTI_MODAL_MODE)
                 .description(
                     "MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response."
                         + " Does not affect mono modal stop places that do not belong to a multi modal stop place.")
@@ -1173,123 +1070,117 @@ public class TransmodelGraphQLSchema {
               return new SimpleListConnection<>(stops).get(environment);
             })
             .build())
-        //                .field(GraphQLFieldDefinition.newFieldDefinition()
-        //                        .name("nearest")
-        //                        .description(
-        //                                "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
-        //                        .type(relay.connectionType("placeAtDistance",
-        //                                relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
-        //                                new ArrayList<>()))
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("latitude")
-        //                                .description("Latitude of the location")
-        //                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("longitude")
-        //                                .description("Longitude of the location")
-        //                                .type(new GraphQLNonNull(Scalars.GraphQLFloat))
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("maximumDistance")
-        //                                .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
-        //                                .defaultValue(2000)
-        //                                .type(Scalars.GraphQLInt)
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("maximumResults")
-        //                                .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
-        //                                .defaultValue(20)
-        //                                .type(Scalars.GraphQLInt)
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("filterByPlaceTypes")
-        //                                .description("Only include places of given types if set. Default accepts all types")
-        //                                .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
-        //                                .type(new GraphQLList(filterPlaceTypeEnum))
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("filterByModes")
-        //                                .description("Only include places that include this mode. Only checked for places with mode i.e. quays, departures.")
-        //                                .type(new GraphQLList(modeEnum))
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("filterByInUse")
-        //                                .description("Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included.")
-        //                                .type(Scalars.GraphQLBoolean)
-        //                                .defaultValue(Boolean.FALSE)
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("filterByIds")
-        //                                .description("Only include places that match one of the given ids.")
-        //                                .type(filterInputType)
-        //                                .build())
-        //                        .argument(GraphQLArgument.newArgument()
-        //                                .name("multiModalMode")
-        //                                .type(multiModalModeEnum)
-        //                                .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
-        //                                                     " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace")
-        //                                .defaultValue("parent")
-        //                                .build())
-        //                        .argument(relay.getConnectionFieldArguments())
-        //                        .dataFetcher(environment -> {
-        //                            List<FeedScopedId> filterByStops = null;
-        //                            List<FeedScopedId> filterByRoutes = null;
-        //                            List<String> filterByBikeRentalStations = null;
-        //                            List<String> filterByBikeParks = null;
-        //                            List<String> filterByCarParks = null;
-        //                            @SuppressWarnings("rawtypes")
-        //                            Map filterByIds = environment.getArgument("filterByIds");
-        //                            if (filterByIds != null) {
-        //                                filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
-        //                                filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
-        //                                filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
-        //                                filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
-        //                                filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
-        //                            }
-        //
-        //                            List<TraverseMode> filterByTransportModes = environment.getArgument("filterByModes");
-        //                            List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
-        //                            if (CollectionUtils.isEmpty(placeTypes)) {
-        //                                placeTypes = Arrays.asList(TransmodelPlaceType.values());
-        //                            }
-        //                            List<GraphIndex.PlaceType> filterByPlaceTypes = mapper.mapPlaceTypes(placeTypes);
-        //
-        //                            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
-        //                            int orgMaxResults = environment.getArgument("maximumResults");
-        //                            int maxResults = orgMaxResults;
-        //                            if (placeTypes != null && placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-        //                                maxResults *= 5;
-        //                            }
-        //
-        //                            List<GraphIndex.PlaceAndDistance> places;
-        //                            try {
-        //                                places = index.findClosestPlacesByWalking(
-        //                                        environment.getArgument("latitude"),
-        //                                        environment.getArgument("longitude"),
-        //                                        environment.getArgument("maximumDistance"),
-        //                                        maxResults,
-        //                                        filterByTransportModes,
-        //                                        filterByPlaceTypes,
-        //                                        filterByStops,
-        //                                        filterByRoutes,
-        //                                        filterByBikeRentalStations,
-        //                                        filterByBikeParks,
-        //                                        filterByCarParks,
-        //                                        environment.getArgument("filterByInUse")
-        //                                );
-        //                            } catch (VertexNotFoundException e) {
-        //                                LOG.warn("findClosestPlacesByWalking failed with exception, returning empty list of places. " , e);
-        //                                places = Collections.emptyList();
-        //                            }
-        //
-        //                            places = convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode")).stream().limit(orgMaxResults).collect(Collectors.toList());
-        //                            if (CollectionUtils.isEmpty(places)) {
-        //                                return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
-        //                            }
-        //                            return new SimpleListConnection(places).get(environment);
-        //                        })
-        //                        .build())
+        .field(GraphQLFieldDefinition.newFieldDefinition()
+          .name("nearest")
+          .description(
+              "Get all places (quays, stop places, car parks etc. with coordinates) within the specified radius from a location. The returned type has two fields place and distance. The search is done by walking so the distance is according to the network of walkables.")
+          .type(relay.connectionType("placeAtDistance",
+              relay.edgeType("placeAtDistance", placeAtDistanceType, null, new ArrayList<>()),
+              new ArrayList<>()))
+          .argument(GraphQLArgument.newArgument()
+              .name("latitude")
+              .description("Latitude of the location")
+              .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("longitude")
+              .description("Longitude of the location")
+              .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("maximumDistance")
+              .description("Maximum distance (in meters) to search for from the specified location. Default is 2000m.")
+              .defaultValue(2000)
+              .type(new GraphQLNonNull(Scalars.GraphQLFloat))
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("maximumResults")
+              .description("Maximum number of results. Search is stopped when this limit is reached. Default is 20.")
+              .defaultValue(20)
+              .type(Scalars.GraphQLInt)
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("filterByPlaceTypes")
+              .description("Only include places of given types if set. Default accepts all types")
+              .defaultValue(Arrays.asList(TransmodelPlaceType.values()))
+              .type(new GraphQLList(filterPlaceTypeEnum))
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("filterByModes")
+              .description("Only include places that include this mode. Only checked for places with mode i.e. quays, departures.")
+              .type(new GraphQLList(TRANSPORT_MODE))
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("filterByInUse")
+              .description("Only affects queries for quays and stop places. If true only quays and stop places with at least one visiting line are included.")
+              .type(Scalars.GraphQLBoolean)
+              .defaultValue(Boolean.FALSE)
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("filterByIds")
+              .description("Only include places that match one of the given ids.")
+              .type(filterInputType)
+              .build())
+          .argument(GraphQLArgument.newArgument()
+              .name("multiModalMode")
+              .type(MULTI_MODAL_MODE)
+              .description("MultiModalMode for query. To control whether multi modal parent stop places, their mono modal children or both are included in the response." +
+                  " Does not affect mono modal stop places that do not belong to a multi modal stop place. Only applicable for placeType StopPlace")
+              .defaultValue("parent")
+              .build())
+          .argument(relay.getConnectionFieldArguments())
+          .dataFetcher(environment -> {
+            List<FeedScopedId> filterByStops = null;
+            List<FeedScopedId> filterByRoutes = null;
+            List<String> filterByBikeRentalStations = null;
+            List<String> filterByBikeParks = null;
+            List<String> filterByCarParks = null;
+            @SuppressWarnings("rawtypes") Map filterByIds = environment.getArgument("filterByIds");
+            if (filterByIds != null) {
+              filterByStops = toIdList(((List<String>) filterByIds.get("quays")));
+              filterByRoutes = toIdList(((List<String>) filterByIds.get("lines")));
+              filterByBikeRentalStations = filterByIds.get("bikeRentalStations") != null ? (List<String>) filterByIds.get("bikeRentalStations") : Collections.emptyList();
+              filterByBikeParks = filterByIds.get("bikeParks") != null ? (List<String>) filterByIds.get("bikeParks") : Collections.emptyList();
+              filterByCarParks = filterByIds.get("carParks") != null ? (List<String>) filterByIds.get("carParks") : Collections.emptyList();
+            }
+
+            List<TransitMode> filterByTransportModes = environment.getArgument("filterByModes");
+            List<TransmodelPlaceType> placeTypes = environment.getArgument("filterByPlaceTypes");
+            if (CollectionUtils.isEmpty(placeTypes)) {
+              placeTypes = Arrays.asList(TransmodelPlaceType.values());
+            }
+            List<PlaceType> filterByPlaceTypes = TransmodelMappingUtil.mapPlaceTypes(placeTypes);
+
+            // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
+            int orgMaxResults = environment.getArgument("maximumResults");
+            int maxResults = orgMaxResults;
+            if (placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
+              maxResults *= 5;
+            }
+
+            List<PlaceAtDistance> places;
+            places = GqlUtil.getRoutingService(environment).findClosestPlaces(
+                environment.getArgument("latitude"),
+                environment.getArgument("longitude"),
+                environment.getArgument("maximumDistance"),
+                maxResults,
+                filterByTransportModes,
+                filterByPlaceTypes,
+                filterByStops,
+                filterByRoutes,
+                filterByBikeRentalStations,
+                filterByBikeParks,
+                filterByCarParks,
+                GqlUtil.getRoutingService(environment)
+            );
+
+            places = convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode"), GqlUtil.getRoutingService(environment)).stream().limit(orgMaxResults).collect(Collectors.toList());
+            if (CollectionUtils.isEmpty(places)) {
+              return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
+            }
+            return new SimpleListConnection(places).get(environment);
+          })
+          .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
             .name("authority")
@@ -1745,43 +1636,51 @@ public class TransmodelGraphQLSchema {
 
 
 
+    /**
+     * Create PlaceAndDistance objects for all unique stopPlaces according to specified multiModalMode if client has requested stopPlace type.
+     *
+     * Necessary because nearest does not support StopPlace (stations), so we need to fetch quays instead and map the response.
+     *
+     * Remove PlaceAndDistance objects for quays if client has not requested these.
+     */
+    private List<PlaceAtDistance> convertQuaysToStopPlaces(List<TransmodelPlaceType> placeTypes, List<PlaceAtDistance> places, String multiModalMode, RoutingService routingService) {
+        if (placeTypes==null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
+            // Convert quays to stop places
+          List<PlaceAtDistance> stations = places
+              .stream()
+              .filter(p -> p.place instanceof Stop)
+              .map(p -> new PlaceAtDistance(new MonoOrMultiModalStation(((Stop) p.place).getParentStation(),
+                  null
+              ), p.distance))
+              .collect(Collectors.toList());
 
-//    /**
-//     * Create PlaceAndDistance objects for all unique stopPlaces according to specified multiModalMode if client has requested stopPlace type.
-//     *
-//     * Necessary because nearest does not support StopPlace (stations), so we need to fetch quays instead and map the response.
-//     *
-//     * Remove PlaceAndDistance objects for quays if client has not requested these.
-//     */
-//    private List<GraphIndex.PlaceAndDistance> convertQuaysToStopPlaces(List<TransmodelPlaceType> placeTypes, List<GraphIndex.PlaceAndDistance> places, String multiModalMode) {
-//        if (placeTypes==null || placeTypes.contains(TransmodelPlaceType.STOP_PLACE)) {
-//            // Convert quays to stop places
-//            List<GraphIndex.PlaceAndDistance> stations = places.stream().filter(p -> p.place instanceof Stop)
-//                                                                 .map(p -> new GraphIndex.PlaceAndDistance(index.stationForId.get(((Stop) p.place).getParentStationId()), p.distance))
-//                                                                 .filter(Objects::nonNull).collect(Collectors.toList());
-//
-//            if ("parent".equals(multiModalMode)) {
-//                // Replace monomodal children with their multimodal parents
-//                stations = stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse((Stop) p.place), p.distance)).collect(Collectors.toList());
-//            }
-//            if ("all".equals(multiModalMode)) {
-//                // Add multimodal parents in addition to their monomodal children
-//                places.addAll(stations.stream().map(p -> new GraphIndex.PlaceAndDistance(getParentStopPlace((Stop) p.place).orElse(null), p.distance)).filter(p -> p.place != null).collect(Collectors.toList()));
-//            }
-//
-//            places.addAll(stations);
-//
-//            if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
-//                // Remove quays if only stop places are requested
-//                places = places.stream().filter(p -> !(p.place instanceof Stop && ((Stop) p.place).getLocationType() == 0)).collect(Collectors.toList());
-//            }
-//
-//        }
-//        Collections.sort(places, Comparator.comparing(GraphIndex.PlaceAndDistance::getDistance));
-//
-//        Set<Object> uniquePlaces= new HashSet<>();
-//        return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
-//    }
+            List<PlaceAtDistance> parentStations = stations.stream()
+                .filter(p -> routingService.getMultiModalStationForStations().containsKey((MonoOrMultiModalStation) p.place))
+                .map(p -> new PlaceAtDistance( routingService.getMultiModalStationForStations().get((MonoOrMultiModalStation) p.place), p.distance))
+                .collect(Collectors.toList());
+
+            if ("parent".equals(multiModalMode)) {
+                // Replace monomodal children with their multimodal parents
+                stations = parentStations;
+            }
+            else if ("all".equals(multiModalMode)) {
+                // Add multimodal parents in addition to their monomodal children
+                places.addAll(parentStations);
+            }
+
+            places.addAll(stations);
+
+            if (placeTypes != null && !placeTypes.contains(TransmodelPlaceType.QUAY)) {
+                // Remove quays if only stop places are requested
+                places = places.stream().filter(p -> !(p.place instanceof Stop)).collect(Collectors.toList());
+            }
+
+        }
+        places.sort(Comparator.comparing(p -> p.distance));
+
+        Set<Object> uniquePlaces= new HashSet<>();
+        return places.stream().filter(s -> uniquePlaces.add(s.place)).collect(Collectors.toList());
+    }
 
     private List<FeedScopedId> toIdList(List<String> ids) {
         if (ids == null) return Collections.emptyList();
@@ -1997,7 +1896,7 @@ public class TransmodelGraphQLSchema {
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("mode")
                         .description("The mode of transport or access (e.g., foot) used when traversing this leg.")
-                        .type(EnumTypes.MODE)
+                        .type(MODE)
                         .dataFetcher(environment -> ((Leg) environment.getSource()).mode)
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()

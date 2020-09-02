@@ -3,14 +3,16 @@ package org.opentripplanner.ext.transmodelapi.model.stop;
 import graphql.Scalars;
 import graphql.relay.Relay;
 import graphql.schema.GraphQLFieldDefinition;
+import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
 import graphql.schema.GraphQLObjectType;
+import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
 
 public class PlaceAtDistanceType {
 
   public static final String NAME = "PlaceAtDistance";
 
-  public static GraphQLObjectType create(Relay relay) {
+  public static GraphQLObjectType create(Relay relay, GraphQLInterfaceType placeInterface) {
   return GraphQLObjectType.newObject()
           .name(NAME)
           .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -20,16 +22,16 @@ public class PlaceAtDistanceType {
                   .dataFetcher(environment -> relay.toGlobalId(NAME, "N/A"))
                   .build()
           )
-//                .field(GraphQLFieldDefinition.newFieldDefinition()
-//                        .name("place")
-//                        .type(placeInterface)
-//                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).place)
-//                        .build())
-//                .field(GraphQLFieldDefinition.newFieldDefinition()
-//                        .name("distance")
-//                        .type(Scalars.GraphQLInt)
-//                        .dataFetcher(environment -> ((GraphIndex.PlaceAndDistance) environment.getSource()).distance)
-//                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("place")
+                        .type(placeInterface)
+                        .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).place)
+                        .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("distance")
+                        .type(Scalars.GraphQLFloat)
+                        .dataFetcher(environment -> ((PlaceAtDistance) environment.getSource()).distance)
+                        .build())
           .build();
 }
 }
