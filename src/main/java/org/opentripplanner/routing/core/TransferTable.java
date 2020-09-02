@@ -1,9 +1,10 @@
 package org.opentripplanner.routing.core;
 
 import java.io.Serializable;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.Collection;
 
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.Trip;
@@ -20,15 +21,20 @@ public class TransferTable implements Serializable {
     /**
      * Table which contains transfers between two stops
      */
-    protected Map<P2<Stop>, Transfer> table = new HashMap<>();
+    protected Multimap<P2<Stop>, Transfer> table = ArrayListMultimap.create();
 
     private Transfer getTransfer(Stop fromStop, Stop toStop, Trip fromTrip, Trip toTrip) {
-        Transfer transfer = table.get(new P2<>(fromStop, toStop));
-        if (transfer.getFromTrip() == fromTrip && transfer.getToTrip() == toTrip) {
-            return transfer;
-        } else {
-            return null;
+        Collection<Transfer> transfers = table.get(new P2<>(fromStop, toStop));
+        for (Transfer transfer : transfers) {
+            if (transfer.getFromTrip() == fromTrip && transfer.getToTrip() == toTrip) {
+                return transfer;
+            }
         }
+        return null;
+    }
+
+    public Collection<Transfer> getTransfers() {
+        return table.values();
     }
 
     public void addTransfer(Transfer transfer) {

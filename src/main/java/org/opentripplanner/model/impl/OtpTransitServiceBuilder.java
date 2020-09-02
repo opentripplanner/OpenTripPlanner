@@ -2,6 +2,7 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
@@ -106,10 +107,10 @@ public class OtpTransitServiceBuilder {
 
     private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
+    private final EntityById<FeedScopedId, FlexTrip> flexTripsById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
-
 
     /* Accessors */
 
@@ -217,6 +218,10 @@ public class OtpTransitServiceBuilder {
 
     public Multimap<StopPattern, TripPattern> getTripPatterns() {
         return tripPatterns;
+    }
+
+    public EntityById<FeedScopedId, FlexTrip> getFlexTripsById() {
+        return flexTripsById;
     }
 
 

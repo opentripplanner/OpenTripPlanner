@@ -21,6 +21,7 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.common.geometry.SphericalDistanceLibrary;
 import org.opentripplanner.common.model.T2;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.issues.NoFutureDates;
 import org.opentripplanner.model.Agency;
@@ -243,6 +244,8 @@ public class Graph implements Serializable {
     public Map<FeedScopedId, FlexStopLocation> locationsById = new HashMap<>();
 
     public Map<FeedScopedId, FlexLocationGroup> locationGroupsById = new HashMap<>();
+
+    public Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
 
     /** The distance between elevation samples used in CompactElevationProfile. */
     private double distanceBetweenElevationSamples;
