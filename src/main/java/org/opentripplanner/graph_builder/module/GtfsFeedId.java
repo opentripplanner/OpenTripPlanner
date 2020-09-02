@@ -19,7 +19,8 @@ public class GtfsFeedId {
     private static int FEED_ID_COUNTER = 1;
 
     /**
-     * A Map that keeps track of which feed ids were generated to make sure there are no duplicates
+     * A Map that keeps track of which feed ids were generated in the {@link Builder#build()} method to make sure there
+     * are no duplicates.
      */
     private static final Set<String> seenIds = new HashSet<>();
 
