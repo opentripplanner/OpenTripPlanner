@@ -4,6 +4,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.TraverseMode;
 
 import java.util.ArrayList;
@@ -22,6 +23,7 @@ import static org.opentripplanner.routing.core.TraverseMode.WALK;
  * demonstrate which data is needed by the "code-under-test".
  */
 public class TestItineraryBuilder {
+  public static final ServiceDate SERVICE_DATE = new ServiceDate(2020, 9, 21);
   public static final String FEED = "F";
   public static final Route BUS_ROUTE = route(TransitMode.BUS);
   public static final Route RAIL_ROUTE = route(TransitMode.RAIL);
@@ -140,7 +142,8 @@ public class TestItineraryBuilder {
     int waitTime = start - lastEndTime(start);
     cost += cost(WAIT_RELUCTANCE_FACTOR, waitTime);
     cost += cost(1.0f, end - start) + BOARD_COST;
-    leg(new Leg(trip(tripId, route)), start, end, to);
+    Leg leg = leg(new Leg(trip(tripId, route)), start, end, to);
+    leg.serviceDate = SERVICE_DATE;
     return this;
   }
 

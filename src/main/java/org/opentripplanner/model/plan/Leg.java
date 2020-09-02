@@ -217,6 +217,9 @@ public class Leg {
       // Assert both legs are transit legs
       if(!isTransitLeg() || !other.isTransitLeg()) { throw new IllegalStateException(); }
 
+      // Must be on the same service date
+      if(!serviceDate.equals(other.serviceDate)) { return false; }
+
       // If NOT the same trip, return false
       if(!trip.getId().equals(other.trip.getId())) { return false; }
 
