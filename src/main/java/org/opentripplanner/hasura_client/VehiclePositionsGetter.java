@@ -25,11 +25,6 @@ public class VehiclePositionsGetter extends HasuraGetter<VehicleDescription, Veh
                         "      _gte: $lonMin\\n" +
                         "      _lte: $lonMax\\n" +
                         "    }\\n" +
-                        "    provider:{\\n" +
-                        "      available : {\\n" +
-                        "        \t_eq: true\\n" +
-                        "      }\\n" +
-                        "    }\\n" +
                         "  }) {\\n" +
                         "    providerVehicleId\\n" +
                         "    latitude\\n" +
