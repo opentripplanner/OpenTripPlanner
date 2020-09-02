@@ -20,6 +20,8 @@ import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
 import graphql.schema.GraphQLTypeReference;
 import org.apache.commons.collections.CollectionUtils;
+import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
@@ -1464,7 +1466,7 @@ public class TransmodelGraphQLSchema {
             .newFieldDefinition()
             .name("bikeRentalStationsByBbox")
             .description(
-                "Get all bike rental stations within the specified bounding box. NOT IMPLEMENTED")
+                "Get all bike rental stations within the specified bounding box.")
             .type(new GraphQLNonNull(new GraphQLList(bikeRentalStationType)))
             .argument(GraphQLArgument
                 .newArgument()
@@ -1486,7 +1488,16 @@ public class TransmodelGraphQLSchema {
                 .name("maximumLongitude")
                 .type(Scalars.GraphQLFloat)
                 .build())
-            .dataFetcher(environment -> Collections.emptyList())
+            .dataFetcher(environment -> GqlUtil
+                .getRoutingService(environment)
+                .getBikerentalStationService()
+                .getBikeRentalStationForEnvelope(new Envelope(new Coordinate(
+                    environment.getArgument("minimumLongitude"),
+                    environment.getArgument("minimumLatitude")
+                ), new Coordinate(
+                    environment.getArgument("maximumLongitude"),
+                    environment.getArgument("maximumLatitude")
+                ))))
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
