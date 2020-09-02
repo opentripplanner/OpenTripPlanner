@@ -3,7 +3,7 @@ package org.opentripplanner.routing.edgetype;
 import junit.framework.TestCase;
 
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -49,7 +49,7 @@ public class TestTriangle extends TestCase {
         double slopeSpeedLength = testStreet.getEffectiveBikeDistance();
 
         RoutingRequest options = new RoutingRequest(TraverseMode.BICYCLE);
-        options.optimize = OptimizeType.TRIANGLE;
+        options.optimize = BicycleOptimizeType.TRIANGLE;
         options.bikeSpeed = 6.0;
         options.walkReluctance = 1;
 
