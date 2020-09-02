@@ -10,7 +10,9 @@ import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -82,6 +84,10 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Map<FeedScopedId, BoardingArea> boardingAreasById;
 
+    private final Map<FeedScopedId, FlexStopLocation> locationsById;
+
+    private final Map<FeedScopedId, FlexLocationGroup> locationGroupsById;
+
     private final Map<Trip, List<StopTime>> stopTimesByTrip;
 
     private final Collection<Transfer> transfers;
@@ -110,6 +116,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.entrancesById = builder.getEntrances().asImmutableMap();
         this.pathwayNodesById = builder.getPathwayNodes().asImmutableMap();
         this.boardingAreasById = builder.getBoardingAreas().asImmutableMap();
+        this.locationsById = builder.getLocations().asImmutableMap();
+        this.locationGroupsById = builder.getLocationGroups().asImmutableMap();
         this.stopTimesByTrip = builder.getStopTimesSortedByTrip().asImmutableMap();
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
@@ -208,6 +216,16 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<BoardingArea> getAllBoardingAreas() {
         return immutableList(boardingAreasById.values());
+    }
+
+    @Override
+    public Collection<FlexStopLocation> getAllLocations() {
+        return immutableList(locationsById.values());
+    }
+
+    @Override
+    public Collection<FlexLocationGroup> getAllLocationGroups() {
+        return immutableList(locationGroupsById.values());
     }
 
     @Override

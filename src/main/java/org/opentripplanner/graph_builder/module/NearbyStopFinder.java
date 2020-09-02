@@ -6,7 +6,9 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TripPattern;
 import org.opentripplanner.routing.algorithm.astar.AStar;
 import org.opentripplanner.routing.algorithm.astar.strategies.TrivialRemainingWeightHeuristic;
@@ -89,10 +91,13 @@ public class NearbyStopFinder {
 
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
         for (StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
-            Stop ts1 = stopAtDistance.stop;
-            /* Consider this destination stop as a candidate for every trip pattern passing through it. */
-            for (TripPattern pattern : graph.index.getPatternsForStop(ts1)) {
-                closestStopForPattern.putMin(pattern, stopAtDistance);
+            StopLocation ts1 = stopAtDistance.stop;
+
+            if (ts1 instanceof Stop){
+                /* Consider this destination stop as a candidate for every trip pattern passing through it. */
+                for (TripPattern pattern : graph.index.getPatternsForStop(ts1)) {
+                    closestStopForPattern.putMin(pattern, stopAtDistance);
+                }
             }
         }
 
@@ -158,7 +163,7 @@ public class NearbyStopFinder {
                 Vertex targetVertex = state.getVertex();
                 if (originVertices.contains(targetVertex)) continue;
                 if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
-                    stopsFound.add(StopAtDistance.stopAtDistanceForState(state));
+                    stopsFound.add(StopAtDistance.stopAtDistanceForState(state, ((TransitStopVertex) targetVertex).getStop()));
                 }
             }
         }

@@ -5,6 +5,7 @@ import gnu.trove.map.hash.TIntIntHashMap;
 import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -74,7 +75,8 @@ class StreetSearch {
         }
 
         for (StopAtDistance stopAtDistance : stopAtDistanceList) {
-            int stopIndex = transitLayer.getIndexByStop(stopAtDistance.stop);
+            if (!(stopAtDistance.stop instanceof Stop)) continue;
+            int stopIndex = transitLayer.getIndexByStop((Stop) stopAtDistance.stop);
             int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             resultTimesSecByStopIndex.put(stopIndex, accessTimeSec);

@@ -3,8 +3,6 @@ package org.opentripplanner.model;
 
 import org.opentripplanner.util.TimeToStringConverter;
 
-import java.io.Serializable;
-
 
 /**
  * This class is TEMPORALLY used during mapping of GTFS and Netex into the internal Model,
@@ -21,7 +19,7 @@ public final class StopTime implements Comparable<StopTime> {
 
     private Trip trip;
 
-    private Stop stop;
+    private StopLocation stop;
 
     private int arrivalTime = MISSING_VALUE;
 
@@ -44,6 +42,14 @@ public final class StopTime implements Comparable<StopTime> {
     /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
     private String farePeriodId;
 
+    private int minArrivalTime = MISSING_VALUE;
+
+    private int maxDepartureTime = MISSING_VALUE;
+
+    private int continuousPickup;
+
+    private int continuousDropOff;
+
     public StopTime() { }
 
     public StopTime(StopTime st) {
@@ -59,6 +65,10 @@ public final class StopTime implements Comparable<StopTime> {
         this.dropOffType = st.dropOffType;
         this.shapeDistTraveled = st.shapeDistTraveled;
         this.farePeriodId = st.farePeriodId;
+        this.minArrivalTime = st.minArrivalTime;
+        this.maxDepartureTime  = st.maxDepartureTime;
+        this.continuousPickup = st.continuousPickup;
+        this.continuousDropOff = st.continuousDropOff;
     }
 
     /**
@@ -90,11 +100,11 @@ public final class StopTime implements Comparable<StopTime> {
         this.stopSequence = stopSequence;
     }
 
-    public Stop getStop() {
+    public StopLocation getStop() {
         return stop;
     }
 
-    public void setStop(Stop stop) {
+    public void setStop(StopLocation stop) {
         this.stop = stop;
     }
 
@@ -209,6 +219,38 @@ public final class StopTime implements Comparable<StopTime> {
 
     public void setFarePeriodId(String farePeriodId) {
         this.farePeriodId = farePeriodId;
+    }
+
+    public void setMinArrivalTime(int minArrivalTime) {
+        this.minArrivalTime = minArrivalTime;
+    }
+
+    public int getMinArrivalTime() {
+        return minArrivalTime;
+    }
+
+    public void setMaxDepartureTime(int maxDepartureTime) {
+        this.maxDepartureTime = maxDepartureTime;
+    }
+
+    public int getMaxDepartureTime() {
+        return maxDepartureTime;
+    }
+
+    public int getContinuousPickup() {
+        return continuousPickup;
+    }
+
+    public void setContinuousPickup(int continuousPickup) {
+        this.continuousPickup = continuousPickup;
+    }
+
+    public int getContinuousDropOff() {
+        return continuousDropOff;
+    }
+
+    public void setContinuousDropOff(int continuousDropOff) {
+        this.continuousDropOff = continuousDropOff;
     }
 
     public int compareTo(StopTime o) {

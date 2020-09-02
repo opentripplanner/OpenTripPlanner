@@ -59,6 +59,10 @@ public interface OtpTransitService {
 
     Collection<BoardingArea> getAllBoardingAreas();
 
+    Collection<FlexStopLocation> getAllLocations();
+
+    Collection<FlexLocationGroup> getAllLocationGroups();
+
     /**
      * @return the list of {@link StopTime} objects associated with the trip,
      * sorted by {@link StopTime#getStopSequence()}
