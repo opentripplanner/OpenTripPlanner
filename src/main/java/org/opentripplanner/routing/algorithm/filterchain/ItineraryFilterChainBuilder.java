@@ -72,6 +72,19 @@ public class ItineraryFilterChainBuilder {
             }
         }
 
+        // Remove itineraries if max limit is set
+        if (parameters.maxNumberOfItineraries() > 0) {
+            // Sort first to make sure we keep the most relevant itineraries
+            filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
+            filters.add(
+                new MaxLimitFilter(
+                    "number-of-itineraries-filter",
+                    parameters.maxNumberOfItineraries(),
+                    maxLimitReachedSubscriber
+                )
+            );
+        }
+
         // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
         // remove elements/ based on the given itinerary properties - not considering other
         // itineraries. This may remove itineraries in the "groupBy" filters that are considered
@@ -91,20 +104,8 @@ public class ItineraryFilterChainBuilder {
             }
         }
 
-
-        // Sort itineraries
+        // Do the final itineraries sort
         filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
-
-        // Remove itineraries if max limit is set
-        if (parameters.maxNumberOfItineraries() > 0) {
-            filters.add(
-                new MaxLimitFilter(
-                    "number-of-itineraries-filter",
-                    parameters.maxNumberOfItineraries(),
-                    maxLimitReachedSubscriber
-                )
-            );
-        }
 
         if(parameters.debug()) {
             filters = addDebugWrappers(filters);
