@@ -178,6 +178,9 @@ public class TimetableSnapshotSource {
             return;
         }
 
+        // Acquire lock on buffer
+        bufferLock.lock();
+
         //create a simple list of all the trip ids that are included in the update
         List<String> allUpdatedTripIds = new ArrayList<>();
         for (TripUpdate u : updates) {
@@ -185,9 +188,6 @@ public class TimetableSnapshotSource {
                 allUpdatedTripIds.add(u.getTrip().getTripId());
             }
         }
-
-        // Acquire lock on buffer
-        bufferLock.lock();
 
         try {
             if (fullDataset) {
