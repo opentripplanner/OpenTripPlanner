@@ -55,7 +55,7 @@ public class StreetTransitLink extends Edge {
     }
 
     public String getName() {
-        return "street transit link";
+        return this.stopVertex.getStop().getName();
     }
 
     @Override
