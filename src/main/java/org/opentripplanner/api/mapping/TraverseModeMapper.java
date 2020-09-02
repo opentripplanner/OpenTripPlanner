@@ -42,7 +42,6 @@ public class TraverseModeMapper {
             case FERRY: return "FERRY";
             case FUNICULAR: return "FUNICULAR";
             case GONDOLA: return "GONDOLA";
-            case LEG_SWITCH: return "LEG_SWITCH";
             case RAIL: return "RAIL";
             case SUBWAY: return "SUBWAY";
             case TRAM: return "TRAM";
