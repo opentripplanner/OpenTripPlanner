@@ -187,7 +187,7 @@ public class VermontFlexRoutingTest {
             // Don't make temporary edges
             AStar astar = new AStar();
             astar.getShortestPathTree(options);
-            GraphPath path = astar.getPathsToTarget().iterator().next();
+            GraphPath path = astar.getPathsToTarget().size()>0?astar.getPathsToTarget().get(0):null;
             List<Ride> rides = Ride.createRides(path);
             // possibly no rides if just walking.
             if (!rides.isEmpty()) {
@@ -227,6 +227,7 @@ public class VermontFlexRoutingTest {
         options.setArriveBy(arriveBy);
         // defaults in vermont router-config.json
         options.setMaxWalkDistance(maxWalkDistance);
+        options.setSoftWalkLimit(true);
         options.flexCallAndRideReluctance = callAndRideReluctance;
         options.routingReluctances.setWalkReluctance(walkReluctance);
         options.routingReluctances.setWaitAtBeginningFactor(waitAtBeginningFactor);
