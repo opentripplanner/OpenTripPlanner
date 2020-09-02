@@ -11,6 +11,7 @@ import org.opentripplanner.routing.spt.GraphPath;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 /**
  * Model a transit trip so that assertions can be made against it
@@ -103,45 +104,47 @@ public class Ride {
     public static List<Ride> createRides(GraphPath path) {
         List<Ride> rides = new ArrayList<>();
         Ride ride = null;
-        for (State state : path.states) {
-            Edge edge = state.getBackEdge();
-            if ( ! (edge instanceof HopEdge))
-                continue;
-            HopEdge hEdge = (HopEdge) edge;
-            if (ride == null || ! state.getRoute().equals(ride.route)) {
-                ride = new Ride();
-                rides.add(ride);
-                ride.startZone = hEdge.getBeginStop().getZoneId();
-                ride.zones.add(ride.startZone);
-                ride.agency = state.getBackTrip().getRoute().getAgency().getId();
-                ride.route = state.getRoute();
-                ride.startTime = state.getBackState().getTimeSeconds();
-                ride.firstStop = hEdge.getBeginStop();
-                ride.trip = state.getTripId();
-                if (hEdge instanceof PartialPatternHop) {
-                    PartialPatternHop hop = (PartialPatternHop) hEdge;
-                    if (hop.isFlagStopBoard()) {
-                        ride.boardType = BoardAlightType.FLAG_STOP;
-                    } else if (hop.isDeviatedRouteBoard()) {
-                        ride.boardType = BoardAlightType.DEVIATED;
+        if(Objects.nonNull(path)) {
+            for (State state : path.states) {
+                Edge edge = state.getBackEdge();
+                if (!(edge instanceof HopEdge))
+                    continue;
+                HopEdge hEdge = (HopEdge) edge;
+                if (ride == null || !state.getRoute().equals(ride.route)) {
+                    ride = new Ride();
+                    rides.add(ride);
+                    ride.startZone = hEdge.getBeginStop().getZoneId();
+                    ride.zones.add(ride.startZone);
+                    ride.agency = state.getBackTrip().getRoute().getAgency().getId();
+                    ride.route = state.getRoute();
+                    ride.startTime = state.getBackState().getTimeSeconds();
+                    ride.firstStop = hEdge.getBeginStop();
+                    ride.trip = state.getTripId();
+                    if (hEdge instanceof PartialPatternHop) {
+                        PartialPatternHop hop = (PartialPatternHop) hEdge;
+                        if (hop.isFlagStopBoard()) {
+                            ride.boardType = BoardAlightType.FLAG_STOP;
+                        } else if (hop.isDeviatedRouteBoard()) {
+                            ride.boardType = BoardAlightType.DEVIATED;
+                        }
                     }
                 }
-            }
-            ride.lastStop = hEdge.getEndStop();
-            ride.endZone  = ride.lastStop.getZoneId();
-            ride.zones.add(ride.endZone);
-            ride.endTime = state.getTimeSeconds();
-            ride.alightType = BoardAlightType.DEFAULT;
-            if (hEdge instanceof PartialPatternHop) {
-                PartialPatternHop hop = (PartialPatternHop) hEdge;
-                if (hop.isFlagStopAlight()) {
-                    ride.alightType = BoardAlightType.FLAG_STOP;
-                } else if (hop.isDeviatedRouteAlight()) {
-                    ride.alightType = BoardAlightType.DEVIATED;
+                ride.lastStop = hEdge.getEndStop();
+                ride.endZone = ride.lastStop.getZoneId();
+                ride.zones.add(ride.endZone);
+                ride.endTime = state.getTimeSeconds();
+                ride.alightType = BoardAlightType.DEFAULT;
+                if (hEdge instanceof PartialPatternHop) {
+                    PartialPatternHop hop = (PartialPatternHop) hEdge;
+                    if (hop.isFlagStopAlight()) {
+                        ride.alightType = BoardAlightType.FLAG_STOP;
+                    } else if (hop.isDeviatedRouteAlight()) {
+                        ride.alightType = BoardAlightType.DEVIATED;
+                    }
                 }
-            }
 
-            // in default fare service, classify rides by mode
+                // in default fare service, classify rides by mode
+            }
         }
         return rides;
     }
