@@ -1,5 +1,6 @@
 package org.opentripplanner.model.base;
 
+import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.transit.raptor.util.TimeUtils;
 
 import javax.validation.constraints.NotNull;
@@ -84,6 +85,10 @@ public class ToStringBuilder {
 
     public ToStringBuilder addObj(String name, Object obj) {
         return addIfNotNull(name, obj);
+    }
+
+    public ToStringBuilder addEntityId(String name, TransitEntity<?> entity) {
+        return addIfNotNull(name, entity, e -> e.getId().toString());
     }
 
     public <T> ToStringBuilder addInts(String name, int[] intArray) {

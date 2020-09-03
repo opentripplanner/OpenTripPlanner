@@ -57,7 +57,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Agency> agency() {
-    return environment -> getRoutingService(environment).getAgencyForId(getSource(environment).agencyId);
+    return environment -> getSource(environment).getAgency();
   }
 
   @Override
@@ -104,13 +104,12 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Route> route() {
-    return environment -> getRoutingService(environment).getRouteForId(getSource(environment).routeId);
+    return environment -> getSource(environment).getRoute();
   }
 
   @Override
   public DataFetcher<Trip> trip() {
-    return environment -> getRoutingService(environment).getTripForId().get(getSource(environment).tripId);
-
+    return environment -> getSource(environment).getTrip();
   }
 
   @Override
