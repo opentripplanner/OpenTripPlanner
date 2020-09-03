@@ -1,5 +1,6 @@
 package org.opentripplanner.hasura_client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.opentripplanner.hasura_client.hasura_objects.BikeStationHasura;
 import org.opentripplanner.hasura_client.mappers.BikeStationsMapper;
 import org.opentripplanner.hasura_client.mappers.HasuraToOTPMapper;
@@ -12,7 +13,7 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
     private static final Logger LOG = LoggerFactory.getLogger(HasuraGetter.class);
 
     @Override
-    protected String QUERY() {
+    protected String query() {
         return "{\"query\": \"query Stations(\\n" +
                 "  $latMin: float8\\n" +
                 "  $lonMin: float8\\n" +
@@ -43,7 +44,18 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
     }
 
     @Override
+    protected Logger getLogger() {
+        return LOG;
+    }
+
+    @Override
     protected HasuraToOTPMapper<BikeStationHasura, BikeRentalStation> mapper() {
         return new BikeStationsMapper();
+    }
+
+    @Override
+    protected TypeReference<ApiResponse<BikeStationHasura>> hasuraType() {
+        return new TypeReference<ApiResponse<BikeStationHasura>>() {
+        };
     }
 }

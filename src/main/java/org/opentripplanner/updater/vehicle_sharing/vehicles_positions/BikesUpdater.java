@@ -1,11 +1,8 @@
 package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import com.google.common.reflect.TypeToken;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
-import org.opentripplanner.hasura_client.ApiResponse;
 import org.opentripplanner.hasura_client.BikeStationsGetter;
-import org.opentripplanner.hasura_client.hasura_objects.BikeStationHasura;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -29,8 +26,7 @@ public class BikesUpdater extends PollingGraphUpdater {
     @Override
     protected void runPolling() {
         LOG.info("Polling Bike Stations from API");
-        List<BikeRentalStation> bikeRentalStations = bikeStationsGetter.getFromHasura(graph, url, new TypeToken<ApiResponse<BikeStationHasura>>() {
-        }.getType());
+        List<BikeRentalStation> bikeRentalStations = bikeStationsGetter.getFromHasura(graph, url);
         LOG.info("Got {} bike stations possible to place on a map", bikeRentalStations.size());
         graphUpdaterManager.execute(new BikeStationsGraphWriterRunnable(temporaryStreetSplitter, bikeRentalStations));
     }
