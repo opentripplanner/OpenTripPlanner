@@ -21,8 +21,4 @@ public abstract class EdgeWithParkingZones extends Edge {
     public void setParkingZones(ParkingZoneInfo parkingZones) {
         this.parkingZones = parkingZones;
     }
-
-    public ParkingZoneInfo getParkingZones() {
-        return parkingZones;
-    }
 }

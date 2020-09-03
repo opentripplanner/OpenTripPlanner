@@ -12,7 +12,6 @@ import org.slf4j.LoggerFactory;
 
 import java.util.List;
 
-//TODO one huge todo for miron
 public class BikesUpdater extends PollingGraphUpdater {
 
     private static final Logger LOG = LoggerFactory.getLogger(SharedVehiclesUpdater.class);

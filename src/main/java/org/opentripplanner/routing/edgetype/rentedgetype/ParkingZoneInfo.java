@@ -40,7 +40,7 @@ public class ParkingZoneInfo implements Serializable {
     }
 
     private boolean hasProviderAndVehicleTypeDisabledParkingZonesFeature(VehicleDescription vehicle) {
-        if (vehicle.isHubbable())
+        if (vehicle.requiresHubToDrop())
             return false;
         return parkingZonesEnabled.stream().noneMatch(pz -> pz.appliesToThisVehicle(vehicle));
     }
@@ -49,7 +49,4 @@ public class ParkingZoneInfo implements Serializable {
         return parkingZones.stream().anyMatch(pz -> pz.appliesToThisVehicle(vehicle));
     }
 
-    public List<SingleParkingZone> getParkingZones() {
-        return parkingZones;
-    }
 }

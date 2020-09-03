@@ -6,7 +6,7 @@ import org.locationtech.jts.geom.CoordinateXY;
 import org.opentripplanner.graph_builder.linking.TemporaryStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.vehicle_sharing.Provider;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.RentBikeEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.TemporaryRentVehicleVertex;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.ParkingZonesCalculator;
@@ -16,7 +16,6 @@ import java.util.Collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.verifyNoMoreInteractions;
 
 public class BikeStationsRunnableTest {
     private Graph graph;
@@ -41,24 +40,22 @@ public class BikeStationsRunnableTest {
     public void updateBikeStation() {
         //when
         temporaryStreetSplitter = mock(TemporaryStreetSplitter.class);
-        RentVehicleEdge rentVehicleEdge = new RentVehicleEdge(vertex, station11.getBikeFromStation());
+        RentBikeEdge rentVehicleEdge = new RentBikeEdge(vertex, station11);
         graph.bikeRentalStationsInGraph.put(station11, rentVehicleEdge);
         graph.parkingZonesCalculator = mock(ParkingZonesCalculator.class);
 
         BikeRentalStation newStation = station11.clone();
+
         newStation.spacesAvailable = 13;
         newStation.bikesAvailable = 12;
-
-        rentVehicleEdge.setBikeRentalStation(station11);
 
         //given
         BikeStationsGraphWriterRunnable runnable = new BikeStationsGraphWriterRunnable(temporaryStreetSplitter, Collections.singletonList(newStation));
         runnable.run(graph);
 
         //then
-        verifyNoMoreInteractions(runnable.temporaryStreetSplitter);
-        assertEquals(12, rentVehicleEdge.getBikeRentalStation().bikesAvailable);
-        assertEquals(13, rentVehicleEdge.getBikeRentalStation().spacesAvailable);
+        assertEquals(12, (int) rentVehicleEdge.getBikeRentalStation().bikesAvailable);
+        assertEquals(13, (int) rentVehicleEdge.getBikeRentalStation().spacesAvailable);
     }
 
 

@@ -7,7 +7,7 @@ import org.opentripplanner.routing.edgetype.StreetEdge;
 
 import java.util.Objects;
 
-public class KickScooterDescription extends KickScooterOrBikeDescription {
+public class KickScooterDescription extends BikePathVehicleDescription {
     protected static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_BIKEPATH = 15. * (10. / 36.);
     protected static final double MAX_SPEED_IN_METERS_PER_SECOND_ON_PEDESTRIAN_PATH = 10. * (10. / 36.);
 

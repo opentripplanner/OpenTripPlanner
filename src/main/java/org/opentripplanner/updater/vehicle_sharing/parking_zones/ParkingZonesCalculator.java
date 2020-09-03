@@ -9,9 +9,7 @@ import org.locationtech.jts.geom.impl.CoordinateArraySequence;
 import org.opentripplanner.routing.edgetype.rentedgetype.EdgeWithParkingZones;
 import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
-import org.opentripplanner.routing.graph.Graph;
 
-import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
 
@@ -22,13 +20,11 @@ public class ParkingZonesCalculator {
     private final List<GeometryParkingZone> geometryParkingZones;
 
     @VisibleForTesting
-    List<SingleParkingZone> parkingZonesEnabled;
-    private final List<SingleParkingZone> additionalParkingZonesEnabled = new LinkedList<>();
+    final List<SingleParkingZone> parkingZonesEnabled;
 
     public ParkingZonesCalculator(List<GeometryParkingZone> geometryParkingZones) {
         this.geometryParkingZones = geometryParkingZones;
         this.parkingZonesEnabled = createParkingZonesEnabled();
-        this.parkingZonesEnabled.addAll(additionalParkingZonesEnabled);
     }
 
     private List<SingleParkingZone> createParkingZonesEnabled() {
@@ -70,22 +66,5 @@ public class ParkingZonesCalculator {
                 .filter(pz -> pz.sameProviderIdAndVehicleType(geometryParkingZone))
                 .findFirst()
                 .orElse(null);
-    }
-
-    public void enableNewParkingZone(SingleParkingZone parkingZone, Graph graph) {
-        if (!parkingZonesEnabled.contains(parkingZone)) {
-
-            List<SingleParkingZone> newParkingZonesEnabled = new LinkedList<>(parkingZonesEnabled);
-//          This should be thread secure because at any given time, only one updater may modify graph.
-            newParkingZonesEnabled.add(parkingZone);
-
-            parkingZonesEnabled = newParkingZonesEnabled;
-
-            graph.getDropEdges().forEach(e -> e.setParkingZones(new ParkingZoneInfo(e.getParkingZones().getParkingZones(), parkingZonesEnabled)));
-        }
-    }
-
-    public List<SingleParkingZone> getParkingZonesEnabled() {
-        return parkingZonesEnabled;
     }
 }

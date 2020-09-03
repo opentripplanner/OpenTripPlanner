@@ -4,6 +4,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import org.opentripplanner.routing.core.vehicle_sharing.BikeDescription;
 import org.opentripplanner.routing.core.vehicle_sharing.Provider;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
@@ -20,7 +22,7 @@ public class BikeRentalStation implements Serializable, Cloneable {
     @JsonIgnore
     public I18NString name;
     @JsonSerialize
-    public double longitude, latitude; //longitude, latitude
+    public double longitude, latitude;
     @JsonSerialize
     public int bikesAvailable = Integer.MAX_VALUE;
     @JsonSerialize
@@ -47,6 +49,10 @@ public class BikeRentalStation implements Serializable, Cloneable {
 
     public BikeDescription getBikeFromStation() {
         return new BikeDescription(this);
+    }
+
+    public boolean isStationCompatible(VehicleDescription vehicle) {
+        return vehicle.getProvider() == provider && vehicle.getVehicleType() == VehicleType.BIKE;
     }
 
     /**
