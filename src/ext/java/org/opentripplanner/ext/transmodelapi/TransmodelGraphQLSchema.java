@@ -92,7 +92,6 @@ import static java.util.Collections.emptyList;
 import static org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper.mapIDsToDomain;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.STREET_MODE;
 import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_MODE;
-import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SUBMODE;
 
 /**
  * Schema definition for the Transmodel GraphQL API.
@@ -2017,7 +2016,7 @@ public class TransmodelGraphQLSchema {
                         .name("operator")
                         .description("For ride legs, the operator used for this legs. For non-ride legs, null.")
                         .type(operatorType)
-                        .dataFetcher(environment -> ((Leg) environment.getSource()).getTrip().getOperator())
+                        .dataFetcher(environment -> ((Leg) environment.getSource()).getOperator())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("realtime")

@@ -1,6 +1,7 @@
 package org.opentripplanner.model.plan;
 
 import org.opentripplanner.model.Agency;
+import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StreetNote;
 import org.opentripplanner.model.Trip;
@@ -227,18 +228,25 @@ public class Leg {
       return this.from.stopIndex < other.to.stopIndex && to.stopIndex > other.from.stopIndex;
     }
 
-  /**
-   * For transit legs, the route agency. For non-transit legs {@code null}.
-   */
+  /** For transit legs, the route agency. For non-transit legs {@code null}. */
   public Agency getAgency() {
     return isTransitLeg() ? getRoute().getAgency() : null;
   }
 
-  /** For transit legs, the the trip. For non-transit legs, null. */
-  public Trip getTrip() {  return trip; }
+  /**
+   * For transit legs, the trip operator, fallback to route operator.
+   * For non-transit legs {@code null}.
+   * @see Trip#getOperator()
+   */
+  public Operator getOperator() {
+    return isTransitLeg() ? trip.getOperator() : null;
+  }
 
   /** For transit legs, the the route. For non-transit legs, null. */
   public Route getRoute() { return isTransitLeg() ? trip.getRoute() : null; }
+
+  /** For transit legs, the the trip. For non-transit legs, null. */
+  public Trip getTrip() {  return trip; }
 
   /** Should be used for debug logging only */
     @Override

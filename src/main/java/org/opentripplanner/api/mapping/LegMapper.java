@@ -62,6 +62,8 @@ public class LegMapper {
             var agency = domain.getAgency();
             api.agencyId = FeedScopedIdMapper.mapToApi(agency.getId());
             api.agencyName = agency.getName();
+            api.agencyUrl = agency.getUrl();
+            api.agencyBrandingUrl = agency.getBrandingUrl();
 
             var route = domain.getRoute();
             api.route = route.getLongName();

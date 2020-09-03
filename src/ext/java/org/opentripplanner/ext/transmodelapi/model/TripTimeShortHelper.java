@@ -1,13 +1,12 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.RoutingService;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -18,13 +17,10 @@ public class TripTimeShortHelper {
      * Find trip time short for the from place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
-        Trip trip = leg.getTrip();
-        if (trip == null) {
-            return null;
-        }
-        ServiceDate serviceDate = leg.serviceDate;
+        if (!leg.isTransitLeg()) { return null; }
 
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2
