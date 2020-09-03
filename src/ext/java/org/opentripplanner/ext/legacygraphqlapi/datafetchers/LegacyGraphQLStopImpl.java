@@ -9,6 +9,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
+import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -231,6 +232,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .getTransfersByStop(stop)
               .stream()
               .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
+              .filter(simpleTransfer -> simpleTransfer.to instanceof Stop)
               .map(transfer -> new StopAtDistance(
                   transfer.to,
                   transfer.getDistanceMeters(),

@@ -26,6 +26,7 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Timetable;
 import org.opentripplanner.model.Trip;
@@ -364,8 +365,8 @@ public class GeometryAndBlockProcessor {
         List<List<IndexedLineSegment>> possibleSegmentsForStop = new ArrayList<>();
         int minSegmentIndex = 0;
         for (int i = 0; i < stopTimes.size() ; ++i) {
-            Stop stop = stopTimes.get(i).getStop();
-            Coordinate coord = new Coordinate(stop.getLon(), stop.getLat());
+            StopLocation stop = stopTimes.get(i).getStop();
+            Coordinate coord = stop.getCoordinate().asJtsCoordinate();
             List<IndexedLineSegment> stopSegments = new ArrayList<>();
             double bestDistance = Double.MAX_VALUE;
             IndexedLineSegment bestSegment = null;
@@ -456,8 +457,8 @@ public class GeometryAndBlockProcessor {
         }
 
         StopTime st = stopTimes.get(index);
-        Stop stop = st.getStop();
-        Coordinate stopCoord = new Coordinate(stop.getLon(), stop.getLat());
+        StopLocation stop = st.getStop();
+        Coordinate stopCoord = stop.getCoordinate().asJtsCoordinate();
 
         for (IndexedLineSegment segment : possibleSegmentsForStop.get(index)) {
             if (segment.index < prevSegmentIndex) {
@@ -517,18 +518,18 @@ public class GeometryAndBlockProcessor {
     }
 
     /** create a 2-point linestring (a straight line segment) between the two stops */
-    private LineString createSimpleGeometry(Stop s0, Stop s1) {
+    private LineString createSimpleGeometry(StopLocation s0, StopLocation s1) {
 
         Coordinate[] coordinates = new Coordinate[] {
-                new Coordinate(s0.getLon(), s0.getLat()),
-                new Coordinate(s1.getLon(), s1.getLat())
+                s0.getCoordinate().asJtsCoordinate(),
+                s1.getCoordinate().asJtsCoordinate()
         };
         CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
 
         return geometryFactory.createLineString(sequence);
     }
 
-    private boolean isValid(Geometry geometry, Stop s0, Stop s1) {
+    private boolean isValid(Geometry geometry, StopLocation s0, StopLocation s1) {
         Coordinate[] coordinates = geometry.getCoordinates();
         if (coordinates.length < 2) {
             return false;
@@ -544,8 +545,8 @@ public class GeometryAndBlockProcessor {
         Coordinate geometryStartCoord = coordinates[0];
         Coordinate geometryEndCoord = coordinates[coordinates.length - 1];
 
-        Coordinate startCoord = new Coordinate(s0.getLon(), s0.getLat());
-        Coordinate endCoord = new Coordinate(s1.getLon(), s1.getLat());
+        Coordinate startCoord = s0.getCoordinate().asJtsCoordinate();
+        Coordinate endCoord = s1.getCoordinate().asJtsCoordinate();
         if (SphericalDistanceLibrary.fastDistance(startCoord, geometryStartCoord) > maxStopToShapeSnapDistance) {
             return false;
         } else if (SphericalDistanceLibrary.fastDistance(endCoord, geometryEndCoord) > maxStopToShapeSnapDistance) {

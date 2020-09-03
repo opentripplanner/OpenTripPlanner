@@ -11,7 +11,7 @@ import java.util.TimeZone;
  * A place where actual boarding/departing happens. It can be a bus stop on one side of a road or a
  * platform at a train station. Equivalent to GTFS stop location 0 or NeTEx quay.
  */
-public final class Stop extends StationElement {
+public final class Stop extends StationElement implements StopLocation {
 
   private static final long serialVersionUID = 2L;
 
