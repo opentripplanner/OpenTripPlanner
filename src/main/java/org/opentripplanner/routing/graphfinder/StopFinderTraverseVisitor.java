@@ -28,7 +28,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     if (vertex instanceof TransitStopVertex) {
-      stopsFound.add(StopAtDistance.stopAtDistanceForState(state));
+      stopsFound.add(StopAtDistance.stopAtDistanceForState(state, ((TransitStopVertex) vertex).getStop()));
     }
   }
 }

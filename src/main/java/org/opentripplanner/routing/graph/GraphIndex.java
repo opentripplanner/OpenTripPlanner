@@ -18,6 +18,7 @@ import org.opentripplanner.model.Operator;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TimetableSnapshot;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
@@ -48,7 +49,7 @@ public class GraphIndex {
     private final Map<Trip, TripPattern> patternForTrip = Maps.newHashMap();
     private final Multimap<String, TripPattern> patternsForFeedId = ArrayListMultimap.create();
     private final Multimap<Route, TripPattern> patternsForRoute = ArrayListMultimap.create();
-    private final Multimap<Stop, TripPattern> patternsForStopId = ArrayListMultimap.create();
+    private final Multimap<StopLocation, TripPattern> patternsForStopId = ArrayListMultimap.create();
     private final Map<Station, MultiModalStation> multiModalStationForStations = Maps.newHashMap();
     private final HashGridSpatialIndex<TransitStopVertex> stopSpatialIndex = new HashGridSpatialIndex<>();
     private final Map<ServiceDate, TIntSet> serviceCodesRunningForDate = new HashMap<>();
@@ -168,7 +169,7 @@ public class GraphIndex {
         return routes;
     }
 
-    public Collection<TripPattern> getPatternsForStop(Stop stop) {
+    public Collection<TripPattern> getPatternsForStop(StopLocation stop) {
         return patternsForStopId.get(stop);
     }
 

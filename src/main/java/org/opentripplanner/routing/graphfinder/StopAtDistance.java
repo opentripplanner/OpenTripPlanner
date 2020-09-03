@@ -7,6 +7,7 @@ import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -25,7 +26,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
 
   private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
-  public final Stop stop;
+  public final StopLocation stop;
   public final double distance;
 
   public final List<Edge> edges;
@@ -33,7 +34,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
   public final State state;
 
   public StopAtDistance(
-      Stop stop, double distance, List<Edge> edges, LineString geometry, State state
+      StopLocation stop, double distance, List<Edge> edges, LineString geometry, State state
   ) {
     this.stop = stop;
     this.distance = distance;
@@ -62,7 +63,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
    * Given a State at a StopVertex, bundle the StopVertex together with information about how far
    * away it is and the geometry of the path leading up to the given State.
    */
-  public static StopAtDistance stopAtDistanceForState(State state) {
+  public static StopAtDistance stopAtDistanceForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
     GraphPath graphPath = new GraphPath(state, false);
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -93,7 +94,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
       coordinates = new CoordinateArrayListSequence(coordinateList);
     }
     return new StopAtDistance(
-        (TransitStopVertex) state.getVertex(),
+        stop,
         effectiveWalkDistance,
         edges,
         geometryFactory.createLineString(new PackedCoordinateSequence.Double(coordinates.toCoordinateArray())),

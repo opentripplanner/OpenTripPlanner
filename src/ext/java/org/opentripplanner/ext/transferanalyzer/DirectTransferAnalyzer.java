@@ -77,13 +77,15 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
             Map<Stop, StopAtDistance> stopsEuclidean = nearbyStopFinderEuclidian
                         .findClosestStops(c0.y, c0.x, radiusMeters)
                         .stream()
-                        .collect(Collectors.toMap(t -> t.stop, t -> t));
+                        .filter(t -> t.stop instanceof Stop)
+                        .collect(Collectors.toMap(t -> (Stop) t.stop, t -> t));
 
             /* Find nearby stops by street distance */
             Map<Stop, StopAtDistance> stopsStreets = nearbyStopFinderStreets.
                         findClosestStops(c0.y, c0.x, radiusMeters * RADIUS_MULTIPLIER)
                         .stream()
-                        .collect(Collectors.toMap(t -> t.stop, t -> t));
+                        .filter(t -> t.stop instanceof Stop)
+                        .collect(Collectors.toMap(t -> (Stop) t.stop, t -> t));
 
             Stop originStop = originStopVertex.getStop();
 

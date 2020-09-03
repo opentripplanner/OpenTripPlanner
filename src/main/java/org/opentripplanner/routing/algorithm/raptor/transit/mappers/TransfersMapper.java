@@ -3,6 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.transit.mappers;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.Transfer;
 
@@ -16,7 +17,7 @@ class TransfersMapper {
      */
     static List<List<Transfer>> mapTransfers(
         StopIndexForRaptor stopIndex,
-        Multimap<Stop, SimpleTransfer> transfersByStop
+        Multimap<StopLocation, SimpleTransfer> transfersByStop
     ) {
 
         List<List<Transfer>> transferByStopIndex = new ArrayList<>();
@@ -28,11 +29,13 @@ class TransfersMapper {
 
             for (SimpleTransfer simpleTransfer : transfersByStop.get(stop)) {
                 double effectiveDistance = simpleTransfer.getEffectiveWalkDistance();
-                int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
-                Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
-                    simpleTransfer.getEdges());
+                if (simpleTransfer.to instanceof Stop) {
+                    int toStopIndex = stopIndex.indexByStop.get(simpleTransfer.to);
+                    Transfer transfer = new Transfer(toStopIndex, (int) effectiveDistance,
+                        simpleTransfer.getEdges());
 
-                list.add(transfer);
+                    list.add(transfer);
+                }
             }
         }
         return transferByStopIndex;

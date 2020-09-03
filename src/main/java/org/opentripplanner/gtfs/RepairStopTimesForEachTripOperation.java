@@ -11,6 +11,7 @@ import org.opentripplanner.graph_builder.issues.HopZeroTime;
 import org.opentripplanner.graph_builder.issues.NegativeDwellTime;
 import org.opentripplanner.graph_builder.issues.NegativeHopTime;
 import org.opentripplanner.graph_builder.issues.RepeatedStops;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripStopTimes;
@@ -50,6 +51,9 @@ public class RepairStopTimesForEachTripOperation {
 
             /* Fetch the stop times for this trip. Copy the list since it's immutable. */
             List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
+
+            /* Remove stoptimes without stops */
+            stopTimes.removeIf(st -> !(st.getStop() instanceof Stop));
 
             /* Stop times frequently contain duplicate, missing, or incorrect entries. Repair them. */
             TIntList removedStopSequences = removeRepeatedStops(stopTimes);
@@ -189,8 +193,8 @@ public class RepairStopTimesForEachTripOperation {
                 }
             }
             double hopDistance = SphericalDistanceLibrary
-                    .fastDistance(st0.getStop().getLat(), st0.getStop().getLon(),
-                            st1.getStop().getLat(), st1.getStop().getLon());
+                    .fastDistance(st0.getStop().getCoordinate().asJtsCoordinate(),
+                        st1.getStop().getCoordinate().asJtsCoordinate());
             double hopSpeed = hopDistance / runningTime;
             /* zero-distance hops are probably not harmful, though they could be better
              * represented as dwell times
