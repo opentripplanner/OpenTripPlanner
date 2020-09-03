@@ -1,6 +1,7 @@
 package org.opentripplanner.hasura_client.hasura_objects;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.annotation.JsonProperty;
+import com.fasterxml.jackson.databind.JsonNode;
 
 import java.util.List;
 
@@ -27,6 +28,7 @@ public class ParkingZone extends HasuraObject {
         this.vehicleType = vehicleType;
     }
 
+    @JsonProperty("isAllowed")
     public boolean isAllowed() {
         return isAllowed;
     }
@@ -47,6 +49,15 @@ public class ParkingZone extends HasuraObject {
 
         private List<Feature> features;
 
+        private String type;
+
+        public String getType() {
+            return type;
+        }
+
+        public void setType(String type) {
+            this.type = type;
+        }
 
         public List<Feature> getFeatures() {
             return features;
@@ -61,7 +72,7 @@ public class ParkingZone extends HasuraObject {
 
         private String type;
         private Object properties;
-        private JsonObject geometry;
+        private JsonNode geometry;
 
         public String getType() {
             return type;
@@ -79,11 +90,11 @@ public class ParkingZone extends HasuraObject {
             this.properties = properties;
         }
 
-        public JsonObject getGeometry() {
+        public JsonNode getGeometry() {
             return geometry;
         }
 
-        public void setGeometry(JsonObject geometry) {
+        public void setGeometry(JsonNode geometry) {
             this.geometry = geometry;
         }
     }

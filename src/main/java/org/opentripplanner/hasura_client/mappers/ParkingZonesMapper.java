@@ -1,6 +1,6 @@
 package org.opentripplanner.hasura_client.mappers;
 
-import com.google.gson.JsonObject;
+import com.fasterxml.jackson.databind.JsonNode;
 import org.geotools.geojson.geom.GeometryJSON;
 import org.locationtech.jts.geom.Geometry;
 import org.opentripplanner.hasura_client.hasura_objects.ParkingZone;
@@ -8,6 +8,7 @@ import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
 import org.opentripplanner.updater.vehicle_sharing.parking_zones.GeometryParkingZone;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.Collection;
 import java.util.List;
@@ -24,7 +25,7 @@ public class ParkingZonesMapper extends HasuraToOTPMapper<ParkingZone, GeometryP
 
     private final GeometryJSON geometryJSON = new GeometryJSON();
 
-    private Geometry deserializeGeometry(JsonObject jsonObject) {
+    private Geometry deserializeGeometry(JsonNode jsonObject) {
         try {
             return geometryJSON.read(jsonObject.toString());
         } catch (Exception e) {
@@ -72,10 +73,10 @@ public class ParkingZonesMapper extends HasuraToOTPMapper<ParkingZone, GeometryP
                 .collect(toList());
     }
 
-    //  TODO Don't know how to implement this method. Need to ask Wiktor
     @Override
     protected GeometryParkingZone mapSingleHasuraObject(ParkingZone hasuraObject) {
-        return null;
+        // This feature requires custom list mapping, we cannot map one parking zone into one geometry parking zone
+        throw new NotImplementedException();
     }
 
     @Override

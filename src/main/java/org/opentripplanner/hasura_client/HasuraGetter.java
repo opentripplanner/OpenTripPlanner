@@ -1,21 +1,24 @@
 package org.opentripplanner.hasura_client;
 
+import com.fasterxml.jackson.core.type.TypeReference;
 import org.opentripplanner.hasura_client.hasura_objects.HasuraObject;
 import org.opentripplanner.hasura_client.mappers.HasuraToOTPMapper;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Type;
 import java.util.List;
 
-public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObject> {
-    private static final Logger LOG = LoggerFactory.getLogger(HasuraGetter.class);
+import static java.util.Collections.emptyList;
 
-    protected abstract String QUERY();
+public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObject> {
+    protected abstract String query();
+
+    protected abstract Logger getLogger();
 
     protected abstract HasuraToOTPMapper<HASURA_OBJECT, GRAPH_OBJECT> mapper();
+
+    protected abstract TypeReference<ApiResponse<HASURA_OBJECT>> hasuraType();
 
     protected boolean addGeolocationArguments() {
         return true;
@@ -35,11 +38,11 @@ public abstract class HasuraGetter<GRAPH_OBJECT, HASURA_OBJECT extends HasuraObj
     }
 
 
-    public List<GRAPH_OBJECT> getFromHasura(Graph graph, String url, Type type) {
+    public List<GRAPH_OBJECT> getFromHasura(Graph graph, String url) {
         String arguments = getGeolocationArguments(graph);
-        String body = addGeolocationArguments() ? QUERY() + arguments : QUERY();
-        ApiResponse<HASURA_OBJECT> response = HttpUtils.postData(url, body, type);
-        LOG.info("Got {} objects from API", response.getData().getItems().size());
-        return mapper().map(response.getData().getItems());
+        String body = addGeolocationArguments() ? query() + arguments : query();
+        ApiResponse<HASURA_OBJECT> response = HttpUtils.postData(url, body, hasuraType());
+        getLogger().info("Got {} objects from API", response != null ? response.getData().getItems().size() : "null");
+        return mapper().map(response != null ? response.getData().getItems() : emptyList());
     }
 }
