@@ -2,7 +2,6 @@ package org.opentripplanner.graph_builder.module.time;
 
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 
 import java.io.File;
@@ -39,7 +38,6 @@ public class TrafifcPredictionBuilderModule implements GraphBuilderModule {
                 LOG.info("log1 aurdata Edge {} , Cluste {} start {} endnod{}",e.getid(),e.getclusterid(),e.getstartnodeid(),e.getendnodeid());
                 }
         }
-        StringBuilder a = new StringBuilder();
 
         for (StreetEdge e : graph.getStreetEdges()) {
             LOG.info("culent graph eid {} osmstart {}  osmend {} , ", e.getId(), e.getStartOsmNodeId(),e.getEndOsmNodeId() );

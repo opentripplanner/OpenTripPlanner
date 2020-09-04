@@ -51,7 +51,7 @@ public class EdgeData {
         return startlongitude;
     }
 
-    public void setstartlongitude(long startlongitude) {
+    public void setstartlongitude(double startlongitude) {
         this.startlongitude = startlongitude;
     }
 
@@ -75,7 +75,7 @@ public class EdgeData {
         return endlongitude;
     }
 
-    public void setendlongitude(long endlongitude) {
+    public void setendlongitude(double endlongitude) {
         this.endlongitude = endlongitude;
     }
 

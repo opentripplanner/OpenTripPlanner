@@ -12,7 +12,7 @@ public class QueryData {
 
     public QueryData(long timeMilis) {
         Instant i = Instant.ofEpochMilli(timeMilis);
-        ZonedDateTime z = ZonedDateTime.ofInstant(i, ZoneId.of("Poland/Warsaw"));
+        ZonedDateTime z = ZonedDateTime.ofInstant(i, ZoneId.of("Europe/Warsaw"));
         this.setDay(z.getDayOfWeek().getValue());
         this.setTime(z.getHour() * 3600 + z.getMinute() * 60 + z.getSecond());
 

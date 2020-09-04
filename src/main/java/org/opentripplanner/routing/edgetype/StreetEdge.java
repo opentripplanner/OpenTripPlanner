@@ -541,9 +541,11 @@ public class StreetEdge extends Edge implements Cloneable {
 
         if (this.getTimes()!=null) {
             int i = Collections.binarySearch(this.getTimes(), new QueryData(timeMillis));
-            TimeTable timetable = this.getTimes().get(i);
-            if(timetable!=null)
-                return timetable.getMetrpersecundSpeed();
+            if (i >= 0) {
+                TimeTable timetable = this.getTimes().get(i);
+                if (timetable != null)
+                    return timetable.getMetrpersecundSpeed();
+            }
         }
         return this.getMaxStreetTraverseSpeed();
     }

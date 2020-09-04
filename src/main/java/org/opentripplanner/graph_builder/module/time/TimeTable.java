@@ -35,7 +35,7 @@ public class TimeTable implements Comparable<QueryData> {
     }
 
     public double getMetrpersecundSpeed() {
-        return this.getCurrentspeed() * 3.6;
+        return this.getCurrentspeed() / 3.6;
     }
 
     public int getStarttime() {
@@ -73,12 +73,12 @@ public class TimeTable implements Comparable<QueryData> {
     @Override
     public int compareTo(QueryData o) {
         if (o.getDay() != this.getDaynumber())
-            return o.getDay() - this.getDaynumber();
+            return this.getDaynumber() - o.getDay();
         if (o.getTime() < this.getStarttime())
-            return -1;
+            return 1;
         if (o.getTime() < this.getEndtime())
             return 0;
-        return 1;
+        return -1;
     }
 }
 
