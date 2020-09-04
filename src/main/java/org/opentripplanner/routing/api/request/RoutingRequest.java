@@ -10,7 +10,7 @@ import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
 import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
@@ -208,7 +208,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *                       documented and carried over into the Enum name.
      */
     @Deprecated
-    public OptimizeType optimize = OptimizeType.QUICK;
+    public BicycleOptimizeType optimize = BicycleOptimizeType.QUICK;
 
     /** The epoch date/time that the trip should depart (or arrive, for requests where arriveBy is true) */
     public long dateTime = new Date().getTime() / 1000;
@@ -245,8 +245,17 @@ public class RoutingRequest implements Cloneable, Serializable {
     @Deprecated
     public boolean wheelchairAccessible = false;
 
-    /** The maximum number of itineraries to return. */
-    public int numItineraries = 3;
+    /**
+     * The maximum number of itineraries to return. In OTP1 this parameter terminates the search,
+     * but in OTP2 it crops the list of itineraries AFTER the search is complete. This parameter is
+     * a post search filter function. A side effect from reducing the result is that OTP2 cannot
+     * guarantee to find all pareto-optimal itineraries when paging. Also, a large search-window
+     * and a small {@code numItineraries} waste computer CPU calculation time.
+     * <p>
+     * The default value is 50. This is a reasonably high threshold to prevent large amount of data
+     * to be returned. Consider tuning the search-window instead of setting this to a small value.
+     */
+    public int numItineraries = 50;
 
     /** The maximum slope of streets for wheelchair trips. */
     public double maxWheelchairSlope = 0.0833333333333; // ADA max wheelchair ramp slope is a good default.
@@ -535,7 +544,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      *
      * @see https://github.com/opentripplanner/OpenTripPlanner/issues/2886
      */
-    public Integer maxTransfers = null;
+    public Integer maxTransfers = 12;
 
     /**
      * For the bike triangle, how important time is.
@@ -713,11 +722,11 @@ public class RoutingRequest implements Cloneable, Serializable {
         this.setStreetSubRequestModes(new TraverseModeSet(mode));
     }
 
-    public RoutingRequest(TraverseMode mode, OptimizeType optimize) {
+    public RoutingRequest(TraverseMode mode, BicycleOptimizeType optimize) {
         this(new TraverseModeSet(mode), optimize);
     }
 
-    public RoutingRequest(TraverseModeSet modeSet, OptimizeType optimize) {
+    public RoutingRequest(TraverseModeSet modeSet, BicycleOptimizeType optimize) {
         this();
         this.optimize = optimize;
         this.setStreetSubRequestModes(modeSet);
@@ -774,7 +783,7 @@ public class RoutingRequest implements Cloneable, Serializable {
         }
     }
 
-    public void setOptimize(OptimizeType optimize) {
+    public void setOptimize(BicycleOptimizeType optimize) {
         this.optimize = optimize;
         bikeWalkingOptions.optimize = optimize;
     }

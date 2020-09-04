@@ -11,6 +11,8 @@ import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -89,6 +91,10 @@ public class OtpTransitServiceBuilder {
     private final EntityById<FeedScopedId, PathwayNode> pathwayNodesById = new EntityById<>();
 
     private final EntityById<FeedScopedId, BoardingArea> boardingAreasById = new EntityById<>();
+
+    private final EntityById<FeedScopedId, FlexStopLocation> locationsById = new EntityById<>();
+
+    private final EntityById<FeedScopedId, FlexLocationGroup> locationGroupsById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
@@ -185,6 +191,14 @@ public class OtpTransitServiceBuilder {
 
     public EntityById<FeedScopedId, BoardingArea> getBoardingAreas() {
         return boardingAreasById;
+    }
+
+    public EntityById<FeedScopedId, FlexStopLocation> getLocations() {
+        return locationsById;
+    }
+
+    public EntityById<FeedScopedId, FlexLocationGroup> getLocationGroups() {
+        return locationGroupsById;
     }
 
     public TripStopTimes getStopTimesSortedByTrip() {

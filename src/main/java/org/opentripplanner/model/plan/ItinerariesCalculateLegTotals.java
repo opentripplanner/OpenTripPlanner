@@ -33,11 +33,6 @@ class ItinerariesCalculateLegTotals {
         for (Leg leg : legs) {
             long dt = leg.getDuration();
 
-            // Ignore none moving leg
-            if(leg.mode == TraverseMode.LEG_SWITCH) {
-                continue;
-            }
-
             if (leg.isTransitLeg()) {
                 transitTimeSeconds += dt;
                 ++nTransitLegs;

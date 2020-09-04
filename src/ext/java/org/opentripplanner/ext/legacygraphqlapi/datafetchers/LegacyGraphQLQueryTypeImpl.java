@@ -39,7 +39,7 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.bike_rental.BikeRentalStationService;
 import org.opentripplanner.routing.core.FareRuleSet;
-import org.opentripplanner.routing.core.OptimizeType;
+import org.opentripplanner.routing.core.BicycleOptimizeType;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
@@ -107,7 +107,7 @@ public class LegacyGraphQLQueryTypeImpl
               .arguments(Map.of("id", internalId))
               .build());
 
-          return new PlaceAtDistance(place, Integer.parseInt(parts[0]));
+          return new PlaceAtDistance(place, Double.parseDouble(parts[0]));
         }
         case "Route":
           return routingService.getRouteForId(FeedScopedId.parseId(id));
@@ -633,9 +633,9 @@ public class LegacyGraphQLQueryTypeImpl
       // callWith.argument("compactLegsByReversedSearch", (Boolean v) -> request.compactLegsByReversedSearch = v);
 
       if (environment.getArgument("optimize") != null) {
-        OptimizeType optimize = OptimizeType.valueOf(environment.getArgument("optimize"));
+        BicycleOptimizeType optimize = BicycleOptimizeType.valueOf(environment.getArgument("optimize"));
 
-        if (optimize == OptimizeType.TRIANGLE) {
+        if (optimize == BicycleOptimizeType.TRIANGLE) {
           callWith.argument("triangle.safetyFactor", request::setBikeTriangleSafetyFactor);
           callWith.argument("triangle.slopeFactor", request::setBikeTriangleSlopeFactor);
           callWith.argument("triangle.timeFactor", request::setBikeTriangleTimeFactor);
@@ -651,8 +651,8 @@ public class LegacyGraphQLQueryTypeImpl
           }
         }
 
-        if (optimize == OptimizeType.TRANSFERS) {
-          optimize = OptimizeType.QUICK;
+        if (optimize == BicycleOptimizeType.TRANSFERS) {
+          optimize = BicycleOptimizeType.QUICK;
           request.transferCost += 1800;
         }
 

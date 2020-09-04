@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.vertextype;
 
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,6 +21,9 @@ import java.util.*;
 public abstract class StreetVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
+
+    /** All locations for flex transit, which this vertex is part of */
+    public Set<FlexStopLocation> flexStopLocations;
 
     public StreetVertex(Graph g, String label, Coordinate coord, I18NString streetName) {
         this(g, label, coord.x, coord.y, streetName);

@@ -58,10 +58,43 @@ public class ItineraryFilterChainBuilder {
     public ItineraryFilter build() {
         List<ItineraryFilter> filters = new ArrayList<>();
 
-        // Apply all absolute filters first. Absolute filters are filters that remove elements
-        // based on the given itinerary properties - not considering other itineraries
+        // Sort list on {@code groupByP} in ascending order to keep as many of the elements in the
+        // groups where the grouping parameter is relaxed as possible.
         {
+            List<GroupBySimilarity> groupBy = parameters
+                .groupBySimilarity()
+                .stream()
+                .sorted(Comparator.comparingDouble(o -> o.groupByP))
+                .collect(Collectors.toList());
 
+            for (GroupBySimilarity it : groupBy) {
+                filters.add(new GroupBySimilarLegsFilter(it.groupByP, it.approximateMinLimit));
+            }
+        }
+
+        // Remove itineraries if max limit is set
+        if (parameters.maxNumberOfItineraries() > 0) {
+            // Sort first to make sure we keep the most relevant itineraries
+            filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
+            filters.add(
+                new MaxLimitFilter(
+                    "number-of-itineraries-filter",
+                    parameters.maxNumberOfItineraries(),
+                    maxLimitReachedSubscriber
+                )
+            );
+        }
+
+        // Apply all absolute filters AFTER the groupBy filters. Absolute filters are filters that
+        // remove elements/ based on the given itinerary properties - not considering other
+        // itineraries. This may remove itineraries in the "groupBy" filters that are considered
+        // worse than the itineraries removed here. Let take an example, 2 itineraries, A and B, are
+        // returned. A have a significant higher cost than B, but share the same long last transit
+        // leg. B depart AFTER the latest-departure-time (this may happen if the access is
+        // time-shifted). Then, A will be removed by the "group-by" filters(similar to B, but cost
+        // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
+        // what we want, since both itineraries are none optimal.
+        {
             if (parameters.removeTransitWithHigherCostThanBestOnStreetOnly()) {
                 filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
             }
@@ -71,29 +104,8 @@ public class ItineraryFilterChainBuilder {
             }
         }
 
-        // Sort list on {@code groupByP} in ascending order to keep as many of the elements in the
-        // groups where the grouping parameter is relaxed as possible.
-        List<GroupBySimilarity> groupBy = parameters.groupBySimilarity().stream()
-            .sorted(Comparator.comparingDouble(o -> o.groupByP))
-            .collect(Collectors.toList());
-
-        for (GroupBySimilarity it : groupBy) {
-            filters.add(new GroupBySimilarLegsFilter(it.groupByP, it.approximateMinLimit));
-        }
-
-        // Sort itineraries
+        // Do the final itineraries sort
         filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
-
-        // Remove itineraries if max limit is set
-        if (parameters.maxNumberOfItineraries() > 0) {
-            filters.add(
-                new MaxLimitFilter(
-                    "number-of-itineraries-filter",
-                    parameters.maxNumberOfItineraries(),
-                    maxLimitReachedSubscriber
-                )
-            );
-        }
 
         if(parameters.debug()) {
             filters = addDebugWrappers(filters);

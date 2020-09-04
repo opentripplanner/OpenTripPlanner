@@ -8,6 +8,7 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.StopArrival;
 import org.opentripplanner.routing.api.response.RoutingResponse;
+import org.opentripplanner.routing.api.response.TripSearchMetadata;
 
 import java.util.stream.Collectors;
 
@@ -51,6 +52,33 @@ public class LegacyGraphQLPlanImpl implements LegacyGraphQLDataFetchers.LegacyGr
         .map(PlannerErrorMapper::mapMessage)
         .map(plannerError -> plannerError.message.get(environment.getLocale()))
         .collect(Collectors.toList());
+  }
+
+  @Override
+  public DataFetcher<Long> prevDateTime() {
+    return environment -> {
+      TripSearchMetadata metadata = getSource(environment).getMetadata();
+      if ( metadata == null || metadata.prevDateTime == null ) { return null; }
+      return metadata.prevDateTime.getEpochSecond() * 1000;
+    };
+  }
+
+  @Override
+  public DataFetcher<Long> nextDateTime() {
+    return environment -> {
+      TripSearchMetadata metadata = getSource(environment).getMetadata();
+      if ( metadata == null || metadata.nextDateTime == null ) { return null; }
+      return metadata.nextDateTime.getEpochSecond() * 1000;
+    };
+  }
+
+  @Override
+  public DataFetcher<Long> searchWindowUsed() {
+    return environment -> {
+      TripSearchMetadata metadata = getSource(environment).getMetadata();
+      if ( metadata == null || metadata.searchWindowUsed == null ) { return null; }
+      return metadata.searchWindowUsed.toSeconds();
+    };
   }
 
   @Override

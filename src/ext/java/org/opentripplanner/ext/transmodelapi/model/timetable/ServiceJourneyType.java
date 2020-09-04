@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.transmodelapi.model.timetable;
 
 import graphql.Scalars;
+import graphql.schema.DataFetchingEnvironment;
 import graphql.schema.GraphQLArgument;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLList;
@@ -45,7 +46,7 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("line")
                     .type(new GraphQLNonNull(lineType))
-                    .dataFetcher(environment -> ((Trip) environment.getSource()).getRoute())
+                    .dataFetcher(environment -> (trip(environment)).getRoute())
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("activeDates")
@@ -54,7 +55,7 @@ public class ServiceJourneyType {
                       return GqlUtil
                           .getRoutingService(environment)
                           .getCalendarService()
-                                  .getServiceDatesForServiceId((((Trip) environment.getSource()).getServiceId()))
+                                  .getServiceDatesForServiceId(((trip(environment)).getServiceId()))
                                   .stream().map(gqlUtil.serviceDateMapper::serviceDateToSecondsSinceEpoch).sorted().collect(
                               Collectors.toList());
                         }
@@ -64,7 +65,7 @@ public class ServiceJourneyType {
 //                        .name("serviceAlteration")
 //                        .type(serviceAlterationEnum)
 //                        .description("Whether journey is as planned, a cancellation or an extra journey. Default is as planned")
-//                        .dataFetcher(environment -> (((Trip) environment.getSource()).getServiceAlteration()))
+//                        .dataFetcher(environment -> (((Trip) trip(environment)).getServiceAlteration()))
 //                        .build())
 
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -77,24 +78,24 @@ public class ServiceJourneyType {
                     .name("publicCode")
                     .type(Scalars.GraphQLString)
                     .description("Publicly announced code for service journey, differentiating it from other service journeys for the same line.")
-                    .dataFetcher(environment -> (((Trip) environment.getSource()).getTripShortName()))
+                    .dataFetcher(environment -> ((trip(environment)).getTripShortName()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("privateCode")
                     .type(Scalars.GraphQLString)
                     .description("For internal use by operators.")
-                    .dataFetcher(environment -> (((Trip) environment.getSource()).getInternalPlanningCode()))
+                    .dataFetcher(environment -> ((trip(environment)).getInternalPlanningCode()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("operator")
                     .type(operatorType)
                     .dataFetcher(
-                            environment -> (((Trip) environment.getSource()).getOperator()))
+                            environment -> ((trip(environment)).getOperator()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("directionType")
                     .type(EnumTypes.DIRECTION_TYPE)
-                    .dataFetcher(environment -> directIdStringToInt(((Trip) environment.getSource()).getDirectionId()))
+                    .dataFetcher(environment -> directIdStringToInt(((Trip) trip(environment)).getDirectionId()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("wheelchairAccessible")
@@ -109,27 +110,28 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("journeyPattern")
                     .type(journeyPatternType)
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getPatternForTrip().get(environment.getSource());
-                    })
+                    .dataFetcher(env ->
+                       GqlUtil.getRoutingService(env).getPatternForTrip().get(trip(env))
+                    )
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("quays")
                     .description("Quays visited by service journey")
                     .type(new GraphQLNonNull(new GraphQLList(new GraphQLNonNull(quayType))))
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getPatternForTrip()
-                              .get(environment.getSource()).getStops();
-                    })
+                    .dataFetcher(environment ->
+                        GqlUtil.getRoutingService(environment).getPatternForTrip().get(trip(environment)).getStops()
+                    )
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("passingTimes")
                     .type(new GraphQLNonNull(new GraphQLList(timetabledPassingTimeType)))
                     .description("Returns scheduled passing times only - without realtime-updates, for realtime-data use 'estimatedCalls'")
-                    .dataFetcher(environment -> {
-                      return TripTimeShort.fromTripTimes(
-                              GqlUtil.getRoutingService(environment).getPatternForTrip().get((Trip) environment.getSource()).scheduledTimetable,
-                              environment.getSource());
+                    .dataFetcher(env -> {
+                        Trip trip = trip(env);
+                        return TripTimeShort.fromTripTimes(
+                            GqlUtil.getRoutingService(env).getPatternForTrip().get(trip).scheduledTimetable,
+                            trip
+                        );
                     })
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
@@ -145,7 +147,7 @@ public class ServiceJourneyType {
                             .defaultValue(null)
                             .build())
                     .dataFetcher(environment -> {
-                        final Trip trip = environment.getSource();
+                        final Trip trip = trip(environment);
 
                         final ServiceDate serviceDate = gqlUtil.serviceDateMapper.secondsSinceEpochToServiceDate(environment.getArgument("date"));
                       return GqlUtil
@@ -159,7 +161,7 @@ public class ServiceJourneyType {
                     .description("Detailed path travelled by service journey.")
                     .dataFetcher(environment -> {
                       LineString geometry = GqlUtil.getRoutingService(environment).getPatternForTrip()
-                                        .get(environment.getSource())
+                                        .get(trip(environment))
                                         .getGeometry();
                                 if (geometry == null) {
                                     return null;
@@ -171,25 +173,25 @@ public class ServiceJourneyType {
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("notices")
                     .type(new GraphQLNonNull(new GraphQLList(noticeType)))
-                    .dataFetcher(environment -> {
-                            Trip trip = environment.getSource();
-                      return GqlUtil.getRoutingService(environment).getNoticesByEntity(trip);
-                    })
+                    .dataFetcher(env ->
+                        GqlUtil.getRoutingService(env).getNoticesByEntity(trip(env))
+                    )
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("situations")
                     .description("Get all situations active for the service journey.")
                     .type(new GraphQLNonNull(new GraphQLList(ptSituationElementType)))
-                    .dataFetcher(environment -> {
-                      return GqlUtil.getRoutingService(environment).getTransitAlertService().getTripAlerts(
-                      environment.getSource());
-                    })
+                    .dataFetcher(environment ->
+                        GqlUtil.getRoutingService(environment)
+                            .getTransitAlertService()
+                            .getTripAlerts(trip(environment).getId())
+                    )
                 .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("keyValues")
 //                        .description("List of keyValue pairs for the service journey.")
 //                        .type(new GraphQLList(keyValueType))
-//                        .dataFetcher(environment -> ((Trip) environment.getSource()).getKeyValues())
+//                        .dataFetcher(environment -> ((Trip) trip(environment)).getKeyValues())
 //                        .build())
 //                .field(GraphQLFieldDefinition.newFieldDefinition()
 //                        .name("flexibleServiceType")
@@ -202,6 +204,10 @@ public class ServiceJourneyType {
                     .type(bookingArrangementType)
                     .build())
             .build();
+  }
+
+  private static Trip trip(DataFetchingEnvironment environment) {
+    return environment.getSource();
   }
 
   private static int directIdStringToInt(String directionId) {

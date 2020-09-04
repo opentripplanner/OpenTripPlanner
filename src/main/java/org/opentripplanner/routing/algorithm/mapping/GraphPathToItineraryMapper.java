@@ -175,10 +175,8 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
-     * Slice a {@link State} array at the leg boundaries. Leg switches occur when:
-     * 1. A LEG_SWITCH mode (which itself isn't part of any leg) is seen
-     * 2. The mode changes otherwise, for instance from BICYCLE to WALK
-     * 3. A PatternInterlineDwell edge (i.e. interlining) is seen
+     * Slice a {@link State} array at the leg boundaries. Leg switches occur when the mode changes,
+     * for instance from BICYCLE to WALK.
      *
      * @param states The one-dimensional array of input states
      * @return An array of arrays of states belonging to a single leg (i.e. a two-dimensional array)
@@ -189,7 +187,7 @@ public abstract class GraphPathToItineraryMapper {
         for (State state : states) {
             TraverseMode traverseMode = state.getBackMode();
 
-            if (traverseMode != null && traverseMode != TraverseMode.LEG_SWITCH) {
+            if (traverseMode != null) {
                 trivial = false;
                 break;
             }
@@ -208,18 +206,7 @@ public abstract class GraphPathToItineraryMapper {
 
             if (backMode == null || forwardMode == null) continue;
 
-            Edge edge = states[i + 1].getBackEdge();
-
-            if (backMode == TraverseMode.LEG_SWITCH || forwardMode == TraverseMode.LEG_SWITCH) {
-                if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
-                    legIndexPairs[1] = i;
-                } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
-                    if (legIndexPairs[1] != states.length - 1) {
-                        legsIndexes.add(legIndexPairs);
-                    }
-                    legIndexPairs = new int[] {i, states.length - 1};
-                }
-            } else if (backMode != forwardMode) {                       // Mode change => leg switch
+            if (backMode != forwardMode) {
                 legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
                 legIndexPairs = new int[] {i, states.length - 1};
@@ -250,7 +237,7 @@ public abstract class GraphPathToItineraryMapper {
      * @return The generated leg
      */
     private static Leg generateLeg(Graph graph, State[] states, Locale requestedLocale) {
-        Leg leg = new Leg();
+        Leg leg = new Leg(resolveMode(states));
 
         Edge[] edges = new Edge[states.length - 1];
 
@@ -278,35 +265,11 @@ public abstract class GraphPathToItineraryMapper {
         // But in any case, with Raptor this method is only being used to translate non-transit legs of paths.
         leg.interlineWithPreviousLeg = false;
 
-        addFrequencyFields(states, leg);
-
         leg.rentedBike = states[0].isBikeRenting() && states[states.length - 1].isBikeRenting();
 
-        addModeAndAlerts(graph, leg, states);
+        addAlerts(graph, leg, states);
 
         return leg;
-    }
-
-    private static void addFrequencyFields(State[] states, Leg leg) {
-        /* TODO adapt to new frequency handling.
-        if (states[0].getBackEdge() instanceof FrequencyBoard) {
-            State preBoardState = states[0].getBackState();
-
-            FrequencyBoard fb = (FrequencyBoard) states[0].getBackEdge();
-            FrequencyBasedTripPattern pt = fb.getPattern();
-            int boardTime;
-            if (preBoardState.getServiceDay() == null) {
-                boardTime = 0; //TODO why is this happening?
-            } else {
-                boardTime = preBoardState.getServiceDay().secondsSinceMidnight(
-                        preBoardState.getTimeSeconds());
-            }
-            int period = pt.getPeriod(fb.getStopIndex(), boardTime); //TODO fix
-
-            leg.isNonExactFrequency = !pt.isExact();
-            leg.headway = period;
-        }
-        */
     }
 
     /**
@@ -320,8 +283,6 @@ public abstract class GraphPathToItineraryMapper {
         WalkStep previousStep = null;
 
         TraverseMode lastMode = null;
-
-        BikeRentalStationVertex onVertex = null, offVertex = null;
 
         for (int i = 0; i < legsStates.length; i++) {
             List<WalkStep> walkSteps = generateWalkSteps(graph, legsStates[i], previousStep, requestedLocale);
@@ -399,20 +360,31 @@ public abstract class GraphPathToItineraryMapper {
     }
 
     /**
+     * Resolve mode from states.
+     * @param states The states that go with the leg
+     */
+    private static TraverseMode resolveMode(State[] states) {
+        TraverseMode returnMode = TraverseMode.WALK;
+
+        for (State state : states) {
+            TraverseMode mode = state.getBackMode();
+
+            if (mode != null) {
+                returnMode = mode;
+            }
+        }
+        return returnMode;
+    }
+
+    /**
      * Add mode and alerts fields to a {@link Leg}.
      *
      * @param leg The leg to add the mode and alerts to
      * @param states The states that go with the leg
      */
-    private static void addModeAndAlerts(Graph graph, Leg leg, State[] states) {
+    private static void addAlerts(Graph graph, Leg leg, State[] states) {
         for (State state : states) {
-            TraverseMode mode = state.getBackMode();
             Set<StreetNote> streetNotes = graph.streetNotesService.getNotes(state);
-            Edge edge = state.getBackEdge();
-
-            if (mode != null) {
-                leg.mode = mode;
-            }
 
             if (streetNotes != null) {
                 for (StreetNote streetNote : streetNotes) {
@@ -437,20 +409,19 @@ public abstract class GraphPathToItineraryMapper {
         Stop lastStop = lastVertex instanceof TransitStopVertex ?
                 ((TransitStopVertex) lastVertex).getStop(): null;
 
-        leg.from = makePlace(states[0], firstVertex, firstStop, requestedLocale);
-        leg.to = makePlace(states[states.length - 1], lastVertex, lastStop, requestedLocale);
+        leg.from = makePlace(firstVertex, firstStop, requestedLocale);
+        leg.to = makePlace(lastVertex, lastStop, requestedLocale);
     }
 
     /**
      * Make a {@link Place} to add to a {@link Leg}.
      *
-     * @param state The {@link State} that the {@link Place} pertains to.
      * @param vertex The {@link Vertex} at the {@link State}.
      * @param stop The {@link Stop} associated with the {@link Vertex}.
      * @param requestedLocale The locale to use for all text attributes.
      * @return The resulting {@link Place} object.
      */
-    private static Place makePlace(State state, Vertex vertex, Stop stop, Locale requestedLocale) {
+    private static Place makePlace(Vertex vertex, Stop stop, Locale requestedLocale) {
         String name = vertex.getName(requestedLocale);
 
         //This gets nicer names instead of osm:node:id when changing mode of transport

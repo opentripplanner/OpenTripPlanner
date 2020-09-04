@@ -1,15 +1,13 @@
 package org.opentripplanner.ext.transmodelapi.model;
 
-import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.TripTimeShort;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.model.plan.Leg;
+import org.opentripplanner.routing.RoutingService;
 
-import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -19,13 +17,10 @@ public class TripTimeShortHelper {
      * Find trip time short for the from place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForFromPlace(Leg leg, RoutingService routingService) {
-        Trip trip = routingService.getTripForId().get(leg.tripId);
-        if (trip == null) {
-            return null;
-        }
-        ServiceDate serviceDate = leg.serviceDate;
+        if (!leg.isTransitLeg()) { return null; }
 
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2
@@ -47,13 +42,10 @@ public class TripTimeShortHelper {
      * Find trip time short for the to place in transit leg, or null.
      */
     public TripTimeShort getTripTimeShortForToPlace(Leg leg, RoutingService routingService) {
-        Trip trip = routingService.getTripForId().get(leg.tripId);
-        if (trip == null) {
-            return null;
-        }
-        ServiceDate serviceDate = leg.serviceDate;
+        if (!leg.isTransitLeg()) { return null; }
 
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
+        ServiceDate serviceDate = leg.serviceDate;
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         long endTimeSeconds = (leg.endTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
 
         /* TODO OTP2
@@ -76,26 +68,21 @@ public class TripTimeShortHelper {
      * Find trip time shorts for all stops for the full trip of a leg.
      */
     public List<TripTimeShort> getAllTripTimeShortsForLegsTrip(Leg leg, RoutingService routingService) {
-        if (leg.tripId == null || leg.serviceDate == null) {
-            return new ArrayList<>();
-        }
-        Trip trip = routingService.getTripForId().get(leg.tripId);
+        if (!leg.isTransitLeg()) { return List.of(); }
+
         ServiceDate serviceDate = leg.serviceDate;
-        return routingService.getTripTimesShort(trip, serviceDate);
+        return routingService.getTripTimesShort(leg.getTrip(), serviceDate);
     }
 
     /**
      * Find trip time shorts for all intermediate stops for a leg.
      */
     public List<TripTimeShort> getIntermediateTripTimeShortsForLeg(Leg leg, RoutingService routingService) {
-        Trip trip = routingService.getTripForId().get(leg.tripId);
+        if (!leg.isTransitLeg()) { return List.of(); }
 
-        if (trip == null) {
-            return new ArrayList<>();
-        }
         ServiceDate serviceDate = leg.serviceDate;
 
-        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(trip, serviceDate);
+        List<TripTimeShort> tripTimes = routingService.getTripTimesShort(leg.getTrip(), serviceDate);
         List<TripTimeShort> filteredTripTimes = new ArrayList<>();
 
         long startTimeSeconds = (leg.startTime.toInstant().toEpochMilli() - serviceDate.getAsDate().getTime()) / 1000;
@@ -106,7 +93,8 @@ public class TripTimeShortHelper {
             long boardingTime = leg.realTime ? tripTime.realtimeDeparture : tripTime.scheduledDeparture;
 
             if (!boardingStopFound) {
-                boardingStopFound |= boardingTime == startTimeSeconds && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService);
+                boardingStopFound = boardingTime == startTimeSeconds
+                    && matchesQuayOrSiblingQuay(leg.from.stopId, tripTime.stopId, routingService);
                 continue;
             }
 

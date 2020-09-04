@@ -55,7 +55,7 @@ public class ItineraryTest {
         assertEquals(newTime(10), result.firstLeg().startTime);
         assertEquals(newTime(20), result.firstLeg().endTime);
         assertEquals(TraverseMode.BUS, result.firstLeg().mode);
-        assertEquals(new FeedScopedId("B", "55"), result.firstLeg().tripId);
+      assertEquals(new FeedScopedId("F", "55"), result.firstLeg().getTrip().getId());
         assertEquals(7500, result.firstLeg().distanceMeters, 1E-3);
 
         assertEquals("A ~ BUS 55 12:10 12:20 ~ B [cost: 720]", result.toStr());
@@ -81,7 +81,7 @@ public class ItineraryTest {
         assertEquals(newTime(5), result.firstLeg().startTime);
         assertEquals(newTime(15), result.firstLeg().endTime);
         assertEquals(TraverseMode.RAIL, result.firstLeg().mode);
-        assertEquals(new FeedScopedId("R", "20"), result.firstLeg().tripId);
+        assertEquals(new FeedScopedId("F", "20"), result.firstLeg().getTrip().getId());
         assertEquals(15_000, result.firstLeg().distanceMeters, 1E-3);
 
         assertEquals("A ~ RAIL 20 12:05 12:15 ~ B [cost: 720]", result.toStr());

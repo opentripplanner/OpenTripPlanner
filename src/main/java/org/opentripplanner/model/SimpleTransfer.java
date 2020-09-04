@@ -14,14 +14,14 @@ import java.util.List;
  */
 public class SimpleTransfer implements Serializable {
     private static final long serialVersionUID = 20200316L;
-    public final Stop from;
-    public final Stop to;
+    public final StopLocation from;
+    public final StopLocation to;
 
     private double effectiveWalkDistance;
     
     private List<Edge> edges;
 
-    public SimpleTransfer(Stop from, Stop to, double effectiveWalkDistance, List<Edge> edges) {
+    public SimpleTransfer(StopLocation from, StopLocation to, double effectiveWalkDistance, List<Edge> edges) {
         this.from = from;
         this.to = to;
         this.effectiveWalkDistance = effectiveWalkDistance;

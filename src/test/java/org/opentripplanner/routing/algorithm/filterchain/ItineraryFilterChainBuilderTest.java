@@ -72,7 +72,7 @@ public class ItineraryFilterChainBuilderTest {
   @Test
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
-    ItineraryFilter chain = new ItineraryFilterChainBuilder(config(false, true, 2))
+    ItineraryFilter chain = new ItineraryFilterChainBuilder(config(false, true, 3))
         .withLatestDepartureTimeLimit(newTime(I3_LATE_START_TIME - 1).toInstant())
         .build();
 

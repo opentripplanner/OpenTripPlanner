@@ -57,7 +57,7 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Agency> agency() {
-    return environment -> getRoutingService(environment).getAgencyForId(getSource(environment).agencyId);
+    return environment -> getSource(environment).getAgency();
   }
 
   @Override
@@ -104,13 +104,12 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
 
   @Override
   public DataFetcher<Route> route() {
-    return environment -> getRoutingService(environment).getRouteForId(getSource(environment).routeId);
+    return environment -> getSource(environment).getRoute();
   }
 
   @Override
   public DataFetcher<Trip> trip() {
-    return environment -> getRoutingService(environment).getTripForId().get(getSource(environment).tripId);
-
+    return environment -> getSource(environment).getTrip();
   }
 
   @Override
@@ -147,6 +146,37 @@ public class LegacyGraphQLLegImpl implements LegacyGraphQLDataFetchers.LegacyGra
   @Override
   public DataFetcher<Iterable<WalkStep>> steps() {
     return environment -> getSource(environment).walkSteps;
+  }
+
+  @Override
+  public DataFetcher<String> pickupType() {
+    return environment -> {
+      if (getSource(environment).boardRule == null) return "SCHEDULED";
+      switch (getSource(environment).boardRule) {
+        case "impossible": return "NONE";
+        case "mustPhone": return "CALL_AGENCY";
+        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
+        default: return "SCHEDULED";
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<String> dropoffType() {
+    return environment -> {
+      if (getSource(environment).alightRule == null) return "SCHEDULED";
+      switch (getSource(environment).alightRule) {
+        case "impossible": return "NONE";
+        case "mustPhone": return "CALL_AGENCY";
+        case "coordinateWithDriver": return "COORDINATE_WITH_DRIVER";
+        default: return "SCHEDULED";
+      }
+    };
+  }
+
+  @Override
+  public DataFetcher<Boolean> interlineWithPreviousLeg() {
+    return environment -> getSource(environment).interlineWithPreviousLeg;
   }
 
   private RoutingService getRoutingService(DataFetchingEnvironment environment) {

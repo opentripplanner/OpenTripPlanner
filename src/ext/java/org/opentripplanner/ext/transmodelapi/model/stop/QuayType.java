@@ -11,7 +11,6 @@ import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLTypeReference;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
-import org.opentripplanner.ext.transmodelapi.model.scalars.GeoJSONCoordinatesScalar;
 import org.opentripplanner.ext.transmodelapi.model.route.JourneyWhiteListed;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
@@ -85,10 +84,7 @@ public class QuayType {
                     .name("wheelchairAccessible")
                     .type(EnumTypes.WHEELCHAIR_BOARDING)
                     .description("Whether this quay is suitable for wheelchair boarding.")
-                    .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("timezone")
-                    .type(new GraphQLNonNull(Scalars.GraphQLString))
+                    .dataFetcher(environment -> (((Stop) environment.getSource()).getWheelchairBoarding()))
                     .build())
             .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("publicCode")
@@ -212,12 +208,6 @@ public class QuayType {
 //                        .type(stopTypeEnum)
 //                        .dataFetcher(environment -> (((Stop) environment.getSource()).getStopType()))
 //                        .build())
-            .field(GraphQLFieldDefinition.newFieldDefinition()
-                    .name("flexibleArea")
-                    .description("Geometry for flexible area.")
-                    .type(GeoJSONCoordinatesScalar.getGraphQGeoJSONCoordinatesScalar())
-                    .dataFetcher(environment -> (null))
-                    .build())
            .field(GraphQLFieldDefinition.newFieldDefinition()
                     .name("tariffZones")
                     .type(new GraphQLNonNull(new GraphQLList(tariffZoneType)))

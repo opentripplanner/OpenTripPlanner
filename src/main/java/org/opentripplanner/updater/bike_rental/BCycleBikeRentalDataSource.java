@@ -42,7 +42,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         brstation.networks = new HashSet<String>();
         brstation.networks.add(this.networkName);
 
-        brstation.id = kioskNode.path("Id").toString();
+        brstation.id = kioskNode.path("Id").asText();
         brstation.x = kioskNode.path("Location").path("Longitude").asDouble();
         brstation.y = kioskNode.path("Location").path("Latitude").asDouble();
         brstation.name =  new NonLocalizedString(kioskNode.path("Name").asText());
