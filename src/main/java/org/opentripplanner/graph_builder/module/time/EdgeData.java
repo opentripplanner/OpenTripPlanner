@@ -27,7 +27,7 @@ public class EdgeData {
         this.clusterid = clusterid;
     }
 
-    public double getstartnodeid() {
+    public long  getstartnodeid() {
         return startnodeid;
     }
 
