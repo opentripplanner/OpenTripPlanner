@@ -37,6 +37,7 @@ public class RoutingRequestToFilterChainMapper {
 
     builder
         .withMaxNumberOfItineraries(Math.min(request.numItineraries, MAX_NUMBER_OF_ITINERARIES))
+        .withTransitGeneralizedCostLimit(request.transitGeneralizedCostLimit)
         .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
         .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
         .withMaxLimitReachedSubscriber(maxLimitReachedSubscriber)

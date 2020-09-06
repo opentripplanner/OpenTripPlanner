@@ -520,13 +520,14 @@ Any public field or setter method in this class can be given a default value usi
 ## Tuning itinerary filtering
 Nested inside `routingDefaults {...}` in `router-config.json`.
 
-OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the returned itineraries.
+OTP2 may produce numerous _pareto-optimal_ results when using `time`, `number-of-transfers` and `generalized-cost` as criteria. Use the parameters listed here to reduce/filter the itineraries return by the search engine before returning the results to client.
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
 `debugItineraryFilter` | Enable this to attach a system notice to itineraries instead of removing them. Some filters are not configurable, byt will show up in the system-notice if debugging is enabled. | boolean | `false`
 `groupBySimilarityKeepOne` | Pick ONE itinerary from each group after putting itineraries that is 85% similar together. | double | `0.85` (85%)
 `groupBySimilarityKeepNumOfItineraries` | Reduce the number of itineraries to the requested number by reducing each group of itineraries grouped by 68% similarity. | double | `0.68` (68%)
+`transitGeneralizedCostLimit` | A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost. The function is used to calculate a max-limit. The max-limit is then used to to filter by generalized-cost. Transit itineraries with a cost higher than the max-limit is dropped from the result set. None transit itineraries is excluded from the filter. To set a filter to be 1 hour plus 2 times the best cost use: `3600 + 2.0 x`. To set an absolute value(3000) use: `3000 + 0x`  | `DoubleFunction` | `null`
 
 
 ### Group-by-filters

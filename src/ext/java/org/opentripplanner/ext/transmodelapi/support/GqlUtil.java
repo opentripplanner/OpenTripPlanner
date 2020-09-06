@@ -13,6 +13,7 @@ import org.opentripplanner.ext.transmodelapi.mapping.ServiceDateMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.DateTimeScalarFactory;
+import org.opentripplanner.ext.transmodelapi.model.scalars.DoubleFunctionScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.LocalTimeScalarFactory;
 import org.opentripplanner.ext.transmodelapi.model.scalars.TimeScalarFactory;
 import org.opentripplanner.routing.RoutingService;
@@ -27,6 +28,7 @@ import java.util.TimeZone;
 public class GqlUtil {
   public final GraphQLScalarType dateTimeScalar;
   public final GraphQLScalarType dateScalar;
+  public final GraphQLScalarType doubleFunctionScalar;
   public final GraphQLScalarType localTimeScalar;
   public final GraphQLObjectType timeScalar;
   public final ServiceDateMapper serviceDateMapper;
@@ -35,6 +37,7 @@ public class GqlUtil {
   public GqlUtil(TimeZone timeZone) {
     this.dateTimeScalar = DateTimeScalarFactory.createMillisecondsSinceEpochAsDateTimeStringScalar(timeZone);
     this.dateScalar = DateScalarFactory.createSecondsSinceEpochAsDateStringScalar(timeZone);
+    this.doubleFunctionScalar = DoubleFunctionScalarFactory.createDoubleFunctionScalar();
     this.localTimeScalar = LocalTimeScalarFactory.createLocalTimeScalar();
     this.timeScalar = TimeScalarFactory.createSecondsSinceMidnightAsTimeObject();
     this.serviceDateMapper =  new ServiceDateMapper(timeZone);

@@ -8,12 +8,14 @@ import org.opentripplanner.routing.algorithm.filterchain.filters.LatestDeparture
 import org.opentripplanner.routing.algorithm.filterchain.filters.MaxLimitFilter;
 import org.opentripplanner.routing.algorithm.filterchain.filters.OtpDefaultSortOrder;
 import org.opentripplanner.routing.algorithm.filterchain.filters.RemoveTransitIfStreetOnlyIsBetterFilter;
+import org.opentripplanner.routing.algorithm.filterchain.filters.TransitGeneralizedCostFilter;
 
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import java.util.function.Consumer;
+import java.util.function.DoubleFunction;
 import java.util.stream.Collectors;
 
 
@@ -29,6 +31,7 @@ public class ItineraryFilterChainBuilder {
     private boolean debug = false;
     private int maxNumberOfItineraries = NOT_SET;
     private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
+    private DoubleFunction<Double> transitGeneralizedCostLimit;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
@@ -82,6 +85,21 @@ public class ItineraryFilterChainBuilder {
         return this;
     }
 
+
+    /**
+     * This function is used to compute a max-limit for generalized-cost. The limit
+     * is applied to itineraries with at least one transit leg. Street-only itineraries are not
+     * considered.
+     * <p>
+     * The smallest transit leg generalized-cost value is used as input to the function.
+     * For example if the function is {@code f(x) = 1800 + 2.0 x} and the smallest cost is
+     * {@code 5000}, then all transit itineraries with a cost larger than
+     * {@code 1800 + 2 * 5000 = 11 800} is dropped.
+     */
+    public ItineraryFilterChainBuilder withTransitGeneralizedCostLimit(DoubleFunction<Double> value){
+        this.transitGeneralizedCostLimit = value;
+        return this;
+    }
     /**
      * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
      * cases we get "silly" transit itineraries that is marginally better on travel-duration
@@ -146,6 +164,11 @@ public class ItineraryFilterChainBuilder {
             for (GroupBySimilarity it : groupBy) {
                 filters.add(new GroupBySimilarLegsFilter(it.groupByP, it.approximateMinLimit));
             }
+        }
+
+        // Filter transit itineraries on generalized-cost
+        if(transitGeneralizedCostLimit != null) {
+            filters.add(new TransitGeneralizedCostFilter(transitGeneralizedCostLimit));
         }
 
         // Remove itineraries if max limit is set
