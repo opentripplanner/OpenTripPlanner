@@ -1,7 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters.GroupBySimilarity;
 import org.opentripplanner.routing.algorithm.filterchain.filters.DebugFilterWrapper;
 import org.opentripplanner.routing.algorithm.filterchain.filters.FilterChain;
 import org.opentripplanner.routing.algorithm.filterchain.filters.GroupBySimilarLegsFilter;
@@ -22,13 +21,91 @@ import java.util.stream.Collectors;
  * Create a filter chain based on the given config.
  */
 public class ItineraryFilterChainBuilder {
-    private final FilterChainParameters parameters;
+    private static final int NOT_SET = -1;
+
+    private final boolean arriveBy;
+    private final List<GroupBySimilarity> groupBySimilarity = new ArrayList<>();
+
+    private boolean debug = false;
+    private int maxNumberOfItineraries = NOT_SET;
+    private boolean removeTransitWithHigherCostThanBestOnStreetOnly = true;
     private Instant latestDepartureTimeLimit = null;
     private Consumer<Itinerary> maxLimitReachedSubscriber;
 
+    /**
+     * @param arriveBy Used to set the correct sort order. This si the same flag as the
+     *        {@link org.opentripplanner.routing.api.request.RoutingRequest#arriveBy}.
+     */
+    public ItineraryFilterChainBuilder(boolean arriveBy) {
+        this.arriveBy = arriveBy;
+    }
 
-    public ItineraryFilterChainBuilder(FilterChainParameters parameters) {
-        this.parameters = parameters;
+    /**
+     * The maximum number of itineraries returned. This will remove all itineraries at the
+     * end of the list AFTER the final sort of the itineraries.
+     * <p>
+     * Use {@code -1} to disable.
+     */
+    public ItineraryFilterChainBuilder withMaxNumberOfItineraries(int value) {
+        this.maxNumberOfItineraries = value;
+        return this;
+    }
+
+    /**
+     * Group itineraries by the main legs and keeping approximately the given total number of
+     * itineraries. The itineraries are grouped by the legs that account for more then 'p' % for the
+     * total distance.
+     * <p/>
+     * If the time-table-view is enabled, the result may contain similar itineraries where only the
+     * first and/or last legs are different. This can happen by walking to/from another stop,
+     * saving time, but getting a higher generalized-cost; Or, by taking a short ride.
+     * Use {@code groupByP} in the range {@code 0.80-0.90} and {@code approximateMinLimit=1} will
+     * remove these itineraries an keep only the itineraries with the lowest generalized-cost.
+     * <p>
+     * When this filter is enabled, itineraries are grouped by the "main" transit legs. Short legs
+     * are skipped. Than for each group of itineraries the itinerary with the lowest generalized-cost
+     * is kept. All other itineraries are dropped.
+     * <p>
+     * A good way to allow for some variation is to include several entries, relaxing the min-limit,
+     * while tightening the group-by-p criteria. For example:
+     * <pre>
+     * groupByP | minLimit | Description
+     *   0.90   |    1     | Keep 1 itinerary where 90% of the legs are the same
+     *   0.80   |    2     | Keep 2 itineraries where 80% of the legs are the same
+     *   0.68   |    3     | Keep 3 itineraries where 68% of the legs are the same
+     * </pre>
+     * Normally, we want some variation, so a good value to use for this parameter is the combined
+     * cost of board- and alight-cost including indirect cost from board- and alight-slack.
+     */
+    public ItineraryFilterChainBuilder addGroupBySimilarity(double groupByP, int approximateMinLimit) {
+        this.groupBySimilarity.add(new GroupBySimilarity(groupByP, approximateMinLimit));
+        return this;
+    }
+
+    /**
+     * The direct street search(walk, bicycle, car) is not pruning the transit search, so in some
+     * cases we get "silly" transit itineraries that is marginally better on travel-duration
+     * compared with a on-street-all-the-way itinerary. Use this method to turn this filter
+     * on/off.
+     * <p>
+     * The filter remove all itineraries with a generalized-cost that is higher than the best
+     * on-street-all-the-way itinerary.
+     * <p>
+     * This filter only have an effect, if an on-street-all-the-way(WALK, BICYCLE, CAR) itinerary
+     * exist.
+     */
+    public ItineraryFilterChainBuilder withRemoveTransitWithHigherCostThanBestOnStreetOnly(boolean value) {
+        this.removeTransitWithHigherCostThanBestOnStreetOnly = value;
+        return this;
+    }
+
+    /**
+     * This will NOT delete itineraries, but tag them as deleted using the
+     * {@link Itinerary#systemNotices}.
+     */
+    public ItineraryFilterChainBuilder withDebugEnabled(boolean value) {
+        this.debug = value;
+        return this;
     }
 
     /**
@@ -61,8 +138,7 @@ public class ItineraryFilterChainBuilder {
         // Sort list on {@code groupByP} in ascending order to keep as many of the elements in the
         // groups where the grouping parameter is relaxed as possible.
         {
-            List<GroupBySimilarity> groupBy = parameters
-                .groupBySimilarity()
+            List<GroupBySimilarity> groupBy = groupBySimilarity
                 .stream()
                 .sorted(Comparator.comparingDouble(o -> o.groupByP))
                 .collect(Collectors.toList());
@@ -73,13 +149,13 @@ public class ItineraryFilterChainBuilder {
         }
 
         // Remove itineraries if max limit is set
-        if (parameters.maxNumberOfItineraries() > 0) {
+        if (maxNumberOfItineraries > 0) {
             // Sort first to make sure we keep the most relevant itineraries
-            filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
+            filters.add(new OtpDefaultSortOrder(arriveBy));
             filters.add(
                 new MaxLimitFilter(
                     "number-of-itineraries-filter",
-                    parameters.maxNumberOfItineraries(),
+                    maxNumberOfItineraries,
                     maxLimitReachedSubscriber
                 )
             );
@@ -95,7 +171,7 @@ public class ItineraryFilterChainBuilder {
         // is worse). B is removed by the {@link LatestDepartureTimeFilter} below. This is exactly
         // what we want, since both itineraries are none optimal.
         {
-            if (parameters.removeTransitWithHigherCostThanBestOnStreetOnly()) {
+            if (removeTransitWithHigherCostThanBestOnStreetOnly) {
                 filters.add(new RemoveTransitIfStreetOnlyIsBetterFilter());
             }
 
@@ -105,9 +181,9 @@ public class ItineraryFilterChainBuilder {
         }
 
         // Do the final itineraries sort
-        filters.add(new OtpDefaultSortOrder(parameters.arriveBy()));
+        filters.add(new OtpDefaultSortOrder(arriveBy));
 
-        if(parameters.debug()) {
+        if(debug) {
             filters = addDebugWrappers(filters);
         }
 

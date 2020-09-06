@@ -8,9 +8,8 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.TransitMode;
-import org.opentripplanner.routing.algorithm.filterchain.FilterChainParameters;
-import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.BicycleOptimizeType;
+import org.opentripplanner.routing.core.IntersectionTraversalCostModel;
 import org.opentripplanner.routing.core.RouteMatcher;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.SimpleIntersectionTraversalCostModel;
@@ -680,7 +679,7 @@ public class RoutingRequest implements Cloneable, Serializable {
     /**
      * Keep ONE itinerary for each group with at least this part of the legs in common.
      * Default value is 0.85 (85%), use a value less than 0.50 to turn off.
-     * @see FilterChainParameters#groupBySimilarity()
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
      */
     public Double groupBySimilarityKeepOne = 0.85;
 
@@ -688,7 +687,7 @@ public class RoutingRequest implements Cloneable, Serializable {
      * Keep {@link #numItineraries} itineraries for each group with at least this part of the legs
      * in common.
      * Default value is 0.68 (68%), use a value less than 0.50 to turn off.
-     * @see FilterChainParameters#groupBySimilarity()
+     * @see org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder#addGroupBySimilarity(double, int)
      */
     public Double groupBySimilarityKeepNumOfItineraries = 0.68;
 
