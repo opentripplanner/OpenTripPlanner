@@ -146,6 +146,13 @@ public class Itinerary {
     }
 
     /**
+     * Total distance in meters.
+     */
+    public double distanceMeters() {
+        return legs.stream().mapToDouble(it -> it.distanceMeters).sum();
+    }
+
+    /**
      * Return {@code true} if all legs are WALKING.
      */
     public boolean isWalkingAllTheWay() {
