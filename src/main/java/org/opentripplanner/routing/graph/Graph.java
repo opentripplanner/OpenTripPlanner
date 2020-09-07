@@ -30,6 +30,7 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
+import org.opentripplanner.graph_builder.module.time.ClusterList;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.*;

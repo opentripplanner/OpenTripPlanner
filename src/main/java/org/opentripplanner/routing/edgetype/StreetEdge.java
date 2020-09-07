@@ -7,6 +7,8 @@ import org.opentripplanner.common.TurnRestriction;
 import org.opentripplanner.common.TurnRestrictionType;
 import org.opentripplanner.common.geometry.*;
 import org.opentripplanner.common.model.P2;
+import org.opentripplanner.graph_builder.module.time.QueryData;
+import org.opentripplanner.graph_builder.module.time.TimeTable;
 import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.graph.Edge;
@@ -525,10 +527,36 @@ public class StreetEdge extends Edge implements Cloneable {
      * time we enter this edge, whereas in a reverse search we get the speed based on the time we exit
      * the edge.
      */
+    public ArrayList<TimeTable> getTimes() {
+        return times;
+    }
+
+    public void setTimes(ArrayList<TimeTable> times) {
+        this.times = times;
+    }
+
+    ArrayList<TimeTable> times;
+
+    public double getVooomSpeed(long timeMillis) {
+
+        if (this.getTimes()!=null) {
+            int i = Collections.binarySearch(this.getTimes(), new QueryData(timeMillis));
+            if (i >= 0) {
+                TimeTable timetable = this.getTimes().get(i);
+                if (timetable != null)
+                    return timetable.getMetrpersecundSpeed();
+            }
+        }
+        return this.getMaxStreetTraverseSpeed();
+    }
+
     public double calculateSpeed(RoutingRequest options, TraverseMode traverseMode, VehicleDescription currentVehicle, long timeMillis) {
         double maxVehicleSpeed = options.getSpeed(traverseMode);
         if(currentVehicle != null) {
             maxVehicleSpeed = currentVehicle.getMaxSpeedInMetersPerSecond(this);
+        }
+        if (this.getTimes()!= null && traverseMode== TraverseMode.CAR) {
+            return min(min(maxVehicleSpeed, getMaxStreetTraverseSpeed()), this.getVooomSpeed(timeMillis));
         }
         return min(maxVehicleSpeed,getMaxStreetTraverseSpeed());
     }
