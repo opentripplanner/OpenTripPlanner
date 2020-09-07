@@ -7,17 +7,13 @@ import org.opentripplanner.model.Trip;
 
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
 import java.util.function.Predicate;
+import java.util.stream.Collectors;
 
 public class ScheduledDeviatedTrip extends FlexTrip {
-  private final StopLocation[] stops;
-  private final int[] departureTimes;
-  private final int[] arrivalTimes;
 
-  private final int[] pickupTypes;
-  private final int[] dropOffTypes;
+  private final ScheduledDeviatedStopTime[] stopTimes;
 
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
@@ -36,27 +32,34 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     }
 
     int nStops = stopTimes.size();
-    this.stops = new StopLocation[nStops];
-    this.departureTimes = new int[nStops];
-    this.arrivalTimes = new int[nStops];
-    this.pickupTypes = new int[nStops];
-    this.dropOffTypes = new int[nStops];
+    this.stopTimes = new ScheduledDeviatedStopTime[nStops];
 
     for (int i = 0; i < nStops; i++) {
-      StopTime st = stopTimes.get(i);
-
-      this.stops[i] = st.getStop();
-      this.arrivalTimes[i] = st.getArrivalTime();
-      this.departureTimes[i] = st.getDepartureTime();
-
-      this.pickupTypes[i] = st.getPickupType();
-      this.dropOffTypes[i] = st.getDropOffType();
+      this.stopTimes[i] = new ScheduledDeviatedStopTime(stopTimes.get(i));
     }
   }
 
   @Override
   public Collection<StopLocation> getStops() {
-    return new HashSet<>(Arrays.asList(stops));
+    return Arrays
+        .stream(stopTimes)
+        .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
+        .collect(Collectors.toSet());
   }
 
+  private static class ScheduledDeviatedStopTime {
+    private final StopLocation stop;
+    private final int departureTime;
+    private final int arrivalTime;
+    private final int pickupType;
+    private final int dropOffType;
+
+    private ScheduledDeviatedStopTime(StopTime st) {
+      this.stop = st.getStop();
+      this.arrivalTime = st.getArrivalTime();
+      this.departureTime = st.getDepartureTime();
+      this.pickupType = st.getPickupType();
+      this.dropOffType = st.getDropOffType();
+    }
+  }
 }

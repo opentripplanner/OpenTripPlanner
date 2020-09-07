@@ -3,21 +3,15 @@ package org.opentripplanner.ext.flex.trip;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+
 import java.util.Arrays;
 import java.util.Collection;
-import java.util.HashSet;
 import java.util.List;
+import java.util.stream.Collectors;
 
 public class UnscheduledTrip extends FlexTrip {
 
-  private final StopLocation[] stops;
-  private final int[] minDepartureTimes;
-  private final int[] maxDepartureTimes;
-  private final int[] minArrivalTimes;
-  private final int[] maxArrivalTimes;
-
-  private final int[] pickupTypes;
-  private final int[] dropOffTypes;
+  private final UnscheduledStopTime[] stopTimes;
 
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     return stopTimes.stream().allMatch(st -> !st.isArrivalTimeSet() && !st.isDepartureTimeSet());
@@ -31,31 +25,43 @@ public class UnscheduledTrip extends FlexTrip {
     }
 
     int nStops = stopTimes.size();
-    this.stops = new StopLocation[nStops];
-    this.minDepartureTimes = new int[nStops];
-    this.maxDepartureTimes = new int[nStops];
-    this.minArrivalTimes = new int[nStops];
-    this.maxArrivalTimes = new int[nStops];
-    this.pickupTypes = new int[nStops];
-    this.dropOffTypes = new int[nStops];
+    this.stopTimes = new UnscheduledStopTime[nStops];
 
     for (int i = 0; i < nStops; i++) {
-      StopTime st = stopTimes.get(i);
-
-      this.stops[i] = st.getStop();
-      this.minArrivalTimes[i] = st.getMinArrivalTime();
-      this.minDepartureTimes[i] = st.getMinArrivalTime(); //TODO
-      this.maxArrivalTimes[i] = st.getMaxDepartureTime(); //TODO
-      this.maxDepartureTimes[i] = st.getMaxDepartureTime();
-
-      this.pickupTypes[i] = st.getPickupType();
-      this.dropOffTypes[i] = st.getDropOffType();
+      this.stopTimes[i] = new UnscheduledStopTime(stopTimes.get(i));
     }
   }
 
   @Override
   public Collection<StopLocation> getStops() {
-    return new HashSet<>(Arrays.asList(stops));
+    return Arrays
+        .stream(stopTimes)
+        .map(scheduledDeviatedStopTime -> scheduledDeviatedStopTime.stop)
+        .collect(Collectors.toSet());
   }
 
+  private static class UnscheduledStopTime {
+
+    private final StopLocation stop;
+
+    private final int minArrivalTime;
+    private final int minDepartureTime;
+    private final int maxArrivalTime;
+    private final int maxDepartureTime;
+
+    private final int pickupType;
+    private final int dropOffType;
+
+    private UnscheduledStopTime(StopTime st) {
+      stop = st.getStop();
+
+      minArrivalTime = st.getMinArrivalTime();
+      minDepartureTime = st.getMinArrivalTime(); //TODO
+      maxArrivalTime = st.getMaxDepartureTime(); //TODO
+      maxDepartureTime = st.getMaxDepartureTime();
+
+      pickupType = st.getPickupType();
+      dropOffType = st.getDropOffType();
+    }
+  }
 }
