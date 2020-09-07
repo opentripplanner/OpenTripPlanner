@@ -13,12 +13,11 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>. */
 
 package org.opentripplanner.updater.bike_rental;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.fasterxml.jackson.databind.JsonNode;
 
 /**
  * Implementation of a BikeRentalDataSource for the Smoove GIR SabiWeb used in Helsinki.
@@ -56,8 +55,8 @@ public class SmooveBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
         station.name = new NonLocalizedString(node.path("name").asText().split("\\s", 2)[1]);
         String[] coordinates = node.path("coordinates").asText().split(",");
         try {
-            station.y = Double.parseDouble(coordinates[0].trim());
-            station.x = Double.parseDouble(coordinates[1].trim());
+            station.latitude = Double.parseDouble(coordinates[0].trim());
+            station.longitude = Double.parseDouble(coordinates[1].trim());
         } catch (NumberFormatException e) {
             // E.g. coordinates is empty
             log.warn("Error parsing bike rental station " + station.id, e);

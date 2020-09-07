@@ -1,11 +1,10 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.HashSet;
-
+import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.util.NonLocalizedString;
 
-import com.fasterxml.jackson.databind.JsonNode;
+import java.util.HashSet;
 
 
 /**
@@ -42,9 +41,9 @@ public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSo
         brstation.networks.add(this.networkName);
 
         brstation.id = stationNode.path("id").toString();
-        brstation.x = stationNode.path("longitude").asDouble();
-        brstation.y = stationNode.path("latitude").asDouble();
-        brstation.name =  new NonLocalizedString(stationNode.path("stationName").asText());
+        brstation.longitude = stationNode.path("longitude").asDouble();
+        brstation.latitude = stationNode.path("latitude").asDouble();
+        brstation.name = new NonLocalizedString(stationNode.path("stationName").asText());
         brstation.bikesAvailable = stationNode.path("availableBikes").asInt();
         brstation.spacesAvailable = stationNode.path("availableDocks").asInt();
 

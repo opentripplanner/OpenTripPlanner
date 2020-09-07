@@ -60,7 +60,7 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         return next.makeState();
     }
 
-    private State trySwitchVehicles(State state) {
+    protected State trySwitchVehicles(State state) {
         if (!canDropoffVehicleHere(state.getCurrentVehicle())) {
             return null;
         }
@@ -70,7 +70,7 @@ public class RentVehicleEdge extends EdgeWithParkingZones implements TemporaryEd
         return stateEditor.makeState();
     }
 
-    private State beginVehicleRenting(State state) {
+    protected State beginVehicleRenting(State state) {
         StateEditor next = state.edit(this);
         next.beginVehicleRenting(vehicle);
         return next.makeState();

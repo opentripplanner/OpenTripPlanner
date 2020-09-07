@@ -1,18 +1,12 @@
 package org.opentripplanner.routing.algorithm;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Set;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.api.parameter.QualifiedModeSet;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.RoutingRequest;
 import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.*;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.spt.GraphPath;
@@ -21,6 +15,10 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.routing.vertextype.IntersectionVertex;
 import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TestBikeRental extends TestCase {
     public void testBasic() throws Exception {
@@ -61,8 +59,8 @@ public class TestBikeRental extends TestCase {
         BikeRentalStation station = new BikeRentalStation();
         station.id = "id";
         station.name = new NonLocalizedString("station");
-        station.x = -77.049;
-        station.y = 36.856;
+        station.longitude = -77.049;
+        station.latitude = 36.856;
         station.bikesAvailable = 5;
         station.spacesAvailable = 5;
         BikeRentalStationVertex stationVertex = new BikeRentalStationVertex(graph, station);
@@ -85,8 +83,8 @@ public class TestBikeRental extends TestCase {
         BikeRentalStation station2 = new BikeRentalStation();
         station2.id = "id2";
         station2.name = new NonLocalizedString("station2");
-        station2.x = -77.049;
-        station2.y = 36.857;
+        station2.longitude = -77.049;
+        station2.latitude = 36.857;
         station2.bikesAvailable = 5;
         station2.spacesAvailable = 5;
         BikeRentalStationVertex stationVertex2 = new BikeRentalStationVertex(graph, station2);
