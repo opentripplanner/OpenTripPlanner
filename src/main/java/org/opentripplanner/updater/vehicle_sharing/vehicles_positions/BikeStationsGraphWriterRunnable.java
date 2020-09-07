@@ -14,6 +14,12 @@ import org.slf4j.LoggerFactory;
 import java.util.List;
 import java.util.Optional;
 
+/**
+ * This edge allows us to rent bike from station (or leave current vehicle and rent bike).
+ * This edge is a loop on {@link TemporaryRentVehicleVertex} which, when traversed, changes our current traverse mode,
+ * but leaves us in the same location. Edge is dependent on {@link BikeRentalStation}. Renting a bike is impossible
+ * if station is empty.
+ */
 public class BikeStationsGraphWriterRunnable implements GraphWriterRunnable {
 
     private static final Logger LOG = LoggerFactory.getLogger(BikeStationsGraphWriterRunnable.class);

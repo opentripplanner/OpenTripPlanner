@@ -118,7 +118,7 @@ public class TemporaryStreetSplitter {
     }
 
     public Optional<TemporaryRentVehicleVertex> linkStationToGraph(BikeRentalStation station) {
-        TemporaryRentVehicleVertex temporaryVertex = createTemporaryRentVehicleVertex(station);
+        TemporaryRentVehicleVertex temporaryVertex = createTemporaryRentBikeVertex(station);
         if (!toStreetEdgeLinker.linkTemporarilyBothWays(temporaryVertex, station.getBikeFromStation())) {
             LOG.debug("Couldn't link station {} to graph", station);
             return Optional.empty();
@@ -176,7 +176,7 @@ public class TemporaryStreetSplitter {
         return vertex;
     }
 
-    private TemporaryRentVehicleVertex createTemporaryRentVehicleVertex(BikeRentalStation station) {
+    private TemporaryRentVehicleVertex createTemporaryRentBikeVertex(BikeRentalStation station) {
         TemporaryRentVehicleVertex vertex = new TemporaryRentVehicleVertex(UUID.randomUUID().toString(),
                 new CoordinateXY(station.longitude, station.latitude), "Renting station " + station);
         RentBikeEdge edge = new RentBikeEdge(vertex, station);
