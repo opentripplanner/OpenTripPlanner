@@ -34,8 +34,10 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** How long to wait after polling to poll again. */
     protected Integer pollingPeriodSeconds;
 
-    /** The type name in the preferences JSON. FIXME String type codes seem like a red flag, should probably be removed. */
-    private String type;
+    /**
+     * The type name in the preferences JSON. FIXME String type codes seem like a red flag, should probably be removed.
+     */
+    protected String type;
 
     @Override
     final public void run() {
@@ -73,4 +75,5 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         // Additional configuration for the concrete subclass
         configurePolling(graph, config);
     }
+
 }

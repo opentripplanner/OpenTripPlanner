@@ -45,7 +45,6 @@ public class DropoffVehicleEdgeTest {
         // given
         edge.setParkingZones(parkingZoneInfo);
         when(parkingZoneInfo.canDropoffVehicleHere(CAR_1)).thenReturn(false);
-
         // when
         State traversed = edge.traverse(rentingState);
 
