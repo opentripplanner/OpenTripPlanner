@@ -812,8 +812,9 @@ public class Graph implements Serializable {
     public  void  saveEdgesForTimePrediction(File file) throws  IOException{
         LOG.info(" writing edgges for colecting  time predition data to {}",file.getAbsolutePath() );
         CsvWriter writer = new CsvWriter(file.getPath(),' ', Charset.forName("UTF-8"));
+        try{
         for (StreetEdge e : this.getStreetEdges()){
-            try {
+
                 writer.writeRecord(new String[]{
                         (String.valueOf(e.getId())),
                         (String.valueOf(e.getStartOsmNodeId())),
@@ -827,13 +828,13 @@ public class Graph implements Serializable {
                         (String.valueOf(e.getAzimuth()))
 
                 });
-            } catch (IOException ioException) {
-                file.delete();
-                ioException.printStackTrace();
             }
-            finally {
-                writer.close();
-            }
+        }catch (IOException ioException) {
+            file.delete();
+            ioException.printStackTrace();
+        }
+        finally {
+            writer.close();
         }
 
 
