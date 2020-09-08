@@ -71,7 +71,7 @@ public class GraphBuilder implements Runnable {
     private Graph graph = new Graph();
 
     /** Should the graph be serialized to disk after being created or not? */
-    public boolean serializeGraph = true;
+    public boolean serializeGraph = true ;
 
     public GraphBuilder(File path, GraphBuilderParameters builderParams) {
         graphFile = new File(path, "Graph.obj");
