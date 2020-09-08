@@ -1,5 +1,6 @@
 package org.opentripplanner.routing.algorithm.filterchain;
 
+import lombok.val;
 import org.junit.Test;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.TestItineraryBuilder;
@@ -15,7 +16,12 @@ import static org.opentripplanner.model.plan.TestItineraryBuilder.E;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newItinerary;
 import static org.opentripplanner.model.plan.TestItineraryBuilder.newTime;
 
-public class ItineraryFilterChainBuilderTest {
+
+/**
+ * This class test the hole filter chain with a few test cases. Each filter should be tested
+ * with a unit test. This is just a some test on top of the other filter unit-tests.
+ */
+public class ItineraryFilterChainTest {
   private static final int I3_LATE_START_TIME = 50;
 
   // And some itineraries, with some none optimal options
@@ -32,7 +38,7 @@ public class ItineraryFilterChainBuilderTest {
   @Test
   public void testDefaultFilterChain() {
     // Given a default chain
-    ItineraryFilter chain = new ItineraryFilterChainBuilder(config(false, false, 10)).build();
+    ItineraryFilter chain = createBuilder(false, false, 10).build();
 
     assertEquals(toStr(List.of(i1, i3)), toStr(chain.filter(List.of(i1, i2, i3))));
   }
@@ -40,10 +46,11 @@ public class ItineraryFilterChainBuilderTest {
   @Test
   public void testFilterChainWithLateDepartureFilterSet() {
     // Given a "default" chain
-    ItineraryFilterChainBuilder builder = new ItineraryFilterChainBuilder(config(false, false, 10));
-    // with latest-departure-time-limit set
-    builder.withLatestDepartureTimeLimit(TestItineraryBuilder.newTime(40).toInstant());
-    ItineraryFilter chain = builder.build();
+    ItineraryFilter chain =
+        createBuilder(false, false, 10)
+            // with latest-departure-time-limit set
+            .withLatestDepartureTimeLimit(TestItineraryBuilder.newTime(40).toInstant())
+            .build();
 
     assertEquals(toStr(List.of(i1)), toStr(chain.filter(List.of(i1, i3))));
   }
@@ -57,22 +64,22 @@ public class ItineraryFilterChainBuilderTest {
     Itinerary i3 = newItinerary(A).bus(41, 9, 14, E).build();
 
     // Given a default chain with 'numOfItineraries=2'
-    chain = new ItineraryFilterChainBuilder(config(false, false, 2)).build();
+    chain = createBuilder(false, false, 2).build();
     assertEquals(List.of(i1, i2), chain.filter(List.of(i1, i2, i3)));
 
     // Given a default chain with 'numOfItineraries=1'
-    chain = new ItineraryFilterChainBuilder(config(false, false, 1)).build();
+    chain = createBuilder(false, false, 1).build();
     assertEquals(List.of(i1), chain.filter(List.of(i1, i2, i3)));
 
     // Given a chain with 'numOfItineraries=1' and 'arriveBy=true'
-    chain = new ItineraryFilterChainBuilder(config(true, false, 1)).build();
+    chain = createBuilder(true, false, 1).build();
     assertEquals(List.of(i3), chain.filter(List.of(i1, i2, i3)));
   }
 
   @Test
   public void testDebugFilterChain() {
     // Given a filter-chain with debugging enabled
-    ItineraryFilter chain = new ItineraryFilterChainBuilder(config(false, true, 3))
+    ItineraryFilter chain = createBuilder(false, true, 3)
         .withLatestDepartureTimeLimit(newTime(I3_LATE_START_TIME - 1).toInstant())
         .build();
 
@@ -85,31 +92,33 @@ public class ItineraryFilterChainBuilderTest {
     assertEquals("latest-departure-time-limit", i3.systemNotices.get(0).tag);
   }
 
+  @Test
+  public void removeTransitWithHigherCostThanBestOnStreetOnly() {
+    val builder= createBuilder(true, false, 20);
+    ItineraryFilter chain;
+
+    // given
+    // Walk for 12 minute
+    Itinerary walk = newItinerary(A, 6).walk(12, E).build();
+    // Not optimal, takes longer than walking
+    Itinerary bus = newItinerary(A).bus(21, 6, 28, E).build();
+
+    // Disable filter and allow none optimal bus itinerary pass through
+    chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(false).build();
+    assertEquals(toStr(List.of(walk, bus)), toStr(chain.filter(List.of(walk, bus))));
+
+    // Enable filter and remove bus itinerary
+    chain = builder.withRemoveTransitWithHigherCostThanBestOnStreetOnly(true).build();
+    assertEquals(toStr(List.of(walk)), toStr(chain.filter(List.of(walk, bus))));
+  }
+
 
   /* private methods */
 
-  private FilterChainParameters config(boolean arriveBy, boolean debug, int numOfItineraries) {
-    return new FilterChainParameters() {
-      @Override
-      public boolean arriveBy() { return arriveBy; }
-
-      @Override
-      public int maxNumberOfItineraries() {
-        return numOfItineraries;
-      }
-
-      @Override
-      public List<GroupBySimilarity> groupBySimilarity() {
-        return List.of(
-            // Keep 1 itinerary if a group of itineraries is 85% similar
-            new GroupBySimilarity(0.85, 1),
-            // Keep 'minLimit' itineraries if a group of itineraries is 68% similar
-            new GroupBySimilarity(0.68, numOfItineraries)
-        );
-      }
-
-      @Override
-      public boolean debug() { return debug; }
-    };
+  private ItineraryFilterChainBuilder createBuilder(boolean arriveBy, boolean debug, int numOfItineraries) {
+    return new ItineraryFilterChainBuilder(arriveBy)
+        .withMaxNumberOfItineraries(numOfItineraries)
+        .withRemoveTransitWithHigherCostThanBestOnStreetOnly(true)
+        .withDebugEnabled(debug);
   }
 }
