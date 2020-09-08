@@ -59,6 +59,8 @@ public class GraphBuilder implements Runnable {
     private final File transitLineStopsFile;
 
     private final File transitLineStopTimesFile;
+
+    private final  File timePredictionFile;
     
     private boolean _alwaysRebuild = true;
 
@@ -76,6 +78,7 @@ public class GraphBuilder implements Runnable {
         transitLineFile = new File(path, "linie.csv");
         transitLineStopsFile = new File(path, "przystanki.csv");
         transitLineStopTimesFile = new File(path, "godziny.csv");
+        timePredictionFile = new File(path,"prediction.csv");
         graph.stopClusterMode = builderParams.stopClusterMode;
     }
 
@@ -155,6 +158,7 @@ public class GraphBuilder implements Runnable {
                 graph.saveTransitLines(transitLineFile);
                 graph.saveTransitLineStops(transitLineStopsFile);
                 graph.saveTransitLineStopTimes(transitLineStopTimesFile);
+                graph.saveEdgesForTimePrediction(timePredictionFile);
             } catch (Exception ex) {
                 throw new IllegalStateException(ex);
             }

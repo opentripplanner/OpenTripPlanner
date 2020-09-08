@@ -809,6 +809,36 @@ public class Graph implements Serializable {
             writer.close();
         }
     }
+    public  void  saveEdgesForTimePrediction(File file) throws  IOException{
+        LOG.info(" writing edgges for colecting  time predition data to {}",file.getAbsolutePath() );
+        CsvWriter writer = new CsvWriter(file.getPath(),' ', Charset.forName("UTF-8"));
+        for (StreetEdge e : this.getStreetEdges()){
+            try {
+                writer.writeRecord(new String[]{
+                        (String.valueOf(e.getId())),
+                        (String.valueOf(e.getStartOsmNodeId())),
+                        (String.valueOf(e.getFromVertex().getLat())),
+                        (String.valueOf(e.getFromVertex().getLon())),
+                        (String.valueOf(e.getEndOsmNodeId())),
+                        (String.valueOf(e.getToVertex().getLat())),
+                        (String.valueOf(e.getToVertex().getLon())),
+                        (String.valueOf(e.wayId)),
+                        (String.valueOf(e.getDirection())),
+                        (String.valueOf(e.getAzimuth()))
+
+                });
+            } catch (IOException ioException) {
+                file.delete();
+                ioException.printStackTrace();
+            }
+            finally {
+                writer.close();
+            }
+        }
+
+
+
+    }
 
     public void saveTransitLineStops(File file) throws IOException {
         LOG.info("Writing transit line stops to csv {} ...", file.getAbsolutePath());
