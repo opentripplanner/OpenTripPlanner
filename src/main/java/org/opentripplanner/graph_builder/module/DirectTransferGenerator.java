@@ -81,8 +81,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
             /* Make transfers to each nearby stop that is the closest stop on some trip pattern. */
             int n = 0;
             for (StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0, false)) {
-                /* Skip the origin stop, loop transfers are not needed. */
-                if (sd.stop == stop) continue;
+                // Skip the origin stop, loop transfers are not needed.
+                if (sd.stop == stop) { continue; }
                 graph.transfersByStop.put(
                     stop,
                     new SimpleTransfer(stop, sd.stop, sd.distance, sd.edges)
@@ -93,11 +93,9 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 // This code is for finding transfers from FlexStopLocations to Stops, transfers
                 // from Stops to FlexStopLocations and between Stops are already covered above.
                 for (StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0,  true)) {
-                    /* Skip the origin stop, loop transfers are not needed. */
-                    if (sd.stop == ts0.getStop())
-                        continue;
-                    if (sd.stop instanceof Stop)
-                        continue;
+                    // Skip the origin stop, loop transfers are not needed.
+                    if (sd.stop == ts0.getStop()) { continue; }
+                    if (sd.stop instanceof Stop) { continue; }
                     graph.transfersByStop.put(sd.stop,
                         new SimpleTransfer(sd.stop, ts0.getStop(), sd.distance, sd.edges)
                     );
