@@ -717,6 +717,8 @@ connect to a network resource is the `url` field.
         {
             "type": "stop-time-updater",
             "frequencySec": 60,
+            //seconds ahead of RT feed timestamp for which future block trips will be updated (block trip must be scheduled to start in this window)
+            "blockUpdateWindowSec": 10800,
             // this is either http or file... shouldn't it default to http or guess from the presence of a URL?
             "sourceType": "gtfs-http",
             "url": "http://developer.trimet.org/ws/V1/TripUpdate/appID/0123456789ABCDEF",

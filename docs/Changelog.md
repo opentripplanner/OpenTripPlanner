@@ -8,6 +8,7 @@
 - Improve documentation for `mode` routing parameter (#2809)
 - Disable linking from already linked stops (#2372)
 - Optimize elevation calculations
+- Implement RT delay propagation for future block trips (#2295)
 
 ## 1.4 (2019-07-30)
 
