@@ -16,6 +16,7 @@ import org.onebusaway.gtfs.model.Trip;
 import org.onebusaway.gtfs.serialization.GtfsReader;
 import org.onebusaway.gtfs.services.GenericMutableDao;
 import org.onebusaway.gtfs.services.GtfsMutableRelationalDao;
+import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.model.GtfsBundle;
 import org.opentripplanner.graph_builder.module.geometry.GeometryAndBlockProcessor;
@@ -32,6 +33,7 @@ import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -135,6 +137,9 @@ public class GtfsModule implements GraphBuilderModule {
                 calendarServiceData.add(builder.buildCalendarServiceData());
 
                 // NB! The calls below have side effects - the builder state is updated!
+                if (OTPFeature.FlexRouting.isOn()) {
+                    FlexTripsMapper.createFlexTrips(builder);
+                }
 
                 repairStopTimesForEachTrip(builder.getStopTimesSortedByTrip());
 

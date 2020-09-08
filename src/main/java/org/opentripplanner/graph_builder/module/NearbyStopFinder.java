@@ -2,10 +2,13 @@ package org.opentripplanner.graph_builder.module;
 
 import com.beust.jcommander.internal.Lists;
 import com.beust.jcommander.internal.Sets;
+import com.google.common.collect.ArrayListMultimap;
+import com.google.common.collect.Multimap;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.opentripplanner.common.MinMap;
 import org.opentripplanner.common.geometry.GeometryUtils;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
@@ -21,10 +24,13 @@ import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
 import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.spt.DominanceFunction;
 import org.opentripplanner.routing.spt.ShortestPathTree;
+import org.opentripplanner.routing.vertextype.StreetVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
@@ -79,18 +85,21 @@ public class NearbyStopFinder {
     }
 
     /**
-     * Find all unique nearby stops that are the closest stop on some trip pattern.
+     * Find all unique nearby stops that are the closest stop on some trip pattern or flex trip.
      * Note that the result will include the origin vertex if it is an instance of StopVertex.
      * This is intentional: we don't want to return the next stop down the line for trip patterns that pass through the
      * origin vertex.
      */
-    public Set<StopAtDistance> findNearbyStopsConsideringPatterns (Vertex vertex) {
+    public Set<StopAtDistance> findNearbyStopsConsideringPatterns(Vertex vertex, boolean reverseDirection) {
 
         /* Track the closest stop on each pattern passing nearby. */
         MinMap<TripPattern, StopAtDistance> closestStopForPattern = new MinMap<TripPattern, StopAtDistance>();
 
+        /* Track the closest stop on each flex trip nearby. */
+        MinMap<FlexTrip, StopAtDistance> closestStopForFlexTrip = new MinMap<>();
+
         /* Iterate over nearby stops via the street network or using straight-line distance, depending on the graph. */
-        for (StopAtDistance stopAtDistance : findNearbyStops(vertex)) {
+        for (StopAtDistance stopAtDistance : findNearbyStops(vertex, reverseDirection)) {
             StopLocation ts1 = stopAtDistance.stop;
 
             if (ts1 instanceof Stop){
@@ -98,11 +107,16 @@ public class NearbyStopFinder {
                 for (TripPattern pattern : graph.index.getPatternsForStop(ts1)) {
                     closestStopForPattern.putMin(pattern, stopAtDistance);
                 }
+            } if (OTPFeature.FlexRouting.isOn()) {
+                for (FlexTrip trip : graph.index.getFlexIndex().flexTripsByStop.get(ts1)) {
+                    closestStopForFlexTrip.putMin(trip, stopAtDistance);
+                }
             }
         }
 
         /* Make a transfer from the origin stop to each destination stop that was the closest stop on any pattern. */
         Set<StopAtDistance> uniqueStops = Sets.newHashSet();
+        uniqueStops.addAll(closestStopForFlexTrip.values());
         uniqueStops.addAll(closestStopForPattern.values());
         return uniqueStops;
 
@@ -115,9 +129,9 @@ public class NearbyStopFinder {
      * If the origin vertex is a StopVertex, the result will include it; this characteristic is essential for
      * associating the correct stop with each trip pattern in the vicinity.
      */
-    public List<StopAtDistance> findNearbyStops (Vertex vertex) {
+    public List<StopAtDistance> findNearbyStops(Vertex vertex, boolean reverseDirection) {
         if (useStreets) {
-            return findNearbyStopsViaStreets(vertex);
+            return findNearbyStopsViaStreets(vertex, reverseDirection);
         }
         Coordinate c0 = vertex.getCoordinate();
         return directGraphFinder.findClosestStops(c0.y, c0.x, radiusMeters);
@@ -157,6 +171,9 @@ public class NearbyStopFinder {
         ShortestPathTree spt = astar.getShortestPathTree(routingRequest);
 
         List<StopAtDistance> stopsFound = Lists.newArrayList();
+
+        Multimap<FlexStopLocation, State> locationsMap = ArrayListMultimap.create();
+
         if (spt != null) {
             // TODO use GenericAStar and a traverseVisitor? Add an earliestArrival switch to genericAStar?
             for (State state : spt.getAllStates()) {
@@ -165,8 +182,28 @@ public class NearbyStopFinder {
                 if (targetVertex instanceof TransitStopVertex && state.isFinal()) {
                     stopsFound.add(StopAtDistance.stopAtDistanceForState(state, ((TransitStopVertex) targetVertex).getStop()));
                 }
+                if (OTPFeature.FlexRouting.isOn() && targetVertex instanceof StreetVertex
+                    && ((StreetVertex) targetVertex).flexStopLocations != null) {
+                    for (FlexStopLocation flexStopLocation : ((StreetVertex) targetVertex).flexStopLocations) {
+                        // This is for a simplification, so that we only return one vertex from each
+                        // stop location. All vertices are added to the multimap, which is filtered
+                        // below, so that only the closest vertex is added to stopsFound
+                        locationsMap.put(flexStopLocation, state);
+                    }
+                }
             }
         }
+
+        for (var locationStates : locationsMap.asMap().entrySet()) {
+            FlexStopLocation flexStopLocation = locationStates.getKey();
+            Collection<State> states = locationStates.getValue();
+            // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
+            // the minimum walking distance
+            State min = Collections.min(states, (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance));
+
+            stopsFound.add(StopAtDistance.stopAtDistanceForState(min, flexStopLocation));
+        }
+
         /* Add the origin vertices if needed. The SPT does not include the initial state. FIXME shouldn't it? */
         for (Vertex vertex : originVertices) {
             if (vertex instanceof TransitStopVertex) {
@@ -201,12 +238,14 @@ public class NearbyStopFinder {
         );
     }
 
-    public List<StopAtDistance> findNearbyStopsViaStreets (Vertex originVertex) {
+    public List<StopAtDistance> findNearbyStopsViaStreets(
+        Vertex originVertex,
+        boolean reverseDirection
+    ) {
         return findNearbyStopsViaStreets(
                 Collections.singleton(originVertex),
-                false,
+                reverseDirection,
                 true
         );
     }
-
 }
