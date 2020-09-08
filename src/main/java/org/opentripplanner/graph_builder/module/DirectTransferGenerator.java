@@ -90,6 +90,8 @@ public class DirectTransferGenerator implements GraphBuilderModule {
                 n += 1;
             }
             if (OTPFeature.FlexRouting.isOn()) {
+                // This code is for finding transfers from FlexStopLocations to Stops, transfers
+                // from Stops to FlexStopLocations and between Stops are already covered above.
                 for (StopAtDistance sd : nearbyStopFinder.findNearbyStopsConsideringPatterns(ts0,  true)) {
                     /* Skip the origin stop, loop transfers are not needed. */
                     if (sd.stop == ts0.getStop())

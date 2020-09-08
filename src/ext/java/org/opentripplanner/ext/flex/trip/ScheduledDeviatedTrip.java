@@ -1,15 +1,17 @@
 package org.opentripplanner.ext.flex.trip;
 
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
-public class ScheduledDeviatedTrip extends FlexTrip {
-  static final int MISSING_VALUE = -999;
+import java.util.function.Predicate;
 
+public class ScheduledDeviatedTrip extends FlexTrip {
   private final StopLocation[] stops;
   private final int[] departureTimes;
   private final int[] arrivalTimes;
@@ -17,8 +19,21 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   private final int[] pickupTypes;
   private final int[] dropOffTypes;
 
+  public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
+    Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
+    Predicate<StopTime> noExplicitWindows = stopTime ->
+        stopTime.getMaxDepartureTime() == org.onebusaway.gtfs.model.StopTime.MISSING_VALUE
+            && stopTime.getMinArrivalTime() == org.onebusaway.gtfs.model.StopTime.MISSING_VALUE;
+    return stopTimes.stream().anyMatch(notStopType)
+        && stopTimes.stream().allMatch(noExplicitWindows);
+  }
+
   public ScheduledDeviatedTrip(Trip trip, List<StopTime> stopTimes) {
     super(trip);
+
+    if (!isScheduledFlexTrip(stopTimes)) {
+      throw new IllegalArgumentException("Incompatible stopTimes for scheduled flex trip");
+    }
 
     int nStops = stopTimes.size();
     this.stops = new StopLocation[nStops];

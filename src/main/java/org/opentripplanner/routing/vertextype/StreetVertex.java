@@ -1,6 +1,8 @@
 package org.opentripplanner.routing.vertextype;
 
 import org.opentripplanner.model.FlexStopLocation;
+import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -21,6 +23,10 @@ import java.util.*;
 public abstract class StreetVertex extends Vertex {
 
     private static final long serialVersionUID = 1L;
+
+    private static TraverseModeSet CAR_TRAVERSE_MODE_SET = new TraverseModeSet(TraverseMode.CAR);
+
+    private static TraverseModeSet WALK_TRAVERSE_MODE_SET = new TraverseModeSet(TraverseMode.WALK);
 
     /** All locations for flex transit, which this vertex is part of */
     public Set<FlexStopLocation> flexStopLocations;
@@ -64,5 +70,19 @@ public abstract class StreetVertex extends Vertex {
             calculatedName = new LocalizedString("unnamedStreet", (String[]) null);
         }
         return calculatedName;
+    }
+
+    public boolean isConnectedToWalkingEdge() {
+        return this.getOutgoing().stream().anyMatch(edge ->
+            edge instanceof StreetEdge && ((StreetEdge) edge).canTraverse(WALK_TRAVERSE_MODE_SET));
+    }
+
+    public boolean isConnectedToDriveableEdge() {
+        return this.getOutgoing().stream().anyMatch(edge ->
+            edge instanceof StreetEdge && ((StreetEdge) edge).canTraverse(CAR_TRAVERSE_MODE_SET));
+    }
+
+    public boolean isEligibleForCarPickupDropoff() {
+        return isConnectedToDriveableEdge() && isConnectedToWalkingEdge();
     }
 }

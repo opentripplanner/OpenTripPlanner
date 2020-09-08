@@ -5,9 +5,6 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.services.GraphBuilderModule;
 import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.TraverseModeSet;
-import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.impl.StreetVertexIndex;
@@ -27,23 +24,17 @@ public class FlexLocationsToStreetEdgesMapper implements GraphBuilderModule {
     }
 
     StreetVertexIndex streetIndex = new StreetVertexIndex(graph);
-    TraverseModeSet carTraverseModeSet = new TraverseModeSet(TraverseMode.CAR);
-    TraverseModeSet walkTraverseModeSet = new TraverseModeSet(TraverseMode.WALK);
 
     for (FlexStopLocation flexStopLocation : graph.locationsById.values()) {
       for (Vertex vertx : streetIndex.getVerticesForEnvelope(flexStopLocation
           .getGeometry()
           .getEnvelopeInternal())
       ) {
+        // Check that the vertex is connected to both driveable and walkable edges
         if (!(vertx instanceof StreetVertex)) { continue; }
-        if (vertx.getOutgoing().stream().noneMatch(edge ->
-            edge instanceof StreetEdge && ((StreetEdge) edge).canTraverse(carTraverseModeSet))  ||
-            vertx.getOutgoing().stream().noneMatch(edge ->
-            edge instanceof StreetEdge && ((StreetEdge) edge).canTraverse(walkTraverseModeSet))
-        ) {
-          continue;
-        }
+        if (!((StreetVertex)vertx).isEligibleForCarPickupDropoff()) { continue; }
 
+        // The street index overselects, so need to check for exact geometry inclusion
         Point p = GeometryUtils.getGeometryFactory().createPoint(vertx.getCoordinate());
         if (flexStopLocation.getGeometry().disjoint(p)) {
           continue;

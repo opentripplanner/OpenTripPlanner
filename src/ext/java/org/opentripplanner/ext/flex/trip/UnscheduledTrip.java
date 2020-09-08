@@ -19,9 +19,16 @@ public class UnscheduledTrip extends FlexTrip {
   private final int[] pickupTypes;
   private final int[] dropOffTypes;
 
+  public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
+    return stopTimes.stream().allMatch(st -> !st.isArrivalTimeSet() && !st.isDepartureTimeSet());
+  }
 
   public UnscheduledTrip(Trip trip, List<StopTime> stopTimes) {
     super(trip);
+
+    if (!isUnscheduledTrip(stopTimes)) {
+      throw new IllegalArgumentException("Incompatible stopTimes for unscheduled trip");
+    }
 
     int nStops = stopTimes.size();
     this.stops = new StopLocation[nStops];

@@ -2,18 +2,15 @@ package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.TripStopTimes;
 import org.opentripplanner.model.impl.OtpTransitServiceBuilder;
+import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.function.Predicate;
-
-import static org.onebusaway.gtfs.model.StopTime.MISSING_VALUE;
 
 public class FlexTripsMapper {
 
@@ -23,37 +20,32 @@ public class FlexTripsMapper {
     TripStopTimes stopTimesByTrip = builder.getStopTimesSortedByTrip();
 
     final int tripSize = stopTimesByTrip.size();
-    int tripCount = 0;
+
+    ProgressTracker progress = ProgressTracker.track(
+        "Create flex trips", 500, tripSize
+    );
 
     for (org.opentripplanner.model.Trip trip : stopTimesByTrip.keys()) {
-      if (++tripCount % 100000 == 0) {
-        LOG.debug("Mapped StopTimes for flex trips {}/{}", tripCount, tripSize);
-      }
 
       /* Fetch the stop times for this trip. Copy the list since it's immutable. */
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
-      if (isUnscheduledTrip(stopTimes)) {
+      if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
         if (stopTimes.size() == 2) {
           // TODO: Drop this restriction after time handling and ride times are defined
           builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
         }
-      } else if (isScheduledFlexTrip(stopTimes)) {
+      } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
       } else if (hasContinuousStops(stopTimes)) {
         // builder.getFlexTripsById().add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
+
+      //Keep lambda! A method-ref would causes incorrect class and line number to be logged
+      progress.step(m -> LOG.info(m));
     }
-  }
-
-  private static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    return stopTimes.stream().allMatch(st -> !st.isArrivalTimeSet() && !st.isDepartureTimeSet());
-  }
-
-  private static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
-    Predicate<StopTime> otherStopTypePredicate = Predicate.not(st -> st.getStop() instanceof Stop);
-    Predicate<StopTime> noExplicitWindow = stopTime -> stopTime.getMaxDepartureTime() == MISSING_VALUE && stopTime.getMinArrivalTime() == MISSING_VALUE;
-    return stopTimes.stream().anyMatch(otherStopTypePredicate) && stopTimes.stream().allMatch(noExplicitWindow);
+    LOG.info(progress.completeMessage());
+    LOG.info("Done creating flex trips. Created a total of {} trips.", builder.getFlexTripsById().size());
   }
 
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
