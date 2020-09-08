@@ -186,7 +186,7 @@ public class NearbyStopFinder {
                     && ((StreetVertex) targetVertex).flexStopLocations != null) {
                     for (FlexStopLocation flexStopLocation : ((StreetVertex) targetVertex).flexStopLocations) {
                         // This is for a simplification, so that we only return one vertex from each
-                        // stop location. All vertices area added to the multimap, which is filtered
+                        // stop location. All vertices are added to the multimap, which is filtered
                         // below, so that only the closest vertex is added to stopsFound
                         locationsMap.put(flexStopLocation, state);
                     }
@@ -197,7 +197,8 @@ public class NearbyStopFinder {
         for (var locationStates : locationsMap.asMap().entrySet()) {
             FlexStopLocation flexStopLocation = locationStates.getKey();
             Collection<State> states = locationStates.getValue();
-            // Select the vertex from all vertices that are reachable per by taking the minimum walking distance
+            // Select the vertex from all vertices that are reachable per FlexStopLocation by taking
+            // the minimum walking distance
             State min = Collections.min(states, (s1, s2) -> (int) (s1.walkDistance - s2.walkDistance));
 
             stopsFound.add(StopAtDistance.stopAtDistanceForState(min, flexStopLocation));
