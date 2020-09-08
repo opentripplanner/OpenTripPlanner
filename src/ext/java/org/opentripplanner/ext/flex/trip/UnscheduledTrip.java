@@ -9,6 +9,12 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Collectors;
 
+/**
+ * This type of FlexTrip is used when a taxi-type service is modeled, which operates in one or
+ * between two areas/groups of stops without a set schedule. The travel times are calculated based
+ * on the driving time between the stops, with the schedule times being used just for deciding if a
+ * trip is possible.
+ */
 public class UnscheduledTrip extends FlexTrip {
 
   private final UnscheduledStopTime[] stopTimes;

@@ -11,6 +11,10 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+/**
+ * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
+ * locations, which are not stops, but other types, such as groups of stops or location areas.
+ */
 public class ScheduledDeviatedTrip extends FlexTrip {
 
   private final ScheduledDeviatedStopTime[] stopTimes;
