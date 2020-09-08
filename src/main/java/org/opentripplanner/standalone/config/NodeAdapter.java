@@ -2,6 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.util.OtpAppException;
 import org.slf4j.Logger;
 
@@ -21,6 +22,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.BiFunction;
+import java.util.function.DoubleFunction;
 import java.util.function.Function;
 import java.util.regex.Pattern;
 
@@ -320,6 +322,23 @@ public class NodeAdapter {
 
     public URI asUri(String paramName, String defaultValue) {
         return uriFromString(paramName, asText(paramName, defaultValue));
+    }
+
+    public DoubleFunction<Double> asLinearFunction(String paramName, DoubleFunction<Double> defaultValue) {
+        String text = param(paramName).asText();
+        if (text == null || text.isBlank()) {
+            return defaultValue;
+        }
+        try {
+            return RequestFunctions.parse(text);
+        }
+        catch (Exception e) {
+            throw new OtpAppException(
+                "Unable to parse parameter '" + fullPath(paramName) + "'. The value '" + text
+                    + "' is not a valid function on the form \"a + b x\" (\"2.0 + 7.1 x\")."
+                    + "Source: " + source + "."
+            );
+        }
     }
 
     /**

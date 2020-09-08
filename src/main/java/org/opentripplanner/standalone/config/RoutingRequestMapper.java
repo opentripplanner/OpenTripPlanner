@@ -85,6 +85,7 @@ public class RoutingRequestMapper {
         request.startingTransitTripId = c.asFeedScopedId("startingTransitTripId", dft.startingTransitTripId);
         request.transferCost = c.asInt("transferPenalty", dft.transferCost);
         request.transferSlack = c.asInt("transferSlack", dft.transferSlack);
+        request.transitGeneralizedCostLimit = c.asLinearFunction("transitGeneralizedCostLimit", dft.transitGeneralizedCostLimit);
         request.turnReluctance = c.asDouble("turnReluctance", dft.turnReluctance);
         request.useBikeRentalAvailabilityInformation = c.asBoolean("useBikeRentalAvailabilityInformation", dft.useBikeRentalAvailabilityInformation);
         request.useRequestedDateTimeInMaxHours = c.asBoolean("useRequestedDateTimeInMaxHours", dft.useRequestedDateTimeInMaxHours);
