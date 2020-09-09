@@ -63,6 +63,7 @@ import org.slf4j.LoggerFactory;
 
 import java.io.*;
 import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -809,12 +810,12 @@ public class Graph implements Serializable {
             writer.close();
         }
     }
-    public  void  saveEdgesForTimePrediction(File file) throws  IOException{
-        LOG.info(" writing edgges for colecting  time predition data to {}",file.getAbsolutePath() );
-        CsvWriter writer = new CsvWriter(file.getPath(),' ', Charset.forName("UTF-8"));
-        try{
-        for (StreetEdge e : this.getStreetEdges()){
 
+    public void saveEdgesForTimePrediction(File file) {
+        LOG.info("Writing edges for collecting time prediction data to {}", file.getAbsolutePath());
+        CsvWriter writer = new CsvWriter(file.getPath(), ' ', StandardCharsets.UTF_8);
+        try {
+            for (StreetEdge e : this.getStreetEdges()) {
                 writer.writeRecord(new String[]{
                         (String.valueOf(e.getId())),
                         (String.valueOf(e.getStartOsmNodeId())),
@@ -829,16 +830,12 @@ public class Graph implements Serializable {
 
                 });
             }
-        }catch (IOException ioException) {
+        } catch (IOException ioException) {
             file.delete();
             ioException.printStackTrace();
-        }
-        finally {
+        } finally {
             writer.close();
         }
-
-
-
     }
 
     public void saveTransitLineStops(File file) throws IOException {
