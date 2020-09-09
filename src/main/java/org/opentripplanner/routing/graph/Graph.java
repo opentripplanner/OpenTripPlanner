@@ -30,7 +30,6 @@ import org.opentripplanner.common.MavenVersion;
 import org.opentripplanner.common.geometry.GraphUtils;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.NoFutureDates;
-import org.opentripplanner.graph_builder.module.time.ClusterList;
 import org.opentripplanner.gtfs.GtfsLibrary;
 import org.opentripplanner.kryo.HashBiMapSerializer;
 import org.opentripplanner.model.*;
@@ -42,6 +41,7 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.MortonVertexComparatorFactory;
 import org.opentripplanner.routing.core.TransferTable;
 import org.opentripplanner.routing.core.TraverseMode;
+import org.opentripplanner.routing.core.TraverseModeSet;
 import org.opentripplanner.routing.core.vehicle_sharing.VehicleDescription;
 import org.opentripplanner.routing.edgetype.EdgeWithCleanup;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -67,7 +67,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.*;
-import java.nio.charset.Charset;
+import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -841,7 +841,7 @@ public class Graph implements Serializable {
     public void saveTransitLines(File file) throws IOException {
         LOG.info("Writing transit lines to csv {} ...", file.getAbsolutePath());
 
-        CsvWriter writer = new CsvWriter(file.getPath(), ',', Charset.forName("UTF-8"));
+        CsvWriter writer = new CsvWriter(file.getPath(), ',', StandardCharsets.UTF_8);
         try {
             for (Route route : getTransitRoutes()) {
                 String routeTypeName = "UNSUPPORTED";
@@ -863,7 +863,7 @@ public class Graph implements Serializable {
     public void saveTransitLineStops(File file) throws IOException {
         LOG.info("Writing transit line stops to csv {} ...", file.getAbsolutePath());
 
-        CsvWriter writer = new CsvWriter(file.getPath(), ',', Charset.forName("UTF-8"));
+        CsvWriter writer = new CsvWriter(file.getPath(), ',', StandardCharsets.UTF_8);
         try {
             for (Stop stop : this.transitStops.values()) {
                 writer.writeRecord(new String[]{stop.getId().getId(), "" + stop.getLat(), "" + stop.getLon(), stop.getName(), String.join("#", stop.getLineNames())});
@@ -879,7 +879,7 @@ public class Graph implements Serializable {
     public void saveTransitLineStopTimes(File file, long timeLimit) throws IOException {
         LocalTime startTime = LocalTime.now();
         LOG.info("Preparing to write transit line stop times to csv");
-        CsvWriter writer = new CsvWriter(file.getPath(), ',', Charset.forName("UTF-8"));
+        CsvWriter writer = new CsvWriter(file.getPath(), ',', StandardCharsets.UTF_8);
         LOG.info("Writing transit line stop times to csv {} ...", file.getAbsolutePath());
         int numberOfConsideredRecords = 0;
         int numberOfWrittenRecords = 0;
@@ -918,6 +918,35 @@ public class Graph implements Serializable {
             writer.close();
             LOG.info("Writing transit line stop times to csv took {} seconds (considered entries: {}, written entries: {}",
                     writingTime, numberOfConsideredRecords, numberOfWrittenRecords);
+        }
+    }
+
+    public void saveEdgesForTimePrediction(File file) {
+        LOG.info("Writing edges for collecting time prediction data to {}", file.getAbsolutePath());
+        CsvWriter writer = new CsvWriter(file.getPath(), ' ', StandardCharsets.UTF_8);
+        try {
+            TraverseModeSet car = new TraverseModeSet(TraverseMode.CAR);
+            for (StreetEdge e : this.getStreetEdges()) {
+                if (e.canTraverse(car)) {
+                    writer.writeRecord(new String[]{
+                            (String.valueOf(e.getId())),
+                            (String.valueOf(e.getStartOsmNodeId())),
+                            (String.valueOf(e.getFromVertex().getLat())),
+                            (String.valueOf(e.getFromVertex().getLon())),
+                            (String.valueOf(e.getEndOsmNodeId())),
+                            (String.valueOf(e.getToVertex().getLat())),
+                            (String.valueOf(e.getToVertex().getLon())),
+                            (String.valueOf(e.wayId)),
+                            (String.valueOf(e.getDirection())),
+                            (String.valueOf(e.getAzimuth()))
+                    });
+                }
+            }
+        } catch (IOException ioException) {
+            file.delete();
+            ioException.printStackTrace();
+        } finally {
+            writer.close();
         }
     }
 
