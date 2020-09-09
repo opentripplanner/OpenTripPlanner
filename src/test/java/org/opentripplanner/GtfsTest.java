@@ -56,7 +56,7 @@ public abstract class GtfsTest extends TestCase {
         File gtfs = new File("src/test/resources/" + getFeedName());
         File gtfsRealTime = new File("src/test/resources/" + getFeedName() + ".pb");
         GtfsBundle gtfsBundle = new GtfsBundle(gtfs);
-        feedId = new GtfsFeedId.Builder().id("FEED").build();
+        feedId = new GtfsFeedId.Builder().id("").build();
         gtfsBundle.setFeedId(feedId);
         List<GtfsBundle> gtfsBundleList = Collections.singletonList(gtfsBundle);
         GtfsModule gtfsGraphBuilderImpl = new GtfsModule(gtfsBundleList);
