@@ -4,9 +4,12 @@ import java.util.Objects;
 
 public class Provider {
 
-    private final int providerId;
+    private int providerId;
 
-    private final String providerName;
+    private String providerName;
+
+    public Provider() {
+    }
 
     public Provider(int providerId, String providerName) {
         this.providerId = providerId;
@@ -19,6 +22,14 @@ public class Provider {
 
     public String getProviderName() {
         return providerName;
+    }
+
+    public void setProviderId(int providerId) {
+        this.providerId = providerId;
+    }
+
+    public void setProviderName(String providerName) {
+        this.providerName = providerName;
     }
 
     @Override

@@ -16,16 +16,12 @@ public class VehiclePositionsGetter extends HasuraGetter<VehicleDescription, Veh
         return
                 "{\"query\": \"query VehiclesForArea($latMin: float8, $lonMin: float8, $latMax: float8, $lonMax: float8) {\\n" +
                         "  items:vehicles(\\n" +
-                        "    where: {\\n" +
-                        "    latitude: {\\n" +
-                        "      _gte: $latMin\\n" +
-                        "      _lte: $latMax\\n" +
+                        "  where: {\\n" +
+                        "      latitude: { _gte: $latMin, _lte: $latMax }\\n" +
+                        "      longitude: { _gte: $lonMin, _lte: $lonMax }\\n" +
+                        "      provider: { available: { _eq: true } }\\n" +
                         "    }\\n" +
-                        "    longitude: {\\n" +
-                        "      _gte: $lonMin\\n" +
-                        "      _lte: $lonMax\\n" +
-                        "    }\\n" +
-                        "  }) {\\n" +
+                        "  ) {\\n" +
                         "    providerVehicleId\\n" +
                         "    latitude\\n" +
                         "    longitude\\n" +
@@ -34,9 +30,8 @@ public class VehiclePositionsGetter extends HasuraGetter<VehicleDescription, Veh
                         "    type\\n" +
                         "    range\\n" +
                         "    provider {\\n" +
-                        "      id\\n" +
-                        "      name\\n" +
-                        "      available\\n" +
+                        "      providerId: id\\n" +
+                        "      providerName: name\\n" +
                         "    }\\n" +
                         "  }\\n" +
                         "}\",";
