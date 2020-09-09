@@ -24,21 +24,19 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
                 "    where: {\\n" +
                 "      latitude: { _gte: $latMin, _lte: $latMax }\\n" +
                 "      longitude: { _gte: $lonMin, _lte: $lonMax }\\n" +
+                "      provider: { available: { _eq: true } }\\n" +
                 "    }\\n" +
                 "  ) {\\n" +
                 "    id: id\\n" +
                 "    name: displayName\\n" +
-                "\\n" +
                 "    provider {\\n" +
-                "      available\\n" +
-                "      providerId: id\\n" +
-                "      providerName: name\\n" +
+                "      id\\n" +
+                "      name\\n" +
                 "    }\\n" +
                 "    latitude\\n" +
                 "    longitude\\n" +
-                "    locationName\\n" +
-                "    bikesAvaiable: adultBike\\n" +
-                "    spacesAvaiable: bikeRacks\\n" +
+                "    bikesAvailable: adultBike\\n" +
+                "    spacesAvailable: bikeRacks\\n" +
                 "  }\\n" +
                 "}\",";
     }

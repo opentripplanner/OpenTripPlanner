@@ -1,10 +1,11 @@
 package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
 
-public class VehicleProvider {
+import org.opentripplanner.routing.core.vehicle_sharing.Provider;
+
+public class VehicleProviderHasura {
 
     private int id;
     private String name;
-    private boolean available;
 
     public int getId() {
         return id;
@@ -22,11 +23,9 @@ public class VehicleProvider {
         this.name = name;
     }
 
-    public boolean isAvailable() {
-        return available;
+    public Provider toProvider() {
+        return new Provider(id, name);
     }
 
-    public void setAvailable(boolean available) {
-        this.available = available;
-    }
+
 }

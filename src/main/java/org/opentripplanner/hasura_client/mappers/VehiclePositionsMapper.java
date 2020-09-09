@@ -15,10 +15,6 @@ public class VehiclePositionsMapper extends HasuraToOTPMapper<Vehicle, VehicleDe
             LOG.warn("Omitting vehicle {} because of lack of provider", vehicle.getProviderVehicleId());
             return null;
         }
-        if (!vehicle.getProvider().isAvailable()) {
-            LOG.warn("Omitting vehicle {} because provider {} is unavailable", vehicle.getProviderVehicleId(), vehicle.getProvider().getName());
-            return null;
-        }
         String providerVehicleId = vehicle.getProviderVehicleId();
         double longitude = vehicle.getLongitude();
         double latitude = vehicle.getLatitude();
