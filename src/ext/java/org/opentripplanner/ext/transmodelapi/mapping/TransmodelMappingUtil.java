@@ -1,8 +1,8 @@
 package org.opentripplanner.ext.transmodelapi.mapping;
 
-import org.opentripplanner.ext.transmodelapi.model.stop.PlaceType;
 import org.opentripplanner.ext.transmodelapi.model.TransmodelPlaceType;
 import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.graphfinder.PlaceType;
 
 import java.time.LocalDate;
 import java.util.Date;
@@ -46,18 +46,18 @@ public class TransmodelMappingUtil {
          return inputTypes.stream().map(TransmodelMappingUtil::mapPlaceType).distinct().collect(Collectors.toList());
      }
 
-    private static org.opentripplanner.routing.graphfinder.PlaceType mapPlaceType(TransmodelPlaceType transmodelType){
+    private static PlaceType mapPlaceType(TransmodelPlaceType transmodelType){
         if (transmodelType!=null) {
             switch (transmodelType) {
                 case QUAY:
                 case STOP_PLACE:
-                    return org.opentripplanner.routing.graphfinder.PlaceType.STOP;
+                    return PlaceType.STOP;
                 case BICYCLE_RENT:
-                    return org.opentripplanner.routing.graphfinder.PlaceType.BICYCLE_RENT;
+                    return PlaceType.BICYCLE_RENT;
                 case BIKE_PARK:
-                    return org.opentripplanner.routing.graphfinder.PlaceType.BIKE_PARK;
+                    return PlaceType.BIKE_PARK;
                 case CAR_PARK:
-                    return org.opentripplanner.routing.graphfinder.PlaceType.CAR_PARK;
+                    return PlaceType.CAR_PARK;
             }
         }
         return null;
