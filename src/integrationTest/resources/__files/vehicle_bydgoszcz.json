@@ -1,6 +1,6 @@
 {
   "data": {
-    "vehicles": [
+    "items": [
       {
         "providerVehicleId": "14376",
         "latitude": 53.151564,
@@ -10,6 +10,7 @@
         "type": "car",
         "range": 266.25,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -23,6 +24,7 @@
         "type": "car",
         "range": 105,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -36,6 +38,7 @@
         "type": "car",
         "range": 352.5,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -49,6 +52,7 @@
         "type": "car",
         "range": 228.75,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -62,6 +66,7 @@
         "type": "car",
         "range": 296.25,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -75,6 +80,7 @@
         "type": "car",
         "range": 375,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -88,6 +94,7 @@
         "type": "car",
         "range": 243.75,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -101,6 +108,7 @@
         "type": "car",
         "range": 204.25,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -114,6 +122,7 @@
         "type": "car",
         "range": 231.12,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -127,6 +136,7 @@
         "type": "car",
         "range": 537.5,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -140,6 +150,7 @@
         "type": "car",
         "range": 400,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -153,6 +164,7 @@
         "type": "car",
         "range": 437.5,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -166,6 +178,7 @@
         "type": "car",
         "range": 406.25,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -179,6 +192,7 @@
         "type": "car",
         "range": 158.33,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -192,6 +206,7 @@
         "type": "car",
         "range": 243.81,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -205,6 +220,7 @@
         "type": "car",
         "range": 333.33,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -218,6 +234,7 @@
         "type": "car",
         "range": 700,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -231,6 +248,7 @@
         "type": "car",
         "range": 714.29,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -244,6 +262,7 @@
         "type": "car",
         "range": 114.29,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -257,6 +276,7 @@
         "type": "car",
         "range": 209.52,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -270,6 +290,7 @@
         "type": "car",
         "range": 228.57,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -283,6 +304,7 @@
         "type": "car",
         "range": 171.43,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -296,6 +318,7 @@
         "type": "car",
         "range": 247.62,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -309,6 +332,7 @@
         "type": "car",
         "range": 152.38,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -322,6 +346,7 @@
         "type": "car",
         "range": 342.86,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -335,6 +360,7 @@
         "type": "car",
         "range": 228.57,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -348,6 +374,7 @@
         "type": "car",
         "range": 255.24,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -361,6 +388,7 @@
         "type": "car",
         "range": 198.1,
         "provider": {
+          "available": true,
           "id": 2,
           "name": "Panek"
         }
@@ -374,6 +402,7 @@
         "type": "scooter",
         "range": 24.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -387,6 +416,7 @@
         "type": "scooter",
         "range": 16.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -400,6 +430,7 @@
         "type": "scooter",
         "range": 23.9,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -413,6 +444,7 @@
         "type": "scooter",
         "range": 27.9,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -426,6 +458,7 @@
         "type": "scooter",
         "range": 58.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -439,6 +472,7 @@
         "type": "scooter",
         "range": 61.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -452,6 +486,7 @@
         "type": "scooter",
         "range": 28.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -465,6 +500,7 @@
         "type": "scooter",
         "range": 58.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -478,6 +514,7 @@
         "type": "scooter",
         "range": 59.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -491,6 +528,7 @@
         "type": "scooter",
         "range": 55.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -504,6 +542,7 @@
         "type": "scooter",
         "range": 38.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -517,6 +556,7 @@
         "type": "scooter",
         "range": 42.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -530,6 +570,7 @@
         "type": "scooter",
         "range": 9.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -543,6 +584,7 @@
         "type": "scooter",
         "range": 50.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -556,6 +598,7 @@
         "type": "scooter",
         "range": 63.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -569,6 +612,7 @@
         "type": "scooter",
         "range": 54.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -582,6 +626,7 @@
         "type": "scooter",
         "range": 16,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -595,6 +640,7 @@
         "type": "scooter",
         "range": 57,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -608,6 +654,7 @@
         "type": "scooter",
         "range": 8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -621,6 +668,7 @@
         "type": "scooter",
         "range": 59.9,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -634,6 +682,7 @@
         "type": "scooter",
         "range": 16,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -647,6 +696,7 @@
         "type": "scooter",
         "range": 54.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -660,6 +710,7 @@
         "type": "scooter",
         "range": 30.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -673,6 +724,7 @@
         "type": "scooter",
         "range": 25.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -686,6 +738,7 @@
         "type": "scooter",
         "range": 35.9,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -699,6 +752,7 @@
         "type": "scooter",
         "range": 60.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -712,6 +766,7 @@
         "type": "scooter",
         "range": 54.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -725,6 +780,7 @@
         "type": "scooter",
         "range": 45.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -738,6 +794,7 @@
         "type": "scooter",
         "range": 59.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -751,6 +808,7 @@
         "type": "scooter",
         "range": 24.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -764,6 +822,7 @@
         "type": "scooter",
         "range": 63.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -777,6 +836,7 @@
         "type": "scooter",
         "range": 58.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -790,6 +850,7 @@
         "type": "scooter",
         "range": 61.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -803,6 +864,7 @@
         "type": "scooter",
         "range": 63.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -816,6 +878,7 @@
         "type": "scooter",
         "range": 38.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -829,6 +892,7 @@
         "type": "scooter",
         "range": 58.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -842,6 +906,7 @@
         "type": "scooter",
         "range": 10.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -855,6 +920,7 @@
         "type": "scooter",
         "range": 63.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -868,6 +934,7 @@
         "type": "un-pedal-scooter",
         "range": 17.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -881,6 +948,7 @@
         "type": "un-pedal-scooter",
         "range": 21.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -894,6 +962,7 @@
         "type": "un-pedal-scooter",
         "range": 24,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -907,6 +976,7 @@
         "type": "un-pedal-scooter",
         "range": 24.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -920,6 +990,7 @@
         "type": "un-pedal-scooter",
         "range": 23.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -933,6 +1004,7 @@
         "type": "un-pedal-scooter",
         "range": 24,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -946,6 +1018,7 @@
         "type": "un-pedal-scooter",
         "range": 24.3,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -959,6 +1032,7 @@
         "type": "un-pedal-scooter",
         "range": 22.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -972,6 +1046,7 @@
         "type": "un-pedal-scooter",
         "range": 22.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -985,6 +1060,7 @@
         "type": "un-pedal-scooter",
         "range": 7.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -998,6 +1074,7 @@
         "type": "un-pedal-scooter",
         "range": 10.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1011,6 +1088,7 @@
         "type": "un-pedal-scooter",
         "range": 22.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1024,6 +1102,7 @@
         "type": "un-pedal-scooter",
         "range": 24,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1037,6 +1116,7 @@
         "type": "un-pedal-scooter",
         "range": 22.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1050,6 +1130,7 @@
         "type": "un-pedal-scooter",
         "range": 12.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1063,6 +1144,7 @@
         "type": "un-pedal-scooter",
         "range": 22.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1076,6 +1158,7 @@
         "type": "un-pedal-scooter",
         "range": 24,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1089,6 +1172,7 @@
         "type": "un-pedal-scooter",
         "range": 22.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1102,6 +1186,7 @@
         "type": "un-pedal-scooter",
         "range": 24.6,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1115,6 +1200,7 @@
         "type": "un-pedal-scooter",
         "range": 22.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1128,6 +1214,7 @@
         "type": "un-pedal-scooter",
         "range": 24,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1141,6 +1228,7 @@
         "type": "un-pedal-scooter",
         "range": 17.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1154,6 +1242,7 @@
         "type": "un-pedal-scooter",
         "range": 23.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1167,6 +1256,7 @@
         "type": "un-pedal-scooter",
         "range": 22.5,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1180,6 +1270,7 @@
         "type": "un-pedal-scooter",
         "range": 18.9,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1193,6 +1284,7 @@
         "type": "un-pedal-scooter",
         "range": 23.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1206,6 +1298,7 @@
         "type": "un-pedal-scooter",
         "range": 22.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1219,6 +1312,7 @@
         "type": "un-pedal-scooter",
         "range": 7.2,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1232,6 +1326,7 @@
         "type": "un-pedal-scooter",
         "range": 23.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1245,6 +1340,7 @@
         "type": "un-pedal-scooter",
         "range": 5.1,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1258,6 +1354,7 @@
         "type": "un-pedal-scooter",
         "range": 23.7,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1271,6 +1368,7 @@
         "type": "un-pedal-scooter",
         "range": 23.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1284,6 +1382,7 @@
         "type": "un-pedal-scooter",
         "range": 22.8,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }
@@ -1297,6 +1396,7 @@
         "type": "un-pedal-scooter",
         "range": 23.4,
         "provider": {
+          "available": true,
           "id": 8,
           "name": "Blinkee"
         }

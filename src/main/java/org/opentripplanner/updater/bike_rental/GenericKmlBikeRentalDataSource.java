@@ -1,18 +1,13 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.Arrays;
-import java.util.HashSet;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Set;
-import java.util.prefs.Preferences;
-
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 /**
  * Load bike rental stations from a KML placemarks. Use name as bike park name and point
@@ -71,11 +66,11 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         if (namePrefix != null)
             brStation.name = new NonLocalizedString(namePrefix + brStation.name);
         String[] coords = attributes.get("Point").trim().split(",");
-        brStation.x = Double.parseDouble(coords[0]);
-        brStation.y = Double.parseDouble(coords[1]);
+        brStation.longitude = Double.parseDouble(coords[0]);
+        brStation.latitude = Double.parseDouble(coords[1]);
         // There is no ID in KML, assume unique names and location
         brStation.id = String.format(Locale.US, "%s[%.3f-%.3f]", brStation.name.toString().replace(" ", "_"),
-                brStation.x, brStation.y);
+                brStation.longitude, brStation.latitude);
         brStation.realTimeData = false;
         brStation.bikesAvailable = 1; // Unknown, always 1
         brStation.spacesAvailable = 1; // Unknown, always 1

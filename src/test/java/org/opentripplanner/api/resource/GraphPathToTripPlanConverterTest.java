@@ -1,62 +1,30 @@
 package org.opentripplanner.api.resource;
 
-import com.google.common.collect.ImmutableList;
 import com.google.transit.realtime.GtfsRealtime.TripDescriptor;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeEvent;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate;
 import com.google.transit.realtime.GtfsRealtime.TripUpdate.StopTimeUpdate.ScheduleRelationship;
+import org.junit.Test;
 import org.locationtech.jts.geom.Coordinate;
+import org.locationtech.jts.geom.CoordinateSequence;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
-import org.junit.Test;
 import org.opentripplanner.api.model.*;
 import org.opentripplanner.calendar.impl.CalendarServiceImpl;
-import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedScopedId;
-import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
-import org.opentripplanner.model.StopTime;
-import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.CalendarServiceData;
-import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.gtfs.BikeAccess;
+import org.opentripplanner.model.*;
+import org.opentripplanner.model.calendar.CalendarServiceData;
+import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.alertpatch.Alert;
 import org.opentripplanner.routing.alertpatch.AlertPatch;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.routing.core.Fare;
+import org.opentripplanner.routing.core.*;
 import org.opentripplanner.routing.core.Fare.FareType;
-import org.opentripplanner.routing.core.RoutingContext;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.ServiceDay;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseMode;
-import org.opentripplanner.routing.core.WrappedCurrency;
-import org.opentripplanner.routing.edgetype.AreaEdge;
-import org.opentripplanner.routing.edgetype.AreaEdgeList;
-import org.opentripplanner.routing.edgetype.FreeEdge;
-import org.opentripplanner.routing.edgetype.LegSwitchingEdge;
-import org.opentripplanner.routing.edgetype.OnBoardDepartPatternHop;
-import org.opentripplanner.routing.edgetype.PatternDwell;
-import org.opentripplanner.routing.edgetype.PatternHop;
-import org.opentripplanner.routing.edgetype.PatternInterlineDwell;
-import org.opentripplanner.routing.edgetype.PreAlightEdge;
-import org.opentripplanner.routing.edgetype.PreBoardEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
-import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
-import org.opentripplanner.routing.edgetype.SimpleTransfer;
-import org.opentripplanner.routing.edgetype.StreetBikeRentalLink;
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.edgetype.StreetTransitLink;
-import org.opentripplanner.routing.edgetype.StreetTraversalPermission;
-import org.opentripplanner.routing.edgetype.StreetWithElevationEdge;
-import org.opentripplanner.routing.edgetype.TemporaryPartialStreetEdge;
-import org.opentripplanner.routing.edgetype.TimetableSnapshot;
-import org.opentripplanner.routing.edgetype.TransitBoardAlight;
-import org.opentripplanner.routing.edgetype.TripPattern;
+import org.opentripplanner.routing.edgetype.*;
 import org.opentripplanner.routing.error.TrivialPathException;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -79,7 +47,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class GraphPathToTripPlanConverterTest {
-    private static final double F_DISTANCE[] = {3, 9996806.8, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
+    private static final double F_DISTANCE[] = {3, 10245436.5, 3539050.5, 7, 2478638.8, 4, 2, 1, 0};
     private static final double O_DISTANCE = 7286193.2;
     private static final double OCTANT = Math.PI / 4;
     private static final double NORTH = OCTANT * 0;
@@ -166,7 +134,7 @@ public class GraphPathToTripPlanConverterTest {
     }
 
     /**
-     * Encoded polyline should contain non trival points from LEG_SWITCH states such as going to/from bus stop
+     * Encoded polyline should add last coordinate
      */
     @Test
     public void testLegGeometryPolylineGeneration() {
@@ -175,13 +143,7 @@ public class GraphPathToTripPlanConverterTest {
         RoutingRequest options = new RoutingRequest("BICYCLE_RENT,TRANSIT");
         GraphPath[] graphPaths = buildPaths();
         List<Edge> edges = new ArrayList<>(graphPaths[0].edges);
-        LegStateSplit legStateSplit = new LegStateSplit(graphPaths[0].states, ImmutableList.of(
-                new State(
-                        graphPaths[0].states.get(3).getVertex(),
-                        new StreetTransitLink((StreetVertex) edges.get(edges.size() - 1).getToVertex(), ((TransitStop) graphPaths[0].edges.get(2).getToVertex()), false),
-                        30,
-                        options)
-        ));
+        LegStateSplit legStateSplit = new LegStateSplit(graphPaths[0].states, new Coordinate(1, 2, 3));
 
         // when
         GraphPathToTripPlanConverter.addLegGeometryToLeg(leg, edges, legStateSplit);
@@ -189,6 +151,28 @@ public class GraphPathToTripPlanConverterTest {
 
         // then
         assertNotEquals(normal, leg.legGeometry);
+    }
+
+    @Test
+    public void testLegGeometryContinuity() {
+        // given
+        RoutingRequest options = new RoutingRequest("BICYCLE_RENT,TRANSIT, WALK");
+        GraphPath[] graphPaths = buildPaths();
+
+        // when
+        Itinerary itinerary = GraphPathToTripPlanConverter.generateItinerary(graphPaths[0], false, false, locale);
+
+        // then
+        Coordinate prev = null, next;
+        for (int i = 0; i < itinerary.legs.size() - 1; ++i) {
+            assertNotNull(itinerary.legs.get(i).legGeometry);
+            List<Coordinate> coordinates = PolylineEncoder.decode(itinerary.legs.get(i).legGeometry);
+            next = coordinates.get(0);
+            if (prev != null) {
+                assertEquals(0, next.distance(prev),  0.01);
+            }
+            prev = coordinates.get(coordinates.size() - 1);
+        }
     }
 
     /**
@@ -459,20 +443,20 @@ public class GraphPathToTripPlanConverterTest {
 
         enterPickupStation.id = "Enter pickup";
         enterPickupStation.name = new NonLocalizedString("Enter pickup station");
-        enterPickupStation.x = 180;
-        enterPickupStation.y = 90;
+        enterPickupStation.longitude = 180;
+        enterPickupStation.latitude = 90;
         exitPickupStation.id = "Exit pickup";
         exitPickupStation.name = new NonLocalizedString("Exit pickup station");
-        exitPickupStation.x = 180;
-        exitPickupStation.y = 90;
+        exitPickupStation.longitude = 180;
+        exitPickupStation.latitude = 90;
         enterDropoffStation.id = "Enter dropoff";
         enterDropoffStation.name = new NonLocalizedString("Enter dropoff station");
-        enterDropoffStation.x = 0;
-        enterDropoffStation.y = 90;
+        enterDropoffStation.longitude = 0;
+        enterDropoffStation.latitude = 90;
         exitDropoffStation.id = "Exit dropoff";
         exitDropoffStation.name = new NonLocalizedString("Exit dropoff station");
-        exitDropoffStation.x = 0;
-        exitDropoffStation.y = 90;
+        exitDropoffStation.longitude = 0;
+        exitDropoffStation.latitude = 90;
 
         // Vertices for legs 5 and 6
         BikeRentalStationVertex v44 = new BikeRentalStationVertex(
@@ -559,6 +543,8 @@ public class GraphPathToTripPlanConverterTest {
                 v8, v10, 0, TraverseMode.RAIL);
         PatternHop e11 = new PatternHop(
                 v10, v12, trainStopDepart, trainStopDwell, 0);
+        e11.setGeometry(createSimpleGeometryWithTwist(trainStopDepart, trainStopDwell));
+
         PatternDwell e13 = new PatternDwell(
                 v12, v14, 1, firstTripPattern);
         PatternHop e15 = new PatternHop(
@@ -1487,16 +1473,17 @@ public class GraphPathToTripPlanConverterTest {
      */
     private void compareGeometries(EncodedPolylineBean[] geometries, Type type) {
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals(2, geometries[0].getLength());
-            assertEquals("??_ibE_ibE", geometries[0].getPoints());
+            assertEquals(3, geometries[0].getLength());
+            assertEquals("??_ibE_ibE~hbE_seK", geometries[0].getPoints());
         } else if (type == Type.ONBOARD) {
             assertNull(geometries[0]);
         }
 
-        assertEquals(3, geometries[1].getLength());
         if (type == Type.FORWARD || type == Type.BACKWARD) {
-            assertEquals("_ibE_ibE_{geC_wpkG_{geC_wpkG", geometries[1].getPoints());
+            assertEquals(4, geometries[1].getLength());
+            assertEquals("?_}hQ_ibE~reK_{geC_wpkG_{geC_wpkG", geometries[1].getPoints());
         } else if (type == Type.ONBOARD) {
+            assertEquals(3, geometries[1].getLength());
             assertEquals("_wfhA_ekkC_mcbA_{geC_{geC_wpkG", geometries[1].getPoints());
         }
 
@@ -2033,6 +2020,19 @@ public class GraphPathToTripPlanConverterTest {
     static TemporaryPartialStreetEdge newTemporaryPartialStreetEdge(StreetEdge parentEdge, StreetVertex v1, StreetVertex v2, LineString geometry, String name, double length) {
         return new TemporaryPartialStreetEdge(parentEdge, v1, v2, geometry, new NonLocalizedString(name), length);
     }
+
+    private LineString createSimpleGeometryWithTwist(Stop s0, Stop s1) {
+
+        Coordinate[] coordinates = new Coordinate[]{
+                new Coordinate(s0.getLon() + 2, s0.getLat() - 1),
+                new Coordinate(s0.getLon(), s0.getLat()),
+                new Coordinate(s1.getLon(), s1.getLat())
+        };
+        CoordinateSequence sequence = new PackedCoordinateSequence.Double(coordinates, 2);
+
+        return GeometryUtils.getGeometryFactory().createLineString(sequence);
+    }
+
 
     /**
      * This class extends the {@link CalendarServiceData} class to allow for easier testing.

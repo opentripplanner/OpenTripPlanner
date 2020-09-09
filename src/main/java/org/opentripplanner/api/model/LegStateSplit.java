@@ -1,5 +1,6 @@
 package org.opentripplanner.api.model;
 
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.routing.core.State;
 
 import java.util.List;
@@ -7,18 +8,18 @@ import java.util.List;
 public class LegStateSplit {
 
     private final List<State> states;
-    private final List<State> legSwitchStates;
+    private final Coordinate nextSplitBeginning;
 
-    public LegStateSplit(List<State> states, List<State> legSwitchStates) {
+    public LegStateSplit(List<State> states, Coordinate coordinate) {
         this.states = states;
-        this.legSwitchStates = legSwitchStates;
+        this.nextSplitBeginning = coordinate;
     }
 
     public List<State> getStates() {
         return states;
     }
 
-    public List<State> getLegSwitchStates() {
-        return legSwitchStates;
+    public Coordinate getNextSplitBeginning() {
+        return nextSplitBeginning;
     }
 }

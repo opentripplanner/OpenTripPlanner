@@ -13,6 +13,7 @@ import static java.lang.Double.min;
         @JsonSubTypes.Type(value = KickScooterDescription.class, name = "KICKSCOOTER"),
         @JsonSubTypes.Type(value = CarDescription.class, name = "CAR"),
         @JsonSubTypes.Type(value = MotorbikeDescription.class, name = "MOTORBIKE"),
+        @JsonSubTypes.Type(value = BikeDescription.class, name = "BIKE"),
 })
 public abstract class VehicleDescription {
 
@@ -20,6 +21,8 @@ public abstract class VehicleDescription {
     private final double longitude;
     private final double latitude;
     private final double rangeInMeters;
+
+    protected boolean requiresHubToDrop;
 
     @JsonSerialize
     private final FuelType fuelType;
@@ -32,12 +35,23 @@ public abstract class VehicleDescription {
     private final Provider provider;
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                              Gearbox gearbox, Provider provider, boolean requiresHubToDrop) {
+        this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null, requiresHubToDrop);
+    }
+
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider) {
         this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, null);
     }
 
     public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
                               Gearbox gearbox, Provider provider, Double rangeInMeters) {
+        this(providerVehicleId, longitude, latitude, fuelType, gearbox, provider, rangeInMeters, false);
+
+    }
+
+    public VehicleDescription(String providerVehicleId, double longitude, double latitude, FuelType fuelType,
+                              Gearbox gearbox, Provider provider, Double rangeInMeters, boolean requiresHubToDrop) {
         if (rangeInMeters == null)
             rangeInMeters = this.getDefaultRangeInMeters();
 
@@ -50,6 +64,7 @@ public abstract class VehicleDescription {
         this.gearbox = gearbox;
         this.provider = provider;
         this.rangeInMeters = rangeInMeters;
+        this.requiresHubToDrop = requiresHubToDrop;
     }
 
     @Override
@@ -109,5 +124,9 @@ public abstract class VehicleDescription {
 
     protected Double getMaximumRangeInMeters() {
         return Double.MAX_VALUE;
+    }
+
+    public boolean requiresHubToDrop() {
+        return requiresHubToDrop;
     }
 }

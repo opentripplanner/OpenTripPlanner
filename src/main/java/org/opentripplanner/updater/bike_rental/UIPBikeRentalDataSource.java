@@ -29,8 +29,8 @@ public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
         brstation.id = rentalStationNode.path("id").toString();
         brstation.name = new NonLocalizedString(rentalStationNode.path("title").asText("").trim());
-        brstation.x = rentalStationNode.path("center").path("longitude").asDouble();
-        brstation.y = rentalStationNode.path("center").path("latitude").asDouble();
+        brstation.longitude = rentalStationNode.path("center").path("longitude").asDouble();
+        brstation.latitude = rentalStationNode.path("center").path("latitude").asDouble();
 
         brstation.bikesAvailable = rentalStationNode.path("availability").path("bikes").asInt();
         brstation.spacesAvailable = rentalStationNode.path("availability").path("locks").asInt();

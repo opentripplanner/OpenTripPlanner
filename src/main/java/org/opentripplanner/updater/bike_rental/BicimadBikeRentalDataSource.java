@@ -157,17 +157,17 @@ public class BicimadBikeRentalDataSource implements BikeRentalDataSource, JsonCo
 
         public BikeRentalStation makeStation(JsonNode node) {
 
-                if (!node.path("activate").asText().equals("1")) {
-                        return null;
-                }
-                BikeRentalStation station = new BikeRentalStation();
-                station.id = String.format("%d", node.path("id").asInt());
-                station.x = node.path("longitude").asDouble();
-                station.y = node.path("latitude").asDouble();
-                station.name = new NonLocalizedString(node.path("name").asText());
-                station.bikesAvailable = node.path("dock_bikes").asInt();
-                station.spacesAvailable = node.path("free_bases").asInt();
-                return station;
+            if (!node.path("activate").asText().equals("1")) {
+                return null;
+            }
+            BikeRentalStation station = new BikeRentalStation();
+            station.id = String.format("%d", node.path("id").asInt());
+            station.longitude = node.path("longitude").asDouble();
+            station.latitude = node.path("latitude").asDouble();
+            station.name = new NonLocalizedString(node.path("name").asText());
+            station.bikesAvailable = node.path("dock_bikes").asInt();
+            station.spacesAvailable = node.path("free_bases").asInt();
+            return station;
         }
 
         @Override public String toString() {

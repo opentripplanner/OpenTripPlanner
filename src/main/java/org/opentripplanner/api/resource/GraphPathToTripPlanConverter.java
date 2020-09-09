@@ -110,8 +110,8 @@ public abstract class GraphPathToTripPlanConverter {
                 Leg lastLeg = i.legs.get(i.legs.size() - 1);
                 lastLeg.to.orig = plan.to.orig;
 
-                for (Leg leg:i.legs) {
-                    if(leg.mode!=TraverseMode.WALK && !leg.isTransitLeg() && Objects.isNull(leg.vehicleDescription)){
+                for (Leg leg : i.legs) {
+                    if (leg.mode != TraverseMode.WALK && !leg.isTransitLeg() && Objects.isNull(leg.vehicleDescription)) {
                         LOG.warn("Returning leg without vehicle description for leg: from {} to {}, mode: {} (request: {})",
                                 leg.from.name, leg.to.name, leg.mode, request);
                     }
@@ -298,7 +298,7 @@ public abstract class GraphPathToTripPlanConverter {
 
         // interval legIndexPairs[0], legIndexPairs[1] contains valid states such as WALK, CAR, TRAIN
         // interval legIndexPairs[1], legIndexPairs[2] contains LEG_SWITCH states which separate leg from next leg
-        int[] legIndexPairs = {0, states.size() - 1, states.size() - 1};
+        int[] legIndexPairs = {0, states.size() - 1};
         List<int[]> legsIndexes = new ArrayList<>();
 
         for (int i = 1; i < states.size() - 1; i++) {
@@ -313,20 +313,19 @@ public abstract class GraphPathToTripPlanConverter {
                 if (backMode != TraverseMode.LEG_SWITCH) {              // Start of leg switch
                     legIndexPairs[1] = i;
                 } else if (forwardMode != TraverseMode.LEG_SWITCH) {    // End of leg switch
-                    legIndexPairs[2] = i;
                     if (legIndexPairs[1] != states.size() - 1) {
                         legsIndexes.add(legIndexPairs);
                     }
-                    legIndexPairs = new int[]{i, states.size() - 1, states.size() - 1};
+                    legIndexPairs = new int[]{i, states.size() - 1};
                 }
             } else if (backMode != forwardMode) {                       // Mode change => leg switch
-                legIndexPairs[1] = legIndexPairs[2] = i;
+                legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[]{i, states.size() - 1, states.size() - 1};
+                legIndexPairs = new int[]{i, states.size() - 1};
             } else if (edge instanceof PatternInterlineDwell) {         // Interlining => leg switch
-                legIndexPairs[1] = legIndexPairs[2] = i;
+                legIndexPairs[1] = i;
                 legsIndexes.add(legIndexPairs);
-                legIndexPairs = new int[]{i + 1, states.size() - 1, states.size() - 1};
+                legIndexPairs = new int[]{i + 1, states.size() - 1};
             }
         }
 
@@ -335,9 +334,24 @@ public abstract class GraphPathToTripPlanConverter {
 
         List<LegStateSplit> legsStates = new ArrayList<>();
         // Fill the two-dimensional array with states
-        for (int[] legsIndex : legsIndexes) {
-            legIndexPairs = legsIndex;
-            LegStateSplit legStateSplit = new LegStateSplit(states.subList(legIndexPairs[0], legIndexPairs[1] + 1), states.subList(legIndexPairs[1] + 1, legIndexPairs[2] + 1));
+        for (int i = 0; i < legsIndexes.size(); ++i) {
+            legIndexPairs = legsIndexes.get(i);
+
+            State nextState = Optional.of(i)
+                    .filter(it -> it < legsIndexes.size() - 1)
+                    .map(it -> legsIndexes.get(it+1))
+                    .map(it -> it[0] + 1 ) // We are interested with 2nd state in next leg, or rather in edge between 1st and 2nd state
+                    .filter(it -> it < states.size() )
+                    .map(states::get).orElse(null);
+            Coordinate coordinate = Optional.ofNullable(nextState)
+                    .map(State::getBackEdge)
+                    .map(Edge::getDisplayGeometry)
+                    .map(LineString::getCoordinates)
+                    .filter(it -> it.length !=0)
+                    .map(it -> it[0])
+                    .orElse(null);
+
+            LegStateSplit legStateSplit = new LegStateSplit(states.subList(legIndexPairs[0], legIndexPairs[1] + 1), coordinate);
             legsStates.add(legStateSplit);
         }
 
@@ -392,9 +406,11 @@ public abstract class GraphPathToTripPlanConverter {
 
     @VisibleForTesting
     static void addLegGeometryToLeg(Leg leg, List<Edge> edges, LegStateSplit legStateSplit) {
-        edges.addAll(legStateSplit.getLegSwitchStates().stream().map(State::getBackEdge).collect(Collectors.toList()));
 
         CoordinateArrayListSequence coordinates = makeCoordinates(edges);
+        if(legStateSplit.getNextSplitBeginning() != null && !coordinates.getCoordinate(coordinates.size()-1).equals(legStateSplit.getNextSplitBeginning())) {
+            coordinates.add(legStateSplit.getNextSplitBeginning());
+        }
         Geometry geometry = GeometryUtils.getGeometryFactory().createLineString(coordinates);
 
         leg.legGeometry = PolylineEncoder.createEncodings(geometry);

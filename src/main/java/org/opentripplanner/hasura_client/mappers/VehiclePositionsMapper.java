@@ -1,28 +1,22 @@
-package org.opentripplanner.updater.vehicle_sharing.vehicles_positions;
+package org.opentripplanner.hasura_client.mappers;
 
+import org.opentripplanner.hasura_client.HasuraGetter;
+import org.opentripplanner.hasura_client.hasura_objects.Vehicle;
 import org.opentripplanner.routing.core.vehicle_sharing.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.List;
-import java.util.Objects;
+public class VehiclePositionsMapper extends HasuraToOTPMapper<Vehicle, VehicleDescription> {
+    private static final Logger LOG = LoggerFactory.getLogger(HasuraGetter.class);
 
-import static java.util.stream.Collectors.toList;
-
-public class VehiclePositionsMapper {
-
-    private static final Logger LOG = LoggerFactory.getLogger(VehiclePositionsMapper.class);
-
-    public List<VehicleDescription> map(List<SharedVehiclesApiResponse.Vehicle> vehicles) {
-        return vehicles.stream()
-                .map(this::mapToVehicleDescription)
-                .filter(Objects::nonNull)
-                .collect(toList());
-    }
-
-    private VehicleDescription mapToVehicleDescription(SharedVehiclesApiResponse.Vehicle vehicle) {
+    @Override
+    protected VehicleDescription mapSingleHasuraObject(Vehicle vehicle) {
         if (vehicle.getProvider() == null) {
             LOG.warn("Omitting vehicle {} because of lack of provider", vehicle.getProviderVehicleId());
+            return null;
+        }
+        if (!vehicle.getProvider().isAvailable()) {
+            LOG.warn("Omitting vehicle {} because provider {} is unavailable", vehicle.getProviderVehicleId(), vehicle.getProvider().getName());
             return null;
         }
         String providerVehicleId = vehicle.getProviderVehicleId();

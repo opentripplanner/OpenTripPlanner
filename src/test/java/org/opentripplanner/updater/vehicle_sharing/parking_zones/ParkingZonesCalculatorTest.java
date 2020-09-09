@@ -3,24 +3,26 @@ package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 import org.junit.Before;
 import org.junit.Test;
 import org.locationtech.jts.geom.Geometry;
-import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
+import org.opentripplanner.routing.core.vehicle_sharing.*;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
+import org.opentripplanner.routing.edgetype.rentedgetype.SingleParkingZone;
 import org.opentripplanner.routing.graph.Vertex;
 
 import java.util.List;
 
 import static com.google.common.collect.ImmutableList.of;
 import static java.util.Collections.singletonList;
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 import static org.mockito.Matchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 public class ParkingZonesCalculatorTest {
 
-    private RentVehicleAnywhereEdge edge;
+    private static final CarDescription CAR_1 = new CarDescription("1", 0, 0, FuelType.ELECTRIC, Gearbox.AUTOMATIC, new Provider(1, "PANEK"));
+
+    private DropoffVehicleEdge edge;
     private Geometry geometryAllowed;
     private Geometry geometryDisallowed;
     private ParkingZonesCalculator calculator;
@@ -34,7 +36,7 @@ public class ParkingZonesCalculatorTest {
         Vertex vertex = mock(Vertex.class);
         when(vertex.getLat()).thenReturn(1.1);
         when(vertex.getLon()).thenReturn(2.2);
-        edge = new RentVehicleAnywhereEdge(vertex);
+        edge = new DropoffVehicleEdge(vertex);
         geometryAllowed = mock(Geometry.class);
         geometryDisallowed = mock(Geometry.class);
         GeometryParkingZone geometryParkingZone = new GeometryParkingZone(1, VehicleType.CAR, singletonList(geometryAllowed), singletonList(geometryDisallowed));
@@ -43,13 +45,12 @@ public class ParkingZonesCalculatorTest {
 
     @Test
     public void shouldFindAllProvidersAndVehicleTypesWhichHaveParkingZonesEnabled() {
-        // given
+        // when
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(of(geometryParkingZone1, geometryParkingZone2, geometryParkingZone3));
 
-        // when
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-
         // then
+        List<SingleParkingZone> parkingZonesEnabled = calculator.parkingZonesEnabled;
+
         assertEquals(3, parkingZonesEnabled.size());
         assertTrue(parkingZonesEnabled.contains(new SingleParkingZone(1, VehicleType.CAR)));
         assertTrue(parkingZonesEnabled.contains(new SingleParkingZone(1, VehicleType.MOTORBIKE)));
@@ -58,13 +59,12 @@ public class ParkingZonesCalculatorTest {
 
     @Test
     public void shouldRemoveDuplicatesInParkingZonesEnabled() {
-        // given
+        // when
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(of(geometryParkingZone3, geometryParkingZone3));
 
-        // when
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-
         // then
+        List<SingleParkingZone> parkingZonesEnabled = calculator.parkingZonesEnabled;
+
         assertEquals(1, parkingZonesEnabled.size());
         assertTrue(parkingZonesEnabled.contains(new SingleParkingZone(2, VehicleType.KICKSCOOTER)));
     }
@@ -76,11 +76,10 @@ public class ParkingZonesCalculatorTest {
         when(geometryDisallowed.contains(any())).thenReturn(true);
 
         // when
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
+        ParkingZoneInfo parkingZones = calculator.getParkingZonesForEdge(edge);
 
         // then
-        assertEquals(0, parkingZonesForEdge.size());
+        assertFalse(parkingZones.canDropoffVehicleHere(CAR_1));
     }
 
     @Test
@@ -90,12 +89,10 @@ public class ParkingZonesCalculatorTest {
         when(geometryDisallowed.contains(any())).thenReturn(false);
 
         // when
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
+        ParkingZoneInfo parkingZones = calculator.getParkingZonesForEdge(edge);
 
         // then
-        assertEquals(1, parkingZonesForEdge.size());
-        assertTrue(parkingZonesForEdge.contains(new SingleParkingZone(1, VehicleType.CAR)));
+        assertTrue(parkingZones.canDropoffVehicleHere(CAR_1));
     }
 
     @Test
@@ -104,10 +101,9 @@ public class ParkingZonesCalculatorTest {
         when(geometryAllowed.contains(any())).thenReturn(false);
 
         // when
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
-        List<SingleParkingZone> parkingZonesForEdge = calculator.getParkingZonesForEdge(edge, parkingZonesEnabled);
+        ParkingZoneInfo parkingZones = calculator.getParkingZonesForEdge(edge);
 
         // then
-        assertEquals(0, parkingZonesForEdge.size());
+        assertFalse(parkingZones.canDropoffVehicleHere(CAR_1));
     }
 }

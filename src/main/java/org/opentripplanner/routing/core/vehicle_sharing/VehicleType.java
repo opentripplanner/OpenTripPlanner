@@ -7,9 +7,11 @@ public enum VehicleType {
 
     CAR,
     MOTORBIKE,
-    KICKSCOOTER;
+    KICKSCOOTER,
+    BIKE;
 
     private static final String _CAR = "car";
+    private static final String _BIKE = "bike";
     private static final String _MOTORBIKE = "scooter";
     private static final String _KICKSCOOTER = "un-pedal-scooter";
 
@@ -25,6 +27,8 @@ public enum VehicleType {
         switch (vehicleType) {
             case _CAR:
                 return VehicleType.CAR;
+            case _BIKE:
+                return VehicleType.BIKE;
             case _MOTORBIKE:
                 return VehicleType.MOTORBIKE;
             case _KICKSCOOTER:

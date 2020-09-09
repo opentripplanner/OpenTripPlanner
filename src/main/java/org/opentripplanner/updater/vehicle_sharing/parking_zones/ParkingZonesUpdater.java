@@ -1,8 +1,9 @@
 package org.opentripplanner.updater.vehicle_sharing.parking_zones;
 
 import com.fasterxml.jackson.databind.JsonNode;
-import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo.SingleParkingZone;
-import org.opentripplanner.routing.edgetype.rentedgetype.RentVehicleAnywhereEdge;
+import org.opentripplanner.hasura_client.ParkingZonesGetter;
+import org.opentripplanner.routing.edgetype.rentedgetype.DropoffVehicleEdge;
+import org.opentripplanner.routing.edgetype.rentedgetype.ParkingZoneInfo;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
@@ -26,34 +27,30 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     private Graph graph;
     private String url;
 
-    private RentVehicleAnywhereEdge getRentVehicleAnywhereEdge(Vertex v) {
+    private DropoffVehicleEdge getRentVehicleAnywhereEdge(Vertex v) {
         return v.getOutgoing().stream()
-                .filter(RentVehicleAnywhereEdge.class::isInstance)
-                .map(RentVehicleAnywhereEdge.class::cast)
+                .filter(DropoffVehicleEdge.class::isInstance)
+                .map(DropoffVehicleEdge.class::cast)
                 .findAny()
                 .orElse(null);
     }
 
-    private Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> getNewParkingZones(ParkingZonesCalculator calculator,
-            List<GeometryParkingZone> geometryParkingZones, List<SingleParkingZone> parkingZonesEnabled) {
+    private Map<DropoffVehicleEdge, ParkingZoneInfo> getNewParkingZones(ParkingZonesCalculator calculator) {
         return graph.getVertices().stream()
                 .map(this::getRentVehicleAnywhereEdge)
                 .filter(Objects::nonNull)
-                .collect(toMap(identity(), e -> calculator.getParkingZonesForEdge(e, parkingZonesEnabled)));
+                .collect(toMap(identity(), calculator::getParkingZonesForEdge));
     }
 
     @Override
     protected void runPolling() {
         LOG.info("Polling parking zones from API");
-        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getParkingZones(url, graph);
+        List<GeometryParkingZone> geometryParkingZones = parkingZonesGetter.getFromHasura(graph, url);
         ParkingZonesCalculator calculator = new ParkingZonesCalculator(geometryParkingZones);
-        LOG.info("Grouping parking zones");
-        List<SingleParkingZone> parkingZonesEnabled = calculator.getNewParkingZonesEnabled();
         LOG.info("Calculating parking zones for each vertex");
-        Map<RentVehicleAnywhereEdge, List<SingleParkingZone>> parkingZonesPerVertex =
-                getNewParkingZones(calculator, geometryParkingZones, parkingZonesEnabled);
+        Map<DropoffVehicleEdge, ParkingZoneInfo> parkingZonesPerVertex = getNewParkingZones(calculator);
         ParkingZonesGraphWriterRunnable graphWriterRunnable =
-                new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex, parkingZonesEnabled);
+                new ParkingZonesGraphWriterRunnable(calculator, parkingZonesPerVertex);
         LOG.info("Executing parking zones update");
         graphUpdaterManager.execute(graphWriterRunnable);
         LOG.info("Finished updating parking zones");
@@ -71,6 +68,7 @@ public class ParkingZonesUpdater extends PollingGraphUpdater {
     @Override
     public void configure(Graph graph, JsonNode config) throws Exception {
         configurePolling(graph, config);
+        type = "Parking Zones";
     }
 
     @Override
