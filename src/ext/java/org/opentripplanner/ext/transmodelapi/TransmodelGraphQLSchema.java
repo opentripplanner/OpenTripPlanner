@@ -696,8 +696,8 @@ public class TransmodelGraphQLSchema {
 //                        .build())
 //                .build();
 
-        GraphQLInputObjectType filterInputType = GraphQLInputObjectType.newInputObject()
-                .name("InputFilters")
+        GraphQLInputObjectType inputPlaceIds = GraphQLInputObjectType.newInputObject()
+                .name("InputPlaceIds")
                 .field(GraphQLInputObjectField.newInputObjectField()
                         .name("quays")
                         .description("Quays to include by id.")
@@ -1121,7 +1121,7 @@ public class TransmodelGraphQLSchema {
           .argument(GraphQLArgument.newArgument()
               .name("filterByIds")
               .description("Only include places that match one of the given ids.")
-              .type(filterInputType)
+              .type(inputPlaceIds)
               .build())
           .argument(GraphQLArgument.newArgument()
               .name("multiModalMode")
