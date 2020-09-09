@@ -43,8 +43,6 @@ public class PlaceInterfaceType {
           Object o = typeResolutionEnvironment.getObject();
           GraphQLSchema schema = typeResolutionEnvironment.getSchema();
 
-          // TODO OTP2 - Add support for Station, osv
-
           if (o instanceof Stop) {
             return schema.getObjectType("Quay");
           }
