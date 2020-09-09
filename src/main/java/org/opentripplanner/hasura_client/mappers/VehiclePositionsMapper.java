@@ -20,7 +20,7 @@ public class VehiclePositionsMapper extends HasuraToOTPMapper<Vehicle, VehicleDe
         double latitude = vehicle.getLatitude();
         FuelType fuelType = FuelType.fromString(vehicle.getFuelType());
         Gearbox gearbox = Gearbox.fromString(vehicle.getGearbox());
-        Provider provider = new Provider(vehicle.getProvider().getId(), vehicle.getProvider().getName());
+        Provider provider = new Provider(vehicle.getProvider().getProviderId(), vehicle.getProvider().getProviderName());
         Double rangeInMeters = vehicle.getRangeInMeters();
         VehicleType vehicleType = VehicleType.fromDatabaseVehicleType(vehicle.getType());
         if (vehicleType == null) {

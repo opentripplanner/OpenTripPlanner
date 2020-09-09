@@ -1,11 +1,11 @@
 package org.opentripplanner.hasura_client.hasura_objects;
 
-import org.opentripplanner.updater.vehicle_sharing.vehicles_positions.VehicleProviderHasura;
+import org.opentripplanner.routing.core.vehicle_sharing.Provider;
 
 public class BikeStationHasura extends HasuraObject {
     private int bikesAvailable;
     private int spacesAvailable;
-    private VehicleProviderHasura provider;
+    private Provider provider;
     private double longitude;
     private double latitude;
     private long id;
@@ -27,11 +27,11 @@ public class BikeStationHasura extends HasuraObject {
         this.spacesAvailable = spacesAvailable;
     }
 
-    public VehicleProviderHasura getProviderHasura() {
+    public Provider getProvider() {
         return provider;
     }
 
-    public void setProvider(VehicleProviderHasura provider) {
+    public void setProvider(Provider provider) {
         this.provider = provider;
     }
 

@@ -30,8 +30,8 @@ public class VehiclePositionsGetter extends HasuraGetter<VehicleDescription, Veh
                         "    type\\n" +
                         "    range\\n" +
                         "    provider {\\n" +
-                        "      id\\n" +
-                        "      name\\n" +
+                        "      providerId: id\\n" +
+                        "      providerName: name\\n" +
                         "    }\\n" +
                         "  }\\n" +
                         "}\",";

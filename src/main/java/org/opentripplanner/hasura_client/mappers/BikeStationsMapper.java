@@ -11,6 +11,6 @@ public class BikeStationsMapper extends HasuraToOTPMapper<BikeStationHasura, Bik
                 hasuraObject.getLatitude(),
                 hasuraObject.getBikesAvailable(),
                 hasuraObject.getSpacesAvailable(),
-                hasuraObject.getProviderHasura().toProvider());
+                hasuraObject.getProvider());
     }
 }

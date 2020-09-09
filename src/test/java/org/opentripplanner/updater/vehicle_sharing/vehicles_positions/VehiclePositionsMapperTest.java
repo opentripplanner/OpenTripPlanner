@@ -15,7 +15,7 @@ public class VehiclePositionsMapperTest {
 
     private VehiclePositionsMapper mapper;
 
-    private VehicleProviderHasura provider;
+    private Provider provider;
 
     private Vehicle emptyVehicle, defaultVehicle;
 
@@ -26,9 +26,8 @@ public class VehiclePositionsMapperTest {
         emptyVehicle = new Vehicle();
 
 
-        provider = new VehicleProviderHasura();
-        provider.setId(1);
-        provider.setName("NextBike");
+        provider = new Provider(1, "NextBike");
+
 
         defaultVehicle = new Vehicle();
         defaultVehicle.setProvider(provider);
@@ -130,8 +129,8 @@ public class VehiclePositionsMapperTest {
     }
 
     private void assertBasicVehicleFieldsAreEqual(VehicleDescription vehicleDescription) {
-        assertEquals(defaultVehicle.getProvider().getId(), vehicleDescription.getProvider().getProviderId());
-        assertEquals(defaultVehicle.getProvider().getName(), vehicleDescription.getProvider().getProviderName());
+        assertEquals(defaultVehicle.getProvider().getProviderId(), vehicleDescription.getProvider().getProviderId());
+        assertEquals(defaultVehicle.getProvider().getProviderName(), vehicleDescription.getProvider().getProviderName());
         assertEquals(defaultVehicle.getProviderVehicleId(), vehicleDescription.getProviderVehicleId());
         assertEquals(defaultVehicle.getLongitude(), vehicleDescription.getLongitude(), 0.1);
         assertEquals(defaultVehicle.getLatitude(), vehicleDescription.getLatitude(), 0.1);

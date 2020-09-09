@@ -1,6 +1,6 @@
 package org.opentripplanner.hasura_client.hasura_objects;
 
-import org.opentripplanner.updater.vehicle_sharing.vehicles_positions.VehicleProviderHasura;
+import org.opentripplanner.routing.core.vehicle_sharing.Provider;
 
 public class Vehicle extends HasuraObject {
 
@@ -10,7 +10,7 @@ public class Vehicle extends HasuraObject {
     private String fuelType;
     private String gearbox;
     private String type;
-    private VehicleProviderHasura provider;
+    private Provider provider;
     private Double range;
 
     public Double getRangeInMeters() {
@@ -68,11 +68,11 @@ public class Vehicle extends HasuraObject {
         this.type = type;
     }
 
-    public VehicleProviderHasura getProvider() {
+    public Provider getProvider() {
         return provider;
     }
 
-    public void setProvider(VehicleProviderHasura provider) {
+    public void setProvider(Provider provider) {
         this.provider = provider;
     }
 

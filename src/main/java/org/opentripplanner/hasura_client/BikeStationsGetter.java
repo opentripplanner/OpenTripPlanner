@@ -30,8 +30,8 @@ public class BikeStationsGetter extends HasuraGetter<BikeRentalStation, BikeStat
                 "    id: id\\n" +
                 "    name: displayName\\n" +
                 "    provider {\\n" +
-                "      id\\n" +
-                "      name\\n" +
+                "      providerId: id\\n" +
+                "      providerName: name \\n" +
                 "    }\\n" +
                 "    latitude\\n" +
                 "    longitude\\n" +
