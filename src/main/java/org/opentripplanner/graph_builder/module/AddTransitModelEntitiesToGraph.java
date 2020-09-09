@@ -1,11 +1,14 @@
 package org.opentripplanner.graph_builder.module;
 
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.gtfs.GtfsContext;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FeedInfo;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GroupOfStations;
+import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.OtpTransitService;
 import org.opentripplanner.model.Pathway;
@@ -30,6 +33,7 @@ import org.opentripplanner.routing.vertextype.TransitBoardingAreaVertex;
 import org.opentripplanner.routing.vertextype.TransitEntranceVertex;
 import org.opentripplanner.routing.vertextype.TransitPathwayNodeVertex;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -87,11 +91,19 @@ public class AddTransitModelEntitiesToGraph {
 
         // Although pathways are loaded from GTFS they are street data, so we will put them in the street graph.
         createPathwayEdgesAndAddThemToGraph(graph);
+        if (OTPFeature.FlexRouting.isOn()) {
+            addLocationsToGraph(graph);
+            addLocationGroupsToGraph(graph);
+        }
         addFeedInfoToGraph(graph);
         addAgenciesToGraph(graph);
 
         /* Interpret the transfers explicitly defined in transfers.txt. */
         addTransfersToGraph(graph);
+
+        if (OTPFeature.FlexRouting.isOn()) {
+            addFlexTripsToGraph(graph);
+        }
 
     }
 
@@ -317,6 +329,18 @@ public class AddTransitModelEntitiesToGraph {
         }
     }
 
+    private void addLocationsToGraph(Graph graph) {
+        for (FlexStopLocation flexStopLocation : transitService.getAllLocations()) {
+            graph.locationsById.put(flexStopLocation.getId(), flexStopLocation);
+        }
+    }
+
+    private void addLocationGroupsToGraph(Graph graph) {
+        for (FlexLocationGroup flexLocationGroup : transitService.getAllLocationGroups()) {
+            graph.locationGroupsById.put(flexLocationGroup.getId(), flexLocationGroup);
+        }
+    }
+
     private void addFeedInfoToGraph(Graph graph) {
         for (FeedInfo info : transitService.getAllFeedInfos()) {
             graph.addFeedInfo(info);
@@ -335,6 +359,11 @@ public class AddTransitModelEntitiesToGraph {
         for (Transfer sourceTransfer : transfers) {
             transferTable.addTransfer(sourceTransfer);
         }
+    }
+
+    private void addFlexTripsToGraph(Graph graph) {
+        for(FlexTrip flexTrip : transitService.getAllFlexTrips())
+        graph.flexTripsById.put(flexTrip.getId(), flexTrip);
     }
 
 }

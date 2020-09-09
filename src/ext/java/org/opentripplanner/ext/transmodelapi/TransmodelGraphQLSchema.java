@@ -68,6 +68,7 @@ import org.opentripplanner.model.plan.VertexType;
 import org.opentripplanner.model.plan.WalkStep;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
+import org.opentripplanner.routing.api.request.RequestFunctions;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
@@ -550,6 +551,23 @@ public class TransmodelGraphQLSchema {
                         .name("locale")
                         .type(EnumTypes.LOCALE)
                         .defaultValue("no")
+                        .build())
+               .argument(GraphQLArgument.newArgument()
+                        .name("transitGeneralizedCostLimit")
+                        .description("Set a relative limit for all transit itineraries. The limit "
+                            + "is calculated based on the best transit itinerary generalized-cost. "
+                            + "Itineraries without transit legs are excluded from this filter. "
+                            + "Example: f(x) = 3600 + 2.0 x. If the lowest cost returned is 10 000, "
+                            + "then the limit is set to: 3 600 + 2 * 10 000 = 26 600. Then all "
+                            + "itineraries with at least one transit leg and a cost above 26 600 "
+                            + "is removed from the result. Default: "
+                            + RequestFunctions.serialize(routing.request.transitGeneralizedCostLimit)
+                        )
+                        .type(gqlUtil.doubleFunctionScalar)
+                        // There is a bug in the GraphQL lib. The default value is shown as a
+                   // `boolean` with value `false`, not the actual value. Hence; The default
+                   // is added                    to the description above instead.
+                        // .defaultValue(routing.request.transitGeneralizedCostLimit)
                         .build())
 //                .argument(GraphQLArgument.newArgument()
 //                        .name("compactLegsByReversedSearch")
@@ -2188,7 +2206,7 @@ public class TransmodelGraphQLSchema {
                         .name("distance")
                         .description("Total distance for the trip, in meters. NOT IMPLEMENTED")
                         .type(Scalars.GraphQLFloat)
-                        .dataFetcher(environment -> 0)
+                        .dataFetcher(environment -> ((Itinerary) environment.getSource()).distanceMeters())
                         .build())
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("walkTime")

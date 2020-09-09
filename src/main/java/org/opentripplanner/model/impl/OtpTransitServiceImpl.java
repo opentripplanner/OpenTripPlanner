@@ -3,6 +3,7 @@ package org.opentripplanner.model.impl;
 
 import com.google.common.collect.ImmutableListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Agency;
 import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
@@ -96,6 +97,8 @@ class OtpTransitServiceImpl implements OtpTransitService {
 
     private final Collection<Trip> trips;
 
+    private final Collection<FlexTrip> flexTrips;
+
     /**
      * Create a read only version of the {@link OtpTransitService}.
      */
@@ -122,6 +125,7 @@ class OtpTransitServiceImpl implements OtpTransitService {
         this.transfers = immutableList(builder.getTransfers());
         this.tripPatterns = immutableList(builder.getTripPatterns().values());
         this.trips = immutableList(builder.getTripsById().values());
+        this.flexTrips = immutableList(builder.getFlexTripsById().values());
     }
 
     @Override
@@ -246,6 +250,11 @@ class OtpTransitServiceImpl implements OtpTransitService {
     @Override
     public Collection<Trip> getAllTrips() {
         return trips;
+    }
+
+    @Override
+    public Collection<FlexTrip> getAllFlexTrips() {
+        return flexTrips;
     }
 
 

@@ -2,9 +2,8 @@ package org.opentripplanner.routing.algorithm;
 
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
-import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilterChainBuilder;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
-import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainParametersMapper;
+import org.opentripplanner.routing.algorithm.mapping.RoutingRequestToFilterChainMapper;
 import org.opentripplanner.routing.algorithm.mapping.TripPlanMapper;
 import org.opentripplanner.routing.algorithm.raptor.router.street.AccessEgressRouter;
 import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRouter;
@@ -209,13 +208,9 @@ public class RoutingWorker {
     }
 
     private List<Itinerary> filterItineraries(List<Itinerary> itineraries) {
-        ItineraryFilter filterChain = new ItineraryFilterChainBuilder(
-            RoutingRequestToFilterChainParametersMapper.mapRequestToFilterChainParameters(request)
-        )
-            .withLatestDepartureTimeLimit(filterOnLatestDepartureTime)
-            .withMaxLimitReachedSubscriber(it -> firstRemovedItinerary = it)
-            .build();
-
+        ItineraryFilter filterChain = RoutingRequestToFilterChainMapper.createFilterChain(
+            request, filterOnLatestDepartureTime, it -> firstRemovedItinerary = it
+        );
         return filterChain.filter(itineraries);
     }
 
