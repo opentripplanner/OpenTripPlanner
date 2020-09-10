@@ -15,7 +15,7 @@ public final class AccessStopArrival<T extends RaptorTripSchedule> extends Abstr
     private final RaptorTransfer access;
 
     public AccessStopArrival(int departureTime, int cost, RaptorTransfer access) {
-        super(access.stop(), departureTime, access.durationInSeconds(), cost);
+        super(access.stop(), departureTime, access.durationInSeconds(), cost, access.numberOfPublicServiceLegs() * 2 - (access.connectedByPublicService() ? 1 : 0));
         this.access = access;
     }
 
