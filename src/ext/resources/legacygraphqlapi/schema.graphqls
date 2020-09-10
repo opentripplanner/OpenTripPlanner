@@ -1510,6 +1510,17 @@ type QueryType {
         numItineraries: Int = 3
 
         """
+        The length of the search-window in seconds. This is normally dynamically
+        calculated by the server, but you may override this by setting it. The
+        search-window used in a request is returned in the response metadata.
+        To get the \"next page\" of trips use the metadata(searchWindowUsed and
+        nextWindowDateTime) to create a new request. If not provided the value
+        is resolved depending on the other input parameters, available transit
+        options and realtime changes.
+        """
+        searchWindow: Int,
+
+        """
         The maximum distance (in meters) the user is willing to walk per walking
         section. If the only transport mode allowed is `WALK`, then the value of
         this argument is ignored.

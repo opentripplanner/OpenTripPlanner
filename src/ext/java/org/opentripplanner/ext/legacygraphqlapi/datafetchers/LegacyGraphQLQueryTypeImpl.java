@@ -45,6 +45,7 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.util.ResourceBundleSingleton;
 
+import java.time.Duration;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -588,6 +589,7 @@ public class LegacyGraphQLQueryTypeImpl
 
       callWith.argument("wheelchair", request::setWheelchairAccessible);
       callWith.argument("numItineraries", request::setNumItineraries);
+      callWith.argument("searchWindow", (Integer m) -> request.searchWindow = Duration.ofSeconds(m));
       callWith.argument("maxWalkDistance", request::setMaxWalkDistance);
       // callWith.argument("maxSlope", request::setMaxSlope);
       callWith.argument("maxPreTransitTime", request::setMaxPreTransitTime);
