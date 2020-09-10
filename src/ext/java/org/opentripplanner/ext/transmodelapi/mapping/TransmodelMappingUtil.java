@@ -19,7 +19,11 @@ import java.util.stream.Collectors;
 
 /**
  * Utility methods for mapping transmddel API values to and from internal formats.
+ * 
+ * @deprecated TODO OTP2 - This class should be split into "domain" specific mappers - we do not want a 
+ *                         "kitchen sink" were we throw "everyting" into. 
  */
+@Deprecated
 public class TransmodelMappingUtil {
 
     private final TimeZone timeZone;
