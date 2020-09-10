@@ -164,12 +164,7 @@ public class TransmodelGraphQLSchema {
 
     // Stop
     GraphQLOutputType tariffZoneType = TariffZoneType.createTZ();
-    GraphQLInterfaceType placeInterface = PlaceInterfaceType.create(
-        QuayType.REF,
-        StopPlaceType.REF,
-        new GraphQLTypeReference(BikeRentalStationType.NAME),
-        new GraphQLTypeReference(BikeParkType.NAME)
-    );
+    GraphQLInterfaceType placeInterface = PlaceInterfaceType.create();
     GraphQLOutputType bikeRentalStationType = BikeRentalStationType.create(placeInterface);
     GraphQLOutputType bikeParkType = BikeParkType.createB(placeInterface);
 //  GraphQLOutputType carParkType = new GraphQLTypeReference("CarPark");
