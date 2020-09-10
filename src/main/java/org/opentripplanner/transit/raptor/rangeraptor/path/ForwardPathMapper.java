@@ -53,7 +53,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         }
         while (arrival.arrivedByTransit());
 
-        AccessPathLeg<T> accessLeg = createAccessPathLeg(arrival, transitLeg);
+        AccessPathLeg<T> accessLeg = createAccessPathLeg(arrival, lastLeg);
 
         return new Path<>(iterationDepartureTime, accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
     }
@@ -83,7 +83,7 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         );
     }
 
-    private TransferPathLeg<T> createTransferLeg(ArrivalView<T> arrival, TransitPathLeg<T> transitLeg) {
+    private TransferPathLeg<T> createTransferLeg(ArrivalView<T> arrival, PathLeg<T> nextLeg) {
         int departureTime = arrival.arrivalTime() - arrival.transferLeg().durationInSeconds();
 
         return new TransferPathLeg<>(
@@ -91,11 +91,11 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
                 departureTime,
                 arrival.stop(),
                 arrival.arrivalTime(),
-                transitLeg
+                nextLeg
         );
     }
 
-    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, TransitPathLeg<T> nextLeg) {
+    private AccessPathLeg<T> createAccessPathLeg(ArrivalView<T> from, PathLeg<T> nextLeg) {
         RaptorTransfer access = from.accessLeg().access();
         int departureTime = from.arrivalTime() - access.durationInSeconds();
 
