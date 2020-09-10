@@ -12,7 +12,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class TransitIdMapper {
-  private static final Logger LOG = LoggerFactory.getLogger(TransmodelMappingUtil.class);
+  private static final Logger LOG = LoggerFactory.getLogger(TransitIdMapper.class);
 
   private static String fixedFeedId = null;
 

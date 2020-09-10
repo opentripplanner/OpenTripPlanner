@@ -18,13 +18,12 @@ import graphql.schema.GraphQLObjectType;
 import graphql.schema.GraphQLOutputType;
 import graphql.schema.GraphQLSchema;
 import graphql.schema.GraphQLType;
-import graphql.schema.GraphQLTypeReference;
 import org.apache.commons.collections.CollectionUtils;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.opentripplanner.common.MavenVersion;
+import org.opentripplanner.ext.transmodelapi.mapping.PlaceMapper;
 import org.opentripplanner.ext.transmodelapi.mapping.TransitIdMapper;
-import org.opentripplanner.ext.transmodelapi.mapping.TransmodelMappingUtil;
 import org.opentripplanner.ext.transmodelapi.model.DefaultRoutingRequestType;
 import org.opentripplanner.ext.transmodelapi.model.EnumTypes;
 import org.opentripplanner.ext.transmodelapi.model.PlanResponse;
@@ -51,7 +50,6 @@ import org.opentripplanner.ext.transmodelapi.model.siri.et.EstimatedCallType;
 import org.opentripplanner.ext.transmodelapi.model.siri.sx.PtSituationElementType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeParkType;
 import org.opentripplanner.ext.transmodelapi.model.stop.BikeRentalStationType;
-import org.opentripplanner.ext.transmodelapi.model.stop.MonoOrMultiModalStation;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceAtDistanceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.PlaceInterfaceType;
 import org.opentripplanner.ext.transmodelapi.model.stop.QuayAtDistanceType;
@@ -66,7 +64,6 @@ import org.opentripplanner.ext.transmodelapi.model.timetable.TripMetadataType;
 import org.opentripplanner.ext.transmodelapi.support.GqlUtil;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.model.plan.Leg;
@@ -1146,7 +1143,7 @@ public class TransmodelGraphQLSchema {
             if (CollectionUtils.isEmpty(placeTypes)) {
               placeTypes = Arrays.asList(TransmodelPlaceType.values());
             }
-            List<PlaceType> filterByPlaceTypes = TransmodelMappingUtil.mapPlaceTypes(placeTypes);
+            List<PlaceType> filterByPlaceTypes = PlaceMapper.mapToDomain(placeTypes);
 
             // Need to fetch more than requested no of places if stopPlaces are allowed, as this requires fetching potentially multiple quays for the same stop place and mapping them to unique stop places.
             int orgMaxResults = environment.getArgument("maximumResults");
@@ -1171,7 +1168,13 @@ public class TransmodelGraphQLSchema {
                 GqlUtil.getRoutingService(environment)
             );
 
-            places = TransmodelMappingUtil.convertQuaysToStopPlaces(placeTypes, places,  environment.getArgument("multiModalMode"), GqlUtil.getRoutingService(environment)).stream().limit(orgMaxResults).collect(Collectors.toList());
+            places = PlaceAtDistanceType
+                .convertQuaysToStopPlaces(placeTypes,
+                    places,
+                    environment.getArgument("multiModalMode"),
+                    GqlUtil.getRoutingService(environment)
+                )
+                .stream().limit(orgMaxResults).collect(Collectors.toList());
             if (CollectionUtils.isEmpty(places)) {
               return new DefaultConnection<>(Collections.emptyList(), new DefaultPageInfo(null, null, false, false));
             }
