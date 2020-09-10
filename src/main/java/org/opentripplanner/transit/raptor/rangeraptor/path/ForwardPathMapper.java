@@ -39,6 +39,11 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
         arrival = destinationArrival.previous();
         lastLeg = createEgressPathLeg(destinationArrival);
 
+        if (arrival.arrivedByTransfer()) {
+            lastLeg = createTransferLeg(arrival, lastLeg);
+            arrival = arrival.previous();
+        }
+
         do {
             transitLeg = createTransitLeg(arrival, lastLeg);
             arrival = arrival.previous();
