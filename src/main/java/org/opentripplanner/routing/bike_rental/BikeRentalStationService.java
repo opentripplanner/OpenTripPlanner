@@ -51,7 +51,14 @@ public class BikeRentalStationService implements Serializable {
      * over a set, but we could use a spatial index if the number of bike rental stations is high
      * enough for performance to be a concern.
      */
-    public List<BikeRentalStation> getBikeRentalStationForEnvelope(Envelope envelope) {
+    public List<BikeRentalStation> getBikeRentalStationForEnvelope(
+        double minLon, double minLat, double maxLon, double maxLat
+    ) {
+        Envelope envelope = new Envelope(
+            new Coordinate(minLon, minLat),
+            new Coordinate(maxLon, maxLat)
+        );
+
         return bikeRentalStations
             .stream()
             .filter(b -> envelope.contains(new Coordinate(b.x, b.y)))

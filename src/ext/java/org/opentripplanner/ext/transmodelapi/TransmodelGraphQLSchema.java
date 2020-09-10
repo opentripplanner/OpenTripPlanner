@@ -1488,14 +1488,12 @@ public class TransmodelGraphQLSchema {
                 .build())
             .dataFetcher(environment -> GqlUtil
                 .getRoutingService(environment)
-                .getBikerentalStationService()
-                .getBikeRentalStationForEnvelope(new Envelope(new Coordinate(
+                .getBikerentalStationService().getBikeRentalStationForEnvelope(
                     environment.getArgument("minimumLongitude"),
-                    environment.getArgument("minimumLatitude")
-                ), new Coordinate(
+                    environment.getArgument("minimumLatitude"),
                     environment.getArgument("maximumLongitude"),
                     environment.getArgument("maximumLatitude")
-                ))))
+                ))
             .build())
         .field(GraphQLFieldDefinition
             .newFieldDefinition()
