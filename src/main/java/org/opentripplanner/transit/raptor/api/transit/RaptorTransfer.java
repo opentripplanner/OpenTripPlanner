@@ -47,4 +47,23 @@ public interface RaptorTransfer {
      */
     int durationInSeconds();
 
+    /**
+     * Return the number publicly available services for this {@link RaptorTransfer}. This is used by Raptor to get the
+     * number of transfers correct witch is part of the criteria used to keep optimal result. This method apply to both
+     * access and egress, but is not used for public-transit-transfers.
+     */
+    default int numberOfPublicServiceLegs() {
+        return 0;
+    }
+
+    /**
+     * Is this {@link RaptorTransfer} is connected to the given {@code stop} by <b>transit</b>? For access and egress
+     * paths we allow plugging in flex and other means of transport, witch might include one or more legs onboard a
+     * vehicle. This method should return {@code true} if the leg connecting to the given stop is `onBoard` a public
+     * transport or riding another kind of service like a taxi. This method apply to both access and egress, but is not
+     * used for public-transit-transfers.
+     */
+    default boolean connectedByPublicService() {
+        return false;
+    }
 }
