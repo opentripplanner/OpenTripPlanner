@@ -1518,7 +1518,7 @@ type QueryType {
         is resolved depending on the other input parameters, available transit
         options and realtime changes.
         """
-        searchWindow: Int,
+        searchWindow: Long,
 
         """
         The maximum distance (in meters) the user is willing to walk per walking
