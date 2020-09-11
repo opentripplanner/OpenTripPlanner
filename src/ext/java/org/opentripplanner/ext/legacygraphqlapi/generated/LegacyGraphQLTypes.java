@@ -896,6 +896,7 @@ public class LegacyGraphQLTypes {
     private String _toPlace;
     private Boolean _wheelchair;
     private Integer _numItineraries;
+    private Long _searchWindow;
     private Double _maxWalkDistance;
     private Integer _maxPreTransitTime;
     private Double _carParkCarLegWeight;
@@ -950,6 +951,7 @@ public class LegacyGraphQLTypes {
         this._toPlace = (String) args.get("toPlace");
         this._wheelchair = (Boolean) args.get("wheelchair");
         this._numItineraries = (Integer) args.get("numItineraries");
+        this._searchWindow = (Long) args.get("searchWindow");
         this._maxWalkDistance = (Double) args.get("maxWalkDistance");
         this._maxPreTransitTime = (Integer) args.get("maxPreTransitTime");
         this._carParkCarLegWeight = (Double) args.get("carParkCarLegWeight");
@@ -1012,6 +1014,7 @@ public class LegacyGraphQLTypes {
     public String getLegacyGraphQLToPlace() { return this._toPlace; }
     public Boolean getLegacyGraphQLWheelchair() { return this._wheelchair; }
     public Integer getLegacyGraphQLNumItineraries() { return this._numItineraries; }
+    public Long getLegacyGraphQLSearchWindow() { return this._searchWindow; }
     public Double getLegacyGraphQLMaxWalkDistance() { return this._maxWalkDistance; }
     public Integer getLegacyGraphQLMaxPreTransitTime() { return this._maxPreTransitTime; }
     public Double getLegacyGraphQLCarParkCarLegWeight() { return this._carParkCarLegWeight; }
