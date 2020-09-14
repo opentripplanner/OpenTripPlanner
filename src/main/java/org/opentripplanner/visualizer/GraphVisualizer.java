@@ -1,15 +1,14 @@
 package org.opentripplanner.visualizer;
 
 import com.google.common.collect.Sets;
-import org.locationtech.jts.geom.Coordinate;
 import javassist.Modifier;
+import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.graph_builder.annotation.GraphBuilderAnnotation;
 import org.opentripplanner.graph_builder.annotation.StopUnlinked;
 import org.opentripplanner.routing.algorithm.TraverseVisitor;
-import org.opentripplanner.routing.core.OptimizeType;
-import org.opentripplanner.routing.core.RoutingRequest;
-import org.opentripplanner.routing.core.State;
-import org.opentripplanner.routing.core.TraverseModeSet;
+import org.opentripplanner.routing.core.*;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleType;
+import org.opentripplanner.routing.core.vehicle_sharing.VehicleTypeFilter;
 import org.opentripplanner.routing.edgetype.StreetEdge;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -33,9 +32,10 @@ import java.awt.event.*;
 import java.lang.reflect.Field;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
 import java.util.Queue;
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Exit on window close.
@@ -135,20 +135,22 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 			State st = (State)theList.getSelectedValue();
 			if(st==null){
 				return;
-			}
-			
-			DefaultListModel<String> stateListModel = new DefaultListModel<String>();
-			stateListModel.addElement( "weight:"+st.getWeight() );
-			stateListModel.addElement( "weightdelta:"+st.getWeightDelta() );
-			stateListModel.addElement( "bikeRenting:"+st.isBikeRenting() );
-			stateListModel.addElement( "carParked:"+st.isCarParked() );
-			stateListModel.addElement( "walkDistance:"+st.getTraverseDistanceInMeters() );
-			stateListModel.addElement( "elapsedTime:"+st.getElapsedTimeSeconds() );
-			stateListModel.addElement( "numBoardings:"+st.getNumBoardings() );
-			outputList.setModel( stateListModel );
-			
-			lastStateClicked = st;
-		}
+            }
+
+            DefaultListModel<String> stateListModel = new DefaultListModel<String>();
+            stateListModel.addElement("weight:" + st.getWeight());
+            stateListModel.addElement("weightdelta:" + st.getWeightDelta());
+            stateListModel.addElement("bikeRenting:" + st.isBikeRenting());
+            stateListModel.addElement("carParked:" + st.isCarParked());
+            stateListModel.addElement("walkDistance:" + st.getTraverseDistanceInMeters());
+            stateListModel.addElement("elapsedTime:" + st.getElapsedTimeSeconds());
+            stateListModel.addElement("numBoardings:" + st.getNumBoardings());
+            stateListModel.addElement("timeTraversedInMode:" + st.createTimeTraversedInModeMap());
+            stateListModel.addElement("currentVehicle:" + st.getCurrentVehicle());
+            outputList.setModel(stateListModel);
+
+            lastStateClicked = st;
+        }
 	}
 
 	private final class OnPopupMenuClickListener implements ActionListener {
@@ -258,12 +260,12 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 		PathPrinter(GraphPath gp){
 			this.gp=gp;
 		}
-		public String toString(){
-			SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
-			String startTime = shortDateFormat.format(new Date(gp.getStartTime()*1000));
-			String endTime = shortDateFormat.format(new Date(gp.getEndTime()*1000));
-			return "Path ("+startTime+"-"+endTime+") weight:"+gp.getWeight()+" dur:"+(gp.getDuration()/60.0)+" walk:"+gp.getWalkDistance()+" nTrips:"+gp.getTrips().size();
-		}
+		public String toString() {
+            SimpleDateFormat shortDateFormat = new SimpleDateFormat("HH:mm:ss z");
+            String startTime = shortDateFormat.format(new Date(gp.getStartTime() * 1000));
+            String endTime = shortDateFormat.format(new Date(gp.getEndTime() * 1000));
+            return "Path (" + startTime + "-" + endTime + ") weight:" + gp.getWeight() + " dur:" + (gp.getDuration() / 60.0) + " timeInModes:" + gp.getTimeTraversedInMode() + " nTrips:" + gp.getTrips().size();
+        }
 	}
 
     private static final long serialVersionUID = 1L;
@@ -292,6 +294,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JCheckBox bikeCheckBox;
 
+    private JCheckBox rentingAllowedBox;
+
     private JCheckBox trainCheckBox;
 
     private JCheckBox busCheckBox;
@@ -308,10 +312,14 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
 
     private JTextField boardingPenaltyField;
 
+    private JTextField vehicleTypesAllowedField;
+
+    private JTextField startingModeField;
+
     private DefaultListModel<GraphBuilderAnnotation> annotationMatchesModel;
 
     private JList<GraphBuilderAnnotation> annotationMatches;
-    
+
     private DefaultListModel<String> metadataModel;
 
     private HashSet<Vertex> closed;
@@ -553,6 +561,9 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(walkCheckBox);
         bikeCheckBox = new JCheckBox("bike");
         pane.add(bikeCheckBox);
+        rentingAllowedBox = new JCheckBox("renting allowed");
+        rentingAllowedBox.setSelected(true);
+        pane.add(rentingAllowedBox);
         trainCheckBox = new JCheckBox("trainish");
         pane.add(trainCheckBox);
         busCheckBox = new JCheckBox("busish");
@@ -566,8 +577,8 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         pane.add(carCheckBox);
 
         // GridLayout does not support empty cells, so a dummy label is used to fix the layout.
-        JLabel dummyLabel = new JLabel("");
-        pane.add(dummyLabel);
+//        JLabel dummyLabel = new JLabel("Have a nice, routefull day!");
+//        pane.add(dummyLabel);
 
         // row: arrive by?
         JLabel arriveByLabel = new JLabel("Arrive by?:");
@@ -575,11 +586,24 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         arriveByCheckBox = new JCheckBox("arrive by");
         pane.add(arriveByCheckBox);
 
+        // row: Vehicles Type allowed
+        JLabel vehicleTypesAllowedLabel = new JLabel("Vehicle types allowed:");
+        pane.add(vehicleTypesAllowedLabel);
+        vehicleTypesAllowedField = new JTextField("car,scooter,un-pedal-scooter,bike");
+        pane.add(vehicleTypesAllowedField);
+
+        // row: sarting mode
+        JLabel startingModeLabel = new JLabel("Starting Mode:");
+        pane.add(startingModeLabel);
+        startingModeField = new JTextField("WALK");
+        pane.add(startingModeField);
+
         // row: boarding penalty
         JLabel boardPenaltyLabel = new JLabel("Boarding penalty (min):");
         pane.add(boardPenaltyLabel);
         boardingPenaltyField = new JTextField("5");
         pane.add(boardingPenaltyField);
+
 
         // row: max walk
         JLabel maxWalkLabel = new JLabel("Maximum walk (meters):");
@@ -1369,19 +1393,25 @@ public class GraphVisualizer extends JFrame implements VertexSelectionListener {
         if (transitCheckBox.isSelected())
             modeSet.setTransit(true);
         RoutingRequest options = new RoutingRequest(modeSet);
+        options.rentingAllowed = rentingAllowedBox.isSelected();
         options.setArriveBy(arriveByCheckBox.isSelected());
         options.setWalkBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60); // override low 2-4 minute values
         // TODO LG Add ui element for bike board cost (for now bike = 2 * walk)
         options.setBikeBoardCost(Integer.parseInt(boardingPenaltyField.getText()) * 60 * 2);
         // there should be a ui element for walk distance and optimize type
-        options.setOptimize( getSelectedOptimizeType() );
+        options.setOptimize(getSelectedOptimizeType());
         options.setMaxWalkDistance(Integer.parseInt(maxWalkField.getText()));
+
+        options.vehicleValidator.addFilter(new VehicleTypeFilter(
+                Arrays.stream(vehicleTypesAllowedField.getText().split(",")).map(VehicleType::fromDatabaseVehicleType).collect(Collectors.toSet())));
+
+        options.startingMode = TraverseMode.valueOf(startingModeField.getText());
         options.setDateTime(when);
         options.setFromString(from);
         options.setToString(to);
         options.walkSpeed = Float.parseFloat(walkSpeed.getText());
         options.bikeSpeed = Float.parseFloat(bikeSpeed.getText());
-        options.softWalkLimiting = ( softWalkLimiting.isSelected() );
+        options.softWalkLimiting = (softWalkLimiting.isSelected());
         options.softWalkPenalty = (Float.parseFloat(softWalkPenalty.getText()));
         options.softWalkOverageRate = (Float.parseFloat(this.softWalkOverageRate.getText()));
         options.numItineraries = 1;

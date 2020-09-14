@@ -1,10 +1,5 @@
 package org.opentripplanner.routing.spt;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
-
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
@@ -12,11 +7,14 @@ import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.routing.core.RoutingContext;
 import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.edgetype.flex.TemporaryDirectPatternHop;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Vertex;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
 
 import static org.opentripplanner.api.resource.GraphPathToTripPlanConverter.makeCoordinates;
 
@@ -35,6 +33,8 @@ public class GraphPath {
 
     private double walkDistance = 0;
 
+    private Map<TraverseMode, Integer> timeTraversedInMode;
+
     // don't really need to save this (available through State) but why not
     private RoutingContext rctx;
 
@@ -42,7 +42,7 @@ public class GraphPath {
      * Construct a GraphPath based on the given state by following back-edge fields all the way back
      * to the origin of the search. This constructs a proper Java list of states (allowing random
      * access etc.) from the predecessor information left in states by the search algorithm.
-     * 
+     *
      * Optionally re-traverses all edges backward in order to remove excess waiting time from the
      * final itinerary presented to the user. When planning with departure time, the edges will then
      * be re-traversed once more in order to move the waiting time forward in time, towards the end.
@@ -62,6 +62,7 @@ public class GraphPath {
             LOG.debug("Disable reverse-optimize for on-board depart");
             optimize = false;
         }
+        this.timeTraversedInMode = s.createTimeTraversedInModeMap();
 
 //        LOG.info("NORMAL");
 //        s.dumpPath();
@@ -244,5 +245,9 @@ public class GraphPath {
             }
         }
         return trips;
+    }
+
+    public Map<TraverseMode, Integer> getTimeTraversedInMode() {
+        return timeTraversedInMode;
     }
 }
