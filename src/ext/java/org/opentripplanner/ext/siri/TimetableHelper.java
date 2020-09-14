@@ -50,7 +50,6 @@ public class TimetableHelper {
      *
      * @param journey  SIRI-ET EstimatedVehicleJourney
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -341,7 +340,6 @@ public class TimetableHelper {
      * Calculate new stoppattern based on single stop cancellations
      *
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -444,10 +442,7 @@ public class TimetableHelper {
      * Apply the SIRI ET to the appropriate TripTimes from this Timetable.
      * Calculate new stoppattern based on single stop cancellations
      *
-     * @param oldTimes
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param trip
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -584,7 +579,6 @@ public class TimetableHelper {
      *
      * @param activity SIRI-VM VehicleActivity
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong

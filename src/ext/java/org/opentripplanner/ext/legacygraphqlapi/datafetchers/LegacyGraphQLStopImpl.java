@@ -9,7 +9,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -295,7 +294,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups());
+              args.getLegacyGraphQLOmitNonPickups(),
+              false
+          );
 
       return getValue(
           environment,
@@ -324,7 +325,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups()
+              args.getLegacyGraphQLOmitNonPickups(),
+              false
           ).stream();
 
       Stream<StopTimesInPattern> stream = getValue(

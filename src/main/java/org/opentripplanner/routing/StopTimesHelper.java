@@ -35,7 +35,6 @@ public class StopTimesHelper {
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
    * @param includeCancelledTrips If true, cancelled trips will also be included in result
-   * @return
    */
   public static List<StopTimesInPattern> stopTimesForStop(
       RoutingService routingService,

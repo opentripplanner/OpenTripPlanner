@@ -8,7 +8,6 @@ import org.opentripplanner.routing.alertpatch.EntitySelector;
 import org.opentripplanner.routing.alertpatch.StopCondition;
 import org.opentripplanner.routing.alertpatch.TimePeriod;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.NonLocalizedString;
@@ -16,7 +15,30 @@ import org.opentripplanner.util.TranslatedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.ifopt.siri20.StopPlaceRef;
-import uk.org.siri.siri20.*;
+import uk.org.siri.siri20.AffectedLineStructure;
+import uk.org.siri.siri20.AffectedOperatorStructure;
+import uk.org.siri.siri20.AffectedRouteStructure;
+import uk.org.siri.siri20.AffectedStopPlaceStructure;
+import uk.org.siri.siri20.AffectedStopPointStructure;
+import uk.org.siri.siri20.AffectedVehicleJourneyStructure;
+import uk.org.siri.siri20.AffectsScopeStructure;
+import uk.org.siri.siri20.DataFrameRefStructure;
+import uk.org.siri.siri20.DefaultedTextStructure;
+import uk.org.siri.siri20.FramedVehicleJourneyRefStructure;
+import uk.org.siri.siri20.HalfOpenTimestampOutputRangeStructure;
+import uk.org.siri.siri20.InfoLinkStructure;
+import uk.org.siri.siri20.LineRef;
+import uk.org.siri.siri20.NaturalLanguageStringStructure;
+import uk.org.siri.siri20.NetworkRefStructure;
+import uk.org.siri.siri20.OperatorRefStructure;
+import uk.org.siri.siri20.PtSituationElement;
+import uk.org.siri.siri20.RoutePointTypeEnumeration;
+import uk.org.siri.siri20.ServiceDelivery;
+import uk.org.siri.siri20.SeverityEnumeration;
+import uk.org.siri.siri20.SituationExchangeDeliveryStructure;
+import uk.org.siri.siri20.StopPointRef;
+import uk.org.siri.siri20.VehicleJourneyRef;
+import uk.org.siri.siri20.WorkflowStatusEnumeration;
 
 import java.io.Serializable;
 import java.text.ParseException;
@@ -45,7 +67,7 @@ public class SiriAlertsUpdateHandler {
 
     private SiriFuzzyTripMatcher siriFuzzyTripMatcher;
 
-    private String feedId;
+    private final String feedId;
 
     private final Set<TransitAlert> alerts = new HashSet<>();
 
@@ -135,7 +157,7 @@ public class SiriAlertsUpdateHandler {
 
             AffectsScopeStructure.Operators operators = affectsStructure.getOperators();
 
-            if (operators != null && !isListNullOrEmpty(operators.getAffectedOperators())) {
+            if (operators != null && isNotEmpty(operators.getAffectedOperators())) {
                 for (AffectedOperatorStructure affectedOperator : operators.getAffectedOperators()) {
 
                     OperatorRefStructure operatorRef = affectedOperator.getOperatorRef();
@@ -156,7 +178,7 @@ public class SiriAlertsUpdateHandler {
             if (networks != null) {
                 for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
                     List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
-                    if (affectedLines != null && !isListNullOrEmpty(affectedLines)) {
+                    if (isNotEmpty(affectedLines)) {
                         for (AffectedLineStructure line : affectedLines) {
 
                             LineRef lineRef = line.getLineRef();
@@ -174,7 +196,7 @@ public class SiriAlertsUpdateHandler {
             AffectsScopeStructure.StopPoints stopPoints = affectsStructure.getStopPoints();
             AffectsScopeStructure.StopPlaces stopPlaces = affectsStructure.getStopPlaces();
 
-            if (stopPoints != null && !isListNullOrEmpty(stopPoints.getAffectedStopPoints())) {
+            if (stopPoints != null && isNotEmpty(stopPoints.getAffectedStopPoints())) {
 
                 for (AffectedStopPointStructure stopPoint : stopPoints.getAffectedStopPoints()) {
                     StopPointRef stopPointRef = stopPoint.getStopPointRef();
@@ -202,7 +224,7 @@ public class SiriAlertsUpdateHandler {
                         }
                     }
                 }
-            } else if (stopPlaces != null && !isListNullOrEmpty(stopPlaces.getAffectedStopPlaces())) {
+            } else if (stopPlaces != null && isNotEmpty(stopPlaces.getAffectedStopPlaces())) {
 
                 for (AffectedStopPlaceStructure stopPoint : stopPlaces.getAffectedStopPlaces()) {
                     StopPlaceRef stopPlace = stopPoint.getStopPlaceRef();
@@ -227,11 +249,11 @@ public class SiriAlertsUpdateHandler {
                     }
 
                 }
-            } else if (networks != null && !isListNullOrEmpty(networks.getAffectedNetworks())) {
+            } else if (networks != null && isNotEmpty(networks.getAffectedNetworks())) {
 
                 for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
                     List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
-                    if (affectedLines != null && !isListNullOrEmpty(affectedLines)) {
+                    if (isNotEmpty(affectedLines)) {
                         for (AffectedLineStructure line : affectedLines) {
 
                             LineRef lineRef = line.getLineRef();
@@ -287,7 +309,7 @@ public class SiriAlertsUpdateHandler {
             }
 
             AffectsScopeStructure.VehicleJourneys vjs = affectsStructure.getVehicleJourneys();
-            if (vjs != null && !isListNullOrEmpty(vjs.getAffectedVehicleJourneies())) {
+            if (vjs != null && isNotEmpty(vjs.getAffectedVehicleJourneies())) {
 
                 for (AffectedVehicleJourneyStructure affectedVehicleJourney : vjs.getAffectedVehicleJourneies()) {
 
@@ -317,7 +339,7 @@ public class SiriAlertsUpdateHandler {
                     List<VehicleJourneyRef> vehicleJourneyReves = affectedVehicleJourney.getVehicleJourneyReves();
 
 
-                    if (!isListNullOrEmpty(vehicleJourneyReves)) {
+                    if (isNotEmpty(vehicleJourneyReves)) {
                         for (VehicleJourneyRef vehicleJourneyRef : vehicleJourneyReves) {
 
                             List<FeedScopedId> tripIds = new ArrayList<>();
@@ -551,7 +573,7 @@ public class SiriAlertsUpdateHandler {
      */
     private I18NString getInfoLinkAsString(PtSituationElement.InfoLinks infoLinks) {
         if (infoLinks != null) {
-            if (!isListNullOrEmpty(infoLinks.getInfoLinks())) {
+            if (isNotEmpty(infoLinks.getInfoLinks())) {
                 InfoLinkStructure infoLinkStructure = infoLinks.getInfoLinks().get(0);
                 if (infoLinkStructure != null && infoLinkStructure.getUri() != null) {
                     return new NonLocalizedString(infoLinkStructure.getUri());
@@ -567,7 +589,7 @@ public class SiriAlertsUpdateHandler {
     private List<AlertUrl> getInfoLinks(PtSituationElement.InfoLinks infoLinks) {
         List<AlertUrl> alertUrls = new ArrayList<>();
         if (infoLinks != null) {
-            if (!isListNullOrEmpty(infoLinks.getInfoLinks())) {
+            if (isNotEmpty(infoLinks.getInfoLinks())) {
                 for (InfoLinkStructure infoLink : infoLinks.getInfoLinks()) {
                     AlertUrl alertUrl = new AlertUrl();
 
@@ -617,18 +639,19 @@ public class SiriAlertsUpdateHandler {
         alertPatch.getStopConditions().addAll(alertStopConditions);
     }
 
-    private boolean isListNullOrEmpty(List list) {
-        if (list == null || list.isEmpty()) {
-            return true;
-        }
-        return false;
+
+    /**
+     * @return True if list have at least one element. {@code false} is returned if the given list
+     * is empty or {@code null}.
+     */
+    private boolean isNotEmpty(List<?> list) {
+        return list != null && !list.isEmpty();
     }
 
     /**
      * convert a SIRI DefaultedTextStructure to a OTP TranslatedString
      *
      * @return A TranslatedString containing the same information as the input
-     * @param input
      */
     private I18NString getTranslatedString(List<DefaultedTextStructure> input) {
         Map<String, String> translations = new HashMap<>();

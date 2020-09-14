@@ -6,6 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
 
+import javax.xml.bind.JAXBException;
+import javax.xml.stream.XMLStreamException;
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -15,6 +18,8 @@ import java.util.UUID;
 public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     private static final Logger LOG =
             LoggerFactory.getLogger(SiriVMHttpTripUpdateSource.class);
+
+    private final static long RETRY_INTERVAL_MILLIS = 5000;
 
     /**
      * True iff the last list with updates represent all updates that are active right now, i.e. all
@@ -36,9 +41,8 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
 
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
-    private long retryIntervalMillis = 5000;
     private int retryCount = 0;
-    private String originalRequestorRef;
+    private final String originalRequestorRef;
 
     public SiriVMHttpTripUpdateSource(Parameters parameters) {
         String url = parameters.getUrl();
@@ -94,11 +98,11 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
                 return siri;
 
             }
-        } catch (Exception e) {
+        } catch (IOException | JAXBException | XMLStreamException e) {
             LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
             LOG.warn("Failed to parse SIRI-VM feed from " + url + ":", e);
 
-            final long sleepTime = retryIntervalMillis + retryIntervalMillis * retryCount;
+            final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
 
             retryCount++;
 

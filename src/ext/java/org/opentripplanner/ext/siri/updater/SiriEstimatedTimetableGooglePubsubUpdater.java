@@ -75,9 +75,7 @@ import java.util.concurrent.atomic.AtomicLong;
  */
 public class SiriEstimatedTimetableGooglePubsubUpdater implements GraphUpdater {
 
-    private static final int DEFAULT_RECONNECT_PERIOD_SEC = 5; // Five seconds
-
-    private static Logger LOG = LoggerFactory.getLogger(SiriEstimatedTimetableGooglePubsubUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(SiriEstimatedTimetableGooglePubsubUpdater.class);
 
     /**
      * Parent update manager. Is used to execute graph writer runnables.

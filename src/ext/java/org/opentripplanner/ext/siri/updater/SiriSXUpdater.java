@@ -24,6 +24,7 @@ import java.util.UUID;
 
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
+    private static final long RETRY_INTERVAL_MILLIS = 5000;
 
     private GraphUpdaterManager updaterManager;
 
@@ -46,9 +47,8 @@ public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
 
-    private long retryIntervalMillis = 5000;
     private int retryCount = 0;
-    private String originalRequestorRef;
+    private final String originalRequestorRef;
 
     public SiriSXUpdater(Parameters config) {
         super(config);
@@ -122,7 +122,7 @@ public class SiriSXUpdater extends PollingGraphUpdater {
             } while (moreData);
         } catch (IOException e) {
 
-            final long sleepTime = retryIntervalMillis + retryIntervalMillis * retryCount;
+            final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
 
             retryCount++;
 

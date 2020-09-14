@@ -84,11 +84,6 @@ public class RoutingService {
                 includeCancelledTrips
         );
     }
-    public List<StopTimesInPattern> stopTimesForStop(
-            Stop stop, long startTime, int timeRange, int numberOfDepartures, boolean omitNonPickups
-    ) {
-        return stopTimesForStop(stop, startTime, timeRange, numberOfDepartures, omitNonPickups, false);
-    }
 
     /**
      * Get a list of all trips that pass through a stop during a single ServiceDate. Useful when
