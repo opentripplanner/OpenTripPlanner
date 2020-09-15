@@ -54,7 +54,7 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
             }
         } else if (newElement instanceof TransferStopArrival) {
             for (RaptorTransfer egressLeg : egressLegs) {
-                if (egressLeg.connectedByPublicService()) {
+                if (egressLeg.stopReachedOnBoard()) {
                     TransferStopArrival<T> transferStopArrival = (TransferStopArrival<T>) newElement;
                     destinationArrivals.add(
                         transferStopArrival,

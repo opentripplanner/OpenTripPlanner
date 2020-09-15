@@ -89,7 +89,7 @@ public interface RaptorTransfer {
      * This information is used to generate transfers from that stop to other stops only when this
      * method returns true.
      */
-    default boolean connectedByPublicService() {
+    default boolean stopReachedOnBoard() {
         return false;
     }
 }

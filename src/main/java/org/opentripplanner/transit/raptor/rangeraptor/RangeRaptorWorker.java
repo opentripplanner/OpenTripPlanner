@@ -175,7 +175,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
     private void doTransfersForAccessLegs(boolean inTransit) {
         for (RaptorTransfer it : accessLegs) {
             if (it.numberOfLegs() / 2 == roundTracker.round()
-                && it.connectedByPublicService() == inTransit
+                && it.stopReachedOnBoard() == inTransit
             ) {
                 transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
             }
