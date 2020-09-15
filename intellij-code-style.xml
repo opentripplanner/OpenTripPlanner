@@ -2,9 +2,9 @@
 <code_scheme name="OpenTripPlanner v2" version="1">
   <option name="OTHER_INDENT_OPTIONS">
     <value>
-      <option name="INDENT_SIZE" value="2" />
-      <option name="CONTINUATION_INDENT_SIZE" value="4" />
-      <option name="TAB_SIZE" value="2" />
+      <option name="INDENT_SIZE" value="4" />
+      <option name="CONTINUATION_INDENT_SIZE" value="8" />
+      <option name="TAB_SIZE" value="4" />
     </value>
   </option>
   <option name="RIGHT_MARGIN" value="100" />
