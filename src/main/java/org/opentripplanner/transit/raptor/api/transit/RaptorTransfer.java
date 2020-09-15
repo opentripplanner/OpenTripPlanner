@@ -42,7 +42,9 @@ public interface RaptorTransfer {
      *
      * Returns -1 if transfer is not possible after the requested departure time
      */
-    int earliestDepartureTime(int requestedDepartureTime);
+    default int earliestDepartureTime(int requestedDepartureTime) {
+        return requestedDepartureTime;
+    };
 
     /**
      * Returns the latest possible arrival time for the leg. Used in DRT systems or bike shares
@@ -50,7 +52,9 @@ public interface RaptorTransfer {
      *
      * Returns -1 if transfer is not possible before the requested arrival time
      */
-    int latestArrivalTime(int requestedArrivalTime);
+    default int latestArrivalTime(int requestedArrivalTime) {
+        return requestedArrivalTime;
+    };
 
     /* ACCESS/TRANSFER/EGRESS CONTAINING MULTIPLE LEGS */
     // The methods below should be only overridden when a RaptorTransfer contains information about
