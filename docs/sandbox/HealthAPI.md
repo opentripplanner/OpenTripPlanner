@@ -4,7 +4,7 @@
 - Entur, Norway
 
 ## Changelog
-- Initial implementation of readiness endpoint
+- Initial implementation of readiness endpoint (November 2019)
 
 ## Documentation
 

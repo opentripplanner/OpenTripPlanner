@@ -41,7 +41,7 @@ pages:
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtention.md'
 - Sandbox:
-    - Health API: 'sandbox/ActuatorAPI.md'
+    - Health API: 'sandbox/HealthAPI.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
     - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'

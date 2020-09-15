@@ -1,12 +1,13 @@
 # Direct transfer analyzer module
 
+## Contact Info
 - Gard Mellemstrand, Entur, Norway
 
 ## Changelog
 
 ### May 20th 2019
 
-- Added the direct transfer analyzer module
+- Added the direct transfer analyzer module (May 2019)
 
 ### Documentation
 

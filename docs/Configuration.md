@@ -158,7 +158,7 @@ Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.j
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
-`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf|\.osm|\.osm\.xml)$` 
+`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf)`|\.osm|\.osm\.xml)$` 
 `dem` | Pattern used to match Elevation DEM files on local disk | Regexp Pattern | `(?i)\.tiff?$` 
 `gtfs` | Pattern used to match GTFS files on local disk | Regexp Pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | Regexp Pattern | `(?i)netex` 

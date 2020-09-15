@@ -6,8 +6,8 @@
 - Entur, Norway
 
 ## Changelog
-- Initial version of Transmodel Graph QL API
-- Added support for multimodal StopPlaces
+- Initial version of Transmodel Graph QL API (September 2019)
+- Added support for multimodal StopPlaces (November 2020)
 
 ## Documentation
 
