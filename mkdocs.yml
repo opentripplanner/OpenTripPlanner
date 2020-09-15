@@ -40,7 +40,7 @@ pages:
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
     - Sandbox development: 'SandboxExtention.md'
-- Sandbox extentions:
+- Sandbox:
     - Health API: 'sandbox/ActuatorAPI.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
