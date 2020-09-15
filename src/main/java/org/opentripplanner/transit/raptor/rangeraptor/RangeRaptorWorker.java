@@ -154,16 +154,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
             // NB since we have transfer limiting not bothering to cut off search when there are no more transfers
             // as that will be rare and complicates the code
-            timerByMinuteScheduleSearch().time(this::findAllTransitForRound);
+            timerByMinuteScheduleSearch().time(() -> findAllTransitForRound(iterationDepartureTime));
 
-            // TODO this needs to be below transitsForRoundComplete to not clear touched stops
-            doTransfersForAccessLegs(iterationDepartureTime, true);
-
-            timerByMinuteTransfers().time(this::transfersForRound);
-
-            doTransfersForAccessLegs(iterationDepartureTime, false);
-
-            lifeCycle.transfersForRoundComplete();
+            timerByMinuteTransfers().time(() -> transfersForRound(iterationDepartureTime));
 
             lifeCycle.roundComplete(state.isDestinationReachedInCurrentRound());
         }
@@ -204,7 +197,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
     /**
      * Perform a scheduled search
      */
-    private void findAllTransitForRound() {
+    private void findAllTransitForRound(int iterationDepartureTime) {
         IntIterator stops = state.stopsTouchedPreviousRound();
         Iterator<? extends RaptorRoute<T>> routeIterator = transitData.routeIterator(stops);
 
@@ -223,9 +216,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             }
         }
         lifeCycle.transitsForRoundComplete();
+
+        // TODO this needs to be below transitsForRoundComplete to not clear touched stops
+        doTransfersForAccessLegs(iterationDepartureTime, true);
     }
 
-    private void transfersForRound() {
+    private void transfersForRound(int iterationDepartureTime) {
         IntIterator it = state.stopsTouchedByTransitCurrentRound();
 
         while (it.hasNext()) {
@@ -234,6 +230,10 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             // loop transfers are already included by virtue of those stops having been reached
             state.transferToStops(fromStop, transitData.getTransfers(fromStop));
         }
+
+        doTransfersForAccessLegs(iterationDepartureTime, false);
+
+        lifeCycle.transfersForRoundComplete();
     }
 
     /**

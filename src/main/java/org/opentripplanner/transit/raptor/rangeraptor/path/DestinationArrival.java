@@ -4,6 +4,7 @@ import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.api.view.EgressLegView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.AbstractStopArrival;
 
 
 /**
@@ -54,7 +55,7 @@ class DestinationArrival<T extends RaptorTripSchedule> implements ArrivalView<T>
 
     @Override
     public int round() {
-        return numberOfTransfers + 1;
+        return numberOfTransfers + 1 + AbstractStopArrival.getParetoRounds(egress);
     }
 
     @Override
