@@ -32,33 +32,23 @@ public final class ForwardPathMapper<T extends RaptorTripSchedule> implements Pa
 
     @Override
     public Path<T> mapToPath(final DestinationArrival<T> destinationArrival) {
-        ArrivalView<T> arrival;
         PathLeg<T> lastLeg;
-        TransitPathLeg<T> transitLeg;
+        AccessPathLeg<T> accessLeg;
 
-        arrival = destinationArrival.previous();
         lastLeg = createEgressPathLeg(destinationArrival);
 
-        if (arrival.arrivedByTransfer()) {
-            lastLeg = createTransferLeg(arrival, lastLeg);
-            arrival = arrival.previous();
-        }
-
-        do {
-            transitLeg = createTransitLeg(arrival, lastLeg);
-            arrival = arrival.previous();
-
-            if (arrival.arrivedByTransfer()) {
-                lastLeg = createTransferLeg(arrival, transitLeg);
-                arrival = arrival.previous();
-            }
-            else {
-                lastLeg = transitLeg;
+        for (ArrivalView<T> arrival = destinationArrival.previous(); true; arrival = arrival.previous()) {
+            if (arrival.arrivedByTransit()) {
+                lastLeg = createTransitLeg(arrival, lastLeg);
+            } else if (arrival.arrivedByTransfer()) {
+                lastLeg = createTransferLeg(arrival, lastLeg);
+            } else if (arrival.arrivedByAccessLeg()) {
+                accessLeg = createAccessPathLeg(arrival, lastLeg);
+                break;
+            } else {
+                throw new RuntimeException("Unknown arrival type");
             }
         }
-        while (arrival.arrivedByTransit());
-
-        AccessPathLeg<T> accessLeg = createAccessPathLeg(arrival, lastLeg);
 
         return new Path<>(iterationDepartureTime, accessLeg, RaptorCostConverter.toOtpDomainCost(destinationArrival.cost()));
     }
