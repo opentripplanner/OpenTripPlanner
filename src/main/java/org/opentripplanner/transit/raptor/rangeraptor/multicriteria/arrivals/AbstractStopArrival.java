@@ -1,6 +1,5 @@
 package org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals;
 
-import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
 import org.opentripplanner.transit.raptor.util.paretoset.ParetoComparator;
@@ -21,15 +20,6 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
 
     public static <T extends RaptorTripSchedule> ParetoComparator<AbstractStopArrival<T>> compareArrivalTimeAndRound() {
         return (l, r) -> l.arrivalTime < r.arrivalTime || l.paretoRound < r.paretoRound;
-    }
-
-    /**
-     * Return the number of paretoRounds a RaptorTransfer should take. This is used for computing
-     * the correct paretoRound for accesses and egresses, which contain public service legs, which
-     * originate outside the RAPTOR algorithm.
-     */
-    public static int getParetoRounds(RaptorTransfer access) {
-        return access.numberOfPublicServiceLegs() * 2 - (access.connectedByPublicService() ? 1 : 0);
     }
 
     private final AbstractStopArrival<T> previous;

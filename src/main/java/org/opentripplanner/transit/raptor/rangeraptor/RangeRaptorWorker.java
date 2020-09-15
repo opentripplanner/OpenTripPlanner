@@ -174,7 +174,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      */
     private void doTransfersForAccessLegs(boolean inTransit) {
         for (RaptorTransfer it : accessLegs) {
-            if (it.numberOfPublicServiceLegs() == roundTracker.round()
+            if (it.numberOfLegs() / 2 == roundTracker.round()
                 && it.connectedByPublicService() == inTransit
             ) {
                 transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
@@ -189,7 +189,7 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
         int round = roundTracker.round();
         boolean hasAccessesLeft = accessLegs
             .stream()
-            .anyMatch(raptorTransfer -> raptorTransfer.numberOfPublicServiceLegs() > round);
+            .anyMatch(raptorTransfer -> raptorTransfer.numberOfLegs() / 2 > round);
 
         return (state.isNewRoundAvailable() || hasAccessesLeft) && roundTracker.hasMoreRounds();
     }
