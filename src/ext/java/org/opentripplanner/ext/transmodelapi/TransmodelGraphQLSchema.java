@@ -625,7 +625,7 @@ public class TransmodelGraphQLSchema {
                         .build())
                 .argument(GraphQLArgument.newArgument()
                         .name("waitReluctance")
-                        .description("Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle.")
+                        .description("Wait cost is multiplied by this value. Setting this to a value lower than 1 indicates that waiting is better than staying on a vehicle. This should never be set higher than walkReluctance, since that would lead to walking down a line to avoid waiting.")
                         .type(Scalars.GraphQLFloat)
                         .defaultValue(routing.request.waitReluctance)
                         .build())
