@@ -4,6 +4,7 @@ import org.opentripplanner.netex.loader.NetexImportDataIndex;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalVersionMapById;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.DestinationDisplaysInFrame_RelStructure;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupsOfLinesInFrame_RelStructure;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -40,6 +41,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
     private final Collection<GroupOfLines> groupOfLines = new ArrayList<>();
 
     private final Collection<Route> routes = new ArrayList<>();
+
+    private final Collection<FlexibleLine> flexibleLines = new ArrayList<>();
 
     private final Collection<Line> lines = new ArrayList<>();
 
@@ -112,6 +115,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         index.destinationDisplayById.addAll(destinationDisplays);
         index.groupOfLinesById.addAll(groupOfLines);
         index.journeyPatternsById.addAll(journeyPatterns);
+        index.flexibleLineByid.addAll(flexibleLines);
         index.lineById.addAll(lines);
         index.networkById.addAll(networks);
         noticeParser.setResultOnIndex(index);
@@ -193,6 +197,8 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         for (JAXBElement element : lines.getLine_()) {
             if (element.getValue() instanceof Line) {
                 this.lines.add((Line) element.getValue());
+            } else if (element.getValue() instanceof FlexibleLine) {
+                this.flexibleLines.add((FlexibleLine) element.getValue());
             }
             else {
                 warnOnMissingMapping(LOG, element.getValue());

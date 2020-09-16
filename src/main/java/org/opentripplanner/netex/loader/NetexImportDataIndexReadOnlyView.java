@@ -8,6 +8,7 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -37,6 +38,7 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMapById<FlexibleStopPlace> getFlexibleStopPlacesById();
     ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById();
     ReadOnlyHierarchicalMapById<JourneyPattern> getJourneyPatternsById();
+    ReadOnlyHierarchicalMapById<FlexibleLine> getFlexibleLineById();
     ReadOnlyHierarchicalMapById<Line> getLineById();
     ReadOnlyHierarchicalMapById<StopPlace> getMultiModalStopPlaceById();
     ReadOnlyHierarchicalMapById<Notice> getNoticeById();

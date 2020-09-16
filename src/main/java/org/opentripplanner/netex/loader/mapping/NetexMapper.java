@@ -19,6 +19,7 @@ import org.opentripplanner.netex.loader.NetexImportDataIndexReadOnlyView;
 import org.opentripplanner.netex.support.DayTypeRefsToServiceIdAdapter;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.rutebanken.netex.model.Authority;
+import org.rutebanken.netex.model.FlexibleLine;
 import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -193,6 +194,10 @@ public class NetexMapper {
                 netexIndex.getTimeZone()
         );
         for (Line line : netexIndex.getLineById().localValues()) {
+            Route route = routeMapper.mapRoute(line);
+            transitBuilder.getRoutes().add(route);
+        }
+        for (FlexibleLine line : netexIndex.getFlexibleLineById().localValues()) {
             Route route = routeMapper.mapRoute(line);
             transitBuilder.getRoutes().add(route);
         }
