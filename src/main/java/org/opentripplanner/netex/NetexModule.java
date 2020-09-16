@@ -1,5 +1,6 @@
 package org.opentripplanner.netex;
 
+import org.opentripplanner.ext.flex.FlexTripsMapper;
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.module.AddTransitModelEntitiesToGraph;
 import org.opentripplanner.graph_builder.module.GtfsFeedId;
@@ -14,6 +15,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.impl.DefaultFareServiceFactory;
 import org.opentripplanner.routing.services.FareServiceFactory;
 import org.opentripplanner.standalone.config.BuildConfig;
+import org.opentripplanner.util.OTPFeature;
 
 import java.util.HashMap;
 import java.util.List;
@@ -85,6 +87,11 @@ public class NetexModule implements GraphBuilderModule {
                 transitBuilder.limitServiceDays(transitPeriodLimit);
 
                 calendarServiceData.add(transitBuilder.buildCalendarServiceData());
+
+                // NB! The calls below have side effects - the builder state is updated!
+                if (OTPFeature.FlexRouting.isOn()) {
+                    FlexTripsMapper.createFlexTrips(transitBuilder);
+                }
 
                 OtpTransitService otpService = transitBuilder.build();
 

@@ -1,7 +1,9 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
@@ -43,7 +45,11 @@ class StopTimesMapper {
 
     private final EntityById<FeedScopedId, Stop> stopsById;
 
+    private final EntityById<FeedScopedId, FlexStopLocation> flexibleStopLocationsById;
+
     private final ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef;
+
+    private final ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef;
 
     private String currentHeadSign;
 
@@ -51,13 +57,17 @@ class StopTimesMapper {
     StopTimesMapper(
             FeedScopedIdFactory idFactory,
             EntityById<FeedScopedId, Stop> stopsById,
+            EntityById<FeedScopedId, FlexStopLocation> flexStopLocationsById,
             ReadOnlyHierarchicalMap<String, DestinationDisplay> destinationDisplayById,
-            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef
+            ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef
     ) {
         this.idFactory = idFactory;
         this.destinationDisplayById = destinationDisplayById;
         this.stopsById = stopsById;
+        this.flexibleStopLocationsById = flexStopLocationsById;
         this.quayIdByStopPointRef = quayIdByStopPointRef;
+        this.flexibleStopPlaceIdByStopPointRef = flexibleStopPlaceIdByStopPointRef;
     }
 
     /**
@@ -77,7 +87,13 @@ class StopTimesMapper {
             String pointInJourneyPattern = currentPassingTime.getPointInJourneyPatternRef().getValue().getRef();
 
             StopPointInJourneyPattern stopPoint = findStopPoint(pointInJourneyPattern, journeyPattern);
-            Stop stop = lookupStop(stopPoint, quayIdByStopPointRef, stopsById);
+            StopLocation stop = lookUpStopLocation(
+                stopPoint,
+                quayIdByStopPointRef,
+                flexibleStopPlaceIdByStopPointRef,
+                stopsById,
+                flexibleStopLocationsById
+            );
             if (stop == null) {
                 LOG.warn("Stop with id {} not found for StopPoint {} in JourneyPattern {}. "
                         + "Trip {} will not be mapped.",
@@ -110,7 +126,7 @@ class StopTimesMapper {
     private StopTime mapToStopTime(
             Trip trip,
             StopPointInJourneyPattern stopPoint,
-            Stop stop,
+            StopLocation stop,
             TimetabledPassingTime passingTime,
             int stopSequence
     ) {
@@ -162,26 +178,37 @@ class StopTimesMapper {
         return stopTime;
     }
 
-    private Stop lookupStop(
+    private StopLocation lookUpStopLocation(
             StopPointInJourneyPattern stopPointInJourneyPattern,
             ReadOnlyHierarchicalMap<String, String> quayIdByStopPointRef,
-            EntityById<FeedScopedId, Stop> stopsById
+            ReadOnlyHierarchicalMap<String, String> flexibleStopPlaceIdByStopPointRef,
+            EntityById<FeedScopedId, Stop> stopsById,
+            EntityById<FeedScopedId, FlexStopLocation> flexStopLocationsById
     ) {
         if (stopPointInJourneyPattern == null) return null;
 
         String stopPointRef = stopPointInJourneyPattern.getScheduledStopPointRef().getValue().getRef();
 
         String stopId = quayIdByStopPointRef.lookup(stopPointRef);
-        if (stopId == null) {
+        String flexibleStopPlaceId = flexibleStopPlaceIdByStopPointRef.lookup(stopPointRef);
+
+        if (stopId == null && flexibleStopPlaceId == null) {
             LOG.warn("No passengerStopAssignment found for " + stopPointRef);
             return null;
         }
 
-        Stop stop = stopsById.get(idFactory.createId(stopId));
-        if (stop == null) {
-            LOG.warn("Quay not found for " + stopPointRef);
+        StopLocation stopLocation;
+        if (stopId != null) {
+            stopLocation = stopsById.get(idFactory.createId(stopId));
+        } else {
+            stopLocation = flexStopLocationsById.get(idFactory.createId(flexibleStopPlaceId));
         }
-        return stop;
+
+        if (stopLocation == null) {
+            LOG.warn("No Quay or FlexibleStopPlace found for " + stopPointRef);
+        }
+
+        return stopLocation;
     }
 
     private static StopPointInJourneyPattern findStopPoint(String pointInJourneyPatterRef,

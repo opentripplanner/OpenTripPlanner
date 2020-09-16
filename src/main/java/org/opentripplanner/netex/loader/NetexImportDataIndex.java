@@ -89,6 +89,7 @@ public class NetexImportDataIndex {
     public final HierarchicalMapById<Operator> operatorsById;
     public final HierarchicalMultimap<String, TimetabledPassingTime> passingTimeByStopPointId;
     public final HierarchicalVersionMapById<Quay> quayById;
+    public final HierarchicalMap<String, String> flexibleStopPlaceByStopPointRef;
     public final HierarchicalMap<String, String> quayIdByStopPointRef;
     public final HierarchicalMapById<Route> routeById;
     public final HierarchicalMultimap<String, ServiceJourney> serviceJourneyByPatternId;
@@ -132,6 +133,7 @@ public class NetexImportDataIndex {
         this.operatorsById = new HierarchicalMapById<>();
         this.passingTimeByStopPointId = new HierarchicalMultimap<>();
         this.quayById = new HierarchicalVersionMapById<>();
+        this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>();
         this.quayIdByStopPointRef = new HierarchicalMap<>();
         this.routeById = new HierarchicalMapById<>();
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>();
@@ -166,6 +168,7 @@ public class NetexImportDataIndex {
         this.operatorsById = new HierarchicalMapById<>(parent.operatorsById);
         this.passingTimeByStopPointId = new HierarchicalMultimap<>(parent.passingTimeByStopPointId);
         this.quayById = new HierarchicalVersionMapById<>(parent.quayById);
+        this.flexibleStopPlaceByStopPointRef = new HierarchicalMap<>(parent.flexibleStopPlaceByStopPointRef);
         this.quayIdByStopPointRef = new HierarchicalMap<>(parent.quayIdByStopPointRef);
         this.routeById = new HierarchicalMapById<>(parent.routeById);
         this.serviceJourneyByPatternId = new HierarchicalMultimap<>(parent.serviceJourneyByPatternId);
@@ -262,6 +265,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalVersionMapById<Quay> getQuayById() {
                 return quayById;
+            }
+
+            public ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef() {
+                return flexibleStopPlaceByStopPointRef;
             }
 
             public ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef() {

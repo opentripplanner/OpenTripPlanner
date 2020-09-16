@@ -1,8 +1,13 @@
 package org.opentripplanner.netex.loader.mapping;
 
 import org.junit.Test;
+import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.loader.util.HierarchicalMap;
+import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 
 import java.math.BigInteger;
 import java.time.LocalTime;
@@ -34,8 +39,10 @@ public class StopTimesMapperTest {
         StopTimesMapper stopTimesMapper = new StopTimesMapper(
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
+                new EntityById<>(),
                 sample.getDestinationDisplayById(),
-                sample.getQuayIdByStopPointRef()
+                sample.getQuayIdByStopPointRef(),
+                new HierarchicalMap<>()
         );
 
         StopTimesMapper.MappedStopTimes result = stopTimesMapper.mapToStopTimes(

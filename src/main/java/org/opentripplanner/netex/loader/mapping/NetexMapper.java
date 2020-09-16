@@ -207,11 +207,13 @@ public class NetexMapper {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 idFactory,
                 transitBuilder.getStops(),
+                transitBuilder.getLocations(),
                 transitBuilder.getRoutes(),
                 transitBuilder.getShapePoints().keySet(),
                 netexIndex.getRouteById(),
                 netexIndex.getJourneyPatternsById(),
                 netexIndex.getQuayIdByStopPointRef(),
+                netexIndex.getFlexibleStopPlaceByStopPointRef(),
                 netexIndex.getDestinationDisplayById(),
                 netexIndex.getServiceJourneyByPatternId(),
                 deduplicator

@@ -61,7 +61,10 @@ public class NetexDocumentParser {
         } else if(value instanceof TimetableFrame) {
             parse((TimetableFrame) value, new TimeTableFrameParser(netexIndex.journeyPatternsById));
         } else if(value instanceof ServiceFrame) {
-            parse((ServiceFrame) value, new ServiceFrameParser(netexIndex.quayById));
+            parse((ServiceFrame) value, new ServiceFrameParser(
+                netexIndex.quayById,
+                netexIndex.flexibleStopPlaceById
+            ));
         }  else if (value instanceof SiteFrame) {
             parse((SiteFrame) value, new SiteFrameParser());
         } else if (value instanceof CompositeFrame) {

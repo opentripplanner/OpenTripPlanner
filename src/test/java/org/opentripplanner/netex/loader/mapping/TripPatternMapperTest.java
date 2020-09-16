@@ -5,6 +5,8 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
+import org.opentripplanner.model.impl.EntityById;
+import org.opentripplanner.netex.loader.util.HierarchicalMap;
 import org.opentripplanner.netex.loader.util.HierarchicalMapById;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -29,11 +31,13 @@ public class TripPatternMapperTest {
         TripPatternMapper tripPatternMapper = new TripPatternMapper(
                 MappingSupport.ID_FACTORY,
                 sample.getStopsById(),
+                new EntityById<>(),
                 sample.getOtpRouteByid(),
                 Collections.emptySet(),
                 sample.getRouteById(),
                 sample.getJourneyPatternById(),
                 sample.getQuayIdByStopPointRef(),
+                new HierarchicalMap<>(),
                 new HierarchicalMapById<>(),
                 sample.getServiceJourneyByPatternId(),
                 new Deduplicator()

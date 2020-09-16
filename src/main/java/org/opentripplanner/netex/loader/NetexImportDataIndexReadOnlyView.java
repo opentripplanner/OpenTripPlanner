@@ -48,6 +48,7 @@ public interface NetexImportDataIndexReadOnlyView {
     ReadOnlyHierarchicalMap<String, Collection<TimetabledPassingTime>> getPassingTimeByStopPointId();
     ReadOnlyHierarchicalVersionMapById<Quay> getQuayById();
     ReadOnlyHierarchicalMap<String, String> getQuayIdByStopPointRef();
+    ReadOnlyHierarchicalMap<String, String> getFlexibleStopPlaceByStopPointRef();
     ReadOnlyHierarchicalMapById<Route> getRouteById();
     ReadOnlyHierarchicalMap<String, Collection<ServiceJourney>> getServiceJourneyByPatternId();
     ReadOnlyHierarchicalMapById<ServiceLink> getServiceLinkById();
