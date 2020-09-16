@@ -134,10 +134,8 @@ public class LegacyGraphQLQueryTypeImpl
   }
 
   @Override
-  public DataFetcher<Iterable<FeedInfo>> feeds() {
-    return environment -> getRoutingService(environment)
-        .getFeedInfoForId()
-        .values();
+  public DataFetcher<Iterable<String>> feeds() {
+    return environment -> getRoutingService(environment).getFeedIds();
   }
 
   @Override

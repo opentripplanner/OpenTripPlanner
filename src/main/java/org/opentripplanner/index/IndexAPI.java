@@ -96,9 +96,7 @@ public class IndexAPI {
     @Path("/feeds/{feedId}")
     public ApiFeedInfo getFeedInfo(@PathParam("feedId") String feedId) {
         ApiFeedInfo feedInfo = FeedInfoMapper.mapToApi(
-                createRoutingService()
-                        .getFeedInfoForId()
-                        .get(feedId)
+                createRoutingService().getFeedInfo(feedId)
         );
         return validateExist("FeedInfo", feedInfo, "feedId", feedId);
     }

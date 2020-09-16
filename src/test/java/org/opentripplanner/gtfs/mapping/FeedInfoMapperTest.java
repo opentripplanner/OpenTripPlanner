@@ -39,7 +39,7 @@ public class FeedInfoMapperTest {
         FEED_INFO.setVersion(VERSION);
     }
 
-    private FeedInfoMapper subject = new FeedInfoMapper();
+    private FeedInfoMapper subject = new FeedInfoMapper(ID);
 
     @Test
     public void testMapCollection() throws Exception {
