@@ -26,7 +26,8 @@ public class FlexStopLocationMapper {
   }
 
   /**
-   * Maps NeTEx FlexibleStopPlace to FlexStopLocation.
+   * Maps NeTEx FlexibleStopPlace to FlexStopLocation. This currently does not support
+   * FlexLocationGroup, as an equivalent is not defined in the NeTEx Nordic profile.
    */
   public FlexStopLocation map(FlexibleStopPlace flexibleStopPlace) {
     FlexStopLocation result = new FlexStopLocation();

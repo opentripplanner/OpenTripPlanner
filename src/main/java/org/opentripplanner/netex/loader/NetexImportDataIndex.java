@@ -13,6 +13,7 @@ import org.rutebanken.netex.model.Authority;
 import org.rutebanken.netex.model.DayType;
 import org.rutebanken.netex.model.DayTypeAssignment;
 import org.rutebanken.netex.model.DestinationDisplay;
+import org.rutebanken.netex.model.FlexibleStopPlace;
 import org.rutebanken.netex.model.GroupOfLines;
 import org.rutebanken.netex.model.GroupOfStopPlaces;
 import org.rutebanken.netex.model.JourneyPattern;
@@ -73,6 +74,7 @@ public class NetexImportDataIndex {
      * */
     public final Set<DayTypeRefsToServiceIdAdapter> dayTypeRefs;
     public final HierarchicalMapById<DestinationDisplay> destinationDisplayById;
+    public final HierarchicalMapById<FlexibleStopPlace> flexibleStopPlaceById;
     public final HierarchicalMapById<GroupOfLines> groupOfLinesById;
     public final HierarchicalMapById<GroupOfStopPlaces> groupOfStopPlacesById;
     public final HierarchicalMapById<JourneyPattern> journeyPatternsById;
@@ -113,6 +115,7 @@ public class NetexImportDataIndex {
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>();
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>();
+        this.flexibleStopPlaceById = new HierarchicalMapById<>();
         this.groupOfLinesById = new HierarchicalMapById<>();
         this.groupOfStopPlacesById = new HierarchicalMapById<>();
         this.journeyPatternsById = new HierarchicalMapById<>();
@@ -145,6 +148,7 @@ public class NetexImportDataIndex {
         this.dayTypeAssignmentByDayTypeId = new HierarchicalMultimap<>(parent.dayTypeAssignmentByDayTypeId);
         this.dayTypeRefs = new HashSet<>();
         this.destinationDisplayById = new HierarchicalMapById<>(parent.destinationDisplayById);
+        this.flexibleStopPlaceById = new HierarchicalMapById<>(parent.flexibleStopPlaceById);
         this.groupOfLinesById = new HierarchicalMapById<>(parent.groupOfLinesById);
         this.groupOfStopPlacesById = new HierarchicalMapById<>(parent.groupOfStopPlacesById);
         this.journeyPatternsById = new HierarchicalMapById<>(parent.journeyPatternsById);
@@ -206,6 +210,10 @@ public class NetexImportDataIndex {
 
             public ReadOnlyHierarchicalMapById<DestinationDisplay> getDestinationDisplayById() {
                 return destinationDisplayById;
+            }
+
+            public ReadOnlyHierarchicalMapById<FlexibleStopPlace> getFlexibleStopPlacesById() {
+                return flexibleStopPlaceById;
             }
 
             public ReadOnlyHierarchicalMapById<GroupOfStopPlaces> getGroupOfStopPlacesById() {
