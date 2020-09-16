@@ -4,18 +4,13 @@
     "walkSpeed": 1.3,
     "bikeSpeed": 5,
     "carSpeed": 40,
-    "maxWalkDistance": 5000,
-    "maxTransferWalkDistance": 2000,
-    "maxPreTransitTime": 600,
     "wheelchairAccessible": false,
-    "numItineraries": 3,
-    // "maxSlope": 0.0833333333333,
+    "numItineraries": 12,
     "showIntermediateStops": false,
     "transferPenalty": 0,
     "walkReluctance": 4.0,
     "stairsReluctance": 1.65,
     "turnReluctance": 1.0,
-    //"walkOnStreetReluctance": 1.0,
     "elevatorBoardTime": 90,
     "elevatorBoardCost": 90,
     "elevatorHopTime": 20,
@@ -26,12 +21,12 @@
     "bikeParkTime": 60,
     "bikeParkCost": 120,
     "carDropoffTime": 120,
-    "waitReluctance": 0.8,
-    "waitAtBeginningFactor": 0.4,
+    "waitReluctance": 0.7,
     "walkBoardCost": 600,
     "bikeBoardCost": 600,
     "otherThanPreferredRoutesPenalty": 300,
     "transferSlack": 120,
+    "transitGeneralizedCostLimit": "3600 + 2.0 x",
     // Default slack for any mode is 0 (zero)
     "boardSlackForMode": {
       "FERRY": 60,
@@ -45,17 +40,8 @@
     "carAccelerationSpeed": 2.9,
     "ignoreRealtimeUpdates": false,
     "disableRemainingWeightHeuristic": false,
-    //"preTransitPenalty": 300.0,
-    // "preTransitOverageRate": 10.0,
-    "allowBikeRental": false,
-    "bikeParkAndRide": false,
-    "parkAndRide": false,
-    "kissAndRide": false,
-    //"useTraffic": true,
-    "onlyTransitTrips": false,
     "disableAlertFiltering": false,
     "geoidElevation": false
-    // "callAndRideReluctance": 1.0
   },
   "transit": {
     "maxNumberOfTransfers" : 12,
@@ -70,6 +56,10 @@
       "RECOMMENDED" : 60,
       "PREFERRED" : 0
     }
+  },
+  "bikeRentalServiceDirectoryUrl": "https://api.dev.entur.io/mobility/v1/bikes",
+  "transmodelApi": {
+    "hideFeedId" : true
   },
   "updaters": [
     // SIRI SX service alerts
