@@ -8,6 +8,7 @@ import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.impl.EntityById;
 import org.opentripplanner.netex.loader.util.ReadOnlyHierarchicalMap;
+import org.opentripplanner.util.OTPFeature;
 import org.rutebanken.netex.model.DestinationDisplay;
 import org.rutebanken.netex.model.JourneyPattern;
 import org.rutebanken.netex.model.PointInLinkSequence_VersionedChildStructure;
@@ -110,6 +111,13 @@ class StopTimesMapper {
 
             result.add(currentPassingTime.getId(), stopTime);
         }
+
+        if (OTPFeature.FlexRouting.isOn()) {
+            // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
+            //      this should be harmonized between GTFS and NeTEx
+            modifyDataForUnscheduledFlexTrip(result);
+        }
+
         return result;
     }
 
@@ -244,5 +252,25 @@ class StopTimesMapper {
 
     private static boolean isFalse(Boolean value) {
         return value != null && !value;
+    }
+
+    // TODO This is a temporary mapping of the UnscheduledTrip format, until we decide on how
+    //      this should be harmonized between GTFS and NeTEx
+    private static void modifyDataForUnscheduledFlexTrip(MappedStopTimes result) {
+        List<StopTime> stopTimes = result.stopTimes;
+        if (stopTimes.size() == 2 && stopTimes
+            .stream()
+            .allMatch(s -> s.getStop() instanceof FlexStopLocation)) {
+
+            int departureTime = stopTimes.get(0).getDepartureTime();
+            int arrivalTime = stopTimes.get(1).getArrivalTime();
+
+            for (StopTime stopTime : stopTimes) {
+                stopTime.clearArrivalTime();
+                stopTime.clearDepartureTime();
+                stopTime.setMinArrivalTime(departureTime);
+                stopTime.setMaxDepartureTime(arrivalTime);
+            }
+        }
     }
 }
