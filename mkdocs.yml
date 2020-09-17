@@ -35,7 +35,7 @@ pages:
     - Troubleshooting: 'Troubleshooting-Routing.md'
 - Development:
     - "Developers' Guide": 'Developers-Guide.md'
-    - Architecture: 'Architecture.md'
+    - Interfaces and Data Sources: 'Interfaces-Data-Sources.md'
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
