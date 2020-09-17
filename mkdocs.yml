@@ -3,7 +3,7 @@
 # This static documentation is built and served by Readthedocs
 # at opentripplanner.readthedocs.org
 
-site_name: OpenTripPlanner
+site_name: OpenTripPlanner 2
 site_url: http://docs.opentripplanner.org
 repo_url: http://github.com/opentripplanner/OpenTripPlanner
 docs_dir: docs
