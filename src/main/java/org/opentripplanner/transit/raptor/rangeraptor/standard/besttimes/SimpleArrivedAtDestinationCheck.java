@@ -21,7 +21,7 @@ public class SimpleArrivedAtDestinationCheck implements ArrivedAtDestinationChec
         // This is fast enough, we could use a BitSet for egressStops, but it takes up more
         // memory and the performance is the same.
         for (int i = 0; i < egressStops.length; i++) {
-            if(stopVisited.isStopReachedByTransitCurrentRound(i)) {
+            if(stopVisited.isStopReachedByTransitCurrentRound(egressStops[i])) {
                 return true;
             }
         }

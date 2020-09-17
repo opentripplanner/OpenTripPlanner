@@ -87,6 +87,8 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     private boolean inFirstIteration = true;
 
+    private int iterationDepartureTime;
+
 
     public RangeRaptorWorker(
             S state,
@@ -132,7 +134,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             final IntIterator it = calculator.rangeRaptorMinutes();
             while (it.hasNext()) {
                 // Run the raptor search for this particular iteration departure time
-                runRaptorForMinute(it.next());
+                iterationDepartureTime = it.next();
+                lifeCycle.setupIteration(iterationDepartureTime);
+                runRaptorForMinute();
                 inFirstIteration = false;
             }
         });
@@ -141,13 +145,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
 
     /**
      * Perform one minute of a RAPTOR search.
-     *
-     * @param iterationDepartureTime When this search departs.
      */
-    private void runRaptorForMinute(int iterationDepartureTime) {
-        lifeCycle.setupIteration(iterationDepartureTime);
-
-        doTransfersForAccessLegs(iterationDepartureTime);
+    private void runRaptorForMinute() {
+        doTransfersForAccessLegs(false);
 
         while (hasMoreRounds()) {
             lifeCycle.prepareForNextRound(roundTracker.round());
@@ -171,12 +171,14 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
     /**
      * Set the departure time in the scheduled search to the given departure time,
      * and prepare for the scheduled search at the next-earlier minute.
-     * <p/>
-     * This method is protected to allow reverce search to override it.
      */
-    private void doTransfersForAccessLegs(int iterationDepartureTime) {
+    private void doTransfersForAccessLegs(boolean inTransit) {
         for (RaptorTransfer it : accessLegs) {
-            transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
+            if (it.numberOfLegs() / 2 == roundTracker.round()
+                && it.stopReachedOnBoard() == inTransit
+            ) {
+                transitWorker.setInitialTimeForIteration(it, iterationDepartureTime);
+            }
         }
     }
 
@@ -184,7 +186,12 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
      * Check if the RangeRaptor should continue with a new round.
      */
     private boolean hasMoreRounds() {
-        return roundTracker.hasMoreRounds() && state.isNewRoundAvailable();
+        int round = roundTracker.round();
+        boolean hasAccessesLeft = accessLegs
+            .stream()
+            .anyMatch(raptorTransfer -> raptorTransfer.numberOfLegs() / 2 > round);
+
+        return (state.isNewRoundAvailable() || hasAccessesLeft) && roundTracker.hasMoreRounds();
     }
 
     /**
@@ -209,6 +216,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             }
         }
         lifeCycle.transitsForRoundComplete();
+
+        // TODO this needs to be below transitsForRoundComplete to not clear touched stops
+        doTransfersForAccessLegs(true);
     }
 
     private void transfersForRound() {
@@ -220,6 +230,9 @@ public final class RangeRaptorWorker<T extends RaptorTripSchedule, S extends Wor
             // loop transfers are already included by virtue of those stops having been reached
             state.transferToStops(fromStop, transitData.getTransfers(fromStop));
         }
+
+        doTransfersForAccessLegs(false);
+
         lifeCycle.transfersForRoundComplete();
     }
 

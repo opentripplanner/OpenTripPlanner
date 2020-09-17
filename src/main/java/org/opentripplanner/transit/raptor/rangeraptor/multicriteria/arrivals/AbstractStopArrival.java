@@ -58,11 +58,11 @@ public abstract class AbstractStopArrival<T extends RaptorTripSchedule> implemen
     }
 
     /**
-     * Initial state - first stop visited.
+     * Initial state - first stop visited during the RAPTOR algorithm.
      */
-    AbstractStopArrival(int stop, int departureTime, int travelDuration, int initialCost) {
+    AbstractStopArrival(int stop, int departureTime, int travelDuration, int initialCost, int paretoRound) {
         this.previous = null;
-        this.paretoRound = 0;
+        this.paretoRound = paretoRound;
         this.stop = stop;
         this.arrivalTime = departureTime + travelDuration;
         this.travelDuration = travelDuration;

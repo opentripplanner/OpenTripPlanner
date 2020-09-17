@@ -79,7 +79,7 @@ public final class StdRangeRaptorWorkerState<T
         // (or departure time at the last stop if we search backwards).
         int arrivalTime = calculator.plusDuration(departureTime, durationInSeconds);
 
-        bestTimes.setAccessStopTime(stop, arrivalTime);
+        bestTimes.setAccessStopTime(stop, arrivalTime, accessEgressLeg.stopReachedOnBoard());
         stopArrivalsState.setAccess(stop, arrivalTime, accessEgressLeg);
     }
 
