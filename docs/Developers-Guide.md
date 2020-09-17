@@ -1,6 +1,6 @@
 # Developers Guide
 
-## Setup OTP
+## Quick setup
 _A Quick guide to setting up the OpenTripPlanner project._
 
 You need Git, Maven and Java(JDK) and an IDE installed on your computer. You IDE might have JDK and 
@@ -85,12 +85,12 @@ Many other expressions exist to close issues via commit messages. See [the GitHu
 ### Code Comments
 
 As a matter of [policy](http://github.com/opentripplanner/OpenTripPlanner/issues/93), all new 
-methods, classes, and fields should include comments explaining what they are for and any other 
-pertinent information. For Java code, the comments should use the [JavaDoc conventions]
-(http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide comments that not only 
-explain *what* you did but also *why you did it* while providing some context. Please avoid 
-including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as `@param` annotations 
-with no description.
+methods, classes, and fields should include comments explaining what they are for and any other
+pertinent information. For Java code, the comments should use the 
+[JavaDoc conventions](http://java.sun.com/j2se/javadoc/writingdoccomments). It is best to provide
+comments that not only explain *what* you did but also *why you did it* while providing some
+context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
+`@param` annotations with no description.
 
 ### Documentation
 
@@ -99,8 +99,8 @@ GitHub wiki. This allows version control to be applied to documentation as well 
 code.All pull requests that change how OTP is used or configured should include changes to the
 documentation alongside code modifications. Pages that help organize development teams or serve as
 scratchpads can still go [on the wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki), but
-all documentation that would be of interest to people configuring or using OTP belong [in the repo]
-(https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
+all documentation that would be of interest to people configuring or using OTP belong
+ [in the repo](https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
 
 The documentation files are in Markdown format and are in the `/docs` directory under the root of 
 the project. On every push to the master branch the documentation will be rebuilt and deployed as 
