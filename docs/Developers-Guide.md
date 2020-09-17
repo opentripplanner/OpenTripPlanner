@@ -94,13 +94,10 @@ context. Please avoid including trivial Javadoc or the empty Javadoc stubs added
 
 ### Documentation
 
-Most documentation should be included directly in the OpenTripPlanner repository rather than the 
-GitHub wiki. This allows version control to be applied to documentation as well as program source 
-code.All pull requests that change how OTP is used or configured should include changes to the
-documentation alongside code modifications. Pages that help organize development teams or serve as
-scratchpads can still go [on the wiki](https://github.com/opentripplanner/OpenTripPlanner/wiki), but
-all documentation that would be of interest to people configuring or using OTP belong
- [in the repo](https://github.com/opentripplanner/OpenTripPlanner/tree/master/docs).
+OTP documentation is included directly in the OpenTripPlanner repository. 
+This allows version control to be applied to documentation as well as program source code.
+All pull requests that change how OTP is used or configured should include changes to the
+documentation alongside code modifications. 
 
 The documentation files are in Markdown format and are in the `/docs` directory under the root of 
 the project. On every push to the master branch the documentation will be rebuilt and deployed as 
