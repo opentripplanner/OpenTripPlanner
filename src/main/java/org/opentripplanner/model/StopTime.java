@@ -46,9 +46,11 @@ public final class StopTime implements Comparable<StopTime> {
 
     private int maxDepartureTime = MISSING_VALUE;
 
-    private int continuousPickup;
+    // Disabled by default
+    private int continuousPickup = 1;
 
-    private int continuousDropOff;
+    // Disabled by default
+    private int continuousDropOff = 1;
 
     public StopTime() { }
 

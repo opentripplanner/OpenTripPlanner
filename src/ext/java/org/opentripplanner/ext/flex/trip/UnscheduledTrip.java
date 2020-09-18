@@ -16,6 +16,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -31,7 +32,11 @@ public class UnscheduledTrip extends FlexTrip {
   private final UnscheduledStopTime[] stopTimes;
 
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
-    return stopTimes.stream().allMatch(st -> !st.isArrivalTimeSet() && !st.isDepartureTimeSet());
+    Predicate<StopTime> noExplicitTimes = Predicate.not(st -> st.isArrivalTimeSet() || st.isDepartureTimeSet());
+    Predicate<StopTime> notContinuousStop = stopTime ->
+        stopTime.getContinuousDropOff() == 1 && stopTime.getContinuousPickup() == 1;
+    return stopTimes.stream().allMatch(noExplicitTimes)
+        && stopTimes.stream().allMatch(notContinuousStop);
   }
 
   public UnscheduledTrip(Trip trip, List<StopTime> stopTimes) {

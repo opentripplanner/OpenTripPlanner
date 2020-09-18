@@ -51,9 +51,7 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
         .stream()
-        .anyMatch(st -> st.getContinuousPickup() == 0 || st.getContinuousPickup() == 2
-            || st.getContinuousPickup() == 3 || st.getContinuousDropOff() == 0
-            || st.getContinuousDropOff() == 2 || st.getContinuousDropOff() == 3);
+        .anyMatch(st -> st.getContinuousPickup() != 1 || st.getContinuousDropOff() != 1);
   }
 
 }

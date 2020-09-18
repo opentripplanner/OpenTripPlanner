@@ -22,22 +22,22 @@ import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
+import static org.opentripplanner.model.StopTime.MISSING_VALUE;
+
 /**
  * A scheduled deviated trip is similar to a regular scheduled trip, except that is continues stop
  * locations, which are not stops, but other types, such as groups of stops or location areas.
  */
 public class ScheduledDeviatedTrip extends FlexTrip {
-  private static final int MISSING_VALUE = -999;
 
   private final ScheduledDeviatedStopTime[] stopTimes;
 
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
-    Predicate<StopTime> noExplicitWindows = stopTime ->
-        stopTime.getMaxDepartureTime() == org.onebusaway.gtfs.model.StopTime.MISSING_VALUE
-            && stopTime.getMinArrivalTime() == org.onebusaway.gtfs.model.StopTime.MISSING_VALUE;
+    Predicate<StopTime> notContinuousStop = stopTime ->
+        stopTime.getContinuousDropOff() == 1 && stopTime.getContinuousPickup() == 1;
     return stopTimes.stream().anyMatch(notStopType)
-        && stopTimes.stream().allMatch(noExplicitWindows);
+        && stopTimes.stream().allMatch(notContinuousStop);
   }
 
   public ScheduledDeviatedTrip(Trip trip, List<StopTime> stopTimes) {
@@ -178,8 +178,15 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
     private ScheduledDeviatedStopTime(StopTime st) {
       this.stop = st.getStop();
-      this.arrivalTime = st.getArrivalTime();
-      this.departureTime = st.getDepartureTime();
+
+      // Store the time the user is guaranteed to arrive at latest
+      this.arrivalTime = st.getMaxDepartureTime() != MISSING_VALUE ? st.getMaxDepartureTime() : st.getArrivalTime();
+      // Store the time the user needs to be ready for pickup
+      this.departureTime = st.getMinArrivalTime() != MISSING_VALUE ? st.getMinArrivalTime() : st.getDepartureTime();
+
+      // TODO: Store the window for a stop, and allow the user to have an "unguaranteed"
+      // pickup/dropoff between the start and end of the window
+
       this.pickupType = st.getPickupType();
       this.dropOffType = st.getDropOffType();
     }
