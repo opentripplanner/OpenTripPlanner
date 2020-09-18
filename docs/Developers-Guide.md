@@ -55,7 +55,7 @@ There are several ways to get involved:
 
  * Join the [developer mailing list](http://groups.google.com/group/opentripplanner-dev)
 
- * Fix typos and improve the documentation on the wiki or within the `/docs` directory of the project (details below).
+ * Fix typos and improve the documentation within the `/docs` directory of the project (details below).
 
  * [File a bug or new feature request](http://github.com/openplans/OpenTripPlanner/issues/new).
 
@@ -92,6 +92,7 @@ comments that not only explain *what* you did but also *why you did it* while pr
 context. Please avoid including trivial Javadoc or the empty Javadoc stubs added by IDEs, such as
 `@param` annotations with no description.
 
+
 ### Documentation
 
 OTP documentation is included directly in the OpenTripPlanner repository. 
@@ -112,6 +113,7 @@ In short:
 $ pip install mkdocs
 $ mkdocs serve
 ```
+
 
 ### Debug layers
 
