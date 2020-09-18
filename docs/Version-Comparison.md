@@ -50,10 +50,11 @@ When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they 
 | Departure/arrival time | Single departure or arrival time only | Every minute in a window up to several days long |
 | API Paging | no | yes |
 | Timetable View | no | yes |
-| Sandbox Extensions | no | yes |
+| Plugin Sandbox Extensions | no | yes ([See extensions](SandboxExtension.md)) |
 | Data storage | local, S3 (elevation only) | extensible with local, ZIP,<br>and Google Cloud plugins, S3 available |
 | Transfer Priority | yes (route, trip, stop level) | no (planned) |
 / REST API format | XML, JSON | JSON only |
+
 
 ## Commentary on OTP1 features removed from OTP2
 
@@ -82,6 +83,24 @@ These were all adaptations to the very different IT environment that existed ear
 ### Routing request parameters
 
 Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of functionality, just a different way of expressing things due to the new routing algorithms. A summary of parameters that have been removed and their replacements can be found in the migration guide [OTP2-MigrationGuide].
+
+
+## OTP Trip planning and Transit index APIs
+
+OTP1 have two APIs for trip planning, the REST API and an obsolete GraphQL API(early version of 
+the Digitransit GraphQL API). OTP2 still support the REST API and it is very similar in functionality
+compared with the OTP1 version. In the future we would like to create a new official OTP API using 
+GraphQL replacing the REST API. We will probably support the REST API for a long time to allow 
+everyone to migrate to the new GraphQL API. Today, OTP2 comes with two Sandbox extension APIs:
+
+- [HSL Legacy GraphQL API](sandbox/LegacyGraphQLApi.md) - HSL's GraphQL API used by the Digitransit project.
+- [Transmodel API](sandbox/TransmodelAPI.md) - Entur´s Transmodel API
+
+The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
+uses GTFS terminology, while the Entur API is Transmodel(NeTEx) based. Both APIs are similar in 
+semantics/structure and provide the same functionality. The plan is to merge these to APIs into one
+new official OTP2 API. We will then deprecate the REST API, Transmodel API and the HSL API. The new
+API will be available in a GTFS and a Transmodel "translated" version.  
 
 
 ## Additional characteristics added in OTP2

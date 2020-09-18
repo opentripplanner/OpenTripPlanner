@@ -39,7 +39,7 @@ pages:
     - Localization: 'Localization.md'
     - Bibliography: 'Bibliography.md'
     - Codestyle: 'Codestyle.md'
-    - Sandbox development: 'SandboxExtention.md'
+    - Sandbox development: 'SandboxExtension.md'
 - Sandbox:
     - Health API: 'sandbox/HealthAPI.md'
     - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
