@@ -606,11 +606,7 @@ public class SiriAlertsUpdateHandlerTest  extends GtfsTest {
 
             assertFalse(transitAlertService.getAllAlerts().isEmpty());
 
-            /*
-             * Line and stop-alerts should result in several TransitAlertes. One for each routeId/stop combination
-             */
-
-            assertLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
+            assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
         }
 
         @Test
@@ -633,8 +629,42 @@ public class SiriAlertsUpdateHandlerTest  extends GtfsTest {
             alertsUpdateHandler.update(serviceDelivery);
 
             assertFalse(transitAlertService.getAllAlerts().isEmpty());
-            assertLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
+            assertSeparateLineAndStopAlerts(situationNumber, routeId, stopId0, stopId1);
 
+        }
+
+        private void assertSeparateLineAndStopAlerts(String situationNumber, String routeId, String stopId0, String stopId1) {
+            /*
+             * Line and external stop-alerts should result in several AlertPatches. One for each routeId AND for each stop
+             */
+
+            final FeedScopedId feedRouteId = new FeedScopedId("FEED", routeId);
+            Collection<TransitAlert> tripPatches = transitAlertService.getRouteAlerts(feedRouteId);
+
+            assertNotNull(tripPatches);
+            assertEquals(1, tripPatches.size());
+            TransitAlert transitAlert = tripPatches.iterator().next();
+            assertEquals(situationNumber, transitAlert.getId());
+            assertTrue(matchesEntity(transitAlert, feedRouteId));
+
+            FeedScopedId feedStopId = new FeedScopedId("FEED", stopId0);
+            tripPatches =  transitAlertService.getStopAlerts(feedStopId);
+
+            assertNotNull(tripPatches);
+            assertEquals(1, tripPatches.size());
+            transitAlert = tripPatches.iterator().next();
+            assertEquals(situationNumber, transitAlert.getId());
+            assertTrue(matchesEntity(transitAlert, feedStopId));
+
+
+            feedStopId = new FeedScopedId("FEED", stopId1);
+            tripPatches =  transitAlertService.getStopAlerts(feedStopId);
+
+            assertNotNull(tripPatches);
+            assertEquals(1, tripPatches.size());
+            transitAlert = tripPatches.iterator().next();
+            assertEquals(situationNumber, transitAlert.getId());
+            assertTrue(matchesEntity(transitAlert, feedStopId));
         }
 
         private void assertLineAndStopAlerts(String situationNumber, String routeId, String stopId0, String stopId1) {

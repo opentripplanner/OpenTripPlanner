@@ -173,26 +173,6 @@ public class SiriAlertsUpdateHandler {
                 }
             }
 
-            AffectsScopeStructure.Networks networks = affectsStructure.getNetworks();
-            Set<FeedScopedId> stopRoutes = new HashSet<>();
-            if (networks != null) {
-                for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
-                    List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
-                    if (isNotEmpty(affectedLines)) {
-                        for (AffectedLineStructure line : affectedLines) {
-
-                            LineRef lineRef = line.getLineRef();
-
-                            if (lineRef == null || lineRef.getValue() == null) {
-                                continue;
-                            }
-
-                            stopRoutes.add(new FeedScopedId(feedId, lineRef.getValue()));
-                        }
-                    }
-                }
-            }
-
             AffectsScopeStructure.StopPoints stopPoints = affectsStructure.getStopPoints();
             AffectsScopeStructure.StopPlaces stopPlaces = affectsStructure.getStopPlaces();
 
@@ -210,19 +190,9 @@ public class SiriAlertsUpdateHandler {
                         stopId = new FeedScopedId(feedId, stopPointRef.getValue());
                     }
 
-                    if (stopRoutes.isEmpty()) {
-                        alert.addEntity(new EntitySelector.Stop(stopId));
-                        // TODO: is this correct? Should the stop conditions be in the entity selector?
-                        updateStopConditions(alert, stopPoint.getStopConditions());
-
-                    } else {
-                        //Adding combination of stop & route
-                        for (FeedScopedId routeId : stopRoutes) {
-                            alert.addEntity(new EntitySelector.StopAndRoute(stopId, routeId));
-                            // TODO: is this correct? Should the stop conditions be in the entity selector?
-                            updateStopConditions(alert, stopPoint.getStopConditions());
-                        }
-                    }
+                    alert.addEntity(new EntitySelector.Stop(stopId));
+                    // TODO: is this correct? Should the stop conditions be in the entity selector?
+                    updateStopConditions(alert, stopPoint.getStopConditions());
                 }
             } else if (stopPlaces != null && isNotEmpty(stopPlaces.getAffectedStopPlaces())) {
 
@@ -238,18 +208,12 @@ public class SiriAlertsUpdateHandler {
                         stopId = new FeedScopedId(feedId, stopPlace.getValue());
                     }
 
-
-                    if (stopRoutes.isEmpty()) {
-                        alert.addEntity(new EntitySelector.Stop(stopId));
-                    } else {
-                        //Adding combination of stop & route
-                        for (FeedScopedId routeId : stopRoutes) {
-                            alert.addEntity(new EntitySelector.StopAndRoute(stopId, routeId));
-                        }
-                    }
-
+                    alert.addEntity(new EntitySelector.Stop(stopId));
                 }
-            } else if (networks != null && isNotEmpty(networks.getAffectedNetworks())) {
+            }
+
+            AffectsScopeStructure.Networks networks = affectsStructure.getNetworks();
+            if (networks != null && isNotEmpty(networks.getAffectedNetworks())) {
 
                 for (AffectsScopeStructure.Networks.AffectedNetwork affectedNetwork : networks.getAffectedNetworks()) {
                     List<AffectedLineStructure> affectedLines = affectedNetwork.getAffectedLines();
