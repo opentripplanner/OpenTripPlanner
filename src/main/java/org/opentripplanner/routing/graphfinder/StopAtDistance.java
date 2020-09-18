@@ -8,6 +8,8 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
+import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
 import org.opentripplanner.routing.edgetype.StreetEdge;
@@ -53,6 +55,15 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
   @Override
   public int compareTo(StopAtDistance that) {
     return (int) (this.distance) - (int) (that.distance);
+  }
+
+  public AccessEgress toAccessEgress(StopIndexForRaptor stopIndex, boolean fromTarget) {
+    if (!(stop instanceof Stop)) { return null; }
+    return new AccessEgress(
+        stopIndex.indexByStop.get(stop),
+        (int) state.getElapsedTimeSeconds(),
+        fromTarget ? state.reverse() : state
+    );
   }
 
   public String toString() {

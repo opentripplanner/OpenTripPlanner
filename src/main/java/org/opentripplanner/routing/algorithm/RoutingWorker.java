@@ -20,6 +20,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugAggregator;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -35,6 +36,8 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import java.util.stream.Collectors;
 
 /**
  * Does a complete transit search, including access and egress legs.
@@ -144,8 +147,23 @@ public class RoutingWorker {
         this.debugAggregator.finishedPatternFiltering();
 
         // Prepare access/egress transfers
-        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
-        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
+        Collection<StopAtDistance> accessStops = AccessEgressRouter.streetSearch(request, false, 2000);
+        Collection<StopAtDistance> egressStops = AccessEgressRouter.streetSearch(request, true, 2000);
+
+        Collection<AccessEgress> accessTransfers = accessStops
+            .stream()
+            .map(stopAtDistance -> stopAtDistance.toAccessEgress(
+                transitLayer.getStopIndex(),
+                false
+            ))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
+
+        Collection<AccessEgress> egressTransfers = egressStops
+            .stream()
+            .map(stopAtDistance -> stopAtDistance.toAccessEgress(transitLayer.getStopIndex(), true))
+            .filter(Objects::nonNull)
+            .collect(Collectors.toList());
 
         verifyEgressAccess(accessTransfers, egressTransfers);
 
