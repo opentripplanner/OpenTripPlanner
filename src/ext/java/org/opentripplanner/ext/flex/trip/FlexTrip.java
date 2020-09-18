@@ -1,10 +1,17 @@
 package org.opentripplanner.ext.flex.trip;
 
+import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
+import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
+
 import java.util.Collection;
+import java.util.stream.Stream;
 
 /**
  * This class represents the different variations of what is considered flexible transit, and its
@@ -18,6 +25,18 @@ public abstract class FlexTrip extends TransitEntity<FeedScopedId> {
   public FlexTrip(Trip trip) {
     this.trip = trip;
   }
+
+  public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
+      StopAtDistance access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+  );
+
+  public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
+      StopAtDistance egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+  );
+
+  public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);
+
+  public abstract int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime);
 
   public abstract Collection<StopLocation> getStops();
 

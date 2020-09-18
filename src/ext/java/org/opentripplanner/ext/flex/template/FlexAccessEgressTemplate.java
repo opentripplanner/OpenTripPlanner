@@ -1,0 +1,126 @@
+package org.opentripplanner.ext.flex.template;
+
+import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexTripEdge;
+import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.Stop;
+import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.calendar.ServiceDate;
+import org.opentripplanner.routing.core.State;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Stream;
+
+public abstract class FlexAccessEgressTemplate {
+  protected final StopAtDistance accessEgress;
+  protected final FlexTrip trip;
+  public final int fromStopIndex;
+  public final int toStopIndex;
+  protected final StopLocation transferStop;
+  protected final int differenceFromStartOfTime;
+  public final ServiceDate serviceDate;
+  protected final DistanceCalculator calculator;
+
+  FlexAccessEgressTemplate(
+      StopAtDistance accessEgress,
+      FlexTrip trip,
+      int fromStopIndex,
+      int toStopIndex,
+      StopLocation transferStop,
+      int differenceFromStartOfTime,
+      ServiceDate serviceDate,
+      DistanceCalculator calculator
+  ) {
+    this.accessEgress = accessEgress;
+    this.trip = trip;
+    this.fromStopIndex = fromStopIndex;
+    this.toStopIndex = toStopIndex;
+    this.transferStop = transferStop;
+    this.differenceFromStartOfTime = differenceFromStartOfTime;
+    this.serviceDate = serviceDate;
+    this.calculator = calculator;
+  }
+
+  public StopLocation getTransferStop() {
+    return transferStop;
+  }
+
+  public FlexTrip getFlexTrip() {
+    return trip;
+  }
+
+  abstract protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer);
+
+  abstract protected StopLocation getFinalStop(SimpleTransfer simpleTransfer);
+
+  abstract protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph);
+
+  abstract protected Vertex getFlexVertex(Edge edge);
+
+  abstract protected int[] getFlexTimes(FlexTripEdge flexEdge, State state);
+
+  abstract protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
+
+  abstract protected boolean isRouteable(Vertex flexVertex);
+
+  public Stream<FlexAccessEgress> getFlexAccessEgressStream(
+      Graph graph, Map<Stop, Integer> indexByStop
+  ) {
+    if (transferStop instanceof Stop) {
+      TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
+      if (isRouteable(flexVertex)) {
+        return Stream.of(
+            getFlexAccessEgress(new ArrayList<>(), flexVertex, indexByStop.get(transferStop))
+        );
+      }
+      return Stream.empty();
+    } else {
+      return getTransfersFromTransferStop(graph)
+          .stream()
+          .filter(simpleTransfer -> getFinalStop(simpleTransfer) instanceof Stop)
+          .filter(simpleTransfer -> isRouteable(getFlexVertex(getTransferEdges(simpleTransfer).get(0))))
+          .map(simpleTransfer -> {
+            List<Edge> edges = getTransferEdges(simpleTransfer);
+            return getFlexAccessEgress(edges,
+                getFlexVertex(edges.get(0)),
+                indexByStop.get(getFinalStop(simpleTransfer))
+            );
+          });
+    }
+  }
+
+  protected FlexAccessEgress getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, int stopIndex) {
+    FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
+
+    State state = flexEdge.traverse(accessEgress.state);
+    for (Edge e : transferEdges) {
+      state = e.traverse(state);
+    }
+
+    int[] times = getFlexTimes(flexEdge, state);
+
+    return new FlexAccessEgress(
+        stopIndex,
+        times[0],
+        times[1],
+        times[2],
+        fromStopIndex,
+        toStopIndex,
+        differenceFromStartOfTime,
+        trip,
+        state,
+        transferEdges.isEmpty()
+    );
+  }
+
+}
