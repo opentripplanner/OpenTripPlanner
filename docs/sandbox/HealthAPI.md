@@ -7,7 +7,6 @@
 - Initial implementation of readiness endpoint (November 2019)
 
 ## Documentation
-
 This provides endpoints for checking the health status of the OTP instance. It can be useful when 
 running OTP in a container.
 

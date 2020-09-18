@@ -42,10 +42,10 @@ pages:
     - Sandbox development: 'SandboxExtention.md'
 - Sandbox:
     - Health API: 'sandbox/HealthAPI.md'
+    - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
+    - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
+    - HSL Legacy GraphQL API: 'sandbox/LegacyGraphQLApi.md'
+    - Transmodel(NeTEx) GrpahQL API: 'sandbox/TransmodelApi.md'
+    - SIRI Updater: 'sandbox/SiriUpdator.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
-    - Google Cloud Storage: 'sandbox/GoogleCloudStorage.md'
-    - SIRI Updater: 'sandbox/SiriUpdator.md'
-    - Direct transfer analyzer: 'sandbox/transferanalyzer.md'
-    - Transmodel(NeTEx) GrpahQL API: 'sandbox/TransmodelApi.md'
-
