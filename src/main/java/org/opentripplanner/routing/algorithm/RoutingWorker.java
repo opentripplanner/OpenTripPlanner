@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -28,6 +30,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -150,6 +153,8 @@ public class RoutingWorker {
         Collection<StopAtDistance> accessStops = AccessEgressRouter.streetSearch(request, false, 2000);
         Collection<StopAtDistance> egressStops = AccessEgressRouter.streetSearch(request, true, 2000);
 
+        List<Itinerary> itineraries = new ArrayList<>();
+
         Collection<AccessEgress> accessTransfers = accessStops
             .stream()
             .map(stopAtDistance -> stopAtDistance.toAccessEgress(
@@ -164,6 +169,21 @@ public class RoutingWorker {
             .map(stopAtDistance -> stopAtDistance.toAccessEgress(transitLayer.getStopIndex(), true))
             .filter(Objects::nonNull)
             .collect(Collectors.toList());
+
+        if (OTPFeature.FlexRouting.isOn() && request.modes.transitModes.contains(TransitMode.FLEXIBLE)) {
+            FlexRouter flexRouter = new FlexRouter(
+                request,
+                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
+                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
+                accessStops,
+                egressStops,
+                transitLayer.getStopIndex()
+            );
+
+            itineraries.addAll(flexRouter.getFlexOnlyItineraries());
+            accessTransfers.addAll(flexRouter.getFlexAccesses());
+            egressTransfers.addAll(flexRouter.getFlexEgresses());
+        }
 
         verifyEgressAccess(accessTransfers, egressTransfers);
 
@@ -196,7 +216,6 @@ public class RoutingWorker {
         );
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
-        List<Itinerary> itineraries = new ArrayList<>();
         for (Path<TripSchedule> path : transitResponse.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);
