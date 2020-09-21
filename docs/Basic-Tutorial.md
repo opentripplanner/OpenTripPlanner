@@ -40,7 +40,7 @@ We find [this tool](https://boundingbox.klokantech.com/) useful for determining 
 
 If you have extracted a smaller PBF file from a larger region, be sure to put only your extract (not the original larger file) in the directory with your GTFS data. Otherwise OTP will try to load both the original file and the extract in a later step. See the [page on preparing OSM data](Preparing-OSM) for additional information and example commands for cropping and filtering OSM data.
 
-## Start up OTP
+## Starting OTP
 
 A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <options>`. The 
  `-Xmx` parameter sets the limit on how much memory OTP is allowed to consume. GTFS and OSM data sets are often very large, and OTP is relatively memory-hungry. You will need at least 1GB of memory when working with the Portland TriMet data set, and several gigabytes for larger inputs. If you have
@@ -55,7 +55,7 @@ A typical command to start OTP looks like `java -Xmx1G -jar otp.shaded.jar <opti
 
 ## Building Graphs
 
-There are two main phases to preparing and deploying an OTP server. The first is to analyze the GTFS, OSM and any other inputs (such as elevation data) and build a representation of the transportation network that we call a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29). The second phase is to start a server that provides trip planning and other API services for this graph.
+There are two main phases to preparing and deploying an OTP server. The first is to analyze the GTFS, OSM and any other inputs (such as elevation data) and build a representation of the transportation network. Following mathematical terminology we call this a ['graph'](http://en.wikipedia.org/wiki/Graph_%28mathematics%29), and refer to this phase as "graph building". The second phase is to start a server that provides trip planning and other API services for this graph.
 
 It is possible to save the graph to a file on disk after the first phase, then load the graph from the file in the second phase. This allows restarting the server or starting multiple instances of the server without repeating the often time-consuming process of building the graph. It is also possible to split the graph building process into separate OSM and GTFS stages for similar reasons: to allow reusing results from slow processes, such as applying elevation data to streets. These different options are controlled with command line switches, and will be described in more detail below and in other tutorials.
 
@@ -81,7 +81,7 @@ If you want speed up the process of repeatedly starting up a server with the sam
 
     `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --build --save .`
 
-The server can then be started later using the `--load` parameter:
+This will produce a file called `graph.obj` in the same directory as the inputs. The server can then be started later using the `--load` parameter, and will read this file instead of building the graph from scratch:
 
     `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --load .`
 
