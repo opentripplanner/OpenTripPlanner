@@ -2,8 +2,8 @@
 
 ## Command line
 The command line parameters are changed. Use the `--help` option to get the current documentation,
-and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
-possibility to build the graph in 2 steps is new in OTP2. OTP2 does not support multiple routers.
+and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) for examples. The 
+possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support multiple routers.
 
 
 ## File loading
