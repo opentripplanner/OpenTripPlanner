@@ -108,6 +108,9 @@ class StopTimesMapper {
             }
 
             StopTime stopTime = mapToStopTime(trip, stopPoint, stop, currentPassingTime, i);
+            if (stopTime == null) {
+                return null;
+            }
 
             result.add(currentPassingTime.getId(), stopTime);
         }
@@ -142,6 +145,11 @@ class StopTimesMapper {
         stopTime.setTrip(trip);
         stopTime.setStopSequence(stopSequence);
         stopTime.setStop(stop);
+        // TODO PassingTimes containing EarliestArrivalTime or LatestDepartureTime only not yet
+        //      supported
+        if (passingTime.getArrivalTime() == null && passingTime.getDepartureTime() == null) {
+            return null;
+        }
         stopTime.setArrivalTime(
                 calculateOtpTime(passingTime.getArrivalTime(), passingTime.getArrivalDayOffset(),
                         passingTime.getDepartureTime(), passingTime.getDepartureDayOffset()));
