@@ -1,7 +1,9 @@
 # Changelog
 
 ## 2.0 (in progress)
+
 See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
+
 - Sandbox for experimental features (#2745)
 - Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
 - Remove extra Djikstra implementations
@@ -45,6 +47,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 
 
 ## Ported over from the 1.x
+
 - Add application/x-protobuf to accepted protobuf content-types (#2839)
 - Make OTP run on Java 11 (#2812)
 - Fixes surefire test failure during build (#2816)
