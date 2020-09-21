@@ -1,8 +1,6 @@
-FROM openjdk:11-jre-alpine
+FROM openjdk:11-jre
 MAINTAINER Reittiopas version: 0.1
 
-RUN apk add --update curl bash ttf-dejavu && \
-    rm -rf /var/cache/apk/*
 VOLUME /opt/opentripplanner/graphs
 
 ENV OTP_ROOT="/opt/opentripplanner"
