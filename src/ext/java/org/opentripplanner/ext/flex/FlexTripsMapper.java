@@ -31,10 +31,7 @@ public class FlexTripsMapper {
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        if (stopTimes.size() == 2) {
-          // TODO: Drop this restriction after time handling and ride times are defined
-          builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
-        }
+        builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
       } else if (hasContinuousStops(stopTimes)) {

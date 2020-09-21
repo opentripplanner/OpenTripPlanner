@@ -28,6 +28,7 @@ import java.util.stream.Stream;
  * trip is possible.
  */
 public class UnscheduledTrip extends FlexTrip {
+  private static final int N_STOPS = 2;
 
   private final UnscheduledStopTime[] stopTimes;
 
@@ -35,7 +36,8 @@ public class UnscheduledTrip extends FlexTrip {
     Predicate<StopTime> noExplicitTimes = Predicate.not(st -> st.isArrivalTimeSet() || st.isDepartureTimeSet());
     Predicate<StopTime> notContinuousStop = stopTime ->
         stopTime.getContinuousDropOff() == 1 && stopTime.getContinuousPickup() == 1;
-    return stopTimes.stream().allMatch(noExplicitTimes)
+    return stopTimes.size() == N_STOPS
+        && stopTimes.stream().allMatch(noExplicitTimes)
         && stopTimes.stream().allMatch(notContinuousStop);
   }
 
@@ -46,10 +48,9 @@ public class UnscheduledTrip extends FlexTrip {
       throw new IllegalArgumentException("Incompatible stopTimes for unscheduled trip");
     }
 
-    int nStops = stopTimes.size();
-    this.stopTimes = new UnscheduledStopTime[nStops];
+    this.stopTimes = new UnscheduledStopTime[N_STOPS];
 
-    for (int i = 0; i < nStops; i++) {
+    for (int i = 0; i < N_STOPS; i++) {
       this.stopTimes[i] = new UnscheduledStopTime(stopTimes.get(i));
     }
   }

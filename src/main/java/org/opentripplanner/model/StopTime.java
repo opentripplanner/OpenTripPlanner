@@ -47,10 +47,10 @@ public final class StopTime implements Comparable<StopTime> {
     private int maxDepartureTime = MISSING_VALUE;
 
     // Disabled by default
-    private int continuousPickup = 1;
+    private int continuousPickup = MISSING_VALUE;
 
     // Disabled by default
-    private int continuousDropOff = 1;
+    private int continuousDropOff = MISSING_VALUE;
 
     public StopTime() { }
 
@@ -240,7 +240,7 @@ public final class StopTime implements Comparable<StopTime> {
     }
 
     public int getContinuousPickup() {
-        return continuousPickup;
+        return continuousPickup == MISSING_VALUE ? 1 : continuousPickup;
     }
 
     public void setContinuousPickup(int continuousPickup) {
@@ -248,7 +248,7 @@ public final class StopTime implements Comparable<StopTime> {
     }
 
     public int getContinuousDropOff() {
-        return continuousDropOff;
+        return continuousDropOff == MISSING_VALUE ? 1 : continuousDropOff;
     }
 
     public void setContinuousDropOff(int continuousDropOff) {
