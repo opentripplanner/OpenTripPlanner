@@ -25,12 +25,10 @@ pages:
     - Visual Identity: 'Visual-Identity.md'
 - 'Usage':
     - Basic Tutorial: 'Basic-Tutorial.md'
-    - Netex and SIRI: 'Netex-Norway.md'
-    - Intermediate Tutorial: 'Intermediate-Tutorial.md'
-    - External Tutorials: 'External-Tutorials.md'
-    - 'Getting OTP': 'Getting-OTP.md'
+    - Getting OTP: 'Getting-OTP.md'
     - Configuration: 'Configuration.md'
     - Preparing OSM Data: 'Preparing-OSM.md'
+    - Netex and SIRI: 'Netex-Norway.md'
     - Security: 'Security.md'
     - Troubleshooting: 'Troubleshooting-Routing.md'
 - Development:

@@ -112,3 +112,4 @@ The flow diagram below summarizes all the command line switches used in the abov
 
 You must use at least one of the required parameters: `--load`, `--loadStreet`, `--build`, `--buildStreet`. A _required_ parameter may imply other parameters when the flow allows for no other choice. For example, `--load` implies `--serve`, so `--serve` is not necessary and has no additional effect when used together with `--load`.    
 
+You can run the OTP .jar file with the `--help` option for a full list of command line parameters.
