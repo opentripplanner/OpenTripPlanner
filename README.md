@@ -1,3 +1,5 @@
+[![Build Status](https://travis-ci.org/hsldevcom/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/hsldevcom/OpenTripPlanner)
+
 ## Overview
 
 OpenTripPlanner (OTP) is an open source multi-modal trip planner. It depends on open data in open standard file formats (GTFS and OpenStreetMap), and includes a REST API for journey planning as well as a map-based Javascript client. OpenTripPlanner can also create travel time contour visualizations and compute accessibility indicators for planning and research applications. For more information, see the project website: http://opentripplanner.org
@@ -6,8 +8,6 @@ The main Java server code is in `src/main/`. OTP also includes a Javascript clie
 
 Additional information and instructions are available in the [main documentation](http://docs.opentripplanner.org/en/latest/), including a 
 [quick introduction](http://docs.opentripplanner.org/en/latest/Basic-Tutorial/).
-
-[![Build Status](https://travis-ci.org/opentripplanner/OpenTripPlanner.svg?branch=master)](https://travis-ci.org/opentripplanner/OpenTripPlanner)
 
 ## Development 
 
