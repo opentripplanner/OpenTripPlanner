@@ -81,7 +81,7 @@ These were all adaptations to the very different IT environment that existed ear
 
 ### Routing request parameters
 
-Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of functionality, just a different way of expressing things due to the new routing algorithms. A summary of parameters that have been removed and their replacements can be found in the migration guide [OTP2-MigrationGuide].
+Less parameters are available on the OTP2 REST API than in OTP1. Often there is no practical loss of functionality, just a different way of expressing things due to the new routing algorithms. A summary of parameters that have been removed and their replacements can be found in the migration guide [OTP2-MigrationGuide](OTP2-MigrationGuide.md).
 
 
 ## OTP Trip planning and Transit index APIs
