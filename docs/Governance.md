@@ -10,8 +10,8 @@ The current members of this committee are (in alphabetical order):
 | Sheldon Brown     | [Cambridge Systematics](https://camsys.com/) |
 | Andrew Byrd       | [Conveyal](http://conveyal.com) |
 | Thomas Craig      | [Trillium Transit](https://trilliumtransit.com/) |
-| Drew Dara-Abrams  | [Interline](www.interline.io) |
-| David Emory       | [MARTA (Atlanta, Georgia)](https://www.itsmarta.com/) |
+| Drew Dara-Abrams  | [Interline](http://www.interline.io) |
+| David Emory       | [MARTA](https://www.itsmarta.com/) (Atlanta, Georgia) |
 | Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
 | Tuukka Hastrup    | [Maanteeamet](https://www.mnt.ee/et) (Estonia) |
 | Frank Purcell     | [TriMet](https:/trimet.org) (Portland, Oregon)   |
