@@ -6,17 +6,17 @@ The current members of this committee are (in alphabetical order):
 
 | Name              | Affiliation                 |
 |-------------------|-----------------------------|
-| Sean Barbeau      | University of South Florida |
-| Sheldon Brown     | Cambridge Systematics       |
-| Andrew Byrd       | Conveyal                    |
-| Thomas Craig      | Trillium                    |
-| Drew Dara-Abrams  | Interline                   |
-| David Emory       | MARTA (Atlanta, Georgia)    |
-| Thomas Gran       | Ruter & Entur (Norway)      |
-| Tuukka Hastrup    | Maanteeamet (Estonia)       |
-| Frank Purcell     | TriMet (Portland, Oregon)   |
-| Evan Siroky       | IBI Group                   |
-| David Turner      | ex-OpenPlans                |
+| Sean Barbeau      | [University of South Florida](https://www.cutr.usf.edu/) |
+| Sheldon Brown     | [Cambridge Systematics](https://camsys.com/) |
+| Andrew Byrd       | [Conveyal](http://conveyal.com) |
+| Thomas Craig      | [Trillium Transit](https://trilliumtransit.com/) |
+| Drew Dara-Abrams  | [Interline](www.interline.io) |
+| David Emory       | [MARTA (Atlanta, Georgia)](https://www.itsmarta.com/) |
+| Thomas Gran       | [Ruter](https://ruter.no/en/) & [Entur](https://entur.no/) (Norway) |
+| Tuukka Hastrup    | [Maanteeamet](https://www.mnt.ee/et) (Estonia) |
+| Frank Purcell     | [TriMet](https:/trimet.org) (Portland, Oregon)   |
+| Evan Siroky       | [IBI Group](https://www.ibigroup.com/) |
+| David Turner      | ex-[OpenPlans](https://www.openplans.org/) |
 
 The PLC holds a quarterly video conference on the first Tuesday of June, September, December, and March. 
 An agenda is prepared as a collaborative document in advance of each quarterly meeting. 
