@@ -33,7 +33,7 @@ Using the file `otp-config.json` you can enable or disable different APIs and ex
 ```JSON
 // otp-config.json
 {
-    featuresEnabled : {
+    otpFeatures : {
         APIBikeRental : false,
         SandboxExampleAPIGraphStatistics : true
     }
