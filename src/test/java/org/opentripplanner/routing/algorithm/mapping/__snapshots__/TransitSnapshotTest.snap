@@ -448,23 +448,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -630,23 +613,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -654,7 +620,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -818,23 +784,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.005765276287231695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517189072086715,
-                "longitude": -122.649266303844
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 16th",
               "streetNotes": [ ]
             }
           ],
@@ -1001,23 +950,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -1025,7 +957,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -1224,23 +1156,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -1406,23 +1321,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -1430,7 +1328,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -1594,23 +1492,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.005765276287231695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517189072086715,
-                "longitude": -122.649266303844
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 16th",
               "streetNotes": [ ]
             }
           ],
@@ -1777,23 +1658,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -1801,7 +1665,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -2000,23 +1864,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -2182,23 +2029,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -2206,7 +2036,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -2428,23 +2258,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -2610,23 +2423,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -2634,7 +2430,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -2798,23 +2594,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.005765276287231695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517189072086715,
-                "longitude": -122.649266303844
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 16th",
               "streetNotes": [ ]
             }
           ],
@@ -2981,23 +2760,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -3005,7 +2767,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -3204,23 +2966,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -3386,23 +3131,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -3410,7 +3138,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -3574,23 +3302,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.005765276287231695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517189072086715,
-                "longitude": -122.649266303844
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 16th",
               "streetNotes": [ ]
             }
           ],
@@ -3757,23 +3468,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -3781,7 +3475,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -3980,23 +3674,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "stayOn": false,
               "streetName": "Northeast Sandy Boulevard",
               "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTHWEST",
-              "angle": -0.48561403954377697,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52450640104038,
-                "longitude": -122.64931080431207
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 16th",
-              "streetNotes": [ ]
             }
           ],
           "walkingLeg": true
@@ -4162,23 +3839,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -3.0778122398595986,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523312,
-                "longitude": -122.694901
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW King",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.5070160169213977,
               "area": false,
@@ -4186,7 +3846,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 113.262,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523249092859054,
                 "longitude": -122.69490673448706
@@ -4350,23 +4010,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.005765276287231695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517189072086715,
-                "longitude": -122.649266303844
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 16th",
               "streetNotes": [ ]
             }
           ],
@@ -4533,23 +4176,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -4557,7 +4183,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -4702,23 +4328,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -4726,7 +4335,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 39.059,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -4750,23 +4359,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "way 162042138 from 0",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "SOUTHEAST",
-              "angle": 2.595824436092695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.52311311424974,
-                "longitude": -122.6530727670171
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 12th",
               "streetNotes": [ ]
             }
           ],
@@ -4933,23 +4525,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -2.8184575457673615,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523897,
-                "longitude": -122.700681
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW 23rd Pl",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.247661800162498,
               "area": false,
@@ -4957,7 +4532,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 54.628,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523815597641374,
                 "longitude": -122.70071990797962
@@ -5147,23 +4722,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -5171,7 +4729,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 39.059,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -5195,23 +4753,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "way 162042138 from 0",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "SOUTHEAST",
-              "angle": 2.595824436092695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.52311311424974,
-                "longitude": -122.6530727670171
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 12th",
               "streetNotes": [ ]
             }
           ],
@@ -5378,23 +4919,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -2.8184575457673615,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523897,
-                "longitude": -122.700681
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW 23rd Pl",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.247661800162498,
               "area": false,
@@ -5402,7 +4926,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 54.628,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523815597641374,
                 "longitude": -122.70071990797962
@@ -5592,23 +5116,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -5616,7 +5123,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 39.059,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -5640,23 +5147,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "way 162042138 from 0",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "SOUTHEAST",
-              "angle": 2.595824436092695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.52311311424974,
-                "longitude": -122.6530727670171
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 12th",
               "streetNotes": [ ]
             }
           ],
@@ -5823,23 +5313,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -2.8184575457673615,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523897,
-                "longitude": -122.700681
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW 23rd Pl",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.247661800162498,
               "area": false,
@@ -5847,7 +5320,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 54.628,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523815597641374,
                 "longitude": -122.70071990797962
@@ -6041,23 +5514,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -6065,30 +5521,13 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 20.74,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
               },
               "stayOn": false,
               "streetName": "Northeast 12th Avenue",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "EAST",
-              "angle": 1.593270312319474,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "LEFT",
-              "startLocation": {
-                "latitude": 45.52318191367419,
-                "longitude": -122.65362851554825
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Sandy",
               "streetNotes": [ ]
             }
           ],
@@ -6366,23 +5805,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -6390,7 +5812,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -6529,23 +5951,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -6553,7 +5958,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 51.525,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -6594,23 +5999,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Southeast Morrison Street",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "NORTH",
-              "angle": 0.00349364052476648,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.517201762508755,
-                "longitude": -122.65406748482502
-              },
-              "stayOn": false,
-              "streetName": "SE Morrison & 12th",
               "streetNotes": [ ]
             }
           ],
@@ -6777,23 +6165,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -6801,7 +6172,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -6940,23 +6311,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -6964,7 +6318,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 39.059,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -6988,23 +6342,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "way 162042138 from 0",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "SOUTHEAST",
-              "angle": 2.595824436092695,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.52311311424974,
-                "longitude": -122.6530727670171
-              },
-              "stayOn": false,
-              "streetName": "NE Sandy & 12th",
               "streetNotes": [ ]
             }
           ],
@@ -7171,23 +6508,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTH",
-              "angle": -2.8184575457673615,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.523897,
-                "longitude": -122.700681
-              },
-              "stayOn": false,
-              "streetName": "W Burnside & NW 23rd Pl",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "WEST",
               "angle": -1.247661800162498,
               "area": false,
@@ -7195,7 +6515,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 54.628,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.523815597641374,
                 "longitude": -122.70071990797962
@@ -7496,23 +6816,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -7520,7 +6823,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -7764,23 +7067,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -7788,7 +7074,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -8032,23 +7318,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -8056,7 +7325,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -8300,23 +7569,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -8324,7 +7576,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -8568,23 +7820,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5952420255188264,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.532159,
-                "longitude": -122.698634
-              },
-              "stayOn": false,
-              "streetName": "NW 23rd & Overton",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": 3.117146926361324,
               "area": false,
@@ -8592,7 +7827,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 104.452,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "LEFT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53215782420268,
                 "longitude": -122.69870264831422
@@ -8731,23 +7966,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "NORTHEAST",
-              "angle": 0.5374181530154865,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.529829,
-                "longitude": -122.667591
-              },
-              "stayOn": false,
-              "streetName": "N Interstate & Multnomah (Rose Quarter)",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTHEAST",
               "angle": 2.1082144216807244,
               "area": false,
@@ -8755,7 +7973,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 18.231,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.529830019288696,
                 "longitude": -122.66759013292318
@@ -8864,23 +8082,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               },
               "stayOn": false,
               "streetName": "Northwest Broadway",
-              "streetNotes": [ ]
-            },
-            {
-              "absoluteDirection": "EAST",
-              "angle": 1.5436067140273741,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "RIGHT",
-              "startLocation": {
-                "latitude": 45.52667645709921,
-                "longitude": -122.67755697892466
-              },
-              "stayOn": false,
-              "streetName": "NW Glisan & Broadway",
               "streetNotes": [ ]
             }
           ],
@@ -9047,23 +8248,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "WEST",
-              "angle": -1.5961983598891116,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.531179,
-                "longitude": -122.69454
-              },
-              "stayOn": false,
-              "streetName": "NW 21st & Northrup",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "NORTH",
               "angle": -0.023174148169809464,
               "area": false,
@@ -9071,7 +8255,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 13.057,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53117780366266,
                 "longitude": -122.69460721567688
@@ -9549,23 +8733,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "EAST",
-              "angle": 1.5932702357408055,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.52337,
-                "longitude": -122.653725
-              },
-              "stayOn": false,
-              "streetName": "NE 12th & Couch",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "SOUTH",
               "angle": -3.1191187064694192,
               "area": false,
@@ -9573,7 +8740,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 51.525,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.52336838632084,
                 "longitude": -122.65362253301092
@@ -9820,23 +8987,6 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
           "transitLeg": false,
           "walkSteps": [
             {
-              "absoluteDirection": "SOUTHWEST",
-              "angle": -2.582547543014018,
-              "area": false,
-              "bogusName": false,
-              "distance": 0.0,
-              "edges": [ ],
-              "elevation": [ ],
-              "relativeDirection": "DEPART",
-              "startLocation": {
-                "latitude": 45.530244,
-                "longitude": -122.667794
-              },
-              "stayOn": false,
-              "streetName": "Interstate/Rose Quarter MAX Station",
-              "streetNotes": [ ]
-            },
-            {
               "absoluteDirection": "NORTHWEST",
               "angle": -1.0117505068799668,
               "area": false,
@@ -9844,7 +8994,7 @@ org.opentripplanner.routing.algorithm.mapping.TransitSnapshotTest.test_trip_plan
               "distance": 39.035,
               "edges": [ ],
               "elevation": [ ],
-              "relativeDirection": "RIGHT",
+              "relativeDirection": "DEPART",
               "startLocation": {
                 "latitude": 45.53024090735772,
                 "longitude": -122.66779676192563
