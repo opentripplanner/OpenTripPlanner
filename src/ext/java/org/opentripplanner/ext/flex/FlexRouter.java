@@ -123,11 +123,15 @@ public class FlexRouter {
       if (transferStop instanceof Stop && transfersFromStop.containsKey(transferStop)) {
         for (Transfer transfer : transfersFromStop.get(transferStop)) {
           // TODO: Handle other than route-to-route transfers
-          if (transfer.getFromRoute().equals(template.getFlexTrip().getTrip().getRoute())) {
+          if (transfer.getFromRoute() == null
+              || transfer.getFromRoute().equals(template.getFlexTrip().getTrip().getRoute())
+          ) {
             List<FlexEgressTemplate> templates = flexEgressByStop.get(transfer.getToStop());
             if (templates == null) { continue; }
             for (FlexEgressTemplate egress : templates) {
-              if (transfer.getToRoute().equals(egress.getFlexTrip().getTrip().getRoute())) {
+              if (transfer.getToRoute() == null
+                  || transfer.getToRoute().equals(egress.getFlexTrip().getTrip().getRoute())
+              ) {
                 Itinerary itinerary = template.getTransferItinerary(
                     transfer,
                     egress,

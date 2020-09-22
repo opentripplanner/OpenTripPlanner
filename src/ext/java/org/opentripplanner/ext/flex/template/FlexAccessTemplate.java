@@ -113,7 +113,10 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       return null;
     }
 
-    if (transfer.getTransferType() != TransferType.MIN_TIME) {
+    boolean isMinTimeTransfer = transfer.getTransferType() == TransferType.MIN_TIME;
+    boolean isGuaranteedTransfer = transfer.getTransferType() == TransferType.GUARANTEED;
+
+    if (!isMinTimeTransfer && !isGuaranteedTransfer) {
       // TODO: Handle other types of transfers
       return null;
     }
@@ -128,15 +131,18 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     FlexTripEdge firstFlexEdge = this.getFlexEdge(transferFromVertex, transfer.getFromStop());
     FlexTripEdge secondFlexEdge = template.getFlexEdge(transferToVertex, transfer.getToStop());
 
-    // TODO: Remove this and modify state directly
-    FlexTransferEdge legSwitchEdge = new FlexTransferEdge(transferFromVertex, transferToVertex, transfer.getMinTransferTimeSeconds());
-
     List<Edge> egressEdges = template.accessEgress.edges;
 
     State state = this.accessEgress.state;
 
     state = firstFlexEdge.traverse(state);
-    state = legSwitchEdge.traverse(state);
+
+    // TODO: Remove this and modify state directly
+    if (isMinTimeTransfer) {
+      FlexTransferEdge legSwitchEdge = new FlexTransferEdge(transferFromVertex, transferToVertex, transfer.getMinTransferTimeSeconds());
+      state = legSwitchEdge.traverse(state);
+    }
+    
     state = secondFlexEdge.traverse(state);
 
     for (Edge e : egressEdges) {
