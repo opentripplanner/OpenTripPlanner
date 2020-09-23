@@ -193,7 +193,7 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
   * Include the namespace definition in each and every file: `otp.namespace("otp.configure");`
   * Include a class comment. For example,                                                                                                      
   
-  ```javascript
+```javascript
 /**
  * Configure Class
  *
@@ -205,7 +205,7 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
  *
  * @class
  */
-  ```
+```
   
 *Note: There is still a lot of code following other style conventions, but please adhere to 
 consistent style when you write new code, and help clean up and reformat code as you refactor.*
