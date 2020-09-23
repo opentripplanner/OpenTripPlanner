@@ -1,6 +1,6 @@
 # Security
 
-OTP's built-in Grizzly server is configured to accept HTTPS connections on port 8081 by default, but the HTTPS listener needs an encryption key to establish a connection. The key is placed in a "keystore", a format specific to Java server environments. 
+OTP's built-in Grizzly web server is configured to accept HTTPS connections on port 8081 by default, but the HTTPS listener needs an encryption key to establish a connection. The key is placed in a "keystore", a format specific to Java server environments. 
 
 ## Creating a keystore 
 
@@ -14,14 +14,8 @@ Of course with a self-signed key, most clients will (rightfully) refuse to conne
 
 ## Testing
 
-Once you have created a key, start up the OTP server and test that HTTPS access and authentication are possible. The following command should trigger a reload of all graphs:
+Once you have created a key, start up the OTP server and test that HTTPS access and authentication are possible. You should also be able to fetch any OTP resources over HTTPS. For example, you could simply open `https://localhost:8081/index.html` in a browser, or open a raw TLS connection using `openssl s_client -connect localhost:8081`, then issue the request `GET index.html HTTP/1.1`.
 
-    curl -v --insecure -X PUT --user ROUTERS:ultra_secret -H "accept: application/json" "https://localhost:8081/otp/routers"
+## Other
 
-The username and password (`ROUTERS:ultra_secret`) are placeholders hard-coded into OTP. They will be configurable in version 1.0.
-
-You should also be able to fetch any other OTP resources over HTTPS. For example, you could open a raw TLS connection using `openssl s_client -connect localhost:8081`, then issue the request `GET index.html HTTP/1.1`.
-
-## CORS
-
-TODO explain this
+TODO explain CORS, explain adding TLS with reverse proxy e.g. nginx

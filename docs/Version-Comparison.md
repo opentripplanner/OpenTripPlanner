@@ -24,13 +24,13 @@ Much development effort has gone into OTP2, and most OTP development effort will
 
 However, this does not mean that all users of OpenTripPlanner should switch to OTP2, or that all new users will want to start with OTP2. As of fall 2020, OTP1 remains much more widely used than OTP2, and most importantly OTP2 has a smaller feature set than OTP1. That is to say, OTP2 can do less things than OTP1, but it does them much more efficiently and tries to cover the most common use cases for large-scale OTP deployments. 
 
-When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they need features that are not available in OTP2. 
+When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they need features that are not available in OTP2. If some feature you need is missing from OTP2, you can also create a new issue or comment on an existing one on GitHub, letting us know why it is important to you. New features can be added to the OTP2 if there is sufficient demand and development resources to maintain them.
 
 
 ## High-level feature comparison
 
 | Feature | OTP1 | OTP2 |
-|---|---|---|
+|---------|------|------|
 | OSM street data | yes | yes |
 | GTFS transit data | yes | yes |
 | Netex transit data | no | yes<br>(Nordic profile) |
@@ -44,8 +44,7 @@ When in doubt, new users are advised to try out OTP2 and switch to OTP1 if they 
 | Street (OSM) routing algorithm | Generalized cost A* | Generalized cost A* |
 | Transit routing algorithm | Generalized cost A* | Multi-criteria range-RAPTOR |
 | Search segmentation | Single search through access, transit, egress | Access/egress separate from transit search |
-| Goal direction | Upper-bound search backward from destination,<br> over streets and transit, interleaved with forward search | Upper bound search backward from destination <br> on transit only, before forward search begins |
-| Pareto-optimal results | no | yes |
+| Goal direction | Upper bound search backward from destination,<br> over streets and transit, interleaved with forward search | Upper bound search backward from destination <br> on transit only, before forward search begins |
 | Alternative itineraries | "Trip banning",<br> N lowest generalized costs | True Pareto-optimal results |
 | Departure/arrival time | Single departure or arrival time only | Every minute in a window up to several days long |
 | API Paging | no | yes |
@@ -113,7 +112,7 @@ API will be available in a GTFS and a Transmodel "translated" version.
 
 **Bugfixes** At least bug issues have been resolved in OTP2. Critical fixes have been backported to OTP1. See https://github.com/issues?q=is%3Aclosed+is%3Aissue+label%3AOTP2+label%3Abug
 
-## Other features removed from OTP2:
+## Other features removed from OTP2
 
 **AlertPatch** GTFS-RT Service Alerts will no longer affect routing (e.g. cancel trips). A GTFS-RT Trip Updates feed should be used for this purpose.
   

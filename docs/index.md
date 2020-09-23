@@ -1,9 +1,9 @@
 ![OTP Logo](images/otp-logo.svg)
 # OpenTripPlanner 2
 
-**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled public transportation in combination with bicycling, walking, and mobility services including bike share and ride hailing. Its server component runs on any platform with a Java virtual machine (including Linux, Mac, and Windows). It exposes REST and GraphQL APIs that can be accessed by various clients including open source Javascript components and native mobile applications. It builds its representation of the transportation network from open data in open standard file formats (primarily GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate visibility to clients, finding itineraries that account for disruptions and service changes. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). As of 2020, the codebase has been in active development for over years, and is relied upon by transportation authorities and travel planning applications in [deployments](Deployments) around the world.
+**OpenTripPlanner** (OTP) is an open source multi-modal trip planner, focusing on travel by scheduled public transportation in combination with bicycling, walking, and mobility services including bike share and ride hailing. Its server component runs on any platform with a Java virtual machine (including Linux, Mac, and Windows). It exposes REST and GraphQL APIs that can be accessed by various clients including open source Javascript components and native mobile applications. It builds its representation of the transportation network from open data in open standard file formats (primarily GTFS and OpenStreetMap). It applies real-time updates and alerts with immediate visibility to clients, finding itineraries that account for disruptions and service changes. OTP is released under the [LGPL license](https://opensource.org/licenses/LGPL-3.0). As of 2020, the codebase has been in active development for over ten years, and is relied upon by transportation authorities and travel planning applications in [deployments](Deployments) around the world.
 
-You are currently reading the documentation for **OpenTripPlanner 2**, the second major version of OTP, which is still under development but approaching release. As of 17 September 2020 OpenTripPlanner 2 is in feature freeze, and we have published a release candidate v2.0-RC1 which is now undergoing testing.
+You are currently reading the documentation for **OpenTripPlanner 2**, the second major version of OTP, which is still under development but approaching release. As of 21 September 2020 OpenTripPlanner 2 is in feature freeze, and we have published a release candidate v2.0-RC1 which is now undergoing final testing.
 
 The most recent stable release of OTP is **OpenTripPlanner 1.4**. If you do not want to test the cutting edge system, please switch to that documentation set.
 
@@ -18,12 +18,12 @@ Several versions of this documentation are built and published automatically for
 
 # Audience
 
-The end users of OTP are the millions of people who rely on it to help plan their daily travel, often without even knowing they are using OTP. As an infrastructure component, installation and configuration of OTP tends to be somewhat technical and ideally invisible to those end users. This documentation is indended for people who wish to perform such deployments of OTP, but without necessarily diving into the internal details of the software.
+The end users of OTP are the millions of people who rely on it to help plan their daily travel, often without even knowing they are using OTP. As an infrastructure component, installation and configuration of OTP tends to be somewhat technical and essentially invisible to those end users. This documentation is indended for people who wish to perform such deployments of OTP without necessarily diving into the internal details of the software.
 
-For members of the OTP community interested in software development, additional documentation detailing algorithms, data structures etc. is available within the source repository. It may be browsed via Github by navigating to the directory `src/x`. 
+For members of the OTP community interested in software development, additional documentation detailing algorithms, data structures etc. is available as markdown files within the source code packages. It can be read in your IDE or when browsing the source tree on Github. For example, `https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/transit/raptor/README.md`. 
  
 # Quick Start
-We encourage you to read the introductory sections of this documentation to first familiarize yourself with OpenTripPlanner use cases and configuration. But if you want to get started right away running your own OTP instance, the best place to start is the [Basic Usage](Basic-Usage) page.
+We encourage you to read the introductory sections of this documentation to familiarize yourself with OpenTripPlanner use cases and configuration. But if you want to get started right away running your own OTP instance, the best place to start is the [Basic Tutorial](Basic-Tutorial) page.
 
 # Contact Info
 
