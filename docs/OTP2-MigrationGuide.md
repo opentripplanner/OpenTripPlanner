@@ -37,11 +37,10 @@ These parameters is no longer supported:
  - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
 
  
- 
 ## Router config
- 
+
  - All updaters that require data sources now require you to specify a `sourceType`, even if that
- particular updater only has one possible data source.
+   particular updater only has one possible data source.
  
    
 ## REST API

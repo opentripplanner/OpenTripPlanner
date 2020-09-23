@@ -93,11 +93,11 @@ Building the street graph (especially with elevation data) can take a long time.
 
 Again assuming the input files and OTP JAR file are in the current working directory, you can build a street graph with OSM and elevation data only (ignoring transit input files) with this command:
 
-    `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --buildStreet --save .`
+    `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --buildStreet .`
 
 Then, to build a graph layering transit data on top of the saved street graph (built using the previous command):
 
-    `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --loadStreet --build --save .`
+    `$ java -Xmx2G -jar otp-2.0.0-rc1-shaded.jar --loadStreet --save .`
 
 Finally, the server can be started using the `--load` parameter:
 
@@ -106,7 +106,7 @@ Finally, the server can be started using the `--load` parameter:
 
 ## Command Line Switches
 
-The flow diagram below summarizes all the command line switches used in the above examples, and how they control which actions actions are taken when OTP starts up.
+The flow diagram below summarizes all the command line switches used in the above examples, and how they control which actions are taken when OTP starts up.
 
 ![Command-Line-Parameter-Flow](images/cli-flow.svg)
 
