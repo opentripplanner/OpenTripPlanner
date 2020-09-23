@@ -94,7 +94,7 @@ based storage as well as using local disk. If you run OTP in the cloud you might
 and build times if you use the cloud storage instead of copying the files, it also simplefy the 
 deplyment. Nested `storage` build-config. 
 
-See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/dev-2.x/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
+See (StorageConfig.java)[https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/standalone/config/StorageConfig.java] 
 for up-to-date detailed description of each config parameter. Here is an overview:
 
 config key | description | value type | value default

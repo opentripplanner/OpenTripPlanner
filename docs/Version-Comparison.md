@@ -93,7 +93,7 @@ GraphQL replacing the REST API. We will probably support the REST API for a long
 everyone to migrate to the new GraphQL API. Today, OTP2 comes with two Sandbox extension APIs:
 
 - [HSL Legacy GraphQL API](sandbox/LegacyGraphQLApi.md) - HSL's GraphQL API used by the Digitransit project.
-- [Transmodel API](sandbox/TransmodelAPI.md) - Entur´s Transmodel API
+- [Transmodel API](sandbox/TransmodelApi.md) - Entur´s Transmodel API
 
 The plan is to merge the two APIs above, clean it up and make it the new official API. The HSL API
 uses GTFS terminology, while the Entur API is Transmodel(NeTEx) based. Both APIs are similar in 
