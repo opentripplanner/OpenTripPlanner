@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.trip;
 
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
-import org.opentripplanner.ext.flex.distancecalculator.ScheduledDistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.ScheduledFlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.FlexLocationGroup;
@@ -57,9 +57,9 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   ) {
-    DistanceCalculator scheduledDistanceCalculator = new ScheduledDistanceCalculator(calculator, this);
+    FlexPathCalculator scheduledFlexPathCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
     int fromIndex = getFromIndex(access);
 
@@ -70,7 +70,9 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     for (int toIndex = fromIndex + 1; toIndex < stopTimes.length; toIndex++) {
       if (stopTimes[toIndex].dropOffType == 1) continue;
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
-        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate, scheduledDistanceCalculator));
+        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate,
+            scheduledFlexPathCalculator
+        ));
       }
     }
 
@@ -79,9 +81,9 @@ public class ScheduledDeviatedTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   ) {
-    DistanceCalculator scheduledDistanceCalculator = new ScheduledDistanceCalculator(calculator, this);
+    FlexPathCalculator scheduledFlexPathCalculator = new ScheduledFlexPathCalculator(calculator, this);
 
     int toIndex = getToIndex(egress);
 
@@ -92,7 +94,9 @@ public class ScheduledDeviatedTrip extends FlexTrip {
     for (int fromIndex = toIndex - 1; fromIndex >= 0; fromIndex--) {
       if (stopTimes[fromIndex].pickupType == 1) continue;
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
-        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate, scheduledDistanceCalculator));
+        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate,
+            scheduledFlexPathCalculator
+        ));
       }
     }
 

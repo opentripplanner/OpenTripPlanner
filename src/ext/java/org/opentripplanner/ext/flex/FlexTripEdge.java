@@ -3,8 +3,8 @@ package org.opentripplanner.ext.flex;
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.common.geometry.GeometryUtils;
-import org.opentripplanner.ext.flex.distancecalculator.DistanceAndDuration;
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPath;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.StopLocation;
@@ -29,11 +29,11 @@ public class FlexTripEdge extends Edge {
   public StopLocation s2;
   private FlexTrip trip;
   FlexAccessEgressTemplate flexTemplate;
-  public DistanceAndDuration distanceAndDuration;
+  public FlexPath flexPath;
 
   public FlexTripEdge(
       Vertex v1, Vertex v2, StopLocation s1, StopLocation s2, FlexTrip trip,
-      FlexAccessEgressTemplate flexTemplate, DistanceCalculator calculator
+      FlexAccessEgressTemplate flexTemplate, FlexPathCalculator calculator
   ) {
     super(new Vertex(null, null, 0.0, 0.0) {}, new Vertex(null, null, 0.0, 0.0) {});
     this.s1 = s1;
@@ -43,7 +43,7 @@ public class FlexTripEdge extends Edge {
     this.fromv = v1;
     this.tov = v2;
     // Why is this code so dirty? Because we don't want this edge to be added to the edge lists.
-    this.distanceAndDuration = calculator.getDuration(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
+    this.flexPath = calculator.calculateFlexPath(fromv, tov, flexTemplate.fromStopIndex, flexTemplate.toStopIndex);
   }
 
   @Override
@@ -60,12 +60,12 @@ public class FlexTripEdge extends Edge {
   }
 
   public int getTimeInSeconds() {
-    return distanceAndDuration.durationSeconds;
+    return flexPath.durationSeconds;
   }
 
   @Override
   public double getDistanceMeters() {
-    return distanceAndDuration.distanceMeters;
+    return flexPath.distanceMeters;
   }
 
   @Override

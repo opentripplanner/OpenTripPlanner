@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex.trip;
 
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.FeedScopedId;
@@ -27,11 +27,11 @@ public abstract class FlexTrip extends TransitEntity<FeedScopedId> {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   );
 
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);

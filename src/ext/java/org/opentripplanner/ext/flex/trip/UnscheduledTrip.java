@@ -1,6 +1,6 @@
 package org.opentripplanner.ext.flex.trip;
 
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.model.FlexLocationGroup;
@@ -57,7 +57,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -77,7 +77,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   ) {
     int toIndex = getToIndex(egress);
 

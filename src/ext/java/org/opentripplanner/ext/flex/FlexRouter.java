@@ -2,8 +2,8 @@ package org.opentripplanner.ext.flex;
 
 import gnu.trove.set.TIntSet;
 import org.opentripplanner.common.model.T2;
-import org.opentripplanner.ext.flex.distancecalculator.DirectDistanceCalculator;
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -41,7 +41,7 @@ public class FlexRouter {
   private final StopIndexForRaptor stopIndex;
   private final Collection<Transfer> transitTransfers;
   private final FlexIndex flexIndex;
-  private final DistanceCalculator distanceCalculator;
+  private final FlexPathCalculator flexPathCalculator;
 
   /* Request data */
   private final ZonedDateTime startOfTime;
@@ -70,7 +70,7 @@ public class FlexRouter {
     this.stopIndex = stopIndex;
     this.transitTransfers = graph.getTransferTable().getTransfers();
     this.flexIndex = graph.index.getFlexIndex();
-    this.distanceCalculator = new DirectDistanceCalculator(graph);
+    this.flexPathCalculator = new DirectFlexPathCalculator(graph);
 
     ZoneId tz = graph.getTimeZone().toZoneId();
     Instant searchInstant = request.getDateTime().toInstant();
@@ -113,8 +113,7 @@ public class FlexRouter {
             .mapToObj(i -> t2.second.getFlexAccessTemplates(
                 t2.first,
                 differenceFromStartOfTime[i],
-                serviceDates[i],
-                distanceCalculator
+                serviceDates[i], flexPathCalculator
             ))
             // TODO: Optimization: Could we filter here if earliestDepartureTime or latestArrivalTime is -1
             .flatMap(Function.identity()))
@@ -139,8 +138,7 @@ public class FlexRouter {
             .mapToObj(i -> t2.second.getFlexEgressTemplates(
                 t2.first,
                 differenceFromStartOfTime[i],
-                serviceDates[i],
-                distanceCalculator
+                serviceDates[i], flexPathCalculator
             ))
             // TODO: Optimization: Could we filter here if earliestDepartureTime or latestArrivalTime is -1
             .flatMap(Function.identity()))

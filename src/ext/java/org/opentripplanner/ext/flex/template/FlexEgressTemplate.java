@@ -2,7 +2,7 @@ package org.opentripplanner.ext.flex.template;
 
 import com.google.common.collect.Lists;
 import org.opentripplanner.ext.flex.FlexTripEdge;
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.StopLocation;
@@ -19,7 +19,7 @@ import java.util.List;
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
   ) {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);
   }
@@ -43,7 +43,7 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   protected boolean isRouteable(Vertex flexVertex) {
     if (accessEgress.state.getVertex() == flexVertex) {
       return false;
-    } else if (calculator.getDuration(flexVertex, accessEgress.state.getVertex(), fromStopIndex, toStopIndex) == null) {
+    } else if (calculator.calculateFlexPath(flexVertex, accessEgress.state.getVertex(), fromStopIndex, toStopIndex) == null) {
       return false;
     }
     return true;

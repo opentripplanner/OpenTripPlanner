@@ -2,7 +2,7 @@ package org.opentripplanner.ext.flex.template;
 
 import org.opentripplanner.ext.flex.FlexAccessEgress;
 import org.opentripplanner.ext.flex.FlexTripEdge;
-import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
+import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
@@ -29,7 +29,7 @@ public abstract class FlexAccessEgressTemplate {
   protected final StopLocation transferStop;
   protected final int differenceFromStartOfTime;
   public final ServiceDate serviceDate;
-  protected final DistanceCalculator calculator;
+  protected final FlexPathCalculator calculator;
 
   FlexAccessEgressTemplate(
       NearbyStop accessEgress,
@@ -39,7 +39,7 @@ public abstract class FlexAccessEgressTemplate {
       StopLocation transferStop,
       int differenceFromStartOfTime,
       ServiceDate serviceDate,
-      DistanceCalculator calculator
+      FlexPathCalculator calculator
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
