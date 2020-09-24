@@ -1,7 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import org.opentripplanner.ext.flex.FlexAccessEgress;
-import org.opentripplanner.ext.flex.FlexTripEdge;
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;

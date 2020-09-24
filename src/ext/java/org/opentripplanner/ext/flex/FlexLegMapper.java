@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex;
 
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.plan.Leg;
 import org.opentripplanner.model.plan.VertexType;

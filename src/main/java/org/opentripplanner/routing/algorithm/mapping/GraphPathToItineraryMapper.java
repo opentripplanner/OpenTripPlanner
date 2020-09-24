@@ -9,7 +9,7 @@ import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.ext.flex.FlexLegMapper;
-import org.opentripplanner.ext.flex.FlexTripEdge;
+import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.model.BikeRentalStationInfo;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StreetNote;

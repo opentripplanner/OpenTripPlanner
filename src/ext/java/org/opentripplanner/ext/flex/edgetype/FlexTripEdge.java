@@ -1,4 +1,4 @@
-package org.opentripplanner.ext.flex;
+package org.opentripplanner.ext.flex.edgetype;
 
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.LineString;
@@ -28,7 +28,7 @@ public class FlexTripEdge extends Edge {
   public StopLocation s1;
   public StopLocation s2;
   private FlexTrip trip;
-  FlexAccessEgressTemplate flexTemplate;
+  public FlexAccessEgressTemplate flexTemplate;
   public FlexPath flexPath;
 
   public FlexTripEdge(
