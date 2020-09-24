@@ -68,7 +68,7 @@ public class TransitAlert implements Serializable {
     public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
         for (TimePeriod timePeriod : timePeriods) {
             if (endTimeSeconds >= timePeriod.startTime) {
-                if (startTimeSeconds < timePeriod.endTime) {
+                if (timePeriod.endTime == 0 || startTimeSeconds < timePeriod.endTime) {
                     return true;
                 }
             }
