@@ -450,9 +450,10 @@ It is possible to adjust how OSM data is interpreted by OpenTripPlanner when bui
 OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
 You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
 
-There are currently 3 wayPropertySets defined;
+There are currently following wayPropertySets defined;
 
 - `default` which is based on California/US mapping standard
+- `finland` which is adjusted to rules and speeds in Finland
 - `norway` which is adjusted to rules and speeds in Norway
 - `uk` which is adjusted to rules and speed in the UK
 
