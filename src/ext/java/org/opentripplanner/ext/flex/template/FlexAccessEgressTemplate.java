@@ -79,7 +79,9 @@ public abstract class FlexAccessEgressTemplate {
         return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop));
       }
       return Stream.empty();
-    } else {
+    }
+    // transferStop is Location Area/Line
+    else {
       return getTransfersFromTransferStop(graph)
           .stream()
           .filter(simpleTransfer -> getFinalStop(simpleTransfer) != null)

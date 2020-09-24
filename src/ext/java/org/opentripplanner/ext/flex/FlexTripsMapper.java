@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+
 public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
@@ -48,7 +50,7 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
         .stream()
-        .anyMatch(st -> st.getContinuousPickup() != 1 || st.getContinuousDropOff() != 1);
+        .anyMatch(st -> st.getContinuousPickup() != PICKDROP_NONE || st.getContinuousDropOff() != PICKDROP_NONE);
   }
 
 }
