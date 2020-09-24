@@ -412,18 +412,17 @@ public class SimpleStreetSplitter {
             SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
 
-            if (OTPFeature.FlexRouting.isOn() && graph.index != null) {
-                Point p = GeometryUtils
-                    .getGeometryFactory()
-                    .createPoint(v0.getCoordinate());
+            if (OTPFeature.FlexRouting.isOn() && graph.index != null
+                && edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)
+            ) {
+                Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
                 Envelope env = p.getEnvelopeInternal();
-                for (FlexStopLocation flexStopLocation : graph.index.getFlexIndex().locationIndex.query(env)) {
-                    if (edge.canTraverse(new TraverseModeSet(TraverseMode.CAR))
-                        && !flexStopLocation.getGeometry().disjoint(p)) {
+                for (FlexStopLocation location : graph.index.getFlexIndex().locationIndex.query(env)) {
+                    if (!location.getGeometry().disjoint(p)) {
                         if (v0.flexStopLocations == null) {
                             v0.flexStopLocations = new HashSet<>();
                         }
-                        v0.flexStopLocations.add(flexStopLocation);
+                        v0.flexStopLocations.add(location);
                     }
                 }
             }
