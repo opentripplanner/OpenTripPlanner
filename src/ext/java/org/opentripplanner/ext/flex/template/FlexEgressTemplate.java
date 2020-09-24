@@ -1,13 +1,13 @@
 package org.opentripplanner.ext.flex.template;
 
 import com.google.common.collect.Lists;
+import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
@@ -20,9 +20,9 @@ import java.util.List;
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
   }
 
   protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer) {

@@ -44,7 +44,7 @@ public class FlexRouter {
   private final int departureTime;
   private final boolean arriveBy;
 
-  private final FlexServicesOnDate[] dates;
+  private final FlexServiceDate[] dates;
 
   /* State */
   private List<FlexAccessTemplate> flexAccessTemplates = null;
@@ -72,16 +72,16 @@ public class FlexRouter {
 
     int totalDays = additionalPastSearchDays + 1 + additionalFutureSearchDays;
 
-    this.dates = new FlexServicesOnDate[totalDays];
+    this.dates = new FlexServiceDate[totalDays];
 
     for (int d = -additionalPastSearchDays; d <= additionalFutureSearchDays; ++d) {
       LocalDate date = searchDate.plusDays(d);
       int index = d + additionalPastSearchDays;
       ServiceDate serviceDate = new ServiceDate(date);
-      dates[index] = new FlexServicesOnDate(
-          graph.index.getServiceCodesRunningForDate().get(serviceDate),
+      dates[index] = new FlexServiceDate(
+          serviceDate,
           DateMapper.secondsSinceStartOfTime(startOfTime, date),
-          serviceDate
+          graph.index.getServiceCodesRunningForDate().get(serviceDate)
       );
     }
   }
@@ -92,9 +92,12 @@ public class FlexRouter {
     Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetAccesses);
 
     this.flexAccessTemplates = reachableFlexTrips
+        // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
+            // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
-            .flatMap(date -> date.getFlexAccessTemplates(t2.first, t2.second, this.flexPathCalculator)))
+            // Create templates from trip, boarding at the nearbyStop
+            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date, flexPathCalculator)))
         .collect(Collectors.toList());
   }
 
@@ -104,9 +107,12 @@ public class FlexRouter {
     Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetEgresses);
 
     this.flexEgressTemplates = reachableFlexTrips
+        // For each date the router has data for
         .flatMap(t2 -> Arrays.stream(dates)
+            // Discard if service is not running on date
             .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
-            .flatMap(date -> date.getFlexEgressTemplates(t2.first, t2.second, this.flexPathCalculator)))
+            // Create templates from trip, alighting at the nearbyStop
+            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date, flexPathCalculator)))
         .collect(Collectors.toList());;
   }
 
@@ -120,7 +126,6 @@ public class FlexRouter {
         .collect(Collectors.toMap(nearbyStop -> nearbyStop.stop, Function.identity()));
 
     Set<StopLocation> egressStops = streetEgressByStop.keySet();
-
 
     Collection<Itinerary> itineraries = new ArrayList<>();
 

@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex.template;
 
 import org.opentripplanner.ext.flex.FlexAccessEgress;
+import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
@@ -26,7 +27,7 @@ public abstract class FlexAccessEgressTemplate {
   public final int fromStopIndex;
   public final int toStopIndex;
   protected final StopLocation transferStop;
-  protected final int differenceFromStartOfTime;
+  protected final int secondsFromStartOfTime;
   public final ServiceDate serviceDate;
   protected final FlexPathCalculator calculator;
 
@@ -36,8 +37,7 @@ public abstract class FlexAccessEgressTemplate {
       int fromStopIndex,
       int toStopIndex,
       StopLocation transferStop,
-      int differenceFromStartOfTime,
-      ServiceDate serviceDate,
+      FlexServiceDate date,
       FlexPathCalculator calculator
   ) {
     this.accessEgress = accessEgress;
@@ -45,8 +45,8 @@ public abstract class FlexAccessEgressTemplate {
     this.fromStopIndex = fromStopIndex;
     this.toStopIndex = toStopIndex;
     this.transferStop = transferStop;
-    this.differenceFromStartOfTime = differenceFromStartOfTime;
-    this.serviceDate = serviceDate;
+    this.secondsFromStartOfTime = date.secondsFromStartOfTime;
+    this.serviceDate = date.serviceDate;
     this.calculator = calculator;
   }
 
@@ -112,8 +112,7 @@ public abstract class FlexAccessEgressTemplate {
         times[1],
         times[2],
         fromStopIndex,
-        toStopIndex,
-        differenceFromStartOfTime,
+        toStopIndex, secondsFromStartOfTime,
         trip,
         state,
         transferEdges.isEmpty()

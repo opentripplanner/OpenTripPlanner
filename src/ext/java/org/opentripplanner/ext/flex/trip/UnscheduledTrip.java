@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.trip;
 
+import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
@@ -7,7 +8,6 @@ import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.io.Serializable;
@@ -59,7 +59,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -70,7 +70,7 @@ public class UnscheduledTrip extends FlexTrip {
     for (int toIndex = fromIndex + 1; toIndex < stopTimes.length; toIndex++) {
       if (stopTimes[toIndex].dropOffType == PICKDROP_NONE) continue;
       for (StopLocation stop : expandStops(stopTimes[toIndex].stop)) {
-        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate, calculator));
+        res.add(new FlexAccessTemplate(access, this, fromIndex, toIndex, stop, date, calculator));
       }
     }
 
@@ -79,7 +79,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
   ) {
     int toIndex = getToIndex(egress);
 
@@ -90,7 +90,7 @@ public class UnscheduledTrip extends FlexTrip {
     for (int fromIndex = toIndex - 1; fromIndex >= 0; fromIndex--) {
       if (stopTimes[fromIndex].pickupType == PICKDROP_NONE) continue;
       for (StopLocation stop : expandStops(stopTimes[fromIndex].stop)) {
-        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, differenceFromStartOfTime, serviceDate, calculator));
+        res.add(new FlexEgressTemplate(egress, this, fromIndex, toIndex, stop, date, calculator));
       }
     }
 

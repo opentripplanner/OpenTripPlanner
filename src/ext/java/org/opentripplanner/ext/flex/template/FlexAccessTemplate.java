@@ -1,12 +1,12 @@
 package org.opentripplanner.ext.flex.template;
 
+import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.State;
@@ -26,9 +26,9 @@ import java.util.TimeZone;
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
       NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, FlexPathCalculator calculator
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);
+    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
   }
 
   public Itinerary createDirectItinerary(
@@ -59,7 +59,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     Integer timeShift = null;
 
     if (arriveBy) {
-      int lastStopArrivalTime = departureTime - postFlexTime - differenceFromStartOfTime;
+      int lastStopArrivalTime = departureTime - postFlexTime - secondsFromStartOfTime;
       int latestArrivalTime = trip.latestArrivalTime(
           lastStopArrivalTime,
           fromStopIndex,
@@ -71,9 +71,9 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
       }
 
       // Shift from departing at departureTime to arriving at departureTime
-      timeShift = differenceFromStartOfTime + latestArrivalTime - flexTime - preFlexTime;
+      timeShift = secondsFromStartOfTime + latestArrivalTime - flexTime - preFlexTime;
     } else {
-      int firstStopDepartureTime = departureTime + preFlexTime - differenceFromStartOfTime;
+      int firstStopDepartureTime = departureTime + preFlexTime - secondsFromStartOfTime;
       int earliestDepartureTime = trip.earliestDepartureTime(
           firstStopDepartureTime,
           fromStopIndex,
@@ -84,7 +84,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
         return null;
       }
 
-      timeShift = differenceFromStartOfTime + earliestDepartureTime - preFlexTime;
+      timeShift = secondsFromStartOfTime + earliestDepartureTime - preFlexTime;
     }
 
     Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(
