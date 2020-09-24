@@ -10,7 +10,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.location.TemporaryStreetLocation;
 import org.opentripplanner.transit.raptor.speed_test.model.Place;
 import org.opentripplanner.util.NonLocalizedString;
@@ -35,7 +35,7 @@ class StreetSearch {
     private final SimpleStreetSplitter splitter;
     private final NearbyStopFinder nearbyStopFinder;
     final TIntIntMap resultTimesSecByStopIndex = new TIntIntHashMap();
-    final Map<Integer, StopAtDistance> pathsByStopIndex = new HashMap<>();
+    final Map<Integer, NearbyStop> pathsByStopIndex = new HashMap<>();
 
     StreetSearch(
             TransitLayer transitLayer,
@@ -66,21 +66,21 @@ class StreetSearch {
             splitter.link(vertex);
         }
 
-        List<StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(
+        List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
                 Set.of(vertex), !fromOrigin, true
         );
 
-        if(stopAtDistanceList.isEmpty()) {
+        if(nearbyStopList.isEmpty()) {
             throw new RuntimeException("No stops found nearby: " + place);
         }
 
-        for (StopAtDistance stopAtDistance : stopAtDistanceList) {
-            if (!(stopAtDistance.stop instanceof Stop)) continue;
-            int stopIndex = transitLayer.getIndexByStop((Stop) stopAtDistance.stop);
-            int accessTimeSec = (int)stopAtDistance.edges.stream().map(Edge::getDistanceMeters)
+        for (NearbyStop nearbyStop : nearbyStopList) {
+            if (!(nearbyStop.stop instanceof Stop)) continue;
+            int stopIndex = transitLayer.getIndexByStop((Stop) nearbyStop.stop);
+            int accessTimeSec = (int) nearbyStop.edges.stream().map(Edge::getDistanceMeters)
                     .collect(Collectors.summarizingDouble(Double::doubleValue)).getSum();
             resultTimesSecByStopIndex.put(stopIndex, accessTimeSec);
-            pathsByStopIndex.put(stopIndex, stopAtDistance);
+            pathsByStopIndex.put(stopIndex, nearbyStop);
         }
 
         LOG.debug("Found {} {} stops", resultTimesSecByStopIndex.size(), fromOrigin ?  "access" : "egress");

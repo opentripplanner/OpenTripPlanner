@@ -30,7 +30,7 @@ public class StreetGraphFinder implements GraphFinder {
     this.graph = graph;
   }
 
-  public List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters) {
+  public List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters) {
       StopFinderTraverseVisitor visitor = new StopFinderTraverseVisitor();
       findClosestUsingStreets(lat, lon, radiusMeters, visitor, null);
       return visitor.stopsFound;

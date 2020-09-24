@@ -9,7 +9,7 @@ import java.util.List;
  * Represents a transfer between stops that does not take the street network into account.
  *
  * TODO these should really have a set of valid modes in case bike vs. walk transfers are different
- * TODO Should we just store the StopAtDistance as a field here, or even switch to using it instead
+ * TODO Should we just store the NearbyStop as a field here, or even switch to using it instead
  * where this class is used
  */
 public class SimpleTransfer implements Serializable {

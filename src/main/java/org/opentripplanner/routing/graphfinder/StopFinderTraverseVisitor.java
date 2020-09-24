@@ -15,7 +15,7 @@ import java.util.List;
 public class StopFinderTraverseVisitor implements TraverseVisitor {
 
   /** A list of closest stops found while walking the graph */
-  public final List<StopAtDistance> stopsFound = new ArrayList<>();
+  public final List<NearbyStop> stopsFound = new ArrayList<>();
 
   @Override
   public void visitEdge(Edge edge, State state) { }
@@ -28,7 +28,7 @@ public class StopFinderTraverseVisitor implements TraverseVisitor {
   public void visitVertex(State state) {
     Vertex vertex = state.getVertex();
     if (vertex instanceof TransitStopVertex) {
-      stopsFound.add(StopAtDistance.stopAtDistanceForState(state, ((TransitStopVertex) vertex).getStop()));
+      stopsFound.add(NearbyStop.nearbyStopForState(state, ((TransitStopVertex) vertex).getStop()));
     }
   }
 }

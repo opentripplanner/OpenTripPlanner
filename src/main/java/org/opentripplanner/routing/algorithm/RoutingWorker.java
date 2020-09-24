@@ -12,6 +12,7 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRo
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -22,7 +23,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugAggregator;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -39,8 +40,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
-import java.util.Objects;
-import java.util.stream.Collectors;
 
 /**
  * Does a complete transit search, including access and egress legs.
@@ -150,25 +149,14 @@ public class RoutingWorker {
         this.debugAggregator.finishedPatternFiltering();
 
         // Prepare access/egress transfers
-        Collection<StopAtDistance> accessStops = AccessEgressRouter.streetSearch(request, false, 2000);
-        Collection<StopAtDistance> egressStops = AccessEgressRouter.streetSearch(request, true, 2000);
+        Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request, false, 2000);
+        Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(request, true, 2000);
+
+        AccessEgressMapper accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
+        Collection<AccessEgress> accessTransfers = accessEgressMapper.mapNearbyStops(accessStops, false);
+        Collection<AccessEgress> egressTransfers = accessEgressMapper.mapNearbyStops(egressStops, true);
 
         List<Itinerary> itineraries = new ArrayList<>();
-
-        Collection<AccessEgress> accessTransfers = accessStops
-            .stream()
-            .map(stopAtDistance -> stopAtDistance.toAccessEgress(
-                transitLayer.getStopIndex(),
-                false
-            ))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
-
-        Collection<AccessEgress> egressTransfers = egressStops
-            .stream()
-            .map(stopAtDistance -> stopAtDistance.toAccessEgress(transitLayer.getStopIndex(), true))
-            .filter(Objects::nonNull)
-            .collect(Collectors.toList());
 
         if (OTPFeature.FlexRouting.isOn() && request.modes.transitModes.contains(TransitMode.FLEXIBLE)) {
             FlexRouter flexRouter = new FlexRouter(

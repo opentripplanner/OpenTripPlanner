@@ -9,7 +9,6 @@ import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetch
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLTypes;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.Route;
-import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopTimesInPattern;
@@ -19,7 +18,7 @@ import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.alertpatch.TransitAlert;
 import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -220,7 +219,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
   }
 
   @Override
-  public DataFetcher<Iterable<StopAtDistance>> transfers() {
+  public DataFetcher<Iterable<NearbyStop>> transfers() {
     return environment -> getValue(
         environment,
         stop -> {
@@ -233,7 +232,7 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               .stream()
               .filter(simpleTransfer -> maxDistance == null || simpleTransfer.getDistanceMeters() < maxDistance)
               .filter(simpleTransfer -> simpleTransfer.to instanceof Stop)
-              .map(transfer -> new StopAtDistance(
+              .map(transfer -> new NearbyStop(
                   transfer.to,
                   transfer.getDistanceMeters(),
                   transfer.getEdges(),

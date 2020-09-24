@@ -8,7 +8,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.stream.Stream;
@@ -27,11 +27,11 @@ public abstract class FlexTrip extends TransitEntity<FeedScopedId> {
   }
 
   public abstract Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      StopAtDistance access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   );
 
   public abstract Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      StopAtDistance egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   );
 
   public abstract int earliestDepartureTime(int departureTime, int fromStopIndex, int toStopIndex, int flexTime);

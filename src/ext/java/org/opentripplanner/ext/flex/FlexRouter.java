@@ -7,7 +7,6 @@ import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.calendar.ServiceDate;
@@ -16,7 +15,7 @@ import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.time.Instant;
 import java.time.LocalDate;
@@ -37,8 +36,8 @@ public class FlexRouter {
 
   /* Transit data */
   private final Graph graph;
-  private final Collection<StopAtDistance> streetAccesses;
-  private final Collection<StopAtDistance> streetEgresses;
+  private final Collection<NearbyStop> streetAccesses;
+  private final Collection<NearbyStop> streetEgresses;
   private final StopIndexForRaptor stopIndex;
   private final Collection<Transfer> transitTransfers;
   private final FlexIndex flexIndex;
@@ -61,8 +60,8 @@ public class FlexRouter {
       RoutingRequest request,
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
-      Collection<StopAtDistance> streetAccesses,
-      Collection<StopAtDistance> egressTransfers,
+      Collection<NearbyStop> streetAccesses,
+      Collection<NearbyStop> egressTransfers,
       StopIndexForRaptor stopIndex
   ) {
     this.graph = request.rctx.graph;
@@ -150,9 +149,9 @@ public class FlexRouter {
 
 
   public Collection<Itinerary> getFlexOnlyItineraries() {
-    Map<StopLocation, StopAtDistance> egressTransferByStop = streetEgresses
+    Map<StopLocation, NearbyStop> egressTransferByStop = streetEgresses
         .stream()
-        .collect(Collectors.toMap(stopAtDistance -> stopAtDistance.stop, Function.identity()));
+        .collect(Collectors.toMap(nearbyStop -> nearbyStop.stop, Function.identity()));
 
     Set<StopLocation> egressStops = egressTransferByStop.keySet();
 
@@ -164,7 +163,7 @@ public class FlexRouter {
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
       if (egressStops.contains(transferStop)) {
-        StopAtDistance egress = egressTransferByStop.get(transferStop);
+        NearbyStop egress = egressTransferByStop.get(transferStop);
         Itinerary itinerary = template.getDirectItinerary(egress, arriveBy, departureTime, startOfTime);
         if (itinerary != null) {
           itineraries.add(itinerary);

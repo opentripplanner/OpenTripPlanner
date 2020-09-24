@@ -4,7 +4,7 @@ import graphql.relay.Relay;
 import graphql.schema.DataFetcher;
 import graphql.schema.DataFetchingEnvironment;
 import org.opentripplanner.ext.legacygraphqlapi.generated.LegacyGraphQLDataFetchers;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 public class LegacyGraphQLstopAtDistanceImpl
     implements LegacyGraphQLDataFetchers.LegacyGraphQLStopAtDistance {
@@ -25,7 +25,7 @@ public class LegacyGraphQLstopAtDistanceImpl
     return environment -> (int) getSource(environment).distance;
   }
 
-  private StopAtDistance getSource(DataFetchingEnvironment environment) {
+  private NearbyStop getSource(DataFetchingEnvironment environment) {
     return environment.getSource();
   }
 }

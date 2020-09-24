@@ -11,14 +11,14 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.util.Collection;
 import java.util.List;
 
 public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   public FlexEgressTemplate(
-      StopAtDistance accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
+      NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
       StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   ) {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);

@@ -12,7 +12,7 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.util.ArrayList;
@@ -22,7 +22,7 @@ import java.util.Map;
 import java.util.stream.Stream;
 
 public abstract class FlexAccessEgressTemplate {
-  protected final StopAtDistance accessEgress;
+  protected final NearbyStop accessEgress;
   protected final FlexTrip trip;
   public final int fromStopIndex;
   public final int toStopIndex;
@@ -32,7 +32,7 @@ public abstract class FlexAccessEgressTemplate {
   protected final DistanceCalculator calculator;
 
   FlexAccessEgressTemplate(
-      StopAtDistance accessEgress,
+      NearbyStop accessEgress,
       FlexTrip trip,
       int fromStopIndex,
       int toStopIndex,

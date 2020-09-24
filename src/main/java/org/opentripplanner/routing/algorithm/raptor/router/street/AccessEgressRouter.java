@@ -3,7 +3,7 @@ package org.opentripplanner.routing.algorithm.raptor.router.street;
 import org.opentripplanner.graph_builder.module.NearbyStopFinder;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -27,7 +27,7 @@ public class AccessEgressRouter {
      * @param distanceMeters the maximum street distance to search for access/egress stops
      * @return Transfer objects by access/egress stop
      */
-    public static Collection<StopAtDistance> streetSearch (
+    public static Collection<NearbyStop> streetSearch (
         RoutingRequest rr,
         boolean fromTarget,
         int distanceMeters
@@ -46,15 +46,15 @@ public class AccessEgressRouter {
         NearbyStopFinder nearbyStopFinder = new NearbyStopFinder(rr.rctx.graph, distanceMeters, true);
         // We set removeTempEdges to false because this is a sub-request - the temporary edges for the origin and
         // target vertex will be cleaned up at the end of the super-request, and we don't want that to happen twice.
-        List<StopAtDistance> stopAtDistanceList = nearbyStopFinder.findNearbyStopsViaStreets(
+        List<NearbyStop> nearbyStopList = nearbyStopFinder.findNearbyStopsViaStreets(
             vertices,
             fromTarget,
             false,
             nonTransitRoutingRequest
         );
 
-        LOG.debug("Found {} {} stops", stopAtDistanceList.size(), fromTarget ? "egress" : "access");
+        LOG.debug("Found {} {} stops", nearbyStopList.size(), fromTarget ? "egress" : "access");
 
-        return stopAtDistanceList;
+        return nearbyStopList;
     }
 }

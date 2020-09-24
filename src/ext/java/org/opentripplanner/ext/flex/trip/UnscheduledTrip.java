@@ -8,7 +8,7 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.StopTime;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.calendar.ServiceDate;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -57,7 +57,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      StopAtDistance access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop access, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   ) {
     int fromIndex = getFromIndex(access);
 
@@ -77,7 +77,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      StopAtDistance egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
+      NearbyStop egress, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   ) {
     int toIndex = getToIndex(egress);
 
@@ -137,7 +137,7 @@ public class UnscheduledTrip extends FlexTrip {
         : Collections.singleton(stop);
   }
 
-  private int getFromIndex(StopAtDistance accessEgress) {
+  private int getFromIndex(NearbyStop accessEgress) {
     for (int i = 0; i < stopTimes.length; i++) {
       if (stopTimes[i].pickupType == 1) continue; // No pickup or dropoff allowed here
       StopLocation stop = stopTimes[i].stop;
@@ -155,7 +155,7 @@ public class UnscheduledTrip extends FlexTrip {
     return -1;
   }
 
-  private int getToIndex(StopAtDistance accessEgress) {
+  private int getToIndex(NearbyStop accessEgress) {
     for (int i = stopTimes.length - 1; i >= 0; i--) {
       if (stopTimes[i].dropOffType == 1) continue; // No pickup or dropoff allowed here
       StopLocation stop = stopTimes[i].stop;

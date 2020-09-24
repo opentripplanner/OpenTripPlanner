@@ -10,7 +10,7 @@ import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.GraphIndex;
 import org.opentripplanner.routing.graphfinder.DirectGraphFinder;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.StreetGraphFinder;
 import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.slf4j.Logger;
@@ -74,14 +74,14 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
 
             /* Find nearby stops by euclidean distance */
             Coordinate c0 = originStopVertex.getCoordinate();
-            Map<Stop, StopAtDistance> stopsEuclidean = nearbyStopFinderEuclidian
+            Map<Stop, NearbyStop> stopsEuclidean = nearbyStopFinderEuclidian
                         .findClosestStops(c0.y, c0.x, radiusMeters)
                         .stream()
                         .filter(t -> t.stop instanceof Stop)
                         .collect(Collectors.toMap(t -> (Stop) t.stop, t -> t));
 
             /* Find nearby stops by street distance */
-            Map<Stop, StopAtDistance> stopsStreets = nearbyStopFinderStreets.
+            Map<Stop, NearbyStop> stopsStreets = nearbyStopFinderStreets.
                         findClosestStops(c0.y, c0.x, radiusMeters * RADIUS_MULTIPLIER)
                         .stream()
                         .filter(t -> t.stop instanceof Stop)
@@ -102,8 +102,8 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
                             .collect(Collectors.toList());
 
             for (Stop destStop : stopsConnected) {
-                StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
-                StopAtDistance streetStop = stopsStreets.get(destStop);
+                NearbyStop euclideanStop = stopsEuclidean.get(destStop);
+                NearbyStop streetStop = stopsStreets.get(destStop);
 
                 TransferInfo transferInfo = new TransferInfo(
                         originStop,
@@ -119,7 +119,7 @@ public class DirectTransferAnalyzer implements GraphBuilderModule {
             }
 
             for (Stop destStop : stopsUnconnected) {
-                StopAtDistance euclideanStop = stopsEuclidean.get(destStop);
+                NearbyStop euclideanStop = stopsEuclidean.get(destStop);
 
                 /* Log transfers that are found by euclidean search but not by street search */
                 directTransfersNotFound.add(

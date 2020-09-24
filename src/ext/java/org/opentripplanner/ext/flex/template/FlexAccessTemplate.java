@@ -4,10 +4,7 @@ import org.opentripplanner.ext.flex.FlexTripEdge;
 import org.opentripplanner.ext.flex.distancecalculator.DistanceCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
-import org.opentripplanner.model.Transfer;
-import org.opentripplanner.model.TransferType;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
@@ -15,28 +12,26 @@ import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.graph.Edge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.GraphPath;
-import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
-import java.util.Map;
 import java.util.TimeZone;
 
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
   public FlexAccessTemplate(
-      StopAtDistance accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
+      NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
       StopLocation transferStop, int differenceFromStartOfTime, ServiceDate serviceDate, DistanceCalculator calculator
   ) {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);
   }
 
   public Itinerary getDirectItinerary(
-      StopAtDistance egress, boolean arriveBy, int departureTime, ZonedDateTime startOfTime
+      NearbyStop egress, boolean arriveBy, int departureTime, ZonedDateTime startOfTime
   ) {
     List<Edge> egressEdges = egress.edges;
 
