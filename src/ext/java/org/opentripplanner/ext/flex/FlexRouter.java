@@ -86,37 +86,6 @@ public class FlexRouter {
     }
   }
 
-  private void calculateFlexAccessTemplates() {
-    if (this.flexAccessTemplates != null) { return; }
-
-    Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetAccesses);
-
-    this.flexAccessTemplates = reachableFlexTrips
-        // For each date the router has data for
-        .flatMap(t2 -> Arrays.stream(dates)
-            // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
-            // Create templates from trip, boarding at the nearbyStop
-            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date, flexPathCalculator)))
-        .collect(Collectors.toList());
-  }
-
-  private void calculateFlexEgressTemplates() {
-    if (this.flexEgressTemplates != null) { return; }
-
-    Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetEgresses);
-
-    this.flexEgressTemplates = reachableFlexTrips
-        // For each date the router has data for
-        .flatMap(t2 -> Arrays.stream(dates)
-            // Discard if service is not running on date
-            .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
-            // Create templates from trip, alighting at the nearbyStop
-            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date, flexPathCalculator)))
-        .collect(Collectors.toList());;
-  }
-
-
   public Collection<Itinerary> getFlexOnlyItineraries() {
     calculateFlexAccessTemplates();
     calculateFlexEgressTemplates();
@@ -159,6 +128,36 @@ public class FlexRouter {
         .stream()
         .flatMap(template -> template.createFlexAccessEgressStream(graph))
         .collect(Collectors.toList());
+  }
+  
+  private void calculateFlexAccessTemplates() {
+    if (this.flexAccessTemplates != null) { return; }
+
+    Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetAccesses);
+
+    this.flexAccessTemplates = reachableFlexTrips
+        // For each date the router has data for
+        .flatMap(t2 -> Arrays.stream(dates)
+            // Discard if service is not running on date
+            .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
+            // Create templates from trip, boarding at the nearbyStop
+            .flatMap(date -> t2.second.getFlexAccessTemplates(t2.first, date, flexPathCalculator)))
+        .collect(Collectors.toList());
+  }
+
+  private void calculateFlexEgressTemplates() {
+    if (this.flexEgressTemplates != null) { return; }
+
+    Stream<T2<NearbyStop, FlexTrip>> reachableFlexTrips = getReachableFlexTrips(streetEgresses);
+
+    this.flexEgressTemplates = reachableFlexTrips
+        // For each date the router has data for
+        .flatMap(t2 -> Arrays.stream(dates)
+            // Discard if service is not running on date
+            .filter(date -> date.isFlexTripRunning(t2.second, this.graph))
+            // Create templates from trip, alighting at the nearbyStop
+            .flatMap(date -> t2.second.getFlexEgressTemplates(t2.first, date, flexPathCalculator)))
+        .collect(Collectors.toList());;
   }
 
   private Stream<T2<NearbyStop, FlexTrip>> getReachableFlexTrips(Collection<NearbyStop> nearbyStops) {
