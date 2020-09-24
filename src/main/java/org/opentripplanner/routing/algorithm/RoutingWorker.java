@@ -160,16 +160,18 @@ public class RoutingWorker {
 
         if (OTPFeature.FlexRouting.isOn() && request.modes.transitModes.contains(TransitMode.FLEXIBLE)) {
             FlexRouter flexRouter = new FlexRouter(
-                request,
+                request.rctx.graph,
+                request.getDateTime().toInstant(),
+                request.arriveBy,
                 ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
                 ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
                 accessStops,
                 egressStops
             );
 
-            itineraries.addAll(flexRouter.getFlexOnlyItineraries());
-            accessTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.getFlexAccesses()));
-            egressTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.getFlexEgresses()));
+            itineraries.addAll(flexRouter.createFlexOnlyItineraries());
+            accessTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexAccesses()));
+            egressTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexEgresses()));
         }
 
         verifyEgressAccess(accessTransfers, egressTransfers);
