@@ -5,6 +5,7 @@ import org.opentripplanner.ext.flex.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.core.State;
@@ -28,8 +29,8 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
     return Lists.reverse(simpleTransfer.getEdges());
   }
 
-  protected StopLocation getFinalStop(SimpleTransfer simpleTransfer) {
-    return simpleTransfer.from;
+  protected Stop getFinalStop(SimpleTransfer simpleTransfer) {
+    return simpleTransfer.from instanceof Stop ? (Stop) simpleTransfer.from : null;
   }
 
   protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph) {

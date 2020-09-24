@@ -164,13 +164,12 @@ public class RoutingWorker {
                 ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
                 ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
                 accessStops,
-                egressStops,
-                transitLayer.getStopIndex()
+                egressStops
             );
 
             itineraries.addAll(flexRouter.getFlexOnlyItineraries());
-            accessTransfers.addAll(flexRouter.getFlexAccesses());
-            egressTransfers.addAll(flexRouter.getFlexEgresses());
+            accessTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.getFlexAccesses()));
+            egressTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.getFlexEgresses()));
         }
 
         verifyEgressAccess(accessTransfers, egressTransfers);

@@ -11,7 +11,6 @@ import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
-import org.opentripplanner.routing.algorithm.raptor.transit.StopIndexForRaptor;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
 import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.graph.Graph;
@@ -38,7 +37,6 @@ public class FlexRouter {
   private final Graph graph;
   private final Collection<NearbyStop> streetAccesses;
   private final Collection<NearbyStop> streetEgresses;
-  private final StopIndexForRaptor stopIndex;
   private final Collection<Transfer> transitTransfers;
   private final FlexIndex flexIndex;
   private final FlexPathCalculator flexPathCalculator;
@@ -61,13 +59,11 @@ public class FlexRouter {
       int additionalPastSearchDays,
       int additionalFutureSearchDays,
       Collection<NearbyStop> streetAccesses,
-      Collection<NearbyStop> egressTransfers,
-      StopIndexForRaptor stopIndex
+      Collection<NearbyStop> egressTransfers
   ) {
     this.graph = request.rctx.graph;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
-    this.stopIndex = stopIndex;
     this.transitTransfers = graph.getTransferTable().getTransfers();
     this.flexIndex = graph.index.getFlexIndex();
     this.flexPathCalculator = new DirectFlexPathCalculator(graph);
@@ -177,7 +173,7 @@ public class FlexRouter {
 
     return this.flexAccessTemplates
         .stream()
-        .flatMap(flexAccessEgressBase -> flexAccessEgressBase.getFlexAccessEgressStream(graph, stopIndex.indexByStop))
+        .flatMap(flexAccessEgressBase -> flexAccessEgressBase.getFlexAccessEgressStream(graph))
         .collect(Collectors.toList());
   }
 
@@ -186,7 +182,7 @@ public class FlexRouter {
 
     return this.flexEgressTemplates
         .stream()
-        .flatMap(flexAccessEgressBase -> flexAccessEgressBase.getFlexAccessEgressStream(graph, stopIndex.indexByStop))
+        .flatMap(flexAccessEgressBase -> flexAccessEgressBase.getFlexAccessEgressStream(graph))
         .collect(Collectors.toList());
   }
 

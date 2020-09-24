@@ -1,22 +1,23 @@
 package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
-import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
 
-public class FlexAccessEgress extends AccessEgress {
-
-  private final int preFlexTime;
-  private final int flexTime;
-  private final int postFlexTime;
+public class FlexAccessEgress {
+  public final Stop stop;
+  public final int preFlexTime;
+  public final int flexTime;
+  public final int postFlexTime;
   private final int fromStopIndex;
   private final int toStopIndex;
   private final int differenceFromStartOfTime;
   private final FlexTrip trip;
-  private final boolean directToStop;
+  public final State lastState;
+  public final boolean directToStop;
 
   public FlexAccessEgress(
-      int toFromStop,
+      Stop stop,
       int preFlexTime,
       int flexTime,
       int postFlexTime,
@@ -27,7 +28,7 @@ public class FlexAccessEgress extends AccessEgress {
       State lastState,
       boolean directToStop
   ) {
-    super(toFromStop, preFlexTime + flexTime + postFlexTime, lastState);
+    this.stop = stop;
     this.preFlexTime = preFlexTime;
     this.flexTime = flexTime;
     this.postFlexTime = postFlexTime;
@@ -35,10 +36,10 @@ public class FlexAccessEgress extends AccessEgress {
     this.toStopIndex = toStopIndex;
     this.differenceFromStartOfTime = differenceFromStartOfTime;
     this.trip = trip;
+    this.lastState = lastState;
     this.directToStop = directToStop;
   }
 
-  @Override
   public int earliestDepartureTime(int departureTime) {
     int requestedTransitDepartureTime = departureTime + preFlexTime - differenceFromStartOfTime;
     int earliestAvailableTransitDepartureTime = trip.earliestDepartureTime(
@@ -51,7 +52,6 @@ public class FlexAccessEgress extends AccessEgress {
     return earliestAvailableTransitDepartureTime - preFlexTime + differenceFromStartOfTime;
   }
 
-  @Override
   public int latestArrivalTime(int arrivalTime) {
     int requestedTransitArrivalTime = arrivalTime - postFlexTime - differenceFromStartOfTime;
     int latestAvailableTransitArrivalTime = trip.latestArrivalTime(
@@ -62,15 +62,5 @@ public class FlexAccessEgress extends AccessEgress {
     );
     if (latestAvailableTransitArrivalTime == -1) { return -1; }
     return latestAvailableTransitArrivalTime + postFlexTime + differenceFromStartOfTime;
-  }
-
-  @Override
-  public int numberOfLegs() {
-    return directToStop ? 2 : 3;
-  }
-
-  @Override
-  public boolean stopReachedOnBoard() {
-    return directToStop;
   }
 }

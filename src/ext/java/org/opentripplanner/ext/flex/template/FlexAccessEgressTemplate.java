@@ -18,7 +18,6 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-import java.util.Map;
 import java.util.stream.Stream;
 
 public abstract class FlexAccessEgressTemplate {
@@ -61,7 +60,7 @@ public abstract class FlexAccessEgressTemplate {
 
   abstract protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer);
 
-  abstract protected StopLocation getFinalStop(SimpleTransfer simpleTransfer);
+  abstract protected Stop getFinalStop(SimpleTransfer simpleTransfer);
 
   abstract protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph);
 
@@ -73,33 +72,29 @@ public abstract class FlexAccessEgressTemplate {
 
   abstract protected boolean isRouteable(Vertex flexVertex);
 
-  public Stream<FlexAccessEgress> getFlexAccessEgressStream(
-      Graph graph, Map<Stop, Integer> indexByStop
-  ) {
+  public Stream<FlexAccessEgress> getFlexAccessEgressStream(Graph graph) {
     if (transferStop instanceof Stop) {
       TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
       if (isRouteable(flexVertex)) {
-        return Stream.of(
-            getFlexAccessEgress(new ArrayList<>(), flexVertex, indexByStop.get(transferStop))
-        );
+        return Stream.of(getFlexAccessEgress(new ArrayList<>(), flexVertex, (Stop) transferStop));
       }
       return Stream.empty();
     } else {
       return getTransfersFromTransferStop(graph)
           .stream()
-          .filter(simpleTransfer -> getFinalStop(simpleTransfer) instanceof Stop)
+          .filter(simpleTransfer -> getFinalStop(simpleTransfer) != null)
           .filter(simpleTransfer -> isRouteable(getFlexVertex(getTransferEdges(simpleTransfer).get(0))))
           .map(simpleTransfer -> {
             List<Edge> edges = getTransferEdges(simpleTransfer);
             return getFlexAccessEgress(edges,
                 getFlexVertex(edges.get(0)),
-                indexByStop.get(getFinalStop(simpleTransfer))
+                getFinalStop(simpleTransfer)
             );
           });
     }
   }
 
-  protected FlexAccessEgress getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, int stopIndex) {
+  protected FlexAccessEgress getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, Stop stop) {
     FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
 
     State state = flexEdge.traverse(accessEgress.state);
@@ -110,7 +105,7 @@ public abstract class FlexAccessEgressTemplate {
     int[] times = getFlexTimes(flexEdge, state);
 
     return new FlexAccessEgress(
-        stopIndex,
+        stop,
         times[0],
         times[1],
         times[2],
