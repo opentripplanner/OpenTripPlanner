@@ -36,7 +36,7 @@ public class ScheduledDeviatedTrip extends FlexTrip {
   public static boolean isScheduledFlexTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> notStopType = Predicate.not(st -> st.getStop() instanceof Stop);
     Predicate<StopTime> notContinuousStop = stopTime ->
-        stopTime.getContinuousDropOff() == PICKDROP_NONE && stopTime.getContinuousPickup() == PICKDROP_NONE;
+        stopTime.getFlexContinuousDropOff() == PICKDROP_NONE && stopTime.getFlexContinuousPickup() == PICKDROP_NONE;
     return stopTimes.stream().anyMatch(notStopType)
         && stopTimes.stream().allMatch(notContinuousStop);
   }

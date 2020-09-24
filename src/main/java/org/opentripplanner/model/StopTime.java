@@ -47,10 +47,10 @@ public final class StopTime implements Comparable<StopTime> {
     private int maxDepartureTime = MISSING_VALUE;
 
     // Disabled by default
-    private int continuousPickup = MISSING_VALUE;
+    private int flexContinuousPickup = MISSING_VALUE;
 
     // Disabled by default
-    private int continuousDropOff = MISSING_VALUE;
+    private int flexContinuousDropOff = MISSING_VALUE;
 
     public StopTime() { }
 
@@ -69,8 +69,8 @@ public final class StopTime implements Comparable<StopTime> {
         this.farePeriodId = st.farePeriodId;
         this.minArrivalTime = st.minArrivalTime;
         this.maxDepartureTime  = st.maxDepartureTime;
-        this.continuousPickup = st.continuousPickup;
-        this.continuousDropOff = st.continuousDropOff;
+        this.flexContinuousPickup = st.flexContinuousPickup;
+        this.flexContinuousDropOff = st.flexContinuousDropOff;
     }
 
     /**
@@ -239,20 +239,20 @@ public final class StopTime implements Comparable<StopTime> {
         return maxDepartureTime;
     }
 
-    public int getContinuousPickup() {
-        return continuousPickup == MISSING_VALUE ? 1 : continuousPickup;
+    public int getFlexContinuousPickup() {
+        return flexContinuousPickup == MISSING_VALUE ? 1 : flexContinuousPickup;
     }
 
-    public void setContinuousPickup(int continuousPickup) {
-        this.continuousPickup = continuousPickup;
+    public void setFlexContinuousPickup(int flexContinuousPickup) {
+        this.flexContinuousPickup = flexContinuousPickup;
     }
 
-    public int getContinuousDropOff() {
-        return continuousDropOff == MISSING_VALUE ? 1 : continuousDropOff;
+    public int getFlexContinuousDropOff() {
+        return flexContinuousDropOff == MISSING_VALUE ? 1 : flexContinuousDropOff;
     }
 
-    public void setContinuousDropOff(int continuousDropOff) {
-        this.continuousDropOff = continuousDropOff;
+    public void setFlexContinuousDropOff(int flexContinuousDropOff) {
+        this.flexContinuousDropOff = flexContinuousDropOff;
     }
 
     public int compareTo(StopTime o) {

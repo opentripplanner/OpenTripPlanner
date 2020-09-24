@@ -37,7 +37,7 @@ public class UnscheduledTrip extends FlexTrip {
   public static boolean isUnscheduledTrip(List<StopTime> stopTimes) {
     Predicate<StopTime> noExplicitTimes = Predicate.not(st -> st.isArrivalTimeSet() || st.isDepartureTimeSet());
     Predicate<StopTime> notContinuousStop = stopTime ->
-        stopTime.getContinuousDropOff() == PICKDROP_NONE && stopTime.getContinuousPickup() == PICKDROP_NONE;
+        stopTime.getFlexContinuousDropOff() == PICKDROP_NONE && stopTime.getFlexContinuousPickup() == PICKDROP_NONE;
     return stopTimes.size() == N_STOPS
         && stopTimes.stream().allMatch(noExplicitTimes)
         && stopTimes.stream().allMatch(notContinuousStop);
