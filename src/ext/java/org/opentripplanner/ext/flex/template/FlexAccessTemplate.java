@@ -31,7 +31,7 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     super(accessEgress, trip, fromStopTime, toStopTime, transferStop, differenceFromStartOfTime, serviceDate, calculator);
   }
 
-  public Itinerary getDirectItinerary(
+  public Itinerary createDirectItinerary(
       NearbyStop egress, boolean arriveBy, int departureTime, ZonedDateTime startOfTime
   ) {
     List<Edge> egressEdges = egress.edges;

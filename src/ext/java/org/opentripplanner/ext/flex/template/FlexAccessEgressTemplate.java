@@ -72,7 +72,7 @@ public abstract class FlexAccessEgressTemplate {
 
   abstract protected boolean isRouteable(Vertex flexVertex);
 
-  public Stream<FlexAccessEgress> getFlexAccessEgressStream(Graph graph) {
+  public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
     if (transferStop instanceof Stop) {
       TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
       if (isRouteable(flexVertex)) {
