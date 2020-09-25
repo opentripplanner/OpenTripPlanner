@@ -26,9 +26,9 @@ import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.FareComponent;
 import org.opentripplanner.routing.core.FareRuleSet;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.graphfinder.PatternAtStop;
 import org.opentripplanner.routing.graphfinder.PlaceAtDistance;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
 import org.opentripplanner.util.model.EncodedPolylineBean;
 
 import java.util.Map;
@@ -311,7 +311,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Agency> agency();
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Object>> stopsByBbox();
-    public DataFetcher<Connection<StopAtDistance>> stopsByRadius();
+    public DataFetcher<Connection<NearbyStop>> stopsByRadius();
     public DataFetcher<Connection<PlaceAtDistance>> nearest();
     public DataFetcher<PatternAtStop> departureRow();
     public DataFetcher<Object> stop();
@@ -406,7 +406,7 @@ public class LegacyGraphQLDataFetchers {
     public DataFetcher<Iterable<Object>> stops();
     public DataFetcher<Iterable<Route>> routes();
     public DataFetcher<Iterable<TripPattern>> patterns();
-    public DataFetcher<Iterable<StopAtDistance>> transfers();
+    public DataFetcher<Iterable<NearbyStop>> transfers();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForServiceDate();
     public DataFetcher<Iterable<StopTimesInPattern>> stoptimesForPatterns();
     public DataFetcher<Iterable<TripTimeShort>> stoptimesWithoutPatterns();
@@ -421,13 +421,13 @@ public class LegacyGraphQLDataFetchers {
   
   /** A connection to a list of items. */
   public interface LegacyGraphQLStopAtDistanceConnection {
-    public DataFetcher<Iterable<Edge<StopAtDistance>>> edges();
+    public DataFetcher<Iterable<Edge<NearbyStop>>> edges();
     public DataFetcher<Object> pageInfo();
   }
   
   /** An edge in a connection. */
   public interface LegacyGraphQLStopAtDistanceEdge {
-    public DataFetcher<StopAtDistance> node();
+    public DataFetcher<NearbyStop> node();
     public DataFetcher<String> cursor();
   }
   

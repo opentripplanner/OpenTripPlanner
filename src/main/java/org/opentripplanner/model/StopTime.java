@@ -42,13 +42,15 @@ public final class StopTime implements Comparable<StopTime> {
     /** This is a Conveyal extension to the GTFS spec to support Seattle on/off peak fares. */
     private String farePeriodId;
 
-    private int minArrivalTime = MISSING_VALUE;
+    private int flexWindowStart = MISSING_VALUE;
 
-    private int maxDepartureTime = MISSING_VALUE;
+    private int flexWindowEnd = MISSING_VALUE;
 
-    private int continuousPickup;
+    // Disabled by default
+    private int flexContinuousPickup = MISSING_VALUE;
 
-    private int continuousDropOff;
+    // Disabled by default
+    private int flexContinuousDropOff = MISSING_VALUE;
 
     public StopTime() { }
 
@@ -65,10 +67,10 @@ public final class StopTime implements Comparable<StopTime> {
         this.dropOffType = st.dropOffType;
         this.shapeDistTraveled = st.shapeDistTraveled;
         this.farePeriodId = st.farePeriodId;
-        this.minArrivalTime = st.minArrivalTime;
-        this.maxDepartureTime  = st.maxDepartureTime;
-        this.continuousPickup = st.continuousPickup;
-        this.continuousDropOff = st.continuousDropOff;
+        this.flexWindowStart = st.flexWindowStart;
+        this.flexWindowEnd = st.flexWindowEnd;
+        this.flexContinuousPickup = st.flexContinuousPickup;
+        this.flexContinuousDropOff = st.flexContinuousDropOff;
     }
 
     /**
@@ -221,36 +223,36 @@ public final class StopTime implements Comparable<StopTime> {
         this.farePeriodId = farePeriodId;
     }
 
-    public void setMinArrivalTime(int minArrivalTime) {
-        this.minArrivalTime = minArrivalTime;
+    public void setFlexWindowStart(int flexWindowStart) {
+        this.flexWindowStart = flexWindowStart;
     }
 
-    public int getMinArrivalTime() {
-        return minArrivalTime;
+    public int getFlexWindowStart() {
+        return flexWindowStart;
     }
 
-    public void setMaxDepartureTime(int maxDepartureTime) {
-        this.maxDepartureTime = maxDepartureTime;
+    public void setFlexWindowEnd(int flexWindowEnd) {
+        this.flexWindowEnd = flexWindowEnd;
     }
 
-    public int getMaxDepartureTime() {
-        return maxDepartureTime;
+    public int getFlexWindowEnd() {
+        return flexWindowEnd;
     }
 
-    public int getContinuousPickup() {
-        return continuousPickup;
+    public int getFlexContinuousPickup() {
+        return flexContinuousPickup == MISSING_VALUE ? 1 : flexContinuousPickup;
     }
 
-    public void setContinuousPickup(int continuousPickup) {
-        this.continuousPickup = continuousPickup;
+    public void setFlexContinuousPickup(int flexContinuousPickup) {
+        this.flexContinuousPickup = flexContinuousPickup;
     }
 
-    public int getContinuousDropOff() {
-        return continuousDropOff;
+    public int getFlexContinuousDropOff() {
+        return flexContinuousDropOff == MISSING_VALUE ? 1 : flexContinuousDropOff;
     }
 
-    public void setContinuousDropOff(int continuousDropOff) {
-        this.continuousDropOff = continuousDropOff;
+    public void setFlexContinuousDropOff(int flexContinuousDropOff) {
+        this.flexContinuousDropOff = flexContinuousDropOff;
     }
 
     public int compareTo(StopTime o) {

@@ -73,7 +73,7 @@ import org.opentripplanner.routing.api.request.RoutingRequest;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.error.RoutingValidationException;
-import org.opentripplanner.routing.graphfinder.StopAtDistance;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -1140,7 +1140,7 @@ public class TransmodelGraphQLSchema {
                 .build())
             .arguments(relay.getConnectionFieldArguments())
             .dataFetcher(environment -> {
-              List<StopAtDistance> stops;
+              List<NearbyStop> stops;
               try {
                 stops = GqlUtil.getRoutingService(environment)
                     .findClosestStops(environment.getArgument("latitude"),

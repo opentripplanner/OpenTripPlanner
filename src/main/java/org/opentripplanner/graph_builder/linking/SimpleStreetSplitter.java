@@ -5,6 +5,7 @@ import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.GeometryFactory;
 import org.locationtech.jts.geom.LineString;
+import org.locationtech.jts.geom.Point;
 import org.locationtech.jts.index.SpatialIndex;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
@@ -21,6 +22,7 @@ import org.opentripplanner.graph_builder.issues.StopLinkedTooFar;
 import org.opentripplanner.graph_builder.issues.StopUnlinked;
 import org.opentripplanner.graph_builder.services.DefaultStreetEdgeFactory;
 import org.opentripplanner.graph_builder.services.StreetEdgeFactory;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.GenericLocation;
 import org.opentripplanner.openstreetmap.model.OSMWithTags;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -52,11 +54,13 @@ import org.opentripplanner.routing.vertextype.TransitStopVertex;
 import org.opentripplanner.util.I18NString;
 import org.opentripplanner.util.LocalizedString;
 import org.opentripplanner.util.NonLocalizedString;
+import org.opentripplanner.util.OTPFeature;
 import org.opentripplanner.util.ProgressTracker;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.UUID;
 import java.util.function.Function;
@@ -407,6 +411,21 @@ public class SimpleStreetSplitter {
             // split the edge, get the split vertex
             SplitterVertex v0 = split(edge, ll, temporaryVertex != null, endVertex);
             makeLinkEdges(tstop, v0);
+
+            if (OTPFeature.FlexRouting.isOn() && graph.index != null
+                && edge.getPermission().allows(StreetTraversalPermission.PEDESTRIAN_AND_CAR)
+            ) {
+                Point p = GeometryUtils.getGeometryFactory().createPoint(v0.getCoordinate());
+                Envelope env = p.getEnvelopeInternal();
+                for (FlexStopLocation location : graph.index.getFlexIndex().locationIndex.query(env)) {
+                    if (!location.getGeometry().disjoint(p)) {
+                        if (v0.flexStopLocations == null) {
+                            v0.flexStopLocations = new HashSet<>();
+                        }
+                        v0.flexStopLocations.add(location);
+                    }
+                }
+            }
 
             // If splitter vertex is part of area; link splittervertex to all other vertexes in area, this creates
             // edges that were missed by WalkableAreaBuilder
