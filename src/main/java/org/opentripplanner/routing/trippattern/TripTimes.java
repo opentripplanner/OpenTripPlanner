@@ -18,6 +18,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.BitSet;
 import java.util.Collection;
+import java.util.concurrent.TimeUnit;
 
 import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
 
@@ -556,6 +557,15 @@ public class TripTimes implements Serializable, Comparable<TripTimes>, Cloneable
     /** @return whether or not stopIndex is considered a timepoint in this TripTimes. */
     public boolean isTimepoint(final int stopIndex) {
         return timepoints.get(stopIndex);
+    }
+
+    /**
+     * Calculates the duration of the trip in number of days
+     */
+    public int calculateDurationInDays() {
+        return (int) TimeUnit.SECONDS.toDays(
+            scheduledArrivalTimes[scheduledDepartureTimes.length - 1]
+                - scheduledDepartureTimes[0]);
     }
 
     /**
