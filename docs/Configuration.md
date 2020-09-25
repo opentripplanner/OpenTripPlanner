@@ -46,7 +46,7 @@ long | A decimal integer _number_. 64 bit. | `-1234567890123456789`
 enum | A fixed set of string literals. | BicycleOptimize: `"QUICK"`, `"SAFE"` ...
 enum-map | List of key/value pairs, where the key is a enum and the value can be any given type. | `{ RAIL: 1.2, BUS: 2.3 }` 
 enum-set | List of enum string values | `[ "RAIL", "TRAM" ]`
-locale | _"Language\_[country[\_variant]]_". | `en_US`, `nn_NO`
+locale | _`Language[\_country[\_variant]]`_. A Locale object represents a specific geographical, political, or cultural region. For more information see the [Java 11 Locale](https://docs.oracle.com/en/java/javase/11/docs/api/java.base/java/util/Locale.html). | `en_US`, `nn_NO`
 date | Local date. The format is _YYYY-MM-DD_ (ISO-8601). | `2020-09-21`
 date or period | A _local date_, or a _period_ relative to today. The local date has the format `YYYY-MM-DD` and the period has the format `PnYnMnD` or `-PnYnMnD` where `n` is a integer number. | `P1Y` is one year from now, `-P3M2D` means 3 months and 2 days ago, and `P1D` means tomorrow.
 regexp pattern | A regular expression pattern used to match a sting. | `"$^"` matches an empty string. `"gtfs"` matches `"A-*gtfs*-file.zip"`. `"$\w{3})-.*\.xml^"` matches a filename with 3 alpha-numeric characters in the beginning of the filename and _.xml_ as file extension.   
