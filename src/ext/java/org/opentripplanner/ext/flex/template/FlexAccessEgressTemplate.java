@@ -58,18 +58,41 @@ public abstract class FlexAccessEgressTemplate {
     return trip;
   }
 
+  /**
+   * Get a list of edges used for transferring to and from the scheduled transit network. The edges
+   * should be in the order of traversal of the state in the NearbyStop
+   * */
   abstract protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer);
 
+  /**
+   * Get the {@Link Stop} where the connection to the scheduled transit network is made.
+   */
   abstract protected Stop getFinalStop(SimpleTransfer simpleTransfer);
 
+  /**
+   * Get the transfers to/from stops in the scheduled transit network from the beginning/end of the
+   * flex ride for the access/egress.
+   */
   abstract protected Collection<SimpleTransfer> getTransfersFromTransferStop(Graph graph);
 
+  /**
+   * Get the {@Link Vertex} where the flex ride ends/begins for the access/egress.
+   */
   abstract protected Vertex getFlexVertex(Edge edge);
 
+  /**
+   * Get the times in seconds, before during and after the flex ride.
+   */
   abstract protected int[] getFlexTimes(FlexTripEdge flexEdge, State state);
 
+  /**
+   * Get the FlexTripEdge for the flex ride.
+   */
   abstract protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
+  /**
+   * Checks whether the routing is possible
+   */
   abstract protected boolean isRouteable(Vertex flexVertex);
 
   public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
