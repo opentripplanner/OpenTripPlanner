@@ -11,6 +11,7 @@ import org.rutebanken.netex.model.JourneyPatternsInFrame_RelStructure;
 import org.rutebanken.netex.model.Line;
 import org.rutebanken.netex.model.LinesInFrame_RelStructure;
 import org.rutebanken.netex.model.Network;
+import org.rutebanken.netex.model.NetworksInFrame_RelStructure;
 import org.rutebanken.netex.model.PassengerStopAssignment;
 import org.rutebanken.netex.model.Quay;
 import org.rutebanken.netex.model.Route;
@@ -63,6 +64,7 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
         parseStopAssignments(frame.getStopAssignments());
         parseRoutes(frame.getRoutes());
         parseNetwork(frame.getNetwork());
+        parseAdditionalNetworks(frame.getAdditionalNetworks());
         noticeParser.parseNotices(frame.getNotices());
         noticeParser.parseNoticeAssignments(frame.getNoticeAssignments());
         parseLines(frame.getLines());
@@ -167,6 +169,14 @@ class ServiceFrameParser extends NetexParser<Service_VersionFrameStructure> {
 
         if (groupsOfLines != null) {
             parseGroupOfLines(groupsOfLines.getGroupOfLines(), network);
+        }
+    }
+
+    private void parseAdditionalNetworks(NetworksInFrame_RelStructure additionalNetworks) {
+        if (additionalNetworks == null) { return; }
+
+        for (Network additionalNetwork : additionalNetworks.getNetwork()) {
+            parseNetwork(additionalNetwork);
         }
     }
 

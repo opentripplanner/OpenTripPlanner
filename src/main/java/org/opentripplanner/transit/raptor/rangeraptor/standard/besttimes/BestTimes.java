@@ -136,8 +136,11 @@ public final class BestTimes {
      * <p/>
      * This is equivalent to calling {@link #updateNewBestTime(int, int)}
      */
-    public final void setAccessStopTime(final int stop, final int time) {
+    public final void setAccessStopTime(final int stop, final int time, final boolean arrivedViaTransit) {
         updateNewBestTime(stop, time);
+        if (arrivedViaTransit) {
+           transitUpdateNewBestTime(stop, time);
+        }
     }
 
     /**

@@ -29,16 +29,6 @@ public class AccessEgress implements RaptorTransfer {
   }
 
   @Override
-  public int earliestDepartureTime(int requestedDepartureTime) {
-    return requestedDepartureTime;
-  }
-
-  @Override
-  public int latestArrivalTime(int requestedArrivalTime) {
-    return requestedArrivalTime;
-  }
-
-  @Override
   public int durationInSeconds() {
     return durationInSeconds;
   }

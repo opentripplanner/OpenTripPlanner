@@ -3,6 +3,7 @@ package org.opentripplanner.transit.raptor.rangeraptor.multicriteria;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTransfer;
 import org.opentripplanner.transit.raptor.api.transit.RaptorTripSchedule;
 import org.opentripplanner.transit.raptor.api.view.ArrivalView;
+import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransferStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.multicriteria.arrivals.TransitStopArrival;
 import org.opentripplanner.transit.raptor.rangeraptor.path.DestinationArrivalPaths;
 import org.opentripplanner.transit.raptor.api.transit.CostCalculator;
@@ -50,6 +51,17 @@ public class CalculateTransferToDestination<T extends RaptorTripSchedule>
                     egressLeg,
                     costCalculator.walkCost(egressLeg.durationInSeconds())
                 );
+            }
+        } else if (newElement instanceof TransferStopArrival) {
+            for (RaptorTransfer egressLeg : egressLegs) {
+                if (egressLeg.stopReachedOnBoard()) {
+                    TransferStopArrival<T> transferStopArrival = (TransferStopArrival<T>) newElement;
+                    destinationArrivals.add(
+                        transferStopArrival,
+                        egressLeg,
+                        costCalculator.walkCost(egressLeg.durationInSeconds())
+                    );
+                }
             }
         }
     }

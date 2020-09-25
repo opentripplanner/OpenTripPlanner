@@ -122,8 +122,6 @@ public class HeuristicToRunResolverTest {
     private RaptorTransfer dummyLeg() {
         return new RaptorTransfer() {
             @Override public int stop() { return 1; }
-            @Override public int earliestDepartureTime(int requestedDepartureTime) { return requestedDepartureTime; }
-            @Override public int latestArrivalTime(int requestedArrivalTime) { return requestedArrivalTime; }
             @Override public int durationInSeconds() { return 10; }
         };
     }

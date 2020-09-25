@@ -15,7 +15,5 @@ public class TestRaptorTransfer implements RaptorTransfer {
     this.duration = duration;
   }
   @Override public int stop() { return stop; }
-  @Override public int earliestDepartureTime(int time) { return time; }
-  @Override public int latestArrivalTime(int time) { return time; }
   @Override public int durationInSeconds() { return duration; }
 }

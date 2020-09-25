@@ -11,10 +11,10 @@ import java.util.Objects;
  */
 public final class TransferPathLeg<T extends RaptorTripSchedule> extends IntermediatePathLeg<T> {
 
-    private final TransitPathLeg<T> next;
+    private final PathLeg<T> next;
 
 
-    public TransferPathLeg(int fromStop, int fromTime, int toStop, int toTime, TransitPathLeg<T> next) {
+    public TransferPathLeg(int fromStop, int fromTime, int toStop, int toTime, PathLeg<T> next) {
         super(fromStop, fromTime, toStop, toTime);
         this.next = next;
     }
@@ -25,7 +25,7 @@ public final class TransferPathLeg<T extends RaptorTripSchedule> extends Interme
     }
 
     @Override
-    public final TransitPathLeg<T> nextLeg() {
+    public final PathLeg<T> nextLeg() {
         return next;
     }
 
