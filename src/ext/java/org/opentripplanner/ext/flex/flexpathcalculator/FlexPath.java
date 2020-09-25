@@ -7,6 +7,7 @@ public class FlexPath {
 
   public int distanceMeters;
   public int durationSeconds;
+  // TODO: Add geometry for path
 
   public FlexPath(int distanceMeters, int durationSeconds) {
     this.distanceMeters = distanceMeters;

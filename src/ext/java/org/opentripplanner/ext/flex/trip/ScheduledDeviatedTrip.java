@@ -181,9 +181,9 @@ public class ScheduledDeviatedTrip extends FlexTrip {
       this.stop = st.getStop();
 
       // Store the time the user is guaranteed to arrive at latest
-      this.arrivalTime = st.getMaxDepartureTime() != MISSING_VALUE ? st.getMaxDepartureTime() : st.getArrivalTime();
+      this.arrivalTime = st.getFlexWindowEnd() != MISSING_VALUE ? st.getFlexWindowEnd() : st.getArrivalTime();
       // Store the time the user needs to be ready for pickup
-      this.departureTime = st.getMinArrivalTime() != MISSING_VALUE ? st.getMinArrivalTime() : st.getDepartureTime();
+      this.departureTime = st.getFlexWindowStart() != MISSING_VALUE ? st.getFlexWindowStart() : st.getDepartureTime();
 
       // TODO: Store the window for a stop, and allow the user to have an "unguaranteed"
       // pickup/dropoff between the start and end of the window

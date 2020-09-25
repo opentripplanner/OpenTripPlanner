@@ -44,10 +44,12 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
   protected boolean isRouteable(Vertex flexVertex) {
     if (accessEgress.state.getVertex() == flexVertex) {
       return false;
-    } else if (calculator.calculateFlexPath(flexVertex, accessEgress.state.getVertex(), fromStopIndex, toStopIndex) == null) {
-      return false;
-    }
-    return true;
+    } else
+      return calculator.calculateFlexPath(flexVertex,
+          accessEgress.state.getVertex(),
+          fromStopIndex,
+          toStopIndex
+      ) != null;
   };
 
   protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
