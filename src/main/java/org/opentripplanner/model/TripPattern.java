@@ -641,7 +641,9 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         return new Coordinate(s.getLon(), s.getLat());
     }
 
-    // Need an equals() since "Trips in a pattern are no longer necessarily running on the same service ID."
+    /**
+     * Need an equals() since trips in a pattern are no longer necessarily running on the same service ID.
+     */
     @Override
     public boolean equals(Object o) {
         if (this == o) {
