@@ -70,7 +70,8 @@ public class TransitLayerMapper {
             tripPatternsByStopByDate,
             transferByStopIndex,
             stopIndex,
-            graph.getTimeZone().toZoneId()
+            graph.getTimeZone().toZoneId(),
+            graph.getNumberOfDaysOfLongestTrip()
         );
     }
 
