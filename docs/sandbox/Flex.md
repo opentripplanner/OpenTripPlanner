@@ -2,7 +2,8 @@
 
 ## Contact Info
 
-- Kyyti Oy, Helsinki, Finland
+- Kyyti Oy, Finland
+- Entur, Norway
 - Hannes Junnila
 
 
