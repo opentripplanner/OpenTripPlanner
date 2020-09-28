@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 
-public class PollingStoptimeUpdaterParameters extends PollingGraphUpdaterParameters
+public class PollingStoptimeUpdaterConfig extends PollingGraphUpdaterConfig
     implements PollingStoptimeUpdater.Parameters {
 
   private final String feedId;
@@ -12,7 +12,7 @@ public class PollingStoptimeUpdaterParameters extends PollingGraphUpdaterParamet
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
 
-  public PollingStoptimeUpdaterParameters(NodeAdapter c) {
+  public PollingStoptimeUpdaterConfig(NodeAdapter c) {
     super(c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);

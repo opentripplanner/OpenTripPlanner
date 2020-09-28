@@ -2,9 +2,9 @@ package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceConfig;
 
-public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
+public class SiriVMUpdaterConfig extends PollingGraphUpdaterConfig
     implements SiriVMUpdater.Parameters {
 
   private final String feedId;
@@ -13,9 +13,9 @@ public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
   private final boolean blockReadinessUntilInitialized;
-  private final SiriVMHttpTripUpdaterSourceParameters source;
+  private final SiriVMHttpTripUpdaterSourceConfig source;
 
-  public SiriVMUpdaterParameters(NodeAdapter c) {
+  public SiriVMUpdaterConfig(NodeAdapter c) {
     super(c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);
@@ -23,7 +23,7 @@ public class SiriVMUpdaterParameters extends PollingGraphUpdaterParameters
     purgeExpiredData = c.asBoolean("purgeExpiredData", false);
     fuzzyTripMatching = c.asBoolean("fuzzyTripMatching", false);
     blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
-    source = new SiriVMHttpTripUpdaterSourceParameters(c);
+    source = new SiriVMHttpTripUpdaterSourceConfig(c);
   }
 
 

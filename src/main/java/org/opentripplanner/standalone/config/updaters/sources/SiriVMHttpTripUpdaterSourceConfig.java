@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.updaters.sources;
 import org.opentripplanner.ext.siri.updater.SiriVMHttpTripUpdateSource;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class SiriVMHttpTripUpdaterSourceParameters extends UpdaterSourceParameters implements
+public class SiriVMHttpTripUpdaterSourceConfig extends UpdaterSourceConfig implements
     SiriVMHttpTripUpdateSource.Parameters {
 
   private final String requestorRef;
@@ -12,7 +12,7 @@ public class SiriVMHttpTripUpdaterSourceParameters extends UpdaterSourceParamete
 
   private final int timeoutSec;
 
-  public SiriVMHttpTripUpdaterSourceParameters(NodeAdapter c) {
+  public SiriVMHttpTripUpdaterSourceConfig(NodeAdapter c) {
     super(c);
     requestorRef = c.asText("requestorRef", null);
     feedId = c.asText("feedId", null);

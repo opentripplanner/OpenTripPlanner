@@ -3,12 +3,12 @@ package org.opentripplanner.standalone.config.updaters.sources;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.bike_rental.GenericKmlBikeRentalDataSource;
 
-public class GenericKmlBikeRentalSourceParameters extends UpdaterSourceParameters implements
+public class GenericKmlBikeRentalSourceConfig extends UpdaterSourceConfig implements
     GenericKmlBikeRentalDataSource.Parameters {
 
   private final String namePrefix;
 
-  public GenericKmlBikeRentalSourceParameters(NodeAdapter c) {
+  public GenericKmlBikeRentalSourceConfig(NodeAdapter c) {
     super(c);
     namePrefix = c.asText("namePrefix", null);
   }

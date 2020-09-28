@@ -3,10 +3,10 @@ package org.opentripplanner.standalone.config.updaters.sources;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
-public class UpdaterSourceParameters implements UpdaterDataSourceParameters {
+public class UpdaterSourceConfig implements UpdaterDataSourceParameters {
   private final String url;
 
-  public UpdaterSourceParameters(NodeAdapter c) {
+  public UpdaterSourceConfig(NodeAdapter c) {
     url = c.asText("url", null);
   }
 

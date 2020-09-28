@@ -3,14 +3,14 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 
-public class BikeRentalUpdaterParameters extends PollingGraphUpdaterParameters
+public class BikeRentalUpdaterConfig extends PollingGraphUpdaterConfig
     implements BikeRentalUpdater.Parameters {
 
   private final String network;
   private final String networks;
   private final String apiKey;
 
-  public BikeRentalUpdaterParameters(NodeAdapter c) {
+  public BikeRentalUpdaterConfig(NodeAdapter c) {
     super(c);
     network = c.asText("network", null);
     networks = c.asText("networks", null);

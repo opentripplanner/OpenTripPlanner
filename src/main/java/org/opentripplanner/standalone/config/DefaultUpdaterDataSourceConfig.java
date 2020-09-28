@@ -1,11 +1,11 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceParameters;
-import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceParameters;
-import org.opentripplanner.standalone.config.updaters.sources.KmlBikeParkSourceParameters;
-import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
-import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceParameters;
-import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceParameters;
+import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.KmlBikeParkSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.SiriVMHttpTripUpdaterSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceConfig;
 import org.opentripplanner.updater.UpdaterDataSourceConfig;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.OtpAppException;
@@ -42,40 +42,40 @@ public class DefaultUpdaterDataSourceConfig implements UpdaterDataSourceConfig {
   public static final String UIP_BIKE = "uip-bike";
   public static final String VCUV = "vcub";
 
-  private static final Map<String, Function<NodeAdapter, UpdaterSourceParameters>> CONFIG_CREATORS
+  private static final Map<String, Function<NodeAdapter, UpdaterSourceConfig>> CONFIG_CREATORS
       = new HashMap<>();
 
   static {
-    CONFIG_CREATORS.put(B_CYCLE, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(BICIMAD, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(BIXI, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(CITY_BIKES, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(CITI_BIKE_NYC, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(GBFS, GbfsSourceParameters::new);
-    CONFIG_CREATORS.put(JCDECAUX, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(KEOLIS_RENNES, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(KML, GenericKmlBikeRentalSourceParameters::new);
-    CONFIG_CREATORS.put(KML_BIKE_PARK, KmlBikeParkSourceParameters::new);
-    CONFIG_CREATORS.put(NEXT_BIKE, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(OV_FIETS, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SF_BAY_AREA, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SHARE_BIKE, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SIRI_ET, SiriETHttpTripUpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SIRI_ET_PUBSUB, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SIRI_VM, SiriVMHttpTripUpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SIRI_SX, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(SMOOVE, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(UIP_BIKE, UpdaterSourceParameters::new);
-    CONFIG_CREATORS.put(VCUV, UpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(B_CYCLE, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(BICIMAD, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(BIXI, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(CITY_BIKES, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(CITI_BIKE_NYC, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(GBFS, GbfsSourceConfig::new);
+    CONFIG_CREATORS.put(JCDECAUX, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(KEOLIS_RENNES, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(KML, GenericKmlBikeRentalSourceConfig::new);
+    CONFIG_CREATORS.put(KML_BIKE_PARK, KmlBikeParkSourceConfig::new);
+    CONFIG_CREATORS.put(NEXT_BIKE, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(OV_FIETS, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SF_BAY_AREA, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SHARE_BIKE, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SIRI_ET, SiriETHttpTripUpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SIRI_ET_PUBSUB, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SIRI_VM, SiriVMHttpTripUpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SIRI_SX, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(SMOOVE, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(UIP_BIKE, UpdaterSourceConfig::new);
+    CONFIG_CREATORS.put(VCUV, UpdaterSourceConfig::new);
   }
 
   private final String type;
 
-  private final UpdaterSourceParameters updaterSourceParameters;
+  private final UpdaterSourceConfig updaterSourceParameters;
 
   public DefaultUpdaterDataSourceConfig(NodeAdapter sourceConfig) {
     String type = sourceConfig.asText("sourceType");
-    Function<NodeAdapter, UpdaterSourceParameters> factory = CONFIG_CREATORS.get(type);
+    Function<NodeAdapter, UpdaterSourceConfig> factory = CONFIG_CREATORS.get(type);
     if (factory == null) {
       throw new OtpAppException("The updater config type is unknown: " + type);
     }

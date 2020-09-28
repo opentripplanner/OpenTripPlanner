@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class SiriETUpdaterParameters extends PollingGraphUpdaterParameters
+public class SiriETUpdaterConfig extends PollingGraphUpdaterConfig
     implements SiriETUpdater.Parameters {
 
   private final String feedId;
@@ -12,7 +12,7 @@ public class SiriETUpdaterParameters extends PollingGraphUpdaterParameters
   private final boolean purgeExpiredData;
   private final boolean blockReadinessUntilInitialized;
 
-  public SiriETUpdaterParameters(NodeAdapter c) {
+  public SiriETUpdaterConfig(NodeAdapter c) {
     super(c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);

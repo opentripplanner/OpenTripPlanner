@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config.updaters.sources;
 import org.opentripplanner.ext.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class SiriETHttpTripUpdaterSourceParameters extends UpdaterSourceParameters
+public class SiriETHttpTripUpdaterSourceConfig extends UpdaterSourceConfig
     implements SiriETHttpTripUpdateSource.Parameters {
 
   private final String requestorRef;
@@ -14,7 +14,7 @@ public class SiriETHttpTripUpdaterSourceParameters extends UpdaterSourceParamete
 
   private final int previewIntervalMinutes;
 
-  public SiriETHttpTripUpdaterSourceParameters(NodeAdapter c) {
+  public SiriETHttpTripUpdaterSourceConfig(NodeAdapter c) {
     super(c);
     requestorRef = c.asText("requestorRef", null);
     feedId = c.asText("feedId", null);

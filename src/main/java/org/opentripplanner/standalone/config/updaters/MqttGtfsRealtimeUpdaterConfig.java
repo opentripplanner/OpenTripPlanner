@@ -3,14 +3,14 @@ package org.opentripplanner.standalone.config.updaters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 
-public class MqttGtfsRealtimeUpdaterParameters implements MqttGtfsRealtimeUpdater.Parameters {
+public class MqttGtfsRealtimeUpdaterConfig implements MqttGtfsRealtimeUpdater.Parameters {
   private final String url;
   private final String topic;
   private final String feedId;
   private final int qos;
   private final boolean fuzzyTripMatching;
 
-  public MqttGtfsRealtimeUpdaterParameters(NodeAdapter c) {
+  public MqttGtfsRealtimeUpdaterConfig(NodeAdapter c) {
     url = c.asText("url");
     topic = c.asText("topic");
     feedId = c.asText("feedId", null);
