@@ -13,9 +13,9 @@ public class GtfsRealtimeAlertsUpdaterConfig
 
   private final boolean fuzzyTripMatching;
 
-  public GtfsRealtimeAlertsUpdaterConfig(NodeAdapter c)
+  public GtfsRealtimeAlertsUpdaterConfig(String configRef, NodeAdapter c)
   {
-    super(c);
+    super(configRef, c);
     earlyStartSec = c.asInt("earlyStartSec", 0);
     feedId = c.asText("feedId", null);
     fuzzyTripMatching = c.asBoolean("fuzzyTripMatching", false);

@@ -41,7 +41,7 @@ import java.util.List;
  *
  */
 public class MqttGtfsRealtimeUpdater implements GraphUpdater {
-    private static Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(MqttGtfsRealtimeUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
@@ -57,16 +57,19 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     private final String clientId = "OpenTripPlanner-" + MqttClient.generateClientId();
 
+    private final String configRef;
+
     MemoryPersistence persistence = new MemoryPersistence();
 
     private MqttClient client;
 
     public MqttGtfsRealtimeUpdater(Parameters parameters) {
-        url = parameters.getUrl();
-        topic = parameters.getTopic();
-        feedId = parameters.getFeedId();
-        qos = parameters.getQos();
-        fuzzyTripMatching = parameters.getFuzzyTripMatching();
+        this.configRef = parameters.getConfigRef();
+        this.url = parameters.getUrl();
+        this.topic = parameters.getTopic();
+        this.feedId = parameters.getFeedId();
+        this.qos = parameters.getQos();
+        this.fuzzyTripMatching = parameters.getFuzzyTripMatching();
     }
 
     @Override
@@ -114,8 +117,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public String getName() {
-        return "MqttGtfsRealtimeUpdater";
+    public String getConfigRef() {
+        return configRef;
     }
 
     private class Callback implements MqttCallbackExtended {
@@ -182,5 +185,8 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         String getFeedId();
         int getQos();
         boolean getFuzzyTripMatching();
+
+        /** The config name/type for the updater. Used to reference the configuration element. */
+        String getConfigRef();
     }
 }

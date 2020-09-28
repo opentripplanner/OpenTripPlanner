@@ -10,8 +10,8 @@ public class BikeRentalUpdaterConfig extends PollingGraphUpdaterConfig
   private final String networks;
   private final String apiKey;
 
-  public BikeRentalUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public BikeRentalUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     network = c.asText("network", null);
     networks = c.asText("networks", null);
     apiKey = c.asText("apiKey", null);

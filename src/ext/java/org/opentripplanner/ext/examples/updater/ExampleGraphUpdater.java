@@ -33,18 +33,22 @@ import org.slf4j.LoggerFactory;
  */
 public class ExampleGraphUpdater implements GraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(ExampleGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExampleGraphUpdater.class);
 
     private GraphUpdaterManager updaterManager;
 
-    private Integer frequencySec;
+    private final Integer frequencySec;
 
-    private String url;
+    private final String url;
+
+    private final String configRef;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     public ExampleGraphUpdater(PollingGraphUpdater.PollingGraphUpdaterParameters config) {
-        frequencySec = config.getFrequencySec();
-        url = config.getUrl();
+        this.frequencySec = config.getFrequencySec();
+        this.url = config.getUrl();
+        this.configRef = config.getConfigRef() + "." + config.getSourceConfig().getType();
+
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
     }
 
@@ -72,7 +76,16 @@ public class ExampleGraphUpdater implements GraphUpdater {
         LOG.info("Teardown example updater");
     }
 
-    public String getName() {
-        return "ExampleGraphUpdater";
+    public String getConfigRef() {
+        return configRef;
+    }
+
+    @Override
+    public String toString() {
+        return "ExampleGraphUpdater{"
+            + "configRef='" + configRef + '\''
+            + ", url='" + url + '\''
+            + ", frequencySec=" + frequencySec
+            + '}';
     }
 }

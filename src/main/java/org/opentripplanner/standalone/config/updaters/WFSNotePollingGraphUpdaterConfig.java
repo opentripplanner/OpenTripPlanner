@@ -8,8 +8,8 @@ public class WFSNotePollingGraphUpdaterConfig extends PollingGraphUpdaterConfig
 
   private final String featureType;
 
-  public WFSNotePollingGraphUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public WFSNotePollingGraphUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     featureType = c.asText("featureType", null);
   }
 

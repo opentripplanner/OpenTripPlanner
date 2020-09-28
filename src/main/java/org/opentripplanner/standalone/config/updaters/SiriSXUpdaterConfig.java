@@ -13,8 +13,8 @@ public class SiriSXUpdaterConfig extends PollingGraphUpdaterConfig
   private final int timeoutSec;
   private final boolean blockReadinessUntilInitialized;
 
-  public SiriSXUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public SiriSXUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     url = c.asText("url", null);
     requestorRef = c.asText("requestorRef", null);
     earlyStartSec = c.asInt("earlyStartSec", -1);

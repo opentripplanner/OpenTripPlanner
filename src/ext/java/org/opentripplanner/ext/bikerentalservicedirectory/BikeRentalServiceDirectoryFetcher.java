@@ -45,7 +45,8 @@ public class BikeRentalServiceDirectoryFetcher {
             gbfsUpdaterSourceConfig,
             updaterUrl,
             DEFAULT_FREQUENCY_SEC,
-            network
+            network,
+            "bike-rental-service-directory:" + network
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 

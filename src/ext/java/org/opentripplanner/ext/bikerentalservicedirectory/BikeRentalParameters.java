@@ -13,16 +13,20 @@ public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
 
   private final String network;
 
+  private final String configRef;
+
   public BikeRentalParameters(
       UpdaterDataSourceConfig sourceConfig,
       String url,
       int frequencySec,
-      String network
+      String network,
+      String configRef
   ) {
     this.sourceConfig = sourceConfig;
     this.url = url;
     this.frequencySec = frequencySec;
     this.network = network;
+    this.configRef = configRef;
   }
 
   @Override
@@ -53,5 +57,10 @@ public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
   @Override
   public String getApiKey() {
     return null;
+  }
+
+  @Override
+  public String getConfigRef() {
+    return configRef;
   }
 }

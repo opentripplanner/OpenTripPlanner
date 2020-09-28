@@ -12,8 +12,8 @@ public class SiriETUpdaterConfig extends PollingGraphUpdaterConfig
   private final boolean purgeExpiredData;
   private final boolean blockReadinessUntilInitialized;
 
-  public SiriETUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public SiriETUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);
     maxSnapshotFrequencyMs = c.asInt("maxSnapshotFrequencyMs", -1);

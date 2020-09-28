@@ -17,7 +17,7 @@ import org.slf4j.LoggerFactory;
  */
 public abstract class PollingGraphUpdater implements GraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(PollingGraphUpdater.class);
 
     /**
      * Mirrors GraphUpdater.run method. Only difference is that runPolling will be run multiple
@@ -39,17 +39,13 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      */
     protected boolean primed;
 
-    /**
-     * The type name in the preferences JSON.
-     * FIXME: String type codes seem like a red flag. Though they are needed in JSON to decide which Java type to
-     *        deserialize into, they should probably not survive into those Java objects themselves.
-     */
-    private String type;
+    private final String configRef;
+
 
     /** Shared configuration code for all polling graph updaters. */
     public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
-        pollingPeriodSeconds = config.getFrequencySec();
-        type = config.getSourceConfig().getType();
+        this.pollingPeriodSeconds = config.getFrequencySec();
+        this.configRef = config.getConfigRef() + "." + config.getSourceConfig().getType();
     }
 
     @Override
@@ -69,7 +65,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
                 } catch (InterruptedException e) {
                     throw e;
                 } catch (Exception e) {
-                    LOG.error("Error while running polling updater of type {}", type, e);
+                    LOG.error("Error while running polling updater of type {}", configRef, e);
                     // TODO Should we cancel the task? Or after n consecutive failures? cancel();
                 } finally {
                     primed = true;
@@ -92,8 +88,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         return primed;
     }
 
-    public String getName() {
-        return type;
+    public String getConfigRef() {
+        return configRef;
     }
 
     /**
@@ -104,5 +100,8 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
         UpdaterDataSourceConfig getSourceConfig();
         String getUrl();
         int getFrequencySec();
+
+        /** The config name/type for the updater. Used to reference the configuration element. */
+        String getConfigRef();
     }
 }

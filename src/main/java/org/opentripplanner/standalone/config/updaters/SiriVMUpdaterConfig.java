@@ -15,8 +15,8 @@ public class SiriVMUpdaterConfig extends PollingGraphUpdaterConfig
   private final boolean blockReadinessUntilInitialized;
   private final SiriVMHttpTripUpdaterSourceConfig source;
 
-  public SiriVMUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public SiriVMUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);
     maxSnapshotFrequencyMs = c.asInt("maxSnapshotFrequencyMs", -1);

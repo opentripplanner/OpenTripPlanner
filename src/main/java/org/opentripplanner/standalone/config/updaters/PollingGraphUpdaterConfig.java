@@ -8,22 +8,33 @@ import org.opentripplanner.updater.UpdaterDataSourceConfig;
 public class PollingGraphUpdaterConfig
     implements PollingGraphUpdater.PollingGraphUpdaterParameters {
 
+  private final String configRef;
+
   private final UpdaterDataSourceConfig source;
 
   private final String url;
 
   private final int frequencySec;
 
-  public PollingGraphUpdaterConfig(NodeAdapter c) {
-    source = new DefaultUpdaterDataSourceConfig(c);
-    url = c.asText("url", null);
-    frequencySec = c.asInt("frequencySec", 60);
+  public PollingGraphUpdaterConfig(String configRef, NodeAdapter c) {
+    this.configRef = configRef;
+    this.source = new DefaultUpdaterDataSourceConfig(c);
+    this.url = c.asText("url", null);
+    this.frequencySec = c.asInt("frequencySec", 60);
   }
 
 
+  @Override
   public UpdaterDataSourceConfig getSourceConfig() { return source; }
 
+  @Override
   public String getUrl() { return url; }
 
+  @Override
   public int getFrequencySec() { return frequencySec; }
+
+  @Override
+  public String getConfigRef() {
+    return configRef;
+  }
 }

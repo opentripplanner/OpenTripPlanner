@@ -2,16 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.*;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.util.OtpAppException;
 
@@ -19,7 +10,7 @@ import java.net.URI;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.function.Function;
+import java.util.function.BiFunction;
 
 /**
  * This class maps between the JSON array of updaters and the concrete class implementations of
@@ -41,7 +32,7 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final String SIRI_VM_UPDATER = "siri-vm-updater";
   private static final String SIRI_SX_UPDATER = "siri-sx-updater";
 
-  private static final Map<String, Function<NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
+  private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
     CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
@@ -69,11 +60,11 @@ public class UpdatersConfig implements UpdatersParameters {
 
     for (NodeAdapter conf : updaters) {
       String type = conf.asText("type");
-      Function<NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
+      BiFunction<String, NodeAdapter, ?> factory = CONFIG_CREATORS.get(type);
       if(factory == null) {
         throw new OtpAppException("The updater config type is unknown: " + type);
       }
-      configList.put(type, factory.apply(conf));
+      configList.put(type, factory.apply(type, conf));
     }
   }
 

@@ -1,14 +1,5 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -23,6 +14,9 @@ import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 import static org.opentripplanner.standalone.config.DefaultUpdaterDataSourceConfig.*;
 
@@ -225,5 +219,8 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         String getNetwork();
         String getNetworks();
         String getApiKey();
+
+        /** The config name/type for the updater. Used to reference the configuration element. */
+        String getConfigRef();
     }
 }

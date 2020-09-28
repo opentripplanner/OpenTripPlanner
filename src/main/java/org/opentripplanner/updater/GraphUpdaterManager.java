@@ -206,7 +206,7 @@ public class GraphUpdaterManager {
         Collection<String> waitingUpdaters = new ArrayList<>();
         for (GraphUpdater updater : graph.updaterManager.getUpdaterList()) {
             if (!(updater).isPrimed()) {
-                waitingUpdaters.add(updater.getName());
+                waitingUpdaters.add(updater.getConfigRef());
             }
         }
         return waitingUpdaters;

@@ -12,8 +12,8 @@ public class PollingStoptimeUpdaterConfig extends PollingGraphUpdaterConfig
   private final boolean purgeExpiredData;
   private final boolean fuzzyTripMatching;
 
-  public PollingStoptimeUpdaterConfig(NodeAdapter c) {
-    super(c);
+  public PollingStoptimeUpdaterConfig(String configRef, NodeAdapter c) {
+    super(configRef, c);
     feedId = c.asText("feedId", null);
     logFrequency = c.asInt("logFrequency", -1);
     maxSnapshotFrequencyMs = c.asInt("maxSnapshotFrequencyMs", -1);

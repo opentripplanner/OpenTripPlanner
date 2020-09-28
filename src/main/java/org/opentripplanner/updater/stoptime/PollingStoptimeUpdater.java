@@ -164,5 +164,8 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         int getMaxSnapshotFrequencyMs();
         boolean purgeExpiredData();
         boolean fuzzyTripMatching();
+
+        /** The config name/type for the updater. Used to reference the configuration element. */
+        String getConfigRef();
     }
 }
