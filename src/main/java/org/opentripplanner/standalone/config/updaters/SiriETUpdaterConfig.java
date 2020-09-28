@@ -1,6 +1,5 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import org.opentripplanner.ext.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
 

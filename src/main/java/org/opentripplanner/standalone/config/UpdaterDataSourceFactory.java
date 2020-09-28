@@ -15,52 +15,30 @@ import java.util.function.BiFunction;
  */
 public class UpdaterDataSourceFactory {
 
-  public static final String B_CYCLE = "b-cycle";
-  public static final String BICIMAD = "bicimad";
-  public static final String BIXI = "bixi";
-  public static final String CITY_BIKES = "city-bikes";
-  public static final String CITI_BIKE_NYC = "citi-bike-nyc";
-  public static final String GBFS = "gbfs";
-  public static final String JCDECAUX = "jcdecaux";
-  public static final String KEOLIS_RENNES = "keolis-rennes";
-  public static final String KML = "kml";
-  public static final String KML_BIKE_PARK = "kml-bike-park";
-  public static final String NEXT_BIKE = "next-bike";
-  public static final String OV_FIETS = "ov-fiets";
-  public static final String SF_BAY_AREA = "sf-bay-area";
-  public static final String SHARE_BIKE = "share-bike";
-  public static final String SIRI_ET = "siri-et";
-  public static final String SIRI_ET_PUBSUB = "siri-et-pubsub";
-  public static final String SIRI_VM = "siri-vm";
-  public static final String SIRI_SX = "siri-sx";
-  public static final String SMOOVE = "smoove";
-  public static final String UIP_BIKE = "uip-bike";
-  public static final String VCUV = "vcub";
-
   private static final Map<String, Entry> CONFIG_CREATORS = new HashMap<>();
 
   static {
-    add(B_CYCLE, DataSourceType.B_CYCLE, UpdaterSourceConfig::new);
-    add(BICIMAD, DataSourceType.BICIMAD, UpdaterSourceConfig::new);
-    add(BIXI, DataSourceType.BIXI, UpdaterSourceConfig::new);
-    add(CITY_BIKES, DataSourceType.CITY_BIKES, UpdaterSourceConfig::new);
-    add(CITI_BIKE_NYC, DataSourceType.CITI_BIKE_NYC, UpdaterSourceConfig::new);
-    add(GBFS, DataSourceType.GBFS, GbfsSourceConfig::new);
-    add(JCDECAUX, DataSourceType.JCDECAUX, UpdaterSourceConfig::new);
-    add(KEOLIS_RENNES, DataSourceType.KEOLIS_RENNES, UpdaterSourceConfig::new);
-    add(KML, DataSourceType.KML, GenericKmlBikeRentalSourceConfig::new);
-    add(KML_BIKE_PARK, DataSourceType.KML_BIKE_PARK, KmlBikeParkSourceConfig::new);
-    add(NEXT_BIKE, DataSourceType.NEXT_BIKE, UpdaterSourceConfig::new);
-    add(OV_FIETS, DataSourceType.OV_FIETS, UpdaterSourceConfig::new);
-    add(SF_BAY_AREA, DataSourceType.SF_BAY_AREA, UpdaterSourceConfig::new);
-    add(SHARE_BIKE, DataSourceType.SHARE_BIKE, UpdaterSourceConfig::new);
-    add(SIRI_ET, DataSourceType.SIRI_ET, SiriETHttpTripUpdaterSourceConfig::new);
-    add(SIRI_ET_PUBSUB, DataSourceType.SIRI_ET_PUBSUB, UpdaterSourceConfig::new);
-    add(SIRI_VM, DataSourceType.SIRI_VM, SiriVMHttpTripUpdaterSourceConfig::new);
-    add(SIRI_SX, DataSourceType.SIRI_SX, UpdaterSourceConfig::new);
-    add(SMOOVE, DataSourceType.SMOOVE, UpdaterSourceConfig::new);
-    add(UIP_BIKE, DataSourceType.UIP_BIKE, UpdaterSourceConfig::new);
-    add(VCUV, DataSourceType.VCUV, UpdaterSourceConfig::new);
+    add("b-cycle", DataSourceType.B_CYCLE, UpdaterSourceConfig::new);
+    add("bicimad", DataSourceType.BICIMAD, UpdaterSourceConfig::new);
+    add("bixi", DataSourceType.BIXI, UpdaterSourceConfig::new);
+    add("city-bikes", DataSourceType.CITY_BIKES, UpdaterSourceConfig::new);
+    add("citi-bike-nyc", DataSourceType.CITI_BIKE_NYC, UpdaterSourceConfig::new);
+    add("gbfs", DataSourceType.GBFS, GbfsSourceConfig::new);
+    add("jcdecaux", DataSourceType.JCDECAUX, UpdaterSourceConfig::new);
+    add("keolis-rennes", DataSourceType.KEOLIS_RENNES, UpdaterSourceConfig::new);
+    add("kml", DataSourceType.KML, GenericKmlBikeRentalSourceConfig::new);
+    add("kml-bike-park", DataSourceType.KML_BIKE_PARK, KmlBikeParkSourceConfig::new);
+    add("next-bike", DataSourceType.NEXT_BIKE, UpdaterSourceConfig::new);
+    add("ov-fiets", DataSourceType.OV_FIETS, UpdaterSourceConfig::new);
+    add("sf-bay-area", DataSourceType.SF_BAY_AREA, UpdaterSourceConfig::new);
+    add("share-bike", DataSourceType.SHARE_BIKE, UpdaterSourceConfig::new);
+    add("siri-et", DataSourceType.SIRI_ET, SiriETHttpTripUpdaterSourceConfig::new);
+    add("siri-et-pubsub", DataSourceType.SIRI_ET_PUBSUB, UpdaterSourceConfig::new);
+    add("siri-vm", DataSourceType.SIRI_VM, SiriVMHttpTripUpdaterSourceConfig::new);
+    add("siri-sx", DataSourceType.SIRI_SX, UpdaterSourceConfig::new);
+    add("smoove", DataSourceType.SMOOVE, UpdaterSourceConfig::new);
+    add("uip-bike", DataSourceType.UIP_BIKE, UpdaterSourceConfig::new);
+    add("vcub", DataSourceType.VCUV, UpdaterSourceConfig::new);
   }
 
   public static UpdaterDataSourceParameters createDataSourceParameters(String type, NodeAdapter sourceConfig) {
