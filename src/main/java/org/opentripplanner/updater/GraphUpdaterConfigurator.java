@@ -44,16 +44,16 @@ public abstract class GraphUpdaterConfigurator {
 
     public static void setupGraph(
         Graph graph,
-        UpdaterParameters updaterParameters
+        UpdatersParameters updatersParameters
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
         updaters.addAll(
-            createUpdatersFromConfig(updaterParameters)
+            createUpdatersFromConfig(updatersParameters)
         );
         updaters.addAll(
             fetchBikeRentalServicesFromOnlineDirectory(
-                updaterParameters.bikeRentalServiceDirectoryUrl()
+                updatersParameters.bikeRentalServiceDirectoryUrl()
             )
         );
 
@@ -104,7 +104,7 @@ public abstract class GraphUpdaterConfigurator {
      * @return a list of GraphUpdaters created from the configuration
      */
     private static List<GraphUpdater> createUpdatersFromConfig(
-        UpdaterParameters config
+        UpdatersParameters config
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 

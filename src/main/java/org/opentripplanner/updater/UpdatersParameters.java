@@ -14,7 +14,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import java.net.URI;
 import java.util.List;
 
-public interface UpdaterParameters {
+public interface UpdatersParameters {
 
   URI bikeRentalServiceDirectoryUrl();
 

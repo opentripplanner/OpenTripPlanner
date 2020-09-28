@@ -12,6 +12,7 @@ import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
 import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.util.OtpAppException;
 
 import java.net.URI;
@@ -25,7 +26,7 @@ import java.util.function.Function;
  * each updater parameters. Some updaters use the same parameters, so a map is kept between the
  * JSON updater type strings and the appropriate updater parameter class.
  */
-public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParameters {
+public class UpdatersConfig implements UpdatersParameters {
 
   private static final String BIKE_RENTAL = "bike-rental";
   private static final String STOP_TIME_UPDATER = "stop-time-updater";
@@ -61,7 +62,7 @@ public class UpdaterConfig implements org.opentripplanner.updater.UpdaterParamet
 
   private final URI bikeRentalServiceDirectoryUrl;
 
-  public UpdaterConfig(NodeAdapter rootAdapter) {
+  public UpdatersConfig(NodeAdapter rootAdapter) {
     this.bikeRentalServiceDirectoryUrl = rootAdapter.asUri("bikeRentalServiceDirectoryUrl", null);
 
     List<NodeAdapter> updaters = rootAdapter.path("updaters").asList();
