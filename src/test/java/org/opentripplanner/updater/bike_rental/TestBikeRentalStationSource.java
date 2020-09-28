@@ -1,11 +1,11 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
+
+import java.util.List;
 
 public class TestBikeRentalStationSource extends TestCase {
 
@@ -17,11 +17,8 @@ public class TestBikeRentalStationSource extends TestCase {
                 public String getUrl() {
                     return "file:src/test/resources/bike/keolis-rennes.xml";
                 }
-
-                @Override
-                public String getName() {
-                    return null;
-                }
+                // Only needed to create the data source
+                @Override public DataSourceType type() { return null; }
             }
             );
         assertTrue(rennesSource.update());
@@ -48,11 +45,8 @@ public class TestBikeRentalStationSource extends TestCase {
                 public String getUrl() {
                     return "file:src/test/resources/bike/smoove.json";
                 }
-
-                @Override
-                public String getName() {
-                    return null;
-                }
+                // Only needed to create the data source
+                @Override public DataSourceType type() { return null; }
             });
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();

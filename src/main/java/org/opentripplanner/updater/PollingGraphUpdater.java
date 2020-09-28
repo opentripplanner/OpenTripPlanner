@@ -45,7 +45,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
     /** Shared configuration code for all polling graph updaters. */
     public PollingGraphUpdater(PollingGraphUpdaterParameters config) {
         this.pollingPeriodSeconds = config.getFrequencySec();
-        this.configRef = config.getConfigRef() + "." + config.getSourceConfig().getType();
+        this.configRef = config.getConfigRef();
     }
 
     @Override
@@ -97,7 +97,7 @@ public abstract class PollingGraphUpdater implements GraphUpdater {
      * config interfaces of child classes.
      */
     public interface PollingGraphUpdaterParameters {
-        UpdaterDataSourceConfig getSourceConfig();
+        UpdaterDataSourceParameters getSourceParameters();
         String getUrl();
         int getFrequencySec();
 

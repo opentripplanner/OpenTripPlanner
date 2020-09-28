@@ -8,17 +8,12 @@ import org.opentripplanner.routing.edgetype.RentABikeOffEdge;
 import org.opentripplanner.routing.edgetype.RentABikeOnEdge;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
-import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.GraphWriterRunnable;
-import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.*;
 import java.util.Map.Entry;
-
-import static org.opentripplanner.standalone.config.DefaultUpdaterDataSourceConfig.*;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -43,13 +38,14 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         super(parameters);
 
         // Set data source type from config JSON
-        String sourceType = parameters.getSourceConfig().getType();
+        DataSourceType sourceType = parameters.getSourceParameters().type();
         String apiKey = parameters.getApiKey();
         // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
         // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
         String networkName = parameters.getNetwork();
-        UpdaterDataSourceParameters sourceParameters = parameters.getSourceConfig().getUpdaterSourceParameters();
+        UpdaterDataSourceParameters sourceParameters = parameters.getSourceParameters();
         BikeRentalDataSource source = null;
+
         if (sourceType != null) {
             switch (sourceType) {
                 case JCDECAUX:

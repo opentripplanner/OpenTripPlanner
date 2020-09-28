@@ -69,21 +69,20 @@ public class PollingStoptimeUpdater extends PollingGraphUpdater {
         super(parameters);
         // Create update streamer from preferences
         feedId = parameters.getFeedId();
-        String sourceType = parameters.getSourceConfig().getType();
-        if (sourceType != null) {
-            if (sourceType.equals("gtfs-http")) {
+
+        switch (parameters.getSourceParameters().type()) {
+            case GTFS_HTTP:
                 updateSource = new GtfsRealtimeHttpTripUpdateSource(parameters);
-            } else if (sourceType.equals("gtfs-file")) {
+                break;
+            case GTFS_FILE:
                 updateSource = new GtfsRealtimeFileTripUpdateSource(
                     (GtfsRealtimeFileTripUpdateSource.GtfsRealtimeFileTripUpdateSourceParameters) parameters
                 );
-            }
-        }
-
-        // Configure update source
-        if (updateSource == null) {
-            throw new IllegalArgumentException(
-                    "Unknown update streamer source type: " + sourceType);
+                break;
+            default:
+                throw new IllegalArgumentException(
+                    "Unknown update streamer source type: " + parameters.getSourceParameters().type()
+                );
         }
 
         // Configure updater FIXME why are the fields objects instead of primitives? this allows null values...

@@ -1,13 +1,5 @@
 package org.opentripplanner.updater.bike_park;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -20,6 +12,9 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.*;
+import java.util.Map.Entry;
 
 /**
  * Graph updater that dynamically sets availability information on bike parking lots.
@@ -50,7 +45,7 @@ public class BikeParkUpdater extends PollingGraphUpdater {
     public BikeParkUpdater(PollingGraphUpdaterParameters parameters) {
         super(parameters);
         // Set source from preferences
-        source = new KmlBikeParkDataSource((KmlBikeParkDataSource.Parameters) parameters.getSourceConfig());
+        source = new KmlBikeParkDataSource((KmlBikeParkDataSource.Parameters) parameters.getSourceParameters());
 
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }

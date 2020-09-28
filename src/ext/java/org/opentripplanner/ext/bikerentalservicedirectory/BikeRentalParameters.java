@@ -1,11 +1,11 @@
 package org.opentripplanner.ext.bikerentalservicedirectory;
 
-import org.opentripplanner.updater.UpdaterDataSourceConfig;
+import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 
 public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
 
-  private final UpdaterDataSourceConfig sourceConfig;
+  private final UpdaterDataSourceParameters parameters;
 
   private final String url;
 
@@ -16,22 +16,22 @@ public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
   private final String configRef;
 
   public BikeRentalParameters(
-      UpdaterDataSourceConfig sourceConfig,
+      String configRef,
+      String network,
       String url,
       int frequencySec,
-      String network,
-      String configRef
+      UpdaterDataSourceParameters parameters
   ) {
-    this.sourceConfig = sourceConfig;
+    this.configRef = configRef;
+    this.network = network;
     this.url = url;
     this.frequencySec = frequencySec;
-    this.network = network;
-    this.configRef = configRef;
+    this.parameters = parameters;
   }
 
   @Override
-  public UpdaterDataSourceConfig getSourceConfig() {
-    return sourceConfig;
+  public UpdaterDataSourceParameters getSourceParameters() {
+    return parameters;
   }
 
   @Override

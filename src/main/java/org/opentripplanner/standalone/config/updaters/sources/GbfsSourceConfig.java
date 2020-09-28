@@ -1,6 +1,7 @@
 package org.opentripplanner.standalone.config.updaters.sources;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
 
 public class GbfsSourceConfig extends UpdaterSourceConfig implements
@@ -8,8 +9,8 @@ public class GbfsSourceConfig extends UpdaterSourceConfig implements
 
   private final boolean routeAsCar;
 
-  public GbfsSourceConfig(NodeAdapter c) {
-    super(c);
+  public GbfsSourceConfig( DataSourceType type, NodeAdapter c) {
+    super(type, c);
     routeAsCar = c.asBoolean("routeAsCar", false);
   }
 

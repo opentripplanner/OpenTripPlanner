@@ -1,5 +1,6 @@
 package org.opentripplanner.standalone.config.updaters;
 
+import org.opentripplanner.ext.siri.updater.SiriETHttpTripUpdateSource;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
@@ -21,13 +22,18 @@ public class SiriETUpdaterConfig extends PollingGraphUpdaterConfig
     blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
   }
 
+  @Override
   public String getFeedId() { return feedId; }
 
+  @Override
   public int getLogFrequency() { return logFrequency; }
 
+  @Override
   public int getMaxSnapshotFrequencyMs() { return maxSnapshotFrequencyMs; }
 
+  @Override
   public boolean purgeExpiredData() { return purgeExpiredData; }
 
+  @Override
   public boolean blockReadinessUntilInitialized() { return blockReadinessUntilInitialized; }
 }

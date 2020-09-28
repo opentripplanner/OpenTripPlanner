@@ -80,8 +80,7 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriVMHttpTripUpdateSource( (SiriVMHttpTripUpdateSource.Parameters)
-            config.getSourceConfig().getUpdaterSourceParameters());
+        updateSource = new SiriVMHttpTripUpdateSource( (SiriVMHttpTripUpdateSource.Parameters) config.getSourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {

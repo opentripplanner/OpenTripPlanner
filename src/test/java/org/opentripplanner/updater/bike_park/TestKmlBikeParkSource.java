@@ -1,10 +1,10 @@
 package org.opentripplanner.updater.bike_park;
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.routing.bike_park.BikePark;
+import org.opentripplanner.updater.DataSourceType;
+
+import java.util.List;
 
 public class TestKmlBikeParkSource extends TestCase {
 
@@ -26,10 +26,8 @@ public class TestKmlBikeParkSource extends TestCase {
         return "file:src/test/resources/bike/NSFietsenstallingen.kml";
       }
 
-      @Override
-      public String getName() {
-        return null;
-      }
+      // Only needed to create the data source
+      @Override public DataSourceType type() { return null; }
     });
     assertTrue(kmlDataSource.update());
     List<BikePark> bikeParks = kmlDataSource.getBikeParks();
@@ -61,11 +59,8 @@ public class TestKmlBikeParkSource extends TestCase {
           public String getUrl() {
               return "file:src/test/resources/bike/NSFietsenstallingen_folder.kml";
           }
-
-        @Override
-        public String getName() {
-          return null;
-        }
+          // Only needed to create the data source
+          @Override public DataSourceType type() { return null; }
       });
     assertTrue(kmlDataSource.update());
     List<BikePark> bikeParks = kmlDataSource.getBikeParks();

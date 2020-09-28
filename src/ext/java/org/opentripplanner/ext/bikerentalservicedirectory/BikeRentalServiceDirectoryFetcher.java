@@ -2,6 +2,7 @@ package org.opentripplanner.ext.bikerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.util.HttpUtils;
@@ -38,15 +39,17 @@ public class BikeRentalServiceDirectoryFetcher {
       for (JsonNode operator : node.get("operators")) {
         String network = operator.get("name").asText();
         String updaterUrl = adjustUrlForUpdater(operator.get("url").asText());
+        GbfsDataSourceParameters dataSource = new GbfsDataSourceParameters(
+            DataSourceType.GBFS,
+            updaterUrl
+        );
 
-        GbfsDataSourceParameters dataSource = new GbfsDataSourceParameters(updaterUrl, network);
-        GbfsUpdaterSourceConfig gbfsUpdaterSourceConfig = new GbfsUpdaterSourceConfig(dataSource);
         BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
-            gbfsUpdaterSourceConfig,
+            "bike-rental-service-directory:" + network,
+            network,
             updaterUrl,
             DEFAULT_FREQUENCY_SEC,
-            network,
-            "bike-rental-service-directory:" + network
+            dataSource
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 

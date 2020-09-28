@@ -1,16 +1,16 @@
 package org.opentripplanner.ext.bikerentalservicedirectory;
 
+import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.bike_rental.GbfsBikeRentalDataSource;
 
 public class GbfsDataSourceParameters implements GbfsBikeRentalDataSource.Parameters {
 
+  private final DataSourceType type;
   private final String url;
 
-  private final String name;
-
-  public GbfsDataSourceParameters(String url, String name) {
+  public GbfsDataSourceParameters(DataSourceType type, String url) {
+    this.type = type;
     this.url = url;
-    this.name = name;
   }
 
   @Override
@@ -24,7 +24,7 @@ public class GbfsDataSourceParameters implements GbfsBikeRentalDataSource.Parame
   }
 
   @Override
-  public String getName() {
-    return name;
+  public DataSourceType type() {
+    return type;
   }
 }

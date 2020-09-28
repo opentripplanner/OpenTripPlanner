@@ -47,7 +47,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
     public ExampleGraphUpdater(PollingGraphUpdater.PollingGraphUpdaterParameters config) {
         this.frequencySec = config.getFrequencySec();
         this.url = config.getUrl();
-        this.configRef = config.getConfigRef() + "." + config.getSourceConfig().getType();
+        this.configRef = config.getConfigRef();
 
         LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
     }
