@@ -1,10 +1,10 @@
-package org.opentripplanner.analyst.core;
+package org.opentripplanner.common.geometry;
 
 import org.geotools.geometry.Envelope2D;
 import org.geotools.referencing.crs.DefaultGeographicCRS;
 
 /* http://wiki.openstreetmap.org/wiki/Slippy_map_tilenames */
-public class SlippyTile {
+public class WebMercatorTile {
 
     public static String getTileNumber(final double lat, final double lon, final int zoom) {
         int xtile = (int)Math.floor( (lon + 180) / 360 * (1<<zoom) ) ;

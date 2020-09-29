@@ -3,7 +3,7 @@ package org.opentripplanner.inspector;
 import org.geotools.geometry.Envelope2D;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.util.AffineTransformation;
-import org.opentripplanner.analyst.request.TileRequest;
+import org.opentripplanner.common.geometry.MapTile;
 import org.opentripplanner.api.resource.GraphInspectorTileResource;
 import org.opentripplanner.inspector.TileRenderer.TileRenderContext;
 import org.opentripplanner.routing.graph.Graph;
@@ -47,15 +47,15 @@ public class TileRendererManager {
         renderers.put(layer, tileRenderer);
     }
 
-    public BufferedImage renderTile(final TileRequest tileRequest, String layer) {
+    public BufferedImage renderTile(final MapTile mapTile, String layer) {
 
         TileRenderContext context = new TileRenderContext() {
             @Override
             public Envelope expandPixels(double marginXPixels, double marginYPixels) {
                 Envelope retval = new Envelope(bbox);
                 retval.expandBy(
-                        marginXPixels / tileRequest.width * (bbox.getMaxX() - bbox.getMinX()),
-                        marginYPixels / tileRequest.height * (bbox.getMaxY() - bbox.getMinY()));
+                        marginXPixels / mapTile.width * (bbox.getMaxX() - bbox.getMinX()),
+                        marginYPixels / mapTile.height * (bbox.getMaxY() - bbox.getMinY()));
                 return retval;
             }
         };
@@ -67,24 +67,25 @@ public class TileRendererManager {
             throw new IllegalArgumentException("Unknown layer: " + layer);
 
         // The best place for caching tiles may be here
-        BufferedImage image = new BufferedImage(tileRequest.width, tileRequest.height,
+        BufferedImage image = new BufferedImage(
+            mapTile.width, mapTile.height,
                 renderer.getColorModel());
         context.graphics = image.createGraphics();
-        Envelope2D trbb = tileRequest.bbox;
+        Envelope2D trbb = mapTile.bbox;
         context.bbox = new Envelope(trbb.x, trbb.x + trbb.width, trbb.y, trbb.y + trbb.height);
         context.transform = new AffineTransformation();
-        double xScale = tileRequest.width / trbb.width;
-        double yScale = tileRequest.height / trbb.height;
+        double xScale = mapTile.width / trbb.width;
+        double yScale = mapTile.height / trbb.height;
 
         context.transform.translate(-trbb.x, -trbb.y - trbb.height);
         context.transform.scale(xScale, -yScale);
-        context.metersPerPixel = Math.toRadians(trbb.height) * 6371000 / tileRequest.height;
-        context.tileWidth = tileRequest.width;
-        context.tileHeight = tileRequest.height;
+        context.metersPerPixel = Math.toRadians(trbb.height) * 6371000 / mapTile.height;
+        context.tileWidth = mapTile.width;
+        context.tileHeight = mapTile.height;
 
         long start = System.currentTimeMillis();
         renderer.renderTile(context);
-        LOG.debug("Rendered tile at {},{} in {} ms", tileRequest.bbox.y, tileRequest.bbox.x,
+        LOG.debug("Rendered tile at {},{} in {} ms", mapTile.bbox.y, mapTile.bbox.x,
                 System.currentTimeMillis() - start);
         return image;
     }

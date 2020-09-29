@@ -46,4 +46,5 @@ pages:
     - Transmodel(NeTEx) GrpahQL API: 'sandbox/TransmodelApi.md'
     - SIRI Updater: 'sandbox/SiriUpdator.md'
     - Bike Rental Service Directory API support: 'sandbox/BikeRentalServiceDirectory.md'
+    - Mapbox Vector Tiles API: 'sandbox/MapboxVectorTilesApi.md'
     - Sandbox Extension Example: 'sandbox/Examples.md'
