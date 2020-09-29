@@ -208,7 +208,7 @@ public class EnumTypes {
 
     public static GraphQLEnumType bookingMethodEnum = TransmodelIndexGraphQLSchema.createEnum("BookingMethod", BookingArrangement.BookingMethodEnum.values(), (t -> t.name()));
 */
-/*
+
     public static GraphQLEnumType filterPlaceTypeEnum = GraphQLEnumType.newEnum()
             .name("FilterPlaceType")
             .value("quay", TransmodelPlaceType.QUAY, "Quay")
@@ -217,7 +217,7 @@ public class EnumTypes {
             .value("bikePark",TransmodelPlaceType.BIKE_PARK, "Bike parks")
             .value("carPark", TransmodelPlaceType.CAR_PARK, "Car parks")
             .build();
-*/
+
 
     public static GraphQLEnumType BICYCLE_OPTIMISATION_METHOD = GraphQLEnumType.newEnum()
             .name("BicycleOptimisationMethod")
