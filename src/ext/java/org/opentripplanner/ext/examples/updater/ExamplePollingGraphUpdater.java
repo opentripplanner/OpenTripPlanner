@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * {
  *    "type": "example-polling-updater",
- *    "frequencySec": 60,
- *    "url": "https://api.updater.com/example-polling-updater"
+ *    "frequencySec": 60
  * }
  * </pre>
  *
@@ -32,18 +31,15 @@ import org.slf4j.LoggerFactory;
  */
 public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
 
-    private static Logger LOG = LoggerFactory.getLogger(ExamplePollingGraphUpdater.class);
+    private static final Logger LOG = LoggerFactory.getLogger(ExamplePollingGraphUpdater.class);
 
     private GraphUpdaterManager updaterManager;
-
-    private String url;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     // The property frequencySec is already read and used by the abstract base class.
     public ExamplePollingGraphUpdater(PollingGraphUpdaterParameters config) {
         super(config);
-        url = config.getUrl();
-        LOG.info("Configured example polling updater: frequencySec={} and url={}", pollingPeriodSeconds, url);
+        LOG.info("Configured example polling updater: frequencySec={}", pollingPeriodSeconds);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
@@ -75,7 +71,7 @@ public class ExamplePollingGraphUpdater extends PollingGraphUpdater {
     }
     
     // This is a private GraphWriterRunnable that can be executed to modify the graph
-    private class ExampleGraphWriter implements GraphWriterRunnable {
+    private static class ExampleGraphWriter implements GraphWriterRunnable {
         @Override
         public void run(Graph graph) {
             LOG.info("ExampleGraphWriter {} runnable is run on the "

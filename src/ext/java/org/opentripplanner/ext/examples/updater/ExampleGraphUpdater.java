@@ -23,8 +23,7 @@ import org.slf4j.LoggerFactory;
  * <pre>
  * {
  *    "type": "example-updater",
- *    "frequencySec": 60,
- *    "url": "https://api.updater.com/example-updater"
+ *    "frequencySec": 60
  * }
  * </pre>
  * 
@@ -39,17 +38,14 @@ public class ExampleGraphUpdater implements GraphUpdater {
 
     private final Integer frequencySec;
 
-    private final String url;
-
     private final String configRef;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
     public ExampleGraphUpdater(PollingGraphUpdater.PollingGraphUpdaterParameters config) {
         this.frequencySec = config.getFrequencySec();
-        this.url = config.getUrl();
         this.configRef = config.getConfigRef();
 
-        LOG.info("Configured example updater: frequencySec={} and url={}", frequencySec, url);
+        LOG.info("Configured example updater: frequencySec={}", frequencySec);
     }
 
     // Here the updater gets to know its parent manager to execute GraphWriterRunnables.
@@ -84,7 +80,6 @@ public class ExampleGraphUpdater implements GraphUpdater {
     public String toString() {
         return "ExampleGraphUpdater{"
             + "configRef='" + configRef + '\''
-            + ", url='" + url + '\''
             + ", frequencySec=" + frequencySec
             + '}';
     }
