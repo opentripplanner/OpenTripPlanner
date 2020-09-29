@@ -5,7 +5,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 
 public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
 
-  private final UpdaterDataSourceParameters parameters;
+  private final UpdaterDataSourceParameters sourceParameters;
 
   private final String url;
 
@@ -16,22 +16,22 @@ public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
   private final String configRef;
 
   public BikeRentalParameters(
+      UpdaterDataSourceParameters sourceParameters,
       String configRef,
       String network,
       String url,
-      int frequencySec,
-      UpdaterDataSourceParameters parameters
+      int frequencySec
   ) {
+    this.sourceParameters = sourceParameters;
     this.configRef = configRef;
     this.network = network;
     this.url = url;
     this.frequencySec = frequencySec;
-    this.parameters = parameters;
   }
 
   @Override
   public UpdaterDataSourceParameters getSourceParameters() {
-    return parameters;
+    return sourceParameters;
   }
 
   @Override

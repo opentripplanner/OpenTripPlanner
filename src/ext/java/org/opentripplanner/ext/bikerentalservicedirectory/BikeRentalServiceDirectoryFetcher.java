@@ -44,12 +44,9 @@ public class BikeRentalServiceDirectoryFetcher {
             updaterUrl
         );
 
-        BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
-            "bike-rental-service-directory:" + network,
-            network,
-            updaterUrl,
-            DEFAULT_FREQUENCY_SEC,
-            dataSource
+        BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(dataSource,
+            "bike-rental-service-directory:" + network, network, updaterUrl,
+            DEFAULT_FREQUENCY_SEC
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
