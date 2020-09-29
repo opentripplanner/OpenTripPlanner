@@ -6,6 +6,7 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

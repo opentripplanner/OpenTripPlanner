@@ -8,6 +8,7 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

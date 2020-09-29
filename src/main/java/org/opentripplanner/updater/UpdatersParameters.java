@@ -33,11 +33,11 @@ public interface UpdatersParameters {
 
   List<MqttGtfsRealtimeUpdater.Parameters> getMqttGtfsRealtimeUpdaterParameters();
 
-  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getBikeParkUpdaterParameters();
+  List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters();
 
-  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters();
+  List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters();
 
-  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters();
+  List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters();
 
   List<WFSNotePollingGraphUpdater.Parameters> getWinkkiPollingGraphUpdaterParameters();
 }

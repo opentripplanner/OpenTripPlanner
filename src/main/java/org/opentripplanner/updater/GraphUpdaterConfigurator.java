@@ -124,13 +124,13 @@ public abstract class GraphUpdaterConfigurator {
         for (MqttGtfsRealtimeUpdater.Parameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
-        for (PollingGraphUpdater.PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
+        for (PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
             updaters.add(new BikeParkUpdater(configItem));
         }
-        for (PollingGraphUpdater.PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {
+        for (PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {
             updaters.add(new ExampleGraphUpdater(configItem));
         }
-        for (PollingGraphUpdater.PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
+        for (PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
             updaters.add(new ExamplePollingGraphUpdater(configItem));
         }
         for (WFSNotePollingGraphUpdater.Parameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {

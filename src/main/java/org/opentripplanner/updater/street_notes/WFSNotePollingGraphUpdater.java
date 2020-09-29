@@ -25,6 +25,7 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 

@@ -1,9 +1,9 @@
 package org.opentripplanner.ext.siri.updater;
 
-import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
-public class SiriSXUpdaterParameters implements PollingGraphUpdater.PollingGraphUpdaterParameters {
+public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
   private final String feedId;
   private final String url;

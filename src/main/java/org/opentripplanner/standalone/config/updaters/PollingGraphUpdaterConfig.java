@@ -2,11 +2,11 @@ package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
 import org.opentripplanner.standalone.config.UpdaterDataSourceFactory;
-import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class PollingGraphUpdaterConfig
-    implements PollingGraphUpdater.PollingGraphUpdaterParameters {
+    implements PollingGraphUpdaterParameters {
 
   private final String configRef;
 

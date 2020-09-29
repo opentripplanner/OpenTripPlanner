@@ -3,8 +3,8 @@ package org.opentripplanner.ext.examples.updater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterManager;
-import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.GraphUpdaterConfigurator;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -41,7 +41,7 @@ public class ExampleGraphUpdater implements GraphUpdater {
     private final String configRef;
 
     // Here the updater can be configured using the properties in the file 'Graph.properties'.
-    public ExampleGraphUpdater(PollingGraphUpdater.PollingGraphUpdaterParameters config) {
+    public ExampleGraphUpdater(PollingGraphUpdaterParameters config) {
         this.frequencySec = config.getFrequencySec();
         this.configRef = config.getConfigRef();
 

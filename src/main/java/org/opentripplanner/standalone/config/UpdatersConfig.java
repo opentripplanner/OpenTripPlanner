@@ -6,7 +6,7 @@ import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.standalone.config.updaters.*;
-import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -128,17 +128,17 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
+  public List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
     return getParameters(BIKE_PARK);
   }
 
   @Override
-  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
+  public List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
     return getParameters(EXAMPLE_UPDATER);
   }
 
   @Override
-  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
+  public List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
     return getParameters(EXAMPLE_POLLING_UPDATER);
   }
 
