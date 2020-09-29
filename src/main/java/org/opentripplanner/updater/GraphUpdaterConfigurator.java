@@ -5,6 +5,7 @@ import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
@@ -111,7 +112,7 @@ public abstract class GraphUpdaterConfigurator {
         for (SiriETUpdater.Parameters configItem : config.getSiriETUpdaterParameters()) {
             updaters.add(new SiriETUpdater(configItem));
         }
-        for (SiriSXUpdater.Parameters configItem : config.getSiriSXUpdaterParameters()) {
+        for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
             updaters.add(new SiriSXUpdater(configItem));
         }
         for (SiriVMUpdater.Parameters configItem : config.getSiriVMUpdaterParameters()) {

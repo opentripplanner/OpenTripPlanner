@@ -3,7 +3,7 @@ package org.opentripplanner.standalone.config;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.standalone.config.updaters.*;
 import org.opentripplanner.updater.PollingGraphUpdater;
@@ -56,7 +56,7 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::new);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::new);
-    CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::new);
+    CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::create);
   }
 
   private final Multimap<String, Object> configList = ArrayListMultimap.create();
@@ -108,7 +108,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriSXUpdater.Parameters> getSiriSXUpdaterParameters() {
+  public List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters() {
     return getParameters(SIRI_SX_UPDATER);
   }
 

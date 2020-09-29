@@ -1,7 +1,7 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -25,7 +25,7 @@ public interface UpdatersParameters {
 
   List<SiriETUpdater.Parameters> getSiriETUpdaterParameters();
 
-  List<SiriSXUpdater.Parameters> getSiriSXUpdaterParameters();
+  List<SiriSXUpdaterParameters> getSiriSXUpdaterParameters();
 
   List<SiriVMUpdater.Parameters> getSiriVMUpdaterParameters();
 
