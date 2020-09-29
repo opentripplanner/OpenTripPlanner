@@ -276,8 +276,8 @@ class StopTimesMapper {
             for (StopTime stopTime : stopTimes) {
                 stopTime.clearArrivalTime();
                 stopTime.clearDepartureTime();
-                stopTime.setMinArrivalTime(departureTime);
-                stopTime.setMaxDepartureTime(arrivalTime);
+                stopTime.setFlexWindowStart(departureTime);
+                stopTime.setFlexWindowEnd(arrivalTime);
             }
         }
     }
