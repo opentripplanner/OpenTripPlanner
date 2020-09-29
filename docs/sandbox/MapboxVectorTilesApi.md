@@ -13,7 +13,7 @@
 
 This API produces [Mapbox vector tiles](https://docs.mapbox.com/vector-tiles/reference/), which are used by eg. [Digitransit-ui](https://github.com/HSLdevcom/digitransit-ui) to show information about public transit entities on the map.
 
-The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf"`, where `layers is a comma separated list of layer names from the configuration.
+The tiles can be fetched from `/otp/routers/{routerId}/vectorTiles/{layers}/{z}/{x}/{y}.pbf`, where `layers is a comma separated list of layer names from the configuration.
 
 ### Configuration
 To enable this you need to add the feature `SandboxAPIMapboxVectorTilesApi` in `otp-config.json`.
@@ -53,7 +53,7 @@ The feature must be configured in `router-config.json` as follows
 
 For each layer, the configuration includes,
  - `name` which is used in the url to fetch tiles, and as the layer name in the vector tiles.
- - `type` which tells the type of the layer. Currently `Stop`, `Station` and `BikeRental` are supported
+ - `type` which tells the type of the layer. Currently `Stop`, `Station` and `BikeRental` are supported.
  - `mapper` which describes the mapper converting the properties from the OTP model entities to the vector tile properties. Currently `Digitransit` is supported for all layer types.
  - `minZoom` and `maxZoom` which describe the zoom levels the layer is active for.
  - `cacheMaxSeconds` which sets the cache header in the response. The lowest value of the layers included is selected.

@@ -16,7 +16,7 @@ import java.util.function.Function;
 import java.util.stream.Collectors;
 
 public class DigitransitStopPropertyMapper extends PropertyMapper<TransitStopVertex> {
-  private Graph graph;
+  private final Graph graph;
 
   public static DigitransitStopPropertyMapper create(Graph graph) {
     return new DigitransitStopPropertyMapper(graph);

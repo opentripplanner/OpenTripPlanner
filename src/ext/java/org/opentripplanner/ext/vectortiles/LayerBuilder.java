@@ -46,7 +46,15 @@ public abstract class LayerBuilder<T> {
     return layerBuilder.build();
   }
 
+  /**
+   * Get a list of geometries in this layer inside the query envelope. The geometries should include
+   * an object of type T as their userData.
+   */
   abstract protected List<Geometry> getGeometries(Envelope query);
 
+  /**
+   * How far outside its boundaries should the tile contain information. The value is a fraction of
+   * the tile size.
+   */
   abstract protected double getExpansionFactor();
 }

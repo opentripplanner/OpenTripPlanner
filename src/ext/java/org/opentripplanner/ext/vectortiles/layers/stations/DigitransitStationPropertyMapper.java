@@ -15,7 +15,7 @@ import java.util.Map;
 import java.util.stream.Collectors;
 
 public class DigitransitStationPropertyMapper extends PropertyMapper<Station> {
-  private Graph graph;
+  private final Graph graph;
 
   private DigitransitStationPropertyMapper(Graph graph) {this.graph = graph;}
 
