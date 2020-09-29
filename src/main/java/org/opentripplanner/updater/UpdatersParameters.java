@@ -1,15 +1,14 @@
 package org.opentripplanner.updater;
 
-import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
-import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
 
 import java.net.URI;
 import java.util.List;
@@ -18,27 +17,27 @@ public interface UpdatersParameters {
 
   URI bikeRentalServiceDirectoryUrl();
 
-  List<BikeRentalUpdaterConfig> getBikeRentalParameters();
+  List<BikeRentalUpdater.Parameters> getBikeRentalParameters();
 
-  List<GtfsRealtimeAlertsUpdaterConfig> getGtfsRealtimeAlertsUpdaterParameters();
+  List<GtfsRealtimeAlertsUpdater.Parameters> getGtfsRealtimeAlertsUpdaterParameters();
 
-  List<PollingStoptimeUpdaterConfig> getPollingStoptimeUpdaterParameters();
+  List<PollingStoptimeUpdater.Parameters> getPollingStoptimeUpdaterParameters();
 
-  List<SiriETUpdaterConfig> getSiriETUpdaterParameters();
+  List<SiriETUpdater.Parameters> getSiriETUpdaterParameters();
 
-  List<SiriSXUpdaterConfig> getSiriSXUpdaterParameters();
+  List<SiriSXUpdater.Parameters> getSiriSXUpdaterParameters();
 
-  List<SiriVMUpdaterConfig> getSiriVMUpdaterParameters();
+  List<SiriVMUpdater.Parameters> getSiriVMUpdaterParameters();
 
-  List<WebsocketGtfsRealtimeUpdaterConfig> getWebsocketGtfsRealtimeUpdaterParameters();
+  List<WebsocketGtfsRealtimeUpdater.Parameters> getWebsocketGtfsRealtimeUpdaterParameters();
 
-  List<MqttGtfsRealtimeUpdaterConfig> getMqttGtfsRealtimeUpdaterParameters();
+  List<MqttGtfsRealtimeUpdater.Parameters> getMqttGtfsRealtimeUpdaterParameters();
 
-  List<PollingGraphUpdaterConfig> getBikeParkUpdaterParameters();
+  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getBikeParkUpdaterParameters();
 
-  List<PollingGraphUpdaterConfig> getExampleGraphUpdaterParameters();
+  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters();
 
-  List<PollingGraphUpdaterConfig> getExamplePollingGraphUpdaterParameters();
+  List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters();
 
-  List<WFSNotePollingGraphUpdaterConfig> getWinkkiPollingGraphUpdaterParameters();
+  List<WFSNotePollingGraphUpdater.Parameters> getWinkkiPollingGraphUpdaterParameters();
 }

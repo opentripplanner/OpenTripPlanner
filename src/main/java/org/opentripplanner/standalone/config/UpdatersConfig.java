@@ -2,8 +2,18 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
+import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.standalone.config.updaters.*;
+import org.opentripplanner.updater.PollingGraphUpdater;
 import org.opentripplanner.updater.UpdatersParameters;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
 import org.opentripplanner.util.OtpAppException;
 
 import java.net.URI;
@@ -78,66 +88,66 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<BikeRentalUpdaterConfig> getBikeRentalParameters() {
-    return getParameters(BIKE_RENTAL, BikeRentalUpdaterConfig.class);
+  public List<BikeRentalUpdater.Parameters> getBikeRentalParameters() {
+    return getParameters(BIKE_RENTAL);
   }
 
   @Override
-  public List<GtfsRealtimeAlertsUpdaterConfig> getGtfsRealtimeAlertsUpdaterParameters() {
-    return getParameters(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig.class);
+  public List<GtfsRealtimeAlertsUpdater.Parameters> getGtfsRealtimeAlertsUpdaterParameters() {
+    return getParameters(REAL_TIME_ALERTS);
   }
 
   @Override
-  public List<PollingStoptimeUpdaterConfig> getPollingStoptimeUpdaterParameters() {
-    return getParameters(WINKKI_POLLING_UPDATER, PollingStoptimeUpdaterConfig.class);
+  public List<PollingStoptimeUpdater.Parameters> getPollingStoptimeUpdaterParameters() {
+    return getParameters(WINKKI_POLLING_UPDATER);
   }
 
   @Override
-  public List<SiriETUpdaterConfig> getSiriETUpdaterParameters() {
-    return getParameters(SIRI_ET_UPDATER, SiriETUpdaterConfig.class);
+  public List<SiriETUpdater.Parameters> getSiriETUpdaterParameters() {
+    return getParameters(SIRI_ET_UPDATER);
   }
 
   @Override
-  public List<SiriSXUpdaterConfig> getSiriSXUpdaterParameters() {
-    return getParameters(SIRI_SX_UPDATER, SiriSXUpdaterConfig.class);
+  public List<SiriSXUpdater.Parameters> getSiriSXUpdaterParameters() {
+    return getParameters(SIRI_SX_UPDATER);
   }
 
   @Override
-  public List<SiriVMUpdaterConfig> getSiriVMUpdaterParameters() {
-    return getParameters(SIRI_VM_UPDATER, SiriVMUpdaterConfig.class);
+  public List<SiriVMUpdater.Parameters> getSiriVMUpdaterParameters() {
+    return getParameters(SIRI_VM_UPDATER);
   }
 
   @Override
-  public List<WebsocketGtfsRealtimeUpdaterConfig> getWebsocketGtfsRealtimeUpdaterParameters() {
-    return getParameters(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig.class);
+  public List<WebsocketGtfsRealtimeUpdater.Parameters> getWebsocketGtfsRealtimeUpdaterParameters() {
+    return getParameters(WEBSOCKET_GTFS_RT_UPDATER);
   }
 
   @Override
-  public List<MqttGtfsRealtimeUpdaterConfig> getMqttGtfsRealtimeUpdaterParameters() {
-    return getParameters(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig.class);
+  public List<MqttGtfsRealtimeUpdater.Parameters> getMqttGtfsRealtimeUpdaterParameters() {
+    return getParameters(MQTT_GTFS_RT_UPDATER);
   }
 
   @Override
-  public List<PollingGraphUpdaterConfig> getBikeParkUpdaterParameters() {
-    return getParameters(BIKE_PARK, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
+    return getParameters(BIKE_PARK);
   }
 
   @Override
-  public List<PollingGraphUpdaterConfig> getExampleGraphUpdaterParameters() {
-    return getParameters(EXAMPLE_UPDATER, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
+    return getParameters(EXAMPLE_UPDATER);
   }
 
   @Override
-  public List<PollingGraphUpdaterConfig> getExamplePollingGraphUpdaterParameters() {
-    return getParameters(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig.class);
+  public List<PollingGraphUpdater.PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
+    return getParameters(EXAMPLE_POLLING_UPDATER);
   }
 
   @Override
-  public List<WFSNotePollingGraphUpdaterConfig> getWinkkiPollingGraphUpdaterParameters() {
-    return getParameters(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig.class);
+  public List<WFSNotePollingGraphUpdater.Parameters> getWinkkiPollingGraphUpdaterParameters() {
+    return getParameters(WINKKI_POLLING_UPDATER);
   }
 
-  private <T> List<T> getParameters(String key, Class<T> type) {
+  private <T> List<T> getParameters(String key) {
     return (List<T>) configList.get(key);
   }
 }
