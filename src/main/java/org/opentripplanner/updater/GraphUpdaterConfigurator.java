@@ -3,10 +3,16 @@ package org.opentripplanner.updater;
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
-import org.opentripplanner.ext.siri.updater.*;
+import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
+import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
+import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
+import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -121,7 +127,7 @@ public abstract class GraphUpdaterConfigurator {
         for (MqttGtfsRealtimeUpdater.Parameters configItem : config.getMqttGtfsRealtimeUpdaterParameters()) {
             updaters.add(new MqttGtfsRealtimeUpdater(configItem));
         }
-        for (PollingGraphUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
+        for (BikeParkUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
             updaters.add(new BikeParkUpdater(configItem));
         }
         for (PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {

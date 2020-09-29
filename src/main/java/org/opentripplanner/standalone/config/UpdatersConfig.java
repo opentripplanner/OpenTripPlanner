@@ -6,9 +6,11 @@ import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.*;
+import org.opentripplanner.standalone.config.updaters.BikeParkUpdaterConfig;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -46,7 +48,7 @@ public class UpdatersConfig implements UpdatersParameters {
 
   static {
     CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
-    CONFIG_CREATORS.put(BIKE_PARK, PollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::new);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::new);
     CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig::new);
@@ -128,7 +130,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<PollingGraphUpdaterParameters> getBikeParkUpdaterParameters() {
+  public List<BikeParkUpdaterParameters> getBikeParkUpdaterParameters() {
     return getParameters(BIKE_PARK);
   }
 

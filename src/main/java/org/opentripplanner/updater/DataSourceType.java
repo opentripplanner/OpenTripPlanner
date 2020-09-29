@@ -11,7 +11,6 @@ public enum DataSourceType {
   JCDECAUX,
   KEOLIS_RENNES,
   KML,
-  KML_BIKE_PARK,
   NEXT_BIKE,
   OV_FIETS,
   SF_BAY_AREA,

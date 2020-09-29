@@ -1,6 +1,8 @@
 package org.opentripplanner.standalone.config;
 
-import org.opentripplanner.standalone.config.updaters.sources.*;
+import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceConfig;
+import org.opentripplanner.standalone.config.updaters.sources.UpdaterSourceConfig;
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.util.OtpAppException;
@@ -27,7 +29,6 @@ public class UpdaterDataSourceFactory {
     add("jcdecaux", DataSourceType.JCDECAUX, UpdaterSourceConfig::new);
     add("keolis-rennes", DataSourceType.KEOLIS_RENNES, UpdaterSourceConfig::new);
     add("kml", DataSourceType.KML, GenericKmlBikeRentalSourceConfig::new);
-    add("kml-bike-park", DataSourceType.KML_BIKE_PARK, KmlBikeParkSourceConfig::new);
     add("next-bike", DataSourceType.NEXT_BIKE, UpdaterSourceConfig::new);
     add("ov-fiets", DataSourceType.OV_FIETS, UpdaterSourceConfig::new);
     add("sf-bay-area", DataSourceType.SF_BAY_AREA, UpdaterSourceConfig::new);
