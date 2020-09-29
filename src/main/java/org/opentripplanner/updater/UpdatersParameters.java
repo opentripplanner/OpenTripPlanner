@@ -7,7 +7,7 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
 
@@ -22,7 +22,7 @@ public interface UpdatersParameters {
 
   List<GtfsRealtimeAlertsUpdater.Parameters> getGtfsRealtimeAlertsUpdaterParameters();
 
-  List<PollingStoptimeUpdater.Parameters> getPollingStoptimeUpdaterParameters();
+  List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
 
   List<SiriETUpdaterParameters> getSiriETUpdaterParameters();
 

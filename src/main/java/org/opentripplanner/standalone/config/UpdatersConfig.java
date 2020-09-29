@@ -13,7 +13,7 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
-import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
+import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
 import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
 import org.opentripplanner.util.OtpAppException;
@@ -49,7 +49,7 @@ public class UpdatersConfig implements UpdatersParameters {
   static {
     CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
     CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
-    CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::new);
+    CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::new);
     CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig::new);
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::new);
@@ -100,8 +100,8 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<PollingStoptimeUpdater.Parameters> getPollingStoptimeUpdaterParameters() {
-    return getParameters(WINKKI_POLLING_UPDATER);
+  public List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters() {
+    return getParameters(STOP_TIME_UPDATER);
   }
 
   @Override

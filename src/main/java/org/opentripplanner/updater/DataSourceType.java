@@ -20,6 +20,6 @@ public enum DataSourceType {
   VCUV,
 
   // GTFS RT
-  GTFS_HTTP,
-  GTFS_FILE;
+  GTFS_RT_HTTP,
+  GTFS_RT_FILE;
 }

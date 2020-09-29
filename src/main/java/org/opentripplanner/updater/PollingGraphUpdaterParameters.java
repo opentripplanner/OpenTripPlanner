@@ -12,7 +12,6 @@ public interface PollingGraphUpdaterParameters {
   @Deprecated
   String getUrl();
 
-
   int getFrequencySec();
 
   /** The config name/type for the updater. Used to reference the configuration element. */
