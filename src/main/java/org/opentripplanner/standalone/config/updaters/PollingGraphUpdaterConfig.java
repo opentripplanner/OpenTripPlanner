@@ -5,8 +5,7 @@ import org.opentripplanner.standalone.config.UpdaterDataSourceFactory;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
-public class PollingGraphUpdaterConfig
-    implements PollingGraphUpdaterParameters {
+public class PollingGraphUpdaterConfig implements PollingGraphUpdaterParameters {
 
   private final String configRef;
 
@@ -34,7 +33,5 @@ public class PollingGraphUpdaterConfig
   public int getFrequencySec() { return frequencySec; }
 
   @Override
-  public String getConfigRef() {
-    return configRef;
-  }
+  public String getConfigRef() { return configRef; }
 }

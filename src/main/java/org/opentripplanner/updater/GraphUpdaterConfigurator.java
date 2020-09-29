@@ -3,10 +3,7 @@ package org.opentripplanner.updater;
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
 import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
 import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
-import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
-import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
+import org.opentripplanner.ext.siri.updater.*;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
@@ -115,7 +112,7 @@ public abstract class GraphUpdaterConfigurator {
         for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {
             updaters.add(new SiriSXUpdater(configItem));
         }
-        for (SiriVMUpdater.Parameters configItem : config.getSiriVMUpdaterParameters()) {
+        for (SiriVMUpdaterParameters configItem : config.getSiriVMUpdaterParameters()) {
             updaters.add(new SiriVMUpdater(configItem));
         }
         for (WebsocketGtfsRealtimeUpdater.Parameters configItem : config.getWebsocketGtfsRealtimeUpdaterParameters()) {

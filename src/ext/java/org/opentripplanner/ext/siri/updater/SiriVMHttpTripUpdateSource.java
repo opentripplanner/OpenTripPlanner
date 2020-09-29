@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -10,7 +9,6 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     private static final Logger LOG =
@@ -37,21 +35,13 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
     public SiriVMHttpTripUpdateSource(Parameters parameters) {
-        String url = parameters.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
-
+        this.url = parameters.getUrl();
         this.requestorRef = parameters.getRequestorRef();
-        if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-"+UUID.randomUUID().toString();
-        }
         this.feedId = parameters.getFeedId();
 
         int timeoutSec = parameters.getTimeoutSec();
         if (timeoutSec > 0) {
-            this.timeout = 1000*timeoutSec;
+            this.timeout = 1000 * timeoutSec;
         }
 
         requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-VM"));
@@ -110,7 +100,8 @@ public class SiriVMHttpTripUpdateSource implements VehicleMonitoringSource {
         return this.feedId;
     }
 
-    public interface Parameters extends UpdaterDataSourceParameters {
+    interface Parameters {
+        String getUrl();
         String getRequestorRef();
         String getFeedId();
         int getTimeoutSec();

@@ -34,7 +34,6 @@ public class UpdaterDataSourceFactory {
     add("share-bike", DataSourceType.SHARE_BIKE, UpdaterSourceConfig::new);
     add("siri-et", DataSourceType.SIRI_ET, SiriETHttpTripUpdaterSourceConfig::new);
     add("siri-et-pubsub", DataSourceType.SIRI_ET_PUBSUB, UpdaterSourceConfig::new);
-    add("siri-vm", DataSourceType.SIRI_VM, SiriVMHttpTripUpdaterSourceConfig::new);
     add("siri-sx", DataSourceType.SIRI_SX, UpdaterSourceConfig::new);
     add("smoove", DataSourceType.SMOOVE, UpdaterSourceConfig::new);
     add("uip-bike", DataSourceType.UIP_BIKE, UpdaterSourceConfig::new);
