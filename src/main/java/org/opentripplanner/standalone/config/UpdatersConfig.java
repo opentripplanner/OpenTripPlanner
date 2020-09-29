@@ -2,7 +2,7 @@ package org.opentripplanner.standalone.config;
 
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.*;
@@ -54,7 +54,7 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::new);
+    CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::create);
   }
@@ -103,7 +103,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<SiriETUpdater.Parameters> getSiriETUpdaterParameters() {
+  public List<SiriETUpdaterParameters> getSiriETUpdaterParameters() {
     return getParameters(SIRI_ET_UPDATER);
   }
 

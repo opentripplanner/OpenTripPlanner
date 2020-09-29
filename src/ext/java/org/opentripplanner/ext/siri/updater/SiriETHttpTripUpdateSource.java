@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.ext.siri.SiriHttpUtils;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.Siri;
@@ -11,7 +10,6 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
     private static final Logger LOG =
@@ -30,38 +28,24 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
 
     private final String url;
 
+    private final String requestorRef;
+
+    private final int timeout;
+
     private ZonedDateTime lastTimestamp = ZonedDateTime.now().minusMonths(1);
 
-    private String requestorRef;
-
-    private int timeout;
-
-    private int previewIntervalMillis = -1;
+    private final int previewIntervalMillis;
 
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
     public SiriETHttpTripUpdateSource(Parameters parameters) {
-        String url = parameters.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
-
-        this.requestorRef = parameters.getRequestorRef();
-        if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-"+ UUID.randomUUID().toString();
-        }
         this.feedId = parameters.getFeedId();
+        this.url = parameters.getUrl();
+        this.requestorRef = parameters.getRequestorRef();
+        this.timeout = parameters.getTimeoutSec() > 0 ? 1000 * parameters.getTimeoutSec() : -1;
 
-        int timeoutSec = parameters.getTimeoutSec();
-        if (timeoutSec > 0) {
-            this.timeout = 1000*timeoutSec;
-        }
-
-        int previewIntervalMinutes = parameters.getPreviewIntervalMinutes();
-        if (previewIntervalMinutes > 0) {
-            this.previewIntervalMillis = 1000*60*previewIntervalMinutes;
-        }
+        int min = parameters.getPreviewIntervalMinutes();
+        this.previewIntervalMillis = min > 0 ? 1000 * 60 * min : -1;
 
         requestHeaders.put("ET-Client-Name", SiriHttpUtils.getUniqueETClientName("-ET"));
     }
@@ -124,7 +108,8 @@ public class SiriETHttpTripUpdateSource implements EstimatedTimetableSource {
         return this.feedId;
     }
 
-    public interface Parameters extends UpdaterDataSourceParameters {
+    public interface Parameters {
+        String getUrl();
         String getRequestorRef();
         String getFeedId();
         int getTimeoutSec();

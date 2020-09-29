@@ -32,9 +32,6 @@ public class UpdaterDataSourceFactory {
     add("ov-fiets", DataSourceType.OV_FIETS, UpdaterSourceConfig::new);
     add("sf-bay-area", DataSourceType.SF_BAY_AREA, UpdaterSourceConfig::new);
     add("share-bike", DataSourceType.SHARE_BIKE, UpdaterSourceConfig::new);
-    add("siri-et", DataSourceType.SIRI_ET, SiriETHttpTripUpdaterSourceConfig::new);
-    add("siri-et-pubsub", DataSourceType.SIRI_ET_PUBSUB, UpdaterSourceConfig::new);
-    add("siri-sx", DataSourceType.SIRI_SX, UpdaterSourceConfig::new);
     add("smoove", DataSourceType.SMOOVE, UpdaterSourceConfig::new);
     add("uip-bike", DataSourceType.UIP_BIKE, UpdaterSourceConfig::new);
     add("vcub", DataSourceType.VCUV, UpdaterSourceConfig::new);

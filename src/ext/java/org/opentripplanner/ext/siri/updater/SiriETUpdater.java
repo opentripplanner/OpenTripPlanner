@@ -5,7 +5,6 @@ import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedTimetableDeliveryStructure;
@@ -67,12 +66,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriETUpdater(Parameters config) {
+    public SiriETUpdater(SiriETUpdaterParameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriETHttpTripUpdateSource((SiriETHttpTripUpdateSource.Parameters) config.getSourceParameters());
+        updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -152,11 +151,4 @@ public class SiriETUpdater extends PollingGraphUpdater {
         return "Polling SIRI ET updater with update source = " + s;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeedId();
-        int getLogFrequency();
-        int getMaxSnapshotFrequencyMs();
-        boolean purgeExpiredData();
-        boolean blockReadinessUntilInitialized();
-    }
 }

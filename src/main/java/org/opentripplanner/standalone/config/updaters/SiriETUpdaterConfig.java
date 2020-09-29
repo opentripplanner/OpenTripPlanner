@@ -1,38 +1,25 @@
 package org.opentripplanner.standalone.config.updaters;
 
-import org.opentripplanner.ext.siri.updater.SiriETUpdater;
+import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.NodeAdapter;
 
-public class SiriETUpdaterConfig extends PollingGraphUpdaterConfig
-    implements SiriETUpdater.Parameters {
+import java.util.UUID;
 
-  private final String feedId;
-  private final int logFrequency;
-  private final int maxSnapshotFrequencyMs;
-  private final boolean purgeExpiredData;
-  private final boolean blockReadinessUntilInitialized;
+public class SiriETUpdaterConfig {
 
-  public SiriETUpdaterConfig(String configRef, NodeAdapter c) {
-    super(configRef, c);
-    feedId = c.asText("feedId", null);
-    logFrequency = c.asInt("logFrequency", -1);
-    maxSnapshotFrequencyMs = c.asInt("maxSnapshotFrequencyMs", -1);
-    purgeExpiredData = c.asBoolean("purgeExpiredData", false);
-    blockReadinessUntilInitialized = c.asBoolean("blockReadinessUntilInitialized", false);
+  public static SiriETUpdaterParameters create(String configRef, NodeAdapter c) {
+    return new SiriETUpdaterParameters(
+        configRef,
+        c.asText("feedId", null),
+        c.asInt("logFrequency", -1),
+        c.asInt("maxSnapshotFrequencyMs", -1),
+        c.asBoolean("purgeExpiredData", false),
+        c.asBoolean("blockReadinessUntilInitialized", false),
+        c.asText("url"),
+        c.asInt("frequencySec", 60),
+        c.asText("requestorRef", "otp-"+ UUID.randomUUID()),
+        c.asInt("timeoutSec", -1),
+        c.asInt("previewIntervalMinutes", -1)
+    );
   }
-
-  @Override
-  public String getFeedId() { return feedId; }
-
-  @Override
-  public int getLogFrequency() { return logFrequency; }
-
-  @Override
-  public int getMaxSnapshotFrequencyMs() { return maxSnapshotFrequencyMs; }
-
-  @Override
-  public boolean purgeExpiredData() { return purgeExpiredData; }
-
-  @Override
-  public boolean blockReadinessUntilInitialized() { return blockReadinessUntilInitialized; }
 }

@@ -106,7 +106,7 @@ public abstract class GraphUpdaterConfigurator {
         for (PollingStoptimeUpdater.Parameters configItem : config.getPollingStoptimeUpdaterParameters()) {
             updaters.add(new PollingStoptimeUpdater(configItem));
         }
-        for (SiriETUpdater.Parameters configItem : config.getSiriETUpdaterParameters()) {
+        for (SiriETUpdaterParameters configItem : config.getSiriETUpdaterParameters()) {
             updaters.add(new SiriETUpdater(configItem));
         }
         for (SiriSXUpdaterParameters configItem : config.getSiriSXUpdaterParameters()) {

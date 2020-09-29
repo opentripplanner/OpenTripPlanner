@@ -13,9 +13,14 @@ import java.util.*;
  */
 public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
-    private final GbfsStationDataSource stationInformationSource;  // station_information.json required by GBFS spec
-    private final GbfsStationStatusDataSource stationStatusSource; // station_status.json required by GBFS spec
-    private final GbfsFloatingBikeDataSource floatingBikeSource;   // free_bike_status.json declared OPTIONAL by GBFS spec
+    // station_information.json required by GBFS spec
+    private final GbfsStationDataSource stationInformationSource;
+
+    // station_status.json required by GBFS spec
+    private final GbfsStationStatusDataSource stationStatusSource;
+
+    // free_bike_status.json declared OPTIONAL by GBFS spec
+    private final GbfsFloatingBikeDataSource floatingBikeSource;
 
     private final String networkName;
 
