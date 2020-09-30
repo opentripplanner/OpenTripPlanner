@@ -1,12 +1,13 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
-import java.util.Map;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
-public class OVFietsKMLDataSource extends GenericXmlBikeRentalDataSource {
-    public OVFietsKMLDataSource(UpdaterDataSourceParameters config) {
+import java.util.Map;
+
+class OVFietsKMLDataSource extends GenericXmlBikeRentalDataSource {
+    public OVFietsKMLDataSource(BikeRentalDataSourceParameters config) {
         super(config,"//*[name()='Placemark']");
     }
 

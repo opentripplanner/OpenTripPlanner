@@ -1,10 +1,11 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -22,7 +23,7 @@ import java.util.List;
  *
  * @see BikeRentalDataSource
  */
-public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
+abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(GenericJsonBikeRentalDataSource.class);
     private String url;
@@ -41,7 +42,7 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      *
      */
     public GenericJsonBikeRentalDataSource(
-        UpdaterDataSourceParameters config,
+        BikeRentalDataSourceParameters config,
         String jsonPath
     ) {
         url = config.getUrl();
@@ -58,12 +59,13 @@ public abstract class GenericJsonBikeRentalDataSource implements BikeRentalDataS
      * @param headerValue header value
      */
     public GenericJsonBikeRentalDataSource(
-        UpdaterDataSourceParameters config,
-        String jsonPath, String headerName,
+        BikeRentalDataSourceParameters config,
+        String jsonPath,
+        String headerName,
         String headerValue
     ) {
-        url = config.getUrl();
-        jsonParsePath = jsonPath;
+        this.url = config.getUrl();
+        this.jsonParsePath = jsonPath;
         this.headerName = headerName;
         this.headerValue = headerValue;
     }

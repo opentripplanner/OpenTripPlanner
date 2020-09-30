@@ -1,13 +1,13 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
+
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.Map;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.NonLocalizedString;
-
-public class KeolisRennesBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
-    public KeolisRennesBikeRentalDataSource(UpdaterDataSourceParameters config) {
+class KeolisRennesBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
+    public KeolisRennesBikeRentalDataSource(BikeRentalDataSourceParameters config) {
         super(config,"//opendata/answer/data/station");
     }
 

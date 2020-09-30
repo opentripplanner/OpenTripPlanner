@@ -13,6 +13,7 @@ import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
@@ -105,7 +106,7 @@ public abstract class GraphUpdaterConfigurator {
     ) {
         List<GraphUpdater> updaters = new ArrayList<>();
 
-        for (BikeRentalUpdater.Parameters configItem : config.getBikeRentalParameters()) {
+        for (BikeRentalUpdaterParameters configItem : config.getBikeRentalParameters()) {
             updaters.add(new BikeRentalUpdater(configItem));
         }
         for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {

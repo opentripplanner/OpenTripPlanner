@@ -2,8 +2,8 @@ package org.opentripplanner.ext.bikerentalservicedirectory;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.GraphUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
@@ -39,14 +39,12 @@ public class BikeRentalServiceDirectoryFetcher {
       for (JsonNode operator : node.get("operators")) {
         String network = operator.get("name").asText();
         String updaterUrl = adjustUrlForUpdater(operator.get("url").asText());
-        GbfsDataSourceParameters dataSource = new GbfsDataSourceParameters(
-            DataSourceType.GBFS,
-            updaterUrl
-        );
 
-        BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(dataSource,
-            "bike-rental-service-directory:" + network, network, updaterUrl,
-            DEFAULT_FREQUENCY_SEC
+        BikeRentalParameters bikeRentalParameters = new BikeRentalParameters(
+            "bike-rental-service-directory:" + network,
+            updaterUrl,
+            DEFAULT_FREQUENCY_SEC,
+            new GbfsDataSourceParameters(updaterUrl, network)
         );
         LOG.info("Fetched updater info for {} at url {}", network, updaterUrl);
 
@@ -65,7 +63,7 @@ public class BikeRentalServiceDirectoryFetcher {
 
   /**
    * The GBFS standard defines "gbfs.json" as the entrypoint, while
-   * {@link org.opentripplanner.updater.bike_rental.BikeRentalDataSource} expects the base url and
+   * {@link BikeRentalDataSource} expects the base url and
    * does not look at "gbfs.json". This method adjusts the URL to what the BikeRentalDataSource
    * expects.
    */

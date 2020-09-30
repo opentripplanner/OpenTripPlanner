@@ -5,7 +5,7 @@ import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
@@ -18,7 +18,7 @@ public interface UpdatersParameters {
 
   URI bikeRentalServiceDirectoryUrl();
 
-  List<BikeRentalUpdater.Parameters> getBikeRentalParameters();
+  List<BikeRentalUpdaterParameters> getBikeRentalParameters();
 
   List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 

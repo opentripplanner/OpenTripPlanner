@@ -1,8 +1,8 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -11,9 +11,15 @@ import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLDecoder;
-import java.util.*;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.LinkedHashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
-public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
 	private static final Logger log = LoggerFactory.getLogger(ShareBikeRentalDataSource.class);
 
@@ -21,7 +27,7 @@ public class ShareBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
 	private Map<String, List<String>> urlParameters = new HashMap<>();
 
-	public ShareBikeRentalDataSource(UpdaterDataSourceParameters config) {
+	public ShareBikeRentalDataSource(BikeRentalDataSourceParameters config) {
 		super(config, "result/LiveStationData");
 		setUrl(config.getUrl());
 	}

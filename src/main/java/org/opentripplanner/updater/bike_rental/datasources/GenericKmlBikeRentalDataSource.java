@@ -1,4 +1,10 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
+
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.datasources.params.GenericKmlBikeRentalDataSourceParameters;
+import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.HashSet;
@@ -6,17 +12,11 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.NonLocalizedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 /**
  * Load bike rental stations from a KML placemarks. Use name as bike park name and point
  * coordinates. Rely on: 1) bike park to be KML Placemarks, 2) geometry to be Point.
  */
-public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
+class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericKmlBikeRentalDataSource.class);
 
@@ -26,7 +26,7 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
 
     private boolean allowDropoff = true;
 
-    public GenericKmlBikeRentalDataSource(Parameters parameters) {
+    public GenericKmlBikeRentalDataSource(GenericKmlBikeRentalDataSourceParameters parameters) {
         super(
             parameters,
             "//*[local-name()='kml']/*[local-name()='Document']/*[local-name()='Placemark']"
@@ -78,8 +78,4 @@ public class GenericKmlBikeRentalDataSource extends GenericXmlBikeRentalDataSour
         return brStation;
     }
 
-    public interface Parameters
-        extends UpdaterDataSourceParameters {
-        String getNamePrefix();
-    }
 }

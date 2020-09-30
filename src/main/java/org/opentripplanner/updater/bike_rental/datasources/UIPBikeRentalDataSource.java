@@ -1,20 +1,20 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 
 import com.fasterxml.jackson.databind.JsonNode;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+class UIPBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
     private String baseURL = null;
 
-    UIPBikeRentalDataSource(UpdaterDataSourceParameters config, String apiKey) {
-        super(config, "stations", "Client-Identifier", apiKey);
+    public UIPBikeRentalDataSource(BikeRentalDataSourceParameters config) {
+        super(config, "stations", "Client-Identifier", config.getApiKey());
     }
 
     /**

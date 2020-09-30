@@ -1,9 +1,8 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
 
@@ -11,16 +10,14 @@ public class TestBikeRentalStationSource extends TestCase {
 
     public void testKeolisRennes() {
 
-        KeolisRennesBikeRentalDataSource rennesSource =
-            new KeolisRennesBikeRentalDataSource(new UpdaterDataSourceParameters() {
-                @Override
-                public String getUrl() {
-                    return "file:src/test/resources/bike/keolis-rennes.xml";
-                }
-                // Only needed to create the data source
-                @Override public DataSourceType type() { return null; }
-            }
-            );
+        KeolisRennesBikeRentalDataSource rennesSource = new KeolisRennesBikeRentalDataSource(
+            new BikeRentalDataSourceParameters(
+                null,
+                "file:src/test/resources/bike/keolis-rennes.xml",
+                null,
+                null
+            )
+        );
         assertTrue(rennesSource.update());
         List<BikeRentalStation> rentalStations = rennesSource.getStations();
         assertEquals(4, rentalStations.size());
@@ -39,15 +36,14 @@ public class TestBikeRentalStationSource extends TestCase {
     }
 
     public void testSmoove() {
-        SmooveBikeRentalDataSource source =
-            new SmooveBikeRentalDataSource(new UpdaterDataSourceParameters() {
-                @Override
-                public String getUrl() {
-                    return "file:src/test/resources/bike/smoove.json";
-                }
-                // Only needed to create the data source
-                @Override public DataSourceType type() { return null; }
-            });
+        SmooveBikeRentalDataSource source = new SmooveBikeRentalDataSource(
+            new BikeRentalDataSourceParameters(
+                null,
+                "file:src/test/resources/bike/smoove.json",
+                null,
+                null
+            )
+        );
         assertTrue(source.update());
         List<BikeRentalStation> rentalStations = source.getStations();
 

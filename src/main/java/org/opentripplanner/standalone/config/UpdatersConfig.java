@@ -18,7 +18,7 @@ import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdat
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
@@ -52,7 +52,7 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final Map<String, BiFunction<String, NodeAdapter, ?>> CONFIG_CREATORS = new HashMap<>();
 
   static {
-    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::new);
+    CONFIG_CREATORS.put(BIKE_RENTAL, BikeRentalUpdaterConfig::create);
     CONFIG_CREATORS.put(BIKE_PARK, BikeParkUpdaterConfig::create);
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::create);
@@ -93,7 +93,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<BikeRentalUpdater.Parameters> getBikeRentalParameters() {
+  public List<BikeRentalUpdaterParameters> getBikeRentalParameters() {
     return getParameters(BIKE_RENTAL);
   }
 

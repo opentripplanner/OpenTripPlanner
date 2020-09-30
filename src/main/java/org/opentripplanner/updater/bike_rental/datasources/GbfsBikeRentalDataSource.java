@@ -1,17 +1,22 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.google.common.collect.Sets;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.params.GbfsBikeRentalDataSourceParameters;
 import org.opentripplanner.util.NonLocalizedString;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 /**
  * Created by demory on 2017-03-14.
  */
-public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
+class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     // station_information.json required by GBFS spec
     private final GbfsStationDataSource stationInformationSource;
@@ -27,17 +32,13 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
     /** Some car rental systems and flex transit systems work exactly like bike rental, but with cars. */
     private final boolean routeAsCar;
 
-    public GbfsBikeRentalDataSource (Parameters parameters, String networkName) {
+    public GbfsBikeRentalDataSource (GbfsBikeRentalDataSourceParameters parameters) {
         routeAsCar = parameters.routeAsCar();
         stationInformationSource = new GbfsStationDataSource(parameters);
         stationStatusSource = new GbfsStationStatusDataSource(parameters);
         floatingBikeSource = new GbfsFloatingBikeDataSource(parameters);
         setBaseUrl(parameters.getUrl());
-        if (networkName != null && !networkName.isEmpty()) {
-            this.networkName = networkName;
-        } else {
-            this.networkName = "GBFS";
-        }
+        this.networkName = parameters.getNetwork("GBFS");
     }
 
     // TODO This should be updated to fetch the endpoints defined in gbfs.json
@@ -90,7 +91,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationDataSource (Parameters config) {
+        public GbfsStationDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
         }
 
@@ -108,7 +109,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsStationStatusDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsStationStatusDataSource (Parameters config) {
+        public GbfsStationStatusDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/stations");
         }
 
@@ -125,7 +126,7 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
 
     class GbfsFloatingBikeDataSource extends GenericJsonBikeRentalDataSource {
 
-        public GbfsFloatingBikeDataSource (Parameters config) {
+        public GbfsFloatingBikeDataSource (GbfsBikeRentalDataSourceParameters config) {
             super(config, "data/bikes");
         }
 
@@ -145,7 +146,4 @@ public class GbfsBikeRentalDataSource implements BikeRentalDataSource {
         }
     }
 
-    public interface Parameters extends UpdaterDataSourceParameters {
-        boolean routeAsCar();
-    }
 }

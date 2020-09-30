@@ -1,25 +1,19 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.standalone.config.updaters.sources.BikeRentalSourceFactory;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 
-public class BikeRentalUpdaterConfig extends PollingGraphUpdaterConfig
-    implements BikeRentalUpdater.Parameters {
+public class BikeRentalUpdaterConfig {
 
-  private final String network;
-  private final String networks;
-  private final String apiKey;
-
-  public BikeRentalUpdaterConfig(String configRef, NodeAdapter c) {
-    super(configRef, c);
-    network = c.asText("network", null);
-    networks = c.asText("networks", null);
-    apiKey = c.asText("apiKey", null);
+  public static BikeRentalUpdaterParameters create(String configRef, NodeAdapter c) {
+    String sourceType = c.asText("sourceType");
+    return new BikeRentalUpdaterParameters(
+        configRef + "." + sourceType,
+        c.asText("url", null),
+        c.asText("networks", null),
+        c.asInt("frequencySec", 60),
+        BikeRentalSourceFactory.create(sourceType, c)
+    );
   }
-
-  public String getNetwork() { return network; }
-
-  public String getNetworks() { return networks; }
-
-  public String getApiKey() { return apiKey; }
 }

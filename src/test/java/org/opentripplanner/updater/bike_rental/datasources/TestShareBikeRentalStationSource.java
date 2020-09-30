@@ -1,9 +1,8 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
 
@@ -12,14 +11,13 @@ public class TestShareBikeRentalStationSource extends TestCase {
     public void testShareBike() {
 
         ShareBikeRentalDataSource shareBikeSource =
-            new ShareBikeRentalDataSource(new UpdaterDataSourceParameters() {
-                @Override
-                public String getUrl() {
-                    return "file:src/test/resources/bike/share-bike.json?SystemID=dummyid";
-                }
-              // Only needed to create the data source
-              @Override public DataSourceType type() { return null; }
-            });
+            new ShareBikeRentalDataSource(new BikeRentalDataSourceParameters(
+                // Only needed to create the data source
+                null,
+                "file:src/test/resources/bike/share-bike.json?SystemID=dummyid",
+                null,
+                null
+            ));
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         assertEquals(17, rentalStations.size());
@@ -41,14 +39,15 @@ public class TestShareBikeRentalStationSource extends TestCase {
     public void testShareBikeMissingSystemIDParameter() {
 
         ShareBikeRentalDataSource shareBikeSource =
-            new ShareBikeRentalDataSource(new UpdaterDataSourceParameters() {
-                @Override
-                public String getUrl() {
-                    return "file:src/test/resources/bike/share-bike.json";
-                }
-              // Only needed to create the data source
-              @Override public DataSourceType type() { return null; }
-            });
+            new ShareBikeRentalDataSource(
+                new BikeRentalDataSourceParameters(
+                    // Only needed to create the data source
+                    null,
+                    "file:src/test/resources/bike/share-bike.json",
+                    null,
+                    null
+                )
+            );
         assertTrue(shareBikeSource.update());
         List<BikeRentalStation> rentalStations = shareBikeSource.getStations();
         BikeRentalStation prinsen = rentalStations.get(0);

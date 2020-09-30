@@ -1,16 +1,17 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
+
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.xml.XmlDataListDownloader;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.xml.XmlDataListDownloader;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
+abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger LOG = LoggerFactory.getLogger(GenericXmlBikeRentalDataSource.class);
 
@@ -21,7 +22,7 @@ public abstract class GenericXmlBikeRentalDataSource implements BikeRentalDataSo
     private final XmlDataListDownloader<BikeRentalStation> xmlDownloader;
 
 
-    public GenericXmlBikeRentalDataSource(UpdaterDataSourceParameters config, String path) {
+    public GenericXmlBikeRentalDataSource(BikeRentalDataSourceParameters config, String path) {
         url = config.getUrl();
         xmlDownloader = new XmlDataListDownloader<>();
         xmlDownloader.setPath(path);

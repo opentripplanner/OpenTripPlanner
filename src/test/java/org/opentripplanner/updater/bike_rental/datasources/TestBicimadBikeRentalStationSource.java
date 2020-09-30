@@ -1,9 +1,8 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import junit.framework.TestCase;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.DataSourceType;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 import java.util.List;
 
@@ -12,14 +11,13 @@ public class TestBicimadBikeRentalStationSource extends TestCase {
         public void testBicimad() {
 
                 BicimadBikeRentalDataSource bicimadBikeRentalDataSource = new BicimadBikeRentalDataSource(
-                    new UpdaterDataSourceParameters() {
-                            @Override
-                            public String getUrl() {
-                                    return "file:src/test/resources/bike/bicimad.json";
-                            }
-                            // Only needed to create the data source
-                            @Override public DataSourceType type() { return null; }
-                    });
+                    new BikeRentalDataSourceParameters(
+                        null,
+                        "file:src/test/resources/bike/bicimad.json",
+                        null,
+                        null
+                    )
+                );
                 assertTrue(bicimadBikeRentalDataSource.update());
                 List<BikeRentalStation> rentalStations = bicimadBikeRentalDataSource.getStations();
                 assertEquals(rentalStations.size(), 172);

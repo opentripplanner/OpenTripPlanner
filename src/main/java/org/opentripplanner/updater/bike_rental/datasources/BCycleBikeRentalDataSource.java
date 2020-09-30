@@ -1,12 +1,11 @@
-package org.opentripplanner.updater.bike_rental;
-
-import java.util.HashSet;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.NonLocalizedString;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.HashSet;
 
 
 /**
@@ -14,21 +13,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * @see GenericJsonBikeRentalDataSource
  */
-public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
-    private String networkName;
+    private final String networkName;
 
-    public BCycleBikeRentalDataSource(
-        UpdaterDataSourceParameters config,
-        String apiKey,
-        String networkName
-    ) {
-        super(config, "", "ApiKey",apiKey);
-        if (networkName != null && !networkName.isEmpty()) {
-            this.networkName = networkName;
-        } else {
-            this.networkName = "B-Cycle";
-        }
+    BCycleBikeRentalDataSource(BikeRentalDataSourceParameters config) {
+        super(config, "", "ApiKey", config.getApiKey());
+        networkName = config.getNetwork("B-Cycle");
     }
 
     public BikeRentalStation makeStation(JsonNode kioskNode) {
@@ -39,7 +30,7 @@ public class BCycleBikeRentalDataSource extends GenericJsonBikeRentalDataSource 
 
         BikeRentalStation brstation = new BikeRentalStation();
 
-        brstation.networks = new HashSet<String>();
+        brstation.networks = new HashSet<>();
         brstation.networks.add(this.networkName);
 
         brstation.id = kioskNode.path("Id").asText();

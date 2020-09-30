@@ -1,12 +1,11 @@
-package org.opentripplanner.updater.bike_rental;
-
-import java.util.HashSet;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.NonLocalizedString;
+package org.opentripplanner.updater.bike_rental.datasources;
 
 import com.fasterxml.jackson.databind.JsonNode;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.NonLocalizedString;
+
+import java.util.HashSet;
 
 
 /**
@@ -14,20 +13,13 @@ import com.fasterxml.jackson.databind.JsonNode;
  *
  * @see GenericJsonBikeRentalDataSource
  */
-public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
+class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSource {
 
-    private String networkName;
+    private final String networkName;
 
-    public CitiBikeNycBikeRentalDataSource(
-        UpdaterDataSourceParameters config,
-        String networkName)
-    {
+    public CitiBikeNycBikeRentalDataSource(BikeRentalDataSourceParameters config) {
         super(config, "stationBeanList");
-        if (networkName != null && !networkName.isEmpty()) {
-            this.networkName = networkName;
-        } else {
-            this.networkName = "CitiBike";
-        }
+        this.networkName = config.getNetwork("CitiBike");
     }
 
     public BikeRentalStation makeStation(JsonNode stationNode) {
@@ -42,7 +34,7 @@ public class CitiBikeNycBikeRentalDataSource extends GenericJsonBikeRentalDataSo
 
         BikeRentalStation brstation = new BikeRentalStation();
 
-        brstation.networks = new HashSet<String>();
+        brstation.networks = new HashSet<>();
         brstation.networks.add(this.networkName);
 
         brstation.id = stationNode.path("id").asText();

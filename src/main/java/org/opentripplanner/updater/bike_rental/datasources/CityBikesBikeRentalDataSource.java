@@ -1,4 +1,14 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
+
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.BikeRentalDataSource;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.HttpUtils;
+import org.opentripplanner.util.NonLocalizedString;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -9,18 +19,8 @@ import java.nio.charset.Charset;
 import java.util.ArrayList;
 import java.util.List;
 
-import com.fasterxml.jackson.databind.JsonNode;
-import com.fasterxml.jackson.databind.ObjectMapper;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.HttpUtils;
-import org.opentripplanner.util.NonLocalizedString;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 // TODO This class could probably inherit from GenericJSONBikeRentalDataSource
-public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
+class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     private static final Logger log = LoggerFactory.getLogger(BixiBikeRentalDataSource.class);
 
@@ -28,7 +28,7 @@ public class CityBikesBikeRentalDataSource implements BikeRentalDataSource {
 
     ArrayList<BikeRentalStation> stations = new ArrayList<>();
 
-    public CityBikesBikeRentalDataSource(UpdaterDataSourceParameters config) {
+    public CityBikesBikeRentalDataSource(BikeRentalDataSourceParameters config) {
         this.url = config.getUrl();
     }
 

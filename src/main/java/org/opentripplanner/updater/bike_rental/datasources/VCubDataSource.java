@@ -1,11 +1,11 @@
-package org.opentripplanner.updater.bike_rental;
+package org.opentripplanner.updater.bike_rental.datasources;
+
+import org.opentripplanner.routing.bike_rental.BikeRentalStation;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.util.NonLocalizedString;
 
 import java.util.HashSet;
 import java.util.Map;
-
-import org.opentripplanner.routing.bike_rental.BikeRentalStation;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
-import org.opentripplanner.util.NonLocalizedString;
 
 /**
  * Bike-rental station data source for the "Communauté d'Agglomération de Bordeaux" (CUB) VCub (aka
@@ -16,9 +16,9 @@ import org.opentripplanner.util.NonLocalizedString;
  * 
  * @author laurent
  */
-public class VCubDataSource extends GenericXmlBikeRentalDataSource {
+class VCubDataSource extends GenericXmlBikeRentalDataSource {
 
-    public VCubDataSource(UpdaterDataSourceParameters config) {
+    public VCubDataSource(BikeRentalDataSourceParameters config) {
         super(config,"//*[name()='bm:CI_VCUB_P']");
     }
 
