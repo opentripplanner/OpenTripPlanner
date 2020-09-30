@@ -8,7 +8,6 @@ import org.opentripplanner.routing.services.TransitAlertService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GtfsRealtimeFuzzyTripMatcher;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.util.HttpUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -55,14 +54,9 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         this.updaterManager = updaterManager;
     }
 
-    public GtfsRealtimeAlertsUpdater(Parameters config) {
+    public GtfsRealtimeAlertsUpdater(GtfsRealtimeAlertsUpdaterParameters config) {
         super(config);
-
-        String url = config.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-        this.url = url;
+        this.url = config.getUrl();
         this.earlyStart = config.getEarlyStartSec();
         this.feedId = config.getFeedId();
         this.fuzzyTripMatching = config.fuzzyTripMatching();
@@ -126,9 +120,4 @@ public class GtfsRealtimeAlertsUpdater extends PollingGraphUpdater {
         return "GtfsRealtimeUpdater(" + url + ")";
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        int getEarlyStartSec();
-        String getFeedId();
-        boolean fuzzyTripMatching();
-    }
 }

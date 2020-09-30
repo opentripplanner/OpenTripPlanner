@@ -9,7 +9,7 @@ import org.opentripplanner.standalone.config.updaters.*;
 import org.opentripplanner.standalone.config.updaters.BikeParkUpdaterConfig;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.opentripplanner.updater.UpdatersParameters;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
@@ -52,7 +52,7 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(STOP_TIME_UPDATER, PollingStoptimeUpdaterConfig::create);
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::new);
     CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig::new);
-    CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::new);
+    CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::create);
     CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
@@ -95,7 +95,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<GtfsRealtimeAlertsUpdater.Parameters> getGtfsRealtimeAlertsUpdaterParameters() {
+  public List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters() {
     return getParameters(REAL_TIME_ALERTS);
   }
 

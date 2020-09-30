@@ -3,7 +3,7 @@ package org.opentripplanner.updater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
-import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
@@ -20,7 +20,7 @@ public interface UpdatersParameters {
 
   List<BikeRentalUpdater.Parameters> getBikeRentalParameters();
 
-  List<GtfsRealtimeAlertsUpdater.Parameters> getGtfsRealtimeAlertsUpdaterParameters();
+  List<GtfsRealtimeAlertsUpdaterParameters> getGtfsRealtimeAlertsUpdaterParameters();
 
   List<PollingStoptimeUpdaterParameters> getPollingStoptimeUpdaterParameters();
 

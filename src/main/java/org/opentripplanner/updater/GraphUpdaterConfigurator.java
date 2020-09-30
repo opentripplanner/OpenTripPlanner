@@ -11,6 +11,7 @@ import org.opentripplanner.ext.siri.updater.SiriVMUpdater;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdater;
+import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdater;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
 import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
@@ -107,7 +108,7 @@ public abstract class GraphUpdaterConfigurator {
         for (BikeRentalUpdater.Parameters configItem : config.getBikeRentalParameters()) {
             updaters.add(new BikeRentalUpdater(configItem));
         }
-        for (GtfsRealtimeAlertsUpdater.Parameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
+        for (GtfsRealtimeAlertsUpdaterParameters configItem : config.getGtfsRealtimeAlertsUpdaterParameters()) {
             updaters.add(new GtfsRealtimeAlertsUpdater(configItem));
         }
         for (PollingStoptimeUpdaterParameters configItem : config.getPollingStoptimeUpdaterParameters()) {
