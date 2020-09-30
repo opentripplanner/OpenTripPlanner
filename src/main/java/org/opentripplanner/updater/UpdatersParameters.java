@@ -36,9 +36,5 @@ public interface UpdatersParameters {
 
   List<BikeParkUpdaterParameters> getBikeParkUpdaterParameters();
 
-  List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters();
-
-  List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters();
-
   List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters();
 }

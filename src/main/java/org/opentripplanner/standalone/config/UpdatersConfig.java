@@ -5,9 +5,16 @@ import com.google.common.collect.Multimap;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriVMUpdaterParameters;
-import org.opentripplanner.standalone.config.updaters.*;
 import org.opentripplanner.standalone.config.updaters.BikeParkUpdaterConfig;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
+import org.opentripplanner.standalone.config.updaters.BikeRentalUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.GtfsRealtimeAlertsUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.MqttGtfsRealtimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.PollingStoptimeUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriETUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriSXUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.SiriVMUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WFSNotePollingGraphUpdaterConfig;
+import org.opentripplanner.standalone.config.updaters.WebsocketGtfsRealtimeUpdaterConfig;
 import org.opentripplanner.updater.UpdatersParameters;
 import org.opentripplanner.updater.alerts.GtfsRealtimeAlertsUpdaterParameters;
 import org.opentripplanner.updater.bike_park.BikeParkUpdaterParameters;
@@ -37,8 +44,6 @@ public class UpdatersConfig implements UpdatersParameters {
   private static final String MQTT_GTFS_RT_UPDATER = "mqtt-gtfs-rt-updater";
   private static final String REAL_TIME_ALERTS = "real-time-alerts";
   private static final String BIKE_PARK = "bike-park";
-  private static final String EXAMPLE_UPDATER = "example-updater";
-  private static final String EXAMPLE_POLLING_UPDATER = "example-polling-updater";
   private static final String WINKKI_POLLING_UPDATER = "winkki-polling-updater";
   private static final String SIRI_ET_UPDATER = "siri-et-updater";
   private static final String SIRI_VM_UPDATER = "siri-vm-updater";
@@ -53,8 +58,6 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(WEBSOCKET_GTFS_RT_UPDATER, WebsocketGtfsRealtimeUpdaterConfig::create);
     CONFIG_CREATORS.put(MQTT_GTFS_RT_UPDATER, MqttGtfsRealtimeUpdaterConfig::create);
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::create);
-    CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::create);
@@ -132,16 +135,6 @@ public class UpdatersConfig implements UpdatersParameters {
   @Override
   public List<BikeParkUpdaterParameters> getBikeParkUpdaterParameters() {
     return getParameters(BIKE_PARK);
-  }
-
-  @Override
-  public List<PollingGraphUpdaterParameters> getExampleGraphUpdaterParameters() {
-    return getParameters(EXAMPLE_UPDATER);
-  }
-
-  @Override
-  public List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters() {
-    return getParameters(EXAMPLE_POLLING_UPDATER);
   }
 
   @Override

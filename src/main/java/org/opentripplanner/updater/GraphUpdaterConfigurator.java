@@ -1,8 +1,6 @@
 package org.opentripplanner.updater;
 
 import org.opentripplanner.ext.bikerentalservicedirectory.BikeRentalServiceDirectoryFetcher;
-import org.opentripplanner.ext.examples.updater.ExampleGraphUpdater;
-import org.opentripplanner.ext.examples.updater.ExamplePollingGraphUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdater;
 import org.opentripplanner.ext.siri.updater.SiriETUpdaterParameters;
 import org.opentripplanner.ext.siri.updater.SiriSXUpdater;
@@ -133,12 +131,6 @@ public abstract class GraphUpdaterConfigurator {
         }
         for (BikeParkUpdaterParameters configItem : config.getBikeParkUpdaterParameters()) {
             updaters.add(new BikeParkUpdater(configItem));
-        }
-        for (PollingGraphUpdaterParameters configItem : config.getExampleGraphUpdaterParameters()) {
-            updaters.add(new ExampleGraphUpdater(configItem));
-        }
-        for (PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
-            updaters.add(new ExamplePollingGraphUpdater(configItem));
         }
         for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));
