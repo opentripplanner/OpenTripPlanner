@@ -1,92 +1,48 @@
 # Configuring OpenTripPlanner
 
-## Base directory
-**TODO OTP2** - This need to be revised.
+## Base Directory
 
-The OTP *base directory* defaults to `/var/otp`. Unless you tell OTP otherwise, all other configuration,
-input files and storage directories
-will be sought immediately beneath this one. This prefix follows UNIX conventions so it should work in Linux and Mac OSX
-environments, but it is inappropriate in Windows and where the user running OTP either cannot obtain permissions to
-`/var` or simply wishes to experiment within his or her home directory rather than deploy a system-wide server.
-In these cases one should use the basePath switch when starting up OTP to override the default. For example:
-`--basePath /home/username/otp` on a Linux system, `--basePath /Users/username/otp` in Mac OSX, or
-`--basePath C:\Users\username\otp` in Windows.
+On the OTP2 command line you must always specify a single directory after all the switches. This tells OTP2 where to look for any configuration files, as well as the input files to build a graph (GTFS, OSM, elevation, and base street graphs) or the `graph.obj` file to load when starting a server. 
 
-## Routers
-**TODO OTP2** - No support for multiple routers any more.
-
-A single OTP instance can handle several regions independently. Each of these separate (but potentially geographically overlapping)
-services is called a *router* and is referred to by a short unique ID such as 'newyork' or 'paris'. Each router has its
-own subdirectory in a directory called 'graphs' directly under the OTP base directory, and each router's directory is
-always named after its router ID. Thus, by default the files for the router 'tokyo' will
-be located at `/var/otp/graphs/tokyo`. Here is an example directory layout for an OTP instance with two routers, one for
-New York City and one for Portland, Oregon:
+A typical OTP2 directory for a New York City graph might include the following:
 
 ```
-/var/otp
-├── otp-config.json
-├── cache
-│   └── ned
-└── graphs
-    ├── nyc
-    │   ├── build-config.json
-    │   ├── graph.obj
-    │   ├── long-island-rail-road_20140216_0114.zip
-    │   ├── mta-new-york-city-transit_20130212_0419.zip
-    │   ├── new-york-city.osm.pbf
-    │   └── port-authority-of-new-york-new-jersey_20150217_0111.zip
-    └── pdx
-        ├── build-config.json
-        ├── graph.obj
-        ├── gtfs.zip
-        ├── portland_oregon.osm.pbf
-        └── router-config.json
+otp-config.json
+build-config.json
+router-config.json
+new-york-city-no-buildings.osm.pbf
+nyc-elevation.tiff
+long-island-rail-road.gtfs.zip
+mta-new-york-city-transit.gtfs.zip
+port-authority-of-new-york-new-jersey.gtfs.zip
+graph.obj
 ```
 
-You can see that each of these subdirectories contains one or more GTFS feeds (which are just zip files full of
-comma-separated tables), a PBF street map file, some JSON configuration files, and another file called `graph.obj`.
-On startup, OTP scans router directories for input and configuration files,
-and can optionally store the resulting combined representation of the transportation network as `graph.obj` in the
-same directory to avoid re-processing the data the next time it starts up. The `cache` directory is where OTP will
-store its local copies of resources fetched from the internet, such as US elevation tiles.
+You could have more than one of these directories if you are building separate graphs for separate regions. Each one should contain one or more GTFS feeds (which are just zip files full of comma-separated text tables), a PBF OpenStreetMap file, some JSON configuration files, and any output files such as `graph.obj`. For convenience, especially if you work with only one graph at a time, you may want to place your OTP2 JAR file in this same directory.
 
+## Three Scopes of Configuration
 
-## System-wide vs. graph build vs. router configuration
+OTP is configured via three configuration JSON files which are read from the directory specified on its command line. We try to provide sensible defaults for every option, so all three of these files are optional, as are all the options within each file. Each configuration file corresponds to options that are relevant at a particular phase of OTP usage. 
 
-OTP is configured via JSON files. The file `otp-config.json` is placed in the OTP base directory and contains settings
-that affect the entire OTP instance. Each router within that instance is configured using two other JSON files placed
-alongside the input files (OSM, GTFS, elevation data etc.) in the router's directory. These router-level config files
-are named `build-config.json` and `router-config.json`. Each configuration option within each of these files is optional,
-as are all three of the files themselves. If any option or an entire file is missing, reasonable defaults will be applied.
+Options and parameters that are taken into account during the graph building process will be "baked into" the graph, and cannot be changed later in a running server. These are specified in `build-config.json`. Other details of OTP operation can be modified without rebuilding the graph. These run-time configuration options are found in `router-config.json`. Finally, `otp-config.json` contains simple switches that enable or disable system-wide features. 
 
-Some parts of the process that loads the street and transit network description are time consuming and memory-hungry.
-To avoid repeating these slow steps every time OTP starts up, we can trigger them manually whenever the input files change,
-saving the resulting transportation network description to disk. We call this prepared product a *graph* (following
-[mathematical terminology](https://en.wikipedia.org/wiki/Graph_%28mathematics%29)), and refer to these "heavier" steps as
-*graph building*. They are controlled by `build-config.json`. There are many other details of OTP operation that can be
-modified without requiring the potentially long operation of rebuilding the graph. These run-time configuration options
-are found in `router-config.json`.
+# System-wide Configuration
 
-# System wide configuration
-The system wide configuration is used to turn system wide features on off. Some of these might only be relevant in the
-build or routing phase, but for simplicity all features are set here. See the 
-[OTPFeature](../src/main/java/org/opentripplanner/util/OTPFeature.java) 
-Java class for a list of all available features and their default settings. For most use-cases changing the features is 
-not necessary. Some of the [Sandbox Extensions](SandboxExtention.md) is enabled using this.
+Using the file `otp-config.json` you can enable or disable different APIs and experimental [Sandbox Extensions](SandboxExtension.md). By default, all supported APIs are enabled and all sandbox features are disabled, so for most OTP2 use cases it is not necessary to create this file. Features that can be toggled in this file are generally only affect the routing phase of OTP2 usage, but for consistency all such "feature flags", even those that would affect graph building, are managed in this one file. See the OTPFeature Java class for an enumeration of all available features and their default settings. Here is an example:
 
 ```JSON
 // otp-config.json
 {
-    featuresEnabled : {
+    otpFeatures : {
         APIBikeRental : false,
         SandboxExampleAPIGraphStatistics : true
     }
 }
 ```
 
-# Graph build configuration
+# Graph Build Configuration
 
-This table lists the possible settings that can be defined in a `build-config.json` file. Sections follow that describe particular settings in more depth.
+This table lists the possible settings that can be defined in a `build-config.json` file. These will be stored in the graph itself, and affect any server that subsequently loads that graph. Sections follow that describe particular settings in more depth.
 
 config key | description | value type | value default | notes
 ---------- | ----------- | ---------- | ------------- | -----
@@ -158,7 +114,7 @@ Nested inside `storage : { localFileNamePatterns : { ... } }` in `build-config.j
 
 config key | description | value type | value default
 ---------- | ----------- | ---------- | -------------
-`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf|\.osm|\.osm\.xml)$` 
+`osm` | Pattern used to match Open Street Map files on local disk | Regexp Pattern | `(?i)(\.pbf)`|\.osm|\.osm\.xml)$` 
 `dem` | Pattern used to match Elevation DEM files on local disk | Regexp Pattern | `(?i)\.tiff?$` 
 `gtfs` | Pattern used to match GTFS files on local disk | Regexp Pattern | `(?i)gtfs` 
 `netex` | Pattern used to match NeTEx files on local disk | Regexp Pattern | `(?i)netex` 
@@ -450,9 +406,10 @@ It is possible to adjust how OSM data is interpreted by OpenTripPlanner when bui
 OSM tags have different meanings in different countries, and how the roads in a particular country or region are tagged affects routing. As an example are roads tagged with `highway=trunk (mainly) walkable in Norway, but forbidden in some other countries. This might lead to OTP being unable to snap stops to these roads, or by giving you poor routing results for walking and biking.
 You can adjust which road types that are accessible by foot, car & bicycle as well as speed limits, suitability for biking and walking.
 
-There are currently 3 wayPropertySets defined;
+There are currently following wayPropertySets defined;
 
 - `default` which is based on California/US mapping standard
+- `finland` which is adjusted to rules and speeds in Finland
 - `norway` which is adjusted to rules and speeds in Norway
 - `uk` which is adjusted to rules and speed in the UK
 

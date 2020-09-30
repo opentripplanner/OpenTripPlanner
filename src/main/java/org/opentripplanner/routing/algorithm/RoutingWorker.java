@@ -1,5 +1,7 @@
 package org.opentripplanner.routing.algorithm;
 
+import org.opentripplanner.ext.flex.FlexRouter;
+import org.opentripplanner.model.TransitMode;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.filterchain.ItineraryFilter;
 import org.opentripplanner.routing.algorithm.mapping.RaptorPathToItineraryMapper;
@@ -10,6 +12,7 @@ import org.opentripplanner.routing.algorithm.raptor.router.street.DirectStreetRo
 import org.opentripplanner.routing.algorithm.raptor.transit.AccessEgress;
 import org.opentripplanner.routing.algorithm.raptor.transit.TransitLayer;
 import org.opentripplanner.routing.algorithm.raptor.transit.TripSchedule;
+import org.opentripplanner.routing.algorithm.raptor.transit.mappers.AccessEgressMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.RaptorRequestMapper;
 import org.opentripplanner.routing.algorithm.raptor.transit.request.RaptorRoutingRequestTransitData;
 import org.opentripplanner.routing.api.request.RoutingRequest;
@@ -20,6 +23,7 @@ import org.opentripplanner.routing.api.response.RoutingResponse;
 import org.opentripplanner.routing.api.response.TripSearchMetadata;
 import org.opentripplanner.routing.error.RoutingValidationException;
 import org.opentripplanner.routing.framework.DebugAggregator;
+import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.services.FareService;
 import org.opentripplanner.standalone.server.Router;
 import org.opentripplanner.transit.raptor.RaptorService;
@@ -27,6 +31,7 @@ import org.opentripplanner.transit.raptor.api.path.Path;
 import org.opentripplanner.transit.raptor.api.request.RaptorRequest;
 import org.opentripplanner.transit.raptor.api.response.RaptorResponse;
 import org.opentripplanner.transit.raptor.rangeraptor.configure.RaptorConfig;
+import org.opentripplanner.util.OTPFeature;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -144,8 +149,30 @@ public class RoutingWorker {
         this.debugAggregator.finishedPatternFiltering();
 
         // Prepare access/egress transfers
-        Collection<AccessEgress> accessTransfers = AccessEgressRouter.streetSearch(request, false, 2000, transitLayer.getStopIndex());
-        Collection<AccessEgress> egressTransfers = AccessEgressRouter.streetSearch(request, true, 2000, transitLayer.getStopIndex());
+        Collection<NearbyStop> accessStops = AccessEgressRouter.streetSearch(request, false, 2000);
+        Collection<NearbyStop> egressStops = AccessEgressRouter.streetSearch(request, true, 2000);
+
+        AccessEgressMapper accessEgressMapper = new AccessEgressMapper(transitLayer.getStopIndex());
+        Collection<AccessEgress> accessTransfers = accessEgressMapper.mapNearbyStops(accessStops, false);
+        Collection<AccessEgress> egressTransfers = accessEgressMapper.mapNearbyStops(egressStops, true);
+
+        List<Itinerary> itineraries = new ArrayList<>();
+
+        if (OTPFeature.FlexRouting.isOn() && request.modes.transitModes.contains(TransitMode.FLEXIBLE)) {
+            FlexRouter flexRouter = new FlexRouter(
+                request.rctx.graph,
+                request.getDateTime().toInstant(),
+                request.arriveBy,
+                ADDITIONAL_SEARCH_DAYS_BEFORE_TODAY,
+                ADDITIONAL_SEARCH_DAYS_AFTER_TODAY,
+                accessStops,
+                egressStops
+            );
+
+            itineraries.addAll(flexRouter.createFlexOnlyItineraries());
+            accessTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexAccesses()));
+            egressTransfers.addAll(accessEgressMapper.mapFlexAccessEgresses(flexRouter.createFlexEgresses()));
+        }
 
         verifyEgressAccess(accessTransfers, egressTransfers);
 
@@ -178,7 +205,6 @@ public class RoutingWorker {
         );
         FareService fareService = request.getRoutingContext().graph.getService(FareService.class);
 
-        List<Itinerary> itineraries = new ArrayList<>();
         for (Path<TripSchedule> path : transitResponse.paths()) {
             // Convert the Raptor/Astar paths to OTP API Itineraries
             Itinerary itinerary = itineraryMapper.createItinerary(path);

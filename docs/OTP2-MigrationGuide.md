@@ -1,9 +1,9 @@
-# How to migrate OTP version 1.x to 2.x
+# How to migrate from OTP1 to OTP2
 
 ## Command line
 The command line parameters are changed. Use the `--help` option to get the current documentation,
-and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#start-up-otp) for examples. The 
-possibility to build the graph in 2 steps is new in OTP2. OTP2 does not support multiple routers.
+and look at the [Basic Tutorial, Start up OPT](Basic-Tutorial.md#starting-otp) for examples. The 
+possibility to build the graph in 2 steps (streets then transit) is new in OTP2. OTP2 does not support multiple routers.
 
 
 ## File loading
@@ -56,8 +56,23 @@ A lot of the query parameters in the REST API are ignored/deprecated, see the [R
  plan is to go over the API documentation before the release - we do not prioritize keeping 
  the documentation up to date, except for this migration guide document.
  
+ The following parameters are missing in OTP2 but will be added:
+- `startingTransitTripId` The ability to plan a trip from on board a vehicle should be implemented by Q1 2021.
+- `intermediatePlaces` - ability to specify intermediate destinations along the route. It is not certain when this will be implemented. 
+- `nonpreferredTransferCost`, `(un)preferredRoutes`, `(un)preferredAgencies` - these help diversify or customize the trips and operators 
+visible in results. Due to the new transit routing algorithm, Entur plans to completely rewrite these features, 
+accounting for market-neutrality requirements and showing relevant trips and operators in local vs. intercity trips.
  
-  
+ Some features in OTP1 will not be present upon launch in OTP2, and they are proposed to be removed permanently from OTP2 but may require some development to support valid important cases:
+ * maxWalkDistance, maxTransferWalkDistance, & maxWait - walkReluctance and waitReluctance should be utilized. If implemented, they should be filters on top of Raptor search rather than embedded in search. But this shouldn't be necessary: if the trip is just beyond max distance/wait, rider should still see it if it is the only option.  
+ * maxHours & useRequestedDateTimeInMaxHours - This is replaced by searchWindow, which limits the arrival or departure window of the trip 
+ * worstTime - This factor returns the “worst” trip in a depart after/arrive by search, i.e. the latest or earliest trip available. It is not a priority for current OTP2 users but could be added as a filter. 
+ * waitAtBeginningFactor - No longer necessary to weight the initial wait differently based on the the Range Raptor search algorithm, which no longer prefers a departure at one valid time over another. Filtering could be implemented on top of Raptor to show certain departure times before others. 
+ * pathComparator - The ability to set a sort order based on departure or arrival should be the domain of the API rather than the search.  
+ * startingTransitStopId - duplicative with fromPlace 
+ * onlyTransitTrips - the new feature for specifying access, egress, transit and direct mode replace the need for this parameter. 
+ 
+
 #### Paging
  In OTP1 most client provided a way to page the results by looking at the trips returned and passing 
  in something like the `last-depature-time` + 1 minute to the next request, to get trips to add to 

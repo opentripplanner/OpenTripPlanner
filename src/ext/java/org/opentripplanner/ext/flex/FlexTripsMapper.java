@@ -12,6 +12,8 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
+import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
+
 public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
@@ -31,10 +33,7 @@ public class FlexTripsMapper {
       List<StopTime> stopTimes = new ArrayList<>(stopTimesByTrip.get(trip));
 
       if (UnscheduledTrip.isUnscheduledTrip(stopTimes)) {
-        if (stopTimes.size() == 2) {
-          // TODO: Drop this restriction after time handling and ride times are defined
-          builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
-        }
+        builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
       } else if (hasContinuousStops(stopTimes)) {
@@ -51,9 +50,7 @@ public class FlexTripsMapper {
   private static boolean hasContinuousStops(List<StopTime> stopTimes) {
     return stopTimes
         .stream()
-        .anyMatch(st -> st.getContinuousPickup() == 0 || st.getContinuousPickup() == 2
-            || st.getContinuousPickup() == 3 || st.getContinuousDropOff() == 0
-            || st.getContinuousDropOff() == 2 || st.getContinuousDropOff() == 3);
+        .anyMatch(st -> st.getFlexContinuousPickup() != PICKDROP_NONE || st.getFlexContinuousDropOff() != PICKDROP_NONE);
   }
 
 }

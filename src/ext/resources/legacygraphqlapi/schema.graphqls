@@ -841,6 +841,9 @@ enum Mode {
     """FERRY"""
     FERRY
 
+    """Enables flexible transit for access and egress legs"""
+    FLEXIBLE
+
     """FUNICULAR"""
     FUNICULAR
 

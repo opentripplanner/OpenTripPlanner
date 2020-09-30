@@ -401,6 +401,12 @@ public class DefaultRoutingRequestType {
                         .type(Scalars.GraphQLBoolean)
                         .dataFetcher(env -> request.geoidElevation)
                         .build())
+                .field(GraphQLFieldDefinition.newFieldDefinition()
+                        .name("transitGeneralizedCostLimit")
+                        .description("A relative maximum limit for the generalized cost for transit itineraries. The limit is a linear function of the minimum generalized-cost.")
+                        .type(Scalars.GraphQLString)
+                        .dataFetcher(env -> request.transitGeneralizedCostLimit)
+                        .build())
                 /*
                 .field(GraphQLFieldDefinition.newFieldDefinition()
                         .name("preferredInterchangePenalty")

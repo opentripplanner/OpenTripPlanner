@@ -6,7 +6,6 @@ import org.locationtech.jts.geom.LineString;
 import org.opentripplanner.api.resource.CoordinateArrayListSequence;
 import org.opentripplanner.common.geometry.GeometryUtils;
 import org.opentripplanner.common.geometry.PackedCoordinateSequence;
-import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
 import org.opentripplanner.routing.core.State;
 import org.opentripplanner.routing.edgetype.PathwayEdge;
@@ -22,7 +21,7 @@ import java.util.List;
  * A specific stop at a distance. Also includes a geometry and potentially a list of edges and a
  * state of how to reach the stop from the search origin
  */
-public class StopAtDistance implements Comparable<StopAtDistance> {
+public class NearbyStop implements Comparable<NearbyStop> {
 
   private static GeometryFactory geometryFactory = GeometryUtils.getGeometryFactory();
 
@@ -33,7 +32,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
   public final LineString geometry;
   public final State state;
 
-  public StopAtDistance(
+  public NearbyStop(
       StopLocation stop, double distance, List<Edge> edges, LineString geometry, State state
   ) {
     this.stop = stop;
@@ -43,7 +42,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
     this.state = state;
   }
 
-  public StopAtDistance(
+  public NearbyStop(
       TransitStopVertex stopVertex, double distance, List<Edge> edges, LineString geometry,
       State state
   ) {
@@ -51,7 +50,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
   }
 
   @Override
-  public int compareTo(StopAtDistance that) {
+  public int compareTo(NearbyStop that) {
     return (int) (this.distance) - (int) (that.distance);
   }
 
@@ -63,7 +62,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
    * Given a State at a StopVertex, bundle the StopVertex together with information about how far
    * away it is and the geometry of the path leading up to the given State.
    */
-  public static StopAtDistance stopAtDistanceForState(State state, StopLocation stop) {
+  public static NearbyStop nearbyStopForState(State state, StopLocation stop) {
     double effectiveWalkDistance = 0.0;
     GraphPath graphPath = new GraphPath(state, false);
     CoordinateArrayListSequence coordinates = new CoordinateArrayListSequence();
@@ -93,7 +92,7 @@ public class StopAtDistance implements Comparable<StopAtDistance> {
       coordinateList.add(lastState.getVertex().getCoordinate());
       coordinates = new CoordinateArrayListSequence(coordinateList);
     }
-    return new StopAtDistance(
+    return new NearbyStop(
         stop,
         effectiveWalkDistance,
         edges,

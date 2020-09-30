@@ -20,7 +20,7 @@ public interface GraphFinder {
    * @param lon Origin longitude
    * @param radiusMeters Search radius from the origin in meters
    */
-  List<StopAtDistance> findClosestStops(double lat, double lon, double radiusMeters);
+  List<NearbyStop> findClosestStops(double lat, double lon, double radiusMeters);
 
   /**
    * Search closest places, including stops, bike rental stations, bike and car parking etc, from a
