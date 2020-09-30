@@ -6,12 +6,6 @@ package org.opentripplanner.updater;
  */
 public interface PollingGraphUpdaterParameters {
 
-  @Deprecated
-  UpdaterDataSourceParameters getSourceParameters();
-
-  @Deprecated
-  String getUrl();
-
   int getFrequencySec();
 
   /** The config name/type for the updater. Used to reference the configuration element. */

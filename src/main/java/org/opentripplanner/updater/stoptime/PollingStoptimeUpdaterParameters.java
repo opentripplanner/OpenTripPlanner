@@ -2,7 +2,6 @@ package org.opentripplanner.updater.stoptime;
 
 import org.opentripplanner.updater.DataSourceType;
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
@@ -89,10 +88,4 @@ public class PollingStoptimeUpdaterParameters implements PollingGraphUpdaterPara
       @Override public String getUrl() { return httpSourceUrl; }
     };
   }
-
-  @Deprecated public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Deprecated public String getUrl() { throw new UnsupportedOperationException(); }
 }

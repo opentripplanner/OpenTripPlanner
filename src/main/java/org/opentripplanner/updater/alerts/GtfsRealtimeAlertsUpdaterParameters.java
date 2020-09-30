@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.alerts;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class GtfsRealtimeAlertsUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
@@ -51,10 +50,5 @@ public class GtfsRealtimeAlertsUpdaterParameters implements PollingGraphUpdaterP
   @Override
   public String getConfigRef() {
     return configRef;
-  }
-
-  @Override
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
   }
 }

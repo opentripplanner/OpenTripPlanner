@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.street_notes;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdaterParameters {
 
@@ -31,8 +30,4 @@ public class WFSNotePollingGraphUpdaterParameters implements PollingGraphUpdater
 
   public String getConfigRef() { return configRef; }
 
-  @Override
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
-  }
 }

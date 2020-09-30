@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
@@ -35,12 +34,6 @@ public class SiriSXUpdaterParameters implements PollingGraphUpdaterParameters {
 
   String getFeedId() {
     return feedId;
-  }
-
-  @Override
-  @Deprecated
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
   }
 
   public String getUrl() {

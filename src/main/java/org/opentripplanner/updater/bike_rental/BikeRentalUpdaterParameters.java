@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.bike_rental;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
 
 public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameters {
@@ -47,10 +46,5 @@ public class BikeRentalUpdaterParameters implements PollingGraphUpdaterParameter
 
   BikeRentalDataSourceParameters sourceParameters() {
     return source;
-  }
-
-  @Deprecated
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
   }
 }

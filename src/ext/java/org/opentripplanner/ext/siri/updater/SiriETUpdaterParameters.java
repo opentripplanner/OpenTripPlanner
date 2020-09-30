@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
@@ -55,8 +54,6 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
 
   public boolean blockReadinessUntilInitialized() { return blockReadinessUntilInitialized; }
 
-  @Override @Deprecated public String getUrl() { throw new UnsupportedOperationException(); }
-
   @Override public int getFrequencySec() { return frequencySec; }
 
   @Override public String getConfigRef() { return configRef; }
@@ -70,11 +67,4 @@ public class SiriETUpdaterParameters implements PollingGraphUpdaterParameters {
       @Override public int getPreviewIntervalMinutes() { return previewIntervalMinutes; }
     };
   }
-
-  @Override
-  @Deprecated
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
-  }
-
 }

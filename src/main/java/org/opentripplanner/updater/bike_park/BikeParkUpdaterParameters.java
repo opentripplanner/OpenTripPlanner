@@ -1,7 +1,6 @@
 package org.opentripplanner.updater.bike_park;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters {
 
@@ -25,14 +24,6 @@ public class BikeParkUpdaterParameters implements PollingGraphUpdaterParameters 
     this.namePrefix = namePrefix;
     this.zip = zip;
   }
-
-  @Override @Deprecated
-  public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override @Deprecated
-  public String getUrl() { throw new UnsupportedOperationException(); }
 
   @Override
   public int getFrequencySec() { return frequencySec; }

@@ -1,7 +1,6 @@
 package org.opentripplanner.ext.siri.updater;
 
 import org.opentripplanner.updater.PollingGraphUpdaterParameters;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
 
 public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
   private final String configRef;
@@ -43,12 +42,6 @@ public class SiriVMUpdaterParameters implements PollingGraphUpdaterParameters {
     this.frequencySec = frequencySec;
     this.timeoutSec = timeoutSec;
   }
-
-  @Override @Deprecated public UpdaterDataSourceParameters getSourceParameters() {
-    throw new UnsupportedOperationException();
-  }
-
-  @Override @Deprecated public String getUrl() { throw new UnsupportedOperationException(); }
 
   @Override
   public int getFrequencySec() {
