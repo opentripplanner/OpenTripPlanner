@@ -64,7 +64,7 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
 
     private final String configRef;
 
-    public WebsocketGtfsRealtimeUpdater(Parameters parameters) {
+    public WebsocketGtfsRealtimeUpdater(WebsocketGtfsRealtimeUpdaterParameters parameters) {
         this.configRef = parameters.getConfigRef();
         this.url = parameters.getUrl();
         this.feedId = parameters.getFeedId();
@@ -186,12 +186,4 @@ public class WebsocketGtfsRealtimeUpdater implements GraphUpdater {
         return configRef;
     }
 
-    public interface Parameters {
-        String getUrl();
-        String getFeedId();
-        int getReconnectPeriodSec();
-
-        /** The config name/type for the updater. Used to reference the configuration element. */
-        String getConfigRef();
-    }
 }

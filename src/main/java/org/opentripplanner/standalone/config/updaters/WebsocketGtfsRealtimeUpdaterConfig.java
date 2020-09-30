@@ -1,39 +1,15 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
+import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdaterParameters;
 
-public class WebsocketGtfsRealtimeUpdaterConfig
-    implements WebsocketGtfsRealtimeUpdater.Parameters {
-  private final String configRef;
-  private final String url;
-  private final String feedId;
-  private final int reconnectPeriodSec;
-
-  public WebsocketGtfsRealtimeUpdaterConfig(String configRef, NodeAdapter c) {
-    this.configRef = configRef;
-    this.url = c.asText("url", null);
-    this.reconnectPeriodSec = c.asInt("reconnectPeriodSec", 60);
-    this.feedId = c.asText("feedId", null);
-  }
-
-  @Override
-  public String getUrl() {
-    return url;
-  }
-
-  @Override
-  public String getFeedId() {
-    return feedId;
-  }
-
-  @Override
-  public int getReconnectPeriodSec() {
-    return reconnectPeriodSec;
-  }
-
-  @Override
-  public String getConfigRef() {
-    return configRef;
+public class WebsocketGtfsRealtimeUpdaterConfig {
+  public static WebsocketGtfsRealtimeUpdaterParameters create(String configRef, NodeAdapter c) {
+    return new WebsocketGtfsRealtimeUpdaterParameters(
+        configRef,
+        c.asText("feedId", null),
+        c.asText("url", null),
+        c.asInt("reconnectPeriodSec", 60)
+    );
   }
 }
