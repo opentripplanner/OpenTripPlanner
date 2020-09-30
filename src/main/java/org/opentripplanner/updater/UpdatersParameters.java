@@ -9,7 +9,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 
 import java.net.URI;
 import java.util.List;
@@ -40,5 +40,5 @@ public interface UpdatersParameters {
 
   List<PollingGraphUpdaterParameters> getExamplePollingGraphUpdaterParameters();
 
-  List<WFSNotePollingGraphUpdater.Parameters> getWinkkiPollingGraphUpdaterParameters();
+  List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters();
 }

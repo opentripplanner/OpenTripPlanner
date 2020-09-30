@@ -19,7 +19,7 @@ import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.updater.street_notes.WinkkiPollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -138,7 +138,7 @@ public abstract class GraphUpdaterConfigurator {
         for (PollingGraphUpdaterParameters configItem : config.getExamplePollingGraphUpdaterParameters()) {
             updaters.add(new ExamplePollingGraphUpdater(configItem));
         }
-        for (WFSNotePollingGraphUpdater.Parameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
+        for (WFSNotePollingGraphUpdaterParameters configItem : config.getWinkkiPollingGraphUpdaterParameters()) {
             updaters.add(new WinkkiPollingGraphUpdater(configItem));
         }
 

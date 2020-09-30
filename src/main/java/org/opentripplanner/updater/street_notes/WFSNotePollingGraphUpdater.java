@@ -25,7 +25,6 @@ import org.opentripplanner.routing.services.notes.StreetNotesService;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -81,7 +80,7 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
      * Here the updater can be configured using the properties in the file 'Graph.properties'.
      * The property frequencySec is already read and used by the abstract base class.
      */
-    public WFSNotePollingGraphUpdater(Parameters config) {
+    public WFSNotePollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
         super(config);
         try {
             url = new URL(config.getUrl());
@@ -197,7 +196,4 @@ public abstract class WFSNotePollingGraphUpdater extends PollingGraphUpdater {
         return ret;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeatureType();
-    }
 }

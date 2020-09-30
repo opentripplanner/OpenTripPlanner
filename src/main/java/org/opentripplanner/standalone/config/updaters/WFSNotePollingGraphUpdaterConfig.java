@@ -1,17 +1,16 @@
 package org.opentripplanner.standalone.config.updaters;
 
 import org.opentripplanner.standalone.config.NodeAdapter;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 
-public class WFSNotePollingGraphUpdaterConfig extends PollingGraphUpdaterConfig
-    implements WFSNotePollingGraphUpdater.Parameters {
+public class WFSNotePollingGraphUpdaterConfig {
 
-  private final String featureType;
-
-  public WFSNotePollingGraphUpdaterConfig(String configRef, NodeAdapter c) {
-    super(configRef, c);
-    featureType = c.asText("featureType", null);
+  public static WFSNotePollingGraphUpdaterParameters create(String configRef, NodeAdapter c) {
+    return new WFSNotePollingGraphUpdaterParameters(
+        configRef,
+        c.asText("url"),
+        c.asText("featureType"),
+        c.asInt("frequencySec", 60)
+    );
   }
-
-  public String getFeatureType() { return featureType; }
 }

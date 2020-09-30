@@ -15,7 +15,7 @@ import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
 import org.opentripplanner.updater.stoptime.MqttGtfsRealtimeUpdater;
 import org.opentripplanner.updater.stoptime.PollingStoptimeUpdaterParameters;
 import org.opentripplanner.updater.stoptime.WebsocketGtfsRealtimeUpdater;
-import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdater;
+import org.opentripplanner.updater.street_notes.WFSNotePollingGraphUpdaterParameters;
 import org.opentripplanner.util.OtpAppException;
 
 import java.net.URI;
@@ -55,7 +55,7 @@ public class UpdatersConfig implements UpdatersParameters {
     CONFIG_CREATORS.put(REAL_TIME_ALERTS, GtfsRealtimeAlertsUpdaterConfig::create);
     CONFIG_CREATORS.put(EXAMPLE_UPDATER, PollingGraphUpdaterConfig::new);
     CONFIG_CREATORS.put(EXAMPLE_POLLING_UPDATER, PollingGraphUpdaterConfig::new);
-    CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::new);
+    CONFIG_CREATORS.put(WINKKI_POLLING_UPDATER, WFSNotePollingGraphUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_ET_UPDATER, SiriETUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_VM_UPDATER, SiriVMUpdaterConfig::create);
     CONFIG_CREATORS.put(SIRI_SX_UPDATER, SiriSXUpdaterConfig::create);
@@ -145,7 +145,7 @@ public class UpdatersConfig implements UpdatersParameters {
   }
 
   @Override
-  public List<WFSNotePollingGraphUpdater.Parameters> getWinkkiPollingGraphUpdaterParameters() {
+  public List<WFSNotePollingGraphUpdaterParameters> getWinkkiPollingGraphUpdaterParameters() {
     return getParameters(WINKKI_POLLING_UPDATER);
   }
 
