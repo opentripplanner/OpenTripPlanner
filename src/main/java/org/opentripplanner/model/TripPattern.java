@@ -2,7 +2,6 @@ package org.opentripplanner.model;
 
 import com.beust.jcommander.internal.Maps;
 import com.beust.jcommander.internal.Sets;
-import com.google.common.base.Objects;
 import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.Multimap;
 import com.google.common.hash.HashFunction;
@@ -29,6 +28,7 @@ import java.util.Collection;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.function.Predicate;
 
@@ -642,7 +642,28 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     }
 
     /**
-     * Need an equals() since trips in a pattern are no longer necessarily running on the same service ID.
+     * Need an equals() since trips in a pattern are no longer necessarily running on the same
+     * service ID.
+     * <p>
+     * A TransitEntity SHOULD not implement hashCode/equals. We make an EXCEPTION to this for
+     * TripPattern, because the alternative is worse. Since TripPatterns are cloned and changed by
+     * realtime updates and exist in a "global" space in Sets/Maps, the equals and hash code
+     * need to include all elements that can be changed. We could make a wrapper type and implement
+     * hc/eq for that and use that in all Set/Maps, but that would also ve quite messy. The REAL
+     * fix to this problem is to make TripPattern unique within the context it live. This is a
+     * larger task and should be addressed when implementing the issue:
+     * https://github.com/opentripplanner/OpenTripPlanner/issues/3030
+     * <p>
+     * The TripPattern is used as a <em>key</em> in a Set/Map in quite a few places. Use a reg-exp
+     * search for "(Map|Set)<TripPattern") to find the places where it is used.
+     * <p>
+     * Note! Classes that have mutable fields that are part of eq/hc are vulnerable. If added to a
+     * Set/Map the set/map MUST be re-indexed it the object is mutated. When mutating TripPattens
+     * make sure the object is NOT part of an existing Set/Map.
+     * <p>
+     * {@code hopGeometries}  is NOT part of the equals/hashCode methods to avoid costly
+     * computations. Hence; It is not allowed to ONLY change the hopGeometries, but at least one
+     * other field must be changed.
      */
     @Override
     public boolean equals(Object o) {
@@ -657,14 +678,27 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         }
         TripPattern that = (TripPattern) o;
         return directionId == that.directionId &&
-                Objects.equal(id, that.id) &&
-                Objects.equal(name, that.name) &&
-                Objects.equal(route, that.route) &&
-                Objects.equal(stopPattern, that.stopPattern) &&
-                Objects.equal(scheduledTimetable, that.scheduledTimetable) &&
-                Objects.equal(trips, that.trips) &&
-                Objects.equal(hopGeometries, that.hopGeometries) &&
-                Objects.equal(perStopFlags, that.perStopFlags) &&
-                Objects.equal(services, that.services);
+                Objects.equals(id, that.id) &&
+                Objects.equals(name, that.name) &&
+                Objects.equals(route, that.route) &&
+                Objects.equals(stopPattern, that.stopPattern) &&
+                Objects.equals(scheduledTimetable, that.scheduledTimetable) &&
+                Objects.equals(trips, that.trips) &&
+                Objects.equals(services, that.services) &&
+                Arrays.equals(perStopFlags, that.perStopFlags);
+    }
+
+    @Override
+    public int hashCode() {
+        return 31 * Objects.hash(
+            id,
+            name,
+            route,
+            directionId,
+            stopPattern,
+            scheduledTimetable,
+            trips,
+            services
+        ) + Arrays.hashCode(perStopFlags);
     }
 }
