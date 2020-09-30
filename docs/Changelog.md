@@ -44,6 +44,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Remove AlertPatcher (#3134)
 - Update DebugOutput to match new routing phases of OTP2 (#3109)
 - Filter transit itineraries with relative high cost (#3157).
+- Fix: The updater config type is unknown: gtfs-http #3195
 
 
 ## Ported over from the 1.x
