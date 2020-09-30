@@ -63,7 +63,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
     private MqttClient client;
 
-    public MqttGtfsRealtimeUpdater(Parameters parameters) {
+    public MqttGtfsRealtimeUpdater(MqttGtfsRealtimeUpdaterParameters parameters) {
         this.configRef = parameters.getConfigRef();
         this.url = parameters.getUrl();
         this.topic = parameters.getTopic();
@@ -78,7 +78,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
     }
 
     @Override
-    public void setup(Graph graph) throws Exception {
+    public void setup(Graph graph) {
         // Only create a realtime data snapshot source if none exists already
         TimetableSnapshotSource snapshotSource =
             graph.getOrSetupTimetableSnapshotProvider(TimetableSnapshotSource::new);
@@ -138,7 +138,7 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
         }
 
         @Override
-        public void messageArrived(String topic, MqttMessage message) throws Exception {
+        public void messageArrived(String topic, MqttMessage message) {
             List<GtfsRealtime.TripUpdate> updates = null;
             boolean fullDataset = true;
             try {
@@ -177,16 +177,5 @@ public class MqttGtfsRealtimeUpdater implements GraphUpdater {
 
         @Override
         public void deliveryComplete(IMqttDeliveryToken token) {}
-    }
-
-    public interface Parameters {
-        String getUrl();
-        String getTopic();
-        String getFeedId();
-        int getQos();
-        boolean getFuzzyTripMatching();
-
-        /** The config name/type for the updater. Used to reference the configuration element. */
-        String getConfigRef();
     }
 }
