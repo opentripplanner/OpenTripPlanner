@@ -256,7 +256,8 @@ public class StopPlaceType {
         startTimeSeconds,
         timeRage,
         departuresPerTripPattern,
-        omitNonBoarding
+        omitNonBoarding,
+        false
     );
 
     // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used

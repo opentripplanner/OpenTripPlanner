@@ -271,7 +271,8 @@ public class IndexAPI {
                 startTime,
                 timeRange,
                 numberOfDepartures,
-                omitNonPickups
+                omitNonPickups,
+                false
         )
                 .stream()
                 .map(StopTimesInPatternMapper::mapToApi)

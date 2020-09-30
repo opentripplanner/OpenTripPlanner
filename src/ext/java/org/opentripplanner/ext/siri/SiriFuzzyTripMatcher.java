@@ -6,7 +6,6 @@ import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.Trip;
 import org.opentripplanner.model.TripPattern;
-import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -14,11 +13,11 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.EstimatedCall;
 import uk.org.siri.siri20.EstimatedVehicleJourney;
+import uk.org.siri.siri20.RecordedCall;
 import uk.org.siri.siri20.VehicleActivityStructure;
 import uk.org.siri.siri20.VehicleModesEnumeration;
 
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -129,12 +128,27 @@ public class SiriFuzzyTripMatcher {
             }
         }
         if (trips == null || trips.isEmpty()) {
-            List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
-            EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size() - 1);
 
-            String lastStopPoint = lastStop.getStopPointRef().getValue();
+            String lastStopPoint = null;
+            ZonedDateTime arrivalTime = null;
 
-            ZonedDateTime arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+            if (journey.getEstimatedCalls() != null && journey.getEstimatedCalls().getEstimatedCalls() != null
+                    && !journey.getEstimatedCalls().getEstimatedCalls().isEmpty()) { // Pick last stop from EstimatedCalls
+                List<EstimatedCall> estimatedCalls = journey.getEstimatedCalls().getEstimatedCalls();
+                EstimatedCall lastStop = estimatedCalls.get(estimatedCalls.size() - 1);
+
+                lastStopPoint = lastStop.getStopPointRef().getValue();
+                arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+
+            } else if (journey.getRecordedCalls() != null && journey.getRecordedCalls().getRecordedCalls() != null
+                    && !journey.getRecordedCalls().getRecordedCalls().isEmpty()) { // No EstimatedCalls exist - pick last RecordedCall
+
+                List<RecordedCall> recordedCalls = journey.getRecordedCalls().getRecordedCalls();
+                final RecordedCall lastStop = recordedCalls.get(recordedCalls.size() - 1);
+
+                lastStopPoint = lastStop.getStopPointRef().getValue();
+                arrivalTime = lastStop.getAimedArrivalTime() != null ? lastStop.getAimedArrivalTime() : lastStop.getAimedDepartureTime();
+            }
 
             if (arrivalTime != null) {
                 trips = getMatchingTripsOnStopOrSiblings(lastStopPoint, arrivalTime);
@@ -334,31 +348,6 @@ public class SiriFuzzyTripMatcher {
         return null;
     }
 
-    List<FeedScopedId> getTripIdForTripShortNameServiceDateAndMode(String tripShortName, ServiceDate serviceDate, TraverseMode traverseMode/*, TransmodelTransportSubmode transportSubmode*/) {
-
-        Set<Trip> cachedTripsBySiriId = getCachedTripsBySiriId(tripShortName);
-
-        if (cachedTripsBySiriId.isEmpty()) {
-            cachedTripsBySiriId = getCachedTripsByVehicleRef(tripShortName);
-        }
-
-        List<FeedScopedId> matches = new ArrayList<>();
-        for (Trip trip : cachedTripsBySiriId) {
-            if (trip.getRoute().getMode().equals(traverseMode)
-                /*|| trip.getTransportSubmode().equals(transportSubmode)*/) {
-                Set<ServiceDate> serviceDates = routingService.getCalendarService().getServiceDatesForServiceId(trip.getServiceId());
-
-                if (serviceDates.contains(serviceDate) &&
-                        trip.getTripShortName() != null &&
-                        trip.getTripShortName().equals(tripShortName)) {
-                    matches.add(trip.getId());
-                }
-            }
-        }
-
-
-        return matches;
-    }
 
     public int getTripDepartureTime(FeedScopedId tripId) {
         Trip trip = routingService.getTripForId().get(tripId);

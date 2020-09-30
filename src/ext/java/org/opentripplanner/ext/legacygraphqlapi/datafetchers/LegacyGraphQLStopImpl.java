@@ -294,7 +294,9 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups());
+              args.getLegacyGraphQLOmitNonPickups(),
+              false
+          );
 
       return getValue(
           environment,
@@ -323,7 +325,8 @@ public class LegacyGraphQLStopImpl implements LegacyGraphQLDataFetchers.LegacyGr
               args.getLegacyGraphQLStartTime(),
               args.getLegacyGraphQLTimeRange(),
               args.getLegacyGraphQLNumberOfDepartures(),
-              args.getLegacyGraphQLOmitNonPickups()
+              args.getLegacyGraphQLOmitNonPickups(),
+              false
           ).stream();
 
       Stream<StopTimesInPattern> stream = getValue(

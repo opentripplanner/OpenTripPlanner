@@ -130,6 +130,16 @@ public class AlertToLegMapper {
                 if (alerts != null) {
                     alertsForStopAndRoute.addAll(alerts);
                 }
+
+                // ...and siblings - platform may have been changed
+                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                    if (!stop.getId().equals(siblingStop.getId())) {
+                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndRouteAlerts(stop.getParentStation().getId(), routeId);
+                        if (siblingAlerts != null) {
+                            alertsForStopAndRoute.addAll(siblingAlerts);
+                        }
+                    }
+                }
             }
 
             // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
@@ -168,6 +178,17 @@ public class AlertToLegMapper {
                 if (alerts != null) {
                     alertsForStopAndTrip.addAll(alerts);
                 }
+
+                // ...and siblings - platform may have been changed
+                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                    if (!stop.getId().equals(siblingStop.getId())) {
+                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAndTripAlerts(stop.getParentStation().getId(), tripId);
+                        if (siblingAlerts != null) {
+                            alertsForStopAndTrip.addAll(siblingAlerts);
+                        }
+                    }
+                }
+
             }
             // TODO SIRI: Add support for fetching alerts attached to MultiModal-stops
             //            if (stop.getMultiModalStation() != null) {
@@ -203,6 +224,16 @@ public class AlertToLegMapper {
                 Collection<TransitAlert> parentStopAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
                 if (parentStopAlerts != null) {
                     alertsForStop.addAll(parentStopAlerts);
+                }
+
+                // ...and siblings - platform may have been changed
+                for (Stop siblingStop : stop.getParentStation().getChildStops()) {
+                    if (!stop.getId().equals(siblingStop.getId())) {
+                        Collection<TransitAlert> siblingAlerts = graph.getTransitAlertService().getStopAlerts(stop.getParentStation().getId());
+                        if (siblingAlerts != null) {
+                            alertsForStop.addAll(siblingAlerts);
+                        }
+                    }
                 }
             }
 

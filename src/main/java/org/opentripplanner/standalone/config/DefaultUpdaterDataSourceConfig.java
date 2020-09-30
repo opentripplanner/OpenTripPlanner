@@ -1,5 +1,7 @@
 package org.opentripplanner.standalone.config;
 
+import org.opentripplanner.ext.siri.updater.SiriEstimatedTimetableGooglePubsubUpdater;
+import org.opentripplanner.standalone.config.updaters.GooglePubsubSiriETUpdaterParameters;
 import org.opentripplanner.standalone.config.updaters.sources.GbfsSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.GenericKmlBikeRentalSourceParameters;
 import org.opentripplanner.standalone.config.updaters.sources.KmlBikeParkSourceParameters;
@@ -38,6 +40,7 @@ public class DefaultUpdaterDataSourceConfig implements UpdaterDataSourceConfig {
   public static final String BICIMAD = "bicimad";
 
   public static final String SIRI_ET = "siri-et";
+  public static final String SIRI_ET_PUBSUB = "siri-et-pubsub";
   public static final String SIRI_VM = "siri-vm";
   public static final String SIRI_SX = "siri-sx";
   public static final String KML_BIKE_PARK = "kml-bike-park";
@@ -63,6 +66,7 @@ public class DefaultUpdaterDataSourceConfig implements UpdaterDataSourceConfig {
     CONFIG_CREATORS.put(SMOOVE, UpdaterSourceParameters::new);
     CONFIG_CREATORS.put(BICIMAD, UpdaterSourceParameters::new);
     CONFIG_CREATORS.put(SIRI_ET, SiriETHttpTripUpdaterSourceParameters::new);
+    CONFIG_CREATORS.put(SIRI_ET_PUBSUB, UpdaterSourceParameters::new);
     CONFIG_CREATORS.put(SIRI_VM, SiriVMHttpTripUpdaterSourceParameters::new);
     CONFIG_CREATORS.put(SIRI_SX, UpdaterSourceParameters::new);
     CONFIG_CREATORS.put(KML_BIKE_PARK, KmlBikeParkSourceParameters::new);

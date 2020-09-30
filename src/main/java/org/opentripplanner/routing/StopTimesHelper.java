@@ -34,6 +34,7 @@ public class StopTimesHelper {
    * @param timeRange Searches forward for timeRange seconds from startTime
    * @param numberOfDepartures Number of departures to fetch per pattern
    * @param omitNonPickups If true, do not include vehicles that will not pick up passengers.
+   * @param includeCancelledTrips If true, cancelled trips will also be included in result
    */
   public static List<StopTimesInPattern> stopTimesForStop(
       RoutingService routingService,
@@ -42,8 +43,14 @@ public class StopTimesHelper {
       long startTime,
       int timeRange,
       int numberOfDepartures,
-      boolean omitNonPickups
+      boolean omitNonPickups,
+      boolean includeCancelledTrips
   ) {
+
+    //
+    // TODO: SIRI: Add support for including cancelled trips
+    //
+
 
     if (startTime == 0) {
       startTime = System.currentTimeMillis() / 1000;

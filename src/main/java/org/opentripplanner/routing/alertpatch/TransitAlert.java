@@ -34,6 +34,9 @@ public class TransitAlert implements Serializable {
     //null means unknown
     public String severity;
 
+    //null means unknown
+    public int priority;
+
     private List<TimePeriod> timePeriods = new ArrayList<>();
 
     private String feedId;
@@ -65,7 +68,7 @@ public class TransitAlert implements Serializable {
     public boolean displayDuring(long startTimeSeconds, long endTimeSeconds) {
         for (TimePeriod timePeriod : timePeriods) {
             if (endTimeSeconds >= timePeriod.startTime) {
-                if (startTimeSeconds < timePeriod.endTime) {
+                if (timePeriod.endTime == 0 || startTimeSeconds < timePeriod.endTime) {
                     return true;
                 }
             }

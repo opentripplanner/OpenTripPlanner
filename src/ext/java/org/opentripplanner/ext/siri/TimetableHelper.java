@@ -50,7 +50,6 @@ public class TimetableHelper {
      *
      * @param journey  SIRI-ET EstimatedVehicleJourney
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -77,11 +76,13 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
 
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
             recordedCalls = journeyRecordedCalls.getRecordedCalls();
@@ -339,7 +340,6 @@ public class TimetableHelper {
      * Calculate new stoppattern based on single stop cancellations
      *
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -352,11 +352,12 @@ public class TimetableHelper {
         EstimatedVehicleJourney.EstimatedCalls journeyEstimatedCalls = journey.getEstimatedCalls();
         EstimatedVehicleJourney.RecordedCalls journeyRecordedCalls = journey.getRecordedCalls();
 
-        if (journeyEstimatedCalls == null) {
-            return null;
+        List<EstimatedCall> estimatedCalls;
+        if (journeyEstimatedCalls != null) {
+            estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
+        } else {
+            estimatedCalls = new ArrayList<>();
         }
-
-        List<EstimatedCall> estimatedCalls = journeyEstimatedCalls.getEstimatedCalls();
 
         List<RecordedCall> recordedCalls;
         if (journeyRecordedCalls != null) {
@@ -368,6 +369,9 @@ public class TimetableHelper {
         //Get all scheduled stops
         Stop[] stops = timetable.pattern.stopPattern.stops;
 
+        // Keeping track of visited stop-objects to allow multiple visits to a stop.
+        List<Object> alreadyVisited = new ArrayList<>();
+
         List<Stop> modifiedStops = new ArrayList<>();
 
         for (int i = 0; i < stops.length; i++) {
@@ -377,6 +381,9 @@ public class TimetableHelper {
             if (i < recordedCalls.size()) {
                 for (RecordedCall recordedCall : recordedCalls) {
 
+                    if (alreadyVisited.contains(recordedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(recordedCall.getStopPointRef().getValue());
 
@@ -392,12 +399,16 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(recordedCall);
                         break;
                     }
                 }
             } else {
                 for (EstimatedCall estimatedCall : estimatedCalls) {
 
+                    if (alreadyVisited.contains(estimatedCall)) {
+                        continue;
+                    }
                     //Current stop is being updated
                     boolean stopsMatchById = stop.getId().getId().equals(estimatedCall.getStopPointRef().getValue());
 
@@ -413,6 +424,7 @@ public class TimetableHelper {
                     if (stopsMatchById) {
                         foundMatch = true;
                         modifiedStops.add(stop);
+                        alreadyVisited.add(estimatedCall);
                         break;
                     }
                 }
@@ -430,10 +442,7 @@ public class TimetableHelper {
      * Apply the SIRI ET to the appropriate TripTimes from this Timetable.
      * Calculate new stoppattern based on single stop cancellations
      *
-     * @param oldTimes
      * @param journey    SIRI-ET EstimatedVehicleJourney
-     * @param trip
-     * @param routingService
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
@@ -570,7 +579,6 @@ public class TimetableHelper {
      *
      * @param activity SIRI-VM VehicleActivity
      * @param timeZone time zone of trip update
-     * @param tripId
      * @return new copy of updated TripTimes after TripUpdate has been applied on TripTimes of trip
      * with the id specified in the trip descriptor of the TripUpdate; null if something
      * went wrong
