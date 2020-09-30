@@ -80,7 +80,9 @@ public class NodeAdapter {
 
     public List<NodeAdapter> asList() {
         List<NodeAdapter> result = new ArrayList<>();
-        int i = 0;
+
+        // Count elements starting at 1
+        int i = 1;
         for (JsonNode node : json) {
             String pName = "[" + i + "]";
             NodeAdapter child = new NodeAdapter(node, source, fullPath(pName));
@@ -365,7 +367,7 @@ public class NodeAdapter {
         while (it.hasNext()) {
             String fieldName = it.next();
             if(!parameterNames.contains(fieldName)) {
-                unusedParams.add(fullPath(fieldName));
+                unusedParams.add(fullPath(fieldName) + ":" + json.get(fieldName));
             }
         }
 

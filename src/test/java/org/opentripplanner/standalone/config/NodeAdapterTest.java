@@ -136,7 +136,7 @@ public class NodeAdapterTest {
         Mockito.verify(log)
             .warn(
                 Mockito.anyString(),
-                Mockito.eq("key.unknown"),
+                Mockito.eq("key.unknown:7"),
                 Mockito.eq("Test")
             );
     }
