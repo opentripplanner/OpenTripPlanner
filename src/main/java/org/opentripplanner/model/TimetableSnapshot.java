@@ -1,9 +1,8 @@
 package org.opentripplanner.model;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ArrayListMultimap;
 import com.google.common.collect.HashMultimap;
-import com.google.common.collect.Multimap;
+import com.google.common.collect.SetMultimap;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.TransitLayerUpdater;
 import org.opentripplanner.routing.trippattern.TripTimes;
@@ -123,7 +122,7 @@ public class TimetableSnapshot {
      *
      * TODO Find a generic way to keep all realtime indexes.
      */
-    private Multimap<Stop, TripPattern> patternsForStop = ArrayListMultimap.create();
+    private SetMultimap<Stop, TripPattern> patternsForStop = HashMultimap.create();
     
     /**
      * Boolean value indicating that timetable snapshot is read only if true. Once it is true, it shouldn't
@@ -401,7 +400,7 @@ public class TimetableSnapshot {
         return patternsForStop.get(stop);
     }
 
-    public void setPatternsForStop(Multimap<Stop, TripPattern> patternsForStop) {
+    public void setPatternsForStop(SetMultimap<Stop, TripPattern> patternsForStop) {
         this.patternsForStop = patternsForStop;
     }
 }
