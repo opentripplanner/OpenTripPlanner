@@ -386,9 +386,14 @@ public class TimetableSnapshot {
         return timetables.keySet();
     }
 
+    /**
+     * Add the patterns to the stop index, only if they come from a modified pattern
+     */
     private void addPatternToIndex(TripPattern tripPattern) {
-        for (Stop stop: tripPattern.getStops()) {
-            patternsForStop.put(stop, tripPattern);
+        if (tripPattern.getOriginalTripPattern() != null) {
+            for (Stop stop: tripPattern.getStops()) {
+                patternsForStop.put(stop, tripPattern);
+            }
         }
     }
 

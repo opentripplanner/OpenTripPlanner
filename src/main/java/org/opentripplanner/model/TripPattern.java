@@ -104,6 +104,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     private byte[][] hopGeometries = null;
 
     /**
+     * The original TripPattern this replaces at least for one modified trip.
+     */
+    private TripPattern originalTripPattern = null;
+
+    /**
      * The unique identifier for this trip pattern. For GTFS feeds this is generally
      * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
      * NeTEx the JourneyPattern id is used.
@@ -337,6 +342,14 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
         else {
             scheduledTimetable.tripTimes.removeIf(tt -> removeTrip.test(tt.trip));
         }
+    }
+
+    public TripPattern getOriginalTripPattern() {
+        return originalTripPattern;
+    }
+
+    public void setOriginalTripPattern(TripPattern originalTripPattern) {
+        this.originalTripPattern = originalTripPattern;
     }
 
     private static String stopNameAndId (Stop stop) {
