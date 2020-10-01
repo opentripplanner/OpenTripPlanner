@@ -571,6 +571,20 @@
             <version>0.12</version>
         </dependency>
 
+        <!-- XML <-> protobuf-mapper for SIRI-->
+        <dependency>
+            <groupId>org.entur</groupId>
+            <artifactId>siri-protobuf-mapper</artifactId>
+            <version>0.5</version>
+        </dependency>
+
+        <!-- Google Cloud Pubsub for SIRI-updater-->
+        <dependency>
+            <groupId>com.google.cloud</groupId>
+            <artifactId>google-cloud-pubsub</artifactId>
+            <version>1.100.0</version>
+        </dependency>
+
         <!--
             The jaxb-api provides annotations like XmlElement indicating how classes should be (de)serialized.
             The jaxb-runtime pulls in the jaxb-api of the same version transitively. But we specify both api and

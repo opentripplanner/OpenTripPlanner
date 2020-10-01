@@ -39,6 +39,7 @@ import static org.opentripplanner.ext.transmodelapi.model.EnumTypes.TRANSPORT_SU
 
 public class StopPlaceType {
   public static final String NAME = "StopPlace";
+  public static final GraphQLOutputType REF = new GraphQLTypeReference(NAME);
 
   public static GraphQLObjectType create(
       GraphQLInterfaceType placeInterface,
@@ -255,7 +256,8 @@ public class StopPlaceType {
         startTimeSeconds,
         timeRage,
         departuresPerTripPattern,
-        omitNonBoarding
+        omitNonBoarding,
+        false
     );
 
     // TODO OTP2 - Applying filters here is not correct - the `departuresPerTripPattern` is used

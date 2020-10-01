@@ -4,8 +4,7 @@ import graphql.Scalars;
 import graphql.schema.GraphQLFieldDefinition;
 import graphql.schema.GraphQLInterfaceType;
 import graphql.schema.GraphQLNonNull;
-import graphql.schema.GraphQLObjectType;
-import graphql.schema.GraphQLOutputType;
+import graphql.schema.GraphQLSchema;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.bike_park.BikePark;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -13,9 +12,6 @@ import org.opentripplanner.routing.bike_rental.BikeRentalStation;
 public class PlaceInterfaceType {
 
   public static GraphQLInterfaceType create(
-      GraphQLOutputType quayType,
-      GraphQLOutputType bikeRentalStationType,
-      GraphQLOutputType bikeParkType
   ) {
     return GraphQLInterfaceType
         .newInterface()
@@ -38,17 +34,24 @@ public class PlaceInterfaceType {
             .build())
         .typeResolver(typeResolutionEnvironment -> {
           Object o = typeResolutionEnvironment.getObject();
+          GraphQLSchema schema = typeResolutionEnvironment.getSchema();
 
-          // TODO OTP2 - Add support for Station, osv
+          // Passing in the type itself in the constructor does not work, as the type has not been
+          // created yet and you need the actual type and not just a reference to it. That is why
+          // we get the type from the schema. This also follows how it is done in the
+          // LegacyGraphQLNodeTypeResolver.
 
           if (o instanceof Stop) {
-            return (GraphQLObjectType) quayType;
+            return schema.getObjectType("Quay");
+          }
+          if (o instanceof MonoOrMultiModalStation) {
+            return schema.getObjectType("StopPlace");
           }
           if (o instanceof BikeRentalStation) {
-            return (GraphQLObjectType) bikeRentalStationType;
+            return schema.getObjectType("BikeRentalStation");
           }
           if (o instanceof BikePark) {
-            return (GraphQLObjectType) bikeParkType;
+            return schema.getObjectType("BikePark");
           }
           //if (o instanceof CarPark) {
           //    return (GraphQLObjectType) carParkType;

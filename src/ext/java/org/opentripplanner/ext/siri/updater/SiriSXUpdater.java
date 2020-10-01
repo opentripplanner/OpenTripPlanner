@@ -15,6 +15,7 @@ import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
 import uk.org.siri.siri20.Siri;
 
+import java.io.IOException;
 import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
@@ -23,6 +24,7 @@ import java.util.UUID;
 
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
+    private static final long RETRY_INTERVAL_MILLIS = 5000;
 
     private GraphUpdaterManager updaterManager;
 
@@ -44,6 +46,10 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
+
+    private int retryCount = 0;
+    private final String originalRequestorRef;
+
     public SiriSXUpdater(Parameters config) {
         super(config);
         // TODO: add options to choose different patch services
@@ -56,6 +62,9 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         if (requestorRef == null || requestorRef.isEmpty()) {
             requestorRef = "otp-"+UUID.randomUUID().toString();
         }
+
+        //Keeping original requestorRef use as base for updated requestorRef to be used in retries
+        this.originalRequestorRef = requestorRef;
 
         this.url = url;// + uniquenessParameter;
         this.earlyStart = config.getEarlyStartSec();
@@ -94,25 +103,44 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     @Override
     protected void runPolling() {
-        boolean moreData = false;
-        do {
-            Siri updates = getUpdates();
-            if (updates != null) {
-                ServiceDelivery serviceDelivery = updates.getServiceDelivery();
-                // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
-                moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
-                final boolean markPrimed = !moreData;
-                if (serviceDelivery.getSituationExchangeDeliveries() != null) {
-                    updaterManager.execute(graph -> {
-                        updateHandler.update(serviceDelivery);
-                        if (markPrimed) primed = true;
-                    });
+        try {
+            boolean moreData = false;
+            do {
+                Siri updates = getUpdates();
+                if (updates != null) {
+                    ServiceDelivery serviceDelivery = updates.getServiceDelivery();
+                    // Use isTrue in case isMoreData returns null. Mark the updater as primed after last page of updates.
+                    moreData = BooleanUtils.isTrue(serviceDelivery.isMoreData());
+                    final boolean markPrimed = !moreData;
+                    if (serviceDelivery.getSituationExchangeDeliveries() != null) {
+                        updaterManager.execute(graph -> {
+                            updateHandler.update(serviceDelivery);
+                            if (markPrimed) primed = true;
+                        });
+                    }
                 }
+            } while (moreData);
+        } catch (IOException e) {
+
+            final long sleepTime = RETRY_INTERVAL_MILLIS + RETRY_INTERVAL_MILLIS * retryCount;
+
+            retryCount++;
+
+            LOG.info("Caught timeout - retry no. {} after {} millis", retryCount, sleepTime);
+
+            try {
+                Thread.sleep(sleepTime);
+            } catch (InterruptedException ex) {
+                //Ignore
             }
-        } while (moreData);
+
+            // Creating new requestorRef so all data is refreshed
+            requestorRef = originalRequestorRef + "-retry-" + retryCount;
+            runPolling();
+        }
     }
 
-    private Siri getUpdates() {
+    private Siri getUpdates() throws IOException {
 
         long t1 = System.currentTimeMillis();
         long creating = 0;
@@ -147,6 +175,10 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
             lastTimestamp = responseTimestamp;
             return siri;
+        } catch (IOException e) {
+            LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
+            LOG.error("Error reading SIRI feed from " + url, e);
+            throw e;
         } catch (Exception e) {
             LOG.info("Failed after {} ms", (System.currentTimeMillis()-t1));
             LOG.error("Error reading SIRI feed from " + url, e);
