@@ -29,7 +29,7 @@ import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
  * on the driving time between the stops, with the schedule times being used just for deciding if a
  * trip is possible.
  */
-public class UnscheduledTrip extends FlexTrip {
+public class UnscheduledTrip extends FlexTrip<Integer> {
   private static final int N_STOPS = 2;
 
   private final UnscheduledStopTime[] stopTimes;
@@ -58,36 +58,36 @@ public class UnscheduledTrip extends FlexTrip {
   }
 
   @Override
-  public Stream<FlexAccessTemplate> getFlexAccessTemplates(
-      NearbyStop access, FlexServiceDate date, FlexPathCalculator calculator
+  public Stream<FlexAccessTemplate<Integer>> getFlexAccessTemplates(
+      NearbyStop access, FlexServiceDate date, FlexPathCalculator<Integer> calculator
   ) {
     int fromIndex = getFromIndex(access);
 
     if (fromIndex != 0) { return Stream.empty(); }
     if (stopTimes[1].dropOffType == PICKDROP_NONE) { return Stream.empty(); }
 
-    ArrayList<FlexAccessTemplate> res = new ArrayList<>();
+    ArrayList<FlexAccessTemplate<Integer>> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[1].stop)) {
-      res.add(new FlexAccessTemplate(access, this, fromIndex, 1, stop, date, calculator));
+      res.add(new FlexAccessTemplate<>(access, this, fromIndex, 1, stop, date, calculator));
     }
 
     return res.stream();
   }
 
   @Override
-  public Stream<FlexEgressTemplate> getFlexEgressTemplates(
-      NearbyStop egress, FlexServiceDate date, FlexPathCalculator calculator
+  public Stream<FlexEgressTemplate<Integer>> getFlexEgressTemplates(
+      NearbyStop egress, FlexServiceDate date, FlexPathCalculator<Integer> calculator
   ) {
     int toIndex = getToIndex(egress);
 
     if (toIndex != 1) { return Stream.empty(); }
     if (stopTimes[0].pickupType == PICKDROP_NONE) { return Stream.empty(); }
 
-    ArrayList<FlexEgressTemplate> res = new ArrayList<>();
+    ArrayList<FlexEgressTemplate<Integer>> res = new ArrayList<>();
 
     for (StopLocation stop : expandStops(stopTimes[0].stop)) {
-      res.add(new FlexEgressTemplate(egress, this, 0, toIndex, stop, date, calculator));
+      res.add(new FlexEgressTemplate<>(egress, this, 0, toIndex, stop, date, calculator));
     }
 
     return res.stream();
@@ -95,7 +95,7 @@ public class UnscheduledTrip extends FlexTrip {
 
   @Override
   public int earliestDepartureTime(
-      int departureTime, int fromStopIndex, int toStopIndex, int flexTime
+      int departureTime, Integer fromStopIndex, Integer toStopIndex, int flexTime
   ) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
@@ -109,7 +109,7 @@ public class UnscheduledTrip extends FlexTrip {
   }
 
   @Override
-  public int latestArrivalTime(int arrivalTime, int fromStopIndex, int toStopIndex, int flexTime) {
+  public int latestArrivalTime(int arrivalTime, Integer fromStopIndex, Integer toStopIndex, int flexTime) {
     UnscheduledStopTime fromStopTime = stopTimes[fromStopIndex];
     UnscheduledStopTime toStopTime = stopTimes[toStopIndex];
     if (toStopTime.flexWindowStart > arrivalTime || fromStopTime.flexWindowStart > (

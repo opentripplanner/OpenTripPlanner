@@ -76,5 +76,5 @@ public interface OtpTransitService {
 
     Collection<Trip> getAllTrips();
 
-    Collection<FlexTrip> getAllFlexTrips();
+    Collection<FlexTrip<?>> getAllFlexTrips();
 }

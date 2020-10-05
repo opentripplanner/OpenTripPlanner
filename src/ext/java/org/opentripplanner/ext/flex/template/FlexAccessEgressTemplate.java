@@ -21,24 +21,24 @@ import java.util.Collection;
 import java.util.List;
 import java.util.stream.Stream;
 
-public abstract class FlexAccessEgressTemplate {
+public abstract class FlexAccessEgressTemplate<T> {
   protected final NearbyStop accessEgress;
-  protected final FlexTrip trip;
-  public final int fromStopIndex;
-  public final int toStopIndex;
+  protected final FlexTrip<T> trip;
+  public final T fromStopIndex;
+  public final T toStopIndex;
   protected final StopLocation transferStop;
   protected final int secondsFromStartOfTime;
   public final ServiceDate serviceDate;
-  protected final FlexPathCalculator calculator;
+  protected final FlexPathCalculator<T> calculator;
 
   FlexAccessEgressTemplate(
       NearbyStop accessEgress,
-      FlexTrip trip,
-      int fromStopIndex,
-      int toStopIndex,
+      FlexTrip<T> trip,
+      T fromStopIndex,
+      T toStopIndex,
       StopLocation transferStop,
       FlexServiceDate date,
-      FlexPathCalculator calculator
+      FlexPathCalculator<T> calculator
   ) {
     this.accessEgress = accessEgress;
     this.trip = trip;
@@ -54,7 +54,7 @@ public abstract class FlexAccessEgressTemplate {
     return transferStop;
   }
 
-  public FlexTrip getFlexTrip() {
+  public FlexTrip<T> getFlexTrip() {
     return trip;
   }
 
@@ -83,19 +83,19 @@ public abstract class FlexAccessEgressTemplate {
   /**
    * Get the times in seconds, before during and after the flex ride.
    */
-  abstract protected int[] getFlexTimes(FlexTripEdge flexEdge, State state);
+  abstract protected int[] getFlexTimes(FlexTripEdge<T> flexEdge, State state);
 
   /**
    * Get the FlexTripEdge for the flex ride.
    */
-  abstract protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
+  abstract protected FlexTripEdge<T> getFlexEdge(Vertex flexFromVertex, StopLocation transferStop);
 
   /**
    * Checks whether the routing is possible
    */
   abstract protected boolean isRouteable(Vertex flexVertex);
 
-  public Stream<FlexAccessEgress> createFlexAccessEgressStream(Graph graph) {
+  public Stream<FlexAccessEgress<T>> createFlexAccessEgressStream(Graph graph) {
     if (transferStop instanceof Stop) {
       TransitStopVertex flexVertex = graph.index.getStopVertexForStop().get(transferStop);
       if (isRouteable(flexVertex)) {
@@ -119,8 +119,8 @@ public abstract class FlexAccessEgressTemplate {
     }
   }
 
-  protected FlexAccessEgress getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, Stop stop) {
-    FlexTripEdge flexEdge = getFlexEdge(flexVertex, transferStop);
+  protected FlexAccessEgress<T> getFlexAccessEgress(List<Edge> transferEdges, Vertex flexVertex, Stop stop) {
+    FlexTripEdge<T> flexEdge = getFlexEdge(flexVertex, transferStop);
 
     State state = flexEdge.traverse(accessEgress.state);
     for (Edge e : transferEdges) {
@@ -129,13 +129,14 @@ public abstract class FlexAccessEgressTemplate {
 
     int[] times = getFlexTimes(flexEdge, state);
 
-    return new FlexAccessEgress(
+    return new FlexAccessEgress<>(
         stop,
         times[0],
         times[1],
         times[2],
         fromStopIndex,
-        toStopIndex, secondsFromStartOfTime,
+        toStopIndex,
+        secondsFromStartOfTime,
         trip,
         state,
         transferEdges.isEmpty()

@@ -107,7 +107,7 @@ public class OtpTransitServiceBuilder {
 
     private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-    private final EntityById<FeedScopedId, FlexTrip> flexTripsById = new EntityById<>();
+    private final EntityById<FeedScopedId, FlexTrip<?>> flexTripsById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
@@ -220,7 +220,7 @@ public class OtpTransitServiceBuilder {
         return tripPatterns;
     }
 
-    public EntityById<FeedScopedId, FlexTrip> getFlexTripsById() {
+    public EntityById<FeedScopedId, FlexTrip<?>> getFlexTripsById() {
         return flexTripsById;
     }
 

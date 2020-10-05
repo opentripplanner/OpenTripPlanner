@@ -4,15 +4,15 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.routing.core.State;
 
-public class FlexAccessEgress {
+public class FlexAccessEgress<T> {
   public final Stop stop;
   public final int preFlexTime;
   public final int flexTime;
   public final int postFlexTime;
-  private final int fromStopIndex;
-  private final int toStopIndex;
+  private final T fromStopIndex;
+  private final T toStopIndex;
   private final int differenceFromStartOfTime;
-  private final FlexTrip trip;
+  private final FlexTrip<T> trip;
   public final State lastState;
   public final boolean directToStop;
 
@@ -21,10 +21,10 @@ public class FlexAccessEgress {
       int preFlexTime,
       int flexTime,
       int postFlexTime,
-      int fromStopIndex,
-      int toStopIndex,
+      T fromStopIndex,
+      T toStopIndex,
       int differenceFromStartOfTime,
-      FlexTrip trip,
+      FlexTrip<T> trip,
       State lastState,
       boolean directToStop
   ) {

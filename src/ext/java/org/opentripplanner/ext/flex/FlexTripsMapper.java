@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex;
 
+import org.opentripplanner.ext.flex.trip.ContinuousPickupDropOffTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
@@ -37,7 +38,7 @@ public class FlexTripsMapper {
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
       } else if (hasContinuousStops(stopTimes)) {
-        // builder.getFlexTripsById().add(new ContinuousPickupDropOffTrip(trip, stopTimes));
+        builder.getFlexTripsById().add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
 
       //Keep lambda! A method-ref would causes incorrect class and line number to be logged

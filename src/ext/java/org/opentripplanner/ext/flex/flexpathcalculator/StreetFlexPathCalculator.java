@@ -22,16 +22,16 @@ import java.util.Map;
  *       - Use a one-to-many search
  *       - Cache found times
  */
-public class StreetFlexPathCalculator implements FlexPathCalculator {
-  private Graph graph;
-  private Map<T2<Vertex, Vertex>, FlexPath> cache = new HashMap<>();
+public class StreetFlexPathCalculator implements FlexPathCalculator<Integer> {
+  private final Graph graph;
+  private final Map<T2<Vertex, Vertex>, FlexPath> cache = new HashMap<>();
 
   public StreetFlexPathCalculator(Graph graph) {
     this.graph = graph;
   }
 
   @Override
-  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex) {
+  public FlexPath calculateFlexPath(Vertex fromv, Vertex tov, Integer fromStopIndex, Integer toStopIndex) {
     T2<Vertex, Vertex> key = new T2<>(fromv, tov);
     FlexPath cacheValue = cache.get(key);
     if (cacheValue != null) return cacheValue;

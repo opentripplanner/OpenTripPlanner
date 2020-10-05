@@ -7,12 +7,12 @@ import org.opentripplanner.routing.graph.Vertex;
 /**
  * Calculated driving times and distance based on direct distance and fixed average driving speed.
  */
-public class DirectFlexPathCalculator implements FlexPathCalculator {
+public class DirectFlexPathCalculator implements FlexPathCalculator<Integer> {
   public static final double FLEX_SPEED = 8.0;
 
   private static final int DIRECT_EXTRA_TIME = 5 * 60;
 
-  private double flexSpeed;
+  private final double flexSpeed;
 
   public DirectFlexPathCalculator(Graph graph) {
     this.flexSpeed = graph.flexSpeed;
@@ -20,7 +20,7 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
 
   @Override
   public FlexPath calculateFlexPath(
-      Vertex fromv, Vertex tov, int fromStopIndex, int toStopIndex
+      Vertex fromv, Vertex tov, Integer fromStopIndex, Integer toStopIndex
   ) {
     double distance = SphericalDistanceLibrary.distance(fromv.getCoordinate(), tov.getCoordinate());
 

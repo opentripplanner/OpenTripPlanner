@@ -11,7 +11,7 @@ import java.util.Locale;
 
 public class FlexTransferEdge extends Edge {
 
-  private int minTransferTimeSeconds;
+  private final int minTransferTimeSeconds;
 
   public FlexTransferEdge(
       TransitStopVertex transferFromVertex, TransitStopVertex transferToVertex,

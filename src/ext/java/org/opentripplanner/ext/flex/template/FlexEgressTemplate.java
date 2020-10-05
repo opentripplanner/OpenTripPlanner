@@ -17,12 +17,12 @@ import org.opentripplanner.routing.graphfinder.NearbyStop;
 import java.util.Collection;
 import java.util.List;
 
-public class FlexEgressTemplate extends FlexAccessEgressTemplate {
+public class FlexEgressTemplate<T> extends FlexAccessEgressTemplate<T> {
   public FlexEgressTemplate(
-      NearbyStop accessEgress, FlexTrip trip, int fromStopTime, int toStopTime,
-      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator calculator
+      NearbyStop accessEgress, FlexTrip<T> trip, T fromStopIndex, T toStopIndex,
+      StopLocation transferStop, FlexServiceDate date, FlexPathCalculator<T> calculator
   ) {
-    super(accessEgress, trip, fromStopTime, toStopTime, transferStop, date, calculator);
+    super(accessEgress, trip, fromStopIndex, toStopIndex, transferStop, date, calculator);
   }
 
   protected List<Edge> getTransferEdges(SimpleTransfer simpleTransfer) {
@@ -50,17 +50,17 @@ public class FlexEgressTemplate extends FlexAccessEgressTemplate {
           fromStopIndex,
           toStopIndex
       ) != null;
-  };
+  }
 
-  protected int[] getFlexTimes(FlexTripEdge flexEdge, State state) {
+  protected int[] getFlexTimes(FlexTripEdge<T> flexEdge, State state) {
     int postFlexTime = (int) accessEgress.state.getElapsedTimeSeconds();
     int edgeTimeInSeconds = flexEdge.getTimeInSeconds();
     int preFlexTime = (int) state.getElapsedTimeSeconds() - postFlexTime - edgeTimeInSeconds;
     return new int[]{ preFlexTime, edgeTimeInSeconds, postFlexTime };
   }
 
-  protected FlexTripEdge getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {
-    return new FlexTripEdge(
+  protected FlexTripEdge<T> getFlexEdge(Vertex flexFromVertex, StopLocation transferStop) {
+    return new FlexTripEdge<>(
         flexFromVertex,
         accessEgress.state.getVertex(),
         transferStop,

@@ -10,14 +10,18 @@ import java.util.ArrayList;
 
 public class FlexLegMapper {
 
-  static public void fixFlexTripLeg(Leg leg, FlexTripEdge flexTripEdge) {
+  static public void fixFlexTripLeg(Leg leg, FlexTripEdge<?> flexTripEdge) {
       leg.from.stopId = flexTripEdge.s1.getId();
       // TODO: Should flex be of its own type
       leg.from.vertexType = flexTripEdge.s1 instanceof Stop ? VertexType.TRANSIT : VertexType.NORMAL;
-      leg.from.stopIndex = flexTripEdge.flexTemplate.fromStopIndex;
+      if (flexTripEdge.flexTemplate.fromStopIndex instanceof Integer) {
+          leg.from.stopIndex = (Integer) flexTripEdge.flexTemplate.fromStopIndex;
+      }
       leg.to.stopId = flexTripEdge.s2.getId();
       leg.to.vertexType = flexTripEdge.s2 instanceof Stop ? VertexType.TRANSIT : VertexType.NORMAL;
-      leg.to.stopIndex = flexTripEdge.flexTemplate.toStopIndex;
+      if (flexTripEdge.flexTemplate.toStopIndex instanceof Integer) {
+          leg.to.stopIndex = (Integer) flexTripEdge.flexTemplate.toStopIndex;
+      }
 
       leg.intermediateStops = new ArrayList<>();
       leg.distanceMeters = flexTripEdge.getDistanceMeters();
