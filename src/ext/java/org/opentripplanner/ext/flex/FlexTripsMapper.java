@@ -13,8 +13,6 @@ import org.slf4j.LoggerFactory;
 import java.util.ArrayList;
 import java.util.List;
 
-import static org.opentripplanner.model.StopPattern.PICKDROP_NONE;
-
 public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
@@ -37,7 +35,7 @@ public class FlexTripsMapper {
         builder.getFlexTripsById().add(new UnscheduledTrip(trip, stopTimes));
       } else if (ScheduledDeviatedTrip.isScheduledFlexTrip(stopTimes)) {
         builder.getFlexTripsById().add(new ScheduledDeviatedTrip(trip, stopTimes));
-      } else if (hasContinuousStops(stopTimes)) {
+      } else if (ContinuousPickupDropOffTrip.hasContinuousStops(stopTimes)) {
         builder.getFlexTripsById().add(new ContinuousPickupDropOffTrip(trip, stopTimes));
       }
 
@@ -46,12 +44,6 @@ public class FlexTripsMapper {
     }
     LOG.info(progress.completeMessage());
     LOG.info("Done creating flex trips. Created a total of {} trips.", builder.getFlexTripsById().size());
-  }
-
-  private static boolean hasContinuousStops(List<StopTime> stopTimes) {
-    return stopTimes
-        .stream()
-        .anyMatch(st -> st.getFlexContinuousPickup() != PICKDROP_NONE || st.getFlexContinuousDropOff() != PICKDROP_NONE);
   }
 
 }
