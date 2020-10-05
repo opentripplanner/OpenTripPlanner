@@ -45,7 +45,6 @@ if [ "${TRAVIS_PULL_REQUEST}" == "false" ]; then
       docker push $DOCKER_IMAGE_COMMIT
       docker tag $DOCKER_IMAGE_COMMIT $DOCKER_IMAGE_OTP2
       docker push $DOCKER_IMAGE_OTP2
-    fi
     elif [ "$TRAVIS_BRANCH" = "otp2-prod" ]; then
       echo "Pushing otp2-prod image"
       docker push $DOCKER_IMAGE_COMMIT
