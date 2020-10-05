@@ -40,6 +40,8 @@ import java.util.Collections;
 import java.util.List;
 import java.util.TimeZone;
 
+import static org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper.getBoardAlightMessage;
+
 /**
  * This maps the paths found by the Raptor search algorithm to the itinerary structure currently used by OTP. The paths,
  * access/egress transfers and transit layer only contains the minimal information needed for routing. Additional
@@ -186,8 +188,9 @@ public class RaptorPathToItineraryMapper {
         //    where you are really boarding or alighting (considering interlining / in-seat transfers).
         //    That needs to be re-implemented for the Raptor transit case.
         //    - See e2118e0a -> GraphPathToTripPlanConverter#fixupLegs(List<Leg>, State[][]))
-        // leg.alightRule = <Assign here>;
-        // leg.boardRule =  <Assign here>;
+        TripPattern tripPattern = tripSchedule.getOriginalTripPattern();
+        leg.alightRule = getBoardAlightMessage(tripPattern.getAlightType(alightStopIndexInPattern));
+        leg.boardRule = getBoardAlightMessage(tripPattern.getBoardType(boardStopIndexInPattern));
 
         AlertToLegMapper.addAlertPatchesToLeg(
             request.getRoutingContext().graph,
