@@ -247,6 +247,9 @@ public class Graph implements Serializable {
 
     public Map<FeedScopedId, FlexTrip> flexTripsById = new HashMap<>();
 
+    /** Speed in m/s for flex trips without a time multiplier */
+    public double flexSpeed;
+
     /** The distance between elevation samples used in CompactElevationProfile. */
     private double distanceBetweenElevationSamples;
 

@@ -15,7 +15,7 @@ public class DirectFlexPathCalculator implements FlexPathCalculator {
   private double flexSpeed;
 
   public DirectFlexPathCalculator(Graph graph) {
-    this.flexSpeed = FLEX_SPEED;
+    this.flexSpeed = graph.flexSpeed;
   }
 
   @Override

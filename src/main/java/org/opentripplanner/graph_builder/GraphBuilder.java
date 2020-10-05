@@ -221,6 +221,15 @@ public class GraphBuilder implements Runnable {
             // Add links to flex areas after the streets has been split, so that also the split edges are connected
             if (OTPFeature.FlexRouting.isOn()) {
                 graphBuilder.addModule(new FlexLocationsToStreetEdgesMapper());
+                graphBuilder.addModule(new GraphBuilderModule() {
+                    @Override
+                    public void buildGraph(
+                        Graph graph, HashMap<Class<?>, Object> extra,
+                        DataImportIssueStore issueStore
+                    ) { graph.flexSpeed = config.flexSpeed; }
+
+                    @Override public void checkInputs() {}
+                });
             }
             // The stops can be linked to each other once they are already linked to the street network.
             if ( ! config.useTransfersTxt) {

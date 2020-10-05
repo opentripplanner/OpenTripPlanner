@@ -277,6 +277,9 @@ public class BuildConfig {
      */
     public LocalDate transitServiceEnd;
 
+    /** Speed in m/s for flex trips without a time multiplier */
+    public double flexSpeed;
+
     /**
      * Netex specific build parameters.
      */
@@ -337,6 +340,7 @@ public class BuildConfig {
         transitServiceEnd = c.asDateOrRelativePeriod( "transitServiceEnd", "P3Y");
         useTransfersTxt = c.asBoolean("useTransfersTxt", false);
         writeCachedElevations = c.asBoolean("writeCachedElevations", false);
+        flexSpeed = c.asDouble("flexSpeed", 6.0);
 
         // List of complex parameters
         fareServiceFactory = DefaultFareServiceFactory.fromConfig(c.asRawNode("fares"));
