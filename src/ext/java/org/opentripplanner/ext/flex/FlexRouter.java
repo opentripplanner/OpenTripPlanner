@@ -6,7 +6,9 @@ import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
 import org.opentripplanner.ext.flex.template.FlexAccessTemplate;
 import org.opentripplanner.ext.flex.template.FlexEgressTemplate;
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.raptor.transit.mappers.DateMapper;
@@ -48,6 +50,7 @@ public class FlexRouter {
   /* State */
   private List<FlexAccessTemplate> flexAccessTemplates = null;
   private List<FlexEgressTemplate> flexEgressTemplates = null;
+  private Collection<Transfer> transitTransfers;
 
   public FlexRouter(
       Graph graph,
@@ -61,6 +64,7 @@ public class FlexRouter {
     this.graph = graph;
     this.streetAccesses = streetAccesses;
     this.streetEgresses = egressTransfers;
+    this.transitTransfers = graph.getTransferTable().getTransfers();
     this.flexIndex = graph.index.getFlexIndex();
     this.flexPathCalculator = new DirectFlexPathCalculator(graph);
 
@@ -96,6 +100,15 @@ public class FlexRouter {
 
     Set<StopLocation> egressStops = streetEgressByStop.keySet();
 
+    Map<Stop, List<Transfer>> transfersFromStop = transitTransfers
+        .stream()
+        .collect(Collectors.groupingBy(Transfer::getFromStop));
+
+    Map<Stop, List<FlexEgressTemplate>> flexEgressByStop = flexEgressTemplates
+        .stream()
+        .filter(template -> template.getTransferStop() instanceof Stop)
+        .collect(Collectors.groupingBy(template -> (Stop) template.getTransferStop()));
+
     Collection<Itinerary> itineraries = new ArrayList<>();
 
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
@@ -105,6 +118,30 @@ public class FlexRouter {
         Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
         if (itinerary != null) {
           itineraries.add(itinerary);
+        }
+      }
+      if (transferStop instanceof Stop && transfersFromStop.containsKey(transferStop)) {
+        for (Transfer transfer : transfersFromStop.get(transferStop)) {
+          // TODO: Handle other than route-to-route transfers
+          if (transfer.getFromRoute().equals(template.getFlexTrip().getTrip().getRoute())) {
+            List<FlexEgressTemplate> templates = flexEgressByStop.get(transfer.getToStop());
+            if (templates == null) { continue; }
+            for (FlexEgressTemplate egress : templates) {
+              if (transfer.getToRoute().equals(egress.getFlexTrip().getTrip().getRoute())) {
+                Itinerary itinerary = template.getTransferItinerary(
+                    transfer,
+                    egress,
+                    arriveBy,
+                    departureTime,
+                    startOfTime,
+                    graph.index.getStopVertexForStop()
+                );
+                if (itinerary != null) {
+                  itineraries.add(itinerary);
+                }
+              }
+            }
+          }
         }
       }
     }
