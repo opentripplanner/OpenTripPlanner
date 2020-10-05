@@ -1,6 +1,7 @@
 package org.opentripplanner.ext.flex;
 
 import org.opentripplanner.ext.flex.trip.FlexTrip;
+// import org.opentripplanner.ext.flex.trip.ContinuousPickupDropOffTrip;
 import org.opentripplanner.ext.flex.trip.ScheduledDeviatedTrip;
 import org.opentripplanner.ext.flex.trip.UnscheduledTrip;
 import org.opentripplanner.model.StopTime;
@@ -19,8 +20,8 @@ public class FlexTripsMapper {
 
   private static final Logger LOG = LoggerFactory.getLogger(FlexTripsMapper.class);
 
-  static public List<FlexTrip> createFlexTrips(OtpTransitServiceBuilder builder) {
-    List<FlexTrip> result = new ArrayList<>();
+  static public List<FlexTrip<?>> createFlexTrips(OtpTransitServiceBuilder builder) {
+    List<FlexTrip<?>> result = new ArrayList<>();
     TripStopTimes stopTimesByTrip = builder.getStopTimesSortedByTrip();
 
     final int tripSize = stopTimesByTrip.size();

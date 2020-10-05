@@ -156,7 +156,7 @@ public class RoutingWorker {
 
         // Special handling of flex accesses
         if (OTPFeature.FlexRouting.isOn() && request.modes.accessMode.equals(StreetMode.FLEXIBLE)) {
-            Collection<FlexAccessEgress> flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
+            Collection<FlexAccessEgress<?>> flexAccessList = FlexAccessEgressRouter.routeAccessEgress(
                 request,
                 false
             );
@@ -175,7 +175,7 @@ public class RoutingWorker {
 
         // Special handling of flex egresses
         if (OTPFeature.FlexRouting.isOn() && request.modes.egressMode.equals(StreetMode.FLEXIBLE)) {
-            Collection<FlexAccessEgress> flexEgressList = FlexAccessEgressRouter.routeAccessEgress(
+            Collection<FlexAccessEgress<?>> flexEgressList = FlexAccessEgressRouter.routeAccessEgress(
                 request,
                 true
             );
