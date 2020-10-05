@@ -28,6 +28,13 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final BoardingAreaMapper boardingAreaMapper = new BoardingAreaMapper();
 
+    private final LocationMapper locationMapper = new LocationMapper();
+
+    private final LocationGroupMapper locationGroupMapper = new LocationGroupMapper(
+        stopMapper,
+        locationMapper
+    );
+
     private final FareAttributeMapper fareAttributeMapper = new FareAttributeMapper();
 
     private final ServiceCalendarDateMapper serviceCalendarDateMapper = new ServiceCalendarDateMapper();
@@ -65,7 +72,7 @@ public class GTFSToOtpTransitServiceMapper {
         agencyMapper = new AgencyMapper(feedId);
         routeMapper = new RouteMapper(agencyMapper);
         tripMapper = new TripMapper(routeMapper);
-        stopTimeMapper = new StopTimeMapper(stopMapper, tripMapper);
+        stopTimeMapper = new StopTimeMapper(stopMapper, locationMapper, locationGroupMapper, tripMapper);
         frequencyMapper = new FrequencyMapper(tripMapper);
         transferMapper = new TransferMapper(
             routeMapper, stationMapper, stopMapper, tripMapper
@@ -101,6 +108,8 @@ public class GTFSToOtpTransitServiceMapper {
 
         mapGtfsStopsToOtpTypes(data, builder);
 
+        builder.getLocations().addAll(locationMapper.map(data.getAllLocations()));
+        builder.getLocationGroups().addAll(locationGroupMapper.map(data.getAllLocationGroups()));
         builder.getPathways().addAll(pathwayMapper.map(data.getAllPathways()));
         builder.getStopTimesSortedByTrip().addAll(stopTimeMapper.map(data.getAllStopTimes()));
         builder.getTransfers().addAll(transferMapper.map(data.getAllTransfers()));
