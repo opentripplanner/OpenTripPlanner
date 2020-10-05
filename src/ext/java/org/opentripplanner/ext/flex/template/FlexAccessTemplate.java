@@ -1,5 +1,6 @@
 package org.opentripplanner.ext.flex.template;
 
+import org.opentripplanner.ext.flex.edgetype.FlexTransferEdge;
 import org.opentripplanner.ext.flex.FlexServiceDate;
 import org.opentripplanner.ext.flex.edgetype.FlexTripEdge;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -7,6 +8,8 @@ import org.opentripplanner.ext.flex.trip.FlexTrip;
 import org.opentripplanner.model.SimpleTransfer;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopLocation;
+import org.opentripplanner.model.transfer.Transfer;
+import org.opentripplanner.model.transfer.TransferType;
 import org.opentripplanner.model.plan.Itinerary;
 import org.opentripplanner.routing.algorithm.mapping.GraphPathToItineraryMapper;
 import org.opentripplanner.routing.core.State;
@@ -15,12 +18,14 @@ import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.routing.graph.Vertex;
 import org.opentripplanner.routing.graphfinder.NearbyStop;
 import org.opentripplanner.routing.spt.GraphPath;
+import org.opentripplanner.routing.vertextype.TransitStopVertex;
 
 import java.time.ZonedDateTime;
 import java.util.Calendar;
 import java.util.Collection;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.TimeZone;
 
 public class FlexAccessTemplate extends FlexAccessEgressTemplate {
@@ -96,6 +101,63 @@ public class FlexAccessTemplate extends FlexAccessEgressTemplate {
     Calendar c = Calendar.getInstance(TimeZone.getTimeZone(zdt.getZone()));
     c.setTimeInMillis(zdt.toInstant().toEpochMilli());
     itinerary.timeShiftToStartAt(c);
+    return itinerary;
+  }
+
+  public Itinerary getTransferItinerary(
+      Transfer transfer, FlexEgressTemplate template, boolean arriveBy, int departureTime,
+      ZonedDateTime startOfTime, Map<Stop, TransitStopVertex> stopVertexForStop
+  ) {
+    if (transfer.getFromStop() != transfer.getToStop()) {
+      // TODO: Handle walking between legs
+      return null;
+    }
+
+    boolean isMinTimeTransfer = transfer.getTransferType() == TransferType.MIN_TIME;
+    boolean isGuaranteedTransfer = transfer.getTransferType() == TransferType.GUARANTEED;
+
+    if (!isMinTimeTransfer && !isGuaranteedTransfer) {
+      // TODO: Handle other types of transfers
+      return null;
+    }
+
+    TransitStopVertex transferFromVertex = stopVertexForStop.get(transfer.getFromStop());
+    TransitStopVertex transferToVertex = stopVertexForStop.get(transfer.getToStop());
+
+    if (!this.isRouteable(transferFromVertex) || !template.isRouteable(transferToVertex)) {
+      return null;
+    }
+
+    FlexTripEdge firstFlexEdge = this.getFlexEdge(transferFromVertex, transfer.getFromStop());
+    FlexTripEdge secondFlexEdge = template.getFlexEdge(transferToVertex, transfer.getToStop());
+
+    List<Edge> egressEdges = template.accessEgress.edges;
+
+    State state = this.accessEgress.state;
+
+    state = firstFlexEdge.traverse(state);
+
+    // TODO: Remove this and modify state directly
+    if (isMinTimeTransfer) {
+      FlexTransferEdge legSwitchEdge = new FlexTransferEdge(transferFromVertex, transferToVertex, transfer.getMinTransferTimeSeconds());
+      state = legSwitchEdge.traverse(state);
+    }
+    
+    state = secondFlexEdge.traverse(state);
+
+    for (Edge e : egressEdges) {
+      state = e.traverse(state);
+    }
+
+    // TODO: Filtering of invalid itineraries
+
+    Itinerary itinerary = GraphPathToItineraryMapper.generateItinerary(
+        new GraphPath(state),
+        Locale.ENGLISH
+    );
+
+    // TODO: Timeshift
+
     return itinerary;
   }
 
