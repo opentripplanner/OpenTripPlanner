@@ -10,7 +10,6 @@ import org.locationtech.jts.geom.Coordinate;
 import org.opentripplanner.api.resource.DebugOutput;
 import org.opentripplanner.common.model.P2;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.Route;
 import org.opentripplanner.model.StopTimesInPattern;
 import org.opentripplanner.model.Trip;
@@ -305,7 +304,7 @@ public class LegacyGraphQLDataFetchers {
   
   public interface LegacyGraphQLQueryType {
     public DataFetcher<Object> node();
-    public DataFetcher<Iterable<FeedInfo>> feeds();
+    public DataFetcher<Iterable<String>> feeds();
     public DataFetcher<Iterable<Agency>> agencies();
     public DataFetcher<Iterable<FareRuleSet>> ticketTypes();
     public DataFetcher<Agency> agency();

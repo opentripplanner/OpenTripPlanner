@@ -32,7 +32,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     private final ServiceCalendarDateMapper serviceCalendarDateMapper = new ServiceCalendarDateMapper();
 
-    private final FeedInfoMapper feedInfoMapper = new FeedInfoMapper();
+    private final FeedInfoMapper feedInfoMapper;
 
     private final ShapePointMapper shapePointMapper = new ShapePointMapper();
 
@@ -61,6 +61,7 @@ public class GTFSToOtpTransitServiceMapper {
 
     GTFSToOtpTransitServiceMapper(DataImportIssueStore issueStore, String feedId) {
         this.issueStore = issueStore;
+        feedInfoMapper = new FeedInfoMapper(feedId);
         agencyMapper = new AgencyMapper(feedId);
         routeMapper = new RouteMapper(agencyMapper);
         tripMapper = new TripMapper(routeMapper);
