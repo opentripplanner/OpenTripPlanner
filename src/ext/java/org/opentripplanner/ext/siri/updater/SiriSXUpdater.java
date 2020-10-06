@@ -19,7 +19,6 @@ import java.io.InputStream;
 import java.time.ZonedDateTime;
 import java.util.HashMap;
 import java.util.Map;
-import java.util.UUID;
 
 public class SiriSXUpdater extends PollingGraphUpdater {
     private static final Logger LOG = LoggerFactory.getLogger(SiriSXUpdater.class);
@@ -44,27 +43,17 @@ public class SiriSXUpdater extends PollingGraphUpdater {
 
     private static final Map<String, String> requestHeaders = new HashMap<>();
 
-    public SiriSXUpdater(Parameters config) {
+    public SiriSXUpdater(SiriSXUpdaterParameters config) {
         super(config);
         // TODO: add options to choose different patch services
-        String url = config.getUrl();
-        if (url == null) {
-            throw new IllegalArgumentException("Missing mandatory 'url' parameter");
-        }
-
+        this.url = config.getUrl();
         this.requestorRef = config.getRequestorRef();
-        if (requestorRef == null || requestorRef.isEmpty()) {
-            requestorRef = "otp-"+UUID.randomUUID().toString();
-        }
-
-        this.url = url;// + uniquenessParameter;
         this.earlyStart = config.getEarlyStartSec();
         this.feedId = config.getFeedId();
 
-
         int timeoutSec = config.getTimeoutSec();
         if (timeoutSec > 0) {
-            this.timeout = 1000*timeoutSec;
+            this.timeout = 1000 * timeoutSec;
         }
 
         blockReadinessUntilInitialized = config.blockReadinessUntilInitialized();
@@ -168,12 +157,4 @@ public class SiriSXUpdater extends PollingGraphUpdater {
         return "SiriSXUpdater (" + url + ")";
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getUrl();
-        String getRequestorRef();
-        int getEarlyStartSec();
-        String getFeedId();
-        int getTimeoutSec();
-        boolean blockReadinessUntilInitialized();
-    }
 }

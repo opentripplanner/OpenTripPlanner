@@ -3,7 +3,6 @@ package org.opentripplanner.ext.siri.updater;
 import org.apache.commons.lang3.BooleanUtils;
 import org.opentripplanner.ext.siri.SiriTimetableSnapshotSource;
 import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.standalone.config.updaters.sources.SiriETHttpTripUpdaterSourceParameters;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
@@ -67,13 +66,12 @@ public class SiriETUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriETUpdater(Parameters config) {
+    public SiriETUpdater(SiriETUpdaterParameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriETHttpTripUpdateSource((SiriETHttpTripUpdaterSourceParameters)
-            config.getSourceConfig().getUpdaterSourceParameters());
+        updateSource = new SiriETHttpTripUpdateSource(config.sourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -153,11 +151,4 @@ public class SiriETUpdater extends PollingGraphUpdater {
         return "Polling SIRI ET updater with update source = " + s;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeedId();
-        int getLogFrequency();
-        int getMaxSnapshotFrequencyMs();
-        boolean purgeExpiredData();
-        boolean blockReadinessUntilInitialized();
-    }
 }

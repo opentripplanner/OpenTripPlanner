@@ -1,13 +1,5 @@
 package org.opentripplanner.updater.bike_park;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_park.BikePark;
@@ -20,6 +12,14 @@ import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Graph updater that dynamically sets availability information on bike parking lots.
@@ -37,30 +37,29 @@ public class BikeParkUpdater extends PollingGraphUpdater {
 
     private GraphUpdaterManager updaterManager;
 
-    Map<BikePark, BikeParkVertex> verticesByPark = new HashMap<BikePark, BikeParkVertex>();
+    private final Map<BikePark, BikeParkVertex> verticesByPark = new HashMap<>();
 
-    private BikeParkDataSource source;
-
-    private Graph graph;
+    private final BikeParkDataSource source;
 
     private SimpleStreetSplitter linker;
 
     private BikeRentalStationService bikeService;
 
-    public BikeParkUpdater(PollingGraphUpdaterParameters parameters) {
+    public BikeParkUpdater(BikeParkUpdaterParameters parameters) {
         super(parameters);
         // Set source from preferences
-        source = new KmlBikeParkDataSource((KmlBikeParkDataSource.Parameters) parameters.getSourceConfig());
+        source = new KmlBikeParkDataSource(parameters.sourceParameters());
 
         LOG.info("Creating bike-park updater running every {} seconds : {}", pollingPeriodSeconds, source);
     }
 
+    @Override
     public void setGraphUpdaterManager(GraphUpdaterManager updaterManager) {
         this.updaterManager = updaterManager;
     }
 
+    @Override
     public void setup(Graph graph) {
-        this.graph = graph;
         // Creation of network linker library will not modify the graph
         linker = new SimpleStreetSplitter(graph, new DataImportIssueStore(false));
         // Adding a bike park station service needs a graph writer runnable
@@ -81,12 +80,13 @@ public class BikeParkUpdater extends PollingGraphUpdater {
         updaterManager.execute(graphWriterRunnable);
     }
 
+    @Override
     public void teardown() {
     }
 
     private class BikeParkGraphWriterRunnable implements GraphWriterRunnable {
 
-        private List<BikePark> bikeParks;
+        private final List<BikePark> bikeParks;
 
         private BikeParkGraphWriterRunnable(List<BikePark> bikeParks) {
             this.bikeParks = bikeParks;

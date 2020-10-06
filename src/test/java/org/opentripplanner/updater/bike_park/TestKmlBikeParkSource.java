@@ -1,34 +1,23 @@
 package org.opentripplanner.updater.bike_park;
 
-import java.util.List;
-
 import junit.framework.TestCase;
-
 import org.opentripplanner.routing.bike_park.BikePark;
+
+import java.util.List;
 
 public class TestKmlBikeParkSource extends TestCase {
 
   public void testKML() {
 
     KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-      @Override
-      public String getNamePrefix() {
+      @Override public String getNamePrefix() {
         return null;
       }
-
-      @Override
-      public boolean zip() {
+      @Override public boolean zip() {
         return false;
       }
-
-      @Override
-      public String getUrl() {
+      @Override public String getUrl() {
         return "file:src/test/resources/bike/NSFietsenstallingen.kml";
-      }
-
-      @Override
-      public String getName() {
-        return null;
       }
     });
     assertTrue(kmlDataSource.update());
@@ -47,25 +36,15 @@ public class TestKmlBikeParkSource extends TestCase {
   public void testKMLWithFolder() {
 
       KmlBikeParkDataSource kmlDataSource = new KmlBikeParkDataSource(new KmlBikeParkDataSource.Parameters() {
-          @Override
-          public String getNamePrefix() {
+          @Override public String getNamePrefix() {
               return null;
           }
-
-          @Override
-          public boolean zip() {
+          @Override public boolean zip() {
               return false;
           }
-
-          @Override
-          public String getUrl() {
+          @Override public String getUrl() {
               return "file:src/test/resources/bike/NSFietsenstallingen_folder.kml";
           }
-
-        @Override
-        public String getName() {
-          return null;
-        }
       });
     assertTrue(kmlDataSource.update());
     List<BikePark> bikeParks = kmlDataSource.getBikeParks();

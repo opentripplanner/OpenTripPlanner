@@ -45,6 +45,7 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 - Update DebugOutput to match new routing phases of OTP2 [#3109](https://github.com/opentripplanner/OpenTripPlanner/issues/3109)
 - Filter transit itineraries with relative high cost [#3157](https://github.com/opentripplanner/OpenTripPlanner/issues/3157)
 - Fix issue with colliding TripPattern ids after modifications form real-time updaters [#3202](https://github.com/opentripplanner/OpenTripPlanner/issues/3202)
+- Fix: The updater config type is unknown: gtfs-http [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 
 ## Ported over from the 1.x
 

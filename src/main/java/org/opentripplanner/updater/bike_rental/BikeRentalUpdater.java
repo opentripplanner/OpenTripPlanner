@@ -1,14 +1,5 @@
 package org.opentripplanner.updater.bike_rental;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Set;
-
 import org.opentripplanner.graph_builder.DataImportIssueStore;
 import org.opentripplanner.graph_builder.linking.SimpleStreetSplitter;
 import org.opentripplanner.routing.bike_rental.BikeRentalStation;
@@ -20,11 +11,18 @@ import org.opentripplanner.routing.vertextype.BikeRentalStationVertex;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.GraphWriterRunnable;
 import org.opentripplanner.updater.PollingGraphUpdater;
-import org.opentripplanner.updater.UpdaterDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.datasources.BikeRentalDataSourceFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static org.opentripplanner.standalone.config.DefaultUpdaterDataSourceConfig.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 
 /**
  * Dynamic bike-rental station updater which updates the Graph with bike rental stations from one BikeRentalDataSource.
@@ -45,83 +43,13 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
 
     private final String network;
 
-    public BikeRentalUpdater(Parameters parameters) throws IllegalArgumentException {
+    public BikeRentalUpdater(BikeRentalUpdaterParameters parameters) throws IllegalArgumentException {
         super(parameters);
-
-        // Set data source type from config JSON
-        String sourceType = parameters.getSourceConfig().getType();
-        String apiKey = parameters.getApiKey();
-        // Each updater can be assigned a unique network ID in the configuration to prevent returning bikes at
-        // stations for another network. TODO shouldn't we give each updater a unique network ID by default?
-        String networkName = parameters.getNetwork();
-        UpdaterDataSourceParameters sourceParameters = parameters.getSourceConfig().getUpdaterSourceParameters();
-        BikeRentalDataSource source = null;
-        if (sourceType != null) {
-            switch (sourceType) {
-                case JCDECAUX:
-                    source = new JCDecauxBikeRentalDataSource(sourceParameters);
-                    break;
-                case B_CYCLE:
-                    source = new BCycleBikeRentalDataSource(
-                        sourceParameters,
-                        apiKey,
-                        networkName
-                    );
-                    break;
-                case BIXI:
-                    source = new BixiBikeRentalDataSource(sourceParameters);
-                    break;
-                case KEOLIS_RENNES:
-                    source = new KeolisRennesBikeRentalDataSource(sourceParameters);
-                    break;
-                case OV_FIETS:
-                    source = new OVFietsKMLDataSource(sourceParameters);
-                    break;
-                case CITY_BIKES:
-                    source = new CityBikesBikeRentalDataSource(sourceParameters);
-                    break;
-                case VCUV:
-                    source = new VCubDataSource(sourceParameters);
-                    break;
-                case CITI_BIKE_NYC:
-                    source = new CitiBikeNycBikeRentalDataSource(sourceParameters, networkName);
-                    break;
-                case NEXT_BIKE:
-                    source = new NextBikeRentalDataSource(sourceParameters, networkName);
-                    break;
-                case KML:
-                    source = new GenericKmlBikeRentalDataSource((GenericKmlBikeRentalDataSource.Parameters) sourceParameters);
-                    break;
-                case SF_BAY_AREA:
-                    source = new SanFranciscoBayAreaBikeRentalDataSource(
-                        sourceParameters,
-                        networkName
-                    );
-                    break;
-                case SHARE_BIKE:
-                    source = new ShareBikeRentalDataSource(sourceParameters);
-                    break;
-                case UIP_BIKE:
-                    source = new UIPBikeRentalDataSource(sourceParameters, apiKey);
-                    break;
-                case GBFS:
-                    source = new GbfsBikeRentalDataSource((GbfsBikeRentalDataSource.Parameters) sourceParameters, networkName);
-                    break;
-                case SMOOVE:
-                    source = new SmooveBikeRentalDataSource(sourceParameters);
-                    break;
-                case BICIMAD:
-                    source = new BicimadBikeRentalDataSource(sourceParameters);
-                    break;
-            }
-        }
-
-        if (source == null) {
-            throw new IllegalArgumentException("Unknown bike rental source type: " + sourceType);
-        }
-
         // Configure updater
         LOG.info("Setting up bike rental updater.");
+
+        BikeRentalDataSource source = BikeRentalDataSourceFactory.create(parameters.sourceParameters());
+
         this.source = source;
         this.network = parameters.getNetworks();
         if (pollingPeriodSeconds <= 0) {
@@ -129,7 +57,6 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         } else {
             LOG.info("Creating bike-rental updater running every {} seconds: {}", pollingPeriodSeconds, source);
         }
-
     }
 
     @Override
@@ -221,9 +148,4 @@ public class BikeRentalUpdater extends PollingGraphUpdater {
         }
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getNetwork();
-        String getNetworks();
-        String getApiKey();
-    }
 }

@@ -1,57 +1,16 @@
 package org.opentripplanner.ext.bikerentalservicedirectory;
 
-import org.opentripplanner.updater.UpdaterDataSourceConfig;
-import org.opentripplanner.updater.bike_rental.BikeRentalUpdater;
+import org.opentripplanner.updater.bike_rental.datasources.params.BikeRentalDataSourceParameters;
+import org.opentripplanner.updater.bike_rental.BikeRentalUpdaterParameters;
 
-public class BikeRentalParameters implements BikeRentalUpdater.Parameters {
-
-  private final UpdaterDataSourceConfig sourceConfig;
-
-  private final String url;
-
-  private final int frequencySec;
-
-  private final String network;
+public class BikeRentalParameters extends BikeRentalUpdaterParameters {
 
   public BikeRentalParameters(
-      UpdaterDataSourceConfig sourceConfig,
+      String configRef,
       String url,
       int frequencySec,
-      String network
+      BikeRentalDataSourceParameters sourceParameters
   ) {
-    this.sourceConfig = sourceConfig;
-    this.url = url;
-    this.frequencySec = frequencySec;
-    this.network = network;
-  }
-
-  @Override
-  public UpdaterDataSourceConfig getSourceConfig() {
-    return sourceConfig;
-  }
-
-  @Override
-  public String getUrl() {
-    return url;
-  }
-
-  @Override
-  public int getFrequencySec() {
-    return frequencySec;
-  }
-
-  @Override
-  public String getNetwork() {
-    return network;
-  }
-
-  @Override
-  public String getNetworks() {
-    return null;
-  }
-
-  @Override
-  public String getApiKey() {
-    return null;
+    super(configRef, url, null, frequencySec, sourceParameters);
   }
 }
