@@ -29,7 +29,7 @@ Options and parameters that are taken into account during the graph building pro
 ## Configuration types
 
 The OTP configuration files use the JSON file format. OTP allows comments and unquoted field names 
-in the JSON configuration files - to be more human friendly. OTP support all the basic JSON types: 
+in the JSON configuration files to be more human-friendly. OTP supports all the basic JSON types: 
 nested objects `{...}`, arrays `[]`, numbers `789.0` and boolean `true` | `false`. In addition to 
 these basic types some configuration parameters are parsed with some restrictions. In the 
 documentation below we will refer to the following types:
