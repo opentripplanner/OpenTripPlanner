@@ -18,7 +18,6 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.TimeZone;
 
 
@@ -265,6 +264,8 @@ public class Timetable implements Serializable {
             int numStops = newTimes.getNumStops();
             Integer delay = null;
 
+            final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;
                 if (update != null) {
@@ -289,8 +290,6 @@ public class Timetable implements Serializable {
                         newTimes.updateDepartureDelay(i, 0);
                         delay = 0;
                     } else {
-                        long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
-
                         if (update.hasArrival()) {
                             StopTimeEvent arrival = update.getArrival();
                             if (arrival.hasDelay()) {

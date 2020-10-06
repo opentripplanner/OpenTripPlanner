@@ -75,9 +75,11 @@ public class SiriTripPatternCache {
 
             TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
+            tripPattern.setCreatedByRealtimeUpdater();
+
             // Copy information from the TripPattern this is replacing
             if (originalTripPattern != null) {
-                tripPattern.setId(originalTripPattern.getId());
+                tripPattern.setOriginalTripPattern(originalTripPattern);
                 tripPattern.setHopGeometriesFromPattern(originalTripPattern);
             }
             

@@ -161,9 +161,9 @@ public class NetexLoaderSmokeTest {
 
     private void assertNoticeAssignments(Multimap<TransitEntity<?>, Notice> map) {
         assertNote(map, fId("RUT:ServiceJourney:4-101468-583"),"045", "Notice on ServiceJourney");
-        assertNote(map, stId("RUT:ServiceJourney:4-101468-583", 0), "035", "Notice on TimetabledPassingTime");
+        assertNote(map, stId("RUT:ServiceJourney:4-101468-583", 0).getId(), "035", "Notice on TimetabledPassingTime");
         assertNote(map, fId("RUT:Line:4"), "075", "Notice on Line");
-        assertNote(map, stId("RUT:ServiceJourney:4-101493-1098", 1), "090", "Notice on Journeypattern");
+        assertNote(map, stId("RUT:ServiceJourney:4-101493-1098", 1).getId(), "090", "Notice on Journeypattern");
         assertEquals(4, map.size());
     }
 

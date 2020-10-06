@@ -30,7 +30,7 @@ public abstract class TransitEntity<T extends Serializable> implements Serializa
      * example after reloading a serialized instance.
      */
     @Override
-    public boolean equals(Object obj) {
+    final public boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }
@@ -39,7 +39,7 @@ public abstract class TransitEntity<T extends Serializable> implements Serializa
     }
 
     @Override
-    public int hashCode() {
+    final public int hashCode() {
         return getId().hashCode();
     }
 }
