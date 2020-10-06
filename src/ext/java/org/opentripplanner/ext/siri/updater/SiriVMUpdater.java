@@ -7,6 +7,7 @@ import org.opentripplanner.routing.RoutingService;
 import org.opentripplanner.routing.graph.Graph;
 import org.opentripplanner.updater.GraphUpdaterManager;
 import org.opentripplanner.updater.PollingGraphUpdater;
+import org.opentripplanner.updater.PollingGraphUpdaterParameters;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import uk.org.siri.siri20.ServiceDelivery;
@@ -75,13 +76,12 @@ public class SiriVMUpdater extends PollingGraphUpdater {
      */
     private SiriTimetableSnapshotSource snapshotSource;
 
-    public SiriVMUpdater(Parameters config) {
+    public SiriVMUpdater(SiriVMUpdaterParameters config) {
         super(config);
         // Create update streamer from preferences
         feedId = config.getFeedId();
 
-        updateSource = new SiriVMHttpTripUpdateSource( (SiriVMHttpTripUpdateSource.Parameters)
-            config.getSourceConfig().getUpdaterSourceParameters());
+        updateSource = new SiriVMHttpTripUpdateSource(config.sourceParameters());
 
         int logFrequency = config.getLogFrequency();
         if (logFrequency >= 0) {
@@ -168,12 +168,4 @@ public class SiriVMUpdater extends PollingGraphUpdater {
         return "Polling SIRI VM updater with update source = " + s;
     }
 
-    public interface Parameters extends PollingGraphUpdaterParameters {
-        String getFeedId();
-        int getLogFrequency();
-        int getMaxSnapshotFrequencyMs();
-        boolean purgeExpiredData();
-        boolean fuzzyTripMatching();
-        boolean blockReadinessUntilInitialized();
-    }
 }

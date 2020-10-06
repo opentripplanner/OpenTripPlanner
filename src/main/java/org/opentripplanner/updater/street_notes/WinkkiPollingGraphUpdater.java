@@ -7,8 +7,9 @@ import org.opentripplanner.util.NonLocalizedString;
 import java.util.Date;
 
 /**
- * Example implementation of a WFS based street note updater, which can be used to retrieve roadworks and other
- * temporary obstacles from a WFS interface provided by the City of Helsinki's planning department.
+ * Example implementation of a WFS based street note updater, which can be used to retrieve
+ * roadworks and other temporary obstacles from a WFS interface provided by the City of Helsinki's
+ * planning department.
  *
  * Usage example:
  *
@@ -22,7 +23,7 @@ import java.util.Date;
 
 
 public class WinkkiPollingGraphUpdater extends WFSNotePollingGraphUpdater {
-    public WinkkiPollingGraphUpdater(Parameters config) {
+    public WinkkiPollingGraphUpdater(WFSNotePollingGraphUpdaterParameters config) {
         super(config);
     }
 

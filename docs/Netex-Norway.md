@@ -1,4 +1,4 @@
-# OTP2 Using European Data Standards
+# Using European Data Standards
 
 ## Building with Netex Data
 
@@ -26,10 +26,10 @@ The `build-config.json` for a Norwegian graph using Netex data looks like this:
   "dataImportReport": true,
   "netex" : {
     "moduleFilePattern" : ".*-netex\\.zip",
-    "sharedFilePattern" : "_stops.xml",
-    "sharedGroupFilePattern" : "_(\\w{3})_shared_data.xml",
-    "groupFilePattern" : "(\\w{3})_.*\\.xml",
-    "netexFeedId": "RB"
+    "sharedFilePattern": "_stops.xml",
+    "sharedGroupFilePattern": "_(\\w{3})(_flexible)?_shared_data.xml",
+    "groupFilePattern": "(\\w{3})_.*\\.xml",
+    "netexFeedId": "EN"
   }
 }
 ```
@@ -38,7 +38,7 @@ Note the special section specifying how to find Netex XML files within the singl
 
 Once you have the graph inputs (the OSM PBF file, the Netex ZIP file, and the `build-config.json`) saved together in a directory, you can instruct OTP2 to build a graph from these inputs:
 
-`java -Xmx10G otp2.jar --build /path/to/graph/inputs`
+`java -Xmx10G otp2.jar --build --save /path/to/graph/inputs`
 
 This should produce a file `graph.obj` in the same directory as your inputs. Building this Norway graph takes approximately 16 minutes (without elevation data, as configured above), and can be done within 10GB of heap memory (JVM switch `-Xmx10G`). Increasing that to 12 or 14GB might speed it up a bit if you have the space. The Graph file it produces is just under 600MB. The server will take about 30 seconds to load this Graph and start up, and will consume about 4GB of heap memory under light use.
 

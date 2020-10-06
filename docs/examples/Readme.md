@@ -14,6 +14,6 @@ The examples are provided "as is" - they may get outdated over time or miss info
 
 
 ## How to share an example
-Anyone who want can add their example here as long as it is OTP "related". Just create a noraml pull-request to add it. 
+Anyone who want can add their example here as long as it is OTP "related". Just create a normal pull-request to add it. 
 
 

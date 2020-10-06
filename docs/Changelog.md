@@ -4,93 +4,93 @@
 
 See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST API.
 
-- Sandbox for experimental features (#2745)
-- Bugfix for Missing platforms for stops in GTFS import causes a NPE (#2804)
+- Sandbox for experimental features [#2745](https://github.com/opentripplanner/OpenTripPlanner/issues/2745)
+- Bugfix for Missing platforms for stops in GTFS import causes a NPE [#2804](https://github.com/opentripplanner/OpenTripPlanner/issues/2804)
 - Remove extra Djikstra implementations
-- Remove redundant LineStrings in order to save memory (#2795)
-- NeTEx import support (#2769)
+- Remove redundant LineStrings in order to save memory [#2795](https://github.com/opentripplanner/OpenTripPlanner/issues/2795)
+- NeTEx import support [#2769](https://github.com/opentripplanner/OpenTripPlanner/issues/2769)
 - New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
-- Added NeTEx notices (#2824)
-- Make transfers and access/egress use effectiveWalkDistance to take slopes into account (#2857)
-- Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import (#2813)
-- Combined OSM loaders, removing several rarely used ones (#2878)
-- New Java Code Style (part of #2755)
-- Cleanup and rename Graph Builder Annotations, now Data Import Issues (#2871)
-- Bugfix for graph building crashing on unsupported modes (#2899)
-- Add command line parameter for building partial graphs (#2583)
-- Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices (#2887) 
+- Added NeTEx notices [#2824](https://github.com/opentripplanner/OpenTripPlanner/issues/2824)
+- Make transfers and access/egress use effectiveWalkDistance to take slopes into account [#2857](https://github.com/opentripplanner/OpenTripPlanner/issues/2857)
+- Add MultiModalStation and GroupOfStations to OTP model and added these to the NeTEx import [#2813](https://github.com/opentripplanner/OpenTripPlanner/issues/2813)
+- Combined OSM loaders, removing several rarely used ones [#2878](https://github.com/opentripplanner/OpenTripPlanner/issues/2878)
+- New Java Code Style (part of [#2755](https://github.com/opentripplanner/OpenTripPlanner/issues/2755))
+- Cleanup and rename Graph Builder Annotations, now Data Import Issues [#2871](https://github.com/opentripplanner/OpenTripPlanner/issues/2871)
+- Bugfix for graph building crashing on unsupported modes [#2899](https://github.com/opentripplanner/OpenTripPlanner/issues/2899)
+- Add command line parameter for building partial graphs [#2583](https://github.com/opentripplanner/OpenTripPlanner/issues/2583)
+- Refactor GenericLocation/AStar/RoutingContext to allow multiple start vertices [#2887](https://github.com/opentripplanner/OpenTripPlanner/issues/2887) 
 - New Transit search algorithm, Raptor, replaces the AStar for all transit searches. 
-- Update only the relevant parts of the TransitLayer each time an update is applied (#2918)
-- Ability to switch off the fare service(#2912).
-- Limit the transit service period(#2925).
-- Removed unwanted cost added for wait time between access and transit with RangeRaptor (#2927)
-- Dynamic search parameters, calculate raptor search-window when needed. (#2931)
-- Support for next/previous paging trip search results (#2941)
-- Fix mismatch in duration for walk legs, resulting in negative wait times (#2955)
-- NeTEx import now supports ServiceLinks (#2951)
-- Also check TripPatterns added by realtime when showing stoptimes for stop (#2954)
-- Copy geometries from previous TripPattern when realtime updates result in a TripPattern being replaced (#2987)
+- Update only the relevant parts of the TransitLayer each time an update is applied [#2918](https://github.com/opentripplanner/OpenTripPlanner/issues/2918)
+- Ability to switch off the fare service[#2912](https://github.com/opentripplanner/OpenTripPlanner/issues/2912).
+- Limit the transit service period[#2925](https://github.com/opentripplanner/OpenTripPlanner/issues/2925).
+- Removed unwanted cost added for wait time between access and transit with RangeRaptor [#2927](https://github.com/opentripplanner/OpenTripPlanner/issues/2927)
+- Dynamic search parameters, calculate raptor search-window when needed. [#2931](https://github.com/opentripplanner/OpenTripPlanner/issues/2931)
+- Support for next/previous paging trip search results [#2941](https://github.com/opentripplanner/OpenTripPlanner/issues/2941)
+- Fix mismatch in duration for walk legs, resulting in negative wait times [#2955](https://github.com/opentripplanner/OpenTripPlanner/issues/2955)
+- NeTEx import now supports ServiceLinks [#2951](https://github.com/opentripplanner/OpenTripPlanner/issues/2951)
+- Also check TripPatterns added by realtime when showing stoptimes for stop [#2954](https://github.com/opentripplanner/OpenTripPlanner/issues/2954)
+- Copy geometries from previous TripPattern when realtime updates result in a TripPattern being replaced [#2987](https://github.com/opentripplanner/OpenTripPlanner/issues/2987)
 - Support for the Norwegian language.
-- Update pathways support to official GTFS specification (#2923)
-- Support for XML (de-)serialization is REMOVED from the REST API (#3031)
-- Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API (#3011)
-- Make agency id feed scoped (#3035)
-- Refactor kiss and ride to a more general car pickup mode (#3063)
-- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
-- Add MQTT transport for the GTFS-RT trip update updater (#3094)
-- Add FinlandWayPropertySetSource (#3096)
-- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode (#3088)
-- Reading and writing files(CONFIG, GRAPH, DEM, OSM, GTFS, NETEX, DATA_IMPORT_ISSUES) is changed. All files, except configuration files, are read from a data source. We support Google Cloud Storage and the local file system data sources for now, but plan to add at least support for AWS S3 (#2891)
-- Remove AlertPatcher (#3134)
-- Update DebugOutput to match new routing phases of OTP2 (#3109)
-- Filter transit itineraries with relative high cost (#3157).
-- Fix issue with colliding TripPattern ids after modifications form real-time updaters. (#3202)
-
+- Update pathways support to official GTFS specification [#2923](https://github.com/opentripplanner/OpenTripPlanner/issues/2923)
+- Support for XML (de-)serialization is REMOVED from the REST API [#3031](https://github.com/opentripplanner/OpenTripPlanner/issues/3031)
+- Refactor how to specify access/egress/direct/transit modes in the internal model and the Transmodel API [#3011](https://github.com/opentripplanner/OpenTripPlanner/issues/3011)
+- Make agency id feed scoped [#3035](https://github.com/opentripplanner/OpenTripPlanner/issues/3035)
+- Refactor kiss and ride to a more general car pickup mode [#3063](https://github.com/opentripplanner/OpenTripPlanner/issues/3063)
+- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode [#3088](https://github.com/opentripplanner/OpenTripPlanner/issues/3088)
+- Add MQTT transport for the GTFS-RT trip update updater [#3094](https://github.com/opentripplanner/OpenTripPlanner/issues/3094)
+- Add FinlandWayPropertySetSource [#3096](https://github.com/opentripplanner/OpenTripPlanner/issues/3096)
+- Map NeTEx publicCode to OTP tripShortName and NeTEx private code to OTP internalPlanningCode [#3088](https://github.com/opentripplanner/OpenTripPlanner/issues/3088)
+- Reading and writing files(CONFIG, GRAPH, DEM, OSM, GTFS, NETEX, DATA_IMPORT_ISSUES) is changed. All files, except configuration files, are read from a data source. We support Google Cloud Storage and the local file system data sources for now, but plan to add at least support for AWS S3 [#2891](https://github.com/opentripplanner/OpenTripPlanner/issues/2891)
+- Remove AlertPatcher [#3134](https://github.com/opentripplanner/OpenTripPlanner/issues/3134)
+- Update DebugOutput to match new routing phases of OTP2 [#3109](https://github.com/opentripplanner/OpenTripPlanner/issues/3109)
+- Filter transit itineraries with relative high cost [#3157](https://github.com/opentripplanner/OpenTripPlanner/issues/3157)
+- Fix issue with colliding TripPattern ids after modifications form real-time updaters [#3202](https://github.com/opentripplanner/OpenTripPlanner/issues/3202)
+- Fix: The updater config type is unknown: gtfs-http [#3195](https://github.com/opentripplanner/OpenTripPlanner/issues/3195)
 
 ## Ported over from the 1.x
 
-- Add application/x-protobuf to accepted protobuf content-types (#2839)
-- Make OTP run on Java 11 (#2812)
-- Fixes surefire test failure during build (#2816)
-- Disable linking from already linked stops (#2372)
-- Add Way Property Set for the UK (#2818)
+- Add application/x-protobuf to accepted protobuf content-types [#2839](https://github.com/opentripplanner/OpenTripPlanner/issues/2839)
+- Make OTP run on Java 11 [#2812](https://github.com/opentripplanner/OpenTripPlanner/issues/2812)
+- Fixes surefire test failure during build [#2816](https://github.com/opentripplanner/OpenTripPlanner/issues/2816)
+- Disable linking from already linked stops [#2372](https://github.com/opentripplanner/OpenTripPlanner/issues/2372)
+- Add Way Property Set for the UK [#2818](https://github.com/opentripplanner/OpenTripPlanner/issues/2818)
 
 ## 1.4 (2019-07-30)
 
-- Remove Open Traffic prototype code (#2698)
+- Remove Open Traffic prototype code [#2698](https://github.com/opentripplanner/OpenTripPlanner/issues/2698)
 - Docs: improve configuration documentation
-- Update onebusaway-gtfs to latest version from OBA project (#2636)
-- Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes (#2494)
-- Allow itineraries in response to be sorted by duration (#2593)
-- Fix reverse optimization bug (#2653, #2411)
-- increase GTFS-realtime feeds size limit from 64MB to 2G (#2738)
-- Fix XML response serialization (#2685)
-- Refactor InterleavedBidirectionalHeuristic (#2671)
-- Fix minor test failure against BANO geocoder (#2798)
-- Add "Accept" headers to GTFS-RT HTTP requests (#2796)
-- Fixes surefire test failure during build (#2816)
-- Cannot transfer between stops at exactly the same location (#2371)
-- Improve documentation for `mode` routing parameter (#2809)
+- Update onebusaway-gtfs to latest version from OBA project [#2636](https://github.com/opentripplanner/OpenTripPlanner/issues/2636)
+- Remove the coupling to OneBusAway GTFS within OTP's internal model by creating new classes replacing the external classes [#2494](https://github.com/opentripplanner/OpenTripPlanner/issues/2494)
+- Allow itineraries in response to be sorted by duration [#2593](https://github.com/opentripplanner/OpenTripPlanner/issues/2593)
+- Fix reverse optimization bug #2653, #2411
+- increase GTFS-realtime feeds size limit from 64MB to 2G [#2738](https://github.com/opentripplanner/OpenTripPlanner/issues/2738)
+- Fix XML response serialization [#2685](https://github.com/opentripplanner/OpenTripPlanner/issues/2685)
+- Refactor InterleavedBidirectionalHeuristic [#2671](https://github.com/opentripplanner/OpenTripPlanner/issues/2671)
+- Fix minor test failure against BANO geocoder [#2798](https://github.com/opentripplanner/OpenTripPlanner/issues/2798)
+- Add "Accept" headers to GTFS-RT HTTP requests [#2796](https://github.com/opentripplanner/OpenTripPlanner/issues/2796)
+- Fixes surefire test failure during build [#2816](https://github.com/opentripplanner/OpenTripPlanner/issues/2816)
+- Cannot transfer between stops at exactly the same location [#2371](https://github.com/opentripplanner/OpenTripPlanner/issues/2371)
+- Improve documentation for `mode` routing parameter [#2809](https://github.com/opentripplanner/OpenTripPlanner/issues/2809)
 
 ## 1.3 (2018-08-03)
 
-- Fix stop linking to only one edge of platform (#2472)
+- Fix stop linking to only one edge of platform [#2472](https://github.com/opentripplanner/OpenTripPlanner/issues/2472)
 - Log and allow changing number of HTTP handler threads
-- Update Dutch base fare from 89 to 90 cents (#2608)
-- Add Dutch fare service (#2571)
+- Update Dutch base fare from 89 to 90 cents [#2608](https://github.com/opentripplanner/OpenTripPlanner/issues/2608)
+- Add Dutch fare service [#2571](https://github.com/opentripplanner/OpenTripPlanner/issues/2571)
 - Revise unit tests to use less memory
-- Run all graph updater setup methods sequentially (#2545)
+- Run all graph updater setup methods sequentially [#2545](https://github.com/opentripplanner/OpenTripPlanner/issues/2545)
 - Allow vehicle rental systems with cars (stopgap parameter on bike rental)
 - Bump R5 version to get newer gtfs-lib and FST serialization
-- Move stopClusterMode parameter from routing config to build config (#2558)
+- Move stopClusterMode parameter from routing config to build config [#2558](https://github.com/opentripplanner/OpenTripPlanner/issues/2558)
 - Update encrypted Maven artifact signing key (it expired)
 - Clean up logging
-- Remove/update deprecated HTTPClient, add missing SSL ciphers (#2451)
-- Make maxTransfer options configurable through scripting API (#2507)
-- Fix scripts when entity IDs contain colons (#2474)
-- Add HTML report for stops more than 20m from linked road (#2460)
-- Update fares in NycFareServiceImpl (#2466)
-- Compact legs NPE fix (#2449) (#2490)
+- Remove/update deprecated HTTPClient, add missing SSL ciphers [#2451](https://github.com/opentripplanner/OpenTripPlanner/issues/2451)
+- Make maxTransfer options configurable through scripting API [#2507](https://github.com/opentripplanner/OpenTripPlanner/issues/2507)
+- Fix scripts when entity IDs contain colons [#2474](https://github.com/opentripplanner/OpenTripPlanner/issues/2474)
+- Add HTML report for stops more than 20m from linked road [#2460](https://github.com/opentripplanner/OpenTripPlanner/issues/2460)
+- Update fares in NycFareServiceImpl [#2466](https://github.com/opentripplanner/OpenTripPlanner/issues/2466)
+- Compact legs NPE fix [#2449](https://github.com/opentripplanner/OpenTripPlanner/issues/2449) [#2490](https://github.com/opentripplanner/OpenTripPlanner/issues/2490)
 - Docs: elevation data configuration, USGS DEM files
 - Docs: Update list of deployments
 - Docs: API, list of deployments, usage stats and tutorials
@@ -99,28 +99,28 @@ See the [OTP2 Migration Guide](OTP2-MigrationGuide.md) on changes to the REST AP
 
 ## 1.2 (2017-09-18)
 
-- Add support for consuming GBFS bike-rental availability feeds. #2458
+- Add support for consuming GBFS bike-rental availability feeds. [#2458](https://github.com/opentripplanner/OpenTripPlanner/issues/2458)
 - Add GBFS configuration example
-- Add flag for including requested start/end time in maxHours in planner API. #2457
+- Add flag for including requested start/end time in maxHours in planner API. [#2457](https://github.com/opentripplanner/OpenTripPlanner/issues/2457)
 - Add maxTransferDistance graph builder parameter
-- Add option for filtering non-pickup stops in TransitIndex stop times functions. #2377
-- Support foot/bicycle=discouraged OSM tag. #2415
-- Improve linking of transit platforms to connecting access ways. #2422 / #2428
-- Fix bug when building graph with parent station transfers. #2404 / #2410
-- Fix bugs in park and ride search. #2424
+- Add option for filtering non-pickup stops in TransitIndex stop times functions. [#2377](https://github.com/opentripplanner/OpenTripPlanner/issues/2377)
+- Support foot/bicycle=discouraged OSM tag. [#2415](https://github.com/opentripplanner/OpenTripPlanner/issues/2415)
+- Improve linking of transit platforms to connecting access ways. [#2422](https://github.com/opentripplanner/OpenTripPlanner/issues/2422) / [#2428](https://github.com/opentripplanner/OpenTripPlanner/issues/2428)
+- Fix bug when building graph with parent station transfers. [#2404](https://github.com/opentripplanner/OpenTripPlanner/issues/2404) / [#2410](https://github.com/opentripplanner/OpenTripPlanner/issues/2410)
+- Fix bugs in park and ride search. [#2424](https://github.com/opentripplanner/OpenTripPlanner/issues/2424)
 - Support different stop ID formats in field trip module
-- Update URL in BANO geocoding module. #2438 / #2439
-- Add more debug information related to trips matching using GTFS-RT feed. #2432
-- Update default PATH_NOT_FOUND message to new wording developed w/ TriMet. #2355
-- Update Travis build configuration to not attempt GPG operations. #2441
-- Fix javadoc URL in scripting documentation. #2437
-- Automatically link to GitHub issues in Changelog. #2426
-- Expose FeedInfo objects in the Index API #2456
-- Changes to Puget Sound region fare calculation #2484
-- Fix coordinatates when clustering by parent station #2447
-- Allow setting OSM Way Properties from build-config.json #2389
-- Optionally compact ("reverse-optimize") results with complete reverse search #2449
-- Add updater for urbaninfrastructure city bikes #2448
+- Update URL in BANO geocoding module. [#2438](https://github.com/opentripplanner/OpenTripPlanner/issues/2438) / [#2439](https://github.com/opentripplanner/OpenTripPlanner/issues/2439)
+- Add more debug information related to trips matching using GTFS-RT feed. [#2432](https://github.com/opentripplanner/OpenTripPlanner/issues/2432)
+- Update default PATH_NOT_FOUND message to new wording developed w/ TriMet. [#2355](https://github.com/opentripplanner/OpenTripPlanner/issues/2355)
+- Update Travis build configuration to not attempt GPG operations. [#2441](https://github.com/opentripplanner/OpenTripPlanner/issues/2441)
+- Fix javadoc URL in scripting documentation. [#2437](https://github.com/opentripplanner/OpenTripPlanner/issues/2437)
+- Automatically link to GitHub issues in Changelog. [#2426](https://github.com/opentripplanner/OpenTripPlanner/issues/2426)
+- Expose FeedInfo objects in the Index API [#2456](https://github.com/opentripplanner/OpenTripPlanner/issues/2456)
+- Changes to Puget Sound region fare calculation [#2484](https://github.com/opentripplanner/OpenTripPlanner/issues/2484)
+- Fix coordinatates when clustering by parent station [#2447](https://github.com/opentripplanner/OpenTripPlanner/issues/2447)
+- Allow setting OSM Way Properties from build-config.json [#2389](https://github.com/opentripplanner/OpenTripPlanner/issues/2389)
+- Optionally compact ("reverse-optimize") results with complete reverse search [#2449](https://github.com/opentripplanner/OpenTripPlanner/issues/2449)
+- Add updater for urbaninfrastructure city bikes [#2448](https://github.com/opentripplanner/OpenTripPlanner/issues/2448)
 - Miscellaneous documentation updates
 
 ## 1.1 (2017-03-16)

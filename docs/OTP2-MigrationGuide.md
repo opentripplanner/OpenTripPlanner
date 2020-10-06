@@ -26,20 +26,21 @@ you want into a single instance of OTP2.
 ## Build config
 
 These properties changed names from:
+
  - `htmlAnnotations` to `dataImportReport`
  - `maxHtmlAnnotationsPerFile` to `maxDataImportIssuesPerFile`
  - `boardTimes` to `routingDefaults.boardSlackByMode`
  - `alightTimes` to `routingDefaults.alightSlackByMode`
  
 These parameters is no longer supported:
+
  - `stopClusterMode` - TODO OTP2 Why? Old options: `proximity`, `parentStation`
 
  
- 
- ## Router config
- 
+## Router config
+
  - All updaters that require data sources now require you to specify a `sourceType`, even if that
- particular updater only has one possible data source.
+   particular updater only has one possible data source.
  
    
 ## REST API
@@ -50,8 +51,8 @@ Support for XML as a request/response format is removed. The only supported form
 
 #### Query parameter changes
 
-A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/routing/core/RoutingRequest.java) 
- and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/tree/dev-2.x/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
+A lot of the query parameters in the REST API are ignored/deprecated, see the [RoutingRequest](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/routing/api/request/RoutingRequest.java) 
+ and the [RoutingResource](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/src/main/java/org/opentripplanner/api/common/RoutingResource.java)
  class for documentation on what is currently supported - we are adding features one by one. The 
  plan is to go over the API documentation before the release - we do not prioritize keeping 
  the documentation up to date, except for this migration guide document.
