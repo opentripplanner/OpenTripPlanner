@@ -389,7 +389,7 @@ public class TimetableSnapshot {
      * Add the patterns to the stop index, only if they come from a modified pattern
      */
     private void addPatternToIndex(TripPattern tripPattern) {
-        if (tripPattern.getOriginalTripPattern() != null) {
+        if (tripPattern.isCreatedByRealtimeUpdater()) {
             for (Stop stop: tripPattern.getStops()) {
                 patternsForStop.put(stop, tripPattern);
             }

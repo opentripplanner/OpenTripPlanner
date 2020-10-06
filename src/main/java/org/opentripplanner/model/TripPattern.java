@@ -108,6 +108,11 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
     private TripPattern originalTripPattern = null;
 
     /**
+     * Has the TripPattern been created by a real-time update.
+     */
+    private boolean createdByRealtimeUpdater = false;
+
+    /**
      * The unique identifier for this trip pattern. For GTFS feeds this is generally
      * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
      * NeTEx the JourneyPattern id is used.
@@ -349,6 +354,14 @@ public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneabl
 
     public void setOriginalTripPattern(TripPattern originalTripPattern) {
         this.originalTripPattern = originalTripPattern;
+    }
+
+    boolean isCreatedByRealtimeUpdater() {
+        return createdByRealtimeUpdater;
+    }
+
+    public void setCreatedByRealtimeUpdater() {
+        createdByRealtimeUpdater = true;
     }
 
     private static String stopNameAndId (Stop stop) {

@@ -57,6 +57,8 @@ public class TripPatternCache {
 
             TripPattern originalTripPattern = graph.index.getPatternForTrip().get(trip);
 
+            tripPattern.setCreatedByRealtimeUpdater();
+
             // Copy information from the TripPattern this is replacing
             if (originalTripPattern != null) {
                 tripPattern.setOriginalTripPattern(originalTripPattern);
