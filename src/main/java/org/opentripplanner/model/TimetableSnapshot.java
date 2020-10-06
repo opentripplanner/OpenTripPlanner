@@ -120,6 +120,8 @@ public class TimetableSnapshot {
      * stop. This has to be kept in order for them to be included in the stop times api call on a
      * specific stop.
      *
+     * This is a SetMultimap, so that each pattern can only be added once.
+     *
      * TODO Find a generic way to keep all realtime indexes.
      */
     private SetMultimap<Stop, TripPattern> patternsForStop = HashMultimap.create();

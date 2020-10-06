@@ -264,7 +264,7 @@ public class Timetable implements Serializable {
             int numStops = newTimes.getNumStops();
             Integer delay = null;
 
-            long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
+            final long today = updateServiceDate.getAsDate(timeZone).getTime() / 1000;
 
             for (int i = 0; i < numStops; i++) {
                 boolean match = false;

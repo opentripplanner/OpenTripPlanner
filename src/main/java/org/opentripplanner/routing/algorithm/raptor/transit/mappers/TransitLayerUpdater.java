@@ -104,6 +104,9 @@ public class TransitLayerUpdater {
         );
         if (tripPatternForDate != null) {
           patternsForDateMap.put(timetable.pattern, tripPatternForDate);
+        } else {
+          // This has been completely cancelled, or otherwise doesn't map cleanly
+          patternsForDateMap.remove(timetable.pattern);
         }
       }
 
