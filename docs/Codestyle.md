@@ -8,7 +8,7 @@ few modifications. Here is the original Google style guide:
 https://google.github.io/styleguide/javaguide.html
 
 ### IntellJ Code Style formatter 
-If you use IntelliJ, import the provided [intellij-code-style.xml](../intellij-code-style.xml). 
+If you use IntelliJ, import the provided [intellij-code-style.xml](https://github.com/opentripplanner/OpenTripPlanner/blob/2.0-rc/intellij-code-style.xml). 
 Open the `Preferences` from the menu and select _Editor > Code Style_. Then import the code-style
 xml document. Configure _Scheme_ using  _Import Scheme > IntelliJ IDEA code style XML_.
 
@@ -193,7 +193,7 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
   * Include the namespace definition in each and every file: `otp.namespace("otp.configure");`
   * Include a class comment. For example,                                                                                                      
   
-  ```javascript
+```javascript
 /**
  * Configure Class
  *
@@ -205,7 +205,7 @@ As of #206, we follow [Crockford's JavaScript code conventions](http://javascrip
  *
  * @class
  */
-  ```
+```
   
 *Note: There is still a lot of code following other style conventions, but please adhere to 
 consistent style when you write new code, and help clean up and reformat code as you refactor.*
