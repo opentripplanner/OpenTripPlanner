@@ -40,7 +40,7 @@ config:
     elevationProfileComponent: org.opentripplanner.common.model.P2#P2<Double>
     fare: java.util.Map#Map<String, Object>
     fareComponent: org.opentripplanner.routing.core.FareComponent#FareComponent
-    Feed: org.opentripplanner.model.FeedInfo#FeedInfo
+    Feed: String
     Geometry: org.opentripplanner.util.model.EncodedPolylineBean#EncodedPolylineBean
     Itinerary: org.opentripplanner.model.plan.Itinerary#Itinerary
     Leg: org.opentripplanner.model.plan.Leg#Leg

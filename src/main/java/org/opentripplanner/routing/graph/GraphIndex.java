@@ -12,7 +12,6 @@ import org.opentripplanner.common.geometry.CompactElevationProfile;
 import org.opentripplanner.common.geometry.HashGridSpatialIndex;
 import org.opentripplanner.ext.flex.FlexIndex;
 import org.opentripplanner.model.Agency;
-import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Operator;
@@ -43,7 +42,6 @@ public class GraphIndex {
     // TODO: consistently key on model object or id string
     private final Map<FeedScopedId, Agency> agencyForId = Maps.newHashMap();
     private final Map<FeedScopedId, Operator> operatorForId = Maps.newHashMap();
-    private final Map<String, FeedInfo> feedInfoForId = Maps.newHashMap();
     private final Map<FeedScopedId, Stop> stopForId = Maps.newHashMap();
     private final Map<FeedScopedId, Trip> tripForId = Maps.newHashMap();
     private final Map<FeedScopedId, Route> routeForId = Maps.newHashMap();
@@ -214,10 +212,6 @@ public class GraphIndex {
 
     public Map<FeedScopedId, Operator> getOperatorForId() {
         return operatorForId;
-    }
-
-    public Map<String, FeedInfo> getFeedInfoForId() {
-        return feedInfoForId;
     }
 
     public Collection<Stop> getAllStops() {
