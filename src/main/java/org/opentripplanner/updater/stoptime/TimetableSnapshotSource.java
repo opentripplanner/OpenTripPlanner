@@ -922,9 +922,11 @@ public class TimetableSnapshotSource implements TimetableSnapshotProvider {
 
     private boolean purgeExpiredData() {
         final ServiceDate today = new ServiceDate();
+        // TODO: Base this on numberOfDaysOfLongestTrip for tripPatterns
         final ServiceDate previously = today.previous().previous(); // Just to be safe...
 
-        if(lastPurgeDate != null && lastPurgeDate.compareTo(previously) > 0) {
+        // Purge data only if we have changed date
+        if(lastPurgeDate != null && lastPurgeDate.compareTo(previously) >= 0) {
             return false;
         }
 
