@@ -478,7 +478,8 @@ public class LegacyGraphQLTypes {
     Have("HAVE"),
     Park("PARK"),
     Keep("KEEP"),
-    Pickup("PICKUP");
+    Pickup("PICKUP"),
+    Dropoff("DROPOFF");
     
     public final String label;
      
