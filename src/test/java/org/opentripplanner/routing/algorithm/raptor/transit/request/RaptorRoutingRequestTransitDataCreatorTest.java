@@ -19,6 +19,10 @@ import static org.junit.Assert.assertEquals;
 
 public class RaptorRoutingRequestTransitDataCreatorTest {
 
+    public static final FeedScopedId TP_ID_1 = new FeedScopedId("F","1");
+    public static final FeedScopedId TP_ID_2 = new FeedScopedId("F","2");
+    public static final FeedScopedId TP_ID_3 = new FeedScopedId("F","3");
+
     @Test
     public void testMergeTripPatterns() {
         TripTimes[] times = new TripTimes[] { null };
@@ -30,9 +34,9 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
         ZonedDateTime startOfTime = DateMapper.asStartOfService(second, ZoneId.of("Europe/London"));
 
         // Total available trip patterns
-        TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(new FeedScopedId("", "1"),null, null);
-        TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(new FeedScopedId("", "2"),null, null);
-        TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(new FeedScopedId("", "3"),null, null);
+        TripPatternWithRaptorStopIndexes tripPattern1 = new TripPatternWithId(TP_ID_1,null, null);
+        TripPatternWithRaptorStopIndexes tripPattern2 = new TripPatternWithId(TP_ID_2,null, null);
+        TripPatternWithRaptorStopIndexes tripPattern3 = new TripPatternWithId(TP_ID_3,null, null);
 
         List<Map<FeedScopedId, TripPatternForDate>> tripPatternsForDates = new ArrayList<>();
 
@@ -60,15 +64,28 @@ public class RaptorRoutingRequestTransitDataCreatorTest {
             startOfTime, tripPatternsForDates
         );
 
+        // Get the results
+        var r1 = findTripPatternForDate(TP_ID_1, combinedTripPatterns);
+        var r2 = findTripPatternForDate(TP_ID_2, combinedTripPatterns);
+        var r3 = findTripPatternForDate(TP_ID_3, combinedTripPatterns);
+
+
         // Check the number of trip schedules available for each pattern after combining dates in the search range
-        assertEquals(2, combinedTripPatterns.get(0).numberOfTripSchedules());
-        assertEquals(2, combinedTripPatterns.get(1).numberOfTripSchedules());
-        assertEquals(3, combinedTripPatterns.get(2).numberOfTripSchedules());
+        assertEquals(2, r1.numberOfTripSchedules());
+        assertEquals(2, r2.numberOfTripSchedules());
+        assertEquals(3, r3.numberOfTripSchedules());
 
         // Verify that the per-day offsets were calculated correctly
         //   DST - Clocks go forward on March 31st
-        assertEquals(-82800, ((TripScheduleWithOffset) combinedTripPatterns.get(2).getTripSchedule(0)).getSecondsOffset());
-        assertEquals(0, ((TripScheduleWithOffset) combinedTripPatterns.get(2).getTripSchedule(1)).getSecondsOffset());
-        assertEquals(86400, ((TripScheduleWithOffset) combinedTripPatterns.get(2).getTripSchedule(2)).getSecondsOffset());
+        assertEquals(-82800, ((TripScheduleWithOffset) r3.getTripSchedule(0)).getSecondsOffset());
+        assertEquals(0, ((TripScheduleWithOffset) r3.getTripSchedule(1)).getSecondsOffset());
+        assertEquals(86400, ((TripScheduleWithOffset) r3.getTripSchedule(2)).getSecondsOffset());
+    }
+
+    private static TripPatternForDates findTripPatternForDate(FeedScopedId patternId, List<TripPatternForDates> list) {
+        return list.stream()
+            .filter(p -> patternId.equals(p.getTripPattern().getId()))
+            .findFirst()
+            .orElseThrow();
     }
 }

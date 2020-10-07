@@ -92,7 +92,7 @@ public class OtpTransitServiceBuilderTest {
         builder.getCalendarDates().add(createAServiceCalendarDateExclution(SERVICE_WEEKDAYS_ID));
         builder.getFareAttributes().add(createFareAttribute(agency));
         builder.getFareRules().add(new FareRule());
-        builder.getFeedInfos().add(new FeedInfo());
+        builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
         return builder;
     }

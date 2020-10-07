@@ -8,12 +8,13 @@ import org.opentripplanner.model.BoardingArea;
 import org.opentripplanner.model.Entrance;
 import org.opentripplanner.model.FareAttribute;
 import org.opentripplanner.model.FareRule;
+import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.FeedInfo;
 import org.opentripplanner.model.FeedScopedId;
+import org.opentripplanner.model.FlexLocationGroup;
+import org.opentripplanner.model.FlexStopLocation;
 import org.opentripplanner.model.Frequency;
 import org.opentripplanner.model.GroupOfStations;
-import org.opentripplanner.model.FlexStopLocation;
-import org.opentripplanner.model.FlexLocationGroup;
 import org.opentripplanner.model.MultiModalStation;
 import org.opentripplanner.model.Notice;
 import org.opentripplanner.model.Operator;
@@ -25,7 +26,6 @@ import org.opentripplanner.model.ShapePoint;
 import org.opentripplanner.model.Station;
 import org.opentripplanner.model.Stop;
 import org.opentripplanner.model.StopPattern;
-import org.opentripplanner.model.FareZone;
 import org.opentripplanner.model.Transfer;
 import org.opentripplanner.model.TransitEntity;
 import org.opentripplanner.model.Trip;
@@ -44,8 +44,6 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-
-import static org.opentripplanner.model.impl.GenerateMissingIds.generateNoneExistentIds;
 
 /**
  * This class is responsible for building a {@link OtpTransitService}. The instance returned by the
@@ -248,7 +246,6 @@ public class OtpTransitServiceBuilder {
     }
 
     public OtpTransitService build() {
-        generateNoneExistentIds(feedInfos);
         return new OtpTransitServiceImpl(this);
     }
 

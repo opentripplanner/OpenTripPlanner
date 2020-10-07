@@ -65,13 +65,13 @@ public class NetexMapper {
 
     public NetexMapper(
             OtpTransitServiceBuilder transitBuilder,
-            String agencyId,
+            String feedId,
             Deduplicator deduplicator,
             DataImportIssueStore issueStore
     ) {
         this.transitBuilder = transitBuilder;
         this.deduplicator = deduplicator;
-        this.idFactory = new FeedScopedIdFactory(agencyId);
+        this.idFactory = new FeedScopedIdFactory(feedId);
         this.issueStore = issueStore;
     }
 

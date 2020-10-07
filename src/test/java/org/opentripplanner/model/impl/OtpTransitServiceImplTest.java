@@ -49,7 +49,7 @@ public class OtpTransitServiceImplTest {
         FareRule rule = createFareRule();
         builder.getFareAttributes().add(rule.getFare());
         builder.getFareRules().add(rule);
-        builder.getFeedInfos().add(new FeedInfo());
+        builder.getFeedInfos().add(FeedInfo.dummyForTest(FEED_ID));
 
         subject = builder.build();
     }
@@ -88,7 +88,7 @@ public class OtpTransitServiceImplTest {
         Collection<FeedInfo> feedInfos = subject.getAllFeedInfos();
 
         assertEquals(1, feedInfos.size());
-        assertEquals("<FeedInfo 1>", first(feedInfos).toString());
+        assertEquals("<FeedInfo Z>", first(feedInfos).toString());
     }
 
     @Test
