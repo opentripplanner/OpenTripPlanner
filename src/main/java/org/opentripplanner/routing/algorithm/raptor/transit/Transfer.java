@@ -22,6 +22,7 @@ public class Transfer {
 
     public List<Coordinate> getCoordinates() {
         List<Coordinate> coordinates = new ArrayList<>();
+        if (edges == null) return coordinates;
         for (Edge edge : edges) {
             if (edge.getGeometry() != null) {
                 coordinates.addAll((Arrays.asList(edge.getGeometry().getCoordinates())));
@@ -45,7 +46,7 @@ public class Transfer {
     }
 
     public int getDistanceMeters() {
-        return (int)edges.stream().mapToDouble(Edge::getDistanceMeters).sum();
+        return edges != null ? (int)edges.stream().mapToDouble(Edge::getDistanceMeters).sum() : 0;
     }
 
     public List<Edge> getEdges() {
