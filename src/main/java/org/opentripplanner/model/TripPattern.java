@@ -41,7 +41,7 @@ import java.util.function.Predicate;
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
  */
-public class TripPattern extends TransitEntity<FeedScopedId> implements Cloneable, Serializable {
+public class TripPattern extends TransitEntity implements Cloneable, Serializable {
 
     private static final Logger LOG = LoggerFactory.getLogger(TripPattern.class);
 

@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Pathway extends TransitEntity<FeedScopedId> {
+public final class Pathway extends TransitEntity {
 
     private static final long serialVersionUID = -2404871423254094109L;
 

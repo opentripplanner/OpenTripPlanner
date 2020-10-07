@@ -46,7 +46,7 @@ public class NoticeAssignmentMapperTest {
         Route route = new Route();
         route.setId(MappingSupport.ID_FACTORY.createId(ROUTE_ID));
 
-        EntityById<FeedScopedId, Route> routesById = new EntityById<>();
+        EntityById<Route> routesById = new EntityById<>();
         routesById.add(route);
 
         NoticeAssignmentMapper noticeAssignmentMapper = new NoticeAssignmentMapper(
@@ -58,7 +58,7 @@ public class NoticeAssignmentMapperTest {
                 new HashMap<>()
         );
 
-        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement =
+        Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement =
                 noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2 = noticesByElement.get(route).iterator().next();
@@ -106,7 +106,7 @@ public class NoticeAssignmentMapperTest {
                 stopTimesById
         );
 
-        Multimap<TransitEntity<?>, org.opentripplanner.model.Notice> noticesByElement
+        Multimap<TransitEntity, org.opentripplanner.model.Notice> noticesByElement
                 = noticeAssignmentMapper.map(noticeAssignment);
 
         org.opentripplanner.model.Notice notice2a = noticesByElement.get(stopTime1.getId())

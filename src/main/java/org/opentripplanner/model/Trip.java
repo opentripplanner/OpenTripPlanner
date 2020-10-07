@@ -1,7 +1,7 @@
 /* This file is based on code copied from project OneBusAway, see the LICENSE file for further information. */
 package org.opentripplanner.model;
 
-public final class Trip extends TransitEntity<FeedScopedId> {
+public final class Trip extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
 

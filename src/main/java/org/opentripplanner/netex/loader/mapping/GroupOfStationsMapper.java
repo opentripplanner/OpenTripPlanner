@@ -21,15 +21,15 @@ class GroupOfStationsMapper {
 
     private final FeedScopedIdFactory idFactory;
 
-    private final EntityById<FeedScopedId, MultiModalStation> multiModalStations;
+    private final EntityById<MultiModalStation> multiModalStations;
 
-    private final EntityById<FeedScopedId, Station> stations;
+    private final EntityById<Station> stations;
 
 
     GroupOfStationsMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, MultiModalStation> multiModalStations,
-            EntityById<FeedScopedId, Station> stations
+            EntityById<MultiModalStation> multiModalStations,
+            EntityById<Station> stations
     ) {
         this.idFactory = idFactory;
         this.multiModalStations = multiModalStations;

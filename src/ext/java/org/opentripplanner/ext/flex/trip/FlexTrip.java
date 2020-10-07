@@ -18,7 +18,7 @@ import java.util.stream.Stream;
  * subclasses encapsulates the different business logic, which the different types of services
  * adhere to.
  */
-public abstract class FlexTrip extends TransitEntity<FeedScopedId> {
+public abstract class FlexTrip extends TransitEntity {
 
   protected final Trip trip;
 

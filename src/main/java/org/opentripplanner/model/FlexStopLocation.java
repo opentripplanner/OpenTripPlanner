@@ -8,7 +8,7 @@ import org.locationtech.jts.geom.Point;
  * GTFS bundle.
  */
 
-public class FlexStopLocation extends TransitEntity<FeedScopedId> implements StopLocation {
+public class FlexStopLocation extends TransitEntity implements StopLocation {
   private static final long serialVersionUID = 1L;
 
   private FeedScopedId id;

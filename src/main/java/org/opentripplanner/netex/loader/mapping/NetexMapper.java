@@ -240,7 +240,7 @@ public class NetexMapper {
                 stopTimesByNetexId
         );
         for (NoticeAssignment noticeAssignment : netexIndex.getNoticeAssignmentById().localValues()) {
-            Multimap<TransitEntity<?>, Notice> noticesByElementId;
+            Multimap<TransitEntity, Notice> noticesByElementId;
             noticesByElementId = noticeAssignmentMapper.map(noticeAssignment);
             transitBuilder.getNoticeAssignments().putAll(noticesByElementId);
         }

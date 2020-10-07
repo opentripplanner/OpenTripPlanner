@@ -5,7 +5,7 @@ package org.opentripplanner.model;
 /**
  * This class is tha same as a GTFS Agency and Netex Authority.
  */
-public final class Agency extends TransitEntity<FeedScopedId> {
+public final class Agency extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
 

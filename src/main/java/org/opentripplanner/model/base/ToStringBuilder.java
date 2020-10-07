@@ -87,7 +87,7 @@ public class ToStringBuilder {
         return addIfNotNull(name, obj);
     }
 
-    public ToStringBuilder addEntityId(String name, TransitEntity<?> entity) {
+    public ToStringBuilder addEntityId(String name, TransitEntity entity) {
         return addIfNotNull(name, entity, e -> e.getId().toString());
     }
 

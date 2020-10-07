@@ -5,7 +5,7 @@ package org.opentripplanner.model;
  * of the fileds are shared between the types, and eg. in pathways the namespace any of them can be
  * used as from and to.
  */
-public abstract class StationElement extends TransitEntity<FeedScopedId> {
+public abstract class StationElement extends TransitEntity {
 
   protected final FeedScopedId id;
 

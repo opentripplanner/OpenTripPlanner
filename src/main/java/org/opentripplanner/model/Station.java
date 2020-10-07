@@ -10,7 +10,7 @@ import java.util.TimeZone;
  * bus terminal, or a bus station (with a bus stop at each side of the road). Equivalent to GTFS
  * stop location type 1 or NeTEx monomodal StopPlace.
  */
-public class Station extends TransitEntity<FeedScopedId> implements StopCollection {
+public class Station extends TransitEntity implements StopCollection {
 
   private static final long serialVersionUID = 1L;
   public static final TransferPriority DEFAULT_COST_PRIORITY = TransferPriority.ALLOWED;

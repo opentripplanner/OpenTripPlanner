@@ -6,7 +6,7 @@ package org.opentripplanner.model;
  * the {@link org.opentripplanner.routing.trippattern.TripTimes}, but we use this class to map other entities
  * (NoticeAssignment) to StopTimes to be able to decorate itineraries with such data.
  */
-public class StopTimeKey extends TransitEntity<FeedScopedId> {
+public class StopTimeKey extends TransitEntity {
 
     private final FeedScopedId id;
 

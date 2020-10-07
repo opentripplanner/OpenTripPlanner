@@ -5,7 +5,7 @@ import org.opentripplanner.model.*;
 import java.util.Collection;
 import java.util.TimeZone;
 
-public class MonoOrMultiModalStation extends TransitEntity<FeedScopedId> {
+public class MonoOrMultiModalStation extends TransitEntity {
 
   private final FeedScopedId id;
 

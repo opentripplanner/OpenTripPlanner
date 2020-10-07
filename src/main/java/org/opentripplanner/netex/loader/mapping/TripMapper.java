@@ -24,14 +24,14 @@ class TripMapper {
     private static final Logger LOG = LoggerFactory.getLogger(TripMapper.class);
 
     private final FeedScopedIdFactory idFactory;
-    private EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
+    private EntityById<org.opentripplanner.model.Route> otpRouteById;
     private ReadOnlyHierarchicalMap<String, Route> routeById;
     private ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById;
   private final Set<FeedScopedId> shapePointIds;
 
     TripMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            EntityById<org.opentripplanner.model.Route> otpRouteById,
             ReadOnlyHierarchicalMap<String, Route> routeById,
       ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternsById,
       Set<FeedScopedId> shapePointIds

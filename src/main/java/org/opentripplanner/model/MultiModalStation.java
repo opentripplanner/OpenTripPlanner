@@ -12,7 +12,7 @@ import java.util.stream.Collectors;
  * several Stations together using a MultiModalStation in order to support several modes. This
  * entity is not part of GTFS.
  */
-public class MultiModalStation extends TransitEntity<FeedScopedId> implements StopCollection {
+public class MultiModalStation extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
     private final FeedScopedId id;

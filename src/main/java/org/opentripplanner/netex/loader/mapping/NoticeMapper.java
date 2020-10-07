@@ -13,9 +13,9 @@ import org.opentripplanner.model.impl.EntityById;
  */
 class NoticeMapper {
 
-    private FeedScopedIdFactory idFactory;
+    private final FeedScopedIdFactory idFactory;
 
-    private EntityById<FeedScopedId, Notice> cache = new EntityById<>();
+    private final EntityById<Notice> cache = new EntityById<>();
 
     NoticeMapper(FeedScopedIdFactory idFactory) {
         this.idFactory = idFactory;

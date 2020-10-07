@@ -40,7 +40,7 @@ class TripPatternMapper {
 
     private final FeedScopedIdFactory idFactory;
 
-    private final EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById;
+    private final EntityById<org.opentripplanner.model.Route> otpRouteById;
 
     private final ReadOnlyHierarchicalMap<String, Route> routeById;
 
@@ -56,8 +56,8 @@ class TripPatternMapper {
 
     TripPatternMapper(
             FeedScopedIdFactory idFactory,
-            EntityById<FeedScopedId, Stop> stopsById,
-            EntityById<FeedScopedId, org.opentripplanner.model.Route> otpRouteById,
+            EntityById<Stop> stopsById,
+            EntityById<org.opentripplanner.model.Route> otpRouteById,
             Set<FeedScopedId> shapePointsIds,
             ReadOnlyHierarchicalMap<String, Route> routeById,
             ReadOnlyHierarchicalMap<String, JourneyPattern> journeyPatternById,

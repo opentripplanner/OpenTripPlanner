@@ -10,7 +10,7 @@ import java.util.stream.Collectors;
  * several StopPlaces into a hub. It can be a grouping of major stops within a city or a cluster
  * of stops that naturally belong together.
  */
-public class GroupOfStations extends TransitEntity<FeedScopedId> implements StopCollection {
+public class GroupOfStations extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
     private FeedScopedId id;

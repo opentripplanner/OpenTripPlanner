@@ -1,6 +1,6 @@
 package org.opentripplanner.model;
 
-public class FareZone extends TransitEntity<FeedScopedId> {
+public class FareZone extends TransitEntity {
 
   private final FeedScopedId id;
 

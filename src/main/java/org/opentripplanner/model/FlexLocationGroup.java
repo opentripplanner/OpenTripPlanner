@@ -12,7 +12,7 @@ import java.util.Set;
 /**
  * A group of stopLocations, which can share a common Stoptime
  */
-public class FlexLocationGroup extends TransitEntity<FeedScopedId> implements StopLocation {
+public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private static final long serialVersionUID = 1L;
 

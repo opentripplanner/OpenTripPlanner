@@ -53,7 +53,7 @@ import java.util.Set;
 public class OtpTransitServiceBuilder {
     private static final Logger LOG = LoggerFactory.getLogger(OtpTransitServiceBuilder.class);
 
-    private final EntityById<FeedScopedId, Agency> agenciesById = new EntityById<>();
+    private final EntityById<Agency> agenciesById = new EntityById<>();
 
     private final List<ServiceCalendarDate> calendarDates = new ArrayList<>();
 
@@ -67,52 +67,52 @@ public class OtpTransitServiceBuilder {
 
     private final List<Frequency> frequencies = new ArrayList<>();
 
-    private final EntityById<FeedScopedId, GroupOfStations> groupsOfStationsById = new EntityById<>();
+    private final EntityById<GroupOfStations> groupsOfStationsById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, MultiModalStation> multiModalStationsById = new EntityById<>();
+    private final EntityById<MultiModalStation> multiModalStationsById = new EntityById<>();
 
-    private final Multimap<TransitEntity<?>, Notice> noticeAssignments = ArrayListMultimap.create();
+    private final Multimap<TransitEntity, Notice> noticeAssignments = ArrayListMultimap.create();
 
-    private final EntityById<FeedScopedId, Operator> operatorsById = new EntityById<>();
+    private final EntityById<Operator> operatorsById = new EntityById<>();
 
     private final List<Pathway> pathways = new ArrayList<>();
 
-    private final EntityById<FeedScopedId, Route> routesById = new EntityById<>();
+    private final EntityById<Route> routesById = new EntityById<>();
 
     private final Multimap<FeedScopedId, ShapePoint> shapePoints = ArrayListMultimap.create();
 
-    private final EntityById<FeedScopedId, Station> stationsById = new EntityById<>();
+    private final EntityById<Station> stationsById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, Stop> stopsById = new EntityById<>();
+    private final EntityById<Stop> stopsById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, Entrance> entrancesById = new EntityById<>();
+    private final EntityById<Entrance> entrancesById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, PathwayNode> pathwayNodesById = new EntityById<>();
+    private final EntityById<PathwayNode> pathwayNodesById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, BoardingArea> boardingAreasById = new EntityById<>();
+    private final EntityById<BoardingArea> boardingAreasById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, FlexStopLocation> locationsById = new EntityById<>();
+    private final EntityById<FlexStopLocation> locationsById = new EntityById<>();
 
-    private final EntityById<FeedScopedId, FlexLocationGroup> locationGroupsById = new EntityById<>();
+    private final EntityById<FlexLocationGroup> locationGroupsById = new EntityById<>();
 
     private final TripStopTimes stopTimesByTrip = new TripStopTimes();
 
-    private final EntityById<FeedScopedId, FareZone> fareZonesById = new EntityById<>();
+    private final EntityById<FareZone> fareZonesById = new EntityById<>();
 
     private final List<Transfer> transfers = new ArrayList<>();
 
-    private final EntityById<FeedScopedId, Trip> tripsById = new EntityById<>();
+    private final EntityById<Trip> tripsById = new EntityById<>();
 
     private final Multimap<StopPattern, TripPattern> tripPatterns = ArrayListMultimap.create();
 
-    private final EntityById<FeedScopedId, FlexTrip> flexTripsById = new EntityById<>();
+    private final EntityById<FlexTrip> flexTripsById = new EntityById<>();
 
     public OtpTransitServiceBuilder() {
     }
 
     /* Accessors */
 
-    public EntityById<FeedScopedId, Agency> getAgenciesById() {
+    public EntityById<Agency> getAgenciesById() {
         return agenciesById;
     }
 
@@ -140,11 +140,11 @@ public class OtpTransitServiceBuilder {
         return frequencies;
     }
 
-    public EntityById<FeedScopedId, GroupOfStations> getGroupsOfStationsById() {
+    public EntityById<GroupOfStations> getGroupsOfStationsById() {
         return groupsOfStationsById;
     }
 
-    public EntityById<FeedScopedId, MultiModalStation> getMultiModalStationsById() {
+    public EntityById<MultiModalStation> getMultiModalStationsById() {
         return multiModalStationsById;
     }
 
@@ -152,11 +152,11 @@ public class OtpTransitServiceBuilder {
      * get multimap of Notices by the TransitEntity id (Multiple types; hence the Serializable). Entities
      * that might have Notices are Routes, Trips, Stops and StopTimes.
      */
-    public Multimap<TransitEntity<?>, Notice> getNoticeAssignments() {
+    public Multimap<TransitEntity, Notice> getNoticeAssignments() {
         return noticeAssignments;
     }
 
-    public EntityById<FeedScopedId, Operator> getOperatorsById() {
+    public EntityById<Operator> getOperatorsById() {
         return operatorsById;
     }
 
@@ -164,7 +164,7 @@ public class OtpTransitServiceBuilder {
         return pathways;
     }
 
-    public EntityById<FeedScopedId, Route> getRoutes() {
+    public EntityById<Route> getRoutes() {
         return routesById;
     }
 
@@ -172,31 +172,31 @@ public class OtpTransitServiceBuilder {
         return shapePoints;
     }
 
-    public EntityById<FeedScopedId, Station> getStations() {
+    public EntityById<Station> getStations() {
         return stationsById;
     }
 
-    public EntityById<FeedScopedId, Stop> getStops() {
+    public EntityById<Stop> getStops() {
         return stopsById;
     }
 
-    public EntityById<FeedScopedId, Entrance> getEntrances() {
+    public EntityById<Entrance> getEntrances() {
         return entrancesById;
     }
 
-    public EntityById<FeedScopedId, PathwayNode> getPathwayNodes() {
+    public EntityById<PathwayNode> getPathwayNodes() {
         return pathwayNodesById;
     }
 
-    public EntityById<FeedScopedId, BoardingArea> getBoardingAreas() {
+    public EntityById<BoardingArea> getBoardingAreas() {
         return boardingAreasById;
     }
 
-    public EntityById<FeedScopedId, FlexStopLocation> getLocations() {
+    public EntityById<FlexStopLocation> getLocations() {
         return locationsById;
     }
 
-    public EntityById<FeedScopedId, FlexLocationGroup> getLocationGroups() {
+    public EntityById<FlexLocationGroup> getLocationGroups() {
         return locationGroupsById;
     }
 
@@ -204,13 +204,13 @@ public class OtpTransitServiceBuilder {
         return stopTimesByTrip;
     }
 
-    public EntityById<FeedScopedId, FareZone> getFareZonesById() { return fareZonesById; }
+    public EntityById<FareZone> getFareZonesById() { return fareZonesById; }
 
     public List<Transfer> getTransfers() {
         return transfers;
     }
 
-    public EntityById<FeedScopedId, Trip> getTripsById() {
+    public EntityById<Trip> getTripsById() {
         return tripsById;
     }
 
@@ -218,7 +218,7 @@ public class OtpTransitServiceBuilder {
         return tripPatterns;
     }
 
-    public EntityById<FeedScopedId, FlexTrip> getFlexTripsById() {
+    public EntityById<FlexTrip> getFlexTripsById() {
         return flexTripsById;
     }
 

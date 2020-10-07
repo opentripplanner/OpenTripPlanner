@@ -8,7 +8,7 @@ package org.opentripplanner.model;
  *
  * @see Agency
  */
-public class Operator extends TransitEntity<FeedScopedId> {
+public class Operator extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
 

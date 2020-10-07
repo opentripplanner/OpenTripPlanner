@@ -14,7 +14,6 @@ import org.opentripplanner.model.calendar.ServiceCalendar;
 import org.opentripplanner.model.calendar.ServiceCalendarDate;
 import org.opentripplanner.model.calendar.ServiceDate;
 import org.opentripplanner.model.calendar.ServiceDateInterval;
-import org.opentripplanner.routing.core.TraverseMode;
 import org.opentripplanner.routing.trippattern.Deduplicator;
 import org.opentripplanner.routing.trippattern.TripTimes;
 
@@ -137,7 +136,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(dates.toString(), SERVICE_D_IN, dates.get(0).getServiceId());
 
         // Verify trips
-        EntityById<FeedScopedId, Trip> trips = subject.getTripsById();
+        EntityById<Trip> trips = subject.getTripsById();
         assertEquals(trips.toString(), 2, trips.size());
         assertTrue(trips.toString(), trips.containsKey(tripCSIn.getId()));
         assertTrue(trips.toString(), trips.containsKey(tripCSDIn.getId()));
