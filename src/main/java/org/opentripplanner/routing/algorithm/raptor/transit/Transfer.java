@@ -46,7 +46,9 @@ public class Transfer {
     }
 
     public int getDistanceMeters() {
-        return edges != null ? (int)edges.stream().mapToDouble(Edge::getDistanceMeters).sum() : 0;
+        return edges != null
+            ? (int) edges.stream().mapToDouble(Edge::getDistanceMeters).sum()
+            : effectiveWalkDistanceMeters;
     }
 
     public List<Edge> getEdges() {
