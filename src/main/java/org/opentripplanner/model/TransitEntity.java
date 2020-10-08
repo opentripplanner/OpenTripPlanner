@@ -37,7 +37,7 @@ public abstract class TransitEntity implements Serializable {
      * example after reloading a serialized instance.
      */
     @Override
-    final public boolean equals(Object obj) {
+    public final boolean equals(Object obj) {
         if (obj == null || getClass() != obj.getClass()) {
             return false;
         }

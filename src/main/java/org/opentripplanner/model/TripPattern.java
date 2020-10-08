@@ -134,8 +134,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
         setStopsFromStopPattern(stopPattern);
     }
 
-    public void setId(FeedScopedId id) { throw new IllegalArgumentException(); }
-
     /**
      * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
      */
@@ -566,26 +564,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             .allMatch(t -> t != null && seen.add(t));
     }
 
-    /**
-     * Patterns do not have unique IDs in GTFS, so we make some by concatenating agency id, route id, the direction and
-     * an integer.
-     * This only works if the Collection of TripPattern includes every TripPattern for the agency.
-     */
-    public static void generateUniqueIds(Collection<TripPattern> tripPatterns) {
-        Multimap<String, TripPattern> patternsForRoute = ArrayListMultimap.create();
-        for (TripPattern pattern : tripPatterns) {
-            FeedScopedId routeId = pattern.route.getId();
-            String direction = pattern.directionId != -1 ? String.valueOf(pattern.directionId) : "";
-            patternsForRoute.put(routeId.getId() + ":" + direction, pattern);
-            int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
-            // OBA library uses underscore as separator, we're moving toward colon.
-            String id = String.format("%s:%s:%02d", routeId.getId(), direction, count);
-
-            // TODO OTP2 - This setter will be removed in the next commit
-            pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
-        }
-    }
-
     public String toString () {
         return String.format("<TripPattern %s>", this.getId());
     }
@@ -665,5 +643,4 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     private static Coordinate coordinate(Stop s) {
         return new Coordinate(s.getLon(), s.getLat());
     }
-
 }

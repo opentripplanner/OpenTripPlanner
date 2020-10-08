@@ -86,10 +86,18 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
      */
     private final ReentrantLock bufferLock = new ReentrantLock(true);
 
+
+    /**
+     * Use a id generator to generate TripPattern ids for new TripPatterns created by RealTime
+     * updates.
+     */
+    private final SiriTripPatternIdGenerator tripPatternIdGenerator = new SiriTripPatternIdGenerator();
+
     /**
      * A synchronized cache of trip patterns that are added to the graph due to GTFS-realtime messages.
      */
-    private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache();
+    private final SiriTripPatternCache tripPatternCache = new SiriTripPatternCache(tripPatternIdGenerator);
+
 
     /** Should expired realtime data be purged from the graph. */
     public boolean purgeExpiredData = true;
@@ -559,8 +567,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
 
         StopPattern stopPattern = new StopPattern(aimedStopTimes);
 
-        // TODO OTP2 - This will fail hard, but it will be fixed in the next commit.
-        TripPattern pattern = new TripPattern(null, trip.getRoute(), stopPattern);
+        var id = tripPatternIdGenerator.generateUniqueTripPatternId(trip);
+
+        TripPattern pattern = new TripPattern(id, trip.getRoute(), stopPattern);
 
         TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
 

@@ -163,16 +163,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     }
 
     private TripPattern createTripPattern(String id, Collection<Trip> trips) {
-        TripPattern p = new TripPattern(new FeedScopedId(FEED_ID, id),  route, STOP_PATTERN);
-        p.setId(
-                new FeedScopedId(
-                        FEED_ID,
-                        trips.stream()
-                                .map(t -> t.getId().getId())
-                                .collect(Collectors.joining(":")
-                        )
-                )
+        FeedScopedId patternId = new FeedScopedId(FEED_ID,
+            trips.stream().map(t -> t.getId().getId()).collect(Collectors.joining(":"))
         );
+        TripPattern p = new TripPattern(patternId,  route, STOP_PATTERN);
+
         p.name = "Pattern";
         for (Trip trip : trips) {
             p.add(new TripTimes(trip, STOP_TIMES, DEDUPLICATOR));
