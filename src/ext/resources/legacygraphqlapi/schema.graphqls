@@ -1146,6 +1146,9 @@ enum Qualifier {
 
     """The user can be picked up by someone else riding a vehicle"""
     PICKUP
+
+    """The user can be dropped off by someone else riding a vehicle"""
+    DROPOFF
 }
 
 type QueryType {

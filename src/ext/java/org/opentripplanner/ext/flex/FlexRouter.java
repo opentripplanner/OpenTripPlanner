@@ -1,5 +1,8 @@
 package org.opentripplanner.ext.flex;
 
+import com.google.common.collect.HashMultimap;
+import com.google.common.collect.Multimap;
+import com.google.common.collect.Multimaps;
 import org.opentripplanner.common.model.T2;
 import org.opentripplanner.ext.flex.flexpathcalculator.DirectFlexPathCalculator;
 import org.opentripplanner.ext.flex.flexpathcalculator.FlexPathCalculator;
@@ -90,9 +93,9 @@ public class FlexRouter {
     calculateFlexAccessTemplates();
     calculateFlexEgressTemplates();
 
-    Map<StopLocation, NearbyStop> streetEgressByStop = streetEgresses
+    Multimap<StopLocation, NearbyStop> streetEgressByStop = streetEgresses
         .stream()
-        .collect(Collectors.toMap(nearbyStop -> nearbyStop.stop, Function.identity()));
+        .collect(Multimaps.toMultimap(nearbyStop -> nearbyStop.stop, Function.identity(), HashMultimap::create));
 
     Set<StopLocation> egressStops = streetEgressByStop.keySet();
 
@@ -101,10 +104,11 @@ public class FlexRouter {
     for (FlexAccessTemplate template : this.flexAccessTemplates) {
       StopLocation transferStop = template.getTransferStop();
       if (egressStops.contains(transferStop)) {
-        NearbyStop egress = streetEgressByStop.get(transferStop);
-        Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
-        if (itinerary != null) {
-          itineraries.add(itinerary);
+        for(NearbyStop egress : streetEgressByStop.get(transferStop)) {
+          Itinerary itinerary = template.createDirectItinerary(egress, arriveBy, departureTime, startOfTime);
+          if (itinerary != null) {
+            itineraries.add(itinerary);
+          }
         }
       }
     }
