@@ -27,9 +27,8 @@ class RouteMapper {
     }
 
     private Route doMap(org.onebusaway.gtfs.model.Route rhs) {
-        Route lhs = new Route();
+        Route lhs = new Route(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
 
-        lhs.setId(AgencyAndIdMapper.mapAgencyAndId(rhs.getId()));
         lhs.setAgency(agencyMapper.map(rhs.getAgency()));
         lhs.setShortName(rhs.getShortName());
         lhs.setLongName(rhs.getLongName());

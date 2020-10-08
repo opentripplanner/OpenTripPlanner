@@ -117,8 +117,12 @@ class TripPatternMapper {
         // Create StopPattern from any trip (since they are part of the same JourneyPattern)
         StopPattern stopPattern = new StopPattern(result.tripStopTimes.get(trips.get(0)));
 
-        TripPattern tripPattern = new TripPattern(lookupRoute(journeyPattern), stopPattern);
-        tripPattern.setId(idFactory.createId(journeyPattern.getId()));
+        TripPattern tripPattern = new TripPattern(
+            idFactory.createId(journeyPattern.getId()),
+            lookupRoute(journeyPattern),
+            stopPattern
+        );
+
         tripPattern.name = journeyPattern.getName() == null ? "" : journeyPattern.getName().getValue();
 
         createTripTimes(trips, tripPattern);

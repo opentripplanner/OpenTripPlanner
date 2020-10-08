@@ -45,9 +45,9 @@ class RouteMapper {
     }
 
     org.opentripplanner.model.Route mapRoute(Line line){
-        org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
-
-        otpRoute.setId(idFactory.createId(line.getId()));
+        org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
+            idFactory.createId(line.getId())
+        );
         otpRoute.setAgency(findOrCreateAuthority(line));
         otpRoute.setOperator(findOperator(line));
         otpRoute.setLongName(line.getName().getValue());

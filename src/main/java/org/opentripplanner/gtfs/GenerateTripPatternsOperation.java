@@ -121,8 +121,9 @@ public class GenerateTripPatternsOperation {
         // Get the existing TripPattern for this filtered StopPattern, or create one.
         StopPattern stopPattern = new StopPattern(stopTimes);
 
-        TripPattern tripPattern = findOrCreateTripPattern(stopPattern, trip.getRoute(),
-                directionId);
+        TripPattern tripPattern = findOrCreateTripPattern(
+            stopPattern, trip.getRoute(), directionId
+        );
 
         // Create a TripTimes object for this list of stoptimes, which form one trip.
         TripTimes tripTimes = new TripTimes(trip, stopTimes, deduplicator);
@@ -163,7 +164,8 @@ public class GenerateTripPatternsOperation {
             }
         }
 
-        TripPattern tripPattern = new TripPattern(route, stopPattern);
+        // TODO OTP2 - This will fail hard, implement a id generator as a separate commit
+        TripPattern tripPattern = new TripPattern(null, route, stopPattern);
         tripPattern.directionId = directionId;
         tripPatterns.put(stopPattern, tripPattern);
         return tripPattern;

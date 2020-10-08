@@ -13,8 +13,6 @@ import java.util.stream.Collectors;
 public class GroupOfStations extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
-    private FeedScopedId id;
-
     private String name;
 
     // TODO Map from NeTEx
@@ -24,18 +22,11 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
     private Set<StopCollection> childStations = new HashSet<>();
 
-    public GroupOfStations() {
+
+    public GroupOfStations(FeedScopedId id) {
+        super(id);
     }
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
-    }
 
     public String getName() {
         return name;
@@ -84,7 +75,7 @@ public class GroupOfStations extends TransitEntity implements StopCollection {
 
     @Override
     public String toString() {
-        return "<GroupOfStations " + this.id + ">";
+        return "<GroupOfStations " + getId() + ">";
     }
 
     /**

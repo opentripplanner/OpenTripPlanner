@@ -15,8 +15,6 @@ import java.util.stream.Collectors;
 public class MultiModalStation extends TransitEntity implements StopCollection {
     private static final long serialVersionUID = 1L;
 
-    private final FeedScopedId id;
-
     private final Collection<Station> childStations;
 
     private String name;
@@ -32,14 +30,9 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
     /**
      * Create a new multi modal station with the given list of child stations.
      */
-    public MultiModalStation(FeedScopedId feedScopedId, Collection<Station> children) {
-        this.id = feedScopedId;
+    public MultiModalStation(FeedScopedId id, Collection<Station> children) {
+        super(id);
         this.childStations = Collections.unmodifiableCollection(new ArrayList<>(children));
-    }
-
-    @Override
-    public FeedScopedId getId() {
-        return id;
     }
 
     public String getName() {
@@ -107,6 +100,6 @@ public class MultiModalStation extends TransitEntity implements StopCollection {
 
     @Override
     public String toString() {
-        return "<MultiModal station " + this.id + ">";
+        return "<MultiModal station " + getId() + ">";
     }
 }

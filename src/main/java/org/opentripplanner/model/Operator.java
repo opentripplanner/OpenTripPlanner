@@ -12,8 +12,6 @@ public class Operator extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private FeedScopedId id;
-
     private String name;
 
     private String url;
@@ -21,13 +19,8 @@ public class Operator extends TransitEntity {
     private String phone;
 
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    public void setId(FeedScopedId id) {
-        this.id = id;
+    public Operator(FeedScopedId id) {
+        super(id);
     }
 
     public String getName() {
@@ -55,6 +48,6 @@ public class Operator extends TransitEntity {
     }
 
     public String toString() {
-        return "<Operator " + this.id + ">";
+        return "<Operator " + getId() + ">";
     }
 }

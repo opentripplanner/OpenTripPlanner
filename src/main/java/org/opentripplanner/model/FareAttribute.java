@@ -7,8 +7,6 @@ public final class FareAttribute extends TransitEntity {
 
     private static final int MISSING_VALUE = -999;
 
-    private FeedScopedId id;
-
     private float price;
 
     private String currencyType;
@@ -28,27 +26,18 @@ public final class FareAttribute extends TransitEntity {
     /** This is a proposed extension to the GTFS spec */
     private int journeyDuration = MISSING_VALUE;
 
-    public FareAttribute() {
+    public FareAttribute(FeedScopedId id) {
+        super(id);
     }
 
     public FareAttribute(FareAttribute fa) {
-        this.id = fa.id;
+        super(fa.getId());
         this.price = fa.price;
         this.currencyType = fa.currencyType;
         this.paymentMethod = fa.paymentMethod;
         this.transfers = fa.transfers;
         this.transferDuration = fa.transferDuration;
         this.journeyDuration = fa.journeyDuration;
-    }
-
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
     }
 
     public float getPrice() {

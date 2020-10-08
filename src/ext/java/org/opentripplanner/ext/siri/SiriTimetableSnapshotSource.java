@@ -450,8 +450,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         Route route = graph.index.getRouteForId(routeId);
 
         if (route == null) { // Route is unknown - create new
-            route = new Route();
-            route.setId(routeId);
+            route = new Route(routeId);
             route.setType(getRouteType(estimatedVehicleJourney.getVehicleModes()));
 //            route.setOperator(operator);
 
@@ -471,8 +470,7 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
             graph.index.addRoutes(route);
         }
 
-        Trip trip = new Trip();
-        trip.setId(tripId);
+        Trip trip = new Trip(tripId);
         trip.setRoute(route);
 
         // TODO - SIRI: Set transport-submode based on replaced- and replacement-route
@@ -560,7 +558,9 @@ public class SiriTimetableSnapshotSource implements TimetableSnapshotProvider {
         }
 
         StopPattern stopPattern = new StopPattern(aimedStopTimes);
-        TripPattern pattern = new TripPattern(trip.getRoute(), stopPattern);
+
+        // TODO OTP2 - This will fail hard, but it will be fixed in the next commit.
+        TripPattern pattern = new TripPattern(null, trip.getRoute(), stopPattern);
 
         TripTimes tripTimes = new TripTimes(trip, aimedStopTimes, graph.deduplicator);
 

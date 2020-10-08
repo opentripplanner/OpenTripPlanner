@@ -66,8 +66,9 @@ class NetexTestDataSample {
 
         // Add OTP Route (correspond to Netex Line)
         {
-            org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route();
-            otpRoute.setId(ID_FACTORY.createId(line.getId()));
+            org.opentripplanner.model.Route otpRoute = new org.opentripplanner.model.Route(
+                ID_FACTORY.createId(line.getId())
+            );
             otpRouteByid.add(otpRoute);
         }
 

@@ -178,8 +178,7 @@ public class OtpTransitServiceImplTest {
     }
 
     private static FareRule createFareRule() {
-        FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(FEED_ID, "FA"));
+        FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
         FareRule rule = new FareRule();
         rule.setOriginId("Zone A");
         rule.setContainsId("Zone B");

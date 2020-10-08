@@ -15,8 +15,6 @@ public class Station extends TransitEntity implements StopCollection {
   private static final long serialVersionUID = 1L;
   public static final TransferPriority DEFAULT_COST_PRIORITY = TransferPriority.ALLOWED;
 
-  private final FeedScopedId id;
-
   private final String name;
 
   private final String code;
@@ -46,7 +44,7 @@ public class Station extends TransitEntity implements StopCollection {
       TimeZone timezone,
       TransferPriority costPriority
   ) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.coordinate = coordinate;
     this.code = code;
@@ -62,18 +60,7 @@ public class Station extends TransitEntity implements StopCollection {
 
   @Override
   public String toString() {
-    return "<Station " + this.id + ">";
-  }
-
-  @Override
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  /** @throws UnsupportedOperationException */
-  @Override
-  public final void setId(FeedScopedId id) {
-    super.setId(id);
+    return "<Station " + getId() + ">";
   }
 
   public String getName() {

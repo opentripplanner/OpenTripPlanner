@@ -57,8 +57,8 @@ class TripMapper {
             return null;
         }
 
-        Trip trip = new Trip();
-        trip.setId(idFactory.createId(serviceJourney.getId()));
+        Trip trip = new Trip(idFactory.createId(serviceJourney.getId()));
+
         trip.setRoute(route);
         trip.setServiceId(idFactory.createId(serviceId));
         trip.setShapeId(getShapeId(serviceJourney));

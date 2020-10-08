@@ -2,8 +2,6 @@ package org.opentripplanner.model;
 
 public class FareZone extends TransitEntity {
 
-  private final FeedScopedId id;
-
   private final String name;
 
   /**
@@ -12,12 +10,8 @@ public class FareZone extends TransitEntity {
   // TODO This should at some point be connected to Agency or Operator. Currently is is up to the
   //      user to make this connection (based on TariffZone id).
   public FareZone(FeedScopedId id, String name) {
-    this.id = id;
+    super(id);
     this.name = name;
-  }
-
-  public FeedScopedId getId() {
-    return id;
   }
 
   public String getName() {

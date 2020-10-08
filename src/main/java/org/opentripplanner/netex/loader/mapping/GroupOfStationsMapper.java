@@ -37,9 +37,9 @@ class GroupOfStationsMapper {
     }
 
     GroupOfStations map(GroupOfStopPlaces groupOfStopPlaces) {
-        GroupOfStations groupOfStations = new GroupOfStations();
-        groupOfStations.setId(
-                idFactory.createId(groupOfStopPlaces.getId()));
+        GroupOfStations groupOfStations = new GroupOfStations(
+            idFactory.createId(groupOfStopPlaces.getId())
+        );
         groupOfStations.setName(groupOfStopPlaces.getName().getValue());
         WgsCoordinate coordinate = WgsCoordinateMapper.mapToDomain(groupOfStopPlaces.getCentroid());
 

@@ -155,8 +155,7 @@ public class CalendarServiceDataFactoryImplTest {
     }
 
     private static FareAttribute createFareAttribute(Agency agency) {
-        FareAttribute fa = new FareAttribute();
-        fa.setId(new FeedScopedId(FEED_ID, "FA"));
+        FareAttribute fa = new FareAttribute(new FeedScopedId(FEED_ID, "FA"));
         return fa;
     }
 

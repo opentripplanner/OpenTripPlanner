@@ -16,22 +16,14 @@ public class FlexLocationGroup extends TransitEntity implements StopLocation {
 
   private static final long serialVersionUID = 1L;
 
-  private FeedScopedId id;
-
   private String name;
 
   private final Set<StopLocation> stopLocations = new HashSet<>();
 
   private GeometryCollection geometry = new GeometryCollection(null, GeometryUtils.getGeometryFactory());
 
-  @Override
-  public void setId(FeedScopedId id) {
-    this.id = id;
-  }
-
-  @Override
-  public FeedScopedId getId() {
-    return id;
+  public FlexLocationGroup(FeedScopedId id) {
+    super(id);
   }
 
   public void setName(String name) {

@@ -16,9 +16,9 @@ class OperatorToAgencyMapper {
     }
 
     Operator mapOperator(org.rutebanken.netex.model.Operator source){
-        Operator target = new Operator();
-
-        target.setId(idFactory.createId(source.getId()));
+        Operator target = new Operator(
+            idFactory.createId(source.getId())
+        );
         target.setName(source.getName().getValue());
 
         mapContactDetails(source.getContactDetails(), target);

@@ -50,7 +50,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
 
     private static final Deduplicator DEDUPLICATOR = new Deduplicator();
 
-    private final Route route = new Route();
+    private final Route route = new Route(newId());
 
     private final Trip tripCSIn = createTrip("TCalIn", SERVICE_C_IN);
     private final Trip tripCSOut = createTrip("TCalOut", SERVICE_C_OUT);
@@ -90,7 +90,6 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         subject.getStops().add(STOP_2);
 
         // Add Route
-        route.setId(newId());
         route.setType(3);
         route.setMode(TransitMode.BUS);
         subject.getRoutes().add(route);
@@ -99,11 +98,11 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         subject.getTripsById().addAll(List.of(tripCSIn, tripCSOut, tripCSDIn, tripCSDOut));
 
         // Pattern with trips that is partially deleted later
-        patternInT1 = createTripPattern(List.of(tripCSIn, tripCSOut));
+        patternInT1 = createTripPattern("P1", List.of(tripCSIn, tripCSOut));
         // Pattern with trip that is inside period
-        patternInT2 = createTripPattern(List.of(tripCSDIn));
+        patternInT2 = createTripPattern("P2", List.of(tripCSDIn));
         // Pattern with trip outside limiting period - pattern is deleted later
-        TripPattern patternOut = createTripPattern(List.of(tripCSDOut));
+        TripPattern patternOut = createTripPattern("P3", List.of(tripCSDOut));
 
         subject.getTripPatterns().put(STOP_PATTERN, patternInT1);
         subject.getTripPatterns().put(STOP_PATTERN, patternInT2);
@@ -163,8 +162,8 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
         assertEquals(1, patternInT2.scheduledTimetable.tripTimes.size());
     }
 
-    private TripPattern createTripPattern(Collection<Trip> trips) {
-        TripPattern p = new TripPattern(route, STOP_PATTERN);
+    private TripPattern createTripPattern(String id, Collection<Trip> trips) {
+        TripPattern p = new TripPattern(new FeedScopedId(FEED_ID, id),  route, STOP_PATTERN);
         p.setId(
                 new FeedScopedId(
                         FEED_ID,
@@ -192,8 +191,7 @@ public class OtpTransitServiceBuilderLimitPeriodTest {
     }
 
     private Trip createTrip(String id, FeedScopedId serviceId) {
-        Trip trip = new Trip();
-        trip.setId(new FeedScopedId(FEED_ID, id));
+        Trip trip = new Trip(new FeedScopedId(FEED_ID, id));
         trip.setServiceId(serviceId);
         trip.setDirectionId("1");
         trip.setRoute(route);

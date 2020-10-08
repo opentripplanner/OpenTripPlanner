@@ -11,19 +11,12 @@ import org.locationtech.jts.geom.Point;
 public class FlexStopLocation extends TransitEntity implements StopLocation {
   private static final long serialVersionUID = 1L;
 
-  private FeedScopedId id;
-
   private String name;
 
   private Geometry geometry;
 
-  @Override
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  public void setId(FeedScopedId id) {
-    this.id = id;
+  public FlexStopLocation(FeedScopedId id) {
+    super(id);
   }
 
   /**

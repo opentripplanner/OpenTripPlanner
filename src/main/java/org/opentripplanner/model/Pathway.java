@@ -5,8 +5,6 @@ public final class Pathway extends TransitEntity {
 
     private static final long serialVersionUID = -2404871423254094109L;
 
-    private FeedScopedId id;
-
     private int pathwayMode;
 
     private StationElement fromStop;
@@ -27,14 +25,8 @@ public final class Pathway extends TransitEntity {
 
     private boolean isBidirectional;
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
-
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
+    public Pathway(FeedScopedId id) {
+        super(id);
     }
 
     public void setPathwayMode(int pathwayMode) {
@@ -119,7 +111,7 @@ public final class Pathway extends TransitEntity {
 
     @Override
     public String toString() {
-        return "<Pathway " + this.id + ">";
+        return "<Pathway " + getId() + ">";
     }
 
     public boolean isPathwayModeWheelchairAccessible() {

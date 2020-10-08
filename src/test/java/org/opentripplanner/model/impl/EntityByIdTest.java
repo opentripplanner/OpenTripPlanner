@@ -21,7 +21,7 @@ public class EntityByIdTest {
     private static final String LIST_OF_E_TO_STRING = String.format("[%s]", E_TO_STRING);
     private static final String MAP_OF_E_TO_STRING = String.format("{%s=%s}", ID, E_TO_STRING);
 
-    private EntityById<E> subject = new EntityById<>();
+    private final EntityById<E> subject = new EntityById<>();
 
 
     @Test public void add() {
@@ -59,20 +59,11 @@ public class EntityByIdTest {
     }
 
     static class E extends TransitEntity {
-        private final FeedScopedId id;
-
-
         E(FeedScopedId id) {
-            this.id = id;
+            super(id);
         }
-
-        @Override
-        public FeedScopedId getId() {
-            return id;
-        }
-
         @Override public String toString() {
-            return "E-" + id;
+            return "E-" + getId();
         }
     }
 }

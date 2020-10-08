@@ -9,20 +9,13 @@ public class Notice extends TransitEntity {
 
     private static final long serialVersionUID = 1L;
 
-    private FeedScopedId id;
-
     private String text;
 
     private String publicCode;
 
-    @Override
-    public FeedScopedId getId() {
-        return id;
-    }
 
-    @Override
-    public void setId(FeedScopedId id) {
-        this.id = id;
+    public Notice(FeedScopedId id) {
+        super(id);
     }
 
     public String getText() {
@@ -42,5 +35,5 @@ public class Notice extends TransitEntity {
     }
 
     @Override
-    public String toString() { return "<Notice " + id + ">"; }
+    public String toString() { return "<Notice " + getId() + ">"; }
 }

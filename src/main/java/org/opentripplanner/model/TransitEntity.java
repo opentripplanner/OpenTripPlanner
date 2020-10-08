@@ -21,16 +21,14 @@ public abstract class TransitEntity implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
-    public abstract FeedScopedId getId();
+    private final FeedScopedId id;
 
-    /**
-     * Override this method to allow the id to be set. The default implementation throw a
-     * {@link UnsupportedOperationException}.
-     */
-    public void setId(FeedScopedId id) {
-        throw new UnsupportedOperationException(
-                "It is not allowed to change the id for this type: " + getClass().getSimpleName()
-        );
+    public TransitEntity(FeedScopedId id) {
+        this.id = id;
+    }
+
+    public final FeedScopedId getId() {
+        return id;
     }
 
     /**

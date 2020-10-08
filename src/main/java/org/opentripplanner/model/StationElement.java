@@ -7,8 +7,6 @@ package org.opentripplanner.model;
  */
 public abstract class StationElement extends TransitEntity {
 
-  protected final FeedScopedId id;
-
   private final String name;
 
   private final String code;
@@ -32,24 +30,13 @@ public abstract class StationElement extends TransitEntity {
       WheelChairBoarding wheelchairBoarding,
       StopLevel level
   ) {
-    this.id = id;
+    super(id);
     this.name = name;
     this.code = code;
     this.description = description;
     this.coordinate = coordinate;
     this.wheelchairBoarding = wheelchairBoarding;
     this.level = level;
-  }
-
-  @Override
-  public FeedScopedId getId() {
-    return id;
-  }
-
-  /** @throws UnsupportedOperationException */
-  @Override
-  public final void setId(FeedScopedId id) {
-    super.setId(id);
   }
 
   /**

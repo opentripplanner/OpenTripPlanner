@@ -55,12 +55,13 @@ public class SiriTripPatternCache {
         
         // Create TripPattern if it doesn't exist yet
         if (tripPattern == null) {
-            tripPattern = new TripPattern(trip.getRoute(), stopPattern);
-
             // Generate unique code for trip pattern
             //TODO - SIRI: Is this a good way to generate new trippPattern.id?
-            tripPattern.setId(new FeedScopedId(trip.getId().getFeedId(), generateUniqueTripPatternCode(tripPattern)));
-            
+            var id = new FeedScopedId(trip.getId().getFeedId(), generateUniqueTripPatternCode(tripPattern));
+
+            tripPattern = new TripPattern(id, trip.getRoute(), stopPattern);
+
+
             // Create an empty bitset for service codes (because the new pattern does not contain any trips)
             tripPattern.setServiceCodes(graph.getServiceCodes());
             

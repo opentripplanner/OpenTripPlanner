@@ -26,9 +26,8 @@ class NoticeMapper {
             Notice otpNotice = cache.get(id);
 
             if(otpNotice == null) {
-                otpNotice = new Notice();
+                otpNotice = new Notice(id);
 
-                otpNotice.setId(id);
                 otpNotice.setText(netexNotice.getText().getValue());
                 otpNotice.setPublicCode(netexNotice.getPublicCode());
                 cache.add(otpNotice);

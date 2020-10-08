@@ -1,17 +1,23 @@
 package org.opentripplanner.model;
 
+import org.junit.Before;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 
 public class BikeAccessTest {
 
+    public static final String FEED_ID = "F";
+    private final Trip trip = new Trip(new FeedScopedId(FEED_ID, "T1"));
+    private final Route route = new Route(new FeedScopedId(FEED_ID, "R1"));
+
+    @Before
+    public void setup() {
+        trip.setRoute(route);
+    }
+
     @Test
     public void testBikesAllowed() {
-        Trip trip = new Trip();
-        Route route = new Route();
-        trip.setRoute(route);
-
         assertEquals(BikeAccess.UNKNOWN, BikeAccess.fromTrip(trip));
         trip.setBikesAllowed(1);
         assertEquals(BikeAccess.ALLOWED, BikeAccess.fromTrip(trip));
@@ -28,10 +34,6 @@ public class BikeAccessTest {
     @SuppressWarnings("deprecation")
     @Test
     public void testTripBikesAllowed() {
-        Trip trip = new Trip();
-        Route route = new Route();
-        trip.setRoute(route);
-
         assertEquals(BikeAccess.UNKNOWN, BikeAccess.fromTrip(trip));
         trip.setTripBikesAllowed(2);
         assertEquals(BikeAccess.ALLOWED, BikeAccess.fromTrip(trip));
@@ -48,10 +50,6 @@ public class BikeAccessTest {
     @SuppressWarnings("deprecation")
     @Test
     public void testBikesAllowedOverridesTripBikesAllowed() {
-        Trip trip = new Trip();
-        Route route = new Route();
-        trip.setRoute(route);
-
         trip.setBikesAllowed(1);
         trip.setTripBikesAllowed(1);
         assertEquals(BikeAccess.ALLOWED, BikeAccess.fromTrip(trip));
@@ -63,7 +61,6 @@ public class BikeAccessTest {
     @SuppressWarnings("deprecation")
     @Test
     public void setBikesAllowed() {
-        Trip trip = new Trip();
         BikeAccess.setForTrip(trip, BikeAccess.ALLOWED);
         assertEquals(1, trip.getBikesAllowed());
         assertEquals(2, trip.getTripBikesAllowed());

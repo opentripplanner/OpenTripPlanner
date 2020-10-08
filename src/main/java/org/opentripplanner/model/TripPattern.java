@@ -40,6 +40,10 @@ import java.util.function.Predicate;
  *
  * This is called a JOURNEY_PATTERN in the Transmodel vocabulary. However, GTFS calls a Transmodel JOURNEY a "trip",
  * thus TripPattern.
+ * <p>
+ * The {@code id} is a unique identifier for this trip pattern. For GTFS feeds this is generally
+ * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For NeTEx the
+ * JourneyPattern id is used.
  */
 public class TripPattern extends TransitEntity implements Cloneable, Serializable {
 
@@ -54,8 +58,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
     private static final int SHIFT_DROPOFF = 3;
     private static final int NO_PICKUP = 1;
     //private static final int FLAG_BIKES_ALLOWED = 32;
-
-    private FeedScopedId id;
 
     /** The human-readable, unique name for this trip pattern. */
     public String name;
@@ -112,16 +114,27 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
      */
     private boolean createdByRealtimeUpdater = false;
 
-    /**
-     * The unique identifier for this trip pattern. For GTFS feeds this is generally
-     * generated in the format FeedId:Agency:RouteId:DirectionId:PatternNumber. For
-     * NeTEx the JourneyPattern id is used.
-     */
-    @Override
-    public FeedScopedId getId() { return id; }
 
-    @Override
-    public void setId(FeedScopedId id) { this.id = id; }
+    /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
+    // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
+    int[] perStopFlags;
+
+    /**
+     * A set of serviceIds with at least one trip in this pattern.
+     * Trips in a pattern are no longer necessarily running on the same service ID.
+     */
+    // TODO MOVE codes INTO Timetable or TripTimes
+    BitSet services;
+
+
+    public TripPattern(FeedScopedId id, Route route, StopPattern stopPattern) {
+        super(id);
+        this.route = route;
+        this.stopPattern = stopPattern;
+        setStopsFromStopPattern(stopPattern);
+    }
+
+    public void setId(FeedScopedId id) { throw new IllegalArgumentException(); }
 
     /**
      * Convinience method to get the route traverse mode, the mode for all trips in this pattern.
@@ -204,23 +217,6 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     public int numHopGeometries() {
         return hopGeometries.length;
-    }
-
-    /** Holds stop-specific information such as wheelchair accessibility and pickup/dropoff roles. */
-    // TODO: is this necessary? Can we just look at the Stop and StopPattern objects directly?
-    int[] perStopFlags;
-
-    /**
-     * A set of serviceIds with at least one trip in this pattern.
-     * Trips in a pattern are no longer necessarily running on the same service ID.
-     */
-    // TODO MOVE codes INTO Timetable or TripTimes
-    BitSet services;
-
-    public TripPattern(Route route, StopPattern stopPattern) {
-        this.route = route;
-        this.stopPattern = stopPattern;
-        setStopsFromStopPattern(stopPattern);
     }
 
     private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {
@@ -565,7 +561,9 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
 
     public static boolean idsAreUniqueAndNotNull(Collection<TripPattern> tripPatterns) {
         Set<FeedScopedId> seen = new HashSet<>();
-        return tripPatterns.stream().map(t -> t.id).allMatch(t -> t != null && seen.add(t));
+        return tripPatterns.stream()
+            .map(TransitEntity::getId)
+            .allMatch(t -> t != null && seen.add(t));
     }
 
     /**
@@ -582,6 +580,8 @@ public class TripPattern extends TransitEntity implements Cloneable, Serializabl
             int count = patternsForRoute.get(routeId.getId() + ":" + direction).size();
             // OBA library uses underscore as separator, we're moving toward colon.
             String id = String.format("%s:%s:%02d", routeId.getId(), direction, count);
+
+            // TODO OTP2 - This setter will be removed in the next commit
             pattern.setId(new FeedScopedId(routeId.getFeedId(), id));
         }
     }
