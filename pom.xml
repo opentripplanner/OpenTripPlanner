@@ -223,6 +223,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <skip>true</skip>
                     <!-- Turn off strict Javadoc checking -->
                     <doclint>none</doclint>
                     <!-- We get tons of errors about classes not existing, maybe due to multiple source roots.
