@@ -84,7 +84,7 @@ class TripPatternMapper {
         if (serviceJourneys == null || serviceJourneys.isEmpty()) {
             LOG.warn("ServiceJourneyPattern " + journeyPattern.getId()
                     + " does not contain any serviceJourneys.");
-            return null;
+            return result;
         }
 
         List<Trip> trips = new ArrayList<>();

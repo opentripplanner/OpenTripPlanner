@@ -561,7 +561,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.11</version>
         </dependency>
 
         <!-- SIRI -->

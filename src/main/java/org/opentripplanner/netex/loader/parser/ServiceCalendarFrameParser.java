@@ -38,7 +38,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
         parseServiceCalendar(frame.getServiceCalendar());
         parseDayTypes(frame.getDayTypes());
         parseOperatingPeriods(frame.getOperatingPeriods());
-        parseRequiredDayTypeAssignments(frame.getDayTypeAssignments());
+        parseDayTypeAssignments(frame.getDayTypeAssignments());
 
         // Keep list sorted alphabetically
 
@@ -61,7 +61,7 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
 
         parseDayTypes(serviceCalendar.getDayTypes());
         // TODO OTP2 - What about OperatingPeriods here?
-        parseRequiredDayTypeAssignments(serviceCalendar.getDayTypeAssignments());
+        parseDayTypeAssignments(serviceCalendar.getDayTypeAssignments());
     }
 
     //List<JAXBElement<? extends DataManagedObjectStructure>>
@@ -92,15 +92,17 @@ class ServiceCalendarFrameParser extends NetexParser<ServiceCalendarFrame_Versio
         }
     }
 
-    private void parseRequiredDayTypeAssignments(DayTypeAssignments_RelStructure element) {
-        parseRequiredDayTypeAssignments(element.getDayTypeAssignment());
+    private void parseDayTypeAssignments(DayTypeAssignments_RelStructure element) {
+        if(element == null) { return; }
+        parseDayTypeAssignments(element.getDayTypeAssignment());
     }
 
-    private void parseRequiredDayTypeAssignments(DayTypeAssignmentsInFrame_RelStructure element) {
-        parseRequiredDayTypeAssignments(element.getDayTypeAssignment());
+    private void parseDayTypeAssignments(DayTypeAssignmentsInFrame_RelStructure element) {
+        if(element == null) { return; }
+        parseDayTypeAssignments(element.getDayTypeAssignment());
     }
 
-    private void parseRequiredDayTypeAssignments(List<DayTypeAssignment> elements) {
+    private void parseDayTypeAssignments(List<DayTypeAssignment> elements) {
         for (DayTypeAssignment it : elements) {
             String ref = it.getDayTypeRef().getValue().getRef();
             dayTypeAssignmentByDayTypeId.put(ref, it);
