@@ -1,12 +1,16 @@
 package org.opentripplanner.model;
 
+import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * Immutable value object for stop level. This is currently only supported by
  * the GTFS import.
  */
-public class StopLevel {
+public class StopLevel implements Serializable {
+
+    private static final long serialVersionUID = 1L;
+
     private final String name;
     private final double index;
 

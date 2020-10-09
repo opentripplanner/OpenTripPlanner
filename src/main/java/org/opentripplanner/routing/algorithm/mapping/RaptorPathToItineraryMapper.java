@@ -231,7 +231,7 @@ public class RaptorPathToItineraryMapper {
 
     private void mapNonTransitLeg(List<Leg> legs, PathLeg<TripSchedule> pathLeg, Transfer transfer, Place from, Place to, boolean onlyIfNonZeroDistance) {
         List<Edge> edges = transfer.getEdges();
-        if (edges.isEmpty()) {
+        if (edges == null || edges.isEmpty()) {
             Leg leg = new Leg(TraverseMode.WALK);
             leg.from = from;
             leg.to = to;
