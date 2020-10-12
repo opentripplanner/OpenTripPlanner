@@ -1,18 +1,5 @@
 package org.opentripplanner.graph_builder.module.map;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
-
-import org.opentripplanner.routing.edgetype.StreetEdge;
-import org.opentripplanner.routing.graph.Edge;
-import org.opentripplanner.routing.graph.Graph;
-import org.opentripplanner.routing.graph.Vertex;
-import org.opentripplanner.common.pqueue.BinHeap;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import org.locationtech.jts.geom.Coordinate;
 import org.locationtech.jts.geom.Envelope;
 import org.locationtech.jts.geom.Geometry;
@@ -20,6 +7,18 @@ import org.locationtech.jts.index.strtree.STRtree;
 import org.locationtech.jts.linearref.LinearLocation;
 import org.locationtech.jts.linearref.LocationIndexedLine;
 import org.locationtech.jts.simplify.DouglasPeuckerSimplifier;
+import org.opentripplanner.common.pqueue.BinHeap;
+import org.opentripplanner.routing.edgetype.StreetEdge;
+import org.opentripplanner.routing.graph.Edge;
+import org.opentripplanner.routing.graph.Graph;
+import org.opentripplanner.routing.graph.Vertex;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
 
 /**
  * This Performs most of the work for the MapBuilder graph builder module.
@@ -57,7 +56,7 @@ public class StreetMatcher {
     }
 
     @SuppressWarnings("unchecked")
-    public List<Edge> match(Geometry routeGeometry) {
+    public List<StreetEdge> match(Geometry routeGeometry) {
         
         routeGeometry = removeDuplicatePoints(routeGeometry);
 
@@ -78,7 +77,7 @@ public class StreetMatcher {
         envelope.expandBy(distanceThreshold);
 
         BinHeap<MatchState> states = new BinHeap<MatchState>();
-        List<Edge> nearbyEdges = index.query(envelope);
+        List<StreetEdge> nearbyEdges = index.query(envelope);
         while (nearbyEdges.isEmpty()) {
             envelope.expandBy(distanceThreshold);
             distanceThreshold *= 2;
@@ -86,7 +85,7 @@ public class StreetMatcher {
         }
 
         // compute initial states
-        for (Edge initialEdge : nearbyEdges) {
+        for (StreetEdge initialEdge : nearbyEdges) {
             Geometry edgeGeometry = initialEdge.getGeometry();
             
             LocationIndexedLine indexedEdge = new LocationIndexedLine(edgeGeometry);
@@ -144,11 +143,11 @@ public class StreetMatcher {
         return routeGeometry.getFactory().createLineString(coords.toArray(coordArray));
     }
 
-    private List<Edge> toEdgeList(MatchState next) {
-        ArrayList<Edge> edges = new ArrayList<Edge>();
+    private List<StreetEdge> toEdgeList(MatchState next) {
+        ArrayList<StreetEdge> edges = new ArrayList<>();
         Edge lastEdge = null;
         while (next != null) {
-            Edge edge = next.getEdge();
+            StreetEdge edge = next.getEdge();
             if (edge != lastEdge) {
                 edges.add(edge);
                 lastEdge = edge;
