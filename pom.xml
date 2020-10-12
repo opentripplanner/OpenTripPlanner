@@ -223,6 +223,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.2.0</version>
                 <configuration>
+                    <skip>true</skip>
                     <!-- Turn off strict Javadoc checking -->
                     <doclint>none</doclint>
                     <!-- We get tons of errors about classes not existing, maybe due to multiple source roots.
@@ -561,7 +562,7 @@
         <dependency>
             <groupId>org.entur</groupId>
             <artifactId>netex-java-model</artifactId>
-            <version>1.0.8</version>
+            <version>1.0.11</version>
         </dependency>
 
         <!-- SIRI -->
@@ -600,7 +601,7 @@
         <dependency>
             <groupId>org.glassfish.jaxb</groupId>
             <artifactId>jaxb-runtime</artifactId>
-            <version>2.3.1</version>
+            <version>2.3.2</version>
         </dependency>
 
         <!-- TESTING -->

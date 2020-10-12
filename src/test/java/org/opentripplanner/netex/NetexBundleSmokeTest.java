@@ -39,7 +39,7 @@ import static org.junit.Assert.fail;
  * and should be excluded from line coverage. The focus of this test is
  * to test that the different parts of the NeTEx works together.
  */
-public class NetexLoaderSmokeTest {
+public class NetexBundleSmokeTest {
     /**
      * This test load a very simple Netex data set and do assertions on it.
      * For each type we assert some of the most important fields for one element

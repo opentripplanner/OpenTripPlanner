@@ -7,11 +7,14 @@ import org.rutebanken.netex.model.Quays_RelStructure;
 import org.rutebanken.netex.model.Site_VersionFrameStructure;
 import org.rutebanken.netex.model.StopPlace;
 import org.rutebanken.netex.model.TariffZone;
+import org.rutebanken.netex.model.Zone_VersionStructure;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.xml.bind.JAXBElement;
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.List;
 
 class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
     private static final Logger LOG = LoggerFactory.getLogger(NetexParser.class);
@@ -82,8 +85,12 @@ class SiteFrameParser extends NetexParser<Site_VersionFrameStructure> {
         }
     }
 
-    private void parseTariffZones(Collection<TariffZone> tariffZoneList) {
-        tariffZones.addAll(tariffZoneList);
+    private void parseTariffZones(List<JAXBElement<? extends Zone_VersionStructure>> tariffZoneList) {
+        for (JAXBElement<? extends Zone_VersionStructure> tariffZone : tariffZoneList) {
+            if(tariffZone.getValue() instanceof TariffZone) {
+                tariffZones.add((TariffZone) tariffZone.getValue());
+            }
+        }
     }
 
     private void parseQuays(Quays_RelStructure quayRefOrQuay) {

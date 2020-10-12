@@ -51,10 +51,11 @@ public final class DayTypeRefsToServiceIdAdapter {
     }
 
     private static Set<String> collectDayTypeRefs(DayTypeRefs_RelStructure refs) {
+        if(refs == null) { return Set.of(); }
         Set<String> dayTypeRefs = new HashSet<>();
         for (JAXBElement<? extends DayTypeRefStructure> e : refs.getDayTypeRef()) {
             // Keep the ref, ignore version info. Handling the version info is part of the
-            // Norwegian NeTEx profile, so this should probably be fixed. On the other hand
+            // Nordic NeTEx profile, so this should probably be fixed. On the other hand
             // there is not problems reported on this.
             dayTypeRefs.add(e.getValue().getRef());
         }
